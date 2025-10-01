@@ -1,0 +1,235 @@
+<div class="admin-overview" role="main" aria-label="Admin Dashboard Overview">
+  <!-- Header Section -->
+  <header class="overview-header">
+    <div class="header-content">
+      <div class="welcome-section">
+        <h1 class="page-title">
+          <span class="title-icon">🏛️</span>
+          Eatier Platform Admin
+        </h1>
+        <p class="page-subtitle">
+          Monitor platform performance, manage users, and oversee operations
+        </p>
+      </div>
+      <div class="alerts-summary">
+        @if (unreadAlerts().length > 0) {
+          <div class="alerts-badge">
+            <span class="alert-icon">🔔</span>
+            <span class="alert-count">{{ unreadAlerts().length }}</span>
+            <span class="alert-text">Unread Alerts</span>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <!-- Platform Statistics -->
+  <section class="stats-section" aria-label="Platform Statistics">
+    <div class="stats-grid">
+      <div class="stat-card users">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <h3>{{ formatNumber(platformStats().totalUsers) }}</h3>
+          <p>Total Users</p>
+          <div class="stat-change positive">{{ userGrowth() }}% active this month</div>
+        </div>
+      </div>
+
+      <div class="stat-card businesses">
+        <div class="stat-icon">🏪</div>
+        <div class="stat-content">
+          <h3>{{ formatNumber(platformStats().totalBusinesses) }}</h3>
+          <p>Businesses</p>
+          <div class="stat-change neutral">{{ formatNumber(platformStats().totalSpecialists) }} specialists</div>
+        </div>
+      </div>
+
+      <div class="stat-card revenue">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <h3>{{ formatCurrency(platformStats().monthlyRevenue) }}</h3>
+          <p>Monthly Revenue</p>
+          <div class="stat-change positive">{{ formatCurrency(platformStats().totalRevenue) }} total</div>
+        </div>
+      </div>
+
+      <div class="stat-card bookings">
+        <div class="stat-icon">📅</div>
+        <div class="stat-content">
+          <h3>{{ formatNumber(platformStats().monthlyBookings) }}</h3>
+          <p>Monthly Bookings</p>
+          <div class="stat-change positive">{{ formatNumber(platformStats().totalBookings) }} total</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Recent Activity -->
+    <section class="content-card activity-card" aria-label="Recent Platform Activity">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">📊</span>
+          Recent Activity
+        </h2>
+        <button type="button" class="view-all-btn" (click)="viewAllReports()">
+          View Reports
+        </button>
+      </div>
+
+      <div class="card-content">
+        <div class="activity-list">
+          @for (activity of recentActivity().slice(0, 5); track activity.id) {
+            <div class="activity-item" [class]="getActivityColor(activity.type)">
+              <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
+              <div class="activity-details">
+                <h4>{{ activity.description }}</h4>
+                <p class="activity-user">{{ activity.user }}</p>
+                @if (activity.amount) {
+                  <span class="activity-amount">{{ formatCurrency(activity.amount) }}</span>
+                }
+              </div>
+              <div class="activity-time">{{ formatDate(activity.timestamp) }}</div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- System Alerts -->
+    <section class="content-card alerts-card" aria-label="System Alerts">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">🔔</span>
+          System Alerts
+          @if (unreadAlerts().length > 0) {
+            <span class="count-badge">{{ unreadAlerts().length }}</span>
+          }
+        </h2>
+      </div>
+
+      <div class="card-content">
+        @if (systemAlerts().length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">✅</div>
+            <h3>All systems operational</h3>
+            <p>No alerts at this time</p>
+          </div>
+        } @else {
+          <div class="alerts-list">
+            @for (alert of systemAlerts().slice(0, 4); track alert.id) {
+              <div class="alert-item" [class]="getAlertClass(alert.type)" [class.unread]="!alert.isRead">
+                <div class="alert-icon">{{ getAlertIcon(alert.type) }}</div>
+                <div class="alert-content">
+                  <h4>{{ alert.title }}</h4>
+                  <p>{{ alert.message }}</p>
+                  <span class="alert-time">{{ formatDate(alert.timestamp) }}</span>
+                </div>
+                @if (!alert.isRead) {
+                  <button type="button" class="mark-read-btn" (click)="markAlertAsRead(alert.id)">
+                    Mark Read
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Top Performers -->
+    <section class="content-card performers-card" aria-label="Top Performers">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">🏆</span>
+          Top Performers
+        </h2>
+        <button type="button" class="view-all-btn" (click)="viewAllBusinesses()">
+          View All
+        </button>
+      </div>
+
+      <div class="card-content">
+        <div class="performers-list">
+          @for (performer of topPerformers(); track performer.id) {
+            <div class="performer-item" (click)="performer.type === 'business' ? viewBusinessDetails(performer.id) : viewUserDetails(performer.id)">
+              <div class="performer-avatar">
+                @if (performer.avatar) {
+                  <img [src]="performer.avatar" [alt]="performer.name" class="avatar-image">
+                } @else {
+                  <div class="avatar-placeholder">
+                    {{ performer.name.charAt(0) }}
+                  </div>
+                }
+                <div class="performer-type">
+                  {{ performer.type === 'business' ? '🏪' : '👨‍🍳' }}
+                </div>
+              </div>
+              <div class="performer-info">
+                <h4>{{ performer.name }}</h4>
+                <div class="performer-rating">
+                  @for (star of getStarArray(performer.rating); track $index) {
+                    <span class="star" [class.filled]="star">⭐</span>
+                  }
+                  <span class="rating-value">{{ performer.rating }}</span>
+                </div>
+                <div class="performer-stats">
+                  <span class="bookings">📅 {{ performer.totalBookings }} bookings</span>
+                  <span class="revenue">💰 {{ formatCurrency(performer.monthlyRevenue) }}/mo</span>
+                  <span class="location">📍 {{ performer.location }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="content-card actions-card" aria-label="Quick Actions">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">⚡</span>
+          Quick Actions
+        </h2>
+      </div>
+
+      <div class="card-content">
+        <div class="actions-grid">
+          <button type="button" class="action-btn users-action" (click)="viewAllUsers()">
+            <div class="action-icon">👥</div>
+            <div class="action-content">
+              <h4>Manage Users</h4>
+              <p>View and manage all platform users</p>
+            </div>
+          </button>
+
+          <button type="button" class="action-btn businesses-action" (click)="viewAllBusinesses()">
+            <div class="action-icon">🏪</div>
+            <div class="action-content">
+              <h4>Manage Businesses</h4>
+              <p>Oversee restaurant and business accounts</p>
+            </div>
+          </button>
+
+          <button type="button" class="action-btn bookings-action" (click)="viewAllBookings()">
+            <div class="action-icon">📅</div>
+            <div class="action-content">
+              <h4>View Bookings</h4>
+              <p>Monitor all platform bookings</p>
+            </div>
+          </button>
+
+          <button type="button" class="action-btn reports-action" (click)="viewAllReports()">
+            <div class="action-icon">📊</div>
+            <div class="action-content">
+              <h4>Analytics</h4>
+              <p>View detailed platform analytics</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

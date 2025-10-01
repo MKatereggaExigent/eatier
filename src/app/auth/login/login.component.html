@@ -1,0 +1,133 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Welcome back to Eatier</h1>
+      <p>Sign in to your account to continue</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Error Message -->
+      @if (errorMessage()) {
+        <div class="error-message">
+          <span class="error-icon">⚠️</span>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Enter your email"
+          [class.error]="getFieldError('email')"
+          autocomplete="email"
+        />
+        @if (getFieldError('email')) {
+          <span class="field-error">{{ getFieldError('email') }}</span>
+        }
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-input">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Enter your password"
+            [class.error]="getFieldError('password')"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+          >
+            {{ showPassword() ? '👁️' : '👁️‍🗨️' }}
+          </button>
+        </div>
+        @if (getFieldError('password')) {
+          <span class="field-error">{{ getFieldError('password') }}</span>
+        }
+      </div>
+
+      <!-- Remember Me & Forgot Password -->
+      <div class="form-options">
+        <label class="checkbox-label">
+          <input type="checkbox" formControlName="rememberMe" />
+          <span class="checkmark"></span>
+          Remember me
+        </label>
+        <a routerLink="/auth/forgot-password" class="forgot-password">
+          Forgot password?
+        </a>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="login-button"
+        [disabled]="isLoading() || loginForm.invalid"
+      >
+        @if (isLoading()) {
+          <span class="loading-spinner"></span>
+          Signing in...
+        } @else {
+          Sign In
+        }
+      </button>
+    </form>
+
+    <!-- Demo Login Buttons (for development) -->
+    <div class="demo-section">
+      <h3>Demo Accounts (Development Only)</h3>
+      <div class="demo-buttons">
+        <button type="button" class="demo-button admin" (click)="loginAsAdmin()">
+          🏛️ Login as Eatier Admin
+        </button>
+        <button type="button" class="demo-button business" (click)="loginAsBusinessOwner()">
+          🏪 Login as Business Owner
+        </button>
+        <button type="button" class="demo-button user" (click)="loginAsIndividualUser()">
+          🍽️ Login as Food Enthusiast
+        </button>
+        <button type="button" class="demo-button normal" (click)="loginAsNormalUser()">
+          👤 Login as Normal User
+        </button>
+        <button type="button" class="demo-button chef" (click)="loginAsChef()">
+          👨‍🍳 Login as Specialist (Chef)
+        </button>
+      </div>
+    </div>
+
+    <!-- Sign Up Link -->
+    <div class="signup-link">
+      <p>Don't have an account?
+        <a routerLink="/auth/register">Sign up here</a>
+      </p>
+    </div>
+
+    <!-- Social Login (Future Implementation) -->
+    <div class="social-login">
+      <div class="divider">
+        <span>or continue with</span>
+      </div>
+      <div class="social-buttons">
+        <button type="button" class="social-button google" disabled>
+          <span class="social-icon">🔍</span>
+          Google
+        </button>
+        <button type="button" class="social-button facebook" disabled>
+          <span class="social-icon">📘</span>
+          Facebook
+        </button>
+      </div>
+      <p class="social-note">Social login coming soon!</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,314 @@
+<div class="overview-container" role="main" aria-label="Business Overview Dashboard">
+  <!-- Welcome Section -->
+  <header class="welcome-section">
+    <h1 class="welcome-title">
+      Welcome back, {{ currentUser()?.firstName || 'Business Owner' }}!
+    </h1>
+    <p class="welcome-subtitle">Here's what's happening with your restaurant today.</p>
+  </header>
+
+  <!-- Error State -->
+  @if (hasErrors()) {
+    <div class="error-banner" role="alert" aria-live="polite">
+      <div class="error-content">
+        <span class="error-icon">⚠️</span>
+        <div class="error-text">
+          <h3>Unable to load some data</h3>
+          <p>Please check your connection and try again.</p>
+        </div>
+        <button
+          type="button"
+          class="retry-btn"
+          (click)="onRetryLoad('stats')"
+          aria-label="Retry loading data">
+          🔄 Retry
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Stats Cards -->
+  <section class="stats-section" aria-label="Business Statistics">
+    <div class="stats-grid">
+      <!-- Average Rating Card -->
+      <div class="stat-card"
+           [attr.aria-label]="getStatAriaLabel(stats().averageRating, 'Average Rating', stats().ratingChange)">
+        @if (loading().stats) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+              <div class="skeleton-change"></div>
+            </div>
+          </div>
+        } @else {
+          <div class="stat-icon" aria-hidden="true">⭐</div>
+          <div class="stat-content">
+            <h3 class="stat-number">{{ stats().averageRating.toFixed(1) }}</h3>
+            <p class="stat-label">Average Rating</p>
+            <span class="stat-change" [class]="getChangeClass(stats().ratingChange)">
+              <span aria-hidden="true">{{ getChangeIcon(stats().ratingChange) }}</span>
+              {{ stats().ratingChange > 0 ? '+' : '' }}{{ stats().ratingChange.toFixed(1) }} this month
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Total Reviews Card -->
+      <div class="stat-card"
+           [attr.aria-label]="getStatAriaLabel(stats().totalReviews, 'Total Reviews', stats().monthlyReviewsChange)">
+        @if (loading().stats) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+              <div class="skeleton-change"></div>
+            </div>
+          </div>
+        } @else {
+          <div class="stat-icon" aria-hidden="true">📝</div>
+          <div class="stat-content">
+            <h3 class="stat-number">{{ formatNumber(stats().totalReviews) }}</h3>
+            <p class="stat-label">Total Reviews</p>
+            <span class="stat-change" [class]="getChangeClass(stats().monthlyReviewsChange)">
+              <span aria-hidden="true">{{ getChangeIcon(stats().monthlyReviewsChange) }}</span>
+              +{{ stats().monthlyReviewsChange }} this month
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Monthly Views Card -->
+      <div class="stat-card"
+           [attr.aria-label]="getStatAriaLabel(stats().monthlyViews, 'Monthly Views', stats().monthlyViewsChange)">
+        @if (loading().stats) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+              <div class="skeleton-change"></div>
+            </div>
+          </div>
+        } @else {
+          <div class="stat-icon" aria-hidden="true">👀</div>
+          <div class="stat-content">
+            <h3 class="stat-number">{{ formatNumber(stats().monthlyViews) }}</h3>
+            <p class="stat-label">Monthly Views</p>
+            <span class="stat-change" [class]="getChangeClass(stats().monthlyViewsChange)">
+              <span aria-hidden="true">{{ getChangeIcon(stats().monthlyViewsChange) }}</span>
+              +{{ stats().monthlyViewsChange }}% this month
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Favorites Card -->
+      <div class="stat-card"
+           [attr.aria-label]="getStatAriaLabel(stats().favoriteCount, 'Favorites', stats().monthlyFavoritesChange)">
+        @if (loading().stats) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+              <div class="skeleton-change"></div>
+            </div>
+          </div>
+        } @else {
+          <div class="stat-icon" aria-hidden="true">❤️</div>
+          <div class="stat-content">
+            <h3 class="stat-number">{{ formatNumber(stats().favoriteCount) }}</h3>
+            <p class="stat-label">Favorites</p>
+            <span class="stat-change" [class]="getChangeClass(stats().monthlyFavoritesChange)">
+              <span aria-hidden="true">{{ getChangeIcon(stats().monthlyFavoritesChange) }}</span>
+              +{{ stats().monthlyFavoritesChange }} this month
+            </span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <section class="quick-actions" aria-label="Quick Actions">
+    <h2 class="section-title">Quick Actions</h2>
+    <div class="action-grid" role="list">
+      <a routerLink="../menu"
+         class="action-card"
+         role="listitem"
+         aria-label="Manage Menu - Add, edit, or remove menu items">
+        <div class="action-icon" aria-hidden="true">🍽️</div>
+        <h3>Manage Menu</h3>
+        <p>Add, edit, or remove menu items</p>
+      </a>
+
+      <a routerLink="../profile"
+         class="action-card"
+         role="listitem"
+         aria-label="Update Profile - Edit restaurant information and photos">
+        <div class="action-icon" aria-hidden="true">🏪</div>
+        <h3>Update Profile</h3>
+        <p>Edit restaurant information and photos</p>
+      </a>
+
+      <a routerLink="../reviews"
+         class="action-card"
+         role="listitem"
+         aria-label="Respond to Reviews - Engage with customer feedback">
+        <div class="action-icon" aria-hidden="true">💬</div>
+        <h3>Respond to Reviews</h3>
+        <p>Engage with customer feedback</p>
+      </a>
+
+      <a routerLink="../insights"
+         class="action-card"
+         role="listitem"
+         aria-label="View Analytics - Track performance and insights">
+        <div class="action-icon" aria-hidden="true">📊</div>
+        <h3>View Analytics</h3>
+        <p>Track performance and insights</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Recent Reviews -->
+  <section class="recent-reviews" aria-label="Recent Customer Reviews">
+    <div class="section-header">
+      <h2 class="section-title">Recent Reviews</h2>
+      <a routerLink="../reviews" class="view-all" aria-label="View all reviews">View All</a>
+    </div>
+
+    @if (loading().reviews) {
+      <div class="reviews-loading" aria-live="polite">
+        <div class="loading-spinner"></div>
+        <p>Loading recent reviews...</p>
+      </div>
+    } @else if (errors().reviews) {
+      <div class="reviews-error" role="alert">
+        <span class="error-icon">⚠️</span>
+        <p>{{ errors().reviews }}</p>
+        <button
+          type="button"
+          class="retry-btn"
+          (click)="onRetryLoad('reviews')"
+          aria-label="Retry loading reviews">
+          🔄 Retry
+        </button>
+      </div>
+    } @else {
+      <div class="reviews-list" role="list">
+        @for (review of recentReviews(); track review.id) {
+          <article class="review-card" role="listitem">
+            <div class="review-header">
+              <div class="customer-info">
+                @if (review.customerAvatar) {
+                  <img
+                    [src]="review.customerAvatar"
+                    [alt]="review.customerName + ' avatar'"
+                    class="customer-avatar"
+                    loading="lazy">
+                } @else {
+                  <div class="customer-avatar" [attr.aria-label]="review.customerName + ' avatar'">
+                    {{ review.customerName.charAt(0) }}
+                  </div>
+                }
+                <div class="customer-details">
+                  <h4>{{ review.customerName }}</h4>
+                  <div class="rating" [attr.aria-label]="getAriaLabel(review.rating)">
+                    @for (star of getStarArray(review.rating); track $index) {
+                      <span class="star" [class.filled]="star" aria-hidden="true">⭐</span>
+                    }
+                  </div>
+                </div>
+              </div>
+              <time class="review-date" [dateTime]="review.date.toISOString()">
+                {{ formatDate(review.date) }}
+              </time>
+            </div>
+            <p class="review-comment">{{ review.comment }}</p>
+            <div class="review-actions">
+              <button
+                type="button"
+                class="respond-btn"
+                [class.responded]="review.isResponded"
+                (click)="onRespondToReview(review.id)"
+                [attr.aria-label]="review.isResponded ? 'View response to ' + review.customerName + ' review' : 'Respond to ' + review.customerName + ' review'">
+                {{ review.isResponded ? '✓ Responded' : 'Respond' }}
+              </button>
+              <button
+                type="button"
+                class="like-btn"
+                (click)="onMarkHelpful(review.id)"
+                [attr.aria-label]="'Mark ' + review.customerName + ' review as helpful'">
+                👍 Helpful ({{ review.helpfulCount }})
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- Subscription Status -->
+  @if (businessOwner()) {
+    <section class="subscription-status" aria-label="Subscription Information">
+      <div class="subscription-card" [class]="businessOwner()?.subscriptionStatus">
+        <div class="subscription-info">
+          <h3>Subscription Status</h3>
+          <p class="status">{{ businessOwner()?.subscriptionStatus | titlecase }}</p>
+          @if (businessOwner()?.subscriptionStatus === 'trial') {
+            <p class="trial-info" role="alert">Your trial expires in 14 days</p>
+          }
+        </div>
+        <div class="subscription-actions">
+          @if (businessOwner()?.subscriptionStatus === 'trial' || businessOwner()?.subscriptionStatus === 'expired') {
+            <a routerLink="../accounts"
+               class="upgrade-btn"
+               aria-label="Upgrade subscription plan">
+              Upgrade Now
+            </a>
+          } @else {
+            <a routerLink="../accounts"
+               class="manage-btn"
+               aria-label="Manage subscription plan">
+              Manage Plan
+            </a>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- Tips and Resources -->
+  <section class="tips-section" aria-label="Business Growth Tips">
+    <h2 class="section-title">Tips to Grow Your Business</h2>
+    <div class="tips-grid" role="list">
+      <article class="tip-card" role="listitem">
+        <div class="tip-icon" aria-hidden="true">📸</div>
+        <h4>Add High-Quality Photos</h4>
+        <p>Restaurants with photos get 42% more views than those without.</p>
+      </article>
+
+      <article class="tip-card" role="listitem">
+        <div class="tip-icon" aria-hidden="true">💬</div>
+        <h4>Respond to Reviews</h4>
+        <p>Engaging with customers shows you care and can improve your rating.</p>
+      </article>
+
+      <article class="tip-card" role="listitem">
+        <div class="tip-icon" aria-hidden="true">🕒</div>
+        <h4>Keep Hours Updated</h4>
+        <p>Accurate hours help customers know when you're open.</p>
+      </article>
+
+      <article class="tip-card" role="listitem">
+        <div class="tip-icon" aria-hidden="true">🎯</div>
+        <h4>Use Analytics</h4>
+        <p>Track your performance to understand what works best.</p>
+      </article>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,336 @@
+<div class="reviews-container" role="main" aria-label="Business Reviews Management">
+  <!-- Header Section -->
+  <header class="reviews-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="title-icon">⭐</span>
+        Customer Reviews
+      </h1>
+      <p class="page-subtitle">
+        Manage and respond to customer feedback to build stronger relationships
+      </p>
+    </div>
+  </header>
+
+  <!-- Reviews Statistics -->
+  <section class="reviews-stats" aria-label="Reviews Statistics">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-content">
+          <h3>{{ reviewStats().averageRating.toFixed(1) }}</h3>
+          <p>Average Rating</p>
+          <div class="stat-change" [class]="getRatingChangeClass()">
+            {{ getRatingChangeText() }}
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📝</div>
+        <div class="stat-content">
+          <h3>{{ reviewStats().totalReviews.toLocaleString() }}</h3>
+          <p>Total Reviews</p>
+          <div class="stat-change positive">
+            +{{ reviewStats().monthlyReviews }} this month
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💬</div>
+        <div class="stat-content">
+          <h3>{{ reviewStats().responseRate }}%</h3>
+          <p>Response Rate</p>
+          <div class="stat-change" [class]="getResponseRateClass()">
+            {{ getResponseRateText() }}
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-content">
+          <h3>{{ reviewStats().averageResponseTime }}h</h3>
+          <p>Avg Response Time</p>
+          <div class="stat-change positive">
+            -2h from last month
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filters and Actions -->
+  <section class="reviews-controls" aria-label="Review Filters and Actions">
+    <div class="controls-row">
+      <div class="filters-group">
+        <div class="filter-item">
+          <label for="rating-filter" class="filter-label">Rating</label>
+          <select
+            id="rating-filter"
+            class="filter-select"
+            [(ngModel)]="selectedRating"
+            (ngModelChange)="onFilterChange()">
+            <option value="">All Ratings</option>
+            <option value="5">5 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="2">2 Stars</option>
+            <option value="1">1 Star</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label for="status-filter" class="filter-label">Status</label>
+          <select
+            id="status-filter"
+            class="filter-select"
+            [(ngModel)]="selectedStatus"
+            (ngModelChange)="onFilterChange()">
+            <option value="">All Reviews</option>
+            <option value="responded">Responded</option>
+            <option value="pending">Pending Response</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label for="date-filter" class="filter-label">Date Range</label>
+          <select
+            id="date-filter"
+            class="filter-select"
+            [(ngModel)]="selectedDateRange"
+            (ngModelChange)="onFilterChange()">
+            <option value="all">All Time</option>
+            <option value="week">Last Week</option>
+            <option value="month">Last Month</option>
+            <option value="quarter">Last 3 Months</option>
+            <option value="year">Last Year</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions-group">
+        <button
+          type="button"
+          class="action-btn secondary"
+          (click)="exportReviews()"
+          aria-label="Export reviews data">
+          📊 Export
+        </button>
+        <button
+          type="button"
+          class="action-btn primary"
+          (click)="openBulkResponseModal()"
+          [disabled]="selectedReviews().length === 0"
+          aria-label="Respond to selected reviews">
+          💬 Bulk Response ({{ selectedReviews().length }})
+        </button>
+      </div>
+    </div>
+
+    <div class="search-row">
+      <div class="search-container">
+        <input
+          type="search"
+          class="search-input"
+          placeholder="Search reviews by customer name, content, or keywords..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()"
+          aria-label="Search reviews">
+        <button
+          type="button"
+          class="search-btn"
+          (click)="onSearch()"
+          aria-label="Search">
+          🔍
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews List -->
+  <section class="reviews-list-section" aria-label="Customer Reviews List">
+    @if (loading()) {
+      <div class="reviews-loading" aria-live="polite">
+        <div class="loading-spinner"></div>
+        <p>Loading reviews...</p>
+      </div>
+    } @else if (filteredReviews().length === 0) {
+      <div class="no-reviews" role="status">
+        <div class="no-reviews-icon">📝</div>
+        <h3>No Reviews Found</h3>
+        <p>{{ getNoReviewsMessage() }}</p>
+        @if (hasActiveFilters()) {
+          <button
+            type="button"
+            class="clear-filters-btn"
+            (click)="clearAllFilters()">
+            Clear Filters
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="reviews-list" role="list">
+        @for (review of paginatedReviews(); track review.id) {
+          <article class="review-card" role="listitem" [class.selected]="isReviewSelected(review.id)">
+            <div class="review-header">
+              <div class="review-select">
+                <input
+                  type="checkbox"
+                  [id]="'review-' + review.id"
+                  [checked]="isReviewSelected(review.id)"
+                  (change)="toggleReviewSelection(review.id)"
+                  class="review-checkbox"
+                  [attr.aria-label]="'Select review from ' + review.customerName">
+              </div>
+
+              <div class="customer-info">
+                @if (review.customerAvatar) {
+                  <img
+                    [src]="review.customerAvatar"
+                    [alt]="review.customerName + ' avatar'"
+                    class="customer-avatar">
+                } @else {
+                  <div class="customer-avatar-placeholder">
+                    {{ review.customerName.charAt(0).toUpperCase() }}
+                  </div>
+                }
+                <div class="customer-details">
+                  <h4 class="customer-name">{{ review.customerName }}</h4>
+                  <div class="review-rating" [attr.aria-label]="getAriaLabel(review.rating)">
+                    @for (star of getStarArray(review.rating); track $index) {
+                      <span class="star" [class.filled]="star">⭐</span>
+                    }
+                    <span class="rating-value">({{ review.rating }}/5)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="review-meta">
+                <time class="review-date" [dateTime]="review.date.toISOString()">
+                  {{ formatDate(review.date) }}
+                </time>
+                <div class="review-status" [class]="review.status">
+                  {{ getStatusText(review.status) }}
+                </div>
+              </div>
+            </div>
+
+            <div class="review-content">
+              <p class="review-comment">{{ review.comment }}</p>
+
+              @if (review.photos && review.photos.length > 0) {
+                <div class="review-photos">
+                  @for (photo of review.photos; track photo.id) {
+                    <img
+                      [src]="photo.url"
+                      [alt]="'Photo from ' + review.customerName"
+                      class="review-photo"
+                      (click)="openPhotoModal(photo)">
+                  }
+                </div>
+              }
+            </div>
+
+            @if (review.businessResponse) {
+              <div class="business-response">
+                <div class="response-header">
+                  <span class="response-icon">💬</span>
+                  <span class="response-label">Your Response</span>
+                  <time class="response-date" [dateTime]="review.businessResponse.date.toISOString()">
+                    {{ formatDate(review.businessResponse.date) }}
+                  </time>
+                </div>
+                <p class="response-content">{{ review.businessResponse.content }}</p>
+                <div class="response-actions">
+                  <button
+                    type="button"
+                    class="edit-response-btn"
+                    (click)="editResponse(review.id)"
+                    [attr.aria-label]="'Edit response to ' + review.customerName">
+                    ✏️ Edit
+                  </button>
+                </div>
+              </div>
+            }
+
+            <div class="review-actions">
+              @if (!review.businessResponse) {
+                <button
+                  type="button"
+                  class="respond-btn primary"
+                  (click)="openResponseModal(review)"
+                  [attr.aria-label]="'Respond to ' + review.customerName + ' review'">
+                  💬 Respond
+                </button>
+              }
+
+              <button
+                type="button"
+                class="helpful-btn"
+                (click)="markAsHelpful(review.id)"
+                [class.marked]="review.isMarkedHelpful"
+                [attr.aria-label]="'Mark ' + review.customerName + ' review as helpful'">
+                👍 {{ review.isMarkedHelpful ? 'Helpful' : 'Mark Helpful' }} ({{ review.helpfulCount }})
+              </button>
+
+              <button
+                type="button"
+                class="share-btn"
+                (click)="shareReview(review)"
+                [attr.aria-label]="'Share ' + review.customerName + ' review'">
+                📤 Share
+              </button>
+
+              <div class="more-actions">
+                <button
+                  type="button"
+                  class="more-btn"
+                  (click)="toggleMoreActions(review.id)"
+                  [attr.aria-label]="'More actions for ' + review.customerName + ' review'">
+                  ⋯
+                </button>
+                @if (showMoreActions() === review.id) {
+                  <div class="more-menu">
+                    <button type="button" (click)="reportReview(review.id)">🚩 Report</button>
+                    <button type="button" (click)="hideReview(review.id)">👁️ Hide</button>
+                    <button type="button" (click)="downloadReview(review.id)">💾 Download</button>
+                  </div>
+                }
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages() > 1) {
+        <div class="pagination" role="navigation" aria-label="Reviews pagination">
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="currentPage() === 1"
+            (click)="goToPage(currentPage() - 1)"
+            aria-label="Go to previous page">
+            ← Previous
+          </button>
+
+          <div class="pagination-info">
+            Page {{ currentPage() }} of {{ totalPages() }}
+            ({{ filteredReviews().length }} reviews)
+          </div>
+
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="currentPage() === totalPages()"
+            (click)="goToPage(currentPage() + 1)"
+            aria-label="Go to next page">
+            Next →
+          </button>
+        </div>
+      }
+    }
+  </section>
+</div>

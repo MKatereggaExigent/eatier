@@ -1,0 +1,356 @@
+<div class="user-reviews" role="main" aria-label="My Reviews">
+  <!-- Header Section -->
+  <header class="reviews-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">⭐</span>
+          My Reviews
+        </h1>
+        <p class="page-subtitle">
+          Manage your restaurant reviews and share your dining experiences
+        </p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn-primary" (click)="openNewReviewModal()">
+          <span class="btn-icon">✍️</span>
+          Write Review
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats Overview -->
+  <section class="stats-overview" aria-label="Review Statistics">
+    <div class="stats-grid">
+      <div class="stat-card total-reviews">
+        <div class="stat-icon">📝</div>
+        <div class="stat-content">
+          <h3>{{ reviewStats().totalReviews }}</h3>
+          <p>Total Reviews</p>
+          <div class="stat-change">{{ reviewStats().reviewsThisMonth }} this month</div>
+        </div>
+      </div>
+
+      <div class="stat-card average-rating">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-content">
+          <h3>{{ reviewStats().averageRating.toFixed(1) }}</h3>
+          <p>Average Rating</p>
+          <div class="rating-stars">
+            @for (star of getStarArray(reviewStats().averageRating); track $index) {
+              <span class="star" [class.filled]="star">⭐</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card helpful-votes">
+        <div class="stat-icon">👍</div>
+        <div class="stat-content">
+          <h3>{{ reviewStats().helpfulVotes }}</h3>
+          <p>Helpful Votes</p>
+          <div class="stat-change">{{ helpfulnessPercentage() }}% helpful</div>
+        </div>
+      </div>
+
+      <div class="stat-card review-streak">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-content">
+          <h3>{{ reviewStats().reviewStreak }}</h3>
+          <p>Review Streak</p>
+          <div class="stat-change">Keep it up!</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filters and Search -->
+  <section class="filters-section" aria-label="Review Filters">
+    <div class="filters-container">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Search reviews..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="searchQuery.set($event)"
+          class="search-input">
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <div class="filter-controls">
+        <select 
+          [value]="filters().status"
+          (change)="updateFilters({ status: $any($event.target).value })"
+          class="filter-select">
+          <option value="all">All Status</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+          <option value="archived">Archived</option>
+        </select>
+
+        <select 
+          [value]="filters().rating"
+          (change)="updateFilters({ rating: $any($event.target).value })"
+          class="filter-select">
+          <option value="all">All Ratings</option>
+          <option value="5">5 Stars</option>
+          <option value="4">4 Stars</option>
+          <option value="3">3 Stars</option>
+          <option value="2">2 Stars</option>
+          <option value="1">1 Star</option>
+        </select>
+
+        <select 
+          [value]="filters().timeRange"
+          (change)="updateFilters({ timeRange: $any($event.target).value })"
+          class="filter-select">
+          <option value="all">All Time</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="3months">Last 3 Months</option>
+          <option value="year">This Year</option>
+        </select>
+
+        <select 
+          [value]="filters().sortBy"
+          (change)="updateFilters({ sortBy: $any($event.target).value })"
+          class="filter-select">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="rating_high">Highest Rated</option>
+          <option value="rating_low">Lowest Rated</option>
+          <option value="helpful">Most Helpful</option>
+        </select>
+
+        <button type="button" class="btn-secondary" (click)="clearFilters()">
+          Clear Filters
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews List -->
+  <section class="reviews-list" aria-label="Reviews List">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading your reviews...</p>
+      </div>
+    } @else if (filteredReviews().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <h3>No reviews found</h3>
+        @if (searchQuery() || filters().status !== 'all' || filters().rating !== 'all') {
+          <p>Try adjusting your filters or search terms</p>
+          <button type="button" class="btn-secondary" (click)="clearFilters()">
+            Clear Filters
+          </button>
+        } @else {
+          <p>Start sharing your dining experiences by writing your first review</p>
+          <button type="button" class="btn-primary" (click)="openNewReviewModal()">
+            Write Your First Review
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="reviews-grid">
+        @for (review of filteredReviews(); track review.id) {
+          <article class="review-card" [class]="getStatusColor(review.status)">
+            <!-- Review Header -->
+            <div class="review-header">
+              <div class="restaurant-info">
+                @if (review.restaurantImage) {
+                  <img [src]="review.restaurantImage" [alt]="review.restaurantName" class="restaurant-image">
+                } @else {
+                  <div class="restaurant-placeholder">🏪</div>
+                }
+                <div class="restaurant-details">
+                  <h3 class="restaurant-name">{{ review.restaurantName }}</h3>
+                  <div class="review-meta">
+                    <span class="visit-date">{{ formatDate(review.visitDate) }}</span>
+                    <span class="price-range">{{ getPriceRangeDisplay(review.priceRange) }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="review-actions">
+                <div class="status-badge" [class]="getStatusColor(review.status)">
+                  <span class="status-icon">{{ getStatusIcon(review.status) }}</span>
+                  <span class="status-text">{{ review.status | titlecase }}</span>
+                </div>
+                <div class="action-menu">
+                  <button type="button" class="action-btn" (click)="editReview(review)">
+                    ✏️
+                  </button>
+                  <button type="button" class="action-btn" (click)="toggleReviewVisibility(review.id)">
+                    {{ review.isPublic ? '👁️' : '🙈' }}
+                  </button>
+                  <button type="button" class="action-btn delete" (click)="deleteReview(review.id)">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Review Content -->
+            <div class="review-content">
+              <div class="review-rating">
+                <div class="overall-rating">
+                  @for (star of getStarArray(review.rating); track $index) {
+                    <span class="star" [class.filled]="star">⭐</span>
+                  }
+                  <span class="rating-value">{{ review.rating }}/5</span>
+                </div>
+                <div class="detailed-ratings">
+                  <div class="rating-item">
+                    <span class="rating-label">Food</span>
+                    <div class="rating-bar">
+                      <div class="rating-fill" [style.width.%]="(review.foodRating / 5) * 100"></div>
+                    </div>
+                    <span class="rating-number">{{ review.foodRating }}</span>
+                  </div>
+                  <div class="rating-item">
+                    <span class="rating-label">Service</span>
+                    <div class="rating-bar">
+                      <div class="rating-fill" [style.width.%]="(review.serviceRating / 5) * 100"></div>
+                    </div>
+                    <span class="rating-number">{{ review.serviceRating }}</span>
+                  </div>
+                  <div class="rating-item">
+                    <span class="rating-label">Ambiance</span>
+                    <div class="rating-bar">
+                      <div class="rating-fill" [style.width.%]="(review.ambianceRating / 5) * 100"></div>
+                    </div>
+                    <span class="rating-number">{{ review.ambianceRating }}</span>
+                  </div>
+                  <div class="rating-item">
+                    <span class="rating-label">Value</span>
+                    <div class="rating-bar">
+                      <div class="rating-fill" [style.width.%]="(review.valueRating / 5) * 100"></div>
+                    </div>
+                    <span class="rating-number">{{ review.valueRating }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <h4 class="review-title">{{ review.title }}</h4>
+              <p class="review-text">{{ review.content }}</p>
+
+              @if (review.dishesOrdered.length > 0) {
+                <div class="dishes-ordered">
+                  <h5>Dishes Ordered:</h5>
+                  <div class="dishes-list">
+                    @for (dish of review.dishesOrdered; track dish) {
+                      <span class="dish-tag">{{ dish }}</span>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (review.photos.length > 0) {
+                <div class="review-photos">
+                  @for (photo of review.photos; track photo) {
+                    <img [src]="photo" [alt]="'Photo from ' + review.restaurantName" class="review-photo">
+                  }
+                </div>
+              }
+
+              @if (review.tags.length > 0) {
+                <div class="review-tags">
+                  @for (tag of review.tags; track tag) {
+                    <span class="tag">{{ tag.replace('_', ' ') | titlecase }}</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Review Footer -->
+            <div class="review-footer">
+              <div class="review-stats">
+                <span class="helpful-votes">
+                  👍 {{ review.helpfulVotes }} helpful
+                </span>
+                <span class="total-votes">
+                  ({{ review.totalVotes }} votes)
+                </span>
+                <span class="visibility">
+                  {{ review.isPublic ? '🌍 Public' : '🔒 Private' }}
+                </span>
+              </div>
+              <div class="review-dates">
+                <span class="created-date">
+                  Created {{ formatDate(review.createdAt) }}
+                </span>
+                @if (review.updatedAt.getTime() !== review.createdAt.getTime()) {
+                  <span class="updated-date">
+                    Updated {{ formatDate(review.updatedAt) }}
+                  </span>
+                }
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</div>
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteConfirm()) {
+  <div class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Delete Review</h3>
+        <button type="button" class="modal-close" (click)="cancelDelete()">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete your review for <strong>{{ selectedReview()?.restaurantName }}</strong>?</p>
+        <p class="warning-text">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="cancelDelete()">Cancel</button>
+        <button type="button" class="btn-danger" (click)="confirmDelete()">Delete Review</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- New Review Modal Placeholder -->
+@if (showNewReviewModal()) {
+  <div class="modal-overlay" (click)="closeNewReviewModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Write New Review</h3>
+        <button type="button" class="modal-close" (click)="closeNewReviewModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p>New review form would go here...</p>
+        <p class="note">This would include restaurant selection, rating inputs, photo upload, etc.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeNewReviewModal()">Cancel</button>
+        <button type="button" class="btn-primary">Save Review</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Edit Review Modal Placeholder -->
+@if (showEditModal()) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Edit Review</h3>
+        <button type="button" class="modal-close" (click)="closeEditModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Edit review form would go here...</p>
+        <p class="note">Pre-populated with existing review data: {{ selectedReview()?.title }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeEditModal()">Cancel</button>
+        <button type="button" class="btn-primary">Update Review</button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,202 @@
+<aside class="business-sidebar" role="navigation" aria-label="Business Dashboard Navigation">
+  <!-- Sidebar Header -->
+  <div class="sidebar-header">
+    <div class="business-info">
+      <div class="business-avatar">
+        <span class="avatar-icon">🏪</span>
+      </div>
+      <div class="business-details">
+        <h3 class="business-name">{{ businessName() }}</h3>
+        <p class="business-type">{{ businessType() }}</p>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="sidebar-toggle"
+      (click)="toggleSidebar()"
+      [attr.aria-label]="isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
+      <span class="toggle-icon">{{ isCollapsed() ? '→' : '←' }}</span>
+    </button>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="sidebar-nav" [class.collapsed]="isCollapsed()">
+    <ul class="nav-list" role="list">
+      <!-- Overview -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="overview"
+          routerLinkActive="active"
+          class="nav-link"
+          [attr.aria-label]="'Navigate to Overview' + (isCollapsed() ? '' : ' - View business statistics and recent activity')">
+          <span class="nav-icon" aria-hidden="true">📊</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Overview</span>
+          }
+        </a>
+      </li>
+
+      <!-- Menu Management -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="menu"
+          routerLinkActive="active"
+          class="nav-link"
+          [attr.aria-label]="'Navigate to Menu Management' + (isCollapsed() ? '' : ' - Manage your restaurant menu items')">
+          <span class="nav-icon" aria-hidden="true">🍽️</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Menu</span>
+          }
+        </a>
+      </li>
+
+      <!-- Reviews -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="reviews"
+          routerLinkActive="active"
+          class="nav-link"
+          [attr.aria-label]="'Navigate to Reviews' + (isCollapsed() ? '' : ' - View and respond to customer reviews')">
+          <span class="nav-icon" aria-hidden="true">⭐</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Reviews</span>
+            @if (unreadReviews() > 0) {
+              <span class="nav-badge" [attr.aria-label]="unreadReviews() + ' unread reviews'">
+                {{ unreadReviews() }}
+              </span>
+            }
+          }
+        </a>
+      </li>
+
+      <!-- Business Profile -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="profile"
+          routerLinkActive="active"
+          class="nav-link"
+          [attr.aria-label]="'Navigate to Business Profile' + (isCollapsed() ? '' : ' - Edit your restaurant information and photos')">
+          <span class="nav-icon" aria-hidden="true">🏪</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Profile</span>
+          }
+        </a>
+      </li>
+
+      <!-- Digital Card -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="digital-card"
+          routerLinkActive="active"
+          class="nav-link"
+          [attr.aria-label]="'Navigate to Digital Card' + (isCollapsed() ? '' : ' - Create and customize your digital business card')">
+          <span class="nav-icon" aria-hidden="true">💳</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Digital Card</span>
+          }
+        </a>
+      </li>
+
+      <!-- Insights -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="insights"
+          routerLinkActive="active"
+          class="nav-link"
+          [attr.aria-label]="'Navigate to Insights' + (isCollapsed() ? '' : ' - View detailed analytics and performance metrics')">
+          <span class="nav-icon" aria-hidden="true">📈</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Insights</span>
+          }
+        </a>
+      </li>
+
+      <!-- Manage My Ads -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="ads"
+          routerLinkActive="active"
+          class="nav-link"
+          [attr.aria-label]="'Navigate to Manage My Ads' + (isCollapsed() ? '' : ' - Create and manage advertising campaigns')">
+          <span class="nav-icon" aria-hidden="true">📢</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Manage My Ads</span>
+          }
+        </a>
+      </li>
+
+      <!-- Divider -->
+      @if (!isCollapsed()) {
+        <li class="nav-divider" role="separator" aria-hidden="true"></li>
+      }
+
+      <!-- Account Settings -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="accounts"
+          routerLinkActive="active"
+          class="nav-link"
+          [attr.aria-label]="'Navigate to Account Settings' + (isCollapsed() ? '' : ' - Manage subscription and billing')">
+          <span class="nav-icon" aria-hidden="true">⚙️</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Settings</span>
+          }
+        </a>
+      </li>
+
+      <!-- Help & Support -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="/help"
+          class="nav-link"
+          [attr.aria-label]="'Navigate to Help & Support' + (isCollapsed() ? '' : ' - Get help and contact support')">
+          <span class="nav-icon" aria-hidden="true">❓</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Help</span>
+          }
+        </a>
+      </li>
+
+      <!-- Divider -->
+      @if (!isCollapsed()) {
+        <li class="nav-divider" role="separator" aria-hidden="true"></li>
+      }
+
+      <!-- Logout -->
+      <li class="nav-item" role="listitem">
+        <button
+          type="button"
+          (click)="logout()"
+          class="nav-link logout-btn"
+          [attr.aria-label]="'Logout' + (isCollapsed() ? '' : ' - Sign out of your account')">
+          <span class="nav-icon" aria-hidden="true">🚪</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Logout</span>
+          }
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Footer -->
+  @if (!isCollapsed()) {
+    <div class="sidebar-footer">
+      <div class="subscription-status" [class]="subscriptionStatus()">
+        <div class="status-info">
+          <span class="status-icon">{{ getSubscriptionIcon() }}</span>
+          <div class="status-text">
+            <p class="status-label">{{ subscriptionStatus() | titlecase }}</p>
+            @if (subscriptionStatus() === 'trial') {
+              <p class="trial-days">{{ trialDaysLeft() }} days left</p>
+            }
+          </div>
+        </div>
+        @if (subscriptionStatus() === 'trial' || subscriptionStatus() === 'expired' || subscriptionStatus() === 'inactive') {
+          <a routerLink="accounts" class="upgrade-btn" aria-label="Upgrade subscription">
+            Upgrade
+          </a>
+        }
+      </div>
+    </div>
+  }
+</aside>

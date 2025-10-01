@@ -1,0 +1,551 @@
+<div class="reviews-dashboard" role="main" aria-label="Food Enthusiast Reviews Dashboard">
+  <!-- Header Section -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">⭐</span>
+          My Reviews
+        </h1>
+        <p class="page-subtitle">
+          Share your dining experiences and help others discover great restaurants
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn-primary new-review-btn"
+          (click)="openNewReviewModal()"
+          aria-label="Write new review">
+          <span class="btn-icon">✍️</span>
+          Write Review
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    @if (stats(); as reviewStats) {
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📝</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ reviewStats.totalReviews }}</div>
+            <div class="stat-label">Total Reviews</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ reviewStats.averageRating.toFixed(1) }}</div>
+            <div class="stat-label">Average Rating</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">👍</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ reviewStats.helpfulVotes }}</div>
+            <div class="stat-label">Helpful Votes</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ reviewStats.reviewStreak }}</div>
+            <div class="stat-label">Day Streak</div>
+          </div>
+        </div>
+      </div>
+    }
+  </header>
+
+  <!-- Controls Section -->
+  <section class="controls-section">
+    <div class="controls-content">
+      <!-- Search and Filter Toggle -->
+      <div class="search-controls">
+        <div class="search-input-wrapper">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search reviews, restaurants, or cuisines..."
+            [value]="searchQuery()"
+            (input)="onSearchInput($event)"
+            aria-label="Search reviews">
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-controls">
+        <button
+          type="button"
+          class="filter-toggle-btn"
+          (click)="toggleFilters()"
+          [class.active]="showFilters()">
+          <span class="btn-icon">🔽</span>
+          Filters
+          @if (hasActiveFilters()) {
+            <span class="filter-badge">{{ filteredReviews().length }}</span>
+          }
+        </button>
+
+        @if (hasActiveFilters()) {
+          <button
+            type="button"
+            class="clear-filters-btn"
+            (click)="clearFilters()">
+            Clear Filters
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    @if (showFilters()) {
+      <div class="filter-panel">
+        <div class="filter-grid">
+          <!-- Status Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select
+              class="filter-select"
+              [value]="filters().status"
+              (change)="onFilterChange('status', $event)">
+              @for (option of statusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Rating Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Rating</label>
+            <select
+              class="filter-select"
+              [value]="filters().rating"
+              (change)="onFilterChange('rating', $event)">
+              @for (option of ratingOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Time Range Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Time Range</label>
+            <select
+              class="filter-select"
+              [value]="filters().timeRange"
+              (change)="onFilterChange('timeRange', $event)">
+              @for (option of timeRangeOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Cuisine Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Cuisine</label>
+            <select
+              class="filter-select"
+              [value]="filters().cuisine"
+              (change)="onFilterChange('cuisine', $event)">
+              <option value="all">All Cuisines</option>
+              @for (cuisine of availableCuisines(); track cuisine) {
+                <option [value]="cuisine">{{ cuisine }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Sort Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Sort By</label>
+            <select
+              class="filter-select"
+              [value]="filters().sortBy"
+              (change)="onFilterChange('sortBy', $event)">
+              @for (option of sortOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- Reviews List -->
+  <section class="reviews-section">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading your reviews...</p>
+      </div>
+    } @else if (filteredReviews().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">⭐</div>
+        <h3>No reviews found</h3>
+        @if (hasActiveFilters()) {
+          <p>Try adjusting your filters or search terms.</p>
+          <button type="button" class="btn-secondary" (click)="clearFilters()">
+            Clear Filters
+          </button>
+        } @else {
+          <p>You haven't written any restaurant reviews yet.</p>
+          <button type="button" class="btn-primary" (click)="openNewReviewModal()">
+            Write Your First Review
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="reviews-grid">
+        @for (review of filteredReviews(); track review.id) {
+          <div class="review-card" [class]="'status-' + review.status">
+            <!-- Review Header -->
+            <div class="review-header">
+              <div class="restaurant-info">
+                <img
+                  [src]="review.restaurant.imageUrl"
+                  [alt]="review.restaurant.name"
+                  class="restaurant-image"
+                  loading="lazy">
+                <div class="restaurant-details">
+                  <h3 class="restaurant-name">{{ review.restaurant.name }}</h3>
+                  <p class="restaurant-cuisine">{{ review.restaurant.cuisineTypes.join(', ') }}</p>
+                  <p class="restaurant-location">{{ review.restaurant.address }}, {{ review.restaurant.city }}</p>
+                </div>
+              </div>
+
+              <div class="review-rating">
+                <div class="overall-rating" [class]="getRatingColor(review.overallRating)">
+                  <span class="rating-number">{{ review.overallRating }}</span>
+                  <div class="rating-stars">
+                    @for (filled of getStarArray(review.overallRating); track $index) {
+                      <span class="star" [class.filled]="filled">⭐</span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Review Content -->
+            <div class="review-content">
+              @if (review.title) {
+                <h4 class="review-title">{{ review.title }}</h4>
+              }
+
+              <p class="review-text">{{ review.content }}</p>
+
+              <!-- Detailed Ratings -->
+              @if (review.foodRating || review.serviceRating || review.ambianceRating || review.valueRating) {
+                <div class="detailed-ratings">
+                  @if (review.foodRating) {
+                    <div class="rating-item">
+                      <span class="rating-label">Food</span>
+                      <span class="rating-value">{{ review.foodRating }}/5</span>
+                    </div>
+                  }
+                  @if (review.serviceRating) {
+                    <div class="rating-item">
+                      <span class="rating-label">Service</span>
+                      <span class="rating-value">{{ review.serviceRating }}/5</span>
+                    </div>
+                  }
+                  @if (review.ambianceRating) {
+                    <div class="rating-item">
+                      <span class="rating-label">Ambiance</span>
+                      <span class="rating-value">{{ review.ambianceRating }}/5</span>
+                    </div>
+                  }
+                  @if (review.valueRating) {
+                    <div class="rating-item">
+                      <span class="rating-label">Value</span>
+                      <span class="rating-value">{{ review.valueRating }}/5</span>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Review Details -->
+              <div class="review-details">
+                @if (review.visitDate) {
+                  <div class="detail-item">
+                    <span class="detail-icon">📅</span>
+                    <span class="detail-text">Visited {{ formatDate(review.visitDate) }}</span>
+                  </div>
+                }
+
+                @if (review.dishesOrdered.length > 0) {
+                  <div class="detail-item">
+                    <span class="detail-icon">🍽️</span>
+                    <span class="detail-text">{{ review.dishesOrdered.join(', ') }}</span>
+                  </div>
+                }
+
+                @if (review.pricePaid) {
+                  <div class="detail-item">
+                    <span class="detail-icon">💰</span>
+                    <span class="detail-text">{{ formatCurrency(review.pricePaid) }}</span>
+                  </div>
+                }
+
+                @if (review.occasion) {
+                  <div class="detail-item">
+                    <span class="detail-icon">🎉</span>
+                    <span class="detail-text">{{ review.occasion }}</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Recommendation -->
+              @if (review.wouldRecommend !== undefined) {
+                <div class="recommendation" [class.positive]="review.wouldRecommend" [class.negative]="!review.wouldRecommend">
+                  <span class="recommendation-icon">{{ review.wouldRecommend ? '👍' : '👎' }}</span>
+                  <span class="recommendation-text">
+                    {{ review.wouldRecommend ? 'Would recommend' : 'Would not recommend' }}
+                  </span>
+                </div>
+              }
+            </div>
+
+            <!-- Review Footer -->
+            <div class="review-footer">
+              <div class="review-meta">
+                <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+                <span class="review-status" [class]="'status-' + review.status">{{ review.status | titlecase }}</span>
+                @if (review.isVerifiedVisit) {
+                  <span class="verified-badge">✓ Verified Visit</span>
+                }
+              </div>
+
+              <div class="review-stats">
+                @if (review.totalVotes > 0) {
+                  <span class="helpful-votes">
+                    {{ review.helpfulVotes }}/{{ review.totalVotes }} found helpful
+                  </span>
+                }
+              </div>
+            </div>
+
+            <!-- Review Actions -->
+            <div class="review-actions">
+              <button
+                type="button"
+                class="btn-secondary"
+                (click)="openReviewDetails(review)">
+                View Details
+              </button>
+
+              @if (canEdit(review)) {
+                <button
+                  type="button"
+                  class="btn-primary"
+                  (click)="openEditReview(review)">
+                  Edit Review
+                </button>
+              }
+
+              @if (canDelete(review)) {
+                <button
+                  type="button"
+                  class="btn-danger"
+                  (click)="openDeleteConfirm(review)">
+                  Delete
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>
+
+<!-- New Review Modal -->
+@if (showNewReviewModal()) {
+  <div class="modal-overlay" (click)="closeNewReviewModal()">
+    <div class="modal-content new-review-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Write a New Review</h3>
+        <button type="button" class="modal-close" (click)="closeNewReviewModal()">✕</button>
+      </div>
+
+      <form [formGroup]="reviewForm" (ngSubmit)="createReview()" class="review-form">
+        <div class="form-grid">
+          <!-- Restaurant Selection -->
+          <div class="form-group full-width">
+            <label for="restaurant">Restaurant *</label>
+            <select
+              id="restaurant"
+              formControlName="restaurantId"
+              class="form-control"
+              (change)="onRestaurantChange()">
+              <option value="">Select a restaurant</option>
+              @for (restaurant of restaurants(); track restaurant.id) {
+                <option [value]="restaurant.id">{{ restaurant.name }} - {{ restaurant.cuisineTypes.join(', ') }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Overall Rating -->
+          <div class="form-group">
+            <label for="overallRating">Overall Rating *</label>
+            <select id="overallRating" formControlName="overallRating" class="form-control">
+              @for (rating of ratingStars; track rating) {
+                <option [value]="rating">{{ rating }} Star{{ rating > 1 ? 's' : '' }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Detailed Ratings -->
+          <div class="form-group">
+            <label for="foodRating">Food Rating</label>
+            <select id="foodRating" formControlName="foodRating" class="form-control">
+              <option value="">Not rated</option>
+              @for (rating of ratingStars; track rating) {
+                <option [value]="rating">{{ rating }} Star{{ rating > 1 ? 's' : '' }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="serviceRating">Service Rating</label>
+            <select id="serviceRating" formControlName="serviceRating" class="form-control">
+              <option value="">Not rated</option>
+              @for (rating of ratingStars; track rating) {
+                <option [value]="rating">{{ rating }} Star{{ rating > 1 ? 's' : '' }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="ambianceRating">Ambiance Rating</label>
+            <select id="ambianceRating" formControlName="ambianceRating" class="form-control">
+              <option value="">Not rated</option>
+              @for (rating of ratingStars; track rating) {
+                <option [value]="rating">{{ rating }} Star{{ rating > 1 ? 's' : '' }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="valueRating">Value Rating</label>
+            <select id="valueRating" formControlName="valueRating" class="form-control">
+              <option value="">Not rated</option>
+              @for (rating of ratingStars; track rating) {
+                <option [value]="rating">{{ rating }} Star{{ rating > 1 ? 's' : '' }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Review Title -->
+          <div class="form-group full-width">
+            <label for="title">Review Title</label>
+            <input
+              type="text"
+              id="title"
+              formControlName="title"
+              class="form-control"
+              placeholder="Give your review a catchy title">
+          </div>
+
+          <!-- Review Content -->
+          <div class="form-group full-width">
+            <label for="content">Review Content *</label>
+            <textarea
+              id="content"
+              formControlName="content"
+              class="form-control"
+              rows="6"
+              placeholder="Share your dining experience... (minimum 50 characters)"></textarea>
+          </div>
+
+          <!-- Visit Details -->
+          <div class="form-group">
+            <label for="visitDate">Visit Date</label>
+            <input
+              type="date"
+              id="visitDate"
+              formControlName="visitDate"
+              class="form-control"
+              [max]="getTodayDate()">
+          </div>
+
+          <div class="form-group">
+            <label for="partySize">Party Size</label>
+            <select id="partySize" formControlName="partySize" class="form-control">
+              @for (size of partySizeOptions; track size) {
+                <option [value]="size">{{ size }} {{ size === 1 ? 'person' : 'people' }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="pricePaid">Amount Paid</label>
+            <input
+              type="number"
+              id="pricePaid"
+              formControlName="pricePaid"
+              class="form-control"
+              placeholder="0.00"
+              min="0"
+              step="0.01">
+          </div>
+
+          <div class="form-group">
+            <label for="occasion">Occasion</label>
+            <input
+              type="text"
+              id="occasion"
+              formControlName="occasion"
+              class="form-control"
+              placeholder="Birthday, Date Night, etc.">
+          </div>
+
+          <!-- Dishes Ordered -->
+          <div class="form-group full-width">
+            <label for="dishesOrdered">Dishes Ordered</label>
+            <input
+              type="text"
+              id="dishesOrdered"
+              formControlName="dishesOrdered"
+              class="form-control"
+              placeholder="Separate multiple dishes with commas">
+          </div>
+
+          <!-- Recommendation -->
+          <div class="form-group full-width">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                formControlName="wouldRecommend"
+                class="checkbox-input">
+              <span class="checkbox-text">I would recommend this restaurant</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeNewReviewModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="!reviewForm.valid || isLoading()">
+            @if (isLoading()) {
+              <span class="loading-spinner small"></span>
+              Publishing...
+            } @else {
+              Publish Review
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

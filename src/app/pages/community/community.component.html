@@ -1,0 +1,257 @@
+<div class="community-container">
+  <!-- Header -->
+  <div class="community-header">
+    <div class="header-content">
+      <h1>🌟 Community</h1>
+      <p>Connect with chefs, restaurants, and food lovers from around the world</p>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="community-tabs">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'feed'"
+      (click)="setActiveTab('feed')"
+    >
+      🏠 Feed
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'trending'"
+      (click)="setActiveTab('trending')"
+    >
+      🔥 Trending
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'chefs'"
+      (click)="setActiveTab('chefs')"
+    >
+      👨‍🍳 Featured Chefs
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'create'"
+      (click)="setActiveTab('create')"
+    >
+      ✍️ Create Post
+    </button>
+  </div>
+
+  <div class="community-content">
+    <!-- Enhanced Loading State -->
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-container">
+          <div class="loading-spinner large"></div>
+          <div class="loading-text">
+            <h3>Loading community content...</h3>
+            <p>Discovering amazing food stories and chefs</p>
+          </div>
+        </div>
+
+        <!-- Loading Skeletons -->
+        <div class="loading-skeletons">
+          @for (item of [1,2,3]; track item) {
+            <div class="skeleton-card">
+              <div class="skeleton skeleton-header"></div>
+              <div class="skeleton skeleton-content"></div>
+              <div class="skeleton skeleton-actions"></div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Feed Tab -->
+    @if (activeTab() === 'feed' && !isLoading()) {
+      <div class="feed-section">
+        <div class="posts-container">
+          @for (post of posts(); track post.id) {
+            <div class="post-card">
+              <div class="post-header">
+                <div class="author-info">
+                  <img [src]="post.authorAvatar" [alt]="post.authorName" class="author-avatar" />
+                  <div class="author-details">
+                    <div class="author-name">
+                      {{ getAuthorTypeIcon(post.authorType) }} {{ post.authorName }}
+                      <span class="author-badge">{{ getAuthorTypeBadge(post.authorType) }}</span>
+                    </div>
+                    <div class="post-time">{{ formatDate(post.createdAt) }}</div>
+                  </div>
+                </div>
+                <button type="button" class="post-menu-btn">⋯</button>
+              </div>
+
+              <div class="post-content">
+                <p>{{ post.content }}</p>
+
+                @if (post.images && post.images.length > 0) {
+                  <div class="post-images">
+                    @for (image of post.images; track $index) {
+                      <img [src]="image" [alt]="'Post image ' + ($index + 1)" class="post-image" />
+                    }
+                  </div>
+                }
+
+                @if (post.tags.length > 0) {
+                  <div class="post-tags">
+                    @for (tag of post.tags; track tag) {
+                      <span class="tag">#{{ tag }}</span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <div class="post-actions">
+                <button
+                  type="button"
+                  class="action-btn like-btn"
+                  [class.liked]="post.isLiked"
+                  (click)="toggleLike(post)"
+                >
+                  {{ post.isLiked ? '❤️' : '🤍' }} {{ post.likes }}
+                </button>
+                <button type="button" class="action-btn comment-btn">
+                  💬 {{ post.comments }}
+                </button>
+                <button
+                  type="button"
+                  class="action-btn share-btn"
+                  (click)="sharePost(post)"
+                >
+                  🔗 {{ post.shares }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Trending Tab -->
+    @if (activeTab() === 'trending' && !isLoading()) {
+      <div class="trending-section">
+        <h2>🔥 Trending Topics</h2>
+        <div class="trending-topics">
+          @for (topic of trendingTopics(); track topic.name) {
+            <div class="trending-topic">
+              <span class="topic-name">{{ topic.name }}</span>
+              <span class="topic-count">{{ topic.count }} posts</span>
+            </div>
+          }
+        </div>
+
+        <h2>📈 Popular Posts</h2>
+        <div class="popular-posts">
+          @for (post of posts().slice(0, 3); track post.id) {
+            <div class="popular-post-card">
+              <div class="post-preview">
+                <img [src]="post.authorAvatar" [alt]="post.authorName" class="mini-avatar" title="{{ post.authorName }}" />
+                <div class="post-info">
+                  <div class="post-title">{{ post.content.substring(0, 100) }}...</div>
+                  <div class="post-stats">
+                    ❤️ {{ post.likes }} • 💬 {{ post.comments }} • 🔗 {{ post.shares }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Featured Chefs Tab -->
+    @if (activeTab() === 'chefs' && !isLoading()) {
+      <div class="chefs-section">
+        <h2>👨‍🍳 Featured Chefs</h2>
+        <div class="chefs-grid">
+          @for (chef of featuredChefs(); track chef.id) {
+            <div class="chef-card">
+              <img [src]="chef.avatar" [alt]="chef.name" class="chef-avatar" title="{{ chef.name }}" />
+              <div class="chef-info">
+                <h3>{{ chef.name }}</h3>
+                <p class="chef-specialty">{{ chef.specialty }}</p>
+                <div class="chef-stats">
+                  <span class="followers">👥 {{ chef.followers.toLocaleString() }} followers</span>
+                </div>
+                <button
+                  type="button"
+                  class="follow-btn"
+                  [class.following]="chef.isFollowing"
+                  (click)="followChef(chef)"
+                >
+                  {{ chef.isFollowing ? '✓ Following' : '+ Follow' }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Create Post Tab -->
+    @if (activeTab() === 'create' && !isLoading()) {
+      <div class="create-post-section">
+        <h2>✍️ Create New Post</h2>
+        <form [formGroup]="postForm" (ngSubmit)="onCreatePost()" class="create-post-form">
+          <div class="form-group">
+            <label for="postContent">What's on your mind?</label>
+            <textarea
+              id="postContent"
+              formControlName="content"
+              placeholder="Share your culinary thoughts, recipes, or food experiences..."
+              rows="4"
+              class="post-textarea"
+            ></textarea>
+            @if (postForm.get('content')?.invalid && postForm.get('content')?.touched) {
+              <span class="field-error">Please write at least 10 characters</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="postImages">Add Images (Optional)</label>
+            <input
+              id="postImages"
+              type="url"
+              formControlName="images"
+              placeholder="https://example.com/image.jpg"
+              class="post-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="postTags">Tags (Optional)</label>
+            <input
+              id="postTags"
+              type="text"
+              formControlName="tags"
+              placeholder="cooking, recipe, italian (separate with commas)"
+              class="post-input"
+            />
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="secondary-btn" (click)="postForm.reset()">
+              Clear
+            </button>
+            <button
+              type="submit"
+              class="primary-btn"
+              [disabled]="postForm.invalid"
+            >
+              📝 Share Post
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+</div>
+
+

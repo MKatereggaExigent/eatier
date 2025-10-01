@@ -1,0 +1,254 @@
+<div class="faqs-page" role="main" aria-label="Frequently Asked Questions">
+  <!-- Header Section -->
+  <header class="faqs-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">❓</span>
+          Frequently Asked Questions
+        </h1>
+        <p class="page-subtitle">
+          Find answers to common questions about using Eatier
+        </p>
+      </div>
+      <div class="header-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ faqStats().totalFAQs }}</span>
+          <span class="stat-label">FAQs</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ faqStats().totalCategories }}</span>
+          <span class="stat-label">Categories</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Search and Filter Section -->
+  <section class="search-section" aria-label="Search and Filter FAQs">
+    <div class="search-container">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Search FAQs..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="searchQuery.set($event)"
+          class="search-input"
+          aria-label="Search frequently asked questions">
+        <span class="search-icon">🔍</span>
+      </div>
+      
+      <div class="filter-section">
+        <div class="category-filters">
+          <button 
+            type="button"
+            class="category-filter"
+            [class.active]="selectedCategory() === 'all'"
+            (click)="selectedCategory.set('all')"
+            aria-label="Show all categories">
+            <span class="filter-icon">📋</span>
+            <span class="filter-text">All</span>
+          </button>
+          
+          @for (category of faqCategories(); track category.id) {
+            <button 
+              type="button"
+              class="category-filter"
+              [class.active]="selectedCategory() === category.id"
+              [class]="category.color"
+              (click)="selectedCategory.set(category.id)"
+              [attr.aria-label]="'Filter by ' + category.name">
+              <span class="filter-icon">{{ category.icon }}</span>
+              <span class="filter-text">{{ category.name }}</span>
+            </button>
+          }
+        </div>
+        
+        @if (searchQuery() || selectedCategory() !== 'all') {
+          <button 
+            type="button" 
+            class="clear-filters-btn"
+            (click)="clearSearch()"
+            aria-label="Clear all filters">
+            Clear Filters
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Categories Overview -->
+  @if (selectedCategory() === 'all' && !searchQuery()) {
+    <section class="categories-overview" aria-label="FAQ Categories">
+      <div class="categories-grid">
+        @for (category of faqCategories(); track category.id) {
+          <div class="category-card" [class]="category.color">
+            <div class="category-header">
+              <div class="category-icon">{{ category.icon }}</div>
+              <div class="category-info">
+                <h3 class="category-name">{{ category.name }}</h3>
+                <p class="category-description">{{ category.description }}</p>
+              </div>
+            </div>
+            <div class="category-stats">
+              <span class="faq-count">{{ category.faqs.length }} FAQs</span>
+              <button 
+                type="button"
+                class="view-category-btn"
+                (click)="selectedCategory.set(category.id)"
+                [attr.aria-label]="'View ' + category.name + ' FAQs'">
+                View FAQs →
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- FAQ Results -->
+  <section class="faqs-results" aria-label="FAQ Results">
+    @if (filteredFAQs().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>No FAQs found</h3>
+        @if (searchQuery()) {
+          <p>No results found for "{{ searchQuery() }}". Try different keywords or browse categories.</p>
+        } @else {
+          <p>No FAQs available in this category.</p>
+        }
+        <button type="button" class="btn-secondary" (click)="clearSearch()">
+          Clear Search
+        </button>
+      </div>
+    } @else {
+      <div class="faqs-list">
+        @for (faq of filteredFAQs(); track faq.id) {
+          <article class="faq-item" [class.expanded]="isFAQExpanded(faq.id)">
+            <button 
+              type="button"
+              class="faq-question"
+              (click)="toggleFAQ(faq.id)"
+              [attr.aria-expanded]="isFAQExpanded(faq.id)"
+              [attr.aria-controls]="'faq-answer-' + faq.id">
+              <span class="question-text">{{ faq.question }}</span>
+              <span class="expand-icon" [class.rotated]="isFAQExpanded(faq.id)">▼</span>
+            </button>
+            
+            <div 
+              class="faq-answer"
+              [id]="'faq-answer-' + faq.id"
+              [attr.aria-hidden]="!isFAQExpanded(faq.id)">
+              <div class="answer-content">
+                <div class="answer-text" [innerHTML]="faq.answer"></div>
+                
+                <div class="faq-meta">
+                  <div class="faq-tags">
+                    @for (tag of faq.tags; track tag) {
+                      <span class="tag">{{ tag }}</span>
+                    }
+                  </div>
+                  
+                  <div class="faq-stats">
+                    <span class="last-updated">
+                      Updated {{ formatDate(faq.lastUpdated) }}
+                    </span>
+                    <span class="helpfulness">
+                      {{ getHelpfulnessPercentage(faq) }}% found helpful
+                    </span>
+                  </div>
+                </div>
+                
+                <div class="faq-actions">
+                  <div class="helpful-section">
+                    <span class="helpful-label">Was this helpful?</span>
+                    <div class="helpful-buttons">
+                      <button 
+                        type="button"
+                        class="helpful-btn yes"
+                        (click)="markHelpful(faq, true)"
+                        aria-label="Mark as helpful">
+                        👍 Yes
+                      </button>
+                      <button 
+                        type="button"
+                        class="helpful-btn no"
+                        (click)="markHelpful(faq, false)"
+                        aria-label="Mark as not helpful">
+                        👎 No
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    type="button"
+                    class="feedback-btn"
+                    (click)="openFeedbackModal(faq)"
+                    aria-label="Provide feedback on this FAQ">
+                    💬 Feedback
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- Contact Support Section -->
+  <section class="contact-support" aria-label="Contact Support">
+    <div class="support-card">
+      <div class="support-content">
+        <h3>Still need help?</h3>
+        <p>Can't find what you're looking for? Our support team is here to help!</p>
+        <div class="support-actions">
+          <a href="/help" class="btn-primary" routerLink="/help">
+            <span class="btn-icon">💬</span>
+            Contact Support
+          </a>
+          <a href="/feedback" class="btn-secondary" routerLink="/feedback">
+            <span class="btn-icon">📝</span>
+            Send Feedback
+          </a>
+        </div>
+      </div>
+      <div class="support-stats">
+        <div class="stat-item">
+          <span class="stat-icon">⚡</span>
+          <span class="stat-text">Average response time: 2 hours</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🎯</span>
+          <span class="stat-text">98% satisfaction rate</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Feedback Modal -->
+@if (showFeedbackModal()) {
+  <div class="modal-overlay" (click)="closeFeedbackModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Provide Feedback</h3>
+        <button type="button" class="modal-close" (click)="closeFeedbackModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>FAQ:</strong> {{ selectedFAQForFeedback()?.question }}</p>
+        <textarea 
+          placeholder="How can we improve this FAQ? Your feedback helps us provide better answers."
+          rows="4"
+          class="feedback-textarea"
+          #feedbackText></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeFeedbackModal()">Cancel</button>
+        <button type="button" class="btn-primary" (click)="submitFeedback(feedbackText.value)">
+          Submit Feedback
+        </button>
+      </div>
+    </div>
+  </div>
+}

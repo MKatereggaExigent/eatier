@@ -1,0 +1,150 @@
+<div class="restaurant-list-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Discover Restaurants</h1>
+    <p>Find your next favorite dining spot</p>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="search-filters">
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search restaurants, cuisines, or locations..."
+        [value]="searchQuery()"
+        (input)="onSearchChange($any($event.target).value)"
+        class="search-input"
+      />
+      <button type="button" class="search-button">🔍</button>
+    </div>
+
+    <div class="filters">
+      <select
+        [value]="selectedCuisine()"
+        (change)="onCuisineChange($any($event.target).value)"
+        class="filter-select"
+      >
+        @for (cuisine of cuisineTypes; track cuisine) {
+          <option [value]="cuisine === 'All Cuisines' ? '' : cuisine">
+            {{ cuisine }}
+          </option>
+        }
+      </select>
+
+      <select
+        [value]="selectedPriceRange()"
+        (change)="onPriceRangeChange($any($event.target).value)"
+        class="filter-select"
+      >
+        @for (range of priceRanges; track range.value) {
+          <option [value]="range.value">{{ range.label }}</option>
+        }
+      </select>
+
+      <button type="button" class="filter-button">
+        More Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Count -->
+  <div class="results-info">
+    <p>{{ filteredRestaurants().length }} restaurants found</p>
+  </div>
+
+  <!-- Restaurant Grid -->
+  <div class="restaurant-grid">
+    @for (restaurant of filteredRestaurants(); track restaurant.id) {
+      <div class="restaurant-card">
+        <a [routerLink]="['/restaurants', restaurant.id]" class="restaurant-link">
+          <div class="restaurant-image">
+            <img [src]="restaurant.image" [alt]="restaurant.name" />
+            <div class="restaurant-status" [class]="getStatusClass(restaurant.isOpen)">
+              {{ getStatusText(restaurant.isOpen) }}
+            </div>
+            <div class="restaurant-distance">{{ restaurant.distance }}</div>
+          </div>
+
+          <div class="restaurant-info">
+            <div class="restaurant-header">
+              <h3 class="restaurant-name">{{ restaurant.name }}</h3>
+              <div class="restaurant-rating">
+                <div class="stars">
+                  @for (star of getStarArray(restaurant.rating); track $index) {
+                    <span class="star" [class.filled]="star">⭐</span>
+                  }
+                </div>
+                <span class="rating-value">{{ restaurant.rating }}</span>
+                <span class="review-count">({{ restaurant.reviewCount }})</span>
+              </div>
+            </div>
+
+            <div class="restaurant-details">
+              <div class="cuisine-price">
+                <span class="cuisine">{{ restaurant.cuisine }}</span>
+                <span class="price-range">{{ restaurant.priceRange }}</span>
+              </div>
+              <p class="address">{{ restaurant.address }}</p>
+            </div>
+
+            <div class="restaurant-features">
+              @for (feature of restaurant.features; track feature) {
+                <span class="feature-tag">{{ feature }}</span>
+              }
+            </div>
+          </div>
+        </a>
+
+        <div class="restaurant-actions">
+          <button type="button" class="action-btn favorite">
+            ❤️ Save
+          </button>
+          <button type="button" class="action-btn share">
+            📤 Share
+          </button>
+          <button type="button" class="action-btn directions">
+            🗺️ Directions
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="no-results">
+        <div class="no-results-icon">🔍</div>
+        <h3>No restaurants found</h3>
+        <p>Try adjusting your search criteria or filters</p>
+        <button type="button" class="clear-filters-btn" (click)="onSearchChange(''); onCuisineChange(''); onPriceRangeChange('')">
+          Clear All Filters
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Load More (for pagination) -->
+  @if (filteredRestaurants().length > 0) {
+    <div class="load-more">
+      <button type="button" class="load-more-btn">
+        Load More Restaurants
+      </button>
+    </div>
+  }
+
+  <!-- Quick Stats -->
+  <div class="quick-stats">
+    <div class="stat-item">
+      <span class="stat-number">500+</span>
+      <span class="stat-label">Restaurants</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">25+</span>
+      <span class="stat-label">Cuisines</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">10k+</span>
+      <span class="stat-label">Reviews</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">4.2</span>
+      <span class="stat-label">Avg Rating</span>
+    </div>
+  </div>
+</div>

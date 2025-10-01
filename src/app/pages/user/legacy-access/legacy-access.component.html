@@ -1,0 +1,318 @@
+<div class="legacy-access-container">
+  <!-- Header -->
+  <div class="legacy-header">
+    <div class="header-content">
+      <h1>👥 Legacy Account Access</h1>
+      <p>Grant trusted individuals access to manage your account</p>
+    </div>
+
+    <button
+      type="button"
+      class="grant-access-btn"
+      (click)="openGrantModal()"
+    >
+      ➕ Grant Access
+    </button>
+  </div>
+
+  <!-- Success/Error Messages -->
+  @if (successMessage()) {
+    <div class="success-message">
+      <span class="success-icon">✅</span>
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Legacy Access List -->
+  <div class="access-section">
+    <h2>Current Access Grants</h2>
+
+    @if (isLoading() && legacyAccesses().length === 0) {
+      <div class="loading-state">
+        <span class="loading-spinner large"></span>
+        <p>Loading access grants...</p>
+      </div>
+    } @else if (legacyAccesses().length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon">👥</span>
+        <h3>No access grants yet</h3>
+        <p>Grant access to trusted individuals to help manage your account</p>
+        <button type="button" class="primary-btn" (click)="openGrantModal()">
+          Grant Access
+        </button>
+      </div>
+    } @else {
+      <div class="access-list">
+        @for (access of legacyAccesses(); track access.id) {
+          <div class="access-card" [class.inactive]="!access.isActive" [class.expired]="isExpired(access)">
+            <!-- Access Header -->
+            <div class="access-header">
+              <div class="access-info">
+                <h3>{{ access.delegateName }}</h3>
+                <p class="access-email">{{ access.delegateEmail }}</p>
+                <span class="access-level">{{ getAccessLevelLabel(access.accessLevel) }}</span>
+              </div>
+
+              <div class="access-status">
+                @if (isExpired(access)) {
+                  <span class="status-badge expired">Expired</span>
+                } @else if (!access.isActive) {
+                  <span class="status-badge inactive">Inactive</span>
+                } @else if (isExpiringSoon(access)) {
+                  <span class="status-badge warning">Expires Soon</span>
+                } @else {
+                  <span class="status-badge active">Active</span>
+                }
+              </div>
+            </div>
+
+            <!-- Access Details -->
+            <div class="access-details">
+              <div class="detail-item">
+                <span class="detail-label">Granted:</span>
+                <span class="detail-value">{{ formatDate(access.createdAt) }}</span>
+              </div>
+
+              @if (access.expiresAt) {
+                <div class="detail-item">
+                  <span class="detail-label">Expires:</span>
+                  <span class="detail-value">{{ formatDate(access.expiresAt) }}</span>
+                  @if (isExpiringSoon(access) && !isExpired(access)) {
+                    <span class="expiry-warning">({{ getDaysUntilExpiry(access) }} days left)</span>
+                  }
+                </div>
+              }
+
+              @if (access.lastAccessedAt) {
+                <div class="detail-item">
+                  <span class="detail-label">Last Used:</span>
+                  <span class="detail-value">{{ formatDateTime(access.lastAccessedAt) }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- Permissions -->
+            <div class="permissions-section">
+              <h4>Permissions</h4>
+              <div class="permissions-grid">
+                @for (permission of Object.keys(access.permissions); track permission) {
+                  <div class="permission-item" [class.enabled]="getPermissionValue(access.permissions, permission)">
+                    <span class="permission-icon">{{ getPermissionIcon(permission) }}</span>
+                    <span class="permission-label">{{ getPermissionLabel(permission) }}</span>
+                    @if (getPermissionValue(access.permissions, permission)) {
+                      <span class="permission-status">✓</span>
+                    } @else {
+                      <span class="permission-status">✗</span>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Access Actions -->
+            <div class="access-actions">
+              @if (access.isActive && !isExpired(access)) {
+                <button
+                  type="button"
+                  class="action-btn toggle"
+                  (click)="toggleAccessStatus(access)"
+                >
+                  ⏸️ Suspend
+                </button>
+              } @else if (!isExpired(access)) {
+                <button
+                  type="button"
+                  class="action-btn toggle"
+                  (click)="toggleAccessStatus(access)"
+                >
+                  ▶️ Activate
+                </button>
+              }
+
+              <button
+                type="button"
+                class="action-btn revoke"
+                (click)="openRevokeModal(access)"
+              >
+                🗑️ Revoke
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Grant Access Modal -->
+@if (showGrantModal()) {
+  <div class="modal-overlay" (click)="closeGrantModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>👥 Grant Legacy Access</h3>
+        <button type="button" class="close-btn" (click)="closeGrantModal()">✕</button>
+      </div>
+
+      <form [formGroup]="grantAccessForm" (ngSubmit)="onGrantAccess()" class="grant-form">
+        <div class="form-group">
+          <label for="delegateEmail">Email Address *</label>
+          <input
+            id="delegateEmail"
+            type="email"
+            formControlName="delegateEmail"
+            placeholder="trusted.person@example.com"
+            [class.error]="getFieldError(grantAccessForm, 'delegateEmail')"
+          />
+          @if (getFieldError(grantAccessForm, 'delegateEmail')) {
+            <span class="field-error">{{ getFieldError(grantAccessForm, 'delegateEmail') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="delegateName">Full Name *</label>
+          <input
+            id="delegateName"
+            type="text"
+            formControlName="delegateName"
+            placeholder="John Doe"
+            [class.error]="getFieldError(grantAccessForm, 'delegateName')"
+          />
+          @if (getFieldError(grantAccessForm, 'delegateName')) {
+            <span class="field-error">{{ getFieldError(grantAccessForm, 'delegateName') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Access Level *</label>
+          <div class="access-level-options">
+            @for (level of accessLevels; track level.value) {
+              <label class="access-level-option">
+                <input
+                  type="radio"
+                  formControlName="accessLevel"
+                  [value]="level.value"
+                />
+                <div class="option-content">
+                  <span class="option-title">{{ level.label }}</span>
+                  <span class="option-description">{{ level.description }}</span>
+                </div>
+              </label>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="message">Optional Message</label>
+          <textarea
+            id="message"
+            formControlName="message"
+            placeholder="Add a message for the recipient..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="expirationDays">Access Expires (days)</label>
+            <input
+              id="expirationDays"
+              type="number"
+              formControlName="expirationDays"
+              min="1"
+              max="365"
+              [class.error]="getFieldError(grantAccessForm, 'expirationDays')"
+            />
+            @if (getFieldError(grantAccessForm, 'expirationDays')) {
+              <span class="field-error">{{ getFieldError(grantAccessForm, 'expirationDays') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="requiresPassword" />
+              <span class="checkmark"></span>
+              Require password for access
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" (click)="closeGrantModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="primary-btn"
+            [disabled]="isLoading() || grantAccessForm.invalid"
+          >
+            @if (isLoading()) {
+              <span class="loading-spinner"></span>
+              Granting Access...
+            } @else {
+              Grant Access
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Revoke Access Modal -->
+@if (showRevokeModal() && selectedAccess()) {
+  <div class="modal-overlay" (click)="closeRevokeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>🗑️ Revoke Access</h3>
+        <button type="button" class="close-btn" (click)="closeRevokeModal()">✕</button>
+      </div>
+
+      <div class="revoke-warning">
+        <p><strong>⚠️ Are you sure?</strong></p>
+        <p>You are about to revoke access for <strong>{{ selectedAccess()!.delegateName }}</strong> ({{ selectedAccess()!.delegateEmail }}).</p>
+        <p>They will no longer be able to access or manage your account.</p>
+      </div>
+
+      <form [formGroup]="passwordForm" (ngSubmit)="onRevokeAccess()" class="revoke-form">
+        <div class="form-group">
+          <label for="currentPassword">Enter your password to confirm *</label>
+          <input
+            id="currentPassword"
+            type="password"
+            formControlName="currentPassword"
+            placeholder="Your current password"
+            [class.error]="getFieldError(passwordForm, 'currentPassword')"
+          />
+          @if (getFieldError(passwordForm, 'currentPassword')) {
+            <span class="field-error">{{ getFieldError(passwordForm, 'currentPassword') }}</span>
+          }
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" (click)="closeRevokeModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="danger-btn"
+            [disabled]="isLoading() || passwordForm.invalid"
+          >
+            @if (isLoading()) {
+              <span class="loading-spinner"></span>
+              Revoking...
+            } @else {
+              Revoke Access
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,0 +1,377 @@
+<div class="help-centre-container" role="main" aria-label="Help Centre">
+  <!-- Hero Section -->
+  <header class="help-hero">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <span class="hero-icon">💬</span>
+        Help Centre
+      </h1>
+      <p class="hero-subtitle">
+        Get the support you need to make the most of Eatier
+      </p>
+
+      <!-- Search Bar -->
+      <div class="search-section">
+        <div class="search-container">
+          <input
+            type="search"
+            class="search-input"
+            placeholder="Search for help articles, guides, or FAQs..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+            aria-label="Search help articles">
+          <button
+            type="button"
+            class="search-btn"
+            (click)="onSearch()"
+            aria-label="Search">
+            🔍
+          </button>
+        </div>
+        @if (searchResults().length > 0 && searchQuery()) {
+          <div class="search-results" role="region" aria-label="Search results">
+            <h3>Search Results ({{ searchResults().length }})</h3>
+            <div class="results-list">
+              @for (result of searchResults(); track result.id) {
+                <a
+                  [href]="'#' + result.id"
+                  class="result-item"
+                  (click)="scrollToSection(result.id)">
+                  <span class="result-icon">{{ result.icon }}</span>
+                  <div class="result-content">
+                    <h4>{{ result.title }}</h4>
+                    <p>{{ result.description }}</p>
+                  </div>
+                </a>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <!-- Quick Actions -->
+  <section class="quick-actions" aria-label="Quick Help Actions">
+    <h2 class="section-title">Quick Actions</h2>
+    <div class="actions-grid">
+      <button
+        type="button"
+        class="action-card"
+        (click)="openContactModal()"
+        aria-label="Contact support team">
+        <span class="action-icon">📞</span>
+        <h3>Contact Support</h3>
+        <p>Get direct help from our support team</p>
+      </button>
+
+      <a
+        routerLink="/faqs"
+        class="action-card"
+        aria-label="View frequently asked questions">
+        <span class="action-icon">❓</span>
+        <h3>FAQs</h3>
+        <p>Find answers to common questions</p>
+      </a>
+
+      <button
+        type="button"
+        class="action-card"
+        (click)="openLiveChatModal()"
+        aria-label="Start live chat">
+        <span class="action-icon">💬</span>
+        <h3>Live Chat</h3>
+        <p>Chat with our support team in real-time</p>
+      </button>
+
+      <a
+        routerLink="/feedback"
+        class="action-card"
+        aria-label="Submit feedback">
+        <span class="action-icon">📝</span>
+        <h3>Send Feedback</h3>
+        <p>Help us improve Eatier with your suggestions</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Help Categories -->
+  <section class="help-categories" aria-label="Help Categories">
+    <h2 class="section-title">Browse by Category</h2>
+    <div class="categories-grid">
+      @for (category of helpCategories(); track category.id) {
+        <div class="category-card" [id]="category.id">
+          <div class="category-header">
+            <span class="category-icon">{{ category.icon }}</span>
+            <h3>{{ category.title }}</h3>
+            <p>{{ category.description }}</p>
+          </div>
+
+          <div class="category-articles">
+            @for (article of category.articles; track article.id) {
+              <details class="article-item">
+                <summary class="article-title">
+                  <span class="article-icon">{{ article.icon }}</span>
+                  {{ article.title }}
+                </summary>
+                <div class="article-content">
+                  <p [innerHTML]="article.content"></p>
+                  @if (article.steps && article.steps.length > 0) {
+                    <ol class="article-steps">
+                      @for (step of article.steps; track $index) {
+                        <li>{{ step }}</li>
+                      }
+                    </ol>
+                  }
+                  @if (article.relatedLinks && article.relatedLinks.length > 0) {
+                    <div class="related-links">
+                      <h5>Related:</h5>
+                      @for (link of article.relatedLinks; track link.url) {
+                        <a [routerLink]="link.url" class="related-link">{{ link.title }}</a>
+                      }
+                    </div>
+                  }
+                </div>
+              </details>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Contact Support Section -->
+  <section class="contact-support" aria-label="Contact Support">
+    <div class="contact-card">
+      <div class="contact-header">
+        <span class="contact-icon">🤝</span>
+        <h2>Still Need Help?</h2>
+        <p>Our support team is here to help you succeed</p>
+      </div>
+
+      <div class="contact-options">
+        <div class="contact-option">
+          <span class="option-icon">📧</span>
+          <div class="option-content">
+            <h4>Email Support</h4>
+            <p>Get detailed help via email</p>
+            <a href="mailto:support&#64;eatier.com" class="contact-link">support&#64;eatier.com</a>
+          </div>
+        </div>
+
+        <div class="contact-option">
+          <span class="option-icon">💬</span>
+          <div class="option-content">
+            <h4>Live Chat</h4>
+            <p>Chat with us in real-time</p>
+            <button type="button" class="contact-link" (click)="openLiveChatModal()">
+              Start Chat
+            </button>
+          </div>
+        </div>
+
+        <div class="contact-option">
+          <span class="option-icon">📞</span>
+          <div class="option-content">
+            <h4>Phone Support</h4>
+            <p>Speak directly with our team</p>
+            <a href="tel:+1-800-EATIER" class="contact-link">+1 (800) EATIER</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="support-hours">
+        <h4>Support Hours</h4>
+        <div class="hours-grid">
+          <div class="hours-item">
+            <span class="day">Monday - Friday</span>
+            <span class="time">9:00 AM - 6:00 PM EST</span>
+          </div>
+          <div class="hours-item">
+            <span class="day">Saturday</span>
+            <span class="time">10:00 AM - 4:00 PM EST</span>
+          </div>
+          <div class="hours-item">
+            <span class="day">Sunday</span>
+            <span class="time">Closed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Community Resources -->
+  <section class="community-resources" aria-label="Community Resources">
+    <h2 class="section-title">Community Resources</h2>
+    <div class="resources-grid">
+      <a routerLink="/community" class="resource-card">
+        <span class="resource-icon">🌟</span>
+        <h3>Community Forum</h3>
+        <p>Connect with other users and share experiences</p>
+      </a>
+
+      <a href="https://blog.eatier.com" target="_blank" rel="noopener noreferrer" class="resource-card">
+        <span class="resource-icon">📖</span>
+        <h3>Blog & Guides</h3>
+        <p>Learn tips and best practices from our experts</p>
+      </a>
+
+      <a href="https://youtube.com/eatier" target="_blank" rel="noopener noreferrer" class="resource-card">
+        <span class="resource-icon">🎥</span>
+        <h3>Video Tutorials</h3>
+        <p>Watch step-by-step guides and tutorials</p>
+      </a>
+
+      <a href="https://status.eatier.com" target="_blank" rel="noopener noreferrer" class="resource-card">
+        <span class="resource-icon">📊</span>
+        <h3>System Status</h3>
+        <p>Check current system status and updates</p>
+      </a>
+    </div>
+  </section>
+</div>
+
+<!-- Contact Modal -->
+@if (showContactModal()) {
+  <div class="modal-overlay" (click)="closeContactModal()" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="contact-modal-title">Contact Support</h3>
+        <button type="button" class="modal-close" (click)="closeContactModal()" aria-label="Close modal">
+          ✕
+        </button>
+      </div>
+
+      <form class="contact-form" (ngSubmit)="submitContactForm()" [formGroup]="contactForm">
+        <div class="form-group">
+          <label for="contact-name">Name *</label>
+          <input
+            type="text"
+            id="contact-name"
+            formControlName="name"
+            class="form-input"
+            required>
+          @if (contactForm.get('name')?.invalid && contactForm.get('name')?.touched) {
+            <span class="field-error">Name is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="contact-email">Email *</label>
+          <input
+            type="email"
+            id="contact-email"
+            formControlName="email"
+            class="form-input"
+            required>
+          @if (contactForm.get('email')?.invalid && contactForm.get('email')?.touched) {
+            <span class="field-error">Valid email is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="contact-subject">Subject *</label>
+          <select id="contact-subject" formControlName="subject" class="form-select" required>
+            <option value="">Select a topic</option>
+            <option value="account">Account Issues</option>
+            <option value="billing">Billing & Payments</option>
+            <option value="technical">Technical Support</option>
+            <option value="business">Business Account</option>
+            <option value="feature">Feature Request</option>
+            <option value="other">Other</option>
+          </select>
+          @if (contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched) {
+            <span class="field-error">Please select a subject</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="contact-message">Message *</label>
+          <textarea
+            id="contact-message"
+            formControlName="message"
+            class="form-textarea"
+            rows="5"
+            placeholder="Please describe your issue or question in detail..."
+            required></textarea>
+          @if (contactForm.get('message')?.invalid && contactForm.get('message')?.touched) {
+            <span class="field-error">Message is required</span>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="secondary-btn" (click)="closeContactModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="primary-btn"
+            [disabled]="contactForm.invalid || isSubmitting()">
+            @if (isSubmitting()) {
+              <span class="loading-spinner"></span>
+              Sending...
+            } @else {
+              Send Message
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Live Chat Modal -->
+@if (showLiveChatModal()) {
+  <div class="modal-overlay" (click)="closeLiveChatModal()" role="dialog" aria-modal="true" aria-labelledby="chat-modal-title">
+    <div class="modal-content chat-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="chat-modal-title">Live Chat Support</h3>
+        <button type="button" class="modal-close" (click)="closeLiveChatModal()" aria-label="Close chat">
+          ✕
+        </button>
+      </div>
+
+      <div class="chat-container">
+        <div class="chat-messages" #chatMessagesContainer>
+          @for (message of chatMessages(); track message.id) {
+            <div class="chat-message" [class]="message.sender">
+              <div class="message-avatar">
+                {{ message.sender === 'user' ? '👤' : '🎧' }}
+              </div>
+              <div class="message-content">
+                <div class="message-text">{{ message.text }}</div>
+                <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <form class="chat-input-form" (ngSubmit)="sendChatMessage()">
+          <input
+            type="text"
+            [(ngModel)]="chatInput"
+            name="chatInput"
+            class="chat-input"
+            placeholder="Type your message..."
+            [disabled]="!isChatConnected()"
+            maxlength="500">
+          <button
+            type="submit"
+            class="chat-send-btn"
+            [disabled]="!chatInput.trim() || !isChatConnected()"
+            aria-label="Send message">
+            📤
+          </button>
+        </form>
+
+        <div class="chat-status">
+          @if (isChatConnected()) {
+            <span class="status-connected">🟢 Connected to support</span>
+          } @else {
+            <span class="status-connecting">🟡 Connecting...</span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

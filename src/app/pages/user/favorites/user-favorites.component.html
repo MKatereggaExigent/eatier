@@ -1,0 +1,358 @@
+<div class="user-favorites" role="main" aria-label="My Favorite Restaurants">
+  <!-- Header Section -->
+  <header class="favorites-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">❤️</span>
+          My Favorites
+        </h1>
+        <p class="page-subtitle">
+          Your saved restaurants and collections
+        </p>
+      </div>
+
+      @if (stats()) {
+        <div class="header-stats">
+          <div class="stat-item">
+            <span class="stat-number">{{ stats()!.totalFavorites }}</span>
+            <span class="stat-label">Favorites</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ stats()!.averageRating.toFixed(1) }}</span>
+            <span class="stat-label">Avg Rating</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ collections().length }}</span>
+            <span class="stat-label">Collections</span>
+          </div>
+        </div>
+      }
+    </div>
+  </header>
+
+  <!-- Search and Filter Section -->
+  <section class="search-filter-section">
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search your favorites..."
+          [value]="searchQuery()"
+          (input)="searchQuery.set($any($event.target).value)"
+          aria-label="Search favorites">
+      </div>
+
+      <div class="view-controls">
+        <button
+          type="button"
+          class="view-toggle-btn"
+          (click)="toggleViewMode()"
+          [attr.aria-label]="viewMode().label">
+          <span class="btn-icon">{{ viewMode().icon }}</span>
+          <span class="btn-text">{{ viewMode().label }}</span>
+        </button>
+
+        <button
+          type="button"
+          class="filter-toggle-btn"
+          [class.active]="showFilters()"
+          (click)="toggleFilters()"
+          aria-label="Toggle filters">
+          <span class="btn-icon">🎛️</span>
+          <span class="btn-text">Filters</span>
+          @if (hasActiveFilters()) {
+            <span class="filter-badge">{{ filteredFavorites().length }}</span>
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    @if (showFilters()) {
+      <div class="filter-panel" [@slideDown]>
+        <div class="filter-row">
+          <div class="filter-group">
+            <label class="filter-label">Cuisine</label>
+            <select
+              class="filter-select"
+              [value]="filters().cuisine"
+              (change)="updateFilter('cuisine', $any($event.target).value)">
+              <option value="all">All Cuisines</option>
+              @for (cuisine of cuisineOptions.slice(1); track cuisine) {
+                <option [value]="cuisine">{{ cuisine }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Price Range</label>
+            <select
+              class="filter-select"
+              [value]="filters().priceRange"
+              (change)="updateFilter('priceRange', $any($event.target).value)">
+              @for (option of priceRangeOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Rating</label>
+            <select
+              class="filter-select"
+              [value]="filters().rating"
+              (change)="updateFilter('rating', $any($event.target).value)">
+              <option value="all">All Ratings</option>
+              <option value="4">4+ Stars</option>
+              <option value="3">3+ Stars</option>
+              <option value="2">2+ Stars</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Sort By</label>
+            <select
+              class="filter-select"
+              [value]="filters().sortBy"
+              (change)="updateFilter('sortBy', $any($event.target).value)">
+              @for (option of sortOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        @if (hasActiveFilters()) {
+          <div class="filter-actions">
+            <button type="button" class="clear-filters-btn" (click)="clearFilters()">
+              <span class="btn-icon">✕</span>
+              Clear All Filters
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- Collections Section -->
+  @if (collections().length > 0) {
+    <section class="collections-section">
+      <h2 class="section-title">
+        <span class="title-icon">📁</span>
+        My Collections
+      </h2>
+      <div class="collections-grid">
+        @for (collection of collections(); track collection.id) {
+          <div class="collection-card">
+            @if (collection.coverImageUrl) {
+              <div class="collection-cover">
+                <img [src]="collection.coverImageUrl" [alt]="collection.name">
+              </div>
+            }
+            <div class="collection-info">
+              <h3 class="collection-name">{{ collection.name }}</h3>
+              <p class="collection-description">{{ collection.description }}</p>
+              <div class="collection-meta">
+                <span class="item-count">{{ collection.itemCount }} restaurants</span>
+                @if (collection.isPublic) {
+                  <span class="public-badge">Public</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <button type="button" class="new-collection-btn" (click)="showNewCollectionModal.set(true)">
+          <span class="btn-icon">➕</span>
+          <span class="btn-text">New Collection</span>
+        </button>
+      </div>
+    </section>
+  }
+
+  <!-- Favorites Grid/List -->
+  <section class="favorites-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="title-icon">🍽️</span>
+        All Favorites
+        <span class="count-badge">{{ filteredFavorites().length }}</span>
+      </h2>
+    </div>
+
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading your favorites...</p>
+      </div>
+    } @else if (filteredFavorites().length === 0) {
+      <div class="empty-state">
+        @if (hasActiveFilters()) {
+          <div class="empty-icon">🔍</div>
+          <h3>No favorites match your filters</h3>
+          <p>Try adjusting your search criteria or clearing filters.</p>
+          <button type="button" class="btn-secondary" (click)="clearFilters()">
+            Clear Filters
+          </button>
+        } @else {
+          <div class="empty-icon">❤️</div>
+          <h3>No favorites yet</h3>
+          <p>Start exploring restaurants and add them to your favorites!</p>
+          <a routerLink="/restaurants" class="btn-primary">
+            <span class="btn-icon">🔍</span>
+            Discover Restaurants
+          </a>
+        }
+      </div>
+    } @else {
+      <div class="favorites-container" [class]="viewMode().type + '-view'">
+        @for (favorite of filteredFavorites(); track favorite.id) {
+          <article class="favorite-card">
+            <div class="restaurant-image">
+              <img [src]="favorite.restaurant.imageUrl" [alt]="favorite.restaurant.name">
+              <div class="image-overlay">
+                <button
+                  type="button"
+                  class="action-btn view-btn"
+                  (click)="viewRestaurant(favorite.restaurant)"
+                  aria-label="View restaurant details">
+                  <span class="btn-icon">👁️</span>
+                </button>
+                <button
+                  type="button"
+                  class="action-btn reserve-btn"
+                  (click)="makeReservation(favorite.restaurant)"
+                  aria-label="Make reservation">
+                  <span class="btn-icon">📅</span>
+                </button>
+              </div>
+              @if (favorite.restaurant.isOpen) {
+                <div class="status-badge open">Open</div>
+              } @else {
+                <div class="status-badge closed">Closed</div>
+              }
+            </div>
+
+            <div class="restaurant-info">
+              <div class="restaurant-header">
+                <h3 class="restaurant-name">{{ favorite.restaurant.name }}</h3>
+                <div class="restaurant-rating">
+                  <span class="stars">{{ getStarRating(favorite.restaurant.averageRating) }}</span>
+                  <span class="rating-number">{{ favorite.restaurant.averageRating }}</span>
+                  <span class="review-count">({{ favorite.restaurant.totalReviews }})</span>
+                </div>
+              </div>
+
+              <div class="restaurant-details">
+                <div class="cuisine-tags">
+                  @for (cuisine of favorite.restaurant.cuisineTypes; track cuisine) {
+                    <span class="cuisine-tag">{{ cuisine }}</span>
+                  }
+                </div>
+                <div class="price-range">{{ getPriceRangeDisplay(favorite.restaurant.priceRange) }}</div>
+              </div>
+
+              <p class="restaurant-description">{{ favorite.restaurant.description }}</p>
+
+              <div class="location-info">
+                <span class="address">{{ favorite.restaurant.address }}, {{ favorite.restaurant.city }}</span>
+                @if (favorite.restaurant.distance) {
+                  <span class="distance">{{ favorite.restaurant.distance }} mi</span>
+                }
+              </div>
+
+              @if (favorite.notes) {
+                <div class="favorite-notes">
+                  <span class="notes-icon">📝</span>
+                  <span class="notes-text">{{ favorite.notes }}</span>
+                </div>
+              }
+
+              <div class="favorite-meta">
+                <div class="meta-info">
+                  <span class="added-date">Added {{ formatDate(favorite.addedAt) }}</span>
+                  @if (favorite.visitCount > 0) {
+                    <span class="visit-count">{{ favorite.visitCount }} visits</span>
+                  }
+                </div>
+
+                <div class="favorite-actions">
+                  <button
+                    type="button"
+                    class="action-btn edit-btn"
+                    (click)="editNotes(favorite)"
+                    aria-label="Edit notes">
+                    <span class="btn-icon">✏️</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn remove-btn"
+                    (click)="removeFromFavorites(favorite)"
+                    aria-label="Remove from favorites">
+                    <span class="btn-icon">🗑️</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</div>
+
+<!-- Edit Notes Modal -->
+@if (showEditNotesModal()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Edit Notes</h3>
+        <button type="button" class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        @if (selectedFavorite()?.restaurant?.name) {
+          <p><strong>{{ selectedFavorite()!.restaurant.name }}</strong></p>
+        }
+        <textarea
+          #notesTextarea
+          class="notes-textarea"
+          placeholder="Add your personal notes about this restaurant..."
+          [value]="selectedFavorite()?.notes || ''"
+          rows="4"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn-primary" (click)="updateNotes(notesTextarea.value)">
+          Save Notes
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteConfirm()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Remove from Favorites</h3>
+        <button type="button" class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        @if (selectedFavorite()?.restaurant?.name) {
+          <p>Are you sure you want to remove <strong>{{ selectedFavorite()!.restaurant.name }}</strong> from your favorites?</p>
+        }
+        <p class="warning-text">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn-danger" (click)="confirmRemoveFavorite()">
+          Remove Favorite
+        </button>
+      </div>
+    </div>
+  </div>
+}

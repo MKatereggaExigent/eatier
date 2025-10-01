@@ -1,0 +1,679 @@
+<div class="ad-creation-container" role="main" aria-label="Create New Ad Campaign">
+  <!-- Header -->
+  <header class="creation-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">🚀</span>
+          Create New Campaign
+        </h1>
+        <p class="page-subtitle">
+          {{ getStepTitle(currentStep()) }} - Step {{ currentStep() }} of {{ totalSteps() }}
+        </p>
+      </div>
+      
+      <div class="header-actions">
+        <button 
+          type="button" 
+          class="btn-secondary cancel-btn"
+          (click)="cancelCreation()">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div 
+          class="progress-fill" 
+          [style.width.%]="getProgressPercentage()">
+        </div>
+      </div>
+      <div class="progress-steps">
+        @for (step of [1, 2, 3, 4, 5]; track step) {
+          <div 
+            class="progress-step"
+            [class.active]="step === currentStep()"
+            [class.completed]="step < currentStep()"
+            (click)="goToStep(step)">
+            <span class="step-number">{{ step }}</span>
+            <span class="step-label">{{ getStepTitle(step) }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <!-- Step Content -->
+  <div class="step-content">
+    <!-- Step 1: Basic Information -->
+    @if (currentStep() === 1) {
+      <div class="step-panel" id="basic-info-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Basic Information</h2>
+          <p class="panel-description">Tell us about your campaign and what you want to achieve</p>
+        </div>
+
+        <form [formGroup]="basicInfoForm" class="step-form">
+          <div class="form-group">
+            <label for="title" class="form-label">Campaign Title *</label>
+            <input 
+              type="text" 
+              id="title"
+              formControlName="title"
+              class="form-input"
+              placeholder="e.g., Summer Menu Promotion"
+              maxlength="100">
+            <div class="form-help">Choose a descriptive name for your campaign</div>
+          </div>
+
+          <div class="form-group">
+            <label for="description" class="form-label">Campaign Description *</label>
+            <textarea 
+              id="description"
+              formControlName="description"
+              class="form-textarea"
+              placeholder="Describe what you're promoting and why people should be interested..."
+              maxlength="500"
+              rows="4">
+            </textarea>
+            <div class="form-help">Explain what makes your offering special</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Ad Type *</label>
+            <div class="ad-type-options">
+              @for (adType of adTypes; track adType.value) {
+                <div class="ad-type-card">
+                  <input 
+                    type="radio" 
+                    [id]="'type-' + adType.value"
+                    formControlName="type"
+                    [value]="adType.value"
+                    class="ad-type-radio">
+                  <label [for]="'type-' + adType.value" class="ad-type-label">
+                    <div class="ad-type-header">
+                      <h3 class="ad-type-title">{{ adType.label }}</h3>
+                      <span class="ad-type-price">From ${{ adType.minBudget }}/day</span>
+                    </div>
+                    <p class="ad-type-description">{{ adType.description }}</p>
+                  </label>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="category" class="form-label">Business Category *</label>
+            <select id="category" formControlName="category" class="form-select">
+              <option value="">Select a category</option>
+              <option value="restaurant">Restaurant</option>
+              <option value="cafe">Cafe</option>
+              <option value="bar">Bar</option>
+              <option value="catering">Catering</option>
+              <option value="food-truck">Food Truck</option>
+              <option value="bakery">Bakery</option>
+              <option value="chef-services">Chef Services</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Campaign Objectives *</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox" value="brand-awareness" class="checkbox-input">
+                <span class="checkbox-label">Increase Brand Awareness</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" value="drive-bookings" class="checkbox-input">
+                <span class="checkbox-label">Drive Bookings</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" value="promote-menu" class="checkbox-input">
+                <span class="checkbox-label">Promote New Menu Items</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" value="increase-followers" class="checkbox-input">
+                <span class="checkbox-label">Increase Social Media Followers</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" value="website-traffic" class="checkbox-input">
+                <span class="checkbox-label">Drive Website Traffic</span>
+              </label>
+            </div>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- Step 2: Targeting & Audience -->
+    @if (currentStep() === 2) {
+      <div class="step-panel" id="targeting-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Targeting & Audience</h2>
+          <p class="panel-description">Define who should see your ads</p>
+        </div>
+
+        <form [formGroup]="targetingForm" class="step-form">
+          <!-- Geographic Targeting -->
+          <div class="form-section">
+            <h3 class="section-title">Geographic Targeting</h3>
+            
+            <div class="form-group">
+              <label for="region" class="form-label">Region *</label>
+              <select id="region" formControlName="region" class="form-select">
+                @for (region of regions; track region.value) {
+                  <option [value]="region.value">{{ region.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="countries" class="form-label">Countries *</label>
+              <select id="countries" formControlName="countries" class="form-select" multiple>
+                @for (country of availableCountries(); track country) {
+                  <option [value]="country">{{ country }}</option>
+                }
+              </select>
+              <div class="form-help">Hold Ctrl/Cmd to select multiple countries</div>
+            </div>
+
+            <div class="form-group">
+              <label for="cities" class="form-label">Cities (Optional)</label>
+              <select id="cities" formControlName="cities" class="form-select" multiple>
+                @for (city of availableCities(); track city) {
+                  <option [value]="city">{{ city }}</option>
+                }
+              </select>
+              <div class="form-help">Leave empty to target entire countries</div>
+            </div>
+
+            <div class="form-group">
+              <label for="radius" class="form-label">Radius (km)</label>
+              <input 
+                type="range" 
+                id="radius"
+                formControlName="radius"
+                min="5" 
+                max="100" 
+                class="form-range">
+              <div class="range-value">{{ targetingForm.get('radius')?.value }} km</div>
+            </div>
+          </div>
+
+          <!-- Demographic Targeting -->
+          <div class="form-section">
+            <h3 class="section-title">Demographic Targeting</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ageMin" class="form-label">Age Range</label>
+                <div class="age-range-inputs">
+                  <input 
+                    type="number" 
+                    id="ageMin"
+                    formControlName="ageMin"
+                    min="13" 
+                    max="100" 
+                    class="form-input age-input"
+                    placeholder="Min">
+                  <span class="age-separator">to</span>
+                  <input 
+                    type="number" 
+                    id="ageMax"
+                    formControlName="ageMax"
+                    min="13" 
+                    max="100" 
+                    class="form-input age-input"
+                    placeholder="Max">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Gender</label>
+              <div class="radio-group">
+                <label class="radio-item">
+                  <input type="radio" value="all" formControlName="gender" class="radio-input">
+                  <span class="radio-label">All Genders</span>
+                </label>
+                <label class="radio-item">
+                  <input type="radio" value="male" formControlName="gender" class="radio-input">
+                  <span class="radio-label">Male</span>
+                </label>
+                <label class="radio-item">
+                  <input type="radio" value="female" formControlName="gender" class="radio-input">
+                  <span class="radio-label">Female</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="userTypes" class="form-label">User Types *</label>
+              <select id="userTypes" formControlName="userTypes" class="form-select" multiple>
+                <option value="food_enthusiast">Food Enthusiasts</option>
+                <option value="normal_user">Regular Users</option>
+                <option value="business">Business Owners</option>
+                <option value="specialist">Food Specialists</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Interest Targeting -->
+          <div class="form-section">
+            <h3 class="section-title">Interest & Keyword Targeting</h3>
+            
+            <div class="form-group">
+              <label for="interests" class="form-label">Interests</label>
+              <input 
+                type="text" 
+                id="interests"
+                class="form-input"
+                placeholder="e.g., fine dining, local cuisine, food photography"
+                (keydown.enter)="$event.preventDefault()">
+              <div class="form-help">Press Enter to add interests</div>
+            </div>
+
+            <div class="form-group">
+              <label for="keywords" class="form-label">Keywords</label>
+              <input 
+                type="text" 
+                id="keywords"
+                class="form-input"
+                placeholder="e.g., restaurant, food, dining"
+                (keydown.enter)="$event.preventDefault()">
+              <div class="form-help">Keywords that describe your business</div>
+            </div>
+
+            <div class="form-group">
+              <label for="excludedKeywords" class="form-label">Excluded Keywords</label>
+              <input 
+                type="text" 
+                id="excludedKeywords"
+                class="form-input"
+                placeholder="e.g., fast food, delivery"
+                (keydown.enter)="$event.preventDefault()">
+              <div class="form-help">Keywords to avoid targeting</div>
+            </div>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- Step 3: Ad Content & Creative -->
+    @if (currentStep() === 3) {
+      <div class="step-panel" id="content-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Ad Content & Creative</h2>
+          <p class="panel-description">Create compelling content that attracts customers</p>
+        </div>
+
+        <form [formGroup]="contentForm" class="step-form">
+          <div class="form-group">
+            <label for="headline" class="form-label">Headline *</label>
+            <input 
+              type="text" 
+              id="headline"
+              formControlName="headline"
+              class="form-input"
+              placeholder="e.g., Taste Summer at Our Restaurant"
+              maxlength="100">
+            <div class="form-help">Make it catchy and attention-grabbing</div>
+          </div>
+
+          <div class="form-group">
+            <label for="adDescription" class="form-label">Description *</label>
+            <textarea 
+              id="adDescription"
+              formControlName="description"
+              class="form-textarea"
+              placeholder="Fresh seasonal ingredients, expertly crafted dishes..."
+              maxlength="300"
+              rows="3">
+            </textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="subheading" class="form-label">Subheading (Optional)</label>
+            <input 
+              type="text" 
+              id="subheading"
+              formControlName="subheading"
+              class="form-input"
+              placeholder="e.g., Limited time offer"
+              maxlength="150">
+          </div>
+
+          <!-- Call to Action -->
+          <div class="form-section">
+            <h3 class="section-title">Call to Action</h3>
+            
+            <div class="form-group">
+              <label for="ctaType" class="form-label">Action Type *</label>
+              <select id="ctaType" formControlName="ctaType" class="form-select">
+                @for (cta of ctaTypes; track cta.value) {
+                  <option [value]="cta.value">{{ cta.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ctaText" class="form-label">Button Text *</label>
+              <input 
+                type="text" 
+                id="ctaText"
+                formControlName="ctaText"
+                class="form-input"
+                placeholder="Book Now">
+            </div>
+
+            <!-- Conditional CTA fields -->
+            @if (contentForm.get('ctaType')?.value === 'visit_website') {
+              <div class="form-group">
+                <label for="ctaUrl" class="form-label">Website URL</label>
+                <input 
+                  type="url" 
+                  id="ctaUrl"
+                  formControlName="ctaUrl"
+                  class="form-input"
+                  placeholder="https://your-website.com">
+              </div>
+            }
+
+            @if (contentForm.get('ctaType')?.value === 'call_now') {
+              <div class="form-group">
+                <label for="ctaPhone" class="form-label">Phone Number</label>
+                <input 
+                  type="tel" 
+                  id="ctaPhone"
+                  formControlName="ctaPhone"
+                  class="form-input"
+                  placeholder="+1 (555) 123-4567">
+              </div>
+            }
+
+            @if (contentForm.get('ctaType')?.value === 'email_now') {
+              <div class="form-group">
+                <label for="ctaEmail" class="form-label">Email Address</label>
+                <input 
+                  type="email" 
+                  id="ctaEmail"
+                  formControlName="ctaEmail"
+                  class="form-input"
+                  placeholder="contact@restaurant.com">
+              </div>
+            }
+          </div>
+
+          <!-- Media Upload -->
+          <div class="form-section">
+            <h3 class="section-title">Images & Videos</h3>
+            
+            <div class="upload-section">
+              <div class="upload-area">
+                <div class="upload-placeholder">
+                  <span class="upload-icon">📸</span>
+                  <h4>Upload Images</h4>
+                  <p>Add photos that showcase your business</p>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    multiple 
+                    class="upload-input"
+                    (change)="onImageUpload($event)">
+                  <button type="button" class="upload-btn">Choose Images</button>
+                </div>
+              </div>
+
+              <div class="upload-area">
+                <div class="upload-placeholder">
+                  <span class="upload-icon">🎥</span>
+                  <h4>Upload Videos</h4>
+                  <p>Add videos to make your ad more engaging</p>
+                  <input 
+                    type="file" 
+                    accept="video/*" 
+                    multiple 
+                    class="upload-input"
+                    (change)="onVideoUpload($event)">
+                  <button type="button" class="upload-btn">Choose Videos</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- Step 4: Budget & Pricing -->
+    @if (currentStep() === 4) {
+      <div class="step-panel" id="budget-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Budget & Pricing</h2>
+          <p class="panel-description">Set your advertising budget and payment preferences</p>
+        </div>
+
+        <form [formGroup]="budgetForm" class="step-form">
+          <div class="budget-info-card">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+              <h3>Budget Recommendations</h3>
+              <p>Start with a modest budget and increase based on performance. Minimum spend is ${{ selectedAdType()?.minBudget || 5 }}/day for {{ selectedAdType()?.label || 'this' }} ads.</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="currency" class="form-label">Currency *</label>
+            <select id="currency" formControlName="currency" class="form-select">
+              @for (currency of currencies; track currency.value) {
+                <option [value]="currency.value">{{ currency.symbol }} {{ currency.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="totalBudget" class="form-label">Total Campaign Budget *</label>
+            <div class="budget-input-group">
+              <span class="budget-symbol">$</span>
+              <input 
+                type="number" 
+                id="totalBudget"
+                formControlName="totalBudget"
+                class="form-input budget-input"
+                min="5"
+                step="5"
+                placeholder="100">
+            </div>
+            <div class="form-help">Total amount you want to spend on this campaign</div>
+          </div>
+
+          <div class="form-group">
+            <label for="dailyBudget" class="form-label">Daily Budget *</label>
+            <div class="budget-input-group">
+              <span class="budget-symbol">$</span>
+              <input 
+                type="number" 
+                id="dailyBudget"
+                formControlName="dailyBudget"
+                class="form-input budget-input"
+                min="5"
+                step="1"
+                placeholder="10">
+            </div>
+            <div class="form-help">Maximum amount to spend per day</div>
+          </div>
+
+          <div class="form-group">
+            <label for="billingCycle" class="form-label">Billing Cycle *</label>
+            <select id="billingCycle" formControlName="billingCycle" class="form-select">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+
+          <!-- Budget Breakdown -->
+          <div class="budget-breakdown">
+            <h3 class="breakdown-title">Budget Breakdown</h3>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Total Budget:</span>
+              <span class="breakdown-value">${{ budgetForm.get('totalBudget')?.value || 0 }}</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Daily Spend:</span>
+              <span class="breakdown-value">${{ budgetForm.get('dailyBudget')?.value || 0 }}</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-label">Estimated Duration:</span>
+              <span class="breakdown-value">
+                {{ Math.ceil((budgetForm.get('totalBudget')?.value || 0) / (budgetForm.get('dailyBudget')?.value || 1)) }} days
+              </span>
+            </div>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- Step 5: Schedule & Launch -->
+    @if (currentStep() === 5) {
+      <div class="step-panel" id="schedule-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Schedule & Launch</h2>
+          <p class="panel-description">Choose when your campaign should run</p>
+        </div>
+
+        <form [formGroup]="scheduleForm" class="step-form">
+          <div class="form-group">
+            <label for="startDate" class="form-label">Start Date *</label>
+            <input 
+              type="date" 
+              id="startDate"
+              formControlName="startDate"
+              class="form-input">
+            <div class="form-help">When should your campaign begin?</div>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-item">
+              <input 
+                type="checkbox" 
+                formControlName="runContinuously"
+                class="checkbox-input">
+              <span class="checkbox-label">Run campaign continuously</span>
+            </label>
+            <div class="form-help">Campaign will run until you pause it or budget is exhausted</div>
+          </div>
+
+          @if (!scheduleForm.get('runContinuously')?.value) {
+            <div class="form-group">
+              <label for="endDate" class="form-label">End Date</label>
+              <input 
+                type="date" 
+                id="endDate"
+                formControlName="endDate"
+                class="form-input">
+              <div class="form-help">Leave empty to run until budget is exhausted</div>
+            </div>
+          }
+
+          <div class="form-group">
+            <label for="timezone" class="form-label">Timezone *</label>
+            <select id="timezone" formControlName="timezone" class="form-select">
+              <option value="UTC">UTC (Coordinated Universal Time)</option>
+              <option value="EAT">EAT (East Africa Time)</option>
+              <option value="EST">EST (Eastern Standard Time)</option>
+              <option value="PST">PST (Pacific Standard Time)</option>
+              <option value="GMT">GMT (Greenwich Mean Time)</option>
+            </select>
+          </div>
+
+          <!-- Campaign Summary -->
+          <div class="campaign-summary">
+            <h3 class="summary-title">Campaign Summary</h3>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <span class="summary-label">Campaign Name:</span>
+                <span class="summary-value">{{ basicInfoForm.get('title')?.value || 'Untitled Campaign' }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Ad Type:</span>
+                <span class="summary-value">{{ selectedAdType()?.label || 'Not selected' }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Total Budget:</span>
+                <span class="summary-value">${{ budgetForm.get('totalBudget')?.value || 0 }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Daily Budget:</span>
+                <span class="summary-value">${{ budgetForm.get('dailyBudget')?.value || 0 }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Target Countries:</span>
+                <span class="summary-value">{{ (targetingForm.get('countries')?.value || []).join(', ') || 'Not selected' }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Start Date:</span>
+                <span class="summary-value">{{ scheduleForm.get('startDate')?.value || 'Not set' }}</span>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+
+  <!-- Navigation Footer -->
+  <footer class="navigation-footer">
+    <div class="footer-content">
+      <div class="nav-buttons">
+        @if (currentStep() > 1) {
+          <button 
+            type="button" 
+            class="btn-secondary prev-btn"
+            (click)="previousStep()">
+            ← Previous
+          </button>
+        }
+
+        @if (currentStep() < totalSteps()) {
+          <button 
+            type="button" 
+            class="btn-primary next-btn"
+            [disabled]="!canProceedToNext()"
+            (click)="nextStep()">
+            Next →
+          </button>
+        }
+
+        @if (currentStep() === totalSteps()) {
+          <button 
+            type="button" 
+            class="btn-primary launch-btn"
+            [disabled]="!canProceedToNext() || isSubmitting()"
+            (click)="submitCampaign()">
+            @if (isSubmitting()) {
+              <span class="loading-spinner"></span>
+              Creating Campaign...
+            } @else {
+              🚀 Launch Campaign
+            }
+          </button>
+        }
+      </div>
+
+      <!-- Validation Errors -->
+      @if (!canProceedToNext() && stepValidation()[currentStep()]?.errors.length > 0) {
+        <div class="validation-errors">
+          <h4>Please fix the following issues:</h4>
+          <ul>
+            @for (error of stepValidation()[currentStep()]?.errors; track error) {
+              <li>{{ error }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  </footer>
+</div>

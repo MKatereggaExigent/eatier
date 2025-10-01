@@ -1,0 +1,240 @@
+<div class="user-digital-card-container">
+  <!-- Header -->
+  <div class="card-header">
+    <h1>💳 Digital Professional Card</h1>
+    <p>Create and customize your professional digital card with QR code</p>
+  </div>
+
+  <!-- Success Message -->
+  @if (successMessage()) {
+    <div class="success-message">
+      <span class="success-icon">✅</span>
+      {{ successMessage() }}
+    </div>
+  }
+
+  <div class="card-layout">
+    <!-- Customization Panel -->
+    <div class="customization-panel">
+      <h2>🎨 Customize Your Card</h2>
+
+      <!-- Color Presets -->
+      <div class="customization-section">
+        <h3>Color Themes</h3>
+        <div class="color-presets">
+          @for (preset of colorPresets; track preset.name) {
+            <button
+              type="button"
+              class="color-preset"
+              [style.background]="'linear-gradient(135deg, ' + preset.primary + ' 0%, ' + preset.secondary + ' 100%)'"
+              (click)="applyColorPreset(preset)"
+              [title]="preset.name"
+            >
+              <span>{{ preset.name }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Layout Options -->
+      <div class="customization-section">
+        <h3>Layout Style</h3>
+        <div class="layout-options">
+          @for (layout of layoutOptions; track layout.value) {
+            <label class="layout-option">
+              <input
+                type="radio"
+                [value]="layout.value"
+                formControlName="layout"
+              />
+              <div class="option-content">
+                <span class="option-icon">{{ layout.preview }}</span>
+                <span class="option-label">{{ layout.label }}</span>
+              </div>
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Custom Colors -->
+      <div class="customization-section">
+        <h3>Custom Colors</h3>
+        <div class="color-inputs">
+          <div class="color-input">
+            <label for="primaryColor">Primary Color</label>
+            <input
+              id="primaryColor"
+              type="color"
+              formControlName="primaryColor"
+            />
+          </div>
+          <div class="color-input">
+            <label for="secondaryColor">Secondary Color</label>
+            <input
+              id="secondaryColor"
+              type="color"
+              formControlName="secondaryColor"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Options -->
+      <div class="customization-section">
+        <h3>Content Options</h3>
+        <div class="content-options">
+          <label class="content-option">
+            <input type="checkbox" formControlName="includeQR" />
+            <span>Include QR Code</span>
+          </label>
+          <label class="content-option">
+            <input type="checkbox" formControlName="includeContact" />
+            <span>Include Contact Info</span>
+          </label>
+          <label class="content-option">
+            <input type="checkbox" formControlName="includeSpecialties" />
+            <span>Include Specialties</span>
+          </label>
+          <label class="content-option">
+            <input type="checkbox" formControlName="includeBio" />
+            <span>Include Bio</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="customization-actions">
+        <button type="button" class="primary-btn" (click)="saveCustomization()">
+          💾 Save Customization
+        </button>
+        <button type="button" class="secondary-btn" (click)="generateQRCode()" [disabled]="isGenerating()">
+          @if (isGenerating()) {
+            <span class="loading-spinner"></span>
+            Generating...
+          } @else {
+            🔄 Regenerate QR
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Card Preview -->
+    <div class="card-preview">
+      <h2>📱 Preview</h2>
+
+      @if (userProfile()) {
+        <div class="professional-card" [ngStyle]="getPreviewStyle()" [class]="getLayoutClass()">
+          <!-- Background Photo -->
+          @if (userProfile()!.backgroundPhoto) {
+            <div
+              class="card-background"
+              [style.background-image]="'url(' + userProfile()!.backgroundPhoto + ')'"
+            ></div>
+          }
+
+          <!-- Card Content -->
+          <div class="card-content">
+            <!-- Profile Photo -->
+            @if (userProfile()!.profilePhoto) {
+              <div class="profile-photo">
+                <img [src]="userProfile()!.profilePhoto" [alt]="getFullName()" />
+              </div>
+            }
+
+            <!-- Professional Info -->
+            <div class="professional-info">
+              <h3 class="full-name">{{ getFullName() }}</h3>
+
+              @if (userProfile()!.experience) {
+                <div class="experience">{{ getExperienceText() }}</div>
+              }
+
+              @if (customizationForm.get('includeContact')?.value) {
+                <div class="contact-info">
+                  @if (userProfile()!.email) {
+                    <div class="contact-item">✉️ {{ userProfile()!.email }}</div>
+                  }
+                  @if (userProfile()!.phone) {
+                    <div class="contact-item">📞 {{ userProfile()!.phone }}</div>
+                  }
+                </div>
+              }
+
+              @if (customizationForm.get('includeBio')?.value && userProfile()!.bio) {
+                <div class="professional-bio">{{ userProfile()!.bio }}</div>
+              }
+
+              @if (customizationForm.get('includeSpecialties')?.value && userProfile()!.specialtyDishes) {
+                <div class="specialties">
+                  <h4>Specialties:</h4>
+                  <div class="specialty-list">
+                    @for (specialty of getTopSpecialties(); track specialty) {
+                      <span class="specialty-tag">{{ specialty }}</span>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Certifications -->
+              @if (userProfile()!.certifications && userProfile()!.certifications!.length > 0) {
+                <div class="certifications">
+                  <h4>Certifications:</h4>
+                  <div class="cert-list">
+                    @for (cert of userProfile()!.certifications!.slice(0, 2); track cert) {
+                      <span class="cert-badge">🏆 {{ cert }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- QR Code -->
+            @if (customizationForm.get('includeQR')?.value && qrCodeUrl()) {
+              <div class="qr-code">
+                <img [src]="qrCodeUrl()" alt="QR Code" />
+                <span class="qr-label">Scan to connect</span>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="loading-preview">
+          <span class="loading-spinner large"></span>
+          <p>Loading user profile...</p>
+        </div>
+      }
+
+      <!-- Download Options -->
+      <div class="download-options">
+        <h3>📥 Download & Share</h3>
+        <div class="download-buttons">
+          <button type="button" class="download-btn" (click)="downloadCard('png')" [disabled]="isDownloading()">
+            @if (isDownloading()) {
+              <span class="loading-spinner"></span>
+            } @else {
+              🖼️ PNG
+            }
+          </button>
+          <button type="button" class="download-btn" (click)="downloadCard('pdf')" [disabled]="isDownloading()">
+            @if (isDownloading()) {
+              <span class="loading-spinner"></span>
+            } @else {
+              📄 PDF
+            }
+          </button>
+          <button type="button" class="download-btn" (click)="downloadCard('svg')" [disabled]="isDownloading()">
+            @if (isDownloading()) {
+              <span class="loading-spinner"></span>
+            } @else {
+              🎨 SVG
+            }
+          </button>
+        </div>
+
+        <button type="button" class="share-btn" (click)="shareCard()">
+          📤 Share Card
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

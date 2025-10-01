@@ -1,0 +1,493 @@
+<div class="feedback-container" role="main" aria-label="Feedback Center">
+  <!-- Hero Section -->
+  <header class="feedback-hero">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <span class="hero-icon">💬</span>
+        Share Your Feedback
+      </h1>
+      <p class="hero-subtitle">
+        Help us improve Eatier by sharing your thoughts, suggestions, and experiences
+      </p>
+    </div>
+  </header>
+
+  <!-- Feedback Type Selection -->
+  @if (currentStep() === 'type-selection') {
+    <section class="feedback-types" aria-label="Feedback Type Selection">
+      <h2 class="section-title">What would you like to share?</h2>
+      <div class="types-grid">
+        <button
+          type="button"
+          class="type-card"
+          (click)="selectFeedbackType('general')"
+          aria-label="General feedback about the platform">
+          <span class="type-icon">💭</span>
+          <h3>General Feedback</h3>
+          <p>Share your overall experience with Eatier</p>
+        </button>
+
+        <button
+          type="button"
+          class="type-card"
+          (click)="selectFeedbackType('bug')"
+          aria-label="Report a bug or technical issue">
+          <span class="type-icon">🐛</span>
+          <h3>Bug Report</h3>
+          <p>Report technical issues or problems you've encountered</p>
+        </button>
+
+        <button
+          type="button"
+          class="type-card"
+          (click)="selectFeedbackType('feature')"
+          aria-label="Suggest a new feature">
+          <span class="type-icon">💡</span>
+          <h3>Feature Request</h3>
+          <p>Suggest new features or improvements</p>
+        </button>
+
+        <button
+          type="button"
+          class="type-card"
+          (click)="selectFeedbackType('business')"
+          aria-label="Business-specific feedback">
+          <span class="type-icon">🏪</span>
+          <h3>Business Feedback</h3>
+          <p>Feedback about business features and tools</p>
+        </button>
+
+        <button
+          type="button"
+          class="type-card"
+          (click)="selectFeedbackType('restaurant')"
+          aria-label="Restaurant experience feedback">
+          <span class="type-icon">🍽️</span>
+          <h3>Restaurant Experience</h3>
+          <p>Share feedback about a specific restaurant</p>
+        </button>
+
+        <button
+          type="button"
+          class="type-card"
+          (click)="selectFeedbackType('compliment')"
+          aria-label="Share positive feedback">
+          <span class="type-icon">🌟</span>
+          <h3>Compliment</h3>
+          <p>Tell us what you love about Eatier</p>
+        </button>
+      </div>
+    </section>
+  }
+
+  <!-- Feedback Form -->
+  @if (currentStep() === 'feedback-form') {
+    <section class="feedback-form-section" aria-label="Feedback Form">
+      <div class="form-header">
+        <button
+          type="button"
+          class="back-btn"
+          (click)="goBackToTypeSelection()"
+          aria-label="Go back to feedback type selection">
+          ← Back
+        </button>
+        <div class="form-title">
+          <span class="form-icon">{{ getFeedbackTypeIcon() }}</span>
+          <h2>{{ getFeedbackTypeTitle() }}</h2>
+        </div>
+      </div>
+
+      <form class="feedback-form" [formGroup]="feedbackForm" (ngSubmit)="submitFeedback()">
+        <!-- Rating Section (for applicable feedback types) -->
+        @if (showRatingSection()) {
+          <div class="form-section">
+            <h3 class="section-label">Overall Rating</h3>
+            <div class="rating-container">
+              <div class="star-rating" role="radiogroup" aria-label="Rate your experience">
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                  <button
+                    type="button"
+                    class="star-btn"
+                    [class.active]="star <= rating()"
+                    [class.hover]="star <= hoverRating()"
+                    (click)="setRating(star)"
+                    (mouseenter)="setHoverRating(star)"
+                    (mouseleave)="setHoverRating(0)"
+                    [attr.aria-label]="'Rate ' + star + ' out of 5 stars'"
+                    role="radio"
+                    [attr.aria-checked]="star === rating()">
+                    ⭐
+                  </button>
+                }
+              </div>
+              <div class="rating-text">
+                {{ getRatingText() }}
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Restaurant Selection (for restaurant feedback) -->
+        @if (selectedFeedbackType() === 'restaurant') {
+          <div class="form-section">
+            <label for="restaurant-search" class="section-label">Restaurant *</label>
+            <div class="restaurant-search">
+              <input
+                type="text"
+                id="restaurant-search"
+                class="form-input"
+                placeholder="Search for a restaurant..."
+                [(ngModel)]="restaurantQuery"
+                (input)="searchRestaurants()"
+                [ngModelOptions]="{standalone: true}"
+                aria-label="Search for restaurant">
+
+              @if (restaurantResults().length > 0) {
+                <div class="search-results" role="listbox">
+                  @for (restaurant of restaurantResults(); track restaurant.id) {
+                    <button
+                      type="button"
+                      class="restaurant-result"
+                      (click)="selectRestaurant(restaurant)"
+                      role="option"
+                      [attr.aria-selected]="selectedRestaurant()?.id === restaurant.id">
+                      <img [src]="restaurant.image" [alt]="restaurant.name" class="restaurant-image">
+                      <div class="restaurant-info">
+                        <h4>{{ restaurant.name }}</h4>
+                        <p>{{ restaurant.cuisine }} • {{ restaurant.location }}</p>
+                        <div class="restaurant-rating">
+                          <span class="stars">{{ getStarDisplay(restaurant.rating) }}</span>
+                          <span class="rating-value">{{ restaurant.rating }}</span>
+                        </div>
+                      </div>
+                    </button>
+                  }
+                </div>
+              }
+
+              @if (selectedRestaurant()) {
+                <div class="selected-restaurant">
+                  <img [src]="selectedRestaurant()!.image" [alt]="selectedRestaurant()!.name" class="restaurant-image">
+                  <div class="restaurant-info">
+                    <h4>{{ selectedRestaurant()!.name }}</h4>
+                    <p>{{ selectedRestaurant()!.cuisine }} • {{ selectedRestaurant()!.location }}</p>
+                  </div>
+                  <button
+                    type="button"
+                    class="remove-btn"
+                    (click)="removeSelectedRestaurant()"
+                    aria-label="Remove selected restaurant">
+                    ✕
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Subject/Title -->
+        <div class="form-section">
+          <label for="feedback-subject" class="section-label">Subject *</label>
+          <input
+            type="text"
+            id="feedback-subject"
+            formControlName="subject"
+            class="form-input"
+            [placeholder]="getSubjectPlaceholder()"
+            required>
+          @if (feedbackForm.get('subject')?.invalid && feedbackForm.get('subject')?.touched) {
+            <span class="field-error">Subject is required</span>
+          }
+        </div>
+
+        <!-- Description -->
+        <div class="form-section">
+          <label for="feedback-description" class="section-label">Description *</label>
+          <textarea
+            id="feedback-description"
+            formControlName="description"
+            class="form-textarea"
+            rows="6"
+            [placeholder]="getDescriptionPlaceholder()"
+            required></textarea>
+          @if (feedbackForm.get('description')?.invalid && feedbackForm.get('description')?.touched) {
+            <span class="field-error">Description is required (minimum 10 characters)</span>
+          }
+        </div>
+
+        <!-- Priority (for bug reports) -->
+        @if (selectedFeedbackType() === 'bug') {
+          <div class="form-section">
+            <label for="bug-priority" class="section-label">Priority</label>
+            <select id="bug-priority" formControlName="priority" class="form-select">
+              <option value="low">Low - Minor issue</option>
+              <option value="medium">Medium - Affects functionality</option>
+              <option value="high">High - Major problem</option>
+              <option value="critical">Critical - App unusable</option>
+            </select>
+          </div>
+
+          <div class="form-section">
+            <label for="bug-steps" class="section-label">Steps to Reproduce</label>
+            <textarea
+              id="bug-steps"
+              formControlName="stepsToReproduce"
+              class="form-textarea"
+              rows="4"
+              placeholder="1. Go to...&#10;2. Click on...&#10;3. Expected vs actual result..."></textarea>
+          </div>
+        }
+
+        <!-- Contact Information -->
+        <div class="form-section">
+          <h3 class="section-label">Contact Information</h3>
+          <div class="contact-grid">
+            <div class="form-group">
+              <label for="feedback-name">Name</label>
+              <input
+                type="text"
+                id="feedback-name"
+                formControlName="name"
+                class="form-input"
+                placeholder="Your name (optional)">
+            </div>
+            <div class="form-group">
+              <label for="feedback-email">Email</label>
+              <input
+                type="email"
+                id="feedback-email"
+                formControlName="email"
+                class="form-input"
+                placeholder="your.email&#64;example.com">
+              @if (feedbackForm.get('email')?.invalid && feedbackForm.get('email')?.touched) {
+                <span class="field-error">Please enter a valid email address</span>
+              }
+            </div>
+          </div>
+          <div class="contact-note">
+            <span class="note-icon">ℹ️</span>
+            <p>Providing your email helps us follow up on your feedback and keep you updated on any fixes or improvements.</p>
+          </div>
+        </div>
+
+        <!-- File Attachments -->
+        <div class="form-section">
+          <h3 class="section-label">Attachments (Optional)</h3>
+          <div class="file-upload-area"
+               (dragover)="onDragOver($event)"
+               (dragleave)="onDragLeave($event)"
+               (drop)="onDrop($event)"
+               [class.drag-over]="isDragOver()">
+            <input
+              type="file"
+              #fileInput
+              multiple
+              accept="image/*,.pdf,.doc,.docx,.txt"
+              (change)="onFileSelect($event)"
+              class="file-input"
+              id="file-upload">
+            <label for="file-upload" class="file-upload-label">
+              <span class="upload-icon">📎</span>
+              <div class="upload-text">
+                <p><strong>Click to upload</strong> or drag and drop</p>
+                <p class="upload-hint">Images, PDFs, or documents (max 10MB each)</p>
+              </div>
+            </label>
+          </div>
+
+          @if (attachedFiles().length > 0) {
+            <div class="attached-files">
+              <h4>Attached Files:</h4>
+              <div class="files-list">
+                @for (file of attachedFiles(); track file.name) {
+                  <div class="file-item">
+                    <span class="file-icon">{{ getFileIcon(file.type) }}</span>
+                    <div class="file-info">
+                      <span class="file-name">{{ file.name }}</span>
+                      <span class="file-size">{{ formatFileSize(file.size) }}</span>
+                    </div>
+                    <button
+                      type="button"
+                      class="remove-file-btn"
+                      (click)="removeFile(file)"
+                      [attr.aria-label]="'Remove ' + file.name">
+                      ✕
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Anonymous Feedback Option -->
+        <div class="form-section">
+          <div class="checkbox-group">
+            <input
+              type="checkbox"
+              id="anonymous-feedback"
+              formControlName="anonymous"
+              class="form-checkbox">
+            <label for="anonymous-feedback" class="checkbox-label">
+              <span class="checkbox-icon">🕶️</span>
+              Submit feedback anonymously
+            </label>
+          </div>
+          <p class="checkbox-note">
+            Anonymous feedback helps us improve while protecting your privacy. We won't be able to follow up directly.
+          </p>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="goBackToTypeSelection()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="primary-btn"
+            [disabled]="feedbackForm.invalid || isSubmitting()">
+            @if (isSubmitting()) {
+              <span class="loading-spinner"></span>
+              Submitting...
+            } @else {
+              Submit Feedback
+            }
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <!-- Success Message -->
+  @if (currentStep() === 'success') {
+    <section class="success-section" aria-label="Feedback Submitted Successfully">
+      <div class="success-content">
+        <div class="success-icon">✅</div>
+        <h2>Thank You for Your Feedback!</h2>
+        <p class="success-message">
+          Your feedback has been successfully submitted. We appreciate you taking the time to help us improve Eatier.
+        </p>
+
+        @if (!feedbackForm.get('anonymous')?.value && feedbackForm.get('email')?.value) {
+          <div class="follow-up-info">
+            <span class="info-icon">📧</span>
+            <p>We'll follow up with you at <strong>{{ feedbackForm.get('email')?.value }}</strong> if we need more information.</p>
+          </div>
+        }
+
+        <div class="feedback-summary">
+          <h3>Feedback Summary</h3>
+          <div class="summary-item">
+            <span class="summary-label">Type:</span>
+            <span class="summary-value">{{ getFeedbackTypeTitle() }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Subject:</span>
+            <span class="summary-value">{{ feedbackForm.get('subject')?.value }}</span>
+          </div>
+          @if (rating() > 0) {
+            <div class="summary-item">
+              <span class="summary-label">Rating:</span>
+              <span class="summary-value">{{ getStarDisplay(rating()) }} ({{ rating() }}/5)</span>
+            </div>
+          }
+          @if (selectedRestaurant()) {
+            <div class="summary-item">
+              <span class="summary-label">Restaurant:</span>
+              <span class="summary-value">{{ selectedRestaurant()!.name }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="success-actions">
+          <button
+            type="button"
+            class="primary-btn"
+            (click)="submitAnotherFeedback()">
+            Submit Another Feedback
+          </button>
+          <a routerLink="/" class="secondary-btn">
+            Back to Home
+          </a>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- Recent Feedback (if user has submitted before) -->
+  @if (currentStep() === 'type-selection' && recentFeedback().length > 0) {
+    <section class="recent-feedback" aria-label="Your Recent Feedback">
+      <h2 class="section-title">Your Recent Feedback</h2>
+      <div class="feedback-history">
+        @for (feedback of recentFeedback(); track feedback.id) {
+          <div class="feedback-item">
+            <div class="feedback-header">
+              <span class="feedback-type-icon">{{ getFeedbackTypeIconById(feedback.type) }}</span>
+              <div class="feedback-info">
+                <h4>{{ feedback.subject }}</h4>
+                <p class="feedback-meta">
+                  {{ getFeedbackTypeNameById(feedback.type) }} •
+                  {{ formatDate(feedback.submittedAt) }} •
+                  <span class="status" [class]="feedback.status">{{ feedback.status | titlecase }}</span>
+                </p>
+              </div>
+            </div>
+            @if (feedback.response) {
+              <div class="feedback-response">
+                <span class="response-icon">💬</span>
+                <div class="response-content">
+                  <p><strong>Our Response:</strong></p>
+                  <p>{{ feedback.response }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Feedback Statistics -->
+  @if (currentStep() === 'type-selection') {
+    <section class="feedback-stats" aria-label="Community Feedback Statistics">
+      <h2 class="section-title">Community Impact</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-icon">📊</span>
+          <div class="stat-content">
+            <h3>{{ communityStats().totalFeedback.toLocaleString() }}</h3>
+            <p>Total Feedback Received</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-icon">✅</span>
+          <div class="stat-content">
+            <h3>{{ communityStats().implementedSuggestions }}</h3>
+            <p>Features Implemented</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-icon">🐛</span>
+          <div class="stat-content">
+            <h3>{{ communityStats().bugsFixed }}</h3>
+            <p>Bugs Fixed This Month</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-icon">⭐</span>
+          <div class="stat-content">
+            <h3>{{ communityStats().averageRating.toFixed(1) }}</h3>
+            <p>Average User Rating</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+</div>

@@ -1,0 +1,236 @@
+<div class="booking-status-container" [class]="getAvailabilityClass()">
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading availability...</p>
+    </div>
+  } @else if (bookingStatus()) {
+    <!-- Availability Status -->
+    <div class="availability-header">
+      <div class="status-indicator">
+        <span class="status-icon">{{ getAvailabilityIcon() }}</span>
+        <div class="status-text">
+          <h3 class="status-title">{{ availabilityMessage() }}</h3>
+          @if (bookingStatus()?.lastUpdated) {
+            <p class="status-subtitle">
+              Updated {{ formatDate(bookingStatus()!.lastUpdated) }}
+            </p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button
+        class="btn-primary primary-action"
+        [disabled]="primaryAction().disabled"
+        (click)="handlePrimaryAction()">
+        {{ primaryAction().text }}
+      </button>
+
+      <div class="secondary-actions">
+        @for (action of secondaryActions(); track action.action) {
+          <button
+            class="btn-secondary secondary-action"
+            (click)="handleSecondaryAction(action.action)">
+            {{ action.text }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Quick Availability Preview -->
+    @if (showFullInterface && upcomingSlots().length > 0) {
+      <div class="quick-slots">
+        <h4 class="slots-title">Next Available Times</h4>
+        <div class="slots-grid">
+          @for (slot of upcomingSlots(); track slot.id) {
+            <button
+              class="slot-card"
+              (click)="selectTimeSlot(slot)">
+              <div class="slot-date">
+                {{ formatDate(slot.date) }}
+              </div>
+              <div class="slot-time">
+                {{ formatTime(slot.startTime) }} - {{ formatTime(slot.endTime) }}
+              </div>
+              @if (slot.capacity && slot.bookedCount !== undefined) {
+                <div class="slot-capacity">
+                  {{ slot.capacity - slot.bookedCount }} spots left
+                </div>
+              }
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Calendar View -->
+    @if (showCalendar()) {
+      <div class="calendar-container">
+        <div class="calendar-header">
+          <h4>Available Times</h4>
+          <button
+            class="close-calendar"
+            (click)="toggleCalendar()">
+            ✕
+          </button>
+        </div>
+
+        <div class="calendar-grid">
+          @for (slot of bookingStatus()?.calendar || []; track slot.id) {
+            @if (slot.isAvailable) {
+              <button
+                class="calendar-slot available"
+                (click)="selectTimeSlot(slot)">
+                <div class="slot-date">{{ formatDate(slot.date) }}</div>
+                <div class="slot-time">
+                  {{ formatTime(slot.startTime) }} - {{ formatTime(slot.endTime) }}
+                </div>
+              </button>
+            } @else {
+              <div class="calendar-slot unavailable">
+                <div class="slot-date">{{ formatDate(slot.date) }}</div>
+                <div class="slot-time">Booked</div>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Inquiry Form Modal -->
+    @if (showInquiryForm()) {
+      <div class="modal-overlay" (click)="closeInquiryForm()">
+        <div class="inquiry-modal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>{{ inquiryForm().subject || 'Contact Us' }}</h3>
+            <button
+              class="close-modal"
+              (click)="closeInquiryForm()">
+              ✕
+            </button>
+          </div>
+
+          <form class="inquiry-form" (ngSubmit)="submitInquiry()">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="inquiryName" class="form-label">Name *</label>
+                <input
+                  type="text"
+                  id="inquiryName"
+                  class="form-input"
+                  [value]="inquiryForm().name"
+                  (input)="onInputChange($event, 'name')"
+                  placeholder="Your full name"
+                  required>
+              </div>
+
+              <div class="form-group">
+                <label for="inquiryEmail" class="form-label">Email *</label>
+                <input
+                  type="email"
+                  id="inquiryEmail"
+                  class="form-input"
+                  [value]="inquiryForm().email"
+                  (input)="onInputChange($event, 'email')"
+                  placeholder="your@email.com"
+                  required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inquiryPhone" class="form-label">Phone (Optional)</label>
+              <input
+                type="tel"
+                id="inquiryPhone"
+                class="form-input"
+                [value]="inquiryForm().phone"
+                (input)="onInputChange($event, 'phone')"
+                placeholder="+1 (555) 123-4567">
+            </div>
+
+            <div class="form-group">
+              <label for="inquirySubject" class="form-label">Subject</label>
+              <input
+                type="text"
+                id="inquirySubject"
+                class="form-input"
+                [value]="inquiryForm().subject"
+                (input)="updateInquiryForm('subject', $event.target.value)"
+                placeholder="What can we help you with?">
+            </div>
+
+            <div class="form-group">
+              <label for="inquiryMessage" class="form-label">Message *</label>
+              <textarea
+                id="inquiryMessage"
+                class="form-textarea"
+                [value]="inquiryForm().message"
+                (input)="updateInquiryForm('message', $event.target.value)"
+                placeholder="Please provide details about your inquiry..."
+                rows="4"
+                required>
+              </textarea>
+            </div>
+
+            @if (selectedDate()) {
+              <div class="selected-date-info">
+                <strong>Selected Date:</strong> {{ formatDate(selectedDate()!) }}
+              </div>
+            }
+
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-secondary"
+                (click)="closeInquiryForm()">
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="btn-primary">
+                Send Inquiry
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+    <!-- Booking Statistics (for business owners) -->
+    @if (showFullInterface && bookingStatus()?.statistics) {
+      <div class="booking-stats">
+        <h4 class="stats-title">Booking Statistics</h4>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">{{ bookingStatus()!.statistics!.totalBookings }}</div>
+            <div class="stat-label">Total Bookings</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{{ bookingStatus()!.statistics!.pendingBookings }}</div>
+            <div class="stat-label">Pending</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{{ bookingStatus()!.statistics!.confirmedBookings }}</div>
+            <div class="stat-label">Confirmed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{{ Math.round(bookingStatus()!.statistics!.averageRating * 10) / 10 }}</div>
+            <div class="stat-label">Avg Rating</div>
+          </div>
+        </div>
+      </div>
+    }
+  } @else {
+    <div class="error-state">
+      <p>Unable to load booking information</p>
+      <button
+        class="btn-secondary retry-btn"
+        (click)="loadBookingStatus()">
+        Try Again
+      </button>
+    </div>
+  }
+</div>

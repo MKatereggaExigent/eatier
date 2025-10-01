@@ -1,0 +1,447 @@
+<div class="business-profile-container">
+  <!-- Header -->
+  <div class="profile-header">
+    <h1>Business Profile Management</h1>
+    <p>Manage your business information, photos, and settings</p>
+  </div>
+
+  <!-- Success/Error Messages -->
+  @if (successMessage()) {
+    <div class="success-message">
+      <span class="success-icon">✅</span>
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Navigation Tabs -->
+  <div class="profile-tabs">
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeSection() === 'basic'"
+      (click)="setActiveSection('basic')"
+    >
+      📋 Basic Info
+    </button>
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeSection() === 'address'"
+      (click)="setActiveSection('address')"
+    >
+      📍 Address
+    </button>
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeSection() === 'details'"
+      (click)="setActiveSection('details')"
+    >
+      ℹ️ Details
+    </button>
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeSection() === 'facilities'"
+      (click)="setActiveSection('facilities')"
+    >
+      🏢 Facilities
+    </button>
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeSection() === 'hours'"
+      (click)="setActiveSection('hours')"
+    >
+      🕒 Hours
+    </button>
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeSection() === 'media'"
+      (click)="setActiveSection('media')"
+    >
+      📸 Media
+    </button>
+  </div>
+
+  <!-- Profile Form -->
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+
+    <!-- Basic Information Section -->
+    @if (activeSection() === 'basic') {
+      <div class="form-section">
+        <h2>Basic Information</h2>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="businessName">Business Name *</label>
+            <input
+              id="businessName"
+              type="text"
+              formControlName="businessName"
+              placeholder="Enter your business name"
+              [class.error]="getFieldError('businessName')"
+            />
+            @if (getFieldError('businessName')) {
+              <span class="field-error">{{ getFieldError('businessName') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="country">Country *</label>
+            <select
+              id="country"
+              formControlName="country"
+              [class.error]="getFieldError('country')"
+            >
+              <option value="">Select country</option>
+              @for (country of countries; track country) {
+                <option [value]="country">{{ country }}</option>
+              }
+            </select>
+            @if (getFieldError('country')) {
+              <span class="field-error">{{ getFieldError('country') }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="businessType">Business Type *</label>
+            <select
+              id="businessType"
+              formControlName="businessType"
+              [class.error]="getFieldError('businessType')"
+            >
+              <option value="">Select business type</option>
+              @for (type of businessTypes; track type) {
+                <option [value]="type">{{ type }}</option>
+              }
+            </select>
+            @if (getFieldError('businessType')) {
+              <span class="field-error">{{ getFieldError('businessType') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="business@example.com"
+              [class.error]="getFieldError('email')"
+            />
+            @if (getFieldError('email')) {
+              <span class="field-error">{{ getFieldError('email') }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contactNumber">Contact Number *</label>
+            <input
+              id="contactNumber"
+              type="tel"
+              formControlName="contactNumber"
+              placeholder="+1 (555) 123-4567"
+              [class.error]="getFieldError('contactNumber')"
+            />
+            @if (getFieldError('contactNumber')) {
+              <span class="field-error">{{ getFieldError('contactNumber') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="sustainabilityEthos">Sustainability Ethos (Optional)</label>
+            <textarea
+              id="sustainabilityEthos"
+              formControlName="sustainabilityEthos"
+              placeholder="Describe your sustainability practices..."
+              rows="3"
+              [class.error]="getFieldError('sustainabilityEthos')"
+            ></textarea>
+            <div class="character-count" [class.limit-warning]="getSustainabilityCharacterCount() > 180">
+              {{ getSustainabilityCharacterCount() }}/200 characters
+            </div>
+            @if (getFieldError('sustainabilityEthos')) {
+              <span class="field-error">{{ getFieldError('sustainabilityEthos') }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Address Section -->
+    @if (activeSection() === 'address') {
+      <div class="form-section">
+        <h2>Business Address</h2>
+
+        <div class="form-group">
+          <label for="street">Street Address *</label>
+          <input
+            id="street"
+            type="text"
+            formControlName="street"
+            placeholder="123 Main Street"
+            [class.error]="getFieldError('street')"
+          />
+          @if (getFieldError('street')) {
+            <span class="field-error">{{ getFieldError('street') }}</span>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City *</label>
+            <input
+              id="city"
+              type="text"
+              formControlName="city"
+              placeholder="New York"
+              [class.error]="getFieldError('city')"
+            />
+            @if (getFieldError('city')) {
+              <span class="field-error">{{ getFieldError('city') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="state">State/Province *</label>
+            <input
+              id="state"
+              type="text"
+              formControlName="state"
+              placeholder="NY"
+              [class.error]="getFieldError('state')"
+            />
+            @if (getFieldError('state')) {
+              <span class="field-error">{{ getFieldError('state') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="zipCode">ZIP/Postal Code</label>
+            <input
+              id="zipCode"
+              type="text"
+              formControlName="zipCode"
+              placeholder="10001"
+            />
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Details Section -->
+    @if (activeSection() === 'details') {
+      <div class="form-section">
+        <h2>Business Details</h2>
+
+        <div class="form-group">
+          <label for="sustainabilityEthos">Sustainability Ethos</label>
+          <textarea
+            id="sustainabilityEthos"
+            formControlName="sustainabilityEthos"
+            placeholder="Describe your sustainability practices..."
+            rows="3"
+          ></textarea>
+          <div class="character-count">
+            {{ getSustainabilityCharacterCount() }}/200 characters
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bio">Business Bio *</label>
+          <textarea
+            id="bio"
+            formControlName="bio"
+            placeholder="Tell customers about your business..."
+            rows="4"
+            [class.error]="getFieldError('bio')"
+          ></textarea>
+          <div class="character-count" [class.limit-warning]="getBioCharacterCount() > constraints.BIO_MAX_LENGTH * 0.9">
+            {{ getBioCharacterCount() }}/{{ constraints.BIO_MAX_LENGTH }} characters
+          </div>
+          @if (getFieldError('bio')) {
+            <span class="field-error">{{ getFieldError('bio') }}</span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Facilities Section -->
+    @if (activeSection() === 'facilities') {
+      <div class="form-section">
+        <h2>Facilities & Amenities</h2>
+        <p class="section-description">Select the facilities available at your business (icons only display)</p>
+
+        <div class="facilities-grid">
+          @for (facility of Object.keys(facilityIcons); track facility) {
+            <label class="facility-checkbox">
+              <input
+                type="checkbox"
+                [formControlName]="facility"
+              />
+              <div class="facility-content">
+                <span class="facility-icon">{{ getFacilityIcon(facility) }}</span>
+                <span class="facility-label">{{ facility | titlecase }}</span>
+              </div>
+            </label>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Business Hours Section -->
+    @if (activeSection() === 'hours') {
+      <div class="form-section">
+        <h2>Business Hours</h2>
+
+        <div class="hours-grid">
+          @for (day of ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']; track day) {
+            <div class="hours-row">
+              <div class="day-checkbox">
+                <label>
+                  <input
+                    type="checkbox"
+                    [formControlName]="day + 'Open'"
+                  />
+                  {{ day | titlecase }}
+                </label>
+              </div>
+
+              @if (profileForm.get(day + 'Open')?.value) {
+                <div class="time-inputs">
+                  <input
+                    type="time"
+                    [formControlName]="day + 'OpenTime'"
+                    placeholder="Open"
+                  />
+                  <span class="time-separator">to</span>
+                  <input
+                    type="time"
+                    [formControlName]="day + 'CloseTime'"
+                    placeholder="Close"
+                  />
+                </div>
+              } @else {
+                <div class="closed-indicator">
+                  <span>Closed</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Media Section -->
+    @if (activeSection() === 'media') {
+      <div class="form-section">
+        <h2>Photos & Media</h2>
+
+        <!-- Profile Photos -->
+        <div class="media-group">
+          <h3>Profile Photos</h3>
+          <p class="media-description">Upload up to {{ constraints.MAX_PROFILE_PHOTOS }} photos of your business</p>
+
+          <div class="photo-grid">
+            @for (photo of profilePhotos(); track $index) {
+              <div class="photo-item">
+                <img [src]="photo" [alt]="'Business photo ' + ($index + 1)" />
+                <button
+                  type="button"
+                  class="remove-photo"
+                  (click)="removeProfilePhoto($index)"
+                >
+                  ✕
+                </button>
+              </div>
+            }
+
+            @if (profilePhotos().length < constraints.MAX_PROFILE_PHOTOS) {
+              <label class="photo-upload">
+                <input
+                  type="file"
+                  accept="image/*"
+                  (change)="onFileUpload($event, 'profile')"
+                  hidden
+                />
+                <div class="upload-placeholder">
+                  <span class="upload-icon">📷</span>
+                  <span>Add Photo</span>
+                </div>
+              </label>
+            }
+          </div>
+        </div>
+
+        <!-- Background Image -->
+        <div class="media-group">
+          <h3>Background Image</h3>
+          <p class="media-description">Upload a background image for your business profile</p>
+
+          @if (backgroundImage()) {
+            <div class="background-preview">
+              <img [src]="backgroundImage()" alt="Background image" />
+              <button
+                type="button"
+                class="remove-background"
+                (click)="removeBackgroundImage()"
+              >
+                ✕ Remove
+              </button>
+            </div>
+          } @else {
+            <label class="background-upload">
+              <input
+                type="file"
+                accept="image/*"
+                (change)="onFileUpload($event, 'background')"
+                hidden
+              />
+              <div class="upload-placeholder large">
+                <span class="upload-icon">🖼️</span>
+                <span>Upload Background Image</span>
+              </div>
+            </label>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="secondary-button"
+        (click)="loadProfile()"
+      >
+        Reset Changes
+      </button>
+
+      <button
+        type="submit"
+        class="primary-button"
+        [disabled]="isLoading() || profileForm.invalid"
+      >
+        @if (isLoading()) {
+          <span class="loading-spinner"></span>
+          Saving...
+        } @else {
+          Save Profile
+        }
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,451 @@
+<div class="admin-users" role="main" aria-label="Admin Users Management">
+  <!-- Header Section -->
+  <header class="users-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">👥</span>
+          User Management
+        </h1>
+        <p class="page-subtitle">
+          Manage all platform users, monitor activity, and handle user accounts
+        </p>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ userStats().total }}</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ userStats().active }}</div>
+          <div class="stat-label">Active Users</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🏪</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ userStats().businesses }}</div>
+          <div class="stat-label">Businesses</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🍽️</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ userStats().foodEnthusiasts }}</div>
+          <div class="stat-label">Food Enthusiasts</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">👨‍🍳</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ userStats().specialists }}</div>
+          <div class="stat-label">Specialists</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🔐</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ userStats().verified }}</div>
+          <div class="stat-label">Verified</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Controls Section -->
+  <section class="controls-section">
+    <div class="controls-content">
+      <!-- Search and Filter Toggle -->
+      <div class="search-controls">
+        <div class="search-input-wrapper">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search users by name, email, or business..."
+            [value]="searchQuery()"
+            (input)="onSearchInput($event)"
+            aria-label="Search users">
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-controls">
+        <button
+          type="button"
+          class="filter-toggle-btn"
+          (click)="toggleFilters()"
+          [class.active]="showFilters()">
+          <span class="btn-icon">🔽</span>
+          Filters
+          @if (hasActiveFilters()) {
+            <span class="filter-badge">{{ filteredUsers().length }}</span>
+          }
+        </button>
+
+        @if (hasActiveFilters()) {
+          <button
+            type="button"
+            class="clear-filters-btn"
+            (click)="clearFilters()">
+            Clear Filters
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    @if (showFilters()) {
+      <div class="filter-panel">
+        <div class="filter-grid">
+          <!-- Role Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Role</label>
+            <select
+              class="filter-select"
+              [value]="filters().role"
+              (change)="onFilterChange('role', $event)">
+              @for (option of roleOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select
+              class="filter-select"
+              [value]="filters().status"
+              (change)="onFilterChange('status', $event)">
+              @for (option of statusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Verification Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Verification</label>
+            <select
+              class="filter-select"
+              [value]="filters().verification"
+              (change)="onFilterChange('verification', $event)">
+              @for (option of verificationOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Sort Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Sort By</label>
+            <select
+              class="filter-select"
+              [value]="filters().sortBy"
+              (change)="onFilterChange('sortBy', $event)">
+              @for (option of sortOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- Users List -->
+  <section class="users-section">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading users...</p>
+      </div>
+    } @else if (filteredUsers().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <h3>No users found</h3>
+        @if (hasActiveFilters()) {
+          <p>Try adjusting your filters or search terms.</p>
+          <button type="button" class="btn-secondary" (click)="clearFilters()">
+            Clear Filters
+          </button>
+        } @else {
+          <p>No users are currently registered on the platform.</p>
+        }
+      </div>
+    } @else {
+      <div class="users-table-container">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Verification</th>
+              <th>Joined</th>
+              <th>Last Login</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of filteredUsers(); track user.id) {
+              <tr class="user-row" [class]="'status-' + user.status">
+                <!-- User Info -->
+                <td class="user-info">
+                  <div class="user-avatar">
+                    @if (user.avatar) {
+                      <img [src]="user.avatar" [alt]="user.firstName + ' ' + user.lastName" class="avatar-image">
+                    } @else {
+                      <div class="avatar-placeholder">
+                        {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+                      </div>
+                    }
+                  </div>
+                  <div class="user-details">
+                    <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
+                    <div class="user-email">{{ user.email }}</div>
+                    @if (user.businessName) {
+                      <div class="business-name">{{ user.businessName }}</div>
+                    }
+                  </div>
+                </td>
+
+                <!-- Role -->
+                <td class="user-role">
+                  <div class="role-badge" [class]="'role-' + user.role">
+                    <span class="role-icon">{{ getRoleIcon(user.role) }}</span>
+                    <span class="role-text">{{ getRoleLabel(user.role) }}</span>
+                  </div>
+                </td>
+
+                <!-- Status -->
+                <td class="user-status">
+                  <div class="status-badge" [class]="'status-' + user.status">
+                    {{ user.status | titlecase }}
+                  </div>
+                </td>
+
+                <!-- Verification -->
+                <td class="user-verification">
+                  <div class="verification-status">
+                    <div class="verification-item" [class.verified]="user.emailVerified">
+                      <span class="verification-icon">📧</span>
+                      <span class="verification-text">{{ user.emailVerified ? 'Verified' : 'Unverified' }}</span>
+                    </div>
+                    @if (user.phone) {
+                      <div class="verification-item" [class.verified]="user.phoneVerified">
+                        <span class="verification-icon">📱</span>
+                        <span class="verification-text">{{ user.phoneVerified ? 'Verified' : 'Unverified' }}</span>
+                      </div>
+                    }
+                  </div>
+                </td>
+
+                <!-- Joined Date -->
+                <td class="user-joined">
+                  {{ formatDate(user.createdAt) }}
+                </td>
+
+                <!-- Last Login -->
+                <td class="user-last-login">
+                  @if (user.lastLoginAt) {
+                    {{ formatDateTime(user.lastLoginAt) }}
+                  } @else {
+                    <span class="never-logged-in">Never</span>
+                  }
+                </td>
+
+                <!-- Actions -->
+                <td class="user-actions">
+                  <div class="action-buttons">
+                    <button
+                      type="button"
+                      class="btn-action view-btn"
+                      (click)="viewUserDetails(user)"
+                      title="View Details">
+                      👁️
+                    </button>
+
+                    @if (user.status === 'active') {
+                      <button
+                        type="button"
+                        class="btn-action suspend-btn"
+                        (click)="suspendUser(user)"
+                        title="Suspend User">
+                        ⏸️
+                      </button>
+                    } @else if (user.status === 'suspended' || user.status === 'inactive') {
+                      <button
+                        type="button"
+                        class="btn-action activate-btn"
+                        (click)="activateUser(user)"
+                        title="Activate User">
+                        ▶️
+                      </button>
+                    }
+
+                    <button
+                      type="button"
+                      class="btn-action delete-btn"
+                      (click)="deleteUser(user)"
+                      title="Delete User">
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>
+
+<!-- User Details Modal -->
+@if (showUserModal() && selectedUser()) {
+  <div class="modal-overlay" (click)="closeUserModal()">
+    <div class="modal-content user-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>User Details</h3>
+        <button type="button" class="modal-close" (click)="closeUserModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="user-profile">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              @if (selectedUser()!.avatar) {
+                <img [src]="selectedUser()!.avatar" [alt]="selectedUser()!.firstName" class="avatar-image">
+              } @else {
+                <div class="avatar-placeholder">
+                  {{ selectedUser()!.firstName.charAt(0) }}{{ selectedUser()!.lastName.charAt(0) }}
+                </div>
+              }
+            </div>
+            <div class="profile-info">
+              <h4>{{ selectedUser()!.firstName }} {{ selectedUser()!.lastName }}</h4>
+              <p>{{ selectedUser()!.email }}</p>
+              @if (selectedUser()!.businessName) {
+                <p class="business-name">{{ selectedUser()!.businessName }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="profile-details">
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>Role</label>
+                <span class="role-badge" [class]="'role-' + selectedUser()!.role">
+                  {{ getRoleIcon(selectedUser()!.role) }} {{ getRoleLabel(selectedUser()!.role) }}
+                </span>
+              </div>
+
+              <div class="detail-item">
+                <label>Status</label>
+                <span class="status-badge" [class]="'status-' + selectedUser()!.status">
+                  {{ selectedUser()!.status | titlecase }}
+                </span>
+              </div>
+
+              <div class="detail-item">
+                <label>Joined</label>
+                <span>{{ formatDate(selectedUser()!.createdAt) }}</span>
+              </div>
+
+              <div class="detail-item">
+                <label>Last Login</label>
+                <span>
+                  @if (selectedUser()!.lastLoginAt) {
+                    {{ formatDateTime(selectedUser()!.lastLoginAt!) }}
+                  } @else {
+                    Never
+                  }
+                </span>
+              </div>
+
+              @if (selectedUser()!.phone) {
+                <div class="detail-item">
+                  <label>Phone</label>
+                  <span>{{ selectedUser()!.phone }}</span>
+                </div>
+              }
+
+              @if (selectedUser()!.totalBookings !== undefined) {
+                <div class="detail-item">
+                  <label>Total Bookings</label>
+                  <span>{{ selectedUser()!.totalBookings }}</span>
+                </div>
+              }
+
+              @if (selectedUser()!.totalReviews !== undefined) {
+                <div class="detail-item">
+                  <label>Total Reviews</label>
+                  <span>{{ selectedUser()!.totalReviews }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeUserModal()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteConfirm() && selectedUser()) {
+  <div class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirm Deletion</h3>
+        <button type="button" class="modal-close" (click)="cancelDelete()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="delete-warning">
+          <div class="warning-icon">⚠️</div>
+          <div class="warning-content">
+            <h4>Delete User Account</h4>
+            <p>Are you sure you want to delete <strong>{{ selectedUser()!.firstName }} {{ selectedUser()!.lastName }}</strong>?</p>
+            <p>This action cannot be undone and will permanently remove:</p>
+            <ul>
+              <li>User account and profile</li>
+              <li>All user data and history</li>
+              <li>Reviews and bookings</li>
+              <li>Business information (if applicable)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="cancelDelete()">
+          Cancel
+        </button>
+        <button type="button" class="btn-danger" (click)="confirmDelete()">
+          Delete User
+        </button>
+      </div>
+    </div>
+  </div>
+}

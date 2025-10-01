@@ -1,0 +1,353 @@
+<div class="admin-businesses" role="main" aria-label="Admin Businesses Management">
+  <!-- Header Section -->
+  <header class="businesses-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">🏪</span>
+          Business Management
+        </h1>
+        <p class="page-subtitle">
+          Manage all platform businesses, monitor performance, and handle business accounts
+        </p>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🏪</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ businessStats().total }}</div>
+          <div class="stat-label">Total Businesses</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ businessStats().active }}</div>
+          <div class="stat-label">Active</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">🔐</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ businessStats().verified }}</div>
+          <div class="stat-label">Verified</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">🍽️</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ businessStats().restaurants }}</div>
+          <div class="stat-label">Restaurants</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ businessStats().totalBookings }}</div>
+          <div class="stat-label">Total Bookings</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ businessStats().averageRating.toFixed(1) }}</div>
+          <div class="stat-label">Avg Rating</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Controls Section -->
+  <section class="controls-section">
+    <div class="controls-content">
+      <!-- Search and Filter Toggle -->
+      <div class="search-controls">
+        <div class="search-input-wrapper">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search businesses by name, owner, or location..."
+            [value]="searchQuery()"
+            (input)="onSearchInput($event)"
+            aria-label="Search businesses">
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-controls">
+        <button
+          type="button"
+          class="filter-toggle-btn"
+          (click)="toggleFilters()"
+          [class.active]="showFilters()">
+          <span class="btn-icon">🔽</span>
+          Filters
+          @if (hasActiveFilters()) {
+            <span class="filter-badge">{{ filteredBusinesses().length }}</span>
+          }
+        </button>
+        
+        @if (hasActiveFilters()) {
+          <button
+            type="button"
+            class="clear-filters-btn"
+            (click)="clearFilters()">
+            Clear Filters
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    @if (showFilters()) {
+      <div class="filter-panel">
+        <div class="filter-grid">
+          <!-- Business Type Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Business Type</label>
+            <select
+              class="filter-select"
+              [value]="filters().businessType"
+              (change)="onFilterChange('businessType', $event)">
+              @for (option of businessTypeOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select
+              class="filter-select"
+              [value]="filters().status"
+              (change)="onFilterChange('status', $event)">
+              @for (option of statusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Subscription Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Subscription</label>
+            <select
+              class="filter-select"
+              [value]="filters().subscription"
+              (change)="onFilterChange('subscription', $event)">
+              @for (option of subscriptionOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Verification Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Verification</label>
+            <select
+              class="filter-select"
+              [value]="filters().verification"
+              (change)="onFilterChange('verification', $event)">
+              @for (option of verificationOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Sort Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Sort By</label>
+            <select
+              class="filter-select"
+              [value]="filters().sortBy"
+              (change)="onFilterChange('sortBy', $event)">
+              @for (option of sortOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- Businesses List -->
+  <section class="businesses-section">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading businesses...</p>
+      </div>
+    } @else if (filteredBusinesses().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🏪</div>
+        <h3>No businesses found</h3>
+        @if (hasActiveFilters()) {
+          <p>Try adjusting your filters or search terms.</p>
+          <button type="button" class="btn-secondary" (click)="clearFilters()">
+            Clear Filters
+          </button>
+        } @else {
+          <p>No businesses are currently registered on the platform.</p>
+        }
+      </div>
+    } @else {
+      <div class="businesses-grid">
+        @for (business of filteredBusinesses(); track business.id) {
+          <div class="business-card" [class]="'status-' + business.status">
+            <!-- Business Header -->
+            <div class="business-header">
+              <div class="business-info">
+                <div class="business-type-icon">
+                  {{ getBusinessTypeIcon(business.businessType) }}
+                </div>
+                <div class="business-details">
+                  <h3 class="business-name">{{ business.name }}</h3>
+                  <p class="business-owner">{{ business.ownerName }}</p>
+                  <p class="business-location">{{ business.city }}, {{ business.state }}</p>
+                </div>
+              </div>
+              
+              <div class="business-badges">
+                <div class="type-badge" [class]="'type-' + business.businessType">
+                  {{ getBusinessTypeLabel(business.businessType) }}
+                </div>
+                @if (business.verified) {
+                  <div class="verified-badge">✓ Verified</div>
+                }
+              </div>
+            </div>
+
+            <!-- Business Content -->
+            <div class="business-content">
+              <div class="business-stats">
+                <div class="stat-item">
+                  <span class="stat-icon">⭐</span>
+                  <span class="stat-value">{{ business.averageRating.toFixed(1) }}</span>
+                  <span class="stat-label">({{ business.totalReviews }} reviews)</span>
+                </div>
+                
+                <div class="stat-item">
+                  <span class="stat-icon">📅</span>
+                  <span class="stat-value">{{ business.totalBookings }}</span>
+                  <span class="stat-label">bookings</span>
+                </div>
+                
+                @if (business.monthlyRevenue) {
+                  <div class="stat-item">
+                    <span class="stat-icon">💰</span>
+                    <span class="stat-value">{{ formatCurrency(business.monthlyRevenue) }}</span>
+                    <span class="stat-label">monthly</span>
+                  </div>
+                }
+              </div>
+
+              <div class="business-details-grid">
+                <div class="detail-item">
+                  <span class="detail-label">Email</span>
+                  <span class="detail-value">{{ business.email }}</span>
+                </div>
+                
+                @if (business.phone) {
+                  <div class="detail-item">
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value">{{ business.phone }}</span>
+                  </div>
+                }
+                
+                <div class="detail-item">
+                  <span class="detail-label">Joined</span>
+                  <span class="detail-value">{{ formatDate(business.createdAt) }}</span>
+                </div>
+                
+                @if (business.lastLoginAt) {
+                  <div class="detail-item">
+                    <span class="detail-label">Last Login</span>
+                    <span class="detail-value">{{ formatDate(business.lastLoginAt) }}</span>
+                  </div>
+                }
+              </div>
+
+              @if (business.cuisineTypes.length > 0) {
+                <div class="cuisine-tags">
+                  @for (cuisine of business.cuisineTypes; track cuisine) {
+                    <span class="cuisine-tag">{{ cuisine }}</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Business Footer -->
+            <div class="business-footer">
+              <div class="business-status">
+                <div class="status-badges">
+                  <div class="status-badge" [class]="'status-' + business.status">
+                    {{ business.status | titlecase }}
+                  </div>
+                  <div class="subscription-badge" [class]="'subscription-' + business.subscriptionStatus">
+                    {{ business.subscriptionStatus | titlecase }}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="business-actions">
+                <button
+                  type="button"
+                  class="btn-action view-btn"
+                  (click)="viewBusinessDetails(business)"
+                  title="View Details">
+                  👁️
+                </button>
+                
+                @if (!business.verified) {
+                  <button
+                    type="button"
+                    class="btn-action verify-btn"
+                    (click)="verifyBusiness(business)"
+                    title="Verify Business">
+                    ✅
+                  </button>
+                }
+                
+                @if (business.status === 'active') {
+                  <button
+                    type="button"
+                    class="btn-action suspend-btn"
+                    (click)="suspendBusiness(business)"
+                    title="Suspend Business">
+                    ⏸️
+                  </button>
+                } @else if (business.status === 'suspended' || business.status === 'inactive') {
+                  <button
+                    type="button"
+                    class="btn-action activate-btn"
+                    (click)="activateBusiness(business)"
+                    title="Activate Business">
+                    ▶️
+                  </button>
+                }
+                
+                <button
+                  type="button"
+                  class="btn-action delete-btn"
+                  (click)="deleteBusiness(business)"
+                  title="Delete Business">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>

@@ -1,0 +1,32 @@
+<div class="unauthorized-container">
+  <div class="unauthorized-content">
+    <div class="error-icon">🚫</div>
+    <h1>Access Denied</h1>
+    <p>You don't have permission to access this page.</p>
+
+    @if (currentUser()) {
+      <div class="user-info">
+        <p>You are currently logged in as <strong>{{ currentUser()?.firstName }} {{ currentUser()?.lastName }}</strong></p>
+        <p>Role: <span class="role-badge">{{ currentUser()?.role | titlecase }}</span></p>
+      </div>
+
+      <div class="actions">
+        <button type="button" (click)="goToDashboard()" class="primary-btn">
+          Go to My Dashboard
+        </button>
+        <a routerLink="/" class="secondary-btn">
+          Return to Home
+        </a>
+      </div>
+    } @else {
+      <div class="actions">
+        <a routerLink="/login" class="primary-btn">
+          Sign In
+        </a>
+        <a routerLink="/" class="secondary-btn">
+          Return to Home
+        </a>
+      </div>
+    }
+  </div>
+</div>

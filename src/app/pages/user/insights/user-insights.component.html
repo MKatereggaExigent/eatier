@@ -1,0 +1,290 @@
+<div class="user-insights-container">
+  <!-- Header -->
+  <div class="insights-header">
+    <div class="header-content">
+      <h1>{{ getPeriodIcon() }} User Insights</h1>
+      <p>Track your profile performance and professional growth</p>
+    </div>
+    
+    <div class="header-actions">
+      <button
+        type="button"
+        class="export-btn"
+        (click)="exportToPDF()"
+        [disabled]="isExporting() || !insights()"
+      >
+        @if (isExporting()) {
+          <span class="loading-spinner"></span>
+          Exporting...
+        } @else {
+          📄 Export PDF
+        }
+      </button>
+    </div>
+  </div>
+
+  <!-- Period Selection -->
+  <div class="period-selection">
+    <div class="period-tabs">
+      @for (option of periodOptions; track option.value) {
+        <button
+          type="button"
+          class="period-tab"
+          [class.active]="selectedPeriod() === option.value"
+          (click)="onPeriodChange(option.value)"
+          [disabled]="isLoading()"
+        >
+          {{ option.icon }} {{ option.label }}
+        </button>
+      }
+    </div>
+
+    @if (selectedPeriod() === 'custom') {
+      <form [formGroup]="dateRangeForm" (ngSubmit)="onCustomDateRange()" class="custom-range">
+        <div class="date-inputs">
+          <input
+            type="date"
+            formControlName="startDate"
+            placeholder="Start Date"
+          />
+          <span class="date-separator">to</span>
+          <input
+            type="date"
+            formControlName="endDate"
+            placeholder="End Date"
+          />
+        </div>
+        <button type="submit" class="apply-btn" [disabled]="dateRangeForm.invalid">
+          Apply
+        </button>
+      </form>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="loading-spinner large"></span>
+      <p>Loading insights...</p>
+    </div>
+  } @else if (insights()) {
+    <!-- Current Period Info -->
+    <div class="period-info">
+      <h2>{{ getPeriodLabel() }} Report</h2>
+      <p>{{ formatDate(insights()!.period.start) }} - {{ formatDate(insights()!.period.end) }}</p>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="metrics-section">
+      <h3>Profile Metrics</h3>
+      <div class="metrics-grid">
+        <div class="metric-card primary">
+          <div class="metric-icon">👁️</div>
+          <div class="metric-content">
+            <h4>{{ formatNumber(insights()!.metrics.profileViews) }}</h4>
+            <p>Profile Views</p>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">👥</div>
+          <div class="metric-content">
+            <h4>{{ formatNumber(insights()!.metrics.uniqueVisitors) }}</h4>
+            <p>Unique Visitors</p>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">📞</div>
+          <div class="metric-content">
+            <h4>{{ formatNumber(insights()!.metrics.contactClicks) }}</h4>
+            <p>Contact Clicks</p>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">📱</div>
+          <div class="metric-content">
+            <h4>{{ formatNumber(insights()!.metrics.qrScans) }}</h4>
+            <p>QR Code Scans</p>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">🖼️</div>
+          <div class="metric-content">
+            <h4>{{ formatNumber(insights()!.metrics.portfolioViews) }}</h4>
+            <p>Portfolio Views</p>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">📤</div>
+          <div class="metric-content">
+            <h4>{{ formatNumber(insights()!.metrics.businessCardShares) }}</h4>
+            <p>Card Shares</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Professional Metrics -->
+    <div class="professional-section">
+      <h3>Professional Performance</h3>
+      <div class="professional-grid">
+        <div class="professional-card">
+          <div class="professional-header">
+            <h4>💼 Inquiries</h4>
+            <span class="professional-value">{{ insights()!.professional.inquiries }}</span>
+          </div>
+          <div class="professional-detail">
+            <span>{{ insights()!.professional.bookingRequests }} booking requests</span>
+          </div>
+        </div>
+
+        <div class="professional-card">
+          <div class="professional-header">
+            <h4>⭐ Average Rating</h4>
+            <span class="professional-value">{{ insights()!.professional.averageRating }}/5</span>
+          </div>
+          <div class="professional-level" [class]="getRatingLevel(insights()!.professional.averageRating).class">
+            {{ getRatingLevel(insights()!.professional.averageRating).label }}
+          </div>
+        </div>
+
+        <div class="professional-card">
+          <div class="professional-header">
+            <h4>📝 Reviews</h4>
+            <span class="professional-value">{{ insights()!.professional.reviewsReceived }}</span>
+          </div>
+          <div class="professional-detail">
+            <span>{{ getInquiryConversionRate().toFixed(1) }}% conversion rate</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Engagement Analytics -->
+    <div class="engagement-section">
+      <h3>Engagement Analytics</h3>
+      <div class="engagement-grid">
+        <div class="engagement-card">
+          <div class="engagement-header">
+            <h4>Session Duration</h4>
+            <span class="engagement-value">{{ formatDuration(insights()!.engagement.averageSessionDuration) }}</span>
+          </div>
+          <div class="engagement-level" [class]="getEngagementLevel(insights()!.engagement.returnVisitorRate).class">
+            {{ getEngagementLevel(insights()!.engagement.returnVisitorRate).label }}
+          </div>
+        </div>
+
+        <div class="engagement-card">
+          <div class="engagement-header">
+            <h4>Return Visitors</h4>
+            <span class="engagement-value">{{ formatPercentage(insights()!.engagement.returnVisitorRate) }}</span>
+          </div>
+          <div class="engagement-level" [class]="getEngagementLevel(insights()!.engagement.returnVisitorRate).class">
+            {{ getEngagementLevel(insights()!.engagement.returnVisitorRate).label }}
+          </div>
+        </div>
+
+        <div class="engagement-card">
+          <div class="engagement-header">
+            <h4>Profile Completion</h4>
+            <span class="engagement-value">{{ getProfileCompletionScore() }}%</span>
+          </div>
+          <div class="engagement-level" [class]="getProfileCompletionLevel(getProfileCompletionScore()).class">
+            {{ getProfileCompletionLevel(getProfileCompletionScore()).label }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Peak Hours -->
+      <div class="peak-hours">
+        <h4>Peak Activity Hours</h4>
+        <div class="hours-list">
+          @for (hour of insights()!.engagement.peakHours; track hour) {
+            <span class="hour-badge">{{ hour }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Top Referrers -->
+      <div class="referrers">
+        <h4>Top Traffic Sources</h4>
+        <div class="referrers-list">
+          @for (referrer of insights()!.engagement.topReferrers; track referrer; let i = $index) {
+            <div class="referrer-item">
+              <span class="referrer-icon">{{ getReferrerIcon(referrer) }}</span>
+              <span class="referrer-name">{{ referrer }}</span>
+              <span class="referrer-rank">#{{ i + 1 }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Demographics -->
+    <div class="demographics-section">
+      <h3>Audience Demographics</h3>
+      <div class="demographics-grid">
+        <!-- Top Countries -->
+        <div class="demo-card">
+          <h4>🌍 Top Countries</h4>
+          <div class="demo-list">
+            @for (country of insights()!.demographics.topCountries; track country.country) {
+              <div class="demo-item">
+                <span class="demo-label">{{ country.country }}</span>
+                <div class="demo-bar">
+                  <div 
+                    class="demo-fill" 
+                    [style.width.%]="(country.count / insights()!.demographics.topCountries[0].count) * 100"
+                  ></div>
+                </div>
+                <span class="demo-value">{{ formatNumber(country.count) }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Device Types -->
+        <div class="demo-card">
+          <h4>📱 Device Types</h4>
+          <div class="demo-list">
+            @for (device of insights()!.demographics.deviceTypes; track device.type) {
+              <div class="demo-item">
+                <span class="demo-icon">{{ getDeviceIcon(device.type) }}</span>
+                <span class="demo-label">{{ device.type }}</span>
+                <div class="demo-bar">
+                  <div 
+                    class="demo-fill" 
+                    [style.width.%]="device.percentage"
+                  ></div>
+                </div>
+                <span class="demo-value">{{ device.percentage }}%</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Age Groups -->
+        <div class="demo-card">
+          <h4>👥 Age Groups</h4>
+          <div class="demo-list">
+            @for (age of insights()!.demographics.ageGroups; track age.range) {
+              <div class="demo-item">
+                <span class="demo-label">{{ age.range }}</span>
+                <div class="demo-bar">
+                  <div 
+                    class="demo-fill" 
+                    [style.width.%]="age.percentage"
+                  ></div>
+                </div>
+                <span class="demo-value">{{ age.percentage }}%</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

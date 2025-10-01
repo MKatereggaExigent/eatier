@@ -1,0 +1,103 @@
+<nav role="navigation" aria-label="Main menu" class="navbar">
+  <div class="nav-container">
+    <a routerLink="/" class="brand">Eatier</a>
+
+    <ul class="nav-links">
+      <li><a routerLink="/about" routerLinkActive="active">About</a></li>
+      <li><a routerLink="/restaurants" routerLinkActive="active">Restaurants</a></li>
+      <li><a routerLink="/community" routerLinkActive="active">Community</a></li>
+      <li><a routerLink="/faqs" routerLinkActive="active">FAQs</a></li>
+      <li>
+        @if (!isAuthenticated()) {
+          <a routerLink="/login" routerLinkActive="active">Login</a>
+        }
+      </li>
+      <li>
+        @if (!isAuthenticated()) {
+          <a routerLink="/register" routerLinkActive="active" class="cta">Register</a>
+        }
+      </li>
+    </ul>
+
+    <div class="nav-actions">
+      @if (isAuthenticated()) {
+        <!-- Authenticated User Menu -->
+        <div class="user-menu" (click)="toggleUserMenu()">
+          <div class="user-avatar">
+            {{ currentUser()?.firstName?.charAt(0) }}{{ currentUser()?.lastName?.charAt(0) }}
+          </div>
+          <span class="user-name">{{ currentUser()?.firstName }}</span>
+          <span class="dropdown-arrow">▼</span>
+
+          @if (showUserMenu()) {
+            <div class="user-dropdown">
+              <div class="user-info">
+                <p class="user-full-name">{{ currentUser()?.firstName }} {{ currentUser()?.lastName }}</p>
+                <p class="user-role">{{ getUserRoleLabel() }}</p>
+              </div>
+              <hr>
+              <a [routerLink]="getDashboardRoute()" (click)="showUserMenu.set(false)">
+                <span class="menu-icon">📊</span>
+                Dashboard
+              </a>
+              @if (currentUser()?.role === 'business') {
+                <a routerLink="/dashboard/business/restaurant" (click)="showUserMenu.set(false)">
+                  <span class="menu-icon">🏪</span>
+                  My Restaurant
+                </a>
+                <a routerLink="/dashboard/business/menu" (click)="showUserMenu.set(false)">
+                  <span class="menu-icon">🍽️</span>
+                  Menu Management
+                </a>
+                <a routerLink="/dashboard/business/analytics" (click)="showUserMenu.set(false)">
+                  <span class="menu-icon">📈</span>
+                  Analytics
+                </a>
+              }
+              @if (currentUser()?.role === 'normal_user' || currentUser()?.role === 'food_enthusiast') {
+                <a routerLink="/dashboard/user/favorites" (click)="showUserMenu.set(false)">
+                  <span class="menu-icon">❤️</span>
+                  My Favorites
+                </a>
+                <a routerLink="/dashboard/user/reviews" (click)="showUserMenu.set(false)">
+                  <span class="menu-icon">📝</span>
+                  My Reviews
+                </a>
+              }
+              @if (currentUser()?.role === 'specialist') {
+                <a [routerLink]="'/dashboard/' + currentUser()?.role + '/profile'" (click)="showUserMenu.set(false)">
+                  <span class="menu-icon">👤</span>
+                  My Profile
+                </a>
+                <a [routerLink]="'/dashboard/' + currentUser()?.role + '/bookings'" (click)="showUserMenu.set(false)">
+                  <span class="menu-icon">📅</span>
+                  My Bookings
+                </a>
+              }
+              <hr>
+              <a routerLink="/settings" (click)="showUserMenu.set(false)">
+                <span class="menu-icon">⚙️</span>
+                Settings
+              </a>
+              <a routerLink="/help" (click)="showUserMenu.set(false)">
+                <span class="menu-icon">❓</span>
+                Help
+              </a>
+              <hr>
+              <button type="button" class="logout-btn" (click)="logout()">
+                <span class="menu-icon">🚪</span>
+                Sign Out
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <!-- Guest User Actions -->
+        <div class="auth-buttons">
+          <a routerLink="/login" class="login-btn">Sign In</a>
+          <a routerLink="/register" class="register-btn cta">Join Eatier</a>
+        </div>
+      }
+    </div>
+  </div>
+</nav>

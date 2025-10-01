@@ -1,0 +1,493 @@
+<div class="portfolio-management" role="main" aria-label="Portfolio Management">
+  <!-- Header Section -->
+  <header class="portfolio-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">📸</span>
+          Portfolio Management
+        </h1>
+        <p class="page-subtitle">
+          Showcase your work and build your professional reputation
+        </p>
+      </div>
+      <div class="header-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ portfolioImages().length }}</span>
+          <span class="stat-label">Images</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ portfolioVideos().length }}</span>
+          <span class="stat-label">Videos</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ testimonials().length }}</span>
+          <span class="stat-label">Reviews</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="portfolio-tabs" role="tablist">
+    <button 
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'images'"
+      (click)="setActiveTab('images')"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'images'">
+      <span class="tab-icon">🖼️</span>
+      Images
+    </button>
+    <button 
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'videos'"
+      (click)="setActiveTab('videos')"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'videos'">
+      <span class="tab-icon">🎥</span>
+      Videos
+    </button>
+    <button 
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'testimonials'"
+      (click)="setActiveTab('testimonials')"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'testimonials'">
+      <span class="tab-icon">⭐</span>
+      Testimonials
+    </button>
+    <button 
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'settings'"
+      (click)="setActiveTab('settings')"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'settings'">
+      <span class="tab-icon">⚙️</span>
+      Settings
+    </button>
+  </nav>
+
+  <!-- Images Tab -->
+  @if (activeTab() === 'images') {
+    <section class="tab-content images-tab" role="tabpanel">
+      <div class="content-header">
+        <h2>Portfolio Images</h2>
+        <button type="button" class="add-btn primary" (click)="openImageModal()">
+          <span class="btn-icon">➕</span>
+          Add Image
+        </button>
+      </div>
+
+      @if (portfolioImages().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">📷</div>
+          <h3>No images in your portfolio</h3>
+          <p>Start building your portfolio by adding your best work</p>
+          <button type="button" class="add-btn primary" (click)="openImageModal()">
+            Add Your First Image
+          </button>
+        </div>
+      } @else {
+        <div class="images-grid">
+          @for (image of portfolioImages(); track image.id) {
+            <div class="image-card" [class.main-image]="image.isMain">
+              <div class="image-container">
+                <img [src]="image.url" [alt]="image.title" class="portfolio-image">
+                @if (image.isMain) {
+                  <div class="main-badge">Main Image</div>
+                }
+                <div class="image-overlay">
+                  <div class="image-actions">
+                    <button type="button" class="action-btn" (click)="openImageModal(image)" title="Edit">
+                      ✏️
+                    </button>
+                    @if (!image.isMain) {
+                      <button type="button" class="action-btn" (click)="setMainImage(image.id)" title="Set as Main">
+                        ⭐
+                      </button>
+                    }
+                    <button type="button" class="action-btn delete" (click)="deleteImage(image.id)" title="Delete">
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="image-info">
+                <h4>{{ image.title }}</h4>
+                <p class="image-description">{{ image.description }}</p>
+                <div class="image-meta">
+                  <span class="category">{{ image.category }}</span>
+                  <span class="event-type">{{ image.eventType }}</span>
+                  <span class="upload-date">{{ formatDate(image.uploadDate) }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <!-- Videos Tab -->
+  @if (activeTab() === 'videos') {
+    <section class="tab-content videos-tab" role="tabpanel">
+      <div class="content-header">
+        <h2>Portfolio Videos</h2>
+        <button type="button" class="add-btn primary" (click)="openVideoModal()">
+          <span class="btn-icon">➕</span>
+          Add Video
+        </button>
+      </div>
+
+      @if (portfolioVideos().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">🎬</div>
+          <h3>No videos in your portfolio</h3>
+          <p>Add cooking demonstrations or behind-the-scenes content</p>
+          <button type="button" class="add-btn primary" (click)="openVideoModal()">
+            Add Your First Video
+          </button>
+        </div>
+      } @else {
+        <div class="videos-grid">
+          @for (video of portfolioVideos(); track video.id) {
+            <div class="video-card">
+              <div class="video-container">
+                <img [src]="video.thumbnail" [alt]="video.title" class="video-thumbnail">
+                <div class="video-duration">{{ formatDuration(video.duration) }}</div>
+                <div class="video-overlay">
+                  <div class="play-button">▶️</div>
+                  <div class="video-actions">
+                    <button type="button" class="action-btn" (click)="openVideoModal(video)" title="Edit">
+                      ✏️
+                    </button>
+                    <button type="button" class="action-btn delete" (click)="deleteVideo(video.id)" title="Delete">
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="video-info">
+                <h4>{{ video.title }}</h4>
+                <p class="video-description">{{ video.description }}</p>
+                <div class="video-meta">
+                  <span class="upload-date">{{ formatDate(video.uploadDate) }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <!-- Testimonials Tab -->
+  @if (activeTab() === 'testimonials') {
+    <section class="tab-content testimonials-tab" role="tabpanel">
+      <div class="content-header">
+        <h2>Client Testimonials</h2>
+        <button type="button" class="add-btn primary" (click)="openTestimonialModal()">
+          <span class="btn-icon">➕</span>
+          Add Testimonial
+        </button>
+      </div>
+
+      @if (testimonials().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">💬</div>
+          <h3>No testimonials yet</h3>
+          <p>Add client reviews to build trust and credibility</p>
+          <button type="button" class="add-btn primary" (click)="openTestimonialModal()">
+            Add Your First Testimonial
+          </button>
+        </div>
+      } @else {
+        <div class="testimonials-list">
+          @for (testimonial of testimonials(); track testimonial.id) {
+            <div class="testimonial-card" [class.featured]="testimonial.isFeatured">
+              <div class="testimonial-header">
+                <div class="client-info">
+                  @if (testimonial.clientAvatar) {
+                    <img [src]="testimonial.clientAvatar" [alt]="testimonial.clientName" class="client-avatar">
+                  } @else {
+                    <div class="client-avatar-placeholder">
+                      {{ testimonial.clientName.charAt(0) }}
+                    </div>
+                  }
+                  <div class="client-details">
+                    <h4>{{ testimonial.clientName }}</h4>
+                    <div class="rating">
+                      @for (star of getStarArray(testimonial.rating); track $index) {
+                        <span class="star" [class.filled]="star">⭐</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div class="testimonial-actions">
+                  <button type="button" class="action-btn" (click)="openTestimonialModal(testimonial)" title="Edit">
+                    ✏️
+                  </button>
+                  <button type="button" class="action-btn" (click)="toggleTestimonialFeatured(testimonial.id)" 
+                          [title]="testimonial.isFeatured ? 'Remove from Featured' : 'Add to Featured'">
+                    {{ testimonial.isFeatured ? '⭐' : '☆' }}
+                  </button>
+                  <button type="button" class="action-btn" (click)="toggleTestimonialPublic(testimonial.id)"
+                          [title]="testimonial.isPublic ? 'Make Private' : 'Make Public'">
+                    {{ testimonial.isPublic ? '👁️' : '🔒' }}
+                  </button>
+                  <button type="button" class="action-btn delete" (click)="deleteTestimonial(testimonial.id)" title="Delete">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+              <div class="testimonial-content">
+                <p>{{ testimonial.review }}</p>
+                <div class="testimonial-meta">
+                  <span class="event-type">{{ testimonial.eventType }}</span>
+                  <span class="event-date">{{ formatDate(testimonial.eventDate) }}</span>
+                  @if (testimonial.isFeatured) {
+                    <span class="featured-badge">Featured</span>
+                  }
+                  @if (!testimonial.isPublic) {
+                    <span class="private-badge">Private</span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <!-- Settings Tab -->
+  @if (activeTab() === 'settings') {
+    <section class="tab-content settings-tab" role="tabpanel">
+      <div class="content-header">
+        <h2>Portfolio Settings</h2>
+      </div>
+
+      <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()" class="settings-form">
+        <div class="form-section">
+          <h3>Portfolio Information</h3>
+          <div class="form-group">
+            <label for="portfolioTitle">Portfolio Title</label>
+            <input 
+              type="text" 
+              id="portfolioTitle" 
+              formControlName="portfolioTitle"
+              class="form-input"
+              placeholder="e.g., Executive Chef Portfolio">
+          </div>
+          <div class="form-group">
+            <label for="portfolioDescription">Portfolio Description</label>
+            <textarea 
+              id="portfolioDescription" 
+              formControlName="portfolioDescription"
+              class="form-textarea"
+              rows="4"
+              placeholder="Describe your expertise and specialties..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Privacy & Display Settings</h3>
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="showContactInfo" class="form-checkbox">
+              <span class="checkbox-text">Show contact information on portfolio</span>
+            </label>
+          </div>
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="allowDownloads" class="form-checkbox">
+              <span class="checkbox-text">Allow visitors to download images</span>
+            </label>
+          </div>
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="watermarkImages" class="form-checkbox">
+              <span class="checkbox-text">Add watermark to images</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="save-btn primary" [disabled]="settingsForm.invalid">
+            Save Settings
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+</div>
+
+<!-- Image Modal -->
+@if (showImageModal()) {
+  <div class="modal-overlay" (click)="closeImageModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ selectedImage() ? 'Edit Image' : 'Add New Image' }}</h3>
+        <button type="button" class="close-btn" (click)="closeImageModal()">✕</button>
+      </div>
+      <form [formGroup]="imageForm" (ngSubmit)="saveImage()" class="modal-form">
+        <div class="form-group">
+          <label for="imageTitle">Title</label>
+          <input type="text" id="imageTitle" formControlName="title" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="imageDescription">Description</label>
+          <textarea id="imageDescription" formControlName="description" class="form-textarea" rows="3"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="imageCategory">Category</label>
+            <select id="imageCategory" formControlName="category" class="form-select">
+              <option value="">Select Category</option>
+              <option value="Appetizers">Appetizers</option>
+              <option value="Main Course">Main Course</option>
+              <option value="Desserts">Desserts</option>
+              <option value="Beverages">Beverages</option>
+              <option value="Teaching">Teaching</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="imageEventType">Event Type</label>
+            <select id="imageEventType" formControlName="eventType" class="form-select">
+              <option value="">Select Event Type</option>
+              <option value="Private Dinner">Private Dinner</option>
+              <option value="Corporate Event">Corporate Event</option>
+              <option value="Wedding">Wedding</option>
+              <option value="Cooking Class">Cooking Class</option>
+              <option value="Catering">Catering</option>
+            </select>
+          </div>
+        </div>
+        @if (!selectedImage()) {
+          <div class="form-group">
+            <label for="imageFile">Image File</label>
+            <input type="file" id="imageFile" (change)="onImageFileSelected($event)" 
+                   accept="image/*" class="form-file">
+          </div>
+        }
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeImageModal()">Cancel</button>
+          <button type="submit" class="save-btn primary" [disabled]="imageForm.invalid">
+            {{ selectedImage() ? 'Update' : 'Add' }} Image
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Video Modal -->
+@if (showVideoModal()) {
+  <div class="modal-overlay" (click)="closeVideoModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ selectedVideo() ? 'Edit Video' : 'Add New Video' }}</h3>
+        <button type="button" class="close-btn" (click)="closeVideoModal()">✕</button>
+      </div>
+      <form [formGroup]="videoForm" (ngSubmit)="saveVideo()" class="modal-form">
+        <div class="form-group">
+          <label for="videoTitle">Title</label>
+          <input type="text" id="videoTitle" formControlName="title" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="videoDescription">Description</label>
+          <textarea id="videoDescription" formControlName="description" class="form-textarea" rows="3"></textarea>
+        </div>
+        @if (!selectedVideo()) {
+          <div class="form-group">
+            <label for="videoFile">Video File</label>
+            <input type="file" id="videoFile" (change)="onVideoFileSelected($event)" 
+                   accept="video/*" class="form-file">
+          </div>
+        }
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeVideoModal()">Cancel</button>
+          <button type="submit" class="save-btn primary" [disabled]="videoForm.invalid">
+            {{ selectedVideo() ? 'Update' : 'Add' }} Video
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Testimonial Modal -->
+@if (showTestimonialModal()) {
+  <div class="modal-overlay" (click)="closeTestimonialModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ selectedTestimonial() ? 'Edit Testimonial' : 'Add New Testimonial' }}</h3>
+        <button type="button" class="close-btn" (click)="closeTestimonialModal()">✕</button>
+      </div>
+      <form [formGroup]="testimonialForm" (ngSubmit)="saveTestimonial()" class="modal-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="clientName">Client Name</label>
+            <input type="text" id="clientName" formControlName="clientName" class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="rating">Rating</label>
+            <select id="rating" formControlName="rating" class="form-select">
+              <option value="5">5 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="2">2 Stars</option>
+              <option value="1">1 Star</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="review">Review</label>
+          <textarea id="review" formControlName="review" class="form-textarea" rows="4"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="eventType">Event Type</label>
+            <select id="eventType" formControlName="eventType" class="form-select">
+              <option value="">Select Event Type</option>
+              <option value="Private Dinner">Private Dinner</option>
+              <option value="Corporate Event">Corporate Event</option>
+              <option value="Wedding">Wedding</option>
+              <option value="Cooking Class">Cooking Class</option>
+              <option value="Catering">Catering</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="eventDate">Event Date</label>
+            <input type="date" id="eventDate" formControlName="eventDate" class="form-input">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="isPublic" class="form-checkbox">
+              <span class="checkbox-text">Make public</span>
+            </label>
+          </div>
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="isFeatured" class="form-checkbox">
+              <span class="checkbox-text">Feature this testimonial</span>
+            </label>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeTestimonialModal()">Cancel</button>
+          <button type="submit" class="save-btn primary" [disabled]="testimonialForm.invalid">
+            {{ selectedTestimonial() ? 'Update' : 'Add' }} Testimonial
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

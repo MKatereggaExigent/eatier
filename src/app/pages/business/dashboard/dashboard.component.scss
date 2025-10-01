@@ -1,0 +1,73 @@
+// ===================================
+// BUSINESS DASHBOARD LAYOUT
+// Production Ready with Sidebar
+// ===================================
+
+.dashboard {
+  margin-left: 280px; // Account for sidebar width
+  min-height: 100vh;
+  padding: var(--space-8) var(--space-12);
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%);
+  transition: margin-left var(--transition-normal);
+
+  h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: var(--text-4xl);
+    font-weight: var(--font-bold);
+    color: var(--clr-neutral-900);
+    margin-bottom: var(--space-8);
+    text-align: center;
+    background: linear-gradient(135deg, var(--clr-primary-600) 0%, var(--clr-secondary-600) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+// ===================================
+// RESPONSIVE ADJUSTMENTS
+// ===================================
+
+@media (max-width: 1024px) {
+  .dashboard {
+    margin-left: 0;
+    padding: var(--space-6) var(--space-8);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: var(--space-4) var(--space-6);
+
+    h1 {
+      font-size: var(--text-3xl);
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding: var(--space-4);
+
+    h1 {
+      font-size: var(--text-2xl);
+    }
+  }
+}
+
+// ===================================
+// SIDEBAR COLLAPSED STATE
+// ===================================
+
+// When sidebar is collapsed, adjust main content
+.dashboard.sidebar-collapsed {
+  margin-left: 80px;
+}
+
+@media (max-width: 1024px) {
+  .dashboard.sidebar-collapsed {
+    margin-left: 0;
+  }
+}

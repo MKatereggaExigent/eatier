@@ -1,0 +1,236 @@
+<div class="food-enthusiast-overview" role="main" aria-label="Food Enthusiast Dashboard">
+  <!-- Header Section -->
+  <header class="overview-header">
+    <div class="header-content">
+      <div class="welcome-section">
+        <h1 class="page-title">
+          <span class="title-icon">🍽️</span>
+          Welcome back, {{ currentUser()?.firstName || 'Food Enthusiast' }}!
+        </h1>
+        <p class="page-subtitle">
+          Discover amazing restaurants, trending dishes, and culinary experiences
+        </p>
+      </div>
+      <div class="monthly-goal">
+        <div class="goal-content">
+          <h3>Monthly Goal</h3>
+          <div class="goal-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="monthlyProgressPercentage()"></div>
+            </div>
+            <span class="progress-text">{{ userStats().monthlyProgress }}/{{ userStats().monthlyGoal }} restaurants</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats Cards -->
+  <section class="stats-section" aria-label="Your Food Journey Stats">
+    <div class="stats-grid">
+      <div class="stat-card reviews">
+        <div class="stat-icon">📝</div>
+        <div class="stat-content">
+          <h3>{{ userStats().reviewsWritten }}</h3>
+          <p>Reviews Written</p>
+          <div class="stat-change">{{ userStats().averageRating.toFixed(1) }} avg rating</div>
+        </div>
+      </div>
+
+      <div class="stat-card restaurants">
+        <div class="stat-icon">🏪</div>
+        <div class="stat-content">
+          <h3>{{ userStats().restaurantsVisited }}</h3>
+          <p>Restaurants Visited</p>
+          <div class="stat-change">{{ userStats().cuisinesExplored }} cuisines</div>
+        </div>
+      </div>
+
+      <div class="stat-card followers">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <h3>{{ userStats().followersCount }}</h3>
+          <p>Followers</p>
+          <div class="stat-change">Food community</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Restaurant Recommendations -->
+    <section class="content-card recommendations-card" aria-label="Restaurant Recommendations">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">🎯</span>
+          Recommended for You
+        </h2>
+        <button type="button" class="view-all-btn" (click)="viewAllRecommendations()">
+          View All
+        </button>
+      </div>
+
+      <div class="card-content">
+        <div class="recommendations-list">
+          @for (restaurant of topRecommendations(); track restaurant.id) {
+            <div class="restaurant-card" (click)="viewRestaurant(restaurant.id)">
+              <div class="restaurant-image">
+                <img [src]="restaurant.image" [alt]="restaurant.name" loading="lazy">
+                @if (restaurant.isNew) {
+                  <div class="new-badge">New</div>
+                }
+                <button type="button" class="bookmark-btn" (click)="bookmarkRestaurant(restaurant.id); $event.stopPropagation()">
+                  🔖
+                </button>
+              </div>
+              <div class="restaurant-info">
+                <h4>{{ restaurant.name }}</h4>
+                <div class="restaurant-meta">
+                  <span class="cuisine">{{ restaurant.cuisine }}</span>
+                  <span class="rating">⭐ {{ restaurant.rating }}</span>
+                  <span class="price">{{ restaurant.priceRange }}</span>
+                  <span class="distance">📍 {{ restaurant.distance }}</span>
+                </div>
+                <div class="specialties">
+                  @for (specialty of restaurant.specialties.slice(0, 2); track specialty) {
+                    <span class="specialty-tag">{{ specialty }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Trending Dishes -->
+    <section class="content-card trending-card" aria-label="Trending Dishes">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">🔥</span>
+          Trending Dishes
+        </h2>
+        <button type="button" class="view-all-btn" (click)="viewAllTrending()">
+          View All
+        </button>
+      </div>
+
+      <div class="card-content">
+        <div class="trending-list">
+          @for (dish of trendingDishes(); track dish.id) {
+            <div class="dish-card">
+              <div class="dish-image">
+                <img [src]="dish.image" [alt]="dish.name" loading="lazy">
+                <div class="popularity-badge">{{ dish.popularity }}% 🔥</div>
+              </div>
+              <div class="dish-info">
+                <h4>{{ dish.name }}</h4>
+                <p class="restaurant-name">{{ dish.restaurant }}</p>
+                <p class="cuisine-type">{{ dish.cuisine }}</p>
+                <p class="dish-description">{{ dish.description }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Reviews -->
+    <section class="content-card reviews-card" aria-label="Your Recent Reviews">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">⭐</span>
+          Your Recent Reviews
+        </h2>
+        <button type="button" class="view-all-btn" (click)="viewAllReviews()">
+          View All
+        </button>
+      </div>
+
+      <div class="card-content">
+        <div class="reviews-list">
+          @for (review of recentReviews().slice(0, 3); track review.id) {
+            <div class="review-card">
+              <div class="review-header">
+                <div class="restaurant-info">
+                  <img [src]="review.restaurantImage" [alt]="review.restaurantName" class="restaurant-thumb">
+                  <div class="restaurant-details">
+                    <h4>{{ review.restaurantName }}</h4>
+                    <div class="review-rating">
+                      @for (star of getStarArray(review.rating); track $index) {
+                        <span class="star" [class.filled]="star">⭐</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div class="review-date">{{ formatDate(review.date) }}</div>
+              </div>
+              <div class="review-content">
+                <p>{{ review.comment }}</p>
+                <div class="review-stats">
+                  <span class="likes">👍 {{ review.likes }} likes</span>
+                  @if (review.isPublic) {
+                    <span class="visibility">🌐 Public</span>
+                  } @else {
+                    <span class="visibility">🔒 Private</span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Upcoming Events -->
+    <section class="content-card events-card" aria-label="Culinary Events">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">🎉</span>
+          Culinary Events
+        </h2>
+        <button type="button" class="view-all-btn" (click)="viewAllEvents()">
+          View All
+        </button>
+      </div>
+
+      <div class="card-content">
+        <div class="events-list">
+          @for (event of upcomingEvents().slice(0, 3); track event.id) {
+            <div class="event-card" [class.bookmarked]="event.isBookmarked">
+              <div class="event-image">
+                <img [src]="event.image" [alt]="event.title" loading="lazy">
+                <div class="event-type">
+                  <span class="type-icon">{{ getEventTypeIcon(event.type) }}</span>
+                  <span class="type-label">{{ getEventTypeLabel(event.type) }}</span>
+                </div>
+              </div>
+              <div class="event-info">
+                <h4>{{ event.title }}</h4>
+                <div class="event-details">
+                  <div class="event-date">
+                    <span class="date-icon">📅</span>
+                    <span>{{ formatDate(event.date) }}</span>
+                  </div>
+                  <div class="event-location">
+                    <span class="location-icon">📍</span>
+                    <span>{{ event.location }}</span>
+                  </div>
+                  <div class="event-price">
+                    <span class="price-icon">💰</span>
+                    <span>{{ formatCurrency(event.price) }}</span>
+                  </div>
+                </div>
+                <button type="button" class="bookmark-event-btn" (click)="bookmarkEvent(event.id)"
+                        [class.bookmarked]="event.isBookmarked">
+                  {{ event.isBookmarked ? '🔖 Bookmarked' : '🔖 Bookmark' }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

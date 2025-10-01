@@ -1,0 +1,376 @@
+// ===================================
+// GLASSMORPHIC BUTTON COMPONENT
+// Production-Ready Design System
+// ===================================
+
+.glassmorphic-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-weight: var(--font-semibold);
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  // Base Styling
+  background: var(--glass-white-strong);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+
+  // Disabled State
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // Focus State
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+  }
+
+  // Hover Effects
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+
+    .btn-shine {
+      opacity: 1;
+      transform: translateX(100%);
+    }
+  }
+
+  // Active State
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
+  }
+
+  // Size Variants
+  &[data-size="xs"] {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-xs);
+    border-radius: var(--radius-md);
+  }
+
+  &[data-size="sm"] {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-md);
+  }
+
+  &[data-size="md"] {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-sm);
+  }
+
+  &[data-size="lg"] {
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--text-base);
+    border-radius: var(--radius-xl);
+  }
+
+  &[data-size="xl"] {
+    padding: var(--space-5) var(--space-10);
+    font-size: var(--text-lg);
+    border-radius: var(--radius-xl);
+  }
+
+  // Color Variants
+  &[data-variant="primary"] {
+    background: linear-gradient(135deg, var(--clr-primary-500) 0%, var(--clr-primary-600) 100%);
+    color: var(--clr-neutral-0);
+    border-color: var(--clr-primary-600);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--clr-primary-600) 0%, var(--clr-primary-700) 100%);
+      box-shadow: var(--shadow-glow);
+    }
+  }
+
+  &[data-variant="secondary"] {
+    background: linear-gradient(135deg, var(--clr-secondary-500) 0%, var(--clr-secondary-600) 100%);
+    color: var(--clr-neutral-0);
+    border-color: var(--clr-secondary-600);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--clr-secondary-600) 0%, var(--clr-secondary-700) 100%);
+    }
+  }
+
+  &[data-variant="ghost"] {
+    background: transparent;
+    color: var(--clr-primary-600);
+    border: 2px solid var(--clr-primary-200);
+
+    &:hover:not(:disabled) {
+      background: var(--clr-primary-50);
+      border-color: var(--clr-primary-300);
+    }
+  }
+
+  &[data-variant="success"] {
+    background: linear-gradient(135deg, var(--clr-success) 0%, #16a34a 100%);
+    color: var(--clr-neutral-0);
+    border-color: var(--clr-success);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    }
+  }
+
+  &[data-variant="warning"] {
+    background: linear-gradient(135deg, var(--clr-warning) 0%, #d97706 100%);
+    color: var(--clr-neutral-0);
+    border-color: var(--clr-warning);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    }
+  }
+
+  &[data-variant="error"] {
+    background: linear-gradient(135deg, var(--clr-error) 0%, #dc2626 100%);
+    color: var(--clr-neutral-0);
+    border-color: var(--clr-error);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    }
+  }
+
+  &[data-variant="info"] {
+    background: linear-gradient(135deg, var(--clr-info) 0%, #2563eb 100%);
+    color: var(--clr-neutral-0);
+    border-color: var(--clr-info);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    }
+  }
+}
+
+// ===================================
+// BUTTON CONTENT
+// ===================================
+
+.btn-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+
+  .loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid currentColor;
+    border-radius: var(--radius-full);
+    animation: spin 1s linear infinite;
+  }
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: opacity var(--transition-fast);
+  z-index: 2;
+  position: relative;
+
+  &.loading {
+    opacity: 0;
+  }
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+  transition: transform var(--transition-normal);
+
+  .glassmorphic-btn:hover & {
+    transform: scale(1.1);
+  }
+}
+
+.btn-text {
+  line-height: 1;
+  white-space: nowrap;
+}
+
+// ===================================
+// GLASSMORPHIC EFFECTS
+// ===================================
+
+.btn-effects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.btn-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  opacity: 0;
+  transition: all 0.6s ease;
+  transform: translateX(-100%);
+}
+
+.btn-ripple {
+  position: absolute;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  pointer-events: none;
+
+  &.animate {
+    animation: ripple 0.6s ease-out;
+  }
+}
+
+// ===================================
+// ANIMATIONS
+// ===================================
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+// ===================================
+// FULL WIDTH VARIANT
+// ===================================
+
+.glassmorphic-btn.full-width {
+  width: 100%;
+  display: flex;
+}
+
+// ===================================
+// ICON ONLY VARIANT
+// ===================================
+
+.glassmorphic-btn.icon-only {
+  aspect-ratio: 1;
+  padding: var(--space-3);
+
+  &[data-size="xs"] {
+    padding: var(--space-1);
+  }
+
+  &[data-size="sm"] {
+    padding: var(--space-2);
+  }
+
+  &[data-size="lg"] {
+    padding: var(--space-4);
+  }
+
+  &[data-size="xl"] {
+    padding: var(--space-5);
+  }
+}
+
+// ===================================
+// BUTTON GROUPS
+// ===================================
+
+.btn-group {
+  display: inline-flex;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+
+  .glassmorphic-btn {
+    border-radius: 0;
+    border-right-width: 0;
+
+    &:first-child {
+      border-top-left-radius: var(--radius-lg);
+      border-bottom-left-radius: var(--radius-lg);
+    }
+
+    &:last-child {
+      border-top-right-radius: var(--radius-lg);
+      border-bottom-right-radius: var(--radius-lg);
+      border-right-width: 1px;
+    }
+
+    &:hover {
+      transform: none;
+      z-index: 2;
+    }
+  }
+}
+
+// ===================================
+// RESPONSIVE DESIGN
+// ===================================
+
+@media (max-width: 768px) {
+  .glassmorphic-btn {
+    &[data-size="lg"] {
+      padding: var(--space-3) var(--space-6);
+      font-size: var(--text-sm);
+    }
+
+    &[data-size="xl"] {
+      padding: var(--space-4) var(--space-8);
+      font-size: var(--text-base);
+    }
+  }
+}
+
+// ===================================
+// ACCESSIBILITY
+// ===================================
+
+@media (prefers-reduced-motion: reduce) {
+  .glassmorphic-btn {
+    transition: none;
+
+    .btn-shine,
+    .btn-ripple {
+      display: none;
+    }
+  }
+}

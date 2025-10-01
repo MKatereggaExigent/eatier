@@ -1,0 +1,335 @@
+<div class="accounts-center-container">
+  <!-- Header -->
+  <div class="accounts-header">
+    <h1>⚙️ Accounts Centre</h1>
+    <p>Manage your account settings, security, and data</p>
+  </div>
+
+  <!-- Success/Error Messages -->
+  @if (successMessage()) {
+    <div class="success-message">
+      <span class="success-icon">✅</span>
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Navigation Tabs -->
+  <div class="accounts-tabs">
+    <button 
+      type="button"
+      class="tab-button"
+      [class.active]="activeSection() === 'overview'"
+      (click)="setActiveSection('overview')"
+    >
+      📊 Overview
+    </button>
+    <button 
+      type="button"
+      class="tab-button"
+      [class.active]="activeSection() === 'notifications'"
+      (click)="setActiveSection('notifications')"
+    >
+      🔔 Notifications
+    </button>
+    <button 
+      type="button"
+      class="tab-button"
+      [class.active]="activeSection() === 'activity'"
+      (click)="setActiveSection('activity')"
+    >
+      📋 Activity
+    </button>
+    <button 
+      type="button"
+      class="tab-button"
+      [class.active]="activeSection() === 'security'"
+      (click)="setActiveSection('security')"
+    >
+      🔒 Security
+    </button>
+  </div>
+
+  <!-- Overview Section -->
+  @if (activeSection() === 'overview') {
+    <div class="section-content">
+      <h2>Account Overview</h2>
+      
+      <div class="overview-cards">
+        <div class="overview-card">
+          <div class="card-icon">📊</div>
+          <div class="card-content">
+            <h3>Account Status</h3>
+            <p class="status active">Active</p>
+          </div>
+        </div>
+
+        <div class="overview-card">
+          <div class="card-icon">📅</div>
+          <div class="card-content">
+            <h3>Member Since</h3>
+            <p>January 2024</p>
+          </div>
+        </div>
+
+        <div class="overview-card">
+          <div class="card-icon">📈</div>
+          <div class="card-content">
+            <h3>Profile Views</h3>
+            <p>2,456 this month</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="actions-grid">
+          <button type="button" class="action-btn" (click)="exportAccountData()">
+            📄 Export Account Data
+          </button>
+          <button type="button" class="action-btn warning" (click)="openFreezeModal()">
+            ⏸️ Freeze Account
+          </button>
+          <button type="button" class="action-btn danger" (click)="openDeleteModal()">
+            🗑️ Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Notifications Section -->
+  @if (activeSection() === 'notifications') {
+    <div class="section-content">
+      <h2>Notification Settings</h2>
+      
+      <form [formGroup]="notificationForm" (ngSubmit)="onNotificationSubmit()" class="notification-form">
+        <div class="notification-group">
+          <h3>Email Notifications</h3>
+          
+          <label class="notification-item">
+            <input type="checkbox" formControlName="messages" />
+            <div class="notification-content">
+              <span class="notification-title">Messages</span>
+              <span class="notification-description">Receive notifications for new messages</span>
+            </div>
+          </label>
+
+          <label class="notification-item">
+            <input type="checkbox" formControlName="updates" />
+            <div class="notification-content">
+              <span class="notification-title">System Updates</span>
+              <span class="notification-description">Get notified about system updates and maintenance</span>
+            </div>
+          </label>
+
+          <label class="notification-item">
+            <input type="checkbox" formControlName="customerAlerts" />
+            <div class="notification-content">
+              <span class="notification-title">Customer Alerts</span>
+              <span class="notification-description">Notifications about customer interactions</span>
+            </div>
+          </label>
+
+          <label class="notification-item">
+            <input type="checkbox" formControlName="marketingEmails" />
+            <div class="notification-content">
+              <span class="notification-title">Marketing Emails</span>
+              <span class="notification-description">Promotional content and feature updates</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="emailFrequency">Email Frequency</label>
+          <select id="emailFrequency" formControlName="emailFrequency">
+            <option value="immediate">Immediate</option>
+            <option value="daily">Daily Digest</option>
+            <option value="weekly">Weekly Summary</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="primary-btn" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <span class="loading-spinner"></span>
+              Saving...
+            } @else {
+              Save Settings
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Activity Section -->
+  @if (activeSection() === 'activity') {
+    <div class="section-content">
+      <h2>Account Activity</h2>
+      
+      <div class="activity-list">
+        @for (activity of accountActivity(); track activity.id) {
+          <div class="activity-item">
+            <div class="activity-icon">{{ getActionIcon(activity.action) }}</div>
+            <div class="activity-content">
+              <div class="activity-header">
+                <span class="activity-action">{{ activity.action }}</span>
+                <span class="activity-time">{{ formatTimestamp(activity.timestamp) }}</span>
+              </div>
+              <div class="activity-details">
+                @if (activity.details) {
+                  <span>{{ activity.details | json }}</span>
+                }
+                <span class="activity-location">{{ activity.ipAddress }}</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Security Section -->
+  @if (activeSection() === 'security') {
+    <div class="section-content">
+      <h2>Security Settings</h2>
+      
+      <div class="security-options">
+        <div class="security-item">
+          <div class="security-content">
+            <h3>🔑 Change Password</h3>
+            <p>Update your account password for better security</p>
+          </div>
+          <button type="button" class="secondary-btn">Change Password</button>
+        </div>
+
+        <div class="security-item">
+          <div class="security-content">
+            <h3>📱 Two-Factor Authentication</h3>
+            <p>Add an extra layer of security to your account</p>
+          </div>
+          <button type="button" class="secondary-btn">Enable 2FA</button>
+        </div>
+
+        <div class="security-item">
+          <div class="security-content">
+            <h3>🔐 Active Sessions</h3>
+            <p>Manage devices that are currently logged in</p>
+          </div>
+          <button type="button" class="secondary-btn">View Sessions</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Freeze Account Modal -->
+@if (showFreezeModal()) {
+  <div class="modal-overlay" (click)="closeFreezeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>⏸️ Freeze Account</h3>
+        <button type="button" class="close-btn" (click)="closeFreezeModal()">✕</button>
+      </div>
+
+      <form [formGroup]="freezeForm" (ngSubmit)="onFreezeSubmit()" class="freeze-form">
+        <div class="form-group">
+          <label>Freeze Duration</label>
+          <div class="duration-options">
+            @for (duration of freezeDurations; track duration.value) {
+              <label class="duration-option">
+                <input type="radio" formControlName="duration" [value]="duration.value" />
+                <div class="option-content">
+                  <span class="option-title">{{ duration.label }}</span>
+                  <span class="option-description">{{ duration.description }}</span>
+                </div>
+              </label>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="freezeReason">Reason (Optional)</label>
+          <textarea id="freezeReason" formControlName="reason" rows="3" placeholder="Why are you freezing your account?"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" (click)="closeFreezeModal()">Cancel</button>
+          <button type="submit" class="warning-btn" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <span class="loading-spinner"></span>
+              Freezing...
+            } @else {
+              Freeze Account
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Delete Account Modal -->
+@if (showDeleteModal()) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>🗑️ Delete Account</h3>
+        <button type="button" class="close-btn" (click)="closeDeleteModal()">✕</button>
+      </div>
+
+      <div class="warning-message">
+        <p><strong>⚠️ This action cannot be undone!</strong></p>
+        <p>Deleting your account will permanently remove all your data, including:</p>
+        <ul>
+          <li>Business profile and photos</li>
+          <li>Menu data and access permissions</li>
+          <li>Analytics and insights history</li>
+          <li>Customer reviews and ratings</li>
+        </ul>
+      </div>
+
+      <form [formGroup]="deleteForm" (ngSubmit)="onDeleteSubmit()" class="delete-form">
+        <div class="form-group">
+          <label for="confirmText">Type "DELETE MY ACCOUNT" to confirm</label>
+          <input id="confirmText" type="text" formControlName="confirmText" placeholder="DELETE MY ACCOUNT" />
+          @if (getFieldError(deleteForm, 'confirmText')) {
+            <span class="field-error">{{ getFieldError(deleteForm, 'confirmText') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="deleteReason">Reason for deletion (Optional)</label>
+          <textarea id="deleteReason" formControlName="reason" rows="3" placeholder="Help us improve by telling us why you're leaving"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="deletePassword">Enter your password</label>
+          <input id="deletePassword" type="password" formControlName="password" placeholder="Your current password" />
+          @if (getFieldError(deleteForm, 'password')) {
+            <span class="field-error">{{ getFieldError(deleteForm, 'password') }}</span>
+          }
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" (click)="closeDeleteModal()">Cancel</button>
+          <button type="submit" class="danger-btn" [disabled]="isLoading() || deleteForm.invalid">
+            @if (isLoading()) {
+              <span class="loading-spinner"></span>
+              Deleting...
+            } @else {
+              Delete Account Permanently
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

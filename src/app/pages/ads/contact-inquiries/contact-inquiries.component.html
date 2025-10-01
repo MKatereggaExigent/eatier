@@ -1,0 +1,305 @@
+<div class="contact-inquiries-container" role="main" aria-label="Contact Inquiries Management">
+  <!-- Header -->
+  <header class="inquiries-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">📧</span>
+          Contact Inquiries
+        </h1>
+        <p class="page-subtitle">Manage customer inquiries and communications</p>
+      </div>
+      
+      <div class="header-actions">
+        <button 
+          class="btn-secondary export-btn"
+          (click)="exportInquiries()">
+          📊 Export
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="stats-overview">
+      <div class="stat-card">
+        <div class="stat-value">{{ inquiryStats().total }}</div>
+        <div class="stat-label">Total Inquiries</div>
+      </div>
+      <div class="stat-card pending">
+        <div class="stat-value">{{ inquiryStats().pending }}</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-card progress">
+        <div class="stat-value">{{ inquiryStats().inProgress }}</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+      <div class="stat-card resolved">
+        <div class="stat-value">{{ inquiryStats().resolved }}</div>
+        <div class="stat-label">Resolved</div>
+      </div>
+      <div class="stat-card recent">
+        <div class="stat-value">{{ recentInquiries() }}</div>
+        <div class="stat-label">Last 24h</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="search-bar">
+      <input 
+        type="text" 
+        class="search-input"
+        placeholder="Search inquiries..."
+        [value]="searchQuery()"
+        (input)="updateSearchQuery($event.target.value)">
+      <span class="search-icon">🔍</span>
+    </div>
+
+    <div class="filter-controls">
+      <div class="filter-group">
+        <label class="filter-label">Status:</label>
+        <select 
+          class="filter-select"
+          [value]="filterStatus()"
+          (change)="setStatusFilter($event.target.value)">
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+          <option value="closed">Closed</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Type:</label>
+        <select 
+          class="filter-select"
+          [value]="filterType()"
+          (change)="setTypeFilter($event.target.value)">
+          <option value="all">All Types</option>
+          <option value="booking">Booking</option>
+          <option value="quote">Quote</option>
+          <option value="general">General</option>
+        </select>
+      </div>
+
+      <button 
+        class="btn-secondary clear-filters"
+        (click)="clearFilters()">
+        Clear Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Priority Inquiries Alert -->
+  @if (priorityInquiries().length > 0) {
+    <div class="priority-alert">
+      <div class="alert-header">
+        <span class="alert-icon">🚨</span>
+        <h3>High Priority Inquiries</h3>
+      </div>
+      <div class="priority-list">
+        @for (inquiry of priorityInquiries(); track inquiry.id) {
+          <div class="priority-item" (click)="selectInquiry(inquiry)">
+            <div class="priority-info">
+              <span class="inquiry-name">{{ inquiry.inquirerName }}</span>
+              <span class="inquiry-subject">{{ inquiry.subject }}</span>
+            </div>
+            <div class="priority-time">{{ getRelativeTime(inquiry.createdAt) }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Inquiries List -->
+  <div class="inquiries-content">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading inquiries...</p>
+      </div>
+    } @else if (filteredInquiries().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>No inquiries found</h3>
+        <p>No inquiries match your current filters.</p>
+      </div>
+    } @else {
+      <div class="inquiries-list">
+        @for (inquiry of filteredInquiries(); track inquiry.id) {
+          <div 
+            class="inquiry-card"
+            [class]="getStatusClass(inquiry.status)"
+            (click)="selectInquiry(inquiry)">
+            
+            <div class="inquiry-header">
+              <div class="inquiry-meta">
+                <span class="inquiry-type" [title]="inquiry.inquiryType">
+                  {{ getTypeIcon(inquiry.inquiryType) }}
+                </span>
+                <span class="inquiry-priority" [title]="inquiry.priority">
+                  {{ getPriorityIcon(inquiry.priority) }}
+                </span>
+                <span class="inquiry-status" [title]="inquiry.status">
+                  {{ getStatusIcon(inquiry.status) }}
+                </span>
+              </div>
+              <div class="inquiry-time">{{ getRelativeTime(inquiry.createdAt) }}</div>
+            </div>
+
+            <div class="inquiry-content">
+              <div class="inquiry-from">
+                <strong>{{ inquiry.inquirerName }}</strong>
+                <span class="inquiry-email">{{ inquiry.inquirerEmail }}</span>
+              </div>
+              <div class="inquiry-subject">{{ inquiry.subject }}</div>
+              <div class="inquiry-preview">{{ inquiry.message | slice:0:120 }}...</div>
+            </div>
+
+            <div class="inquiry-actions">
+              <button 
+                class="action-btn status-btn"
+                (click)="$event.stopPropagation(); updateInquiryStatus(inquiry.id, 'resolved')"
+                [disabled]="inquiry.status === 'resolved' || inquiry.status === 'closed'">
+                Mark Resolved
+              </button>
+              @if (inquiry.status === 'pending') {
+                <button 
+                  class="action-btn auto-response-btn"
+                  (click)="$event.stopPropagation(); sendAutoResponse(inquiry.id)">
+                  Auto Reply
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Inquiry Details Modal -->
+  @if (showInquiryDetails() && selectedInquiry()) {
+    <div class="modal-overlay" (click)="closeInquiryDetails()">
+      <div class="inquiry-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="inquiry-details-header">
+            <h3>{{ selectedInquiry()!.subject }}</h3>
+            <div class="inquiry-badges">
+              <span class="badge type-badge">
+                {{ getTypeIcon(selectedInquiry()!.inquiryType) }} {{ selectedInquiry()!.inquiryType }}
+              </span>
+              <span class="badge priority-badge" [class]="getPriorityClass(selectedInquiry()!.priority)">
+                {{ getPriorityIcon(selectedInquiry()!.priority) }} {{ selectedInquiry()!.priority }}
+              </span>
+              <span class="badge status-badge" [class]="getStatusClass(selectedInquiry()!.status)">
+                {{ getStatusIcon(selectedInquiry()!.status) }} {{ selectedInquiry()!.status }}
+              </span>
+            </div>
+          </div>
+          <button 
+            class="close-modal"
+            (click)="closeInquiryDetails()">
+            ✕
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <!-- Inquirer Information -->
+          <div class="inquirer-info">
+            <h4>Contact Information</h4>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Name:</label>
+                <span>{{ selectedInquiry()!.inquirerName }}</span>
+              </div>
+              <div class="info-item">
+                <label>Email:</label>
+                <span>{{ selectedInquiry()!.inquirerEmail }}</span>
+              </div>
+              @if (selectedInquiry()!.inquirerPhone) {
+                <div class="info-item">
+                  <label>Phone:</label>
+                  <span>{{ selectedInquiry()!.inquirerPhone }}</span>
+                </div>
+              }
+              <div class="info-item">
+                <label>Date:</label>
+                <span>{{ formatDate(selectedInquiry()!.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message Content -->
+          <div class="message-content">
+            <h4>Message</h4>
+            <div class="message-text">{{ selectedInquiry()!.message }}</div>
+          </div>
+
+          <!-- Status Management -->
+          <div class="status-management">
+            <h4>Manage Inquiry</h4>
+            <div class="management-controls">
+              <div class="control-group">
+                <label>Status:</label>
+                <select 
+                  class="control-select"
+                  [value]="selectedInquiry()!.status"
+                  (change)="updateInquiryStatus(selectedInquiry()!.id, $event.target.value)">
+                  <option value="pending">Pending</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+
+              <div class="control-group">
+                <label>Priority:</label>
+                <select 
+                  class="control-select"
+                  [value]="selectedInquiry()!.priority"
+                  (change)="updateInquiryPriority(selectedInquiry()!.id, $event.target.value)">
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reply Section -->
+          <div class="reply-section">
+            <h4>Send Reply</h4>
+            <textarea 
+              class="reply-textarea"
+              placeholder="Type your reply here..."
+              [value]="replyMessage()"
+              (input)="replyMessage.set($event.target.value)"
+              rows="4">
+            </textarea>
+            
+            <div class="reply-actions">
+              <button 
+                class="btn-secondary"
+                (click)="sendAutoResponse(selectedInquiry()!.id)">
+                Send Auto-Response
+              </button>
+              <button 
+                class="btn-primary"
+                [disabled]="!replyMessage().trim() || isReplying()"
+                (click)="replyToInquiry()">
+                @if (isReplying()) {
+                  <span class="loading-spinner small"></span>
+                  Sending...
+                } @else {
+                  Send Reply
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

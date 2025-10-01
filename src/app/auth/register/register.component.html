@@ -1,0 +1,257 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <h1>Join Eatier</h1>
+      <p>Create your account and start your culinary journey</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      <!-- Error Message -->
+      @if (errorMessage()) {
+        <div class="error-message">
+          <span class="error-icon">⚠️</span>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <!-- Role Selection -->
+      <div class="form-section">
+        <h3>I want to join as:</h3>
+        <div class="role-selection">
+          @for (role of [UserRole.NORMAL_USER, UserRole.BUSINESS, UserRole.FOOD_ENTHUSIAST, UserRole.SPECIALIST]; track role) {
+            <label class="role-option" [class.selected]="selectedRole() === role">
+              <input type="radio" formControlName="role" [value]="role" />
+              <div class="role-content">
+                <span class="role-icon">{{ getRoleIcon(role) }}</span>
+                <div class="role-info">
+                  <h4>{{ role === UserRole.EATIER ? 'Eatier Admin' :
+                          role === UserRole.BUSINESS ? 'Restaurant Owner' :
+                          role === UserRole.FOOD_ENTHUSIAST ? 'Food Enthusiast' :
+                          role === UserRole.NORMAL_USER ? 'Normal User' : 'Specialist' }}</h4>
+                  <p>{{ getRoleDescription(role) }}</p>
+                </div>
+              </div>
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Personal Information -->
+      <div class="form-section">
+        <h3>Personal Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First Name *</label>
+            <input
+              id="firstName"
+              type="text"
+              formControlName="firstName"
+              placeholder="Enter your first name"
+              [class.error]="getFieldError('firstName')"
+            />
+            @if (getFieldError('firstName')) {
+              <span class="field-error">{{ getFieldError('firstName') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last Name *</label>
+            <input
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              placeholder="Enter your last name"
+              [class.error]="getFieldError('lastName')"
+            />
+            @if (getFieldError('lastName')) {
+              <span class="field-error">{{ getFieldError('lastName') }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email"
+            [class.error]="getFieldError('email')"
+            autocomplete="email"
+          />
+          @if (getFieldError('email')) {
+            <span class="field-error">{{ getFieldError('email') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            placeholder="Enter your phone number"
+            [class.error]="getFieldError('phone')"
+            autocomplete="tel"
+          />
+          @if (getFieldError('phone')) {
+            <span class="field-error">{{ getFieldError('phone') }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Role-specific fields -->
+      @if (selectedRole() === UserRole.BUSINESS) {
+        <div class="form-section">
+          <h3>Business Information</h3>
+          <div class="form-group">
+            <label for="businessName">Business Name *</label>
+            <input
+              id="businessName"
+              type="text"
+              formControlName="businessName"
+              placeholder="Enter your restaurant name"
+              [class.error]="getFieldError('businessName')"
+            />
+            @if (getFieldError('businessName')) {
+              <span class="field-error">{{ getFieldError('businessName') }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      @if (selectedRole() === UserRole.SPECIALIST) {
+        <div class="form-section">
+          <h3>Professional Information</h3>
+          <div class="form-group">
+            <label for="experience">Years of Experience *</label>
+            <input
+              id="experience"
+              type="number"
+              formControlName="experience"
+              placeholder="Enter years of experience"
+              min="0"
+              [class.error]="getFieldError('experience')"
+            />
+            @if (getFieldError('experience')) {
+              <span class="field-error">{{ getFieldError('experience') }}</span>
+            }
+          </div>
+
+          @if (selectedRole() === UserRole.SPECIALIST) {
+            <div class="form-group">
+              <label for="specialties">Specialties *</label>
+              <input
+                id="specialties"
+                type="text"
+                formControlName="specialties"
+                placeholder="e.g., Italian, French, Pastry (comma-separated)"
+                [class.error]="getFieldError('specialties')"
+              />
+              @if (getFieldError('specialties')) {
+                <span class="field-error">{{ getFieldError('specialties') }}</span>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Password Section -->
+      <div class="form-section">
+        <h3>Security</h3>
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <div class="password-input">
+            <input
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Create a strong password"
+              [class.error]="getFieldError('password')"
+              autocomplete="new-password"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="togglePasswordVisibility('password')"
+            >
+              {{ showPassword() ? '👁️' : '👁️‍🗨️' }}
+            </button>
+          </div>
+          @if (getFieldError('password')) {
+            <span class="field-error">{{ getFieldError('password') }}</span>
+          }
+          <div class="password-requirements">
+            <small>Password must be at least 8 characters long</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password *</label>
+          <div class="password-input">
+            <input
+              id="confirmPassword"
+              [type]="showConfirmPassword() ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              placeholder="Confirm your password"
+              [class.error]="getFieldError('confirmPassword')"
+              autocomplete="new-password"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="togglePasswordVisibility('confirmPassword')"
+            >
+              {{ showConfirmPassword() ? '👁️' : '👁️‍🗨️' }}
+            </button>
+          </div>
+          @if (getFieldError('confirmPassword')) {
+            <span class="field-error">{{ getFieldError('confirmPassword') }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Terms and Conditions -->
+      <div class="form-section">
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="agreeToTerms" />
+            <span class="checkmark"></span>
+            I agree to the <a href="/legal/terms" target="_blank">Terms of Service</a> and
+            <a href="/legal/privacy" target="_blank">Privacy Policy</a> *
+          </label>
+          @if (getFieldError('agreeToTerms')) {
+            <span class="field-error">{{ getFieldError('agreeToTerms') }}</span>
+          }
+
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="agreeToMarketing" />
+            <span class="checkmark"></span>
+            I would like to receive marketing emails and updates about new features
+          </label>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="register-button"
+        [disabled]="isLoading() || registerForm.invalid"
+      >
+        @if (isLoading()) {
+          <span class="loading-spinner"></span>
+          Creating Account...
+        } @else {
+          Create Account
+        }
+      </button>
+    </form>
+
+    <!-- Login Link -->
+    <div class="login-link">
+      <p>Already have an account?
+        <a routerLink="/auth/login">Sign in here</a>
+      </p>
+    </div>
+  </div>
+</div>

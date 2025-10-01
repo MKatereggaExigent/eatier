@@ -1,0 +1,162 @@
+<div class="user-overview">
+  <!-- Welcome Section -->
+  <div class="welcome-section">
+    <h1>Welcome back, {{ currentUser()?.firstName }}!</h1>
+    <p>Discover new restaurants and share your culinary experiences.</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📝</div>
+      <div class="stat-content">
+        <h3>{{ stats.reviewsWritten }}</h3>
+        <p>Reviews Written</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">❤️</div>
+      <div class="stat-content">
+        <h3>{{ stats.favoriteRestaurants }}</h3>
+        <p>Favorite Places</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">📸</div>
+      <div class="stat-content">
+        <h3>{{ stats.photosUploaded }}</h3>
+        <p>Photos Shared</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">👍</div>
+      <div class="stat-content">
+        <h3>{{ stats.helpfulVotes }}</h3>
+        <p>Helpful Votes</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <h2>Quick Actions</h2>
+    <div class="action-grid">
+      <a routerLink="/restaurants" class="action-card">
+        <div class="action-icon">🔍</div>
+        <h3>Find Restaurants</h3>
+        <p>Discover new places to eat</p>
+      </a>
+
+      <a routerLink="reviews" class="action-card">
+        <div class="action-icon">✍️</div>
+        <h3>Write a Review</h3>
+        <p>Share your dining experience</p>
+      </a>
+
+      <a routerLink="favorites" class="action-card">
+        <div class="action-icon">⭐</div>
+        <h3>My Favorites</h3>
+        <p>View your saved restaurants</p>
+      </a>
+
+      <a routerLink="profile" class="action-card">
+        <div class="action-icon">👤</div>
+        <h3>Update Profile</h3>
+        <p>Manage your preferences</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="recent-activity">
+    <div class="section-header">
+      <h2>Recent Activity</h2>
+      <a routerLink="reviews" class="view-all">View All</a>
+    </div>
+
+    <div class="activity-list">
+      @for (activity of recentActivity; track $index) {
+        <div class="activity-item">
+          <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
+          <div class="activity-content">
+            <p><strong>{{ activity.action }}</strong> at {{ activity.restaurant }}</p>
+            @if (activity.rating) {
+              <div class="activity-rating">
+                @for (star of getStarArray(activity.rating); track $index) {
+                  <span class="star filled">⭐</span>
+                }
+              </div>
+            }
+            <span class="activity-date">{{ formatDate(activity.date) }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Recommended Restaurants -->
+  <div class="recommendations">
+    <div class="section-header">
+      <h2>Recommended for You</h2>
+      <a routerLink="/restaurants" class="view-all">Explore More</a>
+    </div>
+
+    <div class="restaurant-grid">
+      @for (restaurant of recommendedRestaurants; track restaurant.id) {
+        <a [routerLink]="['/restaurants', restaurant.id]" class="restaurant-card">
+          <div class="restaurant-image">
+            <img [src]="restaurant.image" [alt]="restaurant.name" />
+            <div class="restaurant-rating">
+              <span class="rating-value">{{ restaurant.rating }}</span>
+              <span class="star">⭐</span>
+            </div>
+          </div>
+          <div class="restaurant-info">
+            <h4>{{ restaurant.name }}</h4>
+            <p class="cuisine">{{ restaurant.cuisine }}</p>
+            <p class="distance">{{ restaurant.distance }}</p>
+          </div>
+        </a>
+      }
+    </div>
+  </div>
+
+  <!-- Achievements -->
+  <div class="achievements">
+    <h2>Your Achievements</h2>
+    <div class="achievement-grid">
+      <div class="achievement-card earned">
+        <div class="achievement-icon">🏆</div>
+        <h4>Food Explorer</h4>
+        <p>Reviewed 20+ restaurants</p>
+      </div>
+
+      <div class="achievement-card earned">
+        <div class="achievement-icon">📸</div>
+        <h4>Photo Enthusiast</h4>
+        <p>Uploaded 25+ photos</p>
+      </div>
+
+      <div class="achievement-card">
+        <div class="achievement-icon">⭐</div>
+        <h4>Taste Maker</h4>
+        <p>Get 200 helpful votes</p>
+        <div class="progress">
+          <div class="progress-bar" style="width: 78%"></div>
+        </div>
+      </div>
+
+      <div class="achievement-card">
+        <div class="achievement-icon">🌟</div>
+        <h4>Local Guide</h4>
+        <p>Review 50 restaurants</p>
+        <div class="progress">
+          <div class="progress-bar" style="width: 46%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
