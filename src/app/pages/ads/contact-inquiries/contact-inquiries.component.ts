@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { AdManagementService } from '../../../core/services/ad-management.service';
-import { 
-  ContactInquiry, 
-  InquiryStatus, 
+import {
+  ContactInquiry,
+  InquiryStatus,
   InquiryType,
   InquiryPriority,
   AutoResponse
@@ -37,32 +37,32 @@ export class ContactInquiriesComponent implements OnInit {
   // Computed properties
   filteredInquiries = computed(() => {
     let filtered = this.inquiries();
-    
+
     // Filter by status
     const status = this.filterStatus();
     if (status !== 'all') {
       filtered = filtered.filter(inquiry => inquiry.status === status);
     }
-    
+
     // Filter by type
     const type = this.filterType();
     if (type !== 'all') {
       filtered = filtered.filter(inquiry => inquiry.inquiryType === type);
     }
-    
+
     // Search filter
     const query = this.searchQuery().toLowerCase();
     if (query) {
-      filtered = filtered.filter(inquiry => 
+      filtered = filtered.filter(inquiry =>
         inquiry.inquirerName.toLowerCase().includes(query) ||
         inquiry.inquirerEmail.toLowerCase().includes(query) ||
         inquiry.subject.toLowerCase().includes(query) ||
         inquiry.message.toLowerCase().includes(query)
       );
     }
-    
+
     // Sort by date (newest first)
-    return filtered.sort((a, b) => 
+    return filtered.sort((a, b) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   });
@@ -87,7 +87,7 @@ export class ContactInquiriesComponent implements OnInit {
   recentInquiries = computed(() => {
     const oneDayAgo = new Date();
     oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-    
+
     return this.inquiries()
       .filter(inquiry => new Date(inquiry.createdAt) >= oneDayAgo)
       .length;
@@ -116,7 +116,7 @@ export class ContactInquiriesComponent implements OnInit {
   selectInquiry(inquiry: ContactInquiry): void {
     this.selectedInquiry.set(inquiry);
     this.showInquiryDetails.set(true);
-    
+
     // Mark as read if not already
     if (inquiry.status === 'pending') {
       this.updateInquiryStatus(inquiry.id, 'in_progress');
@@ -132,11 +132,11 @@ export class ContactInquiriesComponent implements OnInit {
   async updateInquiryStatus(inquiryId: string, status: InquiryStatus): Promise<void> {
     try {
       await this.adService.updateInquiryStatus(inquiryId, status);
-      
+
       // Update local state
-      this.inquiries.update(inquiries => 
-        inquiries.map(inquiry => 
-          inquiry.id === inquiryId 
+      this.inquiries.update(inquiries =>
+        inquiries.map(inquiry =>
+          inquiry.id === inquiryId
             ? { ...inquiry, status, updatedAt: new Date() }
             : inquiry
         )
@@ -155,11 +155,11 @@ export class ContactInquiriesComponent implements OnInit {
   async updateInquiryPriority(inquiryId: string, priority: InquiryPriority): Promise<void> {
     try {
       await this.adService.updateInquiryPriority(inquiryId, priority);
-      
+
       // Update local state
-      this.inquiries.update(inquiries => 
-        inquiries.map(inquiry => 
-          inquiry.id === inquiryId 
+      this.inquiries.update(inquiries =>
+        inquiries.map(inquiry =>
+          inquiry.id === inquiryId
             ? { ...inquiry, priority, updatedAt: new Date() }
             : inquiry
         )
@@ -178,19 +178,19 @@ export class ContactInquiriesComponent implements OnInit {
   async replyToInquiry(): Promise<void> {
     const inquiry = this.selectedInquiry();
     const message = this.replyMessage().trim();
-    
+
     if (!inquiry || !message) return;
 
     this.isReplying.set(true);
     try {
       await this.adService.replyToInquiry(inquiry.id, message);
-      
+
       // Update inquiry status to resolved
       await this.updateInquiryStatus(inquiry.id, 'resolved');
-      
+
       // Clear reply message
       this.replyMessage.set('');
-      
+
       // Show success message
       alert('Reply sent successfully!');
     } catch (error) {
@@ -338,5 +338,22 @@ export class ContactInquiriesComponent implements OnInit {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  // Template wrapper methods for type casting
+  onStatusFilterChange(value: string): void {
+    this.setStatusFilter(value as InquiryStatus | 'all');
+  }
+
+  onTypeFilterChange(value: string): void {
+    this.setTypeFilter(value as InquiryType | 'all');
+  }
+
+  onInquiryStatusUpdate(inquiryId: string, value: string): void {
+    this.updateInquiryStatus(inquiryId, value as InquiryStatus);
+  }
+
+  onInquiryPriorityUpdate(inquiryId: string, value: string): void {
+    this.updateInquiryPriority(inquiryId, value as InquiryPriority);
   }
 }

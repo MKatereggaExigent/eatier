@@ -1,5 +1,5 @@
 // ===================================
-// APP COMPONENT - GLASSMORPHIC LAYOUT
+// APP COMPONENT - NYT CLEAN LAYOUT
 // ===================================
 
 .app-container {
@@ -8,11 +8,14 @@
   flex-direction: column;
   position: relative;
   overflow-x: hidden;
+  background: #ffffff; // NYT white background
+  color: #000000; // NYT black text
 }
 
 .main-content {
   flex: 1;
   position: relative;
   z-index: 1;
+  background: #ffffff; // Ensure white background
   animation: fadeIn 0.8s ease-out 0.2s both;
 }

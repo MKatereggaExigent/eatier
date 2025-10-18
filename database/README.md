@@ -6,7 +6,7 @@ A comprehensive PostgreSQL database schema for the Itiyum food discovery and res
 
 This database schema supports a multi-tenant food platform with the following key features:
 
-- **5 User Types**: Normal Users, Food Enthusiasts, Business Owners, Specialists, and Eatier Admins
+- **5 User Types**: Normal Users, Food Enthusiasts, Business Owners, Specialists, and Itiyum Admins
 - **Restaurant Management**: Complete business profiles, menus, locations, and staff management
 - **Review System**: Comprehensive review and rating system with social features
 - **Booking System**: Table reservations and specialist service bookings
@@ -19,42 +19,43 @@ This database schema supports a multi-tenant food platform with the following ke
 ### Core Modules
 
 1. **User Management** (`02_user_management.sql`)
+
    - User accounts with role-based access
    - Extended profiles for each user type
    - Authentication and session management
    - Social following system
-
 2. **Business Management** (`03_business_management.sql`)
+
    - Restaurant/business profiles
    - Multiple locations per business
    - Staff management and permissions
    - Subscription and billing
-
 3. **Menu Management** (`04_menu_management.sql`)
+
    - Hierarchical menu structure
    - Item variants and customizations
    - Availability scheduling
    - Pricing and promotions
-
 4. **Reviews & Social** (`05_reviews_and_social.sql`)
+
    - Detailed review system with multiple ratings
    - Photo attachments and voting
    - User collections and badges
    - Social feed and interactions
-
 5. **Bookings & Services** (`06_bookings_and_services.sql`)
+
    - Restaurant table bookings
    - Specialist service bookings
    - Availability management
    - Waitlist system
-
 6. **FAQ & Support** (`07_faq_and_support.sql`)
+
    - Categorized FAQ system
    - Voting and feedback mechanisms
    - Support ticket system
    - Knowledge base articles
-
 7. **Notifications & Analytics** (`08_notifications_and_analytics.sql`)
+
    - Multi-channel notifications
    - Comprehensive analytics tracking
    - A/B testing framework
@@ -70,16 +71,17 @@ This database schema supports a multi-tenant food platform with the following ke
 ### Installation
 
 1. **Clone the repository and navigate to the database directory:**
+
    ```bash
    cd database/
    ```
-
 2. **Run the setup script:**
+
    ```bash
    ./setup_database.sh
    ```
-
 3. **Follow the prompts to:**
+
    - Create the database and user
    - Set up all tables and relationships
    - Optionally insert sample data
@@ -110,12 +112,12 @@ psql -d itiyum_platform -f 10_sample_data.sql
 ### Environment Variables
 
 ```bash
-DATABASE_URL=postgresql://eatier_user:eatier_secure_password_2024@localhost:5432/eatier_platform
+DATABASE_URL=postgresql://itiyum_user:itiyum_secure_password_2024@localhost:5432/itiyum_platform
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=eatier_platform
-DB_USER=eatier_user
-DB_PASSWORD=eatier_secure_password_2024
+DB_NAME=itiyum_platform
+DB_USER=itiyum_user
+DB_PASSWORD=itiyum_secure_password_2024
 ```
 
 ### Connection Pool Settings
@@ -142,7 +144,7 @@ The platform supports 5 distinct user roles:
 - **`food_enthusiast`**: Advanced features, reviews, social following
 - **`business_owner`**: Restaurant management and analytics
 - **`specialist`**: Chef/catering services and portfolio management
-- **`eatier_admin`**: Platform administration and oversight
+- **`itiyum_admin`**: Platform administration and oversight
 
 ### Data Types
 
@@ -188,19 +190,21 @@ The schema includes comprehensive sample data:
 
 ### Demo Accounts
 
-| Email | Password | Role | Description |
-|-------|----------|------|-------------|
-| admin@itiyum.com | password123 | itiyum_admin | Platform administrator |
-| business@example.com | password123 | business_owner | Restaurant owner |
-| user@example.com | password123 | food_enthusiast | Food enthusiast |
-| normaluser@example.com | password123 | normal_user | Regular user |
-| chef@example.com | password123 | specialist | Professional chef |
+
+| Email                  | Password    | Role            | Description            |
+| ---------------------- | ----------- | --------------- | ---------------------- |
+| admin@itiyum.com       | password123 | itiyum_admin    | Platform administrator |
+| business@example.com   | password123 | business_owner  | Restaurant owner       |
+| user@example.com       | password123 | food_enthusiast | Food enthusiast        |
+| normaluser@example.com | password123 | normal_user     | Regular user           |
+| chef@example.com       | password123 | specialist      | Professional chef      |
 
 ## API Integration
 
 ### Common Queries
 
 **Get user with profile:**
+
 ```sql
 SELECT u.*, up.bio, up.location, up.social_links
 FROM users u
@@ -209,6 +213,7 @@ WHERE u.email = $1 AND u.status = 'active';
 ```
 
 **Search businesses:**
+
 ```sql
 SELECT b.*, bl.address, bl.city, bl.state
 FROM businesses b
@@ -220,6 +225,7 @@ ORDER BY b.average_rating DESC, b.total_reviews DESC;
 ```
 
 **Get FAQ by category:**
+
 ```sql
 SELECT f.*, fc.name as category_name
 FROM faqs f
@@ -233,16 +239,17 @@ ORDER BY f.helpful_votes DESC;
 ### Regular Tasks
 
 1. **Update Statistics:**
+
    ```sql
    ANALYZE;
    ```
-
 2. **Vacuum Tables:**
+
    ```sql
    VACUUM ANALYZE;
    ```
-
 3. **Monitor Index Usage:**
+
    ```sql
    SELECT schemaname, tablename, indexname, idx_scan, idx_tup_read, idx_tup_fetch
    FROM pg_stat_user_indexes
@@ -253,13 +260,13 @@ ORDER BY f.helpful_votes DESC;
 
 ```bash
 # Full backup
-pg_dump eatier_platform > backup_$(date +%Y%m%d_%H%M%S).sql
+pg_dump itiyum_platform > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Schema only
-pg_dump --schema-only eatier_platform > schema_backup.sql
+pg_dump --schema-only itiyum_platform > schema_backup.sql
 
 # Data only
-pg_dump --data-only eatier_platform > data_backup.sql
+pg_dump --data-only itiyum_platform > data_backup.sql
 ```
 
 ## Migration Strategy

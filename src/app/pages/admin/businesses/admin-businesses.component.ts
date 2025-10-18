@@ -3,35 +3,36 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
+import { AdminService } from '../../../core/services/admin.service';
 
 export interface AdminBusiness {
   id: string;
   name: string;
   email: string;
   ownerName: string;
-  businessType: 'restaurant' | 'cafe' | 'bar' | 'food_truck' | 'catering';
-  status: 'active' | 'inactive' | 'suspended' | 'pending_verification';
-  subscriptionStatus: 'trial' | 'active' | 'expired' | 'cancelled';
+  ownerEmail: string;
+  businessType: string;
+  status: 'active' | 'frozen' | 'pending_deletion' | 'deleted';
   createdAt: Date;
   lastLoginAt?: Date;
   verified: boolean;
-  address: string;
-  city: string;
-  state: string;
+  address?: string;
+  country: string;
   phone?: string;
-  website?: string;
-  cuisineTypes: string[];
+  bio?: string;
+  sustainabilityEthos?: string;
+  opensAt?: string;
+  closesAt?: string;
+  facilities?: string[];
   averageRating: number;
   totalReviews: number;
   totalBookings: number;
-  monthlyRevenue?: number;
 }
 
 export interface BusinessFilters {
-  businessType: 'all' | 'restaurant' | 'cafe' | 'bar' | 'food_truck' | 'catering';
-  status: 'all' | 'active' | 'inactive' | 'suspended' | 'pending_verification';
-  subscription: 'all' | 'trial' | 'active' | 'expired' | 'cancelled';
-  verification: 'all' | 'verified' | 'unverified';
+  businessType: string;
+  status: string;
+  verification: string;
   sortBy: 'newest' | 'oldest' | 'name' | 'rating' | 'bookings';
 }
 
@@ -39,92 +40,12 @@ export interface BusinessFilters {
   selector: 'app-admin-businesses',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
-  template: `
-    <div class="admin-businesses" role="main" aria-label="Admin Businesses Management">
-      <header class="businesses-header">
-        <div class="header-content">
-          <div class="title-section">
-            <h1 class="page-title">
-              <span class="title-icon">🏪</span>
-              Business Management
-            </h1>
-            <p class="page-subtitle">
-              Manage all platform businesses, monitor performance, and handle business accounts
-            </p>
-          </div>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">🏪</div>
-            <div class="stat-content">
-              <div class="stat-number">{{ businessStats().total }}</div>
-              <div class="stat-label">Total Businesses</div>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">✅</div>
-            <div class="stat-content">
-              <div class="stat-number">{{ businessStats().active }}</div>
-              <div class="stat-label">Active</div>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">🔐</div>
-            <div class="stat-content">
-              <div class="stat-number">{{ businessStats().verified }}</div>
-              <div class="stat-label">Verified</div>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">🍽️</div>
-            <div class="stat-content">
-              <div class="stat-number">{{ businessStats().restaurants }}</div>
-              <div class="stat-label">Restaurants</div>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-content">
-              <div class="stat-number">{{ businessStats().totalBookings }}</div>
-              <div class="stat-label">Total Bookings</div>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">⭐</div>
-            <div class="stat-content">
-              <div class="stat-number">{{ businessStats().averageRating.toFixed(1) }}</div>
-              <div class="stat-label">Avg Rating</div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div class="coming-soon">
-        <div class="coming-soon-icon">🚧</div>
-        <h2>Business Management Coming Soon</h2>
-        <p>Advanced business management features are under development.</p>
-        <p>This will include:</p>
-        <ul>
-          <li>View and manage all platform businesses</li>
-          <li>Business verification and approval</li>
-          <li>Monitor business performance</li>
-          <li>Handle business disputes</li>
-          <li>Business analytics and insights</li>
-        </ul>
-      </div>
-    </div>
-  `,
+  templateUrl: './admin-businesses.component.html',
   styleUrls: ['./admin-businesses.component.scss']
 })
 export class AdminBusinessesComponent implements OnInit {
   private authService = inject(AuthService);
+  private adminService = inject(AdminService);
 
   currentUser = this.authService.currentUser;
 
@@ -143,7 +64,6 @@ export class AdminBusinessesComponent implements OnInit {
   filters = signal<BusinessFilters>({
     businessType: 'all',
     status: 'all',
-    subscription: 'all',
     verification: 'all',
     sortBy: 'newest'
   });
@@ -155,23 +75,17 @@ export class AdminBusinessesComponent implements OnInit {
     { value: 'cafe', label: 'Cafe' },
     { value: 'bar', label: 'Bar' },
     { value: 'food_truck', label: 'Food Truck' },
-    { value: 'catering', label: 'Catering' }
+    { value: 'catering', label: 'Catering' },
+    { value: 'bakery', label: 'Bakery' },
+    { value: 'other', label: 'Other' }
   ];
 
   statusOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
-    { value: 'suspended', label: 'Suspended' },
-    { value: 'pending_verification', label: 'Pending Verification' }
-  ];
-
-  subscriptionOptions = [
-    { value: 'all', label: 'All Subscriptions' },
-    { value: 'trial', label: 'Trial' },
-    { value: 'active', label: 'Active' },
-    { value: 'expired', label: 'Expired' },
-    { value: 'cancelled', label: 'Cancelled' }
+    { value: 'frozen', label: 'Frozen/Suspended' },
+    { value: 'pending_deletion', label: 'Pending Deletion' },
+    { value: 'deleted', label: 'Deleted' }
   ];
 
   verificationOptions = [
@@ -200,8 +114,7 @@ export class AdminBusinessesComponent implements OnInit {
         business.name.toLowerCase().includes(query) ||
         business.ownerName.toLowerCase().includes(query) ||
         business.email.toLowerCase().includes(query) ||
-        business.city.toLowerCase().includes(query) ||
-        business.cuisineTypes.some(cuisine => cuisine.toLowerCase().includes(query))
+        business.country.toLowerCase().includes(query)
       );
     }
 
@@ -213,11 +126,6 @@ export class AdminBusinessesComponent implements OnInit {
     // Status filter
     if (currentFilters.status !== 'all') {
       filtered = filtered.filter(business => business.status === currentFilters.status);
-    }
-
-    // Subscription filter
-    if (currentFilters.subscription !== 'all') {
-      filtered = filtered.filter(business => business.subscriptionStatus === currentFilters.subscription);
     }
 
     // Verification filter
@@ -254,7 +162,6 @@ export class AdminBusinessesComponent implements OnInit {
     const currentFilters = this.filters();
     return currentFilters.businessType !== 'all' ||
            currentFilters.status !== 'all' ||
-           currentFilters.subscription !== 'all' ||
            currentFilters.verification !== 'all' ||
            this.searchQuery().length > 0;
   });
@@ -279,11 +186,52 @@ export class AdminBusinessesComponent implements OnInit {
   // Data loading methods
   loadBusinesses(): void {
     this.isLoading.set(true);
-    // Mock data - in real app, this would be an API call
-    setTimeout(() => {
-      this.businesses.set(this.mockBusinesses);
-      this.isLoading.set(false);
-    }, 1000);
+
+    const currentFilters = this.filters();
+    const searchTerm = this.searchQuery();
+
+    this.adminService.getBusinesses(
+      1,
+      100,
+      searchTerm || undefined,
+      currentFilters.status,
+      currentFilters.businessType,
+      currentFilters.verification
+    ).subscribe({
+      next: (response: any) => {
+        const mappedBusinesses: AdminBusiness[] = response.businesses.map((business: any) => ({
+          id: business.id,
+          name: business.business_name,
+          email: business.email,
+          ownerName: business.owner_name || 'Unknown',
+          ownerEmail: business.owner_email || '',
+          businessType: business.business_type || 'other',
+          status: business.account_status || 'active',
+          createdAt: new Date(business.created_at),
+          lastLoginAt: business.last_login_at ? new Date(business.last_login_at) : undefined,
+          verified: business.email_verified || false,
+          address: business.address,
+          country: business.country || '',
+          phone: business.phone,
+          bio: business.bio,
+          sustainabilityEthos: business.sustainability_ethos,
+          opensAt: business.opens_at,
+          closesAt: business.closes_at,
+          facilities: business.facilities || [],
+          averageRating: parseFloat(business.average_rating) || 0,
+          totalReviews: parseInt(business.total_reviews) || 0,
+          totalBookings: parseInt(business.total_bookings) || 0
+        }));
+
+        this.businesses.set(mappedBusinesses);
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading businesses:', error);
+        this.isLoading.set(false);
+        alert('Failed to load businesses. Please try again.');
+      }
+    });
   }
 
   // UI interaction methods
@@ -295,20 +243,32 @@ export class AdminBusinessesComponent implements OnInit {
     this.filters.set({
       businessType: 'all',
       status: 'all',
-      subscription: 'all',
       verification: 'all',
       sortBy: 'newest'
     });
     this.searchQuery.set('');
+    this.loadBusinesses();
   }
+
+  private searchTimeout: any;
 
   updateFilter(key: keyof BusinessFilters, value: string): void {
     this.filters.update(current => ({ ...current, [key]: value }));
+    this.loadBusinesses(); // Reload data when filter changes
   }
 
   onSearchInput(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.searchQuery.set(target.value);
+
+    // Debounce search input
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+
+    this.searchTimeout = setTimeout(() => {
+      this.loadBusinesses();
+    }, 500); // Wait 500ms after user stops typing
   }
 
   onFilterChange(key: keyof BusinessFilters, event: Event): void {
@@ -328,18 +288,64 @@ export class AdminBusinessesComponent implements OnInit {
   }
 
   verifyBusiness(business: AdminBusiness): void {
-    console.log('Verify business:', business.id);
-    // TODO: Implement business verification
+    if (confirm(`Are you sure you want to verify ${business.name}?`)) {
+      this.adminService.verifyBusiness(business.id).subscribe({
+        next: () => {
+          // Update the business in the list
+          const businesses = this.businesses();
+          const updatedBusinesses = businesses.map(b =>
+            b.id === business.id ? { ...b, verified: true } : b
+          );
+          this.businesses.set(updatedBusinesses);
+          alert(`${business.name} has been verified successfully.`);
+        },
+        error: (error) => {
+          console.error('Error verifying business:', error);
+          alert('Failed to verify business. Please try again.');
+        }
+      });
+    }
   }
 
   suspendBusiness(business: AdminBusiness): void {
-    console.log('Suspend business:', business.id);
-    // TODO: Implement business suspension
+    const reason = prompt(`Enter reason for suspending ${business.name}:`);
+    if (reason !== null) {
+      this.adminService.suspendBusiness(business.id, reason).subscribe({
+        next: () => {
+          // Update the business in the list
+          const businesses = this.businesses();
+          const updatedBusinesses = businesses.map(b =>
+            b.id === business.id ? { ...b, status: 'frozen' as const } : b
+          );
+          this.businesses.set(updatedBusinesses);
+          alert(`${business.name} has been suspended.`);
+        },
+        error: (error) => {
+          console.error('Error suspending business:', error);
+          alert('Failed to suspend business. Please try again.');
+        }
+      });
+    }
   }
 
   activateBusiness(business: AdminBusiness): void {
-    console.log('Activate business:', business.id);
-    // TODO: Implement business activation
+    if (confirm(`Are you sure you want to activate ${business.name}?`)) {
+      this.adminService.activateBusiness(business.id).subscribe({
+        next: () => {
+          // Update the business in the list
+          const businesses = this.businesses();
+          const updatedBusinesses = businesses.map(b =>
+            b.id === business.id ? { ...b, status: 'active' as const } : b
+          );
+          this.businesses.set(updatedBusinesses);
+          alert(`${business.name} has been activated.`);
+        },
+        error: (error) => {
+          console.error('Error activating business:', error);
+          alert('Failed to activate business. Please try again.');
+        }
+      });
+    }
   }
 
   deleteBusiness(business: AdminBusiness): void {
@@ -350,10 +356,23 @@ export class AdminBusinessesComponent implements OnInit {
   confirmDelete(): void {
     const business = this.selectedBusiness();
     if (business) {
-      console.log('Delete business:', business.id);
-      // TODO: Implement business deletion
-      this.showDeleteConfirm.set(false);
-      this.selectedBusiness.set(null);
+      this.adminService.deleteBusiness(business.id).subscribe({
+        next: () => {
+          // Remove the business from the list
+          const businesses = this.businesses();
+          const updatedBusinesses = businesses.filter(b => b.id !== business.id);
+          this.businesses.set(updatedBusinesses);
+          this.showDeleteConfirm.set(false);
+          this.selectedBusiness.set(null);
+          alert(`${business.name} has been deleted successfully.`);
+        },
+        error: (error) => {
+          console.error('Error deleting business:', error);
+          alert('Failed to delete business. Please try again.');
+          this.showDeleteConfirm.set(false);
+          this.selectedBusiness.set(null);
+        }
+      });
     }
   }
 
@@ -395,16 +414,6 @@ export class AdminBusinessesComponent implements OnInit {
     return colorMap[status] || 'secondary';
   }
 
-  getSubscriptionColor(status: string): string {
-    const colorMap: { [key: string]: string } = {
-      'active': 'success',
-      'trial': 'info',
-      'expired': 'warning',
-      'cancelled': 'danger'
-    };
-    return colorMap[status] || 'secondary';
-  }
-
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -423,71 +432,4 @@ export class AdminBusinessesComponent implements OnInit {
   getStarRating(rating: number): string {
     return '⭐'.repeat(Math.floor(rating)) + (rating % 1 >= 0.5 ? '⭐' : '');
   }
-
-  // Mock data
-  private mockBusinesses: AdminBusiness[] = [
-    {
-      id: '1',
-      name: 'The Golden Spoon',
-      email: 'contact@goldenspoon.com',
-      ownerName: 'Maria Garcia',
-      businessType: 'restaurant',
-      status: 'active',
-      subscriptionStatus: 'active',
-      createdAt: new Date('2024-01-10'),
-      lastLoginAt: new Date('2024-01-30'),
-      verified: true,
-      address: '123 Main Street',
-      city: 'New York',
-      state: 'NY',
-      phone: '+1234567890',
-      website: 'https://goldenspoon.com',
-      cuisineTypes: ['American', 'Contemporary'],
-      averageRating: 4.8,
-      totalReviews: 342,
-      totalBookings: 1245,
-      monthlyRevenue: 45000
-    },
-    {
-      id: '2',
-      name: 'Sakura Sushi Bar',
-      email: 'info@sakurasushi.com',
-      ownerName: 'Hiroshi Tanaka',
-      businessType: 'restaurant',
-      status: 'active',
-      subscriptionStatus: 'trial',
-      createdAt: new Date('2024-01-15'),
-      lastLoginAt: new Date('2024-01-29'),
-      verified: true,
-      address: '456 Sushi Lane',
-      city: 'New York',
-      state: 'NY',
-      phone: '+1987654321',
-      cuisineTypes: ['Japanese', 'Sushi'],
-      averageRating: 4.9,
-      totalReviews: 198,
-      totalBookings: 876,
-      monthlyRevenue: 32000
-    },
-    {
-      id: '3',
-      name: 'Coffee Corner',
-      email: 'hello@coffeecorner.com',
-      ownerName: 'Sarah Johnson',
-      businessType: 'cafe',
-      status: 'pending_verification',
-      subscriptionStatus: 'trial',
-      createdAt: new Date('2024-01-20'),
-      verified: false,
-      address: '789 Coffee Street',
-      city: 'Brooklyn',
-      state: 'NY',
-      phone: '+1555666777',
-      cuisineTypes: ['Coffee', 'Pastries'],
-      averageRating: 4.3,
-      totalReviews: 67,
-      totalBookings: 234,
-      monthlyRevenue: 8500
-    }
-  ];
 }

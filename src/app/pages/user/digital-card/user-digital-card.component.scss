@@ -221,7 +221,6 @@
     }
 
     .primary-btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
 
@@ -269,7 +268,6 @@
 
   .professional-card {
     position: relative;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 16px;
     padding: 2rem;
     color: white;
@@ -283,8 +281,7 @@
     }
 
     &.layout-creative {
-      background: linear-gradient(45deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    }
+      }
 
     .card-background {
       position: absolute;
@@ -381,8 +378,7 @@
               border-radius: 12px;
               font-size: 0.75rem;
               font-weight: 500;
-              backdrop-filter: blur(10px);
-            }
+              }
           }
         }
 
@@ -408,8 +404,7 @@
               border-radius: 12px;
               font-size: 0.75rem;
               font-weight: 500;
-              backdrop-filter: blur(10px);
-            }
+              }
           }
         }
       }
@@ -509,7 +504,6 @@
     .share-btn {
       width: 100%;
       padding: 0.875rem;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
       border: none;
       border-radius: 8px;

@@ -1,3 +1,43 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Inter:wght@400;500;600;700&display=swap");
+:host {
+  --clr-primary-600: #0284c7;
+  --clr-primary-700: #0369a1;
+  --clr-secondary-900: #000000;
+  --clr-secondary-600: #525252;
+  --clr-secondary-500: #737373;
+  --clr-secondary-400: #a3a3a3;
+  --clr-secondary-300: #d4d4d4;
+  --clr-secondary-200: #e5e5e5;
+  --clr-secondary-50: #fafafa;
+  --clr-success: #16a34a;
+  --clr-warning: #d97706;
+  --clr-error: #dc2626;
+  --clr-info: #0284c7;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-6xl: 3.75rem;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --leading-relaxed: 1.625;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --transition-normal: 0.2s ease;
+}
+
 .reviews-container {
   padding: var(--space-6) clamp(var(--space-4), 4vw, var(--space-12));
   max-width: 1400px;
@@ -18,10 +58,10 @@
 }
 
 .reviews-header .header-content .page-title {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
   font-size: clamp(var(--text-4xl), 6vw, var(--text-6xl));
   font-weight: var(--font-bold);
-  color: var(--clr-neutral-900);
+  color: #000000;
   margin-bottom: var(--space-6);
   display: flex;
   align-items: center;
@@ -35,9 +75,9 @@
 }
 
 .reviews-header .header-content .page-subtitle {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-xl);
-  color: var(--clr-neutral-600);
+  color: #525252;
   margin-bottom: var(--space-12);
   line-height: var(--leading-relaxed);
 }
@@ -54,14 +94,12 @@
 }
 
 .reviews-stats .stat-card {
-  background: var(--glass-white);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-2xl);
+  background: #ffffff;
+  border: 1px solid var(--clr-secondary-200);
+  border-radius: 0.75rem;
   padding: var(--space-8);
   text-align: center;
-  box-shadow: var(--shadow-glass);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
@@ -74,14 +112,13 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--clr-primary-500) 0%, var(--clr-secondary-500) 100%);
   opacity: 0;
   transition: opacity var(--transition-normal);
 }
 
 .reviews-stats .stat-card:hover {
   transform: translateY(-6px);
-  box-shadow: var(--shadow-2xl);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border-color: rgba(255, 255, 255, 0.4);
 }
 
@@ -101,18 +138,18 @@
 }
 
 .reviews-stats .stat-card .stat-content h3 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
   font-size: var(--text-3xl);
   font-weight: var(--font-bold);
-  color: var(--clr-primary-600);
+  color: #0369a1;
   margin-bottom: var(--space-2);
 }
 
 .reviews-stats .stat-card .stat-content p {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-base);
   font-weight: var(--font-medium);
-  color: var(--clr-neutral-700);
+  color: #404040;
   margin-bottom: var(--space-3);
 }
 
@@ -125,23 +162,21 @@
 
 .reviews-stats .stat-card .stat-content .stat-change.positive {
   background: rgba(34, 197, 94, 0.1);
-  color: var(--clr-secondary-600);
+  color: #000000;
 }
 
 .reviews-stats .stat-card .stat-content .stat-change.negative {
   background: rgba(239, 68, 68, 0.1);
-  color: var(--clr-error);
+  color: #dc2626;
 }
 
 .reviews-controls {
-  background: var(--glass-white);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  background: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-2xl);
+  border-radius: 4px;
   padding: var(--space-8);
   margin-bottom: var(--space-12);
-  box-shadow: var(--shadow-glass);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   animation: fadeInUp 0.8s ease-out 0.6s both;
 }
 
@@ -166,22 +201,20 @@
 }
 
 .reviews-controls .controls-row .filters-group .filter-item .filter-label {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
-  color: var(--clr-neutral-800);
+  color: #262626;
 }
 
 .reviews-controls .controls-row .filters-group .filter-item .filter-select {
   padding: var(--space-3) var(--space-4);
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-sm);
-  color: var(--clr-neutral-800);
-  background: var(--glass-white-strong);
+  color: #262626;
+  background: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: var(--radius-lg);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  border-radius: 4px;
   transition: all var(--transition-normal);
   min-width: 140px;
 }
@@ -201,7 +234,7 @@
   padding: var(--space-3) var(--space-6);
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
-  border-radius: var(--radius-lg);
+  border-radius: 4px;
   cursor: pointer;
   transition: all var(--transition-normal);
   display: flex;
@@ -211,27 +244,28 @@
 }
 
 .reviews-controls .controls-row .actions-group .action-btn.secondary {
-  background: var(--glass-white-strong);
-  color: var(--clr-neutral-700);
+  background: #ffffff;
+  color: #404040;
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .reviews-controls .controls-row .actions-group .action-btn.secondary:hover:not(:disabled) {
-  background: var(--glass-primary);
-  color: var(--clr-primary-700);
+  background: #ffffff;
+  color: #075985;
   transform: translateY(-2px);
 }
 
 .reviews-controls .controls-row .actions-group .action-btn.primary {
-  background: linear-gradient(135deg, var(--clr-primary-500) 0%, var(--clr-primary-600) 100%);
-  color: var(--clr-neutral-0);
+  background: var(--clr-primary-600);
+  color: #ffffff;
   border: none;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .reviews-controls .controls-row .actions-group .action-btn.primary:hover:not(:disabled) {
+  background: var(--clr-primary-700);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
 .reviews-controls .controls-row .actions-group .action-btn.primary:disabled {
@@ -241,7 +275,7 @@
 }
 
 .reviews-controls .controls-row .actions-group .action-btn:focus {
-  outline: 2px solid var(--clr-primary-500);
+  outline: 2px solid #0284c7;
   outline-offset: 2px;
 }
 
@@ -254,14 +288,12 @@
   width: 100%;
   padding: var(--space-4) var(--space-6);
   padding-right: 60px;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-base);
-  color: var(--clr-neutral-800);
-  background: var(--glass-white-strong);
+  color: #262626;
+  background: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: var(--radius-xl);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  border-radius: 4px;
   transition: all var(--transition-normal);
 }
 
@@ -273,7 +305,7 @@
 }
 
 .reviews-controls .search-row .search-container .search-input::placeholder {
-  color: var(--clr-neutral-500);
+  color: #737373;
 }
 
 .reviews-controls .search-row .search-container .search-btn {
@@ -283,10 +315,9 @@
   transform: translateY(-50%);
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--clr-primary-500) 0%, var(--clr-primary-600) 100%);
   border: none;
   border-radius: var(--radius-full);
-  color: var(--clr-neutral-0);
+  color: #ffffff;
   font-size: var(--text-lg);
   cursor: pointer;
   transition: all var(--transition-normal);
@@ -297,11 +328,11 @@
 
 .reviews-controls .search-row .search-container .search-btn:hover {
   transform: translateY(-50%) scale(1.05);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
 .reviews-controls .search-row .search-container .search-btn:focus {
-  outline: 2px solid var(--clr-primary-500);
+  outline: 2px solid #0284c7;
   outline-offset: 2px;
 }
 
@@ -312,8 +343,8 @@
 .reviews-list-section .reviews-loading {
   text-align: center;
   padding: var(--space-16);
-  background: var(--glass-white);
-  border-radius: var(--radius-2xl);
+  background: #ffffff;
+  border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -321,23 +352,23 @@
   width: 40px;
   height: 40px;
   border: 4px solid rgba(217, 119, 6, 0.2);
-  border-top: 4px solid var(--clr-primary-500);
+  border-top: 4px solid #0284c7;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto var(--space-4);
 }
 
 .reviews-list-section .reviews-loading p {
-  font-family: 'Inter', sans-serif;
-  color: var(--clr-neutral-600);
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #525252;
   margin: 0;
 }
 
 .reviews-list-section .no-reviews {
   text-align: center;
   padding: var(--space-16);
-  background: var(--glass-white);
-  border-radius: var(--radius-2xl);
+  background: #ffffff;
+  border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -348,24 +379,24 @@
 }
 
 .reviews-list-section .no-reviews h3 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
   font-size: var(--text-2xl);
-  color: var(--clr-neutral-900);
+  color: #000000;
   margin-bottom: var(--space-4);
 }
 
 .reviews-list-section .no-reviews p {
-  font-family: 'Poppins', sans-serif;
-  color: var(--clr-neutral-600);
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #525252;
   margin-bottom: var(--space-8);
   line-height: var(--leading-relaxed);
 }
 
 .reviews-list-section .no-reviews .clear-filters-btn {
-  background: linear-gradient(135deg, var(--clr-primary-500) 0%, var(--clr-primary-600) 100%);
-  color: var(--clr-neutral-0);
+  background: var(--clr-primary-600);
+  color: #ffffff;
   border: none;
-  border-radius: var(--radius-lg);
+  border-radius: 4px;
   padding: var(--space-3) var(--space-6);
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
@@ -375,7 +406,7 @@
 
 .reviews-list-section .no-reviews .clear-filters-btn:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
 .reviews-list-section .reviews-list {
@@ -385,26 +416,24 @@
 }
 
 .review-card {
-  background: var(--glass-white);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  background: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-2xl);
+  border-radius: 4px;
   padding: var(--space-8);
-  box-shadow: var(--shadow-glass);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   transition: all var(--transition-normal);
   position: relative;
 }
 
 .review-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-2xl);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border-color: rgba(255, 255, 255, 0.4);
 }
 
 .review-card.selected {
   border-color: var(--clr-primary-400);
-  background: var(--glass-primary);
+  background: #ffffff;
 }
 
 .review-card .review-header {
@@ -417,7 +446,7 @@
 .review-card .review-header .review-select .review-checkbox {
   width: 20px;
   height: 20px;
-  accent-color: var(--clr-primary-500);
+  accent-color: #0284c7;
   cursor: pointer;
 }
 
@@ -442,14 +471,13 @@
 }
 
 .review-card .review-header .customer-info .customer-avatar-placeholder {
-  background: linear-gradient(135deg, var(--clr-primary-500) 0%, var(--clr-secondary-500) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-xl);
   font-weight: var(--font-bold);
-  color: var(--clr-neutral-0);
+  color: #ffffff;
   border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -459,10 +487,10 @@
 }
 
 .review-card .review-header .customer-info .customer-details .customer-name {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-lg);
   font-weight: var(--font-semibold);
-  color: var(--clr-neutral-900);
+  color: #000000;
   margin-bottom: var(--space-2);
 }
 
@@ -484,7 +512,7 @@
 
 .review-card .review-header .customer-info .customer-details .review-rating .rating-value {
   font-size: var(--text-sm);
-  color: var(--clr-neutral-600);
+  color: #525252;
   font-weight: var(--font-medium);
   margin-left: var(--space-2);
 }
@@ -496,7 +524,7 @@
 
 .review-card .review-header .review-meta .review-date {
   font-size: var(--text-sm);
-  color: var(--clr-neutral-600);
+  color: #525252;
   display: block;
   margin-bottom: var(--space-2);
 }
@@ -510,12 +538,12 @@
 
 .review-card .review-header .review-meta .review-status.responded {
   background: rgba(34, 197, 94, 0.1);
-  color: var(--clr-secondary-600);
+  color: #000000;
 }
 
 .review-card .review-header .review-meta .review-status.pending {
   background: rgba(217, 119, 6, 0.1);
-  color: var(--clr-warning);
+  color: #d97706;
 }
 
 .review-card .review-content {
@@ -523,9 +551,9 @@
 }
 
 .review-card .review-content .review-comment {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-base);
-  color: var(--clr-neutral-800);
+  color: #262626;
   line-height: var(--leading-relaxed);
   margin-bottom: var(--space-4);
 }
@@ -540,7 +568,7 @@
   width: 100px;
   height: 80px;
   object-fit: cover;
-  border-radius: var(--radius-lg);
+  border-radius: 4px;
   cursor: pointer;
   transition: all var(--transition-normal);
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -552,9 +580,9 @@
 }
 
 .review-card .business-response {
-  background: var(--glass-secondary);
+  background: #ffffff;
   border: 1px solid rgba(34, 197, 94, 0.2);
-  border-radius: var(--radius-xl);
+  border-radius: 4px;
   padding: var(--space-6);
   margin-bottom: var(--space-6);
 }
@@ -571,22 +599,22 @@
 }
 
 .review-card .business-response .response-header .response-label {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
-  color: var(--clr-secondary-700);
+  color: #000000;
   flex: 1;
 }
 
 .review-card .business-response .response-header .response-date {
   font-size: var(--text-xs);
-  color: var(--clr-neutral-600);
+  color: #525252;
 }
 
 .review-card .business-response .response-content {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-sm);
-  color: var(--clr-neutral-800);
+  color: #262626;
   line-height: var(--leading-relaxed);
   margin-bottom: var(--space-4);
 }
@@ -594,8 +622,8 @@
 .review-card .business-response .response-actions .edit-response-btn {
   background: none;
   border: 1px solid rgba(34, 197, 94, 0.3);
-  color: var(--clr-secondary-600);
-  border-radius: var(--radius-lg);
+  color: #000000;
+  border-radius: 4px;
   padding: var(--space-2) var(--space-4);
   font-size: var(--text-xs);
   font-weight: var(--font-medium);
@@ -622,7 +650,7 @@
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  border-radius: var(--radius-lg);
+  border-radius: 4px;
   cursor: pointer;
   transition: all var(--transition-normal);
   display: flex;
@@ -631,43 +659,44 @@
 }
 
 .review-card .review-actions .respond-btn {
-  background: linear-gradient(135deg, var(--clr-primary-500) 0%, var(--clr-primary-600) 100%);
-  color: var(--clr-neutral-0);
+  background: var(--clr-primary-600);
+  color: #ffffff;
   border: none;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .review-card .review-actions .respond-btn:hover {
+  background: var(--clr-primary-700);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .review-card .review-actions .helpful-btn {
-  background: var(--glass-white-strong);
-  color: var(--clr-neutral-700);
+  background: #ffffff;
+  color: #404040;
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .review-card .review-actions .helpful-btn:hover {
-  background: var(--glass-secondary);
-  color: var(--clr-secondary-600);
+  background: #ffffff;
+  color: #000000;
 }
 
 .review-card .review-actions .helpful-btn.marked {
-  background: var(--glass-secondary);
-  color: var(--clr-secondary-600);
+  background: #ffffff;
+  color: #000000;
   border-color: rgba(34, 197, 94, 0.3);
 }
 
 .review-card .review-actions .share-btn {
-  background: var(--glass-white-strong);
-  color: var(--clr-neutral-700);
+  background: #ffffff;
+  color: #404040;
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .review-card .review-actions .share-btn:hover {
-  background: var(--glass-primary);
-  color: var(--clr-primary-600);
+  background: #ffffff;
+  color: #0369a1;
 }
 
 .review-card .review-actions .more-actions {
@@ -677,10 +706,10 @@
 .review-card .review-actions .more-actions .more-btn {
   width: 32px;
   height: 32px;
-  background: var(--glass-white-strong);
+  background: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: var(--radius-full);
-  color: var(--clr-neutral-600);
+  color: #525252;
   font-size: var(--text-lg);
   cursor: pointer;
   transition: all var(--transition-normal);
@@ -690,20 +719,18 @@
 }
 
 .review-card .review-actions .more-actions .more-btn:hover {
-  background: var(--glass-primary);
-  color: var(--clr-primary-600);
+  background: #ffffff;
+  color: #0369a1;
 }
 
 .review-card .review-actions .more-actions .more-menu {
   position: absolute;
   top: 100%;
   right: 0;
-  background: var(--glass-white-strong);
-  -webkit-backdrop-filter: blur(25px);
-  backdrop-filter: blur(25px);
+  background: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   z-index: var(--z-dropdown);
   min-width: 150px;
   margin-top: var(--space-2);
@@ -717,22 +744,22 @@
   border: none;
   text-align: left;
   font-size: var(--text-sm);
-  color: var(--clr-neutral-700);
+  color: #404040;
   cursor: pointer;
   transition: all var(--transition-normal);
 }
 
 .review-card .review-actions .more-actions .more-menu button:hover {
-  background: var(--glass-primary);
-  color: var(--clr-primary-600);
+  background: #ffffff;
+  color: #0369a1;
 }
 
 .review-card .review-actions .more-actions .more-menu button:first-child {
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-radius: 4px 4px 0 0;
 }
 
 .review-card .review-actions .more-actions .more-menu button:last-child {
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  border-radius: 0 0 4px 4px;
 }
 
 .pagination {
@@ -741,18 +768,16 @@
   align-items: center;
   margin-top: var(--space-12);
   padding: var(--space-6);
-  background: var(--glass-white);
+  background: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-2xl);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  border-radius: 4px;
 }
 
 .pagination .pagination-btn {
-  background: var(--glass-white-strong);
-  color: var(--clr-neutral-700);
+  background: #ffffff;
+  color: #404040;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: var(--radius-lg);
+  border-radius: 4px;
   padding: var(--space-3) var(--space-6);
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
@@ -761,8 +786,8 @@
 }
 
 .pagination .pagination-btn:hover:not(:disabled) {
-  background: var(--glass-primary);
-  color: var(--clr-primary-700);
+  background: #ffffff;
+  color: #075985;
   transform: translateY(-2px);
 }
 
@@ -772,14 +797,14 @@
 }
 
 .pagination .pagination-btn:focus {
-  outline: 2px solid var(--clr-primary-500);
+  outline: 2px solid #0284c7;
   outline-offset: 2px;
 }
 
 .pagination .pagination-info {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-sm);
-  color: var(--clr-neutral-600);
+  color: #525252;
   font-weight: var(--font-medium);
 }
 

@@ -1,7 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 import { AccountFreezeOptions, AccountActivity, NotificationSettings } from '../../../shared/models/business-profile.model';
+import { BusinessOwnerService, Business } from '../../../core/services/business-owner.service';
 
 @Component({
   selector: 'app-accounts-center',
@@ -10,10 +12,13 @@ import { AccountFreezeOptions, AccountActivity, NotificationSettings } from '../
   templateUrl: './accounts-center.component.html',
   styleUrls: ['./accounts-center.component.scss']
 })
-export class AccountsCenterComponent implements OnInit {
+export class AccountsCenterComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
+  private businessOwnerService = inject(BusinessOwnerService);
+  private destroy$ = new Subject<void>();
 
   // State management
+  business = signal<Business | null>(null);
   activeSection = signal<string>('overview');
   isLoading = signal<boolean>(false);
   successMessage = signal<string | null>(null);
@@ -122,19 +127,39 @@ export class AccountsCenterComponent implements OnInit {
     this.loadAccountData();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   loadAccountData(): void {
     this.isLoading.set(true);
+    this.errorMessage.set(null);
 
-    // Mock API calls
-    setTimeout(() => {
-      this.notificationSettings.set(this.mockNotificationSettings);
-      this.accountActivity.set(this.mockAccountActivity);
+    this.businessOwnerService.getMyBusiness()
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading business data:', error);
+          this.errorMessage.set('Failed to load account data. Please try again.');
+          return of({ business: null });
+        }),
+        finalize(() => {
+          this.isLoading.set(false);
+        })
+      )
+      .subscribe(response => {
+        if (response && response.business) {
+          this.business.set(response.business);
 
-      // Populate notification form
-      this.notificationForm.patchValue(this.mockNotificationSettings);
+          // Load notification settings (using defaults for now)
+          this.notificationSettings.set(this.mockNotificationSettings);
+          this.notificationForm.patchValue(this.mockNotificationSettings);
 
-      this.isLoading.set(false);
-    }, 1000);
+          // Load account activity (using mock for now)
+          this.accountActivity.set(this.mockAccountActivity);
+        }
+      });
   }
 
   setActiveSection(section: string): void {

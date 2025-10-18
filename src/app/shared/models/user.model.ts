@@ -1,6 +1,6 @@
 export enum UserRole {
-  EATIER = 'eatier',                    // Superuser account managing all other accounts
-  BUSINESS = 'business',                // Restaurant owners showcasing their businesses
+  EATIER = 'itiyum_admin',              // Superuser account managing all other accounts
+  BUSINESS = 'business_owner',          // Restaurant owners showcasing their businesses
   FOOD_ENTHUSIAST = 'food_enthusiast',  // Food lovers exploring cuisines, rating, reviewing
   SPECIALIST = 'specialist',            // Individual chefs, waiters advertising private services
   NORMAL_USER = 'normal_user'           // Regular people looking for nearby food options
@@ -30,7 +30,7 @@ export interface BaseUser {
 }
 
 // EATIER - Superuser account managing all other accounts
-export interface EatierAdmin extends BaseUser {
+export interface ItiyumAdmin extends BaseUser {
   role: UserRole.EATIER;
   permissions: string[];
   lastAdminAction?: Date;
@@ -250,7 +250,7 @@ export interface Specialist extends BaseUser {
   };
 }
 
-export type User = EatierAdmin | BusinessOwner | FoodEnthusiast | NormalUser | Specialist;
+export type User = ItiyumAdmin | BusinessOwner | FoodEnthusiast | NormalUser | Specialist;
 
 export interface UserRegistrationData {
   email: string;

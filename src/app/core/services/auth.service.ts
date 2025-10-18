@@ -1,8 +1,8 @@
 import {
   AuthResponse,
   BusinessOwner,
-  EatierAdmin,
   FoodEnthusiast,
+  ItiyumAdmin,
   LoginCredentials,
   NormalUser,
   Specialist,
@@ -12,23 +12,25 @@ import {
   UserStatus
 } from '../../shared/models/user.model';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { Injectable, computed, signal } from '@angular/core';
-import { delay, map, tap } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { catchError, delay, map, tap } from 'rxjs/operators';
+
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly TOKEN_KEY = 'itiyum_token';
+  private http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
+
+  private readonly TOKEN_KEY = 'auth_token'; // Changed to match admin service
   private readonly REFRESH_TOKEN_KEY = 'itiyum_refresh_token';
   private readonly USER_KEY = 'itiyum_user';
-  private readonly REGISTERED_USERS_KEY = 'itiyum_registered_users';
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
-
-  // In-memory storage for registered users (for development without database)
-  private registeredUsers: Map<string, { user: User; password: string }> = new Map();
 
   // Signals for reactive state management
   private _currentUser = signal<User | null>(null);
@@ -40,7 +42,7 @@ export class AuthService {
   public isAuthenticated = this._isAuthenticated.asReadonly();
   public isLoading = this._isLoading.asReadonly();
   public userRole = computed(() => this._currentUser()?.role || null);
-  public isEatierAdmin = computed(() => this._currentUser()?.role === UserRole.EATIER);
+  public isItiyumAdmin = computed(() => this._currentUser()?.role === UserRole.EATIER);
   public isBusinessOwner = computed(() => this._currentUser()?.role === UserRole.BUSINESS);
   public isFoodEnthusiast = computed(() => this._currentUser()?.role === UserRole.FOOD_ENTHUSIAST);
   public isNormalUser = computed(() => this._currentUser()?.role === UserRole.NORMAL_USER);
@@ -52,7 +54,6 @@ export class AuthService {
 
   constructor() {
     this.initializeAuth();
-    this.loadRegisteredUsers();
   }
 
   private initializeAuth(): void {
@@ -77,40 +78,19 @@ export class AuthService {
     }
   }
 
-  // Load registered users from localStorage
-  private loadRegisteredUsers(): void {
-    try {
-      const storedUsers = localStorage.getItem(this.REGISTERED_USERS_KEY);
-      if (storedUsers) {
-        const usersData = JSON.parse(storedUsers);
-        this.registeredUsers = new Map(Object.entries(usersData));
-        console.log('Loaded registered users:', this.registeredUsers.size);
-      }
-    } catch (error) {
-      console.error('Error loading registered users:', error);
-      this.registeredUsers = new Map();
-    }
-  }
-
-  // Save registered users to localStorage
-  private saveRegisteredUsers(): void {
-    try {
-      const usersObject = Object.fromEntries(this.registeredUsers);
-      localStorage.setItem(this.REGISTERED_USERS_KEY, JSON.stringify(usersObject));
-    } catch (error) {
-      console.error('Error saving registered users:', error);
-    }
-  }
-
   login(credentials: LoginCredentials): Observable<AuthResponse> {
     this.setLoading(true);
 
-    // Mock authentication - replace with actual API call
-    return this.mockLogin(credentials).pipe(
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+      map(response => this.mapBackendLoginResponse(response)),
       tap(response => {
         this.handleAuthSuccess(response);
       }),
-      tap(() => this.setLoading(false))
+      tap(() => this.setLoading(false)),
+      catchError(error => {
+        this.setLoading(false);
+        return throwError(() => this.handleLoginError(error));
+      })
     );
   }
 
@@ -128,8 +108,39 @@ export class AuthService {
   register(registrationData: UserRegistrationData): Observable<AuthResponse> {
     this.setLoading(true);
 
-    // Mock registration - replace with actual API call
-    return this.mockRegister(registrationData).pipe(
+    // Map frontend registration data to backend format
+    const backendData = {
+      email: registrationData.email,
+      password: registrationData.password,
+      firstName: registrationData.firstName,
+      lastName: registrationData.lastName,
+      phone: registrationData.phone,
+      role: registrationData.role,
+      businessName: registrationData.businessName
+    };
+
+    return this.http.post<any>(`${this.apiUrl}/register`, backendData).pipe(
+      map(response => this.mapBackendRegisterResponse(response)),
+      tap(response => {
+        this.handleAuthSuccess(response);
+      }),
+      tap(() => this.setLoading(false)),
+      catchError(error => {
+        this.setLoading(false);
+        return throwError(() => this.handleRegisterError(error));
+      })
+    );
+  }
+
+  // Social Login Method
+  loginWithSocialProvider(provider: 'google' | 'facebook' | 'microsoft' | 'apple' | 'twitter' | 'linkedin' | 'github' | 'instagram'): Observable<AuthResponse> {
+    this.setLoading(true);
+
+    console.log(`Initiating ${provider} OAuth login...`);
+
+    // TODO: Implement actual OAuth flow with backend
+    // For now, return a mock response to demonstrate the flow
+    return this.mockSocialLogin(provider).pipe(
       tap(response => {
         this.handleAuthSuccess(response);
       }),
@@ -163,7 +174,7 @@ export class AuthService {
 
     // Define role-based permissions
     const rolePermissions: Record<UserRole, string[]> = {
-      [UserRole.EATIER]: ['*'], // Eatier admin has all permissions
+      [UserRole.EATIER]: ['*'], // Itiyum admin has all permissions
       [UserRole.BUSINESS]: [
         'restaurant.create',
         'restaurant.update',
@@ -265,24 +276,97 @@ export class AuthService {
     this.isLoadingSubject.next(loading);
   }
 
+  // Backend response mapping methods
+  private mapBackendLoginResponse(response: any): AuthResponse {
+    const user = this.mapBackendUserToFrontend(response.user, response.token);
+
+    return {
+      token: response.token,
+      refreshToken: response.token, // Backend doesn't return separate refresh token yet
+      user: user,
+      expiresIn: 604800 // 7 days in seconds
+    };
+  }
+
+  private mapBackendRegisterResponse(response: any): AuthResponse {
+    const user = this.mapBackendUserToFrontend(response.user, response.token);
+
+    return {
+      token: response.token,
+      refreshToken: response.token,
+      user: user,
+      expiresIn: 604800
+    };
+  }
+
+  private mapBackendUserToFrontend(backendUser: any, token: string): User {
+    // Map backend role names to frontend UserRole enum
+    const roleMap: { [key: string]: UserRole } = {
+      'itiyum_admin': UserRole.EATIER,
+      'business_owner': UserRole.BUSINESS,
+      'food_enthusiast': UserRole.FOOD_ENTHUSIAST,
+      'normal_user': UserRole.NORMAL_USER,
+      'specialist': UserRole.SPECIALIST
+    };
+
+    const role = roleMap[backendUser.role] || UserRole.NORMAL_USER;
+
+    // Create base user object
+    const baseUser = {
+      id: backendUser.id,
+      email: backendUser.email,
+      firstName: backendUser.firstName || backendUser.first_name,
+      lastName: backendUser.lastName || backendUser.last_name,
+      phone: backendUser.phone,
+      role: role,
+      status: backendUser.accountStatus === 'active' ? UserStatus.ACTIVE : UserStatus.PENDING_VERIFICATION,
+      createdAt: new Date(backendUser.createdAt || Date.now()),
+      updatedAt: new Date(backendUser.updatedAt || Date.now()),
+      emailVerified: backendUser.emailVerified || false,
+      phoneVerified: backendUser.phoneVerified || false,
+      avatar: backendUser.profilePhoto
+    };
+
+    // Return user with role-specific properties
+    // For now, return base user - can be extended later with role-specific data
+    return baseUser as User;
+  }
+
+  private handleLoginError(error: HttpErrorResponse): Error {
+    console.error('Login error:', error);
+
+    if (error.status === 401) {
+      return new Error('Invalid email or password');
+    } else if (error.status === 403) {
+      return new Error(error.error?.error || 'Account is not active');
+    } else if (error.status === 0) {
+      return new Error('Cannot connect to server. Please check your internet connection.');
+    } else {
+      return new Error(error.error?.error || 'Login failed. Please try again.');
+    }
+  }
+
+  private handleRegisterError(error: HttpErrorResponse): Error {
+    console.error('Registration error:', error);
+
+    if (error.status === 409) {
+      return new Error('An account with this email already exists');
+    } else if (error.status === 400) {
+      return new Error(error.error?.error || 'Invalid registration data');
+    } else if (error.status === 0) {
+      return new Error('Cannot connect to server. Please check your internet connection.');
+    } else {
+      return new Error(error.error?.error || 'Registration failed. Please try again.');
+    }
+  }
+
   // Mock methods - replace with actual API calls
   private mockLogin(credentials: LoginCredentials): Observable<AuthResponse> {
     return of(null).pipe(
       delay(1000), // Simulate network delay
       map(() => {
-        // First check registered users
-        const registeredUser = this.registeredUsers.get(credentials.email);
-        if (registeredUser && registeredUser.password === credentials.password) {
-          console.log('Login successful for registered user:', credentials.email);
-          return {
-            token: this.generateToken(),
-            refreshToken: this.generateToken(),
-            user: registeredUser.user,
-            expiresIn: 3600
-          };
-        }
-
-        // Then check hardcoded mock users
+        // Mock login - check hardcoded mock users
+        // Note: registeredUsers functionality removed as we now use real HTTP API
         if (credentials.email === 'admin@example.com' && credentials.password === 'password123') {
           return this.createMockAdmin();
         } else if (credentials.email === 'business@example.com' && credentials.password === 'password123') {
@@ -338,7 +422,7 @@ export class AuthService {
                 canViewAnalytics: true,
                 canManageSubscriptions: true
               }
-            } as EatierAdmin;
+            } as ItiyumAdmin;
             break;
           case UserRole.BUSINESS:
             user = {
@@ -502,13 +586,7 @@ export class AuthService {
             throw new Error('Invalid user role');
         }
 
-        // Store the registered user for future logins
-        this.registeredUsers.set(data.email, {
-          user,
-          password: data.password
-        });
-        this.saveRegisteredUsers();
-
+        // Note: registeredUsers functionality removed as we now use real HTTP API
         console.log('User registered successfully:', data.email);
 
         return {
@@ -533,6 +611,55 @@ export class AuthService {
       refreshToken: 'new-mock-refresh-token',
       expiresIn: 3600
     }).pipe(delay(500));
+  }
+
+  private mockSocialLogin(provider: string): Observable<AuthResponse> {
+    return of(null).pipe(
+      delay(1500), // Simulate OAuth redirect and callback delay
+      map(() => {
+        console.log(`Mock ${provider} login - creating user account...`);
+
+        // Create a mock user from social login
+        const socialUser: NormalUser = {
+          id: `social_${provider}_${Date.now()}`,
+          email: `user@${provider}.example.com`,
+          firstName: provider.charAt(0).toUpperCase() + provider.slice(1),
+          lastName: 'User',
+          role: UserRole.NORMAL_USER,
+          status: UserStatus.ACTIVE,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          emailVerified: true, // Social logins are pre-verified
+          phoneVerified: false,
+          avatar: `https://ui-avatars.com/api/?name=${provider}+User&background=random`,
+          preferences: {
+            cuisineTypes: [],
+            dietaryRestrictions: [],
+            priceRange: 'moderate' as const,
+            maxDistance: 10
+          },
+          activity: {
+            favoriteRestaurants: [],
+            recentSearches: [],
+            reviewCount: 0,
+            ordersCount: 0
+          },
+          quickAccess: {
+            frequentOrders: [],
+            savedAddresses: []
+          }
+        };
+
+        // Note: registeredUsers functionality removed as we now use real HTTP API
+
+        return {
+          user: socialUser,
+          token: this.generateToken(),
+          refreshToken: this.generateToken(),
+          expiresIn: 3600
+        };
+      })
+    );
   }
 
   private createMockBusinessOwner(): AuthResponse {
@@ -716,7 +843,7 @@ export class AuthService {
   }
 
   private createMockAdmin(): AuthResponse {
-    const user: EatierAdmin = {
+    const user: ItiyumAdmin = {
       id: '4',
       email: 'admin@example.com',
       firstName: 'Admin',
@@ -827,13 +954,5 @@ export class AuthService {
     return 'mock-jwt-' + Math.random().toString(36).substr(2, 15);
   }
 
-  // Debug method to check registered users
-  getRegisteredUsers(): string[] {
-    return Array.from(this.registeredUsers.keys());
-  }
-
-  // Debug method to check if a specific user exists
-  isUserRegistered(email: string): boolean {
-    return this.registeredUsers.has(email);
-  }
+  // Debug methods removed - now using real HTTP API
 }

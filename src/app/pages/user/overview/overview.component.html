@@ -5,38 +5,92 @@
     <p>Discover new restaurants and share your culinary experiences.</p>
   </div>
 
+  <!-- Error Banner -->
+  @if (hasErrors()) {
+    <div class="error-banner" role="alert">
+      <span class="error-icon">⚠️</span>
+      <div class="error-content">
+        <h3>Unable to load some data</h3>
+        <p>Please check your connection and try again.</p>
+      </div>
+      <button type="button" class="retry-btn" (click)="refreshData()">
+        🔄 Retry
+      </button>
+    </div>
+  }
+
   <!-- Stats Cards -->
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-icon">📝</div>
-      <div class="stat-content">
-        <h3>{{ stats.reviewsWritten }}</h3>
-        <p>Reviews Written</p>
-      </div>
+      @if (loading().stats) {
+        <div class="stat-skeleton">
+          <div class="skeleton-icon"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-number"></div>
+            <div class="skeleton-label"></div>
+          </div>
+        </div>
+      } @else {
+        <div class="stat-icon">📝</div>
+        <div class="stat-content">
+          <h3>{{ stats().totalReviews }}</h3>
+          <p>Reviews Written</p>
+        </div>
+      }
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">❤️</div>
-      <div class="stat-content">
-        <h3>{{ stats.favoriteRestaurants }}</h3>
-        <p>Favorite Places</p>
-      </div>
+      @if (loading().stats) {
+        <div class="stat-skeleton">
+          <div class="skeleton-icon"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-number"></div>
+            <div class="skeleton-label"></div>
+          </div>
+        </div>
+      } @else {
+        <div class="stat-icon">❤️</div>
+        <div class="stat-content">
+          <h3>{{ stats().totalFavorites }}</h3>
+          <p>Favorite Places</p>
+        </div>
+      }
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">📸</div>
-      <div class="stat-content">
-        <h3>{{ stats.photosUploaded }}</h3>
-        <p>Photos Shared</p>
-      </div>
+      @if (loading().stats) {
+        <div class="stat-skeleton">
+          <div class="skeleton-icon"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-number"></div>
+            <div class="skeleton-label"></div>
+          </div>
+        </div>
+      } @else {
+        <div class="stat-icon">📅</div>
+        <div class="stat-content">
+          <h3>{{ stats().totalBookings }}</h3>
+          <p>Bookings Made</p>
+        </div>
+      }
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">👍</div>
-      <div class="stat-content">
-        <h3>{{ stats.helpfulVotes }}</h3>
-        <p>Helpful Votes</p>
-      </div>
+      @if (loading().stats) {
+        <div class="stat-skeleton">
+          <div class="skeleton-icon"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-number"></div>
+            <div class="skeleton-label"></div>
+          </div>
+        </div>
+      } @else {
+        <div class="stat-icon">📸</div>
+        <div class="stat-content">
+          <h3>{{ stats().totalPhotos }}</h3>
+          <p>Photos Shared</p>
+        </div>
+      }
     </div>
   </div>
 
@@ -77,24 +131,79 @@
       <a routerLink="reviews" class="view-all">View All</a>
     </div>
 
-    <div class="activity-list">
-      @for (activity of recentActivity; track $index) {
-        <div class="activity-item">
-          <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
-          <div class="activity-content">
-            <p><strong>{{ activity.action }}</strong> at {{ activity.restaurant }}</p>
-            @if (activity.rating) {
-              <div class="activity-rating">
-                @for (star of getStarArray(activity.rating); track $index) {
-                  <span class="star filled">⭐</span>
+    @if (loading().activity) {
+      <div class="activity-loading">
+        <div class="loading-spinner"></div>
+        <p>Loading activity...</p>
+      </div>
+    } @else if (errors().activity) {
+      <div class="activity-error" role="alert">
+        <span class="error-icon">⚠️</span>
+        <p>{{ errors().activity }}</p>
+        <button type="button" class="retry-btn" (click)="refreshData()">
+          🔄 Retry
+        </button>
+      </div>
+    } @else if (recentActivity().length === 0) {
+      <div class="no-activity">
+        <p>No recent activity. Start exploring restaurants!</p>
+      </div>
+    } @else {
+      <div class="activity-list">
+        @for (activity of recentActivity(); track activity.id) {
+          <div class="activity-item">
+            <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
+            <div class="activity-content">
+              <p><strong>{{ activity.action }}</strong>
+                @if (activity.business_name) {
+                  at {{ activity.business_name }}
                 }
-              </div>
-            }
-            <span class="activity-date">{{ formatDate(activity.date) }}</span>
+              </p>
+              @if (activity.rating) {
+                <div class="activity-rating">
+                  @for (star of getStarArray(activity.rating); track $index) {
+                    <span class="star" [class.filled]="star === 1">⭐</span>
+                  }
+                </div>
+              }
+              <span class="activity-date">{{ formatDate(activity.created_at) }}</span>
+            </div>
           </div>
-        </div>
-      }
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Favorite Restaurants -->
+  <div class="favorites">
+    <div class="section-header">
+      <h2>Your Favorite Places</h2>
+      <a routerLink="favorites" class="view-all">View All</a>
     </div>
+
+    @if (loading().favorites) {
+      <div class="favorites-loading">
+        <div class="loading-spinner"></div>
+        <p>Loading favorites...</p>
+      </div>
+    } @else if (favoriteRestaurants().length === 0) {
+      <div class="no-favorites">
+        <p>No favorites yet. Start adding your favorite restaurants!</p>
+      </div>
+    } @else {
+      <div class="restaurant-grid">
+        @for (favorite of favoriteRestaurants(); track favorite.id) {
+          <a [routerLink]="['/restaurants', favorite.business_id]" class="restaurant-card">
+            <div class="restaurant-info">
+              <h4>{{ favorite.business_name }}</h4>
+              @if (favorite.business_type) {
+                <p class="cuisine">{{ favorite.business_type }}</p>
+              }
+            </div>
+          </a>
+        }
+      </div>
+    }
   </div>
 
   <!-- Recommended Restaurants -->
@@ -104,59 +213,28 @@
       <a routerLink="/restaurants" class="view-all">Explore More</a>
     </div>
 
-    <div class="restaurant-grid">
-      @for (restaurant of recommendedRestaurants; track restaurant.id) {
-        <a [routerLink]="['/restaurants', restaurant.id]" class="restaurant-card">
-          <div class="restaurant-image">
-            <img [src]="restaurant.image" [alt]="restaurant.name" />
-            <div class="restaurant-rating">
-              <span class="rating-value">{{ restaurant.rating }}</span>
-              <span class="star">⭐</span>
+    @if (loading().recommendations) {
+      <div class="recommendations-loading">
+        <div class="loading-spinner"></div>
+        <p>Loading recommendations...</p>
+      </div>
+    } @else if (recommendedRestaurants().length === 0) {
+      <div class="no-recommendations">
+        <p>No recommendations available. Explore restaurants to get personalized suggestions!</p>
+      </div>
+    } @else {
+      <div class="restaurant-grid">
+        @for (restaurant of recommendedRestaurants(); track restaurant.id) {
+          <a [routerLink]="['/restaurants', restaurant.id]" class="restaurant-card">
+            <div class="restaurant-info">
+              <h4>{{ restaurant.business_name || restaurant.name }}</h4>
+              @if (restaurant.business_type || restaurant.cuisine) {
+                <p class="cuisine">{{ restaurant.business_type || restaurant.cuisine }}</p>
+              }
             </div>
-          </div>
-          <div class="restaurant-info">
-            <h4>{{ restaurant.name }}</h4>
-            <p class="cuisine">{{ restaurant.cuisine }}</p>
-            <p class="distance">{{ restaurant.distance }}</p>
-          </div>
-        </a>
-      }
-    </div>
-  </div>
-
-  <!-- Achievements -->
-  <div class="achievements">
-    <h2>Your Achievements</h2>
-    <div class="achievement-grid">
-      <div class="achievement-card earned">
-        <div class="achievement-icon">🏆</div>
-        <h4>Food Explorer</h4>
-        <p>Reviewed 20+ restaurants</p>
+          </a>
+        }
       </div>
-
-      <div class="achievement-card earned">
-        <div class="achievement-icon">📸</div>
-        <h4>Photo Enthusiast</h4>
-        <p>Uploaded 25+ photos</p>
-      </div>
-
-      <div class="achievement-card">
-        <div class="achievement-icon">⭐</div>
-        <h4>Taste Maker</h4>
-        <p>Get 200 helpful votes</p>
-        <div class="progress">
-          <div class="progress-bar" style="width: 78%"></div>
-        </div>
-      </div>
-
-      <div class="achievement-card">
-        <div class="achievement-icon">🌟</div>
-        <h4>Local Guide</h4>
-        <p>Review 50 restaurants</p>
-        <div class="progress">
-          <div class="progress-bar" style="width: 46%"></div>
-        </div>
-      </div>
-    </div>
+    }
   </div>
 </div>

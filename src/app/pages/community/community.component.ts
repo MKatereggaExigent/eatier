@@ -1,8 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { CommunityService, FeaturedChef, CommunityPost as ServiceCommunityPost, TrendingTopic } from '../../core/services/community.service';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommunityService, CommunityPost as ServiceCommunityPost, FeaturedChef, TrendingTopic } from '../../core/services/community.service';
 
 interface CommunityPost {
   id: string;
@@ -49,6 +50,15 @@ export class CommunityComponent implements OnInit {
   featuredChefs = signal<FeaturedChef[]>([]);
   isLoading = signal<boolean>(false);
   activeTab = signal<string>('feed');
+  isSubmittingPost = signal<boolean>(false);
+  postSuccessMessage = signal<string>('');
+  selectedImages = signal<string[]>([]);
+
+  // Pagination state
+  currentPage = signal<number>(1);
+  totalPages = signal<number>(1);
+  pageSize = signal<number>(10);
+  totalPosts = signal<number>(0);
 
   // Forms
   postForm: FormGroup;
@@ -166,7 +176,7 @@ export class CommunityComponent implements OnInit {
 
   constructor() {
     this.postForm = this.fb.group({
-      content: ['', [Validators.required, Validators.minLength(10)]],
+      content: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]],
       images: [''],
       tags: ['']
     });
@@ -176,18 +186,31 @@ export class CommunityComponent implements OnInit {
     this.loadCommunityData();
   }
 
-  loadCommunityData(): void {
+  loadCommunityData(page: number = 1): void {
     this.isLoading.set(true);
+    this.currentPage.set(page);
 
-    // Load posts
-    this.communityService.getPosts({ page: 1, limit: 10 }).subscribe({
+    // Load posts with pagination
+    this.communityService.getPosts({ page, limit: this.pageSize() }).subscribe({
       next: (response) => {
         this.posts.set(response.posts);
+
+        // Update pagination info from response
+        const total = (response as any).total || response.posts.length;
+        this.totalPosts.set(total);
+        this.totalPages.set(Math.ceil(total / this.pageSize()));
+        this.isLoading.set(false);
+
+        // Scroll to top smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       },
       error: (error) => {
         console.error('Error loading posts:', error);
         // Fallback to mock data
         this.posts.set(this.mockPosts);
+        this.totalPosts.set(this.mockPosts.length);
+        this.totalPages.set(Math.ceil(this.mockPosts.length / this.pageSize()));
+        this.isLoading.set(false);
       }
     });
 
@@ -320,11 +343,14 @@ export class CommunityComponent implements OnInit {
 
   onCreatePost(): void {
     if (this.postForm.valid) {
+      this.isSubmittingPost.set(true);
+      this.postSuccessMessage.set('');
+
       const formValue = this.postForm.value;
       const postData = {
         content: formValue.content,
-        images: formValue.images ? [formValue.images] : [],
-        tags: formValue.tags ? formValue.tags.split(',').map((tag: string) => tag.trim()) : [],
+        images: this.selectedImages().length > 0 ? this.selectedImages() : (formValue.images ? [formValue.images] : []),
+        tags: formValue.tags ? formValue.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0) : [],
         authorId: 'current-user-id' // In real app, get from auth service
       };
 
@@ -332,6 +358,15 @@ export class CommunityComponent implements OnInit {
         next: (newPost) => {
           this.posts.update(posts => [newPost, ...posts]);
           this.postForm.reset();
+          this.selectedImages.set([]);
+          this.isSubmittingPost.set(false);
+          this.postSuccessMessage.set('✅ Post created successfully!');
+
+          // Switch back to feed tab to show the new post
+          this.activeTab.set('feed');
+
+          // Clear success message after 3 seconds
+          setTimeout(() => this.postSuccessMessage.set(''), 3000);
         },
         error: (error) => {
           console.error('Error creating post:', error);
@@ -343,17 +378,26 @@ export class CommunityComponent implements OnInit {
             authorAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
             authorType: 'user',
             content: formValue.content,
-            images: formValue.images ? [formValue.images] : [],
+            images: this.selectedImages().length > 0 ? this.selectedImages() : (formValue.images ? [formValue.images] : []),
             likes: 0,
             comments: 0,
             shares: 0,
             createdAt: new Date(),
             isLiked: false,
-            tags: formValue.tags ? formValue.tags.split(',').map((tag: string) => tag.trim()) : []
+            tags: formValue.tags ? formValue.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0) : []
           };
 
           this.posts.update(posts => [newPost, ...posts]);
           this.postForm.reset();
+          this.selectedImages.set([]);
+          this.isSubmittingPost.set(false);
+          this.postSuccessMessage.set('✅ Post created successfully!');
+
+          // Switch back to feed tab to show the new post
+          this.activeTab.set('feed');
+
+          // Clear success message after 3 seconds
+          setTimeout(() => this.postSuccessMessage.set(''), 3000);
         }
       });
     }
@@ -387,5 +431,88 @@ export class CommunityComponent implements OnInit {
       case 'business': return 'Business';
       default: return 'Food Lover';
     }
+  }
+
+  // Image handling
+  addImageUrl(): void {
+    const imageUrl = this.postForm.get('images')?.value;
+    if (imageUrl && imageUrl.trim()) {
+      this.selectedImages.update(images => [...images, imageUrl.trim()]);
+      this.postForm.patchValue({ images: '' });
+    }
+  }
+
+  removeImage(index: number): void {
+    this.selectedImages.update(images => images.filter((_, i) => i !== index));
+  }
+
+  // Character counter
+  getCharacterCount(): number {
+    return this.postForm.get('content')?.value?.length || 0;
+  }
+
+  getRemainingCharacters(): number {
+    const maxLength = 1000; // Maximum characters allowed
+    return maxLength - this.getCharacterCount();
+  }
+
+  isCharacterLimitExceeded(): boolean {
+    return this.getRemainingCharacters() < 0;
+  }
+
+  // Pagination methods
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.loadCommunityData(page);
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages()) {
+      this.goToPage(this.currentPage() + 1);
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage() > 1) {
+      this.goToPage(this.currentPage() - 1);
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
+
+    if (total <= 7) {
+      // Show all pages if 7 or fewer
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
+
+      if (current > 3) {
+        pages.push(-1); // Ellipsis
+      }
+
+      // Show pages around current
+      const start = Math.max(2, current - 1);
+      const end = Math.min(total - 1, current + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (current < total - 2) {
+        pages.push(-1); // Ellipsis
+      }
+
+      // Always show last page
+      pages.push(total);
+    }
+
+    return pages;
   }
 }

@@ -1,11 +1,20 @@
 <div class="register-container">
   <div class="register-card">
+    <!-- Home Button -->
+    <a routerLink="/" class="home-button" aria-label="Go to home page">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Home</span>
+    </a>
+
     <div class="register-header">
-      <h1>Join Eatier</h1>
+      <h1>Join <span class="itiyum-brand">Itiyum</span></h1>
       <p>Create your account and start your culinary journey</p>
     </div>
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form" autocomplete="off">
       <!-- Error Message -->
       @if (errorMessage()) {
         <div class="error-message">
@@ -24,7 +33,7 @@
               <div class="role-content">
                 <span class="role-icon">{{ getRoleIcon(role) }}</span>
                 <div class="role-info">
-                  <h4>{{ role === UserRole.EATIER ? 'Eatier Admin' :
+                  <h4>{{ role === UserRole.EATIER ? 'Itiyum Admin' :
                           role === UserRole.BUSINESS ? 'Restaurant Owner' :
                           role === UserRole.FOOD_ENTHUSIAST ? 'Food Enthusiast' :
                           role === UserRole.NORMAL_USER ? 'Normal User' : 'Specialist' }}</h4>

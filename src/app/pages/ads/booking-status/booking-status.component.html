@@ -158,7 +158,8 @@
                 id="inquirySubject"
                 class="form-input"
                 [value]="inquiryForm().subject"
-                (input)="updateInquiryForm('subject', $event.target.value)"
+                #subjectInput
+                (input)="updateInquiryForm('subject', subjectInput.value)"
                 placeholder="What can we help you with?">
             </div>
 
@@ -168,7 +169,8 @@
                 id="inquiryMessage"
                 class="form-textarea"
                 [value]="inquiryForm().message"
-                (input)="updateInquiryForm('message', $event.target.value)"
+                #messageInput
+                (input)="updateInquiryForm('message', messageInput.value)"
                 placeholder="Please provide details about your inquiry..."
                 rows="4"
                 required>

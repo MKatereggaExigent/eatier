@@ -1,60 +1,199 @@
-<section class="about-grid">
+<div class="about-page">
+  <!-- Hero Carousel Section -->
+  <section class="hero-carousel" (mouseenter)="stopCarousel()" (mouseleave)="startCarousel()">
+    <div class="carousel-container">
+      <!-- Carousel Slides -->
+      @for (slide of carouselSlides; track slide.image; let i = $index) {
+        <div class="carousel-slide"
+             [class.active]="currentSlide() === i"
+             [style.background-image]="'url(' + slide.image + ')'">
+          <div class="slide-overlay"></div>
+        </div>
+      }
 
-  <!-- ─── Businesses card ─────────────────────────── -->
-  <article class="glass-card" data-animate>
-    <header>
-      <h2>For businesses</h2>
-      <img
-        src="https://cdn-icons-png.flaticon.com/512/3435/3435154.png"
-        alt="briefcase icon"
-        class="icon"
-        height="36"
-        width="36"
-      />
-    </header>
+      <!-- Hero Content (stays fixed over carousel) -->
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Welcome to <span class="brand-gradient">Itiyum</span>
+        </h1>
+        <p class="hero-subtitle">
+          The all-in-one platform connecting food lovers, businesses, and culinary professionals
+          in one vibrant ecosystem.
+        </p>
+        <div class="hero-stats">
+          @for (stat of stats; track stat.label) {
+            <div class="stat-item">
+              <div class="stat-value">{{ stat.value }}</div>
+              <div class="stat-label">{{ stat.label }}</div>
+            </div>
+          }
+        </div>
+      </div>
 
-    <p><strong>Eatier</strong> lets restaurants of any size digitise their entire customer
-      journey&nbsp;— menus, specials, conversations — in one slick dashboard.</p>
+      <!-- Carousel Controls -->
+      <button class="carousel-control prev" (click)="prevSlide()" aria-label="Previous slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button class="carousel-control next" (click)="nextSlide()" aria-label="Next slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
 
-    <ul>
-      <li>Share or react to posts across the platform.</li>
-      <li>Harvest insights &amp; craft growth plans with <em>Eatier Analytics</em>.</li>
-      <li>Manage menus, chats, calls &amp; ratings in real-time.</li>
-    </ul>
+      <!-- Carousel Indicators -->
+      <div class="carousel-indicators">
+        @for (slide of carouselSlides; track slide.image; let i = $index) {
+          <button
+            class="indicator"
+            [class.active]="currentSlide() === i"
+            (click)="goToSlide(i)"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+  </section>
 
-    <p>The <strong>Eatier for Business</strong> dashboard even lets indie chefs
-      integrate bookings, commerce &amp; ads to reach brand-new diners.</p>
+  <!-- Mission Statement -->
+  <section class="mission-section">
+    <div class="mission-container">
+      <div class="mission-content">
+        <h2 class="section-title">Our Mission</h2>
+        <p class="mission-text">
+          <span class="itiyum-brand">Itiyum</span> bridges the gap between food businesses and their communities, empowering everyone
+          from restaurant owners to food enthusiasts with the tools they need to succeed. Whether
+          you're managing a restaurant, exploring new cuisines, or showcasing your culinary expertise,
+          <span class="itiyum-brand">Itiyum</span> is your platform for growth and connection.
+        </p>
+      </div>
 
-    <h3>Extra resources</h3>
-    <p>
-      Keep an eye on the <em>Community</em> page for playbooks, tutorials and funding
-      programmes that accelerate your digital journey.
+      <!-- Advertisement Inset Carousel -->
+      <a routerLink="/advertise"
+         class="ad-inset"
+         (mouseenter)="pauseAdCarousel()"
+         (mouseleave)="resumeAdCarousel()">
+        <div class="ad-carousel-container">
+          <!-- Carousel Slides -->
+          @for (slide of adCarouselSlides; track slide.stat; let i = $index) {
+            <div class="ad-carousel-slide"
+                 [class.active]="currentAdSlide() === i"
+                 [style.background]="slide.gradient">
+              <div class="ad-slide-overlay"></div>
+              <div class="ad-slide-content">
+                <div class="ad-badge">Featured</div>
+                <div class="ad-icon">{{ slide.icon }}</div>
+                <div class="ad-stat">{{ slide.stat }}</div>
+                <div class="ad-label">{{ slide.label }}</div>
+                <div class="ad-trend">{{ slide.trend }}</div>
+                <p class="ad-description">{{ slide.description }}</p>
+                <div class="ad-cta">
+                  <span>Start Advertising</span>
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Carousel Indicators -->
+          <div class="ad-carousel-indicators">
+            @for (slide of adCarouselSlides; track slide.stat; let i = $index) {
+              <div class="ad-indicator" [class.active]="currentAdSlide() === i"></div>
+            }
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- User Groups Section -->
+  <section class="user-groups-section">
+    <h2 class="section-title">Built for Everyone</h2>
+    <p class="section-subtitle">
+      <span class="itiyum-brand">Itiyum</span> serves diverse communities within the food industry, each with unique needs and goals.
     </p>
-  </article>
 
-  <!-- ─── Users card ──────────────────────────────── -->
-  <article class="glass-card" data-animate>
-    <header>
-      <h2>For users</h2>
-      <img
-        src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png"
-        alt="chef hat icon"
-        class="icon"
-        height="36"
-        width="36"
-      />
-    </header>
+    <div class="user-groups-grid">
+      @for (group of userGroups; track group.id) {
+        <article class="user-group-card" [attr.data-group]="group.id">
+          <div class="card-header" [style.background]="group.gradient">
+            <div class="icon-wrapper">{{ group.icon }}</div>
+            <h3 class="card-title">{{ group.title }}</h3>
+          </div>
 
-    <p>
-      Discover a vibrant food scene, add your favourite tiny eateries,
-      or showcase your skills in <strong>Eatier Chefs</strong> and get booked for events.
-    </p>
+          <div class="card-body">
+            <p class="card-description">{{ group.description }}</p>
 
-    <p>
-      Performance data fuels continuous R&amp;D, so every release is faster,
-      smarter and more personalised.  
-      Follow the <em>Community</em> page for the latest drops.
-    </p>
-  </article>
+            <div class="features-section">
+              <h4 class="features-title">Key Features</h4>
+              <ul class="features-list">
+                @for (feature of group.features; track feature) {
+                  <li class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>{{ feature }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
 
-</section>
+            <button class="cta-button" [style.background]="group.gradient" routerLink="/login">
+              Get Started as {{ group.title }}
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- Community Section -->
+  <section class="community-section">
+    <div class="community-content">
+      <h2 class="section-title">Join Our Community</h2>
+      <p class="community-text">
+        Connect with thousands of food enthusiasts, restaurant owners, and culinary professionals.
+        Share experiences, discover new places, and grow your presence in the food industry.
+      </p>
+      <div class="community-actions">
+        <button class="primary-button" routerLink="/register">
+          <span>Create Account</span>
+          <span class="arrow">→</span>
+        </button>
+        <button class="secondary-button" routerLink="/login">
+          <span>Sign In</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resources Section -->
+  <section class="resources-section">
+    <div class="resources-content">
+      <h2 class="section-title">Resources & Support</h2>
+      <div class="resources-grid">
+        <div class="resource-card">
+          <div class="resource-icon">📚</div>
+          <h3>Documentation</h3>
+          <p>Comprehensive guides and tutorials to help you make the most of <span class="itiyum-brand">Itiyum</span>.</p>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">💬</div>
+          <h3>Community Forums</h3>
+          <p>Connect with other users, share tips, and get answers to your questions.</p>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">🎓</div>
+          <h3>Training Programs</h3>
+          <p>Learn best practices for growing your business or building your portfolio.</p>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">🤝</div>
+          <h3>Support Team</h3>
+          <p>Our dedicated team is here to help you succeed every step of the way.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

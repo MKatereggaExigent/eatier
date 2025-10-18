@@ -1,0 +1,278 @@
+<div class="admin-bookings" role="main" aria-label="Admin Bookings Management">
+  <!-- Header Section -->
+  <header class="bookings-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">📅</span>
+          Bookings Management
+        </h1>
+        <p class="page-subtitle">
+          Manage all platform bookings, monitor reservations, and handle booking requests
+        </p>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ bookingStats().total }}</div>
+          <div class="stat-label">Total Bookings</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ bookingStats().confirmed }}</div>
+          <div class="stat-label">Confirmed</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ bookingStats().pending }}</div>
+          <div class="stat-label">Pending</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">❌</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ bookingStats().cancelled }}</div>
+          <div class="stat-label">Cancelled</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">✔️</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ bookingStats().completed }}</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ formatCurrency(bookingStats().totalRevenue) }}</div>
+          <div class="stat-label">Total Revenue</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Controls Section -->
+  <section class="controls-section">
+    <div class="controls-content">
+      <!-- Search and Filter Toggle -->
+      <div class="search-controls">
+        <div class="search-input-wrapper">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search bookings by customer, business, or email..."
+            [value]="searchQuery()"
+            (input)="onSearchInput($event)"
+            aria-label="Search bookings">
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-controls">
+        <button
+          type="button"
+          class="filter-toggle-btn"
+          (click)="toggleFilters()"
+          [class.active]="showFilters()">
+          <span class="btn-icon">🔽</span>
+          Filters
+          @if (hasActiveFilters()) {
+            <span class="filter-badge">{{ filteredBookings().length }}</span>
+          }
+        </button>
+
+        @if (hasActiveFilters()) {
+          <button
+            type="button"
+            class="clear-filters-btn"
+            (click)="clearFilters()">
+            Clear Filters
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    @if (showFilters()) {
+      <div class="filter-panel">
+        <div class="filter-grid">
+          <!-- Status Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select
+              class="filter-select"
+              [value]="filters().status"
+              (change)="onFilterChange('status', $event)">
+              @for (option of statusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Date From Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Date From</label>
+            <input
+              type="date"
+              class="filter-select"
+              [value]="filters().dateFrom"
+              (change)="onFilterChange('dateFrom', $event)">
+          </div>
+
+          <!-- Date To Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Date To</label>
+            <input
+              type="date"
+              class="filter-select"
+              [value]="filters().dateTo"
+              (change)="onFilterChange('dateTo', $event)">
+          </div>
+
+          <!-- Sort Filter -->
+          <div class="filter-group">
+            <label class="filter-label">Sort By</label>
+            <select
+              class="filter-select"
+              [value]="filters().sortBy"
+              (change)="onFilterChange('sortBy', $event)">
+              @for (option of sortOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- Bookings List -->
+  <section class="bookings-section">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading bookings...</p>
+      </div>
+    } @else if (filteredBookings().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <h3>No bookings found</h3>
+        @if (hasActiveFilters()) {
+          <p>Try adjusting your filters or search terms.</p>
+          <button type="button" class="btn-secondary" (click)="clearFilters()">
+            Clear Filters
+          </button>
+        } @else {
+          <p>No bookings have been made on the platform yet.</p>
+        }
+      </div>
+    } @else {
+      <div class="bookings-table-wrapper">
+        <table class="bookings-table">
+          <thead>
+            <tr>
+              <th>Booking Date</th>
+              <th>Time</th>
+              <th>Customer</th>
+              <th>Business</th>
+              <th>Party Size</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (booking of filteredBookings(); track booking.id) {
+              <tr [class]="'status-' + booking.status">
+                <td>
+                  <div class="booking-date">
+                    {{ formatDate(booking.bookingDate) }}
+                  </div>
+                </td>
+                <td>
+                  <div class="booking-time">
+                    {{ booking.bookingTime }}
+                  </div>
+                </td>
+                <td>
+                  <div class="customer-info">
+                    <div class="customer-name">{{ booking.userName }}</div>
+                    <div class="customer-email">{{ booking.userEmail }}</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="business-info">
+                    <div class="business-name">{{ booking.businessName }}</div>
+                    <div class="business-type">{{ booking.businessType }}</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="party-size">
+                    {{ booking.partySize }} {{ booking.partySize === 1 ? 'person' : 'people' }}
+                  </div>
+                </td>
+                <td>
+                  <div class="amount">
+                    {{ booking.totalAmount ? formatCurrency(booking.totalAmount) : 'N/A' }}
+                  </div>
+                </td>
+                <td>
+                  <div class="status-badge" [class]="'status-' + booking.status">
+                    {{ booking.status | titlecase }}
+                  </div>
+                </td>
+                <td>
+                  <div class="booking-actions">
+                    <button
+                      type="button"
+                      class="btn-action view-btn"
+                      (click)="viewBookingDetails(booking)"
+                      title="View Details">
+                      👁️
+                    </button>
+
+                    @if (booking.status === 'pending') {
+                      <button
+                        type="button"
+                        class="btn-action confirm-btn"
+                        (click)="confirmBooking(booking)"
+                        title="Confirm Booking">
+                        ✅
+                      </button>
+                    }
+
+                    @if (booking.status === 'pending' || booking.status === 'confirmed') {
+                      <button
+                        type="button"
+                        class="btn-action cancel-btn"
+                        (click)="cancelBooking(booking)"
+                        title="Cancel Booking">
+                        ❌
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>
+

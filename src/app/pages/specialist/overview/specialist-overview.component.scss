@@ -1,6 +1,6 @@
 // ===================================
-// SPECIALIST OVERVIEW - PRODUCTION READY
-// Glassmorphic Design System
+// SPECIALIST OVERVIEW - NYT CLEAN DESIGN
+// New York Times Inspired Design
 // ===================================
 
 .specialist-overview {
@@ -8,6 +8,8 @@
   max-width: 1400px;
   margin: 0 auto;
   min-height: calc(100vh - 200px);
+  background: #ffffff; // NYT white background
+  color: #000000; // NYT black text
   animation: fadeIn 0.8s ease-out;
 }
 

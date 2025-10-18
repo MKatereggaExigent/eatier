@@ -1,6 +1,6 @@
 // ===================================
-// GLASSMORPHIC BUTTON COMPONENT
-// Production-Ready Design System
+// NYT CLEAN BUTTON COMPONENT
+// New York Times Inspired Design
 // ===================================
 
 .glassmorphic-btn {
@@ -8,24 +8,22 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: var(--font-semibold);
   text-align: center;
   text-decoration: none;
-  border: none;
+  border: 2px solid #000000; // NYT black border
   cursor: pointer;
   transition: all var(--transition-normal);
   overflow: hidden;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 
-  // Base Styling
-  background: var(--glass-white-strong);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  // Base Styling - NYT Clean
+  background: #ffffff; // White background
+  color: #000000; // Black text
+  border-radius: 4px; // Minimal border radius
+  box-shadow: none; // No shadow for clean look
 
   // Disabled State
   &:disabled {
@@ -36,25 +34,20 @@
 
   // Focus State
   &:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+    outline: 2px solid #0284c7; // NYT blue focus
+    outline-offset: 2px;
   }
 
-  // Hover Effects
+  // Hover Effects - NYT Style
   &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-
-    .btn-shine {
-      opacity: 1;
-      transform: translateX(100%);
-    }
+    background: #f8f9fa; // Very light gray background
+    border-color: #000000; // Keep black border
   }
 
   // Active State
   &:active:not(:disabled) {
-    transform: translateY(0);
-    box-shadow: var(--shadow-md);
+    background: #e5e5e5; // Slightly darker gray when pressed
+    border-color: #000000;
   }
 
   // Size Variants

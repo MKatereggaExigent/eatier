@@ -153,7 +153,7 @@ export class FoodEnthusiastReviewsComponent implements OnInit {
 
     // Cuisine filter
     if (currentFilters.cuisine !== 'all') {
-      filtered = filtered.filter(review => 
+      filtered = filtered.filter(review =>
         review.restaurant.cuisineTypes.includes(currentFilters.cuisine)
       );
     }
@@ -409,7 +409,11 @@ export class FoodEnthusiastReviewsComponent implements OnInit {
       };
 
       this.isLoading.set(true);
-      this.reviewsService.updateReview(review.id, updates).subscribe({
+      const { photos, ...updateData } = updates;
+      this.reviewsService.updateReview(review.id, {
+        ...updateData,
+        visitDate: updateData.visitDate ? new Date(updateData.visitDate) : undefined
+      }).subscribe({
         next: (success) => {
           if (success) {
             console.log('Review updated successfully');

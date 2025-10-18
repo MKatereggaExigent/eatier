@@ -288,7 +288,7 @@
                         title="Suspend User">
                         ⏸️
                       </button>
-                    } @else if (user.status === 'suspended' || user.status === 'inactive') {
+                    } @else if (user.status === 'frozen' || user.status === 'pending_deletion') {
                       <button
                         type="button"
                         class="btn-action activate-btn"

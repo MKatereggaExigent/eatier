@@ -147,16 +147,16 @@
       <div class="collections-grid">
         @for (collection of collections(); track collection.id) {
           <div class="collection-card">
-            @if (collection.coverImageUrl) {
+            @if ($any(collection).coverImageUrl) {
               <div class="collection-cover">
-                <img [src]="collection.coverImageUrl" [alt]="collection.name">
+                <img [src]="$any(collection).coverImageUrl" [alt]="collection.name">
               </div>
             }
             <div class="collection-info">
               <h3 class="collection-name">{{ collection.name }}</h3>
               <p class="collection-description">{{ collection.description }}</p>
               <div class="collection-meta">
-                <span class="item-count">{{ collection.itemCount }} restaurants</span>
+                <span class="item-count">{{ $any(collection).itemCount || 0 }} restaurants</span>
                 @if (collection.isPublic) {
                   <span class="public-badge">Public</span>
                 }
@@ -229,7 +229,7 @@
                   <span class="btn-icon">📅</span>
                 </button>
               </div>
-              @if (favorite.restaurant.isOpen) {
+              @if ($any(favorite.restaurant).isOpen) {
                 <div class="status-badge open">Open</div>
               } @else {
                 <div class="status-badge closed">Closed</div>
@@ -259,8 +259,8 @@
 
               <div class="location-info">
                 <span class="address">{{ favorite.restaurant.address }}, {{ favorite.restaurant.city }}</span>
-                @if (favorite.restaurant.distance) {
-                  <span class="distance">{{ favorite.restaurant.distance }} mi</span>
+                @if ($any(favorite.restaurant).distance) {
+                  <span class="distance">{{ $any(favorite.restaurant).distance }} mi</span>
                 }
               </div>
 

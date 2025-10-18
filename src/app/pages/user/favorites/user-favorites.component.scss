@@ -1,5 +1,5 @@
 // ===================================
-// USER FAVORITES - GLASSMORPHIC DESIGN
+// USER FAVORITES - clean DESIGN
 // ===================================
 
 .user-favorites {
@@ -7,7 +7,7 @@
   max-width: 1400px;
   margin: 0 auto;
   min-height: 100vh;
-  background: var(--bg-gradient-hero);
+  background: #ffffff;
   position: relative;
 
   &::before {
@@ -17,9 +17,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image:
-      radial-gradient(circle at 25% 25%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+    background: #ffffff; // NYT white background
     pointer-events: none;
     z-index: -1;
   }
@@ -38,23 +36,21 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: var(--space-8);
-    background: var(--glass-white);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    background: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-2xl);
+    border-radius: 4px;
     padding: var(--space-10);
-    box-shadow: var(--shadow-glass);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   }
 
   .title-section {
     flex: 1;
 
     .page-title {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
       font-size: var(--text-4xl);
       font-weight: var(--font-bold);
-      color: var(--clr-neutral-900);
+      color: #000000;
       margin-bottom: var(--space-3);
       display: flex;
       align-items: center;
@@ -67,9 +63,9 @@
     }
 
     .page-subtitle {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: var(--text-lg);
-      color: var(--clr-neutral-600);
+      color: #525252;
       line-height: var(--leading-relaxed);
     }
   }
@@ -82,23 +78,23 @@
       text-align: center;
       padding: var(--space-4) var(--space-6);
       background: rgba(59, 130, 246, 0.1);
-      border-radius: var(--radius-xl);
+      border-radius: 4px;
       border: 1px solid rgba(59, 130, 246, 0.2);
 
       .stat-number {
         display: block;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         font-size: var(--text-2xl);
         font-weight: var(--font-bold);
-        color: var(--clr-primary-600);
+        color: #0369a1;
         line-height: 1;
       }
 
       .stat-label {
         display: block;
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         font-size: var(--text-sm);
-        color: var(--clr-neutral-600);
+        color: #525252;
         margin-top: var(--space-1);
       }
     }
@@ -117,13 +113,11 @@
     display: flex;
     gap: var(--space-6);
     align-items: center;
-    background: var(--glass-white);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    background: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-2xl);
+    border-radius: 4px;
     padding: var(--space-6);
-    box-shadow: var(--shadow-glass);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   }
 
   .search-input-wrapper {
@@ -136,18 +130,18 @@
       top: 50%;
       transform: translateY(-50%);
       font-size: var(--text-lg);
-      color: var(--clr-neutral-500);
+      color: #737373;
     }
 
     .search-input {
       width: 100%;
       padding: var(--space-4) var(--space-4) var(--space-4) var(--space-12);
       border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: var(--radius-xl);
-      background: var(--glass-white-strong);
-      font-family: 'Poppins', sans-serif;
+      border-radius: 4px;
+      background: #ffffff;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: var(--text-base);
-      color: var(--clr-neutral-900);
+      color: #000000;
       transition: all var(--transition-normal);
 
       &:focus {
@@ -157,7 +151,7 @@
       }
 
       &::placeholder {
-        color: var(--clr-neutral-500);
+        color: #737373;
       }
     }
   }
@@ -174,11 +168,11 @@
       padding: var(--space-3) var(--space-5);
       background: var(--glass-neutral);
       border: 1px solid rgba(107, 114, 128, 0.3);
-      border-radius: var(--radius-lg);
-      font-family: 'Inter', sans-serif;
+      border-radius: 4px;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: var(--text-sm);
       font-weight: var(--font-medium);
-      color: var(--clr-neutral-700);
+      color: #404040;
       cursor: pointer;
       transition: all var(--transition-normal);
 
@@ -189,9 +183,9 @@
       }
 
       &.active {
-        background: var(--glass-primary);
+        background: #ffffff;
         border-color: var(--clr-primary-300);
-        color: var(--clr-primary-700);
+        color: #075985;
       }
 
       .btn-icon {
@@ -200,8 +194,8 @@
     }
 
     .filter-badge {
-      background: var(--clr-primary-500);
-      color: var(--clr-neutral-0);
+      background: #0284c7;
+      color: #ffffff;
       font-size: var(--text-xs);
       font-weight: var(--font-bold);
       padding: var(--space-1) var(--space-2);
@@ -213,13 +207,11 @@
 
   .filter-panel {
     margin-top: var(--space-6);
-    background: var(--glass-white);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    background: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-xl);
+    border-radius: 4px;
     padding: var(--space-6);
-    box-shadow: var(--shadow-glass);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 
     .filter-row {
       display: grid;
@@ -230,10 +222,10 @@
     .filter-group {
       .filter-label {
         display: block;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         font-size: var(--text-sm);
         font-weight: var(--font-medium);
-        color: var(--clr-neutral-700);
+        color: #404040;
         margin-bottom: var(--space-2);
       }
 
@@ -241,11 +233,11 @@
         width: 100%;
         padding: var(--space-3) var(--space-4);
         border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: var(--radius-lg);
-        background: var(--glass-white-strong);
-        font-family: 'Poppins', sans-serif;
+        border-radius: 4px;
+        background: #ffffff;
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         font-size: var(--text-sm);
-        color: var(--clr-neutral-900);
+        color: #000000;
         cursor: pointer;
         transition: all var(--transition-normal);
 
@@ -268,8 +260,8 @@
         padding: var(--space-3) var(--space-6);
         background: rgba(239, 68, 68, 0.1);
         border: 1px solid rgba(239, 68, 68, 0.3);
-        border-radius: var(--radius-lg);
-        font-family: 'Inter', sans-serif;
+        border-radius: 4px;
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         font-size: var(--text-sm);
         font-weight: var(--font-medium);
         color: #dc2626;
@@ -299,10 +291,10 @@
   animation: fadeInUp 0.6s ease-out 0.4s both;
 
   .section-title {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: var(--text-2xl);
     font-weight: var(--font-semibold);
-    color: var(--clr-neutral-900);
+    color: #000000;
     margin-bottom: var(--space-8);
     display: flex;
     align-items: center;
@@ -319,19 +311,17 @@
     gap: var(--space-6);
 
     .collection-card {
-      background: var(--glass-white);
-      -webkit-backdrop-filter: blur(20px);
-      backdrop-filter: blur(20px);
+      background: #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: var(--radius-xl);
+      border-radius: 4px;
       overflow: hidden;
-      box-shadow: var(--shadow-glass);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
       transition: all var(--transition-normal);
       cursor: pointer;
 
       &:hover {
         transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
         border-color: rgba(255, 255, 255, 0.4);
       }
 
@@ -355,17 +345,17 @@
         padding: var(--space-6);
 
         .collection-name {
-          font-family: 'Inter', sans-serif;
+          font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           font-size: var(--text-lg);
           font-weight: var(--font-semibold);
-          color: var(--clr-neutral-900);
+          color: #000000;
           margin-bottom: var(--space-2);
         }
 
         .collection-description {
-          font-family: 'Poppins', sans-serif;
+          font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           font-size: var(--text-sm);
-          color: var(--clr-neutral-600);
+          color: #525252;
           line-height: var(--leading-relaxed);
           margin-bottom: var(--space-4);
         }
@@ -376,15 +366,15 @@
           align-items: center;
 
           .item-count {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: var(--text-xs);
-            color: var(--clr-neutral-500);
+            color: #737373;
             font-weight: var(--font-medium);
           }
 
           .public-badge {
-            background: var(--glass-secondary);
-            color: var(--clr-secondary-700);
+            background: #ffffff;
+            color: #000000;
             padding: var(--space-1) var(--space-3);
             border-radius: var(--radius-full);
             font-size: var(--text-xs);
@@ -403,12 +393,12 @@
       gap: var(--space-3);
       background: var(--glass-neutral);
       border: 2px dashed rgba(107, 114, 128, 0.3);
-      border-radius: var(--radius-xl);
+      border-radius: 4px;
       padding: var(--space-8);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: var(--text-base);
       font-weight: var(--font-medium);
-      color: var(--clr-neutral-600);
+      color: #525252;
       cursor: pointer;
       transition: all var(--transition-normal);
       min-height: 200px;
@@ -416,7 +406,7 @@
       &:hover {
         background: rgba(107, 114, 128, 0.1);
         border-color: rgba(107, 114, 128, 0.5);
-        color: var(--clr-neutral-700);
+        color: #404040;
         transform: translateY(-2px);
       }
 
@@ -438,10 +428,10 @@
     margin-bottom: var(--space-8);
 
     .section-title {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: var(--text-2xl);
       font-weight: var(--font-semibold);
-      color: var(--clr-neutral-900);
+      color: #000000;
       display: flex;
       align-items: center;
       gap: var(--space-3);
@@ -451,8 +441,8 @@
       }
 
       .count-badge {
-        background: var(--glass-primary);
-        color: var(--clr-primary-700);
+        background: #ffffff;
+        color: #075985;
         padding: var(--space-1) var(--space-3);
         border-radius: var(--radius-full);
         font-size: var(--text-sm);
@@ -465,31 +455,31 @@
   .loading-state {
     text-align: center;
     padding: var(--space-16);
-    background: var(--glass-white);
-    border-radius: var(--radius-2xl);
+    background: #ffffff;
+    border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.2);
 
     .loading-spinner {
       width: 40px;
       height: 40px;
       border: 3px solid rgba(59, 130, 246, 0.2);
-      border-top: 3px solid var(--clr-primary-500);
+      border-top: 3px solid #0284c7;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin: 0 auto var(--space-4);
     }
 
     p {
-      font-family: 'Poppins', sans-serif;
-      color: var(--clr-neutral-600);
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #525252;
     }
   }
 
   .empty-state {
     text-align: center;
     padding: var(--space-16);
-    background: var(--glass-white);
-    border-radius: var(--radius-2xl);
+    background: #ffffff;
+    border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.2);
 
     .empty-icon {
@@ -499,16 +489,16 @@
     }
 
     h3 {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: var(--text-xl);
       font-weight: var(--font-semibold);
-      color: var(--clr-neutral-900);
+      color: #000000;
       margin-bottom: var(--space-4);
     }
 
     p {
-      font-family: 'Poppins', sans-serif;
-      color: var(--clr-neutral-600);
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #525252;
       line-height: var(--leading-relaxed);
       margin-bottom: var(--space-8);
     }
@@ -519,8 +509,8 @@
       align-items: center;
       gap: var(--space-2);
       padding: var(--space-4) var(--space-8);
-      border-radius: var(--radius-xl);
-      font-family: 'Inter', sans-serif;
+      border-radius: 4px;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: var(--text-base);
       font-weight: var(--font-semibold);
       text-decoration: none;
@@ -533,20 +523,19 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--clr-primary-500) 0%, var(--clr-primary-600) 100%);
-      color: var(--clr-neutral-0);
+      color: #ffffff;
       border: none;
-      box-shadow: var(--shadow-md);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
       }
     }
 
     .btn-secondary {
       background: var(--glass-neutral);
-      color: var(--clr-neutral-700);
+      color: #404040;
       border: 1px solid rgba(107, 114, 128, 0.3);
 
       &:hover {
@@ -595,18 +584,16 @@
   // ===================================
 
   .favorite-card {
-    background: var(--glass-white);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    background: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-2xl);
+    border-radius: 4px;
     overflow: hidden;
-    box-shadow: var(--shadow-glass);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     transition: all var(--transition-normal);
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
       border-color: rgba(255, 255, 255, 0.4);
     }
 
@@ -637,7 +624,7 @@
         transition: opacity var(--transition-normal);
 
         .action-btn {
-          background: var(--glass-white-strong);
+          background: #ffffff;
           border: 1px solid rgba(255, 255, 255, 0.3);
           border-radius: var(--radius-full);
           width: 48px;
@@ -653,13 +640,13 @@
           }
 
           &.view-btn:hover {
-            background: var(--glass-primary);
+            background: #ffffff;
             border-color: var(--clr-primary-300);
             transform: scale(1.1);
           }
 
           &.reserve-btn:hover {
-            background: var(--glass-secondary);
+            background: #ffffff;
             border-color: var(--clr-secondary-300);
             transform: scale(1.1);
           }
@@ -688,8 +675,8 @@
         letter-spacing: 0.5px;
 
         &.open {
-          background: var(--glass-secondary);
-          color: var(--clr-secondary-700);
+          background: #ffffff;
+          color: #000000;
           border: 1px solid var(--clr-secondary-300);
         }
 
@@ -712,10 +699,10 @@
         margin-bottom: var(--space-4);
 
         .restaurant-name {
-          font-family: 'Inter', sans-serif;
+          font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           font-size: var(--text-xl);
           font-weight: var(--font-semibold);
-          color: var(--clr-neutral-900);
+          color: #000000;
           line-height: var(--leading-tight);
           flex: 1;
         }
@@ -733,16 +720,16 @@
           }
 
           .rating-number {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: var(--text-sm);
             font-weight: var(--font-semibold);
-            color: var(--clr-neutral-900);
+            color: #000000;
           }
 
           .review-count {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: var(--text-xs);
-            color: var(--clr-neutral-500);
+            color: #737373;
           }
         }
       }
@@ -759,8 +746,8 @@
           gap: var(--space-2);
 
           .cuisine-tag {
-            background: var(--glass-primary);
-            color: var(--clr-primary-700);
+            background: #ffffff;
+            color: #075985;
             padding: var(--space-1) var(--space-3);
             border-radius: var(--radius-full);
             font-size: var(--text-xs);
@@ -770,17 +757,17 @@
         }
 
         .price-range {
-          font-family: 'Inter', sans-serif;
+          font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           font-size: var(--text-lg);
           font-weight: var(--font-bold);
-          color: var(--clr-secondary-600);
+          color: #000000;
         }
       }
 
       .restaurant-description {
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         font-size: var(--text-sm);
-        color: var(--clr-neutral-600);
+        color: #525252;
         line-height: var(--leading-relaxed);
         margin-bottom: var(--space-4);
         display: -webkit-box;
@@ -796,19 +783,19 @@
         margin-bottom: var(--space-4);
         padding: var(--space-3) var(--space-4);
         background: rgba(59, 130, 246, 0.05);
-        border-radius: var(--radius-lg);
+        border-radius: 4px;
 
         .address {
-          font-family: 'Poppins', sans-serif;
+          font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           font-size: var(--text-sm);
-          color: var(--clr-neutral-600);
+          color: #525252;
         }
 
         .distance {
-          font-family: 'Inter', sans-serif;
+          font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           font-size: var(--text-sm);
           font-weight: var(--font-medium);
-          color: var(--clr-primary-600);
+          color: #0369a1;
         }
       }
 
@@ -818,21 +805,21 @@
         gap: var(--space-3);
         padding: var(--space-4);
         background: rgba(34, 197, 94, 0.05);
-        border-radius: var(--radius-lg);
+        border-radius: 4px;
         border-left: 4px solid var(--clr-secondary-400);
         margin-bottom: var(--space-4);
 
         .notes-icon {
           font-size: var(--text-base);
-          color: var(--clr-secondary-600);
+          color: #000000;
           flex-shrink: 0;
           margin-top: 2px;
         }
 
         .notes-text {
-          font-family: 'Poppins', sans-serif;
+          font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           font-size: var(--text-sm);
-          color: var(--clr-neutral-700);
+          color: #404040;
           line-height: var(--leading-relaxed);
           font-style: italic;
         }
@@ -852,14 +839,14 @@
 
           .added-date,
           .visit-count {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: var(--text-xs);
-            color: var(--clr-neutral-500);
+            color: #737373;
             font-weight: var(--font-medium);
           }
 
           .visit-count {
-            color: var(--clr-secondary-600);
+            color: #000000;
           }
         }
 
@@ -868,9 +855,9 @@
           gap: var(--space-2);
 
           .action-btn {
-            background: var(--glass-white-strong);
+            background: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: var(--radius-lg);
+            border-radius: 4px;
             width: 36px;
             height: 36px;
             display: flex;
@@ -884,7 +871,7 @@
             }
 
             &.edit-btn:hover {
-              background: var(--glass-primary);
+              background: #ffffff;
               border-color: var(--clr-primary-300);
               transform: scale(1.1);
             }
@@ -916,8 +903,6 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -926,12 +911,10 @@
   animation: fadeIn 0.3s ease-out;
 
   .modal-content {
-    background: var(--glass-white);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    background: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-2xl);
+    border-radius: 4px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     max-width: 500px;
     width: 100%;
     max-height: 90vh;
@@ -946,10 +929,10 @@
       align-items: center;
 
       h3 {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         font-size: var(--text-xl);
         font-weight: var(--font-semibold);
-        color: var(--clr-neutral-900);
+        color: #000000;
         margin: 0;
       }
 
@@ -957,15 +940,15 @@
         background: none;
         border: none;
         font-size: var(--text-xl);
-        color: var(--clr-neutral-600);
+        color: #525252;
         cursor: pointer;
         padding: var(--space-2);
-        border-radius: var(--radius-lg);
+        border-radius: 4px;
         transition: all var(--transition-normal);
 
         &:hover {
           background: rgba(107, 114, 128, 0.1);
-          color: var(--clr-neutral-800);
+          color: #262626;
         }
       }
     }
@@ -974,13 +957,13 @@
       padding: var(--space-6);
 
       p {
-        font-family: 'Poppins', sans-serif;
-        color: var(--clr-neutral-700);
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        color: #404040;
         line-height: var(--leading-relaxed);
         margin-bottom: var(--space-4);
 
         strong {
-          color: var(--clr-neutral-900);
+          color: #000000;
           font-weight: var(--font-semibold);
         }
 
@@ -995,11 +978,11 @@
         width: 100%;
         padding: var(--space-4);
         border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: var(--radius-lg);
-        background: var(--glass-white-strong);
-        font-family: 'Poppins', sans-serif;
+        border-radius: 4px;
+        background: #ffffff;
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         font-size: var(--text-base);
-        color: var(--clr-neutral-900);
+        color: #000000;
         resize: vertical;
         min-height: 100px;
         transition: all var(--transition-normal);
@@ -1011,7 +994,7 @@
         }
 
         &::placeholder {
-          color: var(--clr-neutral-500);
+          color: #737373;
         }
       }
     }
@@ -1027,8 +1010,8 @@
       .btn-primary,
       .btn-danger {
         padding: var(--space-3) var(--space-6);
-        border-radius: var(--radius-lg);
-        font-family: 'Inter', sans-serif;
+        border-radius: 4px;
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         font-size: var(--text-sm);
         font-weight: var(--font-medium);
         cursor: pointer;
@@ -1038,7 +1021,7 @@
 
       .btn-secondary {
         background: var(--glass-neutral);
-        color: var(--clr-neutral-700);
+        color: #404040;
         border: 1px solid rgba(107, 114, 128, 0.3);
 
         &:hover {
@@ -1048,22 +1031,20 @@
       }
 
       .btn-primary {
-        background: linear-gradient(135deg, var(--clr-primary-500) 0%, var(--clr-primary-600) 100%);
-        color: var(--clr-neutral-0);
+        color: #ffffff;
 
         &:hover {
           transform: translateY(-1px);
-          box-shadow: var(--shadow-md);
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
       }
 
       .btn-danger {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: var(--clr-neutral-0);
+        color: #ffffff;
 
         &:hover {
           transform: translateY(-1px);
-          box-shadow: var(--shadow-md);
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
       }
     }

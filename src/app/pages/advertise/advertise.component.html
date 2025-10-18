@@ -1,1 +1,274 @@
-<p>advertise works!</p>
+<div class="advertise-page">
+  <!-- Hero Carousel Section -->
+  <section class="hero-carousel" (mouseenter)="stopCarousel()" (mouseleave)="startCarousel()">
+    <div class="carousel-container">
+      <!-- Carousel Slides -->
+      @for (slide of carouselSlides; track slide.image; let i = $index) {
+        <div class="carousel-slide"
+             [class.active]="currentSlide() === i"
+             [style.background-image]="'url(' + slide.image + ')'">
+          <div class="slide-overlay"></div>
+        </div>
+      }
+
+      <!-- Hero Content (stays fixed over carousel) -->
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Advertise with <span class="brand-gradient">Itiyum</span>
+        </h1>
+        <p class="hero-subtitle">
+          Reach thousands of food lovers, restaurant owners, and culinary professionals across the globe.
+          Grow your business with targeted advertising that delivers results.
+        </p>
+        <div class="hero-stats">
+          @for (stat of stats; track stat.label) {
+            <div class="stat-item">
+              <div class="stat-value">{{ stat.value }}</div>
+              <div class="stat-label">{{ stat.label }}</div>
+            </div>
+          }
+        </div>
+        <div class="hero-cta">
+          @if (isAuthenticated() && canAdvertise()) {
+            <button type="button" class="btn-primary" (click)="navigateToCreateAd()">
+              <span>Create Your First Ad</span>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+          } @else {
+            <a routerLink="/register" class="btn-primary">
+              <span>Get Started</span>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </a>
+          }
+        </div>
+      </div>
+
+      <!-- Carousel Controls -->
+      <button class="carousel-control prev" (click)="prevSlide()" aria-label="Previous slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button class="carousel-control next" (click)="nextSlide()" aria-label="Next slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Carousel Indicators -->
+      <div class="carousel-indicators">
+        @for (slide of carouselSlides; track slide.image; let i = $index) {
+          <button
+            class="indicator"
+            [class.active]="currentSlide() === i"
+            (click)="goToSlide(i)"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Ad Types Section -->
+  <section class="ad-types-section">
+    <div class="section-header">
+      <h2 class="section-title">Choose Your Ad Type</h2>
+      <p class="section-subtitle">
+        Select the perfect advertising format for your business goals
+      </p>
+    </div>
+
+    <div class="ad-types-grid">
+      @for (adType of adTypes; track adType.id) {
+        <article class="ad-type-card" [attr.data-type]="adType.id">
+          <div class="card-icon" [style.background]="adType.gradient">
+            {{ adType.icon }}
+          </div>
+          <h3 class="card-title">{{ adType.title }}</h3>
+          <p class="card-description">{{ adType.description }}</p>
+          <ul class="card-features">
+            @for (feature of adType.features; track feature) {
+              <li class="feature-item">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 11.708-.708L6.5 10.293l6.646-6.647a.5.5 0 01.708 0z"/>
+                </svg>
+                <span>{{ feature }}</span>
+              </li>
+            }
+          </ul>
+          <div class="card-badge">{{ adType.badge }}</div>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- Geo-Targeting Section -->
+  <section class="geo-targeting-section">
+    <div class="section-header">
+      <h2 class="section-title">Choose Where Your Ad Appears</h2>
+      <p class="section-subtitle">
+        Target specific regions and countries to reach your ideal audience
+      </p>
+    </div>
+
+    <div class="geo-targeting-content">
+      <div class="geo-visual">
+        <div class="globe-icon">🌍</div>
+        <div class="targeting-stats">
+          <div class="stat">
+            <span class="stat-number">11</span>
+            <span class="stat-label">Regions</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">116</span>
+            <span class="stat-label">Countries</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="geo-features">
+        <h3 class="features-title">Precision Targeting</h3>
+        <ul class="features-list">
+          <li class="feature-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+              <strong>Region Selector</strong>
+              <p>Target entire regions like East Africa, Europe, or Asia</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+              <strong>Country Selector</strong>
+              <p>Choose specific countries for laser-focused campaigns</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+            </svg>
+            <div>
+              <strong>Multi-Select</strong>
+              <p>Combine multiple regions and countries for maximum reach</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing-section">
+    <div class="section-header">
+      <h2 class="section-title">Simple, Transparent Pricing</h2>
+      <p class="section-subtitle">
+        All ads are paid. No hidden fees, no surprises.
+      </p>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-header">
+        <h3 class="pricing-title">Pay-As-You-Go</h3>
+        <p class="pricing-subtitle">Set your own budget and pay only for what you use</p>
+      </div>
+
+      <div class="pricing-amount">
+        <span class="currency-options">$5 / €5 / £5</span>
+        <span class="pricing-label">Minimum Budget</span>
+      </div>
+
+      <ul class="pricing-features">
+        <li>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <span>No setup fees or monthly commitments</span>
+        </li>
+        <li>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <span>Set daily budget limits to control spending</span>
+        </li>
+        <li>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <span>Pause or resume campaigns anytime</span>
+        </li>
+        <li>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <span>Real-time analytics and performance tracking</span>
+        </li>
+      </ul>
+
+      <div class="pricing-note">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0-11a1 1 0 00-1 1v3a1 1 0 002 0V5a1 1 0 00-1-1zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+        </svg>
+        <span>Pricing starts at $5 / €5 / £5. Currency automatically detected based on your location.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits-section">
+    <div class="section-header">
+      <h2 class="section-title">Why Advertise on Itiyum?</h2>
+    </div>
+
+    <div class="benefits-grid">
+      @for (benefit of benefits; track benefit.title) {
+        <article class="benefit-card">
+          <div class="benefit-icon">{{ benefit.icon }}</div>
+          <h3 class="benefit-title">{{ benefit.title }}</h3>
+          <p class="benefit-description">{{ benefit.description }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2 class="cta-title">Ready to Grow Your Business?</h2>
+      <p class="cta-subtitle">
+        Join thousands of businesses already advertising on Itiyum
+      </p>
+      <div class="cta-buttons">
+        @if (isAuthenticated() && canAdvertise()) {
+          <button type="button" class="btn-primary large" (click)="navigateToCreateAd()">
+            <span>Create Your First Ad</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        } @else if (isAuthenticated()) {
+          <div class="upgrade-message">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <p>Advertising is available for Business Owners and Specialists. Please upgrade your account to access this feature.</p>
+          </div>
+        } @else {
+          <a routerLink="/register" class="btn-primary large">
+            <span>Get Started</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,232 @@
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid #e1e1e1;
+  background: #fff;
+  z-index: 10;
+  position: relative;
+
+  a {
+    font-size: var(--font-heading);
+    text-decoration: none;
+    color: var(--clr-black);
+    transition: color 0.3s ease;
+    position: relative;
+
+    &.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -3px;
+      height: 2px;
+      width: 100%;
+      background: hotpink;
+      border-radius: 1px;
+    }
+
+    &:hover {
+      color: #ff4081;
+    }
+  }
+
+  .nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1.25rem;
+
+    li {
+      display: flex;
+      align-items: center;
+    }
+
+    .cta {
+      padding: 0.35rem 0.9rem;
+      border: 1px solid var(--clr-black);
+      border-radius: 4px;
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--clr-black);
+        color: #fff;
+      }
+    }
+  }
+
+  // Authentication buttons for guest users
+  .auth-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+
+    .login-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--clr-black);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: #ff4081;
+      }
+    }
+
+    .register-btn {
+      padding: 0.5rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(255, 64, 129, 0.3);
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 64, 129, 0.4);
+        }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  // User menu styles (existing authenticated user menu)
+  .user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .user-name {
+      font-weight: 500;
+      color: var(--clr-black);
+    }
+
+    .dropdown-arrow {
+      font-size: 0.7rem;
+      color: #666;
+      transition: transform 0.2s ease;
+    }
+
+    &.active .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+  }
+
+  .user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    z-index: 1000;
+    margin-top: 0.5rem;
+
+    .dropdown-header {
+      padding: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .user-avatar {
+          width: 40px;
+          height: 40px;
+        }
+
+        .user-details {
+          .user-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+          }
+
+          .user-role {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: capitalize;
+          }
+        }
+      }
+    }
+
+    .dropdown-menu {
+      padding: 0.5rem 0;
+
+      a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: var(--clr-black);
+        text-decoration: none;
+        transition: background 0.2s ease;
+
+        &:hover {
+          background: rgba(255, 64, 129, 0.1);
+          color: #ff4081;
+        }
+
+        .menu-icon {
+          font-size: 1rem;
+          width: 20px;
+          text-align: center;
+        }
+      }
+    }
+
+    .dropdown-footer {
+      border-top: 1px solid #f0f0f0;
+      padding: 0.5rem;
+
+      .logout-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: none;
+        border: none;
+        color: #dc3545;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background 0.2s ease;
+
+        &:hover {
+          background: rgba(220, 53, 69, 0.1);
+        }
+      }
+    }
+  }
+}

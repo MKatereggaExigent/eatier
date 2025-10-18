@@ -4,7 +4,13 @@
     <h1 class="welcome-title">
       Welcome back, {{ currentUser()?.firstName || 'Business Owner' }}!
     </h1>
-    <p class="welcome-subtitle">Here's what's happening with your restaurant today.</p>
+    <p class="welcome-subtitle">
+      @if (business()) {
+        {{ business()!.business_name }}
+      } @else {
+        Here's what's happening with your business today.
+      }
+    </p>
   </header>
 
   <!-- Error State -->
@@ -19,7 +25,7 @@
         <button
           type="button"
           class="retry-btn"
-          (click)="onRetryLoad('stats')"
+          (click)="refreshData()"
           aria-label="Retry loading data">
           🔄 Retry
         </button>
@@ -30,16 +36,36 @@
   <!-- Stats Cards -->
   <section class="stats-section" aria-label="Business Statistics">
     <div class="stats-grid">
-      <!-- Average Rating Card -->
-      <div class="stat-card"
-           [attr.aria-label]="getStatAriaLabel(stats().averageRating, 'Average Rating', stats().ratingChange)">
-        @if (loading().stats) {
+      <!-- Total Bookings Card -->
+      <div class="stat-card" aria-label="Total Bookings">
+        @if (loading().business) {
           <div class="stat-skeleton">
             <div class="skeleton-icon"></div>
             <div class="skeleton-content">
               <div class="skeleton-number"></div>
               <div class="skeleton-label"></div>
-              <div class="skeleton-change"></div>
+            </div>
+          </div>
+        } @else {
+          <div class="stat-icon" aria-hidden="true">📅</div>
+          <div class="stat-content">
+            <h3 class="stat-number">{{ stats().totalBookings }}</h3>
+            <p class="stat-label">Total Bookings</p>
+            <span class="stat-info">
+              {{ stats().pendingBookings }} pending
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Average Rating Card -->
+      <div class="stat-card" aria-label="Average Rating">
+        @if (loading().business) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
             </div>
           </div>
         } @else {
@@ -47,84 +73,52 @@
           <div class="stat-content">
             <h3 class="stat-number">{{ stats().averageRating.toFixed(1) }}</h3>
             <p class="stat-label">Average Rating</p>
-            <span class="stat-change" [class]="getChangeClass(stats().ratingChange)">
-              <span aria-hidden="true">{{ getChangeIcon(stats().ratingChange) }}</span>
-              {{ stats().ratingChange > 0 ? '+' : '' }}{{ stats().ratingChange.toFixed(1) }} this month
+            <span class="stat-info">
+              {{ stats().totalReviews }} reviews
             </span>
           </div>
         }
       </div>
 
-      <!-- Total Reviews Card -->
-      <div class="stat-card"
-           [attr.aria-label]="getStatAriaLabel(stats().totalReviews, 'Total Reviews', stats().monthlyReviewsChange)">
-        @if (loading().stats) {
+      <!-- Menu Items Card -->
+      <div class="stat-card" aria-label="Menu Items">
+        @if (loading().business) {
           <div class="stat-skeleton">
             <div class="skeleton-icon"></div>
             <div class="skeleton-content">
               <div class="skeleton-number"></div>
               <div class="skeleton-label"></div>
-              <div class="skeleton-change"></div>
             </div>
           </div>
         } @else {
-          <div class="stat-icon" aria-hidden="true">📝</div>
+          <div class="stat-icon" aria-hidden="true">🍽️</div>
           <div class="stat-content">
-            <h3 class="stat-number">{{ formatNumber(stats().totalReviews) }}</h3>
-            <p class="stat-label">Total Reviews</p>
-            <span class="stat-change" [class]="getChangeClass(stats().monthlyReviewsChange)">
-              <span aria-hidden="true">{{ getChangeIcon(stats().monthlyReviewsChange) }}</span>
-              +{{ stats().monthlyReviewsChange }} this month
+            <h3 class="stat-number">{{ stats().totalMenuItems }}</h3>
+            <p class="stat-label">Menu Items</p>
+            <span class="stat-info">
+              Active items
             </span>
           </div>
         }
       </div>
 
-      <!-- Monthly Views Card -->
-      <div class="stat-card"
-           [attr.aria-label]="getStatAriaLabel(stats().monthlyViews, 'Monthly Views', stats().monthlyViewsChange)">
-        @if (loading().stats) {
+      <!-- Today's Bookings Card -->
+      <div class="stat-card" aria-label="Today's Bookings">
+        @if (loading().bookings) {
           <div class="stat-skeleton">
             <div class="skeleton-icon"></div>
             <div class="skeleton-content">
               <div class="skeleton-number"></div>
               <div class="skeleton-label"></div>
-              <div class="skeleton-change"></div>
             </div>
           </div>
         } @else {
-          <div class="stat-icon" aria-hidden="true">👀</div>
+          <div class="stat-icon" aria-hidden="true">📍</div>
           <div class="stat-content">
-            <h3 class="stat-number">{{ formatNumber(stats().monthlyViews) }}</h3>
-            <p class="stat-label">Monthly Views</p>
-            <span class="stat-change" [class]="getChangeClass(stats().monthlyViewsChange)">
-              <span aria-hidden="true">{{ getChangeIcon(stats().monthlyViewsChange) }}</span>
-              +{{ stats().monthlyViewsChange }}% this month
-            </span>
-          </div>
-        }
-      </div>
-
-      <!-- Favorites Card -->
-      <div class="stat-card"
-           [attr.aria-label]="getStatAriaLabel(stats().favoriteCount, 'Favorites', stats().monthlyFavoritesChange)">
-        @if (loading().stats) {
-          <div class="stat-skeleton">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-content">
-              <div class="skeleton-number"></div>
-              <div class="skeleton-label"></div>
-              <div class="skeleton-change"></div>
-            </div>
-          </div>
-        } @else {
-          <div class="stat-icon" aria-hidden="true">❤️</div>
-          <div class="stat-content">
-            <h3 class="stat-number">{{ formatNumber(stats().favoriteCount) }}</h3>
-            <p class="stat-label">Favorites</p>
-            <span class="stat-change" [class]="getChangeClass(stats().monthlyFavoritesChange)">
-              <span aria-hidden="true">{{ getChangeIcon(stats().monthlyFavoritesChange) }}</span>
-              +{{ stats().monthlyFavoritesChange }} this month
+            <h3 class="stat-number">{{ stats().todayBookings }}</h3>
+            <p class="stat-label">Today's Bookings</p>
+            <span class="stat-info">
+              {{ stats().confirmedBookings }} confirmed
             </span>
           </div>
         }
@@ -193,10 +187,14 @@
         <button
           type="button"
           class="retry-btn"
-          (click)="onRetryLoad('reviews')"
+          (click)="refreshData()"
           aria-label="Retry loading reviews">
           🔄 Retry
         </button>
+      </div>
+    } @else if (recentReviews().length === 0) {
+      <div class="no-reviews">
+        <p>No reviews yet. Encourage your customers to leave reviews!</p>
       </div>
     } @else {
       <div class="reviews-list" role="list">
@@ -204,47 +202,36 @@
           <article class="review-card" role="listitem">
             <div class="review-header">
               <div class="customer-info">
-                @if (review.customerAvatar) {
-                  <img
-                    [src]="review.customerAvatar"
-                    [alt]="review.customerName + ' avatar'"
-                    class="customer-avatar"
-                    loading="lazy">
-                } @else {
-                  <div class="customer-avatar" [attr.aria-label]="review.customerName + ' avatar'">
-                    {{ review.customerName.charAt(0) }}
-                  </div>
-                }
+                <div class="customer-avatar" [attr.aria-label]="review.customer_name + ' avatar'">
+                  {{ review.customer_name?.charAt(0) || '?' }}
+                </div>
                 <div class="customer-details">
-                  <h4>{{ review.customerName }}</h4>
-                  <div class="rating" [attr.aria-label]="getAriaLabel(review.rating)">
+                  <h4>{{ review.customer_name || 'Anonymous' }}</h4>
+                  <div class="rating" [attr.aria-label]="review.rating + ' out of 5 stars'">
                     @for (star of getStarArray(review.rating); track $index) {
-                      <span class="star" [class.filled]="star" aria-hidden="true">⭐</span>
+                      <span class="star" [class.filled]="star === 1" aria-hidden="true">⭐</span>
                     }
                   </div>
                 </div>
               </div>
-              <time class="review-date" [dateTime]="review.date.toISOString()">
-                {{ formatDate(review.date) }}
+              <time class="review-date" [dateTime]="review.created_at">
+                {{ formatDate(review.created_at) }}
               </time>
             </div>
-            <p class="review-comment">{{ review.comment }}</p>
+            @if (review.comment) {
+              <p class="review-comment">{{ review.comment }}</p>
+            }
             <div class="review-actions">
               <button
                 type="button"
                 class="respond-btn"
-                [class.responded]="review.isResponded"
-                (click)="onRespondToReview(review.id)"
-                [attr.aria-label]="review.isResponded ? 'View response to ' + review.customerName + ' review' : 'Respond to ' + review.customerName + ' review'">
-                {{ review.isResponded ? '✓ Responded' : 'Respond' }}
+                [class.responded]="review.response_from_owner"
+                [attr.aria-label]="review.response_from_owner ? 'View response to ' + review.customer_name + ' review' : 'Respond to ' + review.customer_name + ' review'">
+                {{ review.response_from_owner ? '✓ Responded' : 'Respond' }}
               </button>
-              <button
-                type="button"
-                class="like-btn"
-                (click)="onMarkHelpful(review.id)"
-                [attr.aria-label]="'Mark ' + review.customerName + ' review as helpful'">
-                👍 Helpful ({{ review.helpfulCount }})
-              </button>
+              <span class="helpful-count">
+                👍 {{ review.helpful_count }} helpful
+              </span>
             </div>
           </article>
         }
@@ -252,35 +239,58 @@
     }
   </section>
 
-  <!-- Subscription Status -->
-  @if (businessOwner()) {
-    <section class="subscription-status" aria-label="Subscription Information">
-      <div class="subscription-card" [class]="businessOwner()?.subscriptionStatus">
-        <div class="subscription-info">
-          <h3>Subscription Status</h3>
-          <p class="status">{{ businessOwner()?.subscriptionStatus | titlecase }}</p>
-          @if (businessOwner()?.subscriptionStatus === 'trial') {
-            <p class="trial-info" role="alert">Your trial expires in 14 days</p>
-          }
-        </div>
-        <div class="subscription-actions">
-          @if (businessOwner()?.subscriptionStatus === 'trial' || businessOwner()?.subscriptionStatus === 'expired') {
-            <a routerLink="../accounts"
-               class="upgrade-btn"
-               aria-label="Upgrade subscription plan">
-              Upgrade Now
-            </a>
-          } @else {
-            <a routerLink="../accounts"
-               class="manage-btn"
-               aria-label="Manage subscription plan">
-              Manage Plan
-            </a>
-          }
-        </div>
+  <!-- Recent Bookings -->
+  <section class="recent-bookings" aria-label="Recent Bookings">
+    <div class="section-header">
+      <h2 class="section-title">Recent Bookings</h2>
+      <a routerLink="../bookings" class="view-all" aria-label="View all bookings">View All</a>
+    </div>
+
+    @if (loading().bookings) {
+      <div class="bookings-loading" aria-live="polite">
+        <div class="loading-spinner"></div>
+        <p>Loading recent bookings...</p>
       </div>
-    </section>
-  }
+    } @else if (errors().bookings) {
+      <div class="bookings-error" role="alert">
+        <span class="error-icon">⚠️</span>
+        <p>{{ errors().bookings }}</p>
+        <button
+          type="button"
+          class="retry-btn"
+          (click)="refreshData()"
+          aria-label="Retry loading bookings">
+          🔄 Retry
+        </button>
+      </div>
+    } @else if (recentBookings().length === 0) {
+      <div class="no-bookings">
+        <p>No bookings yet. Your bookings will appear here.</p>
+      </div>
+    } @else {
+      <div class="bookings-list" role="list">
+        @for (booking of recentBookings(); track booking.id) {
+          <article class="booking-card" role="listitem">
+            <div class="booking-header">
+              <div class="booking-info">
+                <h4>{{ booking.customer_name || 'Guest' }}</h4>
+                <p class="booking-details">
+                  {{ formatDate(booking.booking_date) }} at {{ formatTime(booking.booking_time) }}
+                </p>
+                <p class="party-size">Party of {{ booking.party_size }}</p>
+              </div>
+              <span class="booking-status" [class]="getStatusClass(booking.status)">
+                {{ booking.status }}
+              </span>
+            </div>
+            @if (booking.special_requests) {
+              <p class="special-requests">{{ booking.special_requests }}</p>
+            }
+          </article>
+        }
+      </div>
+    }
+  </section>
 
   <!-- Tips and Resources -->
   <section class="tips-section" aria-label="Business Growth Tips">

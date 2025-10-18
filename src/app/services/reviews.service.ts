@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { map, catchError, switchMap, tap } from 'rxjs/operators';
-import { DatabaseService } from './database.service';
+import { ApiService } from '../core/services/api.service';
 
 export interface Restaurant {
   id: string;
@@ -58,6 +58,7 @@ export interface Review {
   photos: ReviewPhoto[];
   createdAt: Date;
   updatedAt: Date;
+  publishedAt?: Date;
 }
 
 export interface ReviewRequest {
@@ -103,9 +104,7 @@ export interface ReviewFilters {
   providedIn: 'root'
 })
 export class ReviewsService {
-  private http = inject(HttpClient);
-  private databaseService = inject(DatabaseService);
-  private apiUrl = '/api/reviews';
+  private apiService = inject(ApiService);
 
   // State management
   private reviewsSubject = new BehaviorSubject<Review[]>([]);
@@ -117,124 +116,107 @@ export class ReviewsService {
   isLoading$ = this.isLoadingSubject.asObservable();
 
   constructor() {
-    // Initialize with mock data and test database connection
-    this.initializeReviews();
+    this.loadUserReviews();
+    this.loadRestaurants();
   }
 
-  private initializeReviews(): void {
-    this.databaseService.testConnection().subscribe({
-      next: (connected) => {
-        if (connected) {
-          console.log('Database connected, loading reviews from database');
-          this.loadReviewsFromDatabase();
-          this.loadRestaurantsFromDatabase();
-        } else {
-          console.log('Database not available, using mock data');
-          this.reviewsSubject.next(this.mockReviews);
-          this.restaurantsSubject.next(this.mockRestaurants);
-        }
-      },
-      error: () => {
-        console.log('Database connection failed, using mock data');
-        this.reviewsSubject.next(this.mockReviews);
-        this.restaurantsSubject.next(this.mockRestaurants);
-      }
-    });
-  }
+  private loadUserReviews(): void {
+    const userId = localStorage.getItem('user_id') || 'temp-user';
+    this.isLoadingSubject.next(true);
 
-  // Database methods
-  private loadReviewsFromDatabase(): void {
-    this.databaseService.getUserReviews().subscribe({
-      next: (dbReviews) => {
-        const reviews = this.transformDatabaseReviews(dbReviews);
+    this.apiService.get<any>(`reviews/user/${userId}`).subscribe({
+      next: (response) => {
+        const reviews = response.reviews?.map((review: any) => this.transformReview(review)) || [];
         this.reviewsSubject.next(reviews);
+        this.isLoadingSubject.next(false);
       },
       error: (error) => {
-        console.error('Error loading reviews from database:', error);
-        this.reviewsSubject.next(this.mockReviews);
+        console.error('Error loading reviews:', error);
+        this.reviewsSubject.next([]);
+        this.isLoadingSubject.next(false);
       }
     });
   }
 
-  private loadRestaurantsFromDatabase(): void {
-    this.databaseService.getRestaurants().subscribe({
-      next: (dbRestaurants) => {
-        const restaurants = this.transformDatabaseRestaurants(dbRestaurants);
+  private loadRestaurants(): void {
+    this.apiService.get<any[]>('businesses').subscribe({
+      next: (businesses) => {
+        const restaurants = businesses.map(business => this.transformBusinessToRestaurant(business));
         this.restaurantsSubject.next(restaurants);
       },
       error: (error) => {
-        console.error('Error loading restaurants from database:', error);
-        this.restaurantsSubject.next(this.mockRestaurants);
+        console.error('Error loading restaurants:', error);
+        this.restaurantsSubject.next([]);
       }
     });
   }
 
-  private transformDatabaseReviews(dbReviews: any[]): Review[] {
-    return dbReviews.map(dbReview => ({
-      id: dbReview.id,
-      restaurantId: dbReview.business_id,
+  // Transformation methods
+  private transformReview(review: any): Review {
+    return {
+      id: review.id,
+      restaurantId: review.business_id,
       restaurant: {
-        id: dbReview.business.id,
-        name: dbReview.business.name,
-        slug: dbReview.business.slug,
-        description: dbReview.business.description || '',
-        cuisineTypes: dbReview.business.cuisine_types || [],
-        priceRange: dbReview.business.price_range || 'moderate',
-        averageRating: dbReview.business.average_rating || 0,
-        totalReviews: dbReview.business.total_reviews || 0,
+        id: review.business_id,
+        name: review.business_name,
+        slug: review.business_name.toLowerCase().replace(/\s+/g, '-'),
+        description: '',
+        cuisineTypes: [],
+        priceRange: 'moderate',
+        averageRating: 0,
+        totalReviews: 0,
         imageUrl: `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop`,
-        address: dbReview.business_location?.address || '',
-        city: dbReview.business_location?.city || '',
-        state: dbReview.business_location?.state || '',
-        phone: dbReview.business.contact_phone || '',
-        email: dbReview.business.contact_email || '',
-        website: dbReview.business.website
+        address: '',
+        city: '',
+        state: '',
+        phone: '',
+        email: '',
+        website: ''
       },
-      userId: dbReview.user_id,
-      overallRating: dbReview.overall_rating,
-      foodRating: dbReview.food_rating,
-      serviceRating: dbReview.service_rating,
-      ambianceRating: dbReview.ambiance_rating,
-      valueRating: dbReview.value_rating,
-      title: dbReview.title,
-      content: dbReview.content,
-      visitDate: dbReview.visit_date ? new Date(dbReview.visit_date) : undefined,
-      dishesOrdered: dbReview.dishes_ordered || [],
-      pricePaid: dbReview.price_paid,
-      partySize: dbReview.party_size,
-      occasion: dbReview.occasion,
-      wouldRecommend: dbReview.would_recommend,
-      status: dbReview.status,
-      isVerifiedVisit: dbReview.is_verified_visit,
-      helpfulVotes: dbReview.helpful_votes,
-      totalVotes: dbReview.total_votes,
-      isFeatured: dbReview.is_featured,
-      responseFromBusiness: dbReview.response_from_business,
-      responseDate: dbReview.response_date ? new Date(dbReview.response_date) : undefined,
-      photos: dbReview.photos || [],
-      createdAt: new Date(dbReview.created_at),
-      updatedAt: new Date(dbReview.updated_at)
-    }));
+      userId: review.user_id,
+      overallRating: review.overall_rating,
+      foodRating: review.food_rating,
+      serviceRating: review.service_rating,
+      ambianceRating: review.ambiance_rating,
+      valueRating: review.value_rating,
+      title: review.title,
+      content: review.content,
+      visitDate: review.visit_date ? new Date(review.visit_date) : undefined,
+      dishesOrdered: review.dishes_ordered || [],
+      pricePaid: review.price_paid,
+      partySize: review.party_size,
+      occasion: review.occasion,
+      wouldRecommend: review.would_recommend,
+      photos: review.photos || [],
+      helpfulVotes: review.helpful_votes || 0,
+      totalVotes: review.total_votes || 0,
+      status: review.status,
+      createdAt: new Date(review.created_at),
+      updatedAt: new Date(review.updated_at),
+      publishedAt: review.published_at ? new Date(review.published_at) : undefined,
+      isVerifiedVisit: review.is_verified_visit || false,
+      isFeatured: review.is_featured || false
+    };
   }
 
-  private transformDatabaseRestaurants(dbRestaurants: any[]): Restaurant[] {
-    return dbRestaurants.map(dbRestaurant => ({
-      id: dbRestaurant.id,
-      name: dbRestaurant.name,
-      slug: dbRestaurant.slug,
-      description: dbRestaurant.description || '',
-      cuisineTypes: dbRestaurant.cuisine_types || [],
-      priceRange: dbRestaurant.price_range || 'moderate',
-      averageRating: dbRestaurant.average_rating || 0,
-      totalReviews: dbRestaurant.total_reviews || 0,
-      imageUrl: `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop`,
-      address: dbRestaurant.location?.address || '',
-      city: dbRestaurant.location?.city || '',
-      state: dbRestaurant.location?.state || '',
-      phone: dbRestaurant.contact_phone || '',
-      email: dbRestaurant.contact_email || '',
-      website: dbRestaurant.website
-    }));
+  private transformBusinessToRestaurant(business: any): Restaurant {
+    return {
+      id: business.id,
+      name: business.business_name,
+      slug: business.business_name.toLowerCase().replace(/\s+/g, '-'),
+      description: business.bio || '',
+      cuisineTypes: [],
+      priceRange: 'moderate',
+      averageRating: 0,
+      totalReviews: 0,
+      imageUrl: business.profile_photos?.[0] || `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop`,
+      address: business.address || '',
+      city: '',
+      state: '',
+      phone: business.phone || '',
+      email: business.email || '',
+      website: ''
+    };
   }
 
   // Public API methods
@@ -258,68 +240,62 @@ export class ReviewsService {
     );
   }
 
+  getReviewsByRestaurant(restaurantId: string): Observable<Review[]> {
+    return this.apiService.get<any>(`reviews/business/${restaurantId}`).pipe(
+      map(response => response.reviews?.map((review: any) => this.transformReview(review)) || []),
+      catchError(error => {
+        console.error('Error fetching restaurant reviews:', error);
+        return of([]);
+      })
+    );
+  }
+
   // Create new review
   createReview(reviewRequest: ReviewRequest): Observable<Review> {
-    return this.databaseService.createReview(reviewRequest).pipe(
-      switchMap(success => {
-        if (success) {
-          // Reload reviews to get updated list
-          this.loadReviewsFromDatabase();
-          return this.getReviews().pipe(
-            map(reviews => {
-              const newReview = reviews.find(r =>
-                r.restaurantId === reviewRequest.restaurantId &&
-                r.overallRating === reviewRequest.overallRating &&
-                r.content === reviewRequest.content
-              );
-              return newReview || this.createMockReview(reviewRequest);
-            })
-          );
-        } else {
-          return of(this.createMockReview(reviewRequest));
-        }
+    const userId = localStorage.getItem('user_id') || 'temp-user';
+
+    const payload = {
+      businessId: reviewRequest.restaurantId,
+      userId,
+      overallRating: reviewRequest.overallRating,
+      foodRating: reviewRequest.foodRating,
+      serviceRating: reviewRequest.serviceRating,
+      ambianceRating: reviewRequest.ambianceRating,
+      valueRating: reviewRequest.valueRating,
+      title: reviewRequest.title,
+      content: reviewRequest.content,
+      visitDate: reviewRequest.visitDate,
+      dishesOrdered: reviewRequest.dishesOrdered,
+      pricePaid: reviewRequest.pricePaid,
+      partySize: reviewRequest.partySize,
+      occasion: reviewRequest.occasion,
+      wouldRecommend: reviewRequest.wouldRecommend,
+      photos: reviewRequest.photos
+    };
+
+    return this.apiService.post<any>('reviews', payload).pipe(
+      map(response => this.transformReview(response)),
+      tap(review => {
+        const currentReviews = this.reviewsSubject.value;
+        this.reviewsSubject.next([...currentReviews, review]);
       }),
       catchError(error => {
         console.error('Error creating review:', error);
-        return of(this.createMockReview(reviewRequest));
+        throw error;
       })
     );
   }
 
   // Update review
-  updateReview(reviewId: string, updates: Partial<ReviewRequest>): Observable<boolean> {
-    return this.databaseService.updateReview(reviewId, updates).pipe(
-      tap(success => {
-        if (success) {
-          this.loadReviewsFromDatabase();
-        } else {
-          // Update mock data
-          const currentReviews = this.reviewsSubject.value;
-          const updatedReviews = currentReviews.map(review => {
-            if (review.id === reviewId) {
-              const updatedReview: Review = {
-                ...review,
-                overallRating: updates.overallRating ?? review.overallRating,
-                foodRating: updates.foodRating ?? review.foodRating,
-                serviceRating: updates.serviceRating ?? review.serviceRating,
-                ambianceRating: updates.ambianceRating ?? review.ambianceRating,
-                valueRating: updates.valueRating ?? review.valueRating,
-                title: updates.title ?? review.title,
-                content: updates.content ?? review.content,
-                visitDate: updates.visitDate ? new Date(updates.visitDate) : review.visitDate,
-                dishesOrdered: updates.dishesOrdered ?? review.dishesOrdered,
-                pricePaid: updates.pricePaid ?? review.pricePaid,
-                partySize: updates.partySize ?? review.partySize,
-                occasion: updates.occasion ?? review.occasion,
-                wouldRecommend: updates.wouldRecommend ?? review.wouldRecommend,
-                updatedAt: new Date()
-              };
-              return updatedReview;
-            }
-            return review;
-          });
-          this.reviewsSubject.next(updatedReviews);
-        }
+  updateReview(reviewId: string, updates: Partial<Review>): Observable<boolean> {
+    return this.apiService.patch(`reviews/${reviewId}`, updates).pipe(
+      map(() => true),
+      tap(() => {
+        const currentReviews = this.reviewsSubject.value;
+        const updatedReviews = currentReviews.map(review =>
+          review.id === reviewId ? { ...review, ...updates, updatedAt: new Date() } : review
+        );
+        this.reviewsSubject.next(updatedReviews);
       }),
       catchError(error => {
         console.error('Error updating review:', error);
@@ -330,16 +306,12 @@ export class ReviewsService {
 
   // Delete review
   deleteReview(reviewId: string): Observable<boolean> {
-    return this.databaseService.deleteReview(reviewId).pipe(
-      tap(success => {
-        if (success) {
-          this.loadReviewsFromDatabase();
-        } else {
-          // Update mock data
-          const currentReviews = this.reviewsSubject.value;
-          const updatedReviews = currentReviews.filter(review => review.id !== reviewId);
-          this.reviewsSubject.next(updatedReviews);
-        }
+    return this.apiService.delete(`reviews/${reviewId}`).pipe(
+      map(() => true),
+      tap(() => {
+        const currentReviews = this.reviewsSubject.value;
+        const updatedReviews = currentReviews.filter(review => review.id !== reviewId);
+        this.reviewsSubject.next(updatedReviews);
       }),
       catchError(error => {
         console.error('Error deleting review:', error);
@@ -350,24 +322,20 @@ export class ReviewsService {
 
   // Vote on review helpfulness
   voteOnReview(reviewId: string, isHelpful: boolean): Observable<boolean> {
-    return this.databaseService.voteOnReview(reviewId, isHelpful).pipe(
-      tap(success => {
-        if (success) {
-          this.loadReviewsFromDatabase();
-        } else {
-          // Update mock data
-          const currentReviews = this.reviewsSubject.value;
-          const updatedReviews = currentReviews.map(review =>
-            review.id === reviewId
-              ? {
-                  ...review,
-                  helpfulVotes: isHelpful ? review.helpfulVotes + 1 : review.helpfulVotes,
-                  totalVotes: review.totalVotes + 1
-                }
-              : review
-          );
-          this.reviewsSubject.next(updatedReviews);
-        }
+    return this.apiService.post(`reviews/${reviewId}/vote`, { isHelpful }).pipe(
+      map(() => true),
+      tap(() => {
+        const currentReviews = this.reviewsSubject.value;
+        const updatedReviews = currentReviews.map(review =>
+          review.id === reviewId
+            ? {
+                ...review,
+                helpfulVotes: isHelpful ? review.helpfulVotes + 1 : review.helpfulVotes,
+                totalVotes: review.totalVotes + 1
+              }
+            : review
+        );
+        this.reviewsSubject.next(updatedReviews);
       }),
       catchError(error => {
         console.error('Error voting on review:', error);
@@ -483,102 +451,7 @@ export class ReviewsService {
     return streak;
   }
 
-  private createMockReview(request: ReviewRequest): Review {
-    const restaurant = this.mockRestaurants.find(r => r.id === request.restaurantId) || this.mockRestaurants[0];
+  // All data now comes from the backend API
 
-    return {
-      id: Date.now().toString(),
-      restaurantId: request.restaurantId,
-      restaurant,
-      userId: 'current-user',
-      overallRating: request.overallRating,
-      foodRating: request.foodRating,
-      serviceRating: request.serviceRating,
-      ambianceRating: request.ambianceRating,
-      valueRating: request.valueRating,
-      title: request.title,
-      content: request.content,
-      visitDate: request.visitDate ? new Date(request.visitDate) : undefined,
-      dishesOrdered: request.dishesOrdered,
-      pricePaid: request.pricePaid,
-      partySize: request.partySize,
-      occasion: request.occasion,
-      wouldRecommend: request.wouldRecommend,
-      status: 'published',
-      isVerifiedVisit: false,
-      helpfulVotes: 0,
-      totalVotes: 0,
-      isFeatured: false,
-      photos: [],
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-  }
-
-  // Mock data for development
-  private mockRestaurants: Restaurant[] = [
-    {
-      id: 'rest-1',
-      name: 'The Golden Spoon',
-      slug: 'the-golden-spoon',
-      description: 'Fine dining experience with contemporary American cuisine',
-      cuisineTypes: ['American', 'Contemporary'],
-      priceRange: 'expensive',
-      averageRating: 4.8,
-      totalReviews: 342,
-      imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop',
-      address: '123 Main Street',
-      city: 'New York',
-      state: 'NY',
-      phone: '(555) 123-4567',
-      email: 'info@goldenspoon.com',
-      website: 'https://goldenspoon.com'
-    },
-    {
-      id: 'rest-2',
-      name: 'Sakura Sushi Bar',
-      slug: 'sakura-sushi-bar',
-      description: 'Authentic Japanese sushi and sashimi with omakase experience',
-      cuisineTypes: ['Japanese', 'Sushi'],
-      priceRange: 'expensive',
-      averageRating: 4.9,
-      totalReviews: 198,
-      imageUrl: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop',
-      address: '456 Sushi Lane',
-      city: 'New York',
-      state: 'NY',
-      phone: '(555) 987-6543',
-      email: 'info@sakurasushi.com'
-    }
-  ];
-
-  private mockReviews: Review[] = [
-    {
-      id: 'review-1',
-      restaurantId: 'rest-1',
-      restaurant: this.mockRestaurants[0],
-      userId: 'user-1',
-      overallRating: 5,
-      foodRating: 5,
-      serviceRating: 5,
-      ambianceRating: 4,
-      valueRating: 4,
-      title: 'Exceptional Fine Dining Experience',
-      content: 'The Golden Spoon exceeded all expectations. The chef\'s tasting menu was a masterpiece, with each course perfectly executed. The service was impeccable, and the ambiance was sophisticated yet welcoming. The wine pairing was spot-on. This is definitely a special occasion restaurant that delivers on every front.',
-      visitDate: new Date('2024-01-15'),
-      dishesOrdered: ['Chef\'s Tasting Menu', 'Wine Pairing'],
-      pricePaid: 285,
-      partySize: 2,
-      occasion: 'Anniversary',
-      wouldRecommend: true,
-      status: 'published',
-      isVerifiedVisit: true,
-      helpfulVotes: 23,
-      totalVotes: 25,
-      isFeatured: true,
-      photos: [],
-      createdAt: new Date('2024-01-16'),
-      updatedAt: new Date('2024-01-16')
-    }
-  ];
+  // All data now comes from the backend API
 }

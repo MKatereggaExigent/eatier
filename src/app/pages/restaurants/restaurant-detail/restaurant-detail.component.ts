@@ -1,6 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { Component, OnInit, inject, signal } from '@angular/core';
+
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-restaurant-detail',
@@ -76,21 +77,60 @@ export class RestaurantDetailComponent implements OnInit {
       name: 'Spaghetti Carbonara',
       price: '$18.99',
       description: 'Classic Roman pasta with eggs, cheese, and pancetta',
-      image: 'https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=300&h=200&fit=crop'
+      image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=300&h=200&fit=crop',
+      rating: 4.8,
+      orders: 234
     },
     {
       name: 'Margherita Pizza',
       price: '$16.99',
       description: 'Traditional pizza with fresh mozzarella, tomatoes, and basil',
-      image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=300&h=200&fit=crop'
+      image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=300&h=200&fit=crop',
+      rating: 4.7,
+      orders: 189
     },
     {
       name: 'Tiramisu',
       price: '$8.99',
       description: 'Classic Italian dessert with coffee-soaked ladyfingers',
-      image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=300&h=200&fit=crop'
+      image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=300&h=200&fit=crop',
+      rating: 4.9,
+      orders: 156
+    },
+    {
+      name: 'Osso Buco',
+      price: '$24.99',
+      description: 'Braised veal shanks with vegetables and white wine',
+      image: 'https://images.unsplash.com/photo-1598866594230-a7c12756260f?w=300&h=200&fit=crop',
+      rating: 4.6,
+      orders: 98
+    },
+    {
+      name: 'Panna Cotta',
+      price: '$7.99',
+      description: 'Creamy Italian dessert with berry compote',
+      image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=300&h=200&fit=crop',
+      rating: 4.5,
+      orders: 112
+    },
+    {
+      name: 'Lasagna Bolognese',
+      price: '$19.99',
+      description: 'Layers of pasta with rich meat sauce and béchamel',
+      image: 'https://images.unsplash.com/photo-1619895092538-128341789043?w=300&h=200&fit=crop',
+      rating: 4.8,
+      orders: 203
     }
   ];
+
+  // Track helpful clicks per review
+  helpfulClicked = signal<{ [key: string]: boolean }>({});
+
+  // Track if user is replying to a review
+  replyingTo = signal<string | null>(null);
+
+  // Track if write review modal is open
+  showWriteReviewModal = signal(false);
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -128,5 +168,72 @@ export class RestaurantDetailComponent implements OnInit {
 
   visitWebsite(): void {
     window.open(`https://${this.restaurant.website}`, '_blank');
+  }
+
+  // View full menu - navigate to menu page or open modal
+  viewFullMenu(): void {
+    // Option 1: Navigate to menu page
+    // this.router.navigate(['/restaurants', this.restaurantId(), 'menu']);
+
+    // Option 2: Show alert for now (you can implement a modal later)
+    alert('Opening full menu... This will navigate to the menu page or open a modal with the complete menu.');
+  }
+
+  // Write a review - open review modal
+  openWriteReview(): void {
+    this.showWriteReviewModal.set(true);
+    // In a real app, this would open a modal or navigate to review page
+    alert('Opening review form... This will display a modal where customers can write their review with rating, photos, and comments.');
+  }
+
+  // Mark review as helpful
+  markHelpful(reviewId: string): void {
+    const clicked = this.helpfulClicked();
+
+    if (clicked[reviewId]) {
+      // Already clicked, unmark
+      const review = this.recentReviews.find(r => r.id === reviewId);
+      if (review) {
+        review.helpful--;
+      }
+      this.helpfulClicked.set({ ...clicked, [reviewId]: false });
+    } else {
+      // Mark as helpful
+      const review = this.recentReviews.find(r => r.id === reviewId);
+      if (review) {
+        review.helpful++;
+      }
+      this.helpfulClicked.set({ ...clicked, [reviewId]: true });
+    }
+  }
+
+  // Check if review is marked helpful
+  isMarkedHelpful(reviewId: string): boolean {
+    return this.helpfulClicked()[reviewId] || false;
+  }
+
+  // Reply to review
+  replyToReview(reviewId: string): void {
+    if (this.replyingTo() === reviewId) {
+      // Cancel reply
+      this.replyingTo.set(null);
+    } else {
+      // Start replying
+      this.replyingTo.set(reviewId);
+      // In a real app, this would show a reply input field
+      setTimeout(() => {
+        alert(`Reply to review ${reviewId}:\nThis will display an input field where you can type your response to the customer's review.`);
+        this.replyingTo.set(null);
+      }, 100);
+    }
+  }
+
+  // View all reviews - navigate to reviews page
+  viewAllReviews(): void {
+    // Option 1: Navigate to reviews page
+    // this.router.navigate(['/restaurants', this.restaurantId(), 'reviews']);
+
+    // Option 2: Show alert for now
+    alert(`Viewing all ${this.restaurant.reviewCount} reviews... This will navigate to a dedicated reviews page or expand the current section.`);
   }
 }

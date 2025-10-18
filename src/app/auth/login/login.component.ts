@@ -43,8 +43,8 @@ export class LoginComponent {
       this.authService.login(credentials).subscribe({
         next: (response) => {
           // Handle successful login
-          const redirectUrl = localStorage.getItem('eatier_redirect_url') || this.getDefaultRoute(response.user.role);
-          localStorage.removeItem('eatier_redirect_url');
+          const redirectUrl = localStorage.getItem('itiyum_redirect_url') || this.getDefaultRoute(response.user.role);
+          localStorage.removeItem('itiyum_redirect_url');
           this.router.navigateByUrl(redirectUrl);
         },
         error: (error) => {
@@ -93,18 +93,20 @@ export class LoginComponent {
 
   private getDefaultRoute(role: string): string {
     switch (role) {
-      case 'eatier':
-        return '/admin';
+      case 'itiyum_admin':
+      case 'itiyum':
+        return '/admin/overview';
+      case 'business_owner':
       case 'business':
-        return '/dashboard/business';
+        return '/dashboard/business/overview';
       case 'food_enthusiast':
-        return '/dashboard/food-enthusiast';
-      case 'normal_user':
-        return '/dashboard/user';
+        return '/dashboard/food-enthusiast/overview';
       case 'specialist':
-        return '/dashboard/specialist';
+        return '/dashboard/specialist/overview';
+      case 'normal_user':
+        return '/dashboard/user/overview';
       default:
-        return '/dashboard/user'; // Default to user dashboard instead of home
+        return '/dashboard/user/overview'; // Default to user overview
     }
   }
 
@@ -147,5 +149,154 @@ export class LoginComponent {
       password: 'password123'
     });
     this.onSubmit();
+  }
+
+  // Social Login Methods
+  loginWithGoogle(): void {
+    this.errorMessage.set(null);
+    console.log('Initiating Google OAuth login...');
+
+    // TODO: Implement Google OAuth integration
+    // Will use Google Identity Services (GIS) or Firebase Auth
+    this.authService.loginWithSocialProvider('google').subscribe({
+      next: (response) => {
+        const redirectUrl = localStorage.getItem('itiyum_redirect_url') || this.getDefaultRoute(response.user.role);
+        localStorage.removeItem('itiyum_redirect_url');
+        this.router.navigateByUrl(redirectUrl);
+      },
+      error: (error) => {
+        this.errorMessage.set('Google login failed. Please try again.');
+        console.error('Google login error:', error);
+      }
+    });
+  }
+
+  loginWithFacebook(): void {
+    this.errorMessage.set(null);
+    console.log('Initiating Facebook OAuth login...');
+
+    // TODO: Implement Facebook OAuth integration
+    // Will use Facebook Login SDK
+    this.authService.loginWithSocialProvider('facebook').subscribe({
+      next: (response) => {
+        const redirectUrl = localStorage.getItem('itiyum_redirect_url') || this.getDefaultRoute(response.user.role);
+        localStorage.removeItem('itiyum_redirect_url');
+        this.router.navigateByUrl(redirectUrl);
+      },
+      error: (error) => {
+        this.errorMessage.set('Facebook login failed. Please try again.');
+        console.error('Facebook login error:', error);
+      }
+    });
+  }
+
+  loginWithMicrosoft(): void {
+    this.errorMessage.set(null);
+    console.log('Initiating Microsoft OAuth login...');
+
+    // TODO: Implement Microsoft OAuth integration
+    // Will use Microsoft Authentication Library (MSAL)
+    this.authService.loginWithSocialProvider('microsoft').subscribe({
+      next: (response) => {
+        const redirectUrl = localStorage.getItem('itiyum_redirect_url') || this.getDefaultRoute(response.user.role);
+        localStorage.removeItem('itiyum_redirect_url');
+        this.router.navigateByUrl(redirectUrl);
+      },
+      error: (error) => {
+        this.errorMessage.set('Microsoft login failed. Please try again.');
+        console.error('Microsoft login error:', error);
+      }
+    });
+  }
+
+  loginWithApple(): void {
+    this.errorMessage.set(null);
+    console.log('Initiating Apple OAuth login...');
+
+    // TODO: Implement Apple Sign In
+    // Will use Sign in with Apple JS
+    this.authService.loginWithSocialProvider('apple').subscribe({
+      next: (response) => {
+        const redirectUrl = localStorage.getItem('itiyum_redirect_url') || this.getDefaultRoute(response.user.role);
+        localStorage.removeItem('itiyum_redirect_url');
+        this.router.navigateByUrl(redirectUrl);
+      },
+      error: (error) => {
+        this.errorMessage.set('Apple login failed. Please try again.');
+        console.error('Apple login error:', error);
+      }
+    });
+  }
+
+  loginWithTwitter(): void {
+    this.errorMessage.set(null);
+    console.log('Initiating Twitter/X OAuth login...');
+
+    // TODO: Implement Twitter OAuth 2.0 integration
+    this.authService.loginWithSocialProvider('twitter').subscribe({
+      next: (response) => {
+        const redirectUrl = localStorage.getItem('itiyum_redirect_url') || this.getDefaultRoute(response.user.role);
+        localStorage.removeItem('itiyum_redirect_url');
+        this.router.navigateByUrl(redirectUrl);
+      },
+      error: (error) => {
+        this.errorMessage.set('Twitter login failed. Please try again.');
+        console.error('Twitter login error:', error);
+      }
+    });
+  }
+
+  loginWithLinkedIn(): void {
+    this.errorMessage.set(null);
+    console.log('Initiating LinkedIn OAuth login...');
+
+    // TODO: Implement LinkedIn OAuth integration
+    this.authService.loginWithSocialProvider('linkedin').subscribe({
+      next: (response) => {
+        const redirectUrl = localStorage.getItem('itiyum_redirect_url') || this.getDefaultRoute(response.user.role);
+        localStorage.removeItem('itiyum_redirect_url');
+        this.router.navigateByUrl(redirectUrl);
+      },
+      error: (error) => {
+        this.errorMessage.set('LinkedIn login failed. Please try again.');
+        console.error('LinkedIn login error:', error);
+      }
+    });
+  }
+
+  loginWithGitHub(): void {
+    this.errorMessage.set(null);
+    console.log('Initiating GitHub OAuth login...');
+
+    // TODO: Implement GitHub OAuth integration
+    this.authService.loginWithSocialProvider('github').subscribe({
+      next: (response) => {
+        const redirectUrl = localStorage.getItem('itiyum_redirect_url') || this.getDefaultRoute(response.user.role);
+        localStorage.removeItem('itiyum_redirect_url');
+        this.router.navigateByUrl(redirectUrl);
+      },
+      error: (error) => {
+        this.errorMessage.set('GitHub login failed. Please try again.');
+        console.error('GitHub login error:', error);
+      }
+    });
+  }
+
+  loginWithInstagram(): void {
+    this.errorMessage.set(null);
+    console.log('Initiating Instagram OAuth login...');
+
+    // TODO: Implement Instagram OAuth integration (via Facebook)
+    this.authService.loginWithSocialProvider('instagram').subscribe({
+      next: (response) => {
+        const redirectUrl = localStorage.getItem('itiyum_redirect_url') || this.getDefaultRoute(response.user.role);
+        localStorage.removeItem('itiyum_redirect_url');
+        this.router.navigateByUrl(redirectUrl);
+      },
+      error: (error) => {
+        this.errorMessage.set('Instagram login failed. Please try again.');
+        console.error('Instagram login error:', error);
+      }
+    });
   }
 }

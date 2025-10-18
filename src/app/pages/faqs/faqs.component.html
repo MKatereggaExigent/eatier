@@ -8,7 +8,7 @@
           Frequently Asked Questions
         </h1>
         <p class="page-subtitle">
-          Find answers to common questions about using Eatier
+          Find answers to common questions about using <span class="itiyum-brand">Itiyum</span>
         </p>
       </div>
       <div class="header-stats">
@@ -37,10 +37,10 @@
           aria-label="Search frequently asked questions">
         <span class="search-icon">🔍</span>
       </div>
-      
+
       <div class="filter-section">
         <div class="category-filters">
-          <button 
+          <button
             type="button"
             class="category-filter"
             [class.active]="selectedCategory() === 'all'"
@@ -49,9 +49,9 @@
             <span class="filter-icon">📋</span>
             <span class="filter-text">All</span>
           </button>
-          
+
           @for (category of faqCategories(); track category.id) {
-            <button 
+            <button
               type="button"
               class="category-filter"
               [class.active]="selectedCategory() === category.id"
@@ -63,10 +63,10 @@
             </button>
           }
         </div>
-        
+
         @if (searchQuery() || selectedCategory() !== 'all') {
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="clear-filters-btn"
             (click)="clearSearch()"
             aria-label="Clear all filters">
@@ -92,7 +92,7 @@
             </div>
             <div class="category-stats">
               <span class="faq-count">{{ category.faqs.length }} FAQs</span>
-              <button 
+              <button
                 type="button"
                 class="view-category-btn"
                 (click)="selectedCategory.set(category.id)"
@@ -125,7 +125,7 @@
       <div class="faqs-list">
         @for (faq of filteredFAQs(); track faq.id) {
           <article class="faq-item" [class.expanded]="isFAQExpanded(faq.id)">
-            <button 
+            <button
               type="button"
               class="faq-question"
               (click)="toggleFAQ(faq.id)"
@@ -134,21 +134,21 @@
               <span class="question-text">{{ faq.question }}</span>
               <span class="expand-icon" [class.rotated]="isFAQExpanded(faq.id)">▼</span>
             </button>
-            
-            <div 
+
+            <div
               class="faq-answer"
               [id]="'faq-answer-' + faq.id"
               [attr.aria-hidden]="!isFAQExpanded(faq.id)">
               <div class="answer-content">
                 <div class="answer-text" [innerHTML]="faq.answer"></div>
-                
+
                 <div class="faq-meta">
                   <div class="faq-tags">
                     @for (tag of faq.tags; track tag) {
                       <span class="tag">{{ tag }}</span>
                     }
                   </div>
-                  
+
                   <div class="faq-stats">
                     <span class="last-updated">
                       Updated {{ formatDate(faq.lastUpdated) }}
@@ -158,19 +158,19 @@
                     </span>
                   </div>
                 </div>
-                
+
                 <div class="faq-actions">
                   <div class="helpful-section">
                     <span class="helpful-label">Was this helpful?</span>
                     <div class="helpful-buttons">
-                      <button 
+                      <button
                         type="button"
                         class="helpful-btn yes"
                         (click)="markHelpful(faq, true)"
                         aria-label="Mark as helpful">
                         👍 Yes
                       </button>
-                      <button 
+                      <button
                         type="button"
                         class="helpful-btn no"
                         (click)="markHelpful(faq, false)"
@@ -179,8 +179,8 @@
                       </button>
                     </div>
                   </div>
-                  
-                  <button 
+
+                  <button
                     type="button"
                     class="feedback-btn"
                     (click)="openFeedbackModal(faq)"
@@ -237,7 +237,7 @@
       </div>
       <div class="modal-body">
         <p><strong>FAQ:</strong> {{ selectedFAQForFeedback()?.question }}</p>
-        <textarea 
+        <textarea
           placeholder="How can we improve this FAQ? Your feedback helps us provide better answers."
           rows="4"
           class="feedback-textarea"

@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import {
   AdCampaign,
   AdCampaignResponse,
@@ -11,269 +11,124 @@ import {
   AutoResponse,
   CampaignStatus,
   AdType,
-  Currency
+  Currency,
+  CTAType
 } from '../models/ad-management.models';
+import { ApiService } from './api.service';
+import { Observable, from, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdManagementService {
-  private readonly API_BASE_URL = 'http://localhost:3000/api';
+  private apiService = inject(ApiService);
 
-  // Mock data for development
-  private mockCampaigns = signal<AdCampaign[]>([
-    {
-      id: '1',
-      userId: 'user1',
-      title: 'Summer Menu Promotion',
-      description: 'Promote our new summer menu items to local food enthusiasts',
-      type: 'promoted' as AdType,
-      status: 'active' as CampaignStatus,
-      budget: {
-        totalBudget: 500,
-        dailyBudget: 25,
-        spentAmount: 125.50,
-        remainingAmount: 374.50,
-        currency: 'USD' as Currency,
-        billingCycle: 'daily',
-        minimumSpend: 5
-      },
-      targeting: {
-        geographic: {
-          regions: ['East Africa'],
-          countries: ['Kenya', 'Uganda'],
-          cities: ['Nairobi', 'Kampala'],
-          radius: 50
-        },
-        demographic: {
-          ageRange: { min: 25, max: 45 },
-          gender: ['all'],
-          languages: ['English', 'Swahili'],
-          userTypes: ['food_enthusiast', 'normal_user']
-        },
-        interests: ['fine dining', 'local cuisine', 'food photography'],
-        keywords: ['restaurant', 'food', 'dining'],
-        excludedKeywords: ['fast food', 'delivery']
-      },
-      content: {
-        images: [{
-          id: 'img1',
-          url: '/assets/images/summer-menu.jpg',
-          alt: 'Summer menu items',
-          size: 'large',
-          isPrimary: true
-        }],
-        videos: [],
-        text: {
-          headline: 'Taste Summer at Our Restaurant',
-          description: 'Fresh seasonal ingredients, expertly crafted dishes'
-        },
-        callToAction: {
-          type: 'book_now',
-          text: 'Book Now',
-          url: '/booking'
-        }
-      },
-      analytics: {
-        impressions: 12500,
-        clicks: 875,
-        conversions: 45,
-        clickThroughRate: 7.0,
-        conversionRate: 5.14,
-        costPerClick: 0.14,
-        costPerConversion: 2.79,
-        returnOnAdSpend: 320.5,
-        reach: 8900,
-        frequency: 1.4,
-        engagement: {
-          likes: 234,
-          shares: 67,
-          comments: 89,
-          saves: 156,
-          profileVisits: 445,
-          websiteClicks: 678
-        },
-        dailyStats: []
-      },
-      createdAt: new Date('2024-01-15'),
-      updatedAt: new Date('2024-01-20'),
-      startDate: new Date('2024-01-15'),
-      endDate: new Date('2024-02-15'),
-      isActive: true
-    },
-    {
-      id: '2',
-      userId: 'user1',
-      title: 'Chef Portfolio Showcase',
-      description: 'Showcase my culinary skills and attract private dining clients',
-      type: 'sponsored' as AdType,
-      status: 'paused' as CampaignStatus,
-      budget: {
-        totalBudget: 300,
-        dailyBudget: 15,
-        spentAmount: 89.25,
-        remainingAmount: 210.75,
-        currency: 'USD' as Currency,
-        billingCycle: 'daily',
-        minimumSpend: 5
-      },
-      targeting: {
-        geographic: {
-          regions: ['East Africa'],
-          countries: ['Kenya'],
-          cities: ['Nairobi'],
-          radius: 25
-        },
-        demographic: {
-          ageRange: { min: 30, max: 55 },
-          gender: ['all'],
-          languages: ['English'],
-          userTypes: ['food_enthusiast', 'business']
-        },
-        interests: ['private dining', 'chef services', 'gourmet cooking'],
-        keywords: ['private chef', 'catering', 'events'],
-        excludedKeywords: ['budget', 'cheap']
-      },
-      content: {
-        images: [{
-          id: 'img2',
-          url: '/assets/images/chef-portfolio.jpg',
-          alt: 'Chef preparing gourmet dish',
-          size: 'large',
-          isPrimary: true
-        }],
-        videos: [],
-        text: {
-          headline: 'Professional Chef Available',
-          description: 'Elevate your dining experience with personalized culinary services'
-        },
-        callToAction: {
-          type: 'enquire_now',
-          text: 'Enquire Now',
-          email: 'chef@example.com'
-        }
-      },
-      analytics: {
-        impressions: 6750,
-        clicks: 445,
-        conversions: 18,
-        clickThroughRate: 6.59,
-        conversionRate: 4.04,
-        costPerClick: 0.20,
-        costPerConversion: 4.96,
-        returnOnAdSpend: 245.8,
-        reach: 5200,
-        frequency: 1.3,
-        engagement: {
-          likes: 156,
-          shares: 34,
-          comments: 45,
-          saves: 89,
-          profileVisits: 234,
-          websiteClicks: 345
-        },
-        dailyStats: []
-      },
-      createdAt: new Date('2024-01-10'),
-      updatedAt: new Date('2024-01-18'),
-      startDate: new Date('2024-01-10'),
-      endDate: new Date('2024-02-10'),
-      isActive: false
-    }
-  ]);
+  // All data now comes from the backend API
 
-  private mockPaymentMethods = signal<PaymentMethod[]>([
-    {
-      id: 'pm1',
-      type: 'credit_card',
-      cardNumber: '4532',
-      expiryDate: '12/26',
-      cardholderName: 'John Doe',
-      isDefault: true,
-      isActive: true,
-      billingAddress: {
-        street: '123 Main St',
-        city: 'Nairobi',
-        state: 'Nairobi County',
-        postalCode: '00100',
-        country: 'Kenya'
-      }
-    }
-  ]);
 
-  private mockTransactions = signal<AdTransaction[]>([
-    {
-      id: 'tx1',
-      campaignId: '1',
-      amount: 25.00,
-      currency: 'USD',
-      type: 'charge',
-      status: 'completed',
-      paymentMethodId: 'pm1',
-      description: 'Daily ad spend - Summer Menu Promotion',
-      createdAt: new Date('2024-01-20'),
-      processedAt: new Date('2024-01-20')
-    },
-    {
-      id: 'tx2',
-      campaignId: '2',
-      amount: 15.00,
-      currency: 'USD',
-      type: 'charge',
-      status: 'completed',
-      paymentMethodId: 'pm1',
-      description: 'Daily ad spend - Chef Portfolio Showcase',
-      createdAt: new Date('2024-01-18'),
-      processedAt: new Date('2024-01-18')
-    }
-  ]);
 
   // Campaign Management
   async getUserCampaigns(userId: string): Promise<AdCampaignResponse> {
-    // Simulate API call
-    await this.delay(500);
+    try {
+      const response = await this.apiService.get<any>(`ads/campaigns/${userId}`).toPromise();
 
-    const campaigns = this.mockCampaigns().filter(c => c.userId === userId);
-    const totalSpend = campaigns.reduce((sum, c) => sum + c.budget.spentAmount, 0);
-    const totalImpressions = campaigns.reduce((sum, c) => sum + c.analytics.impressions, 0);
-    const totalClicks = campaigns.reduce((sum, c) => sum + c.analytics.clicks, 0);
-    const averageCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+      const campaigns = response.campaigns || [];
+      const totalSpend = campaigns.reduce((sum: number, c: any) => sum + (c.spent_amount || 0), 0);
+      const totalImpressions = campaigns.reduce((sum: number, c: any) => sum + (c.impressions || 0), 0);
+      const totalClicks = campaigns.reduce((sum: number, c: any) => sum + (c.clicks || 0), 0);
+      const averageCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
 
-    return {
-      campaigns,
-      totalCount: campaigns.length,
-      totalSpend,
-      totalImpressions,
-      totalClicks,
-      averageCTR
-    };
+      return {
+        campaigns: this.transformCampaigns(campaigns),
+        totalCount: campaigns.length,
+        totalSpend,
+        totalImpressions,
+        totalClicks,
+        averageCTR
+      };
+    } catch (error) {
+      console.error('Error fetching campaigns:', error);
+      // Return empty response on error
+      return {
+        campaigns: [],
+        totalCount: 0,
+        totalSpend: 0,
+        totalImpressions: 0,
+        totalClicks: 0,
+        averageCTR: 0
+      };
+    }
   }
 
-  async createCampaign(campaignData: AdCreationForm): Promise<AdCampaign> {
-    // Simulate API call
-    await this.delay(1000);
+  private transformCampaigns(campaigns: any[]): AdCampaign[] {
+    return campaigns.map(c => this.transformCampaign(c));
+  }
 
-    const newCampaign: AdCampaign = {
-      id: Date.now().toString(),
-      userId: campaignData.basic.title, // This would be the actual user ID
-      title: campaignData.basic.title,
-      description: campaignData.basic.description,
-      type: campaignData.basic.type,
-      status: 'draft',
-      budget: campaignData.budget,
-      targeting: campaignData.targeting,
-      content: campaignData.content,
+  private transformCampaign(c: any): AdCampaign {
+    return {
+      id: c.id,
+      userId: c.user_id,
+      title: c.title,
+      description: c.description,
+      type: c.type,
+      status: c.status,
+      budget: {
+        totalBudget: parseFloat(c.total_budget),
+        dailyBudget: parseFloat(c.daily_budget),
+        spentAmount: parseFloat(c.spent_amount || 0),
+        remainingAmount: parseFloat(c.remaining_amount || c.total_budget),
+        currency: c.currency || 'USD',
+        billingCycle: c.billing_cycle || 'daily',
+        minimumSpend: parseFloat(c.minimum_spend || 5)
+      },
+      targeting: {
+        geographic: {
+          regions: [],
+          countries: c.target_locations || [],
+          cities: [],
+          radius: c.target_radius_km || 50
+        },
+        demographic: {
+          ageRange: { min: c.target_age_min || 18, max: c.target_age_max || 65 },
+          gender: c.target_gender ? [c.target_gender] : ['all'],
+          languages: ['English'],
+          userTypes: []
+        },
+        interests: c.target_interests || [],
+        keywords: [],
+        excludedKeywords: []
+      },
+      content: {
+        images: c.media_urls ? c.media_urls.map((url: string, idx: number) => ({
+          id: `img${idx}`,
+          url,
+          alt: c.title,
+          size: 'large',
+          isPrimary: idx === 0
+        })) : [],
+        videos: [],
+        text: {
+          headline: c.headline || c.title,
+          description: c.body_text || c.description
+        },
+        callToAction: {
+          type: 'learn-more' as CTAType,
+          text: c.call_to_action || 'Learn More',
+          url: c.destination_url || '/'
+        }
+      },
       analytics: {
-        impressions: 0,
-        clicks: 0,
-        conversions: 0,
-        clickThroughRate: 0,
-        conversionRate: 0,
-        costPerClick: 0,
-        costPerConversion: 0,
-        returnOnAdSpend: 0,
-        reach: 0,
-        frequency: 0,
+        impressions: c.impressions || 0,
+        clicks: c.clicks || 0,
+        conversions: c.conversions || 0,
+        clickThroughRate: c.click_through_rate || 0,
+        conversionRate: c.conversion_rate || 0,
+        costPerClick: parseFloat(c.cost_per_click || 0),
+        costPerConversion: parseFloat(c.cost_per_conversion || 0),
+        returnOnAdSpend: parseFloat(c.return_on_ad_spend || 0),
+        reach: c.reach || 0,
+        frequency: parseFloat(c.frequency || 0),
         engagement: {
           likes: 0,
           shares: 0,
@@ -284,266 +139,453 @@ export class AdManagementService {
         },
         dailyStats: []
       },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      startDate: campaignData.schedule.startDate,
-      endDate: campaignData.schedule.endDate,
-      isActive: false
+      createdAt: new Date(c.created_at),
+      updatedAt: new Date(c.updated_at),
+      startDate: new Date(c.start_date),
+      endDate: c.end_date ? new Date(c.end_date) : undefined,
+      isActive: c.is_active || false
     };
+  }
 
-    // Add to mock data
-    this.mockCampaigns.update(campaigns => [...campaigns, newCampaign]);
+  async createCampaign(campaignData: AdCreationForm): Promise<AdCampaign> {
+    try {
+      // Get current user ID from localStorage or auth service
+      const userId = localStorage.getItem('user_id') || 'temp-user';
 
-    return newCampaign;
+      const payload = {
+        userId,
+        title: campaignData.basic.title,
+        description: campaignData.basic.description,
+        type: campaignData.basic.type,
+        totalBudget: campaignData.budget.totalBudget,
+        dailyBudget: campaignData.budget.dailyBudget,
+        currency: campaignData.budget.currency,
+        targetLocations: campaignData.targeting.geographic.countries,
+        targetAgeMin: campaignData.targeting.demographic.ageRange.min,
+        targetAgeMax: campaignData.targeting.demographic.ageRange.max,
+        targetGender: campaignData.targeting.demographic.gender[0],
+        targetInterests: campaignData.targeting.interests,
+        headline: campaignData.content.text.headline,
+        bodyText: campaignData.content.text.description,
+        callToAction: campaignData.content.callToAction.text,
+        mediaUrls: campaignData.content.images.map(img => img.url),
+        destinationUrl: campaignData.content.callToAction.url,
+        startDate: campaignData.schedule.startDate,
+        endDate: campaignData.schedule.endDate
+      };
+
+      const response = await this.apiService.post<any>('ads/campaigns', payload).toPromise();
+      return this.transformCampaign(response);
+    } catch (error) {
+      console.error('Error creating campaign:', error);
+      throw error;
+    }
   }
 
   async pauseCampaign(campaignId: string): Promise<void> {
-    await this.delay(300);
-
-    this.mockCampaigns.update(campaigns =>
-      campaigns.map(c =>
-        c.id === campaignId
-          ? { ...c, status: 'paused' as CampaignStatus, isActive: false, updatedAt: new Date() }
-          : c
-      )
-    );
+    try {
+      await this.apiService.put(`ads/campaigns/${campaignId}`, {
+        status: 'paused',
+        isActive: false
+      }).toPromise();
+    } catch (error) {
+      console.error('Error pausing campaign:', error);
+      throw error;
+    }
   }
 
   async resumeCampaign(campaignId: string): Promise<void> {
-    await this.delay(300);
-
-    this.mockCampaigns.update(campaigns =>
-      campaigns.map(c =>
-        c.id === campaignId
-          ? { ...c, status: 'active' as CampaignStatus, isActive: true, updatedAt: new Date() }
-          : c
-      )
-    );
+    try {
+      await this.apiService.put(`ads/campaigns/${campaignId}`, {
+        status: 'active',
+        isActive: true
+      }).toPromise();
+    } catch (error) {
+      console.error('Error resuming campaign:', error);
+      throw error;
+    }
   }
 
   async deleteCampaign(campaignId: string): Promise<void> {
-    await this.delay(500);
-
-    this.mockCampaigns.update(campaigns =>
-      campaigns.filter(c => c.id !== campaignId)
-    );
+    try {
+      await this.apiService.delete(`ads/campaigns/${campaignId}`).toPromise();
+    } catch (error) {
+      console.error('Error deleting campaign:', error);
+      throw error;
+    }
   }
 
   // Analytics
   async getCampaignAnalytics(campaignId: string): Promise<AdAnalyticsResponse> {
-    await this.delay(800);
+    try {
+      const response = await this.apiService.get<any[]>(`ads/campaigns/${campaignId}/analytics`).toPromise();
 
-    const campaign = this.mockCampaigns().find(c => c.id === campaignId);
-    if (!campaign) {
-      throw new Error('Campaign not found');
+      // Transform the daily stats from backend format
+      const dailyStats = response?.map((stat: any) => ({
+        date: new Date(stat.date),
+        impressions: stat.impressions || 0,
+        clicks: stat.clicks || 0,
+        conversions: stat.conversions || 0,
+        spend: parseFloat(stat.spend || 0),
+        reach: stat.reach || 0,
+        engagement: {
+          likes: stat.engagement_likes || 0,
+          shares: stat.engagement_shares || 0,
+          comments: stat.engagement_comments || 0,
+          saves: stat.engagement_saves || 0,
+          profileVisits: stat.profile_visits || 0,
+          websiteClicks: stat.website_clicks || 0
+        }
+      }));
+
+      // Calculate aggregated analytics
+      const totalImpressions = dailyStats?.reduce((sum, stat) => sum + stat.impressions, 0) || 0;
+      const totalClicks = dailyStats?.reduce((sum, stat) => sum + stat.clicks, 0) || 0;
+      const totalConversions = dailyStats?.reduce((sum, stat) => sum + stat.conversions, 0) || 0;
+      const totalSpend = dailyStats?.reduce((sum, stat) => sum + stat.spend, 0) || 0;
+
+      return {
+        campaignId,
+        analytics: {
+          impressions: totalImpressions,
+          clicks: totalClicks,
+          conversions: totalConversions,
+          clickThroughRate: totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0,
+          conversionRate: totalClicks > 0 ? (totalConversions / totalClicks) * 100 : 0,
+          costPerClick: totalClicks > 0 ? totalSpend / totalClicks : 0,
+          costPerConversion: totalConversions > 0 ? totalSpend / totalConversions : 0,
+          returnOnAdSpend: 0, // Would need revenue data
+          reach: dailyStats?.reduce((sum, stat) => sum + stat.reach, 0) || 0,
+          frequency: 0, // Would need to calculate
+          engagement: {
+            likes: dailyStats?.reduce((sum, stat) => sum + stat.engagement.likes, 0) || 0,
+            shares: dailyStats?.reduce((sum, stat) => sum + stat.engagement.shares, 0) || 0,
+            comments: dailyStats?.reduce((sum, stat) => sum + stat.engagement.comments, 0) || 0,
+            saves: dailyStats?.reduce((sum, stat) => sum + stat.engagement.saves, 0) || 0,
+            profileVisits: dailyStats?.reduce((sum, stat) => sum + stat.engagement.profileVisits, 0) || 0,
+            websiteClicks: dailyStats?.reduce((sum, stat) => sum + stat.engagement.websiteClicks, 0) || 0
+          },
+          dailyStats: dailyStats || []
+        },
+        insights: [
+          {
+            type: 'performance',
+            title: 'Campaign Performance',
+            description: totalClicks > 0 ? 'Your campaign is generating clicks' : 'Campaign needs optimization',
+            impact: totalClicks > 0 ? 'positive' : 'neutral',
+            actionRequired: totalClicks === 0
+          }
+        ],
+        recommendations: [
+          {
+            type: 'budget_optimization',
+            title: 'Optimize Budget',
+            description: 'Review your campaign performance and adjust budget accordingly',
+            expectedImpact: 'Better ROI',
+            difficulty: 'easy'
+          }
+        ]
+      };
+    } catch (error) {
+      console.error('Error fetching campaign analytics:', error);
+      throw error;
     }
-
-    return {
-      campaignId,
-      analytics: campaign.analytics,
-      insights: [
-        {
-          type: 'performance',
-          title: 'Strong Performance',
-          description: 'Your campaign is performing above average',
-          impact: 'positive',
-          actionRequired: false
-        }
-      ],
-      recommendations: [
-        {
-          type: 'budget_optimization',
-          title: 'Increase Budget',
-          description: 'Consider increasing your daily budget to reach more people',
-          expectedImpact: '+25% more conversions',
-          difficulty: 'easy'
-        }
-      ]
-    };
   }
 
   // Payment Management
   async getPaymentMethods(userId: string): Promise<PaymentMethod[]> {
-    await this.delay(300);
-    return this.mockPaymentMethods();
+    try {
+      const response = await this.apiService.get<any[]>(`ads/payment-methods/${userId}`).toPromise();
+      return response?.map(pm => this.transformPaymentMethod(pm)) || [];
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+      return [];
+    }
+  }
+
+  private transformPaymentMethod(pm: any): PaymentMethod {
+    return {
+      id: pm.id,
+      type: pm.type,
+      cardNumber: pm.card_number,
+      expiryDate: pm.expiry_date,
+      cardholderName: pm.cardholder_name,
+      isDefault: pm.is_default,
+      isActive: pm.is_active,
+      billingAddress: {
+        street: pm.billing_street,
+        city: pm.billing_city,
+        state: pm.billing_state,
+        postalCode: pm.billing_postal_code,
+        country: pm.billing_country
+      }
+    };
   }
 
   async addPaymentMethod(paymentMethod: Omit<PaymentMethod, 'id'>): Promise<PaymentMethod> {
-    await this.delay(800);
+    try {
+      const userId = localStorage.getItem('user_id') || 'temp-user';
+      const payload = {
+        userId,
+        type: paymentMethod.type,
+        cardNumber: paymentMethod.cardNumber,
+        expiryDate: paymentMethod.expiryDate,
+        cardholderName: paymentMethod.cardholderName,
+        isDefault: paymentMethod.isDefault,
+        billingStreet: paymentMethod.billingAddress.street,
+        billingCity: paymentMethod.billingAddress.city,
+        billingState: paymentMethod.billingAddress.state,
+        billingPostalCode: paymentMethod.billingAddress.postalCode,
+        billingCountry: paymentMethod.billingAddress.country
+      };
 
-    const newMethod: PaymentMethod = {
-      ...paymentMethod,
-      id: Date.now().toString()
-    };
-
-    this.mockPaymentMethods.update(methods => [...methods, newMethod]);
-    return newMethod;
+      const response = await this.apiService.post<any>('ads/payment-methods', payload).toPromise();
+      return this.transformPaymentMethod(response);
+    } catch (error) {
+      console.error('Error adding payment method:', error);
+      throw error;
+    }
   }
 
   async removePaymentMethod(paymentMethodId: string): Promise<void> {
-    await this.delay(500);
-
-    this.mockPaymentMethods.update(methods =>
-      methods.filter(m => m.id !== paymentMethodId)
-    );
+    try {
+      await this.apiService.delete(`ads/payment-methods/${paymentMethodId}`).toPromise();
+    } catch (error) {
+      console.error('Error removing payment method:', error);
+      throw error;
+    }
   }
 
   // Transaction Management
   async getRecentTransactions(userId: string): Promise<AdTransaction[]> {
-    await this.delay(400);
-    return this.mockTransactions().slice(0, 10);
+    try {
+      // This would need a backend endpoint for transactions
+      // For now, return empty array since we don't have transaction history endpoint
+      return [];
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      return [];
+    }
   }
 
   // Booking System
   async getBookingStatus(userId: string): Promise<BookingStatus> {
-    await this.delay(300);
+    try {
+      const response = await this.apiService.get<any>(`bookings/availability/${userId}`).toPromise();
 
-    return {
-      userId,
-      isAvailable: true,
-      availabilityType: 'available',
-      nextAvailableDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      lastUpdated: new Date(),
-      calendar: [],
-      bookingSettings: {
-        allowInstantBooking: true,
-        requireApproval: false,
-        advanceBookingDays: 30,
-        cancellationPolicy: {
-          allowCancellation: true,
-          cancellationDeadline: 24,
-          refundPolicy: 'full_refund'
+      // Get calendar slots
+      const calendarResponse = await this.apiService.get<any[]>(`bookings/calendar/${userId}`, {
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      }).toPromise();
+
+      const calendar = calendarResponse?.map(slot => ({
+        id: slot.id,
+        date: new Date(slot.date),
+        startTime: slot.start_time,
+        endTime: slot.end_time,
+        isAvailable: slot.is_available,
+        isBooked: slot.is_booked,
+        maxCapacity: slot.max_capacity,
+        currentBookings: slot.current_bookings,
+        capacity: slot.capacity,
+        bookedCount: slot.booked_count,
+        price: slot.price ? parseFloat(slot.price) : undefined,
+        notes: slot.notes
+      }));
+
+      return {
+        userId: response.userId || userId,
+        isAvailable: response.isAvailable || response.is_available || true,
+        availabilityType: response.availabilityType || response.availability_type || 'available',
+        nextAvailableDate: response.nextAvailableDate ? new Date(response.nextAvailableDate) : undefined,
+        lastUpdated: response.lastUpdated ? new Date(response.lastUpdated) : new Date(),
+        calendar: calendar || [],
+        bookingSettings: {
+          allowInstantBooking: response.allowInstantBooking || response.allow_instant_booking || true,
+          requireApproval: response.requireApproval || response.require_approval || false,
+          advanceBookingDays: response.advanceBookingDays || response.advance_booking_days || 30,
+          cancellationPolicy: {
+            allowCancellation: response.cancellationAllowed || response.cancellation_allowed || true,
+            cancellationDeadline: response.cancellationDeadlineHours || response.cancellation_deadline_hours || 24,
+            refundPolicy: response.refundPolicy || response.refund_policy || 'full_refund'
+          },
+          minimumNotice: response.minimumNoticeHours || response.minimum_notice_hours || 2,
+          bufferTime: response.bufferTimeMinutes || response.buffer_time_minutes || 30
         },
-        minimumNotice: 2,
-        bufferTime: 30
-      },
-      statistics: {
-        totalBookings: 45,
-        pendingBookings: 8,
-        confirmedBookings: 37,
-        averageRating: 4.7
-      }
-    };
+        statistics: {
+          totalBookings: response.totalBookings || response.total_bookings || 0,
+          pendingBookings: response.pendingBookings || response.pending_bookings || 0,
+          confirmedBookings: response.confirmedBookings || response.confirmed_bookings || 0,
+          averageRating: response.averageRating || response.average_rating || 0
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching booking status:', error);
+      // Return default booking status on error
+      return {
+        userId,
+        isAvailable: true,
+        availabilityType: 'available',
+        nextAvailableDate: undefined,
+        lastUpdated: new Date(),
+        calendar: [],
+        bookingSettings: {
+          allowInstantBooking: true,
+          requireApproval: false,
+          advanceBookingDays: 30,
+          cancellationPolicy: {
+            allowCancellation: true,
+            cancellationDeadline: 24,
+            refundPolicy: 'full_refund'
+          },
+          minimumNotice: 2,
+          bufferTime: 30
+        },
+        statistics: {
+          totalBookings: 0,
+          pendingBookings: 0,
+          confirmedBookings: 0,
+          averageRating: 0
+        }
+      };
+    }
   }
 
   // Contact & Inquiry System
   async submitInquiry(inquiry: Omit<ContactInquiry, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'autoResponseSent'>): Promise<ContactInquiry> {
-    await this.delay(600);
+    try {
+      const payload = {
+        recipientId: inquiry.recipientId,
+        inquirerName: inquiry.inquirerName,
+        inquirerEmail: inquiry.inquirerEmail,
+        inquirerPhone: inquiry.inquirerPhone,
+        subject: inquiry.subject,
+        message: inquiry.message,
+        inquiryType: inquiry.inquiryType,
+        priority: inquiry.priority || 'normal',
+        tags: inquiry.tags || []
+      };
 
-    const newInquiry: ContactInquiry = {
-      ...inquiry,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      status: 'pending',
-      autoResponseSent: true,
-      followUpRequired: false,
-      tags: []
-    };
+      const response = await this.apiService.post<any>('inquiries', payload).toPromise();
 
-    // Simulate auto-response
-    console.log(`Auto-response sent to ${inquiry.inquirerEmail}: Hi ${inquiry.inquirerName}. Thank you for getting in touch. This message acknowledges receipt of your message.`);
-
-    return newInquiry;
+      return {
+        id: response.id,
+        recipientId: response.recipient_id,
+        inquirerName: response.inquirer_name,
+        inquirerEmail: response.inquirer_email,
+        inquirerPhone: response.inquirer_phone,
+        subject: response.subject,
+        message: response.message,
+        inquiryType: response.inquiry_type,
+        status: response.status,
+        priority: response.priority,
+        createdAt: new Date(response.created_at),
+        updatedAt: new Date(response.updated_at),
+        followUpRequired: response.follow_up_required || false,
+        tags: response.tags || [],
+        autoResponseSent: true // Assume auto-response is sent by backend
+      };
+    } catch (error) {
+      console.error('Error submitting inquiry:', error);
+      throw error;
+    }
   }
 
   async getAutoResponse(userId: string): Promise<AutoResponse | null> {
-    await this.delay(200);
+    try {
+      const response = await this.apiService.get<any[]>(`inquiries/auto-response/${userId}`).toPromise();
 
-    return {
-      id: 'ar1',
-      userId,
-      template: 'Hi {name}. Thank you for getting in touch. This message acknowledges receipt of your message.',
-      isActive: true,
-      triggers: [
-        {
-          inquiryType: 'booking',
-          keywords: ['booking', 'reservation', 'table'],
-          timeOfDay: { start: '09:00', end: '18:00' },
-          daysOfWeek: [1, 2, 3, 4, 5]
-        }
-      ]
-    };
+      if (!response || response.length === 0) {
+        return null;
+      }
+
+      const template = response?.[0];
+      return {
+        id: template.id,
+        userId: template.user_id,
+        template: template.template_text,
+        isActive: template.is_active,
+        triggers: [
+          {
+            inquiryType: 'booking',
+            keywords: template.trigger_keywords || ['booking', 'reservation'],
+            timeOfDay: {
+              start: template.trigger_time_start || '09:00',
+              end: template.trigger_time_end || '18:00'
+            },
+            daysOfWeek: template.trigger_days_of_week || [1, 2, 3, 4, 5]
+          }
+        ]
+      };
+    } catch (error) {
+      console.error('Error fetching auto-response:', error);
+      return null;
+    }
   }
 
   // Contact inquiry management methods
   async getContactInquiries(userId: string): Promise<ContactInquiry[]> {
-    await this.delay(400);
+    try {
+      const response = await this.apiService.get<any>(`inquiries/${userId}`).toPromise();
 
-    // Mock implementation
-    return [
-      {
-        id: '1',
-        recipientId: userId,
-        inquirerName: 'Sarah Johnson',
-        inquirerEmail: 'sarah.johnson@email.com',
-        inquirerPhone: '+1 (555) 123-4567',
-        subject: 'Wedding Catering Inquiry',
-        message: 'Hi! I\'m planning my wedding for next summer and would love to discuss catering options. We\'re expecting about 150 guests and are interested in a Mediterranean menu. Could we schedule a tasting?',
-        inquiryType: 'quote',
-        status: 'pending',
-        priority: 'high',
-        createdAt: new Date(Date.now() - 3600000), // 1 hour ago
-        updatedAt: new Date(Date.now() - 3600000),
-        followUpRequired: true,
-        tags: ['wedding', 'catering', 'mediterranean']
-      },
-      {
-        id: '2',
-        recipientId: userId,
-        inquirerName: 'Michael Chen',
-        inquirerEmail: 'michael.chen@email.com',
-        subject: 'Private Chef Services',
-        message: 'I\'m looking for a private chef for a dinner party next Friday. We have 8 guests and would prefer Italian cuisine. What are your rates and availability?',
-        inquiryType: 'booking',
-        status: 'in_progress',
-        priority: 'medium',
-        createdAt: new Date(Date.now() - 7200000), // 2 hours ago
-        updatedAt: new Date(Date.now() - 1800000), // 30 minutes ago
-        followUpRequired: true,
-        tags: ['private-chef', 'italian', 'dinner-party']
-      },
-      {
-        id: '3',
-        recipientId: userId,
-        inquirerName: 'Emma Wilson',
-        inquirerEmail: 'emma.wilson@email.com',
-        inquirerPhone: '+1 (555) 987-6543',
-        subject: 'Menu Consultation',
-        message: 'I run a small restaurant and would love to get some consultation on updating our menu. Are you available for menu development services?',
-        inquiryType: 'general',
-        status: 'resolved',
-        priority: 'low',
-        createdAt: new Date(Date.now() - 86400000), // 1 day ago
-        updatedAt: new Date(Date.now() - 3600000), // 1 hour ago
-        followUpRequired: false,
-        tags: ['consultation', 'menu-development']
-      }
-    ];
+      return response.inquiries.map((inquiry: any) => ({
+        id: inquiry.id,
+        recipientId: inquiry.recipient_id,
+        inquirerName: inquiry.inquirer_name,
+        inquirerEmail: inquiry.inquirer_email,
+        inquirerPhone: inquiry.inquirer_phone,
+        subject: inquiry.subject,
+        message: inquiry.message,
+        inquiryType: inquiry.inquiry_type,
+        status: inquiry.status,
+        priority: inquiry.priority,
+        createdAt: new Date(inquiry.created_at),
+        updatedAt: new Date(inquiry.updated_at),
+        followUpRequired: inquiry.follow_up_required || false,
+        tags: inquiry.tags || [],
+        autoResponseSent: !!inquiry.replied_at
+      }));
+    } catch (error) {
+      console.error('Error fetching contact inquiries:', error);
+      return [];
+    }
   }
 
   async updateInquiryStatus(inquiryId: string, status: any): Promise<void> {
-    await this.delay(300);
-    console.log(`Updating inquiry ${inquiryId} status to ${status}`);
+    try {
+      await this.apiService.patch(`inquiries/${inquiryId}/status`, { status }).toPromise();
+    } catch (error) {
+      console.error('Error updating inquiry status:', error);
+      throw error;
+    }
   }
 
   async updateInquiryPriority(inquiryId: string, priority: any): Promise<void> {
-    await this.delay(300);
-    console.log(`Updating inquiry ${inquiryId} priority to ${priority}`);
+    try {
+      await this.apiService.patch(`inquiries/${inquiryId}/priority`, { priority }).toPromise();
+    } catch (error) {
+      console.error('Error updating inquiry priority:', error);
+      throw error;
+    }
   }
 
   async replyToInquiry(inquiryId: string, message: string): Promise<void> {
-    await this.delay(800);
-    console.log(`Replying to inquiry ${inquiryId}: ${message}`);
+    try {
+      await this.apiService.post(`inquiries/${inquiryId}/reply`, { replyMessage: message }).toPromise();
+    } catch (error) {
+      console.error('Error replying to inquiry:', error);
+      throw error;
+    }
   }
 
   async sendAutoResponse(inquiryId: string): Promise<void> {
-    await this.delay(500);
-    console.log(`Sending auto-response for inquiry ${inquiryId}`);
-  }
-
-  // Utility method to simulate API delays
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    try {
+      // Auto-response is handled by the backend when inquiry is created
+      console.log(`Auto-response triggered for inquiry ${inquiryId}`);
+    } catch (error) {
+      console.error('Error sending auto-response:', error);
+      throw error;
+    }
   }
 }

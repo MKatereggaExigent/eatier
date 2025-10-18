@@ -29,7 +29,7 @@ export class UserDashboardComponent {
     const role = this.userRole();
 
     switch (role) {
-      case 'eatier':
+      case 'itiyum_admin':
         return [
           { path: 'overview', label: 'Overview', icon: '📊' },
           { path: 'users', label: 'Users', icon: '👥' },
@@ -79,7 +79,7 @@ export class UserDashboardComponent {
     const role = this.userRole();
 
     switch (role) {
-      case 'eatier':
+      case 'itiyum_admin':
         return 'Admin Dashboard';
       case 'specialist':
         return 'Specialist Dashboard';
@@ -87,7 +87,7 @@ export class UserDashboardComponent {
         return 'Food Enthusiast Hub';
       case 'normal_user':
       default:
-        return 'My Eatier';
+        return 'My Itiyum';
     }
   });
 

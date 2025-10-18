@@ -1,0 +1,470 @@
+:host {
+  --primary-color: #000000;
+  --primary-hover: #262626;
+  --secondary-color: #0284c7;
+  --error-color: #dc2626;
+  --success-color: #16a34a;
+  --warning-color: #f59e0b;
+  --text-primary: #000000;
+  --text-secondary: #525252;
+  --text-tertiary: #737373;
+  --border-color: #e5e5e5;
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --transition-normal: all 0.3s ease;
+}
+
+.admin-settings {
+  padding: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  margin-bottom: 1.5rem;
+}
+
+.settings-header .header-content {
+  margin-bottom: 1.5rem;
+}
+
+.settings-header .header-content .title-section .page-title {
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.settings-header .header-content .title-section .page-title .title-icon {
+  font-size: 1.875rem;
+}
+
+.settings-header .header-content .title-section .page-subtitle {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  color: var(--text-tertiary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.settings-header .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.settings-header .stats-grid .stat-card {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-header .stats-grid .stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #000000;
+  transition: all 0.3s ease;
+}
+
+.settings-header .stats-grid .stat-card:hover {
+  background: #fafafa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-color: #d4d4d4;
+}
+
+.settings-header .stats-grid .stat-card:hover::before {
+  height: 4px;
+  background: #0284c7;
+}
+
+.settings-header .stats-grid .stat-card:hover .stat-icon {
+  transform: scale(1.1);
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.settings-header .stats-grid .stat-card .stat-icon {
+  font-size: 1.5rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f9ff;
+  color: #0284c7;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.settings-header .stats-grid .stat-card .stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-header .stats-grid .stat-card .stat-content .stat-number {
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000000;
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
+}
+
+.settings-header .stats-grid .stat-card .stat-content .stat-label {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.875rem;
+  color: #737373;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.settings-content .loading-state {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.settings-content .loading-state .loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e5e5;
+  border-top-color: #0284c7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+.settings-content .loading-state p {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  color: #737373;
+  margin: 0;
+}
+
+.settings-content .settings-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.settings-content .settings-grid .settings-category {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.settings-content .settings-grid .settings-category .category-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid #e5e5e5;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.settings-content .settings-grid .settings-category .category-header .category-icon {
+  font-size: 2rem;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f9ff;
+  color: #0284c7;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.settings-content .settings-grid .settings-category .category-header .category-info {
+  flex: 1;
+}
+
+.settings-content .settings-grid .settings-category .category-header .category-info .category-name {
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 0.25rem 0;
+}
+
+.settings-content .settings-grid .settings-category .category-header .category-info .category-description {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.875rem;
+  color: #737373;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.settings-content .settings-grid .settings-category .category-settings {
+  padding: 1.25rem;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #f5f5f5;
+  gap: 2rem;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item:last-child {
+  border-bottom: none;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-info {
+  flex: 1;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-info .setting-name {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 0.25rem 0;
+  display: block;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-info .setting-description {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.8125rem;
+  color: #737373;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control {
+  flex-shrink: 0;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .setting-input,
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .setting-select,
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .setting-textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.875rem;
+  color: #000000;
+  transition: all 0.2s ease;
+  min-width: 200px;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .setting-input:focus,
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .setting-select:focus,
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .setting-textarea:focus {
+  outline: none;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .setting-textarea {
+  resize: vertical;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .toggle-switch input:checked + .toggle-slider {
+  background-color: #0284c7;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(24px);
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .toggle-switch input:focus + .toggle-slider {
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .toggle-switch .toggle-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #d4d4d4;
+  border-radius: 28px;
+  transition: all 0.3s ease;
+}
+
+.settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .toggle-switch .toggle-slider::before {
+  content: '';
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.settings-content .settings-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.settings-content .settings-actions button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+}
+
+.settings-content .settings-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.settings-content .settings-actions button .btn-icon {
+  font-size: 1.125rem;
+}
+
+.settings-content .settings-actions button .btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.settings-content .settings-actions .btn-primary {
+  background: #000000;
+  color: #ffffff;
+}
+
+.settings-content .settings-actions .btn-primary:hover:not(:disabled) {
+  background: #262626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.settings-content .settings-actions .btn-secondary {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #e5e5e5;
+}
+
+.settings-content .settings-actions .btn-secondary:hover:not(:disabled) {
+  background: #fafafa;
+  border-color: #d4d4d4;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.success-toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #16a34a;
+  color: #ffffff;
+  padding: 1rem 1.5rem;
+  border-radius: 4px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+  z-index: 1000;
+}
+
+.success-toast .toast-icon {
+  font-size: 1.25rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-settings {
+    padding: 1rem;
+  }
+  .settings-header .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .settings-content .settings-grid .settings-category .category-settings .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control {
+    width: 100%;
+  }
+  .settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .setting-input,
+  .settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .setting-select,
+  .settings-content .settings-grid .settings-category .category-settings .setting-item .setting-control .setting-textarea {
+    width: 100%;
+    min-width: 0;
+  }
+  .settings-content .settings-actions {
+    flex-direction: column;
+  }
+  .settings-content .settings-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+}

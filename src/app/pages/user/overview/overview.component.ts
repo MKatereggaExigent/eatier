@@ -1,9 +1,24 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { Subject, catchError, finalize, forkJoin, of, takeUntil } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 import { AuthService } from '../../../core/services/auth.service';
-import { CommonModule } from '@angular/common';
-import { NormalUser } from '../../../shared/models/user.model';
-import { RouterModule } from '@angular/router';
+import { UserService, UserStats, UserActivity, Favorite } from '../../../core/services/user.service';
+
+interface LoadingState {
+  stats: boolean;
+  activity: boolean;
+  favorites: boolean;
+  recommendations: boolean;
+}
+
+interface ErrorState {
+  stats: string | null;
+  activity: string | null;
+  favorites: string | null;
+  recommendations: string | null;
+}
 
 @Component({
   selector: 'app-user-overview',
@@ -12,68 +27,175 @@ import { RouterModule } from '@angular/router';
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss']
 })
-export class UserOverviewComponent {
+export class UserOverviewComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
+  private userService = inject(UserService);
+  private destroy$ = new Subject<void>();
 
   currentUser = this.authService.currentUser;
 
-  // Mock data - replace with actual service calls
-  stats = {
-    reviewsWritten: 23,
-    favoriteRestaurants: 12,
-    photosUploaded: 45,
-    helpfulVotes: 156
-  };
+  // Loading states
+  loading = signal<LoadingState>({
+    stats: true,
+    activity: true,
+    favorites: true,
+    recommendations: true
+  });
 
-  recentActivity = [
-    {
-      type: 'review',
-      restaurant: 'Bella Italia',
-      action: 'Wrote a review',
-      date: new Date('2024-01-15'),
-      rating: 5
-    },
-    {
-      type: 'favorite',
-      restaurant: 'Sushi Zen',
-      action: 'Added to favorites',
-      date: new Date('2024-01-14')
-    },
-    {
-      type: 'photo',
-      restaurant: 'The Burger Joint',
-      action: 'Uploaded photos',
-      date: new Date('2024-01-13')
+  // Error states
+  errors = signal<ErrorState>({
+    stats: null,
+    activity: null,
+    favorites: null,
+    recommendations: null
+  });
+
+  // Data signals
+  stats = signal<UserStats>({
+    totalReviews: 0,
+    totalBookings: 0,
+    totalFavorites: 0,
+    totalPhotos: 0
+  });
+
+  recentActivity = signal<UserActivity[]>([]);
+  favoriteRestaurants = signal<Favorite[]>([]);
+  recommendedRestaurants = signal<any[]>([]);
+
+  // Computed properties
+  isLoading = computed(() =>
+    this.loading().stats ||
+    this.loading().activity ||
+    this.loading().favorites ||
+    this.loading().recommendations
+  );
+
+  hasErrors = computed(() =>
+    this.errors().stats ||
+    this.errors().activity ||
+    this.errors().favorites ||
+    this.errors().recommendations
+  );
+
+  ngOnInit(): void {
+    this.loadAllData();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private loadAllData(): void {
+    const userId = this.currentUser()?.id;
+    if (!userId) {
+      console.error('No user ID found');
+      return;
     }
-  ];
 
-  recommendedRestaurants = [
-    {
-      id: '1',
-      name: 'Mediterranean Delight',
-      cuisine: 'Mediterranean',
-      rating: 4.5,
-      image: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=300&h=200&fit=crop',
-      distance: '0.8 miles'
-    },
-    {
-      id: '2',
-      name: 'Tokyo Ramen House',
-      cuisine: 'Japanese',
-      rating: 4.7,
-      image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=300&h=200&fit=crop',
-      distance: '1.2 miles'
-    },
-    {
-      id: '3',
-      name: 'Farm to Table',
-      cuisine: 'American',
-      rating: 4.3,
-      image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300&h=200&fit=crop',
-      distance: '2.1 miles'
-    }
-  ];
+    this.loadUserStats(userId);
+    this.loadRecentActivity(userId);
+    this.loadFavorites(userId);
+    this.loadRecommendations(userId);
+  }
 
+  private loadUserStats(userId: string): void {
+    this.loading.update(state => ({ ...state, stats: true }));
+    this.errors.update(state => ({ ...state, stats: null }));
+
+    this.userService.getUserStats(userId)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading user stats:', error);
+          this.errors.update(state => ({
+            ...state,
+            stats: 'Failed to load statistics'
+          }));
+          return of({ totalReviews: 0, totalBookings: 0, totalFavorites: 0, totalPhotos: 0 });
+        }),
+        finalize(() => {
+          this.loading.update(state => ({ ...state, stats: false }));
+        })
+      )
+      .subscribe(stats => {
+        this.stats.set(stats);
+      });
+  }
+
+  private loadRecentActivity(userId: string): void {
+    this.loading.update(state => ({ ...state, activity: true }));
+    this.errors.update(state => ({ ...state, activity: null }));
+
+    this.userService.getUserActivity(userId, { limit: 5 })
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading activity:', error);
+          this.errors.update(state => ({
+            ...state,
+            activity: 'Failed to load recent activity'
+          }));
+          return of({ activities: [] });
+        }),
+        finalize(() => {
+          this.loading.update(state => ({ ...state, activity: false }));
+        })
+      )
+      .subscribe(response => {
+        this.recentActivity.set(response.activities);
+      });
+  }
+
+  private loadFavorites(userId: string): void {
+    this.loading.update(state => ({ ...state, favorites: true }));
+    this.errors.update(state => ({ ...state, favorites: null }));
+
+    this.userService.getUserFavorites(userId, { page: 1, limit: 3 })
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading favorites:', error);
+          this.errors.update(state => ({
+            ...state,
+            favorites: 'Failed to load favorites'
+          }));
+          return of({ favorites: [], total: 0, pagination: { page: 1, limit: 3, hasMore: false } });
+        }),
+        finalize(() => {
+          this.loading.update(state => ({ ...state, favorites: false }));
+        })
+      )
+      .subscribe(response => {
+        this.favoriteRestaurants.set(response.favorites);
+      });
+  }
+
+  private loadRecommendations(userId: string): void {
+    this.loading.update(state => ({ ...state, recommendations: true }));
+    this.errors.update(state => ({ ...state, recommendations: null }));
+
+    this.userService.getRecommendedBusinesses(userId, { limit: 3 })
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading recommendations:', error);
+          this.errors.update(state => ({
+            ...state,
+            recommendations: 'Failed to load recommendations'
+          }));
+          return of({ businesses: [] });
+        }),
+        finalize(() => {
+          this.loading.update(state => ({ ...state, recommendations: false }));
+        })
+      )
+      .subscribe(response => {
+        this.recommendedRestaurants.set(response.businesses);
+      });
+  }
+
+  // Helper methods
   getActivityIcon(type: string): string {
     const icons = {
       review: '📝',
@@ -84,11 +206,12 @@ export class UserOverviewComponent {
     return icons[type as keyof typeof icons] || '📍';
   }
 
-  getStarArray(rating: number): boolean[] {
-    return Array(5).fill(false).map((_, i) => i < Math.floor(rating));
+  getStarArray(rating: number): number[] {
+    return Array(5).fill(0).map((_, i) => i < Math.round(rating) ? 1 : 0);
   }
 
-  formatDate(date: Date): string {
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -96,5 +219,9 @@ export class UserOverviewComponent {
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  refreshData(): void {
+    this.loadAllData();
   }
 }

@@ -29,9 +29,11 @@ export class UnauthorizedComponent {
 
   private getDefaultRoute(role: string): string {
     switch (role) {
-      case 'eatier':
+      case 'itiyum_admin':
+      case 'itiyum': // Backward compatibility
         return '/admin';
-      case 'business':
+      case 'business_owner':
+      case 'business': // Backward compatibility
         return '/dashboard/business';
       case 'food_enthusiast':
         return '/dashboard/food-enthusiast';

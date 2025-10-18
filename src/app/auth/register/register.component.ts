@@ -202,16 +202,20 @@ export class RegisterComponent {
 
   private getDefaultRoute(role: string): string {
     switch (role) {
+      case 'itiyum_admin':
+      case 'itiyum':
+        return '/admin/overview';
       case 'business_owner':
-        return '/dashboard/business';
-      case 'individual_user':
-        return '/dashboard/user';
-      case 'chef':
-        return '/dashboard/chef';
-      case 'waitstaff':
-        return '/dashboard/waitstaff';
+      case 'business':
+        return '/dashboard/business/overview';
+      case 'food_enthusiast':
+        return '/dashboard/food-enthusiast/overview';
+      case 'specialist':
+        return '/dashboard/specialist/overview';
+      case 'normal_user':
+        return '/dashboard/user/overview';
       default:
-        return '/';
+        return '/dashboard/user/overview';
     }
   }
 }

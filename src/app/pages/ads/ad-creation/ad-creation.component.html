@@ -11,10 +11,10 @@
           {{ getStepTitle(currentStep()) }} - Step {{ currentStep() }} of {{ totalSteps() }}
         </p>
       </div>
-      
+
       <div class="header-actions">
-        <button 
-          type="button" 
+        <button
+          type="button"
           class="btn-secondary cancel-btn"
           (click)="cancelCreation()">
           Cancel
@@ -25,14 +25,14 @@
     <!-- Progress Bar -->
     <div class="progress-container">
       <div class="progress-bar">
-        <div 
-          class="progress-fill" 
+        <div
+          class="progress-fill"
           [style.width.%]="getProgressPercentage()">
         </div>
       </div>
       <div class="progress-steps">
         @for (step of [1, 2, 3, 4, 5]; track step) {
-          <div 
+          <div
             class="progress-step"
             [class.active]="step === currentStep()"
             [class.completed]="step < currentStep()"
@@ -58,8 +58,8 @@
         <form [formGroup]="basicInfoForm" class="step-form">
           <div class="form-group">
             <label for="title" class="form-label">Campaign Title *</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               id="title"
               formControlName="title"
               class="form-input"
@@ -70,7 +70,7 @@
 
           <div class="form-group">
             <label for="description" class="form-label">Campaign Description *</label>
-            <textarea 
+            <textarea
               id="description"
               formControlName="description"
               class="form-textarea"
@@ -86,8 +86,8 @@
             <div class="ad-type-options">
               @for (adType of adTypes; track adType.value) {
                 <div class="ad-type-card">
-                  <input 
-                    type="radio" 
+                  <input
+                    type="radio"
                     [id]="'type-' + adType.value"
                     formControlName="type"
                     [value]="adType.value"
@@ -160,7 +160,7 @@
           <!-- Geographic Targeting -->
           <div class="form-section">
             <h3 class="section-title">Geographic Targeting</h3>
-            
+
             <div class="form-group">
               <label for="region" class="form-label">Region *</label>
               <select id="region" formControlName="region" class="form-select">
@@ -192,12 +192,12 @@
 
             <div class="form-group">
               <label for="radius" class="form-label">Radius (km)</label>
-              <input 
-                type="range" 
+              <input
+                type="range"
                 id="radius"
                 formControlName="radius"
-                min="5" 
-                max="100" 
+                min="5"
+                max="100"
                 class="form-range">
               <div class="range-value">{{ targetingForm.get('radius')?.value }} km</div>
             </div>
@@ -206,26 +206,26 @@
           <!-- Demographic Targeting -->
           <div class="form-section">
             <h3 class="section-title">Demographic Targeting</h3>
-            
+
             <div class="form-row">
               <div class="form-group">
                 <label for="ageMin" class="form-label">Age Range</label>
                 <div class="age-range-inputs">
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     id="ageMin"
                     formControlName="ageMin"
-                    min="13" 
-                    max="100" 
+                    min="13"
+                    max="100"
                     class="form-input age-input"
                     placeholder="Min">
                   <span class="age-separator">to</span>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     id="ageMax"
                     formControlName="ageMax"
-                    min="13" 
-                    max="100" 
+                    min="13"
+                    max="100"
                     class="form-input age-input"
                     placeholder="Max">
                 </div>
@@ -264,11 +264,11 @@
           <!-- Interest Targeting -->
           <div class="form-section">
             <h3 class="section-title">Interest & Keyword Targeting</h3>
-            
+
             <div class="form-group">
               <label for="interests" class="form-label">Interests</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 id="interests"
                 class="form-input"
                 placeholder="e.g., fine dining, local cuisine, food photography"
@@ -278,8 +278,8 @@
 
             <div class="form-group">
               <label for="keywords" class="form-label">Keywords</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 id="keywords"
                 class="form-input"
                 placeholder="e.g., restaurant, food, dining"
@@ -289,8 +289,8 @@
 
             <div class="form-group">
               <label for="excludedKeywords" class="form-label">Excluded Keywords</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 id="excludedKeywords"
                 class="form-input"
                 placeholder="e.g., fast food, delivery"
@@ -313,8 +313,8 @@
         <form [formGroup]="contentForm" class="step-form">
           <div class="form-group">
             <label for="headline" class="form-label">Headline *</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               id="headline"
               formControlName="headline"
               class="form-input"
@@ -325,7 +325,7 @@
 
           <div class="form-group">
             <label for="adDescription" class="form-label">Description *</label>
-            <textarea 
+            <textarea
               id="adDescription"
               formControlName="description"
               class="form-textarea"
@@ -337,8 +337,8 @@
 
           <div class="form-group">
             <label for="subheading" class="form-label">Subheading (Optional)</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               id="subheading"
               formControlName="subheading"
               class="form-input"
@@ -349,7 +349,7 @@
           <!-- Call to Action -->
           <div class="form-section">
             <h3 class="section-title">Call to Action</h3>
-            
+
             <div class="form-group">
               <label for="ctaType" class="form-label">Action Type *</label>
               <select id="ctaType" formControlName="ctaType" class="form-select">
@@ -361,8 +361,8 @@
 
             <div class="form-group">
               <label for="ctaText" class="form-label">Button Text *</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 id="ctaText"
                 formControlName="ctaText"
                 class="form-input"
@@ -373,8 +373,8 @@
             @if (contentForm.get('ctaType')?.value === 'visit_website') {
               <div class="form-group">
                 <label for="ctaUrl" class="form-label">Website URL</label>
-                <input 
-                  type="url" 
+                <input
+                  type="url"
                   id="ctaUrl"
                   formControlName="ctaUrl"
                   class="form-input"
@@ -385,8 +385,8 @@
             @if (contentForm.get('ctaType')?.value === 'call_now') {
               <div class="form-group">
                 <label for="ctaPhone" class="form-label">Phone Number</label>
-                <input 
-                  type="tel" 
+                <input
+                  type="tel"
                   id="ctaPhone"
                   formControlName="ctaPhone"
                   class="form-input"
@@ -397,8 +397,8 @@
             @if (contentForm.get('ctaType')?.value === 'email_now') {
               <div class="form-group">
                 <label for="ctaEmail" class="form-label">Email Address</label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   id="ctaEmail"
                   formControlName="ctaEmail"
                   class="form-input"
@@ -410,17 +410,17 @@
           <!-- Media Upload -->
           <div class="form-section">
             <h3 class="section-title">Images & Videos</h3>
-            
+
             <div class="upload-section">
               <div class="upload-area">
                 <div class="upload-placeholder">
                   <span class="upload-icon">📸</span>
                   <h4>Upload Images</h4>
                   <p>Add photos that showcase your business</p>
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    multiple 
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
                     class="upload-input"
                     (change)="onImageUpload($event)">
                   <button type="button" class="upload-btn">Choose Images</button>
@@ -432,10 +432,10 @@
                   <span class="upload-icon">🎥</span>
                   <h4>Upload Videos</h4>
                   <p>Add videos to make your ad more engaging</p>
-                  <input 
-                    type="file" 
-                    accept="video/*" 
-                    multiple 
+                  <input
+                    type="file"
+                    accept="video/*"
+                    multiple
                     class="upload-input"
                     (change)="onVideoUpload($event)">
                   <button type="button" class="upload-btn">Choose Videos</button>
@@ -477,8 +477,8 @@
             <label for="totalBudget" class="form-label">Total Campaign Budget *</label>
             <div class="budget-input-group">
               <span class="budget-symbol">$</span>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 id="totalBudget"
                 formControlName="totalBudget"
                 class="form-input budget-input"
@@ -493,8 +493,8 @@
             <label for="dailyBudget" class="form-label">Daily Budget *</label>
             <div class="budget-input-group">
               <span class="budget-symbol">$</span>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 id="dailyBudget"
                 formControlName="dailyBudget"
                 class="form-input budget-input"
@@ -547,8 +547,8 @@
         <form [formGroup]="scheduleForm" class="step-form">
           <div class="form-group">
             <label for="startDate" class="form-label">Start Date *</label>
-            <input 
-              type="date" 
+            <input
+              type="date"
               id="startDate"
               formControlName="startDate"
               class="form-input">
@@ -557,8 +557,8 @@
 
           <div class="form-group">
             <label class="checkbox-item">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 formControlName="runContinuously"
                 class="checkbox-input">
               <span class="checkbox-label">Run campaign continuously</span>
@@ -569,8 +569,8 @@
           @if (!scheduleForm.get('runContinuously')?.value) {
             <div class="form-group">
               <label for="endDate" class="form-label">End Date</label>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 id="endDate"
                 formControlName="endDate"
                 class="form-input">
@@ -629,8 +629,8 @@
     <div class="footer-content">
       <div class="nav-buttons">
         @if (currentStep() > 1) {
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="btn-secondary prev-btn"
             (click)="previousStep()">
             ← Previous
@@ -638,8 +638,8 @@
         }
 
         @if (currentStep() < totalSteps()) {
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="btn-primary next-btn"
             [disabled]="!canProceedToNext()"
             (click)="nextStep()">
@@ -648,8 +648,8 @@
         }
 
         @if (currentStep() === totalSteps()) {
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="btn-primary launch-btn"
             [disabled]="!canProceedToNext() || isSubmitting()"
             (click)="submitCampaign()">
@@ -664,11 +664,11 @@
       </div>
 
       <!-- Validation Errors -->
-      @if (!canProceedToNext() && stepValidation()[currentStep()]?.errors.length > 0) {
+      @if (!canProceedToNext() && (stepValidation()[currentStep()].errors.length || 0) > 0) {
         <div class="validation-errors">
           <h4>Please fix the following issues:</h4>
           <ul>
-            @for (error of stepValidation()[currentStep()]?.errors; track error) {
+            @for (error of stepValidation()[currentStep()].errors || []; track error) {
               <li>{{ error }}</li>
             }
           </ul>

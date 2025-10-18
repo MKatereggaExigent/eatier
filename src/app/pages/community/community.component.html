@@ -131,6 +131,50 @@
             </div>
           }
         </div>
+
+        <!-- Pagination -->
+        @if (totalPages() > 1) {
+          <div class="pagination-container">
+            <div class="pagination-info">
+              Showing {{ (currentPage() - 1) * pageSize() + 1 }} - {{ Math.min(currentPage() * pageSize(), totalPosts()) }} of {{ totalPosts() }} posts
+            </div>
+
+            <div class="pagination-controls">
+              <button
+                type="button"
+                class="pagination-btn"
+                [disabled]="currentPage() === 1"
+                (click)="previousPage()"
+              >
+                ← Previous
+              </button>
+
+              @for (page of getPageNumbers(); track page) {
+                @if (page === -1) {
+                  <span class="pagination-ellipsis">...</span>
+                } @else {
+                  <button
+                    type="button"
+                    class="pagination-number"
+                    [class.active]="page === currentPage()"
+                    (click)="goToPage(page)"
+                  >
+                    {{ page }}
+                  </button>
+                }
+              }
+
+              <button
+                type="button"
+                class="pagination-btn"
+                [disabled]="currentPage() === totalPages()"
+                (click)="nextPage()"
+              >
+                Next →
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
 
@@ -199,6 +243,14 @@
     @if (activeTab() === 'create' && !isLoading()) {
       <div class="create-post-section">
         <h2>✍️ Create New Post</h2>
+
+        <!-- Success Message -->
+        @if (postSuccessMessage()) {
+          <div class="success-message">
+            {{ postSuccessMessage() }}
+          </div>
+        }
+
         <form [formGroup]="postForm" (ngSubmit)="onCreatePost()" class="create-post-form">
           <div class="form-group">
             <label for="postContent">What's on your mind?</label>
@@ -206,23 +258,71 @@
               id="postContent"
               formControlName="content"
               placeholder="Share your culinary thoughts, recipes, or food experiences..."
-              rows="4"
+              rows="6"
               class="post-textarea"
             ></textarea>
+
+            <!-- Character Counter -->
+            <div class="character-counter" [class.exceeded]="isCharacterLimitExceeded()">
+              {{ getCharacterCount() }} / 1000 characters
+              @if (isCharacterLimitExceeded()) {
+                <span class="error-text"> ({{ Math.abs(getRemainingCharacters()) }} over limit)</span>
+              }
+            </div>
+
             @if (postForm.get('content')?.invalid && postForm.get('content')?.touched) {
-              <span class="field-error">Please write at least 10 characters</span>
+              <span class="field-error">
+                @if (postForm.get('content')?.errors?.['required']) {
+                  Content is required
+                }
+                @if (postForm.get('content')?.errors?.['minlength']) {
+                  Please write at least 10 characters
+                }
+                @if (postForm.get('content')?.errors?.['maxlength']) {
+                  Maximum 1000 characters allowed
+                }
+              </span>
             }
           </div>
 
           <div class="form-group">
             <label for="postImages">Add Images (Optional)</label>
-            <input
-              id="postImages"
-              type="url"
-              formControlName="images"
-              placeholder="https://example.com/image.jpg"
-              class="post-input"
-            />
+            <div class="image-input-wrapper">
+              <input
+                id="postImages"
+                type="url"
+                formControlName="images"
+                placeholder="https://example.com/image.jpg"
+                class="post-input"
+              />
+              <button
+                type="button"
+                class="add-image-btn"
+                (click)="addImageUrl()"
+                [disabled]="!postForm.get('images')?.value"
+              >
+                ➕ Add
+              </button>
+            </div>
+
+            <!-- Image Preview -->
+            @if (selectedImages().length > 0) {
+              <div class="image-preview-grid">
+                @for (image of selectedImages(); track $index) {
+                  <div class="image-preview-item">
+                    <img [src]="image" [alt]="'Preview ' + ($index + 1)" class="preview-image" />
+                    <button
+                      type="button"
+                      class="remove-image-btn"
+                      (click)="removeImage($index)"
+                      title="Remove image"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                }
+              </div>
+            }
           </div>
 
           <div class="form-group">
@@ -234,18 +334,28 @@
               placeholder="cooking, recipe, italian (separate with commas)"
               class="post-input"
             />
+            <small class="hint-text">💡 Use tags to help others discover your post</small>
           </div>
 
           <div class="form-actions">
-            <button type="button" class="secondary-btn" (click)="postForm.reset()">
-              Clear
+            <button
+              type="button"
+              class="secondary-btn"
+              (click)="postForm.reset(); selectedImages.set([])"
+              [disabled]="isSubmittingPost()"
+            >
+              🗑️ Clear
             </button>
             <button
               type="submit"
               class="primary-btn"
-              [disabled]="postForm.invalid"
+              [disabled]="postForm.invalid || isSubmittingPost()"
             >
-              📝 Share Post
+              @if (isSubmittingPost()) {
+                <span class="spinner">⏳</span> Posting...
+              } @else {
+                📝 Share Post
+              }
             </button>
           </div>
         </form>

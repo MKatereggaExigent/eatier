@@ -1,0 +1,471 @@
+<div class="admin-reports" role="main" aria-label="Admin Reports">
+  <!-- Header Section -->
+  <header class="reports-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">📋</span>
+          Reports & Exports
+        </h1>
+        <p class="page-subtitle">
+          Generate comprehensive reports and export platform data
+        </p>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ reportStats().availableReports }}</div>
+          <div class="stat-label">Available Reports</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⏰</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ reportStats().scheduledReports }}</div>
+          <div class="stat-label">Scheduled Reports</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ reportStats().generatedThisMonth }}</div>
+          <div class="stat-label">Generated This Month</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💾</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ reportStats().dataExported }}</div>
+          <div class="stat-label">Data Exported</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Reports Content -->
+  <section class="reports-content">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading reports...</p>
+      </div>
+    } @else {
+      <div class="reports-grid">
+        <!-- Users Report -->
+        <div class="report-card">
+          <div class="report-header">
+            <div class="report-icon">👥</div>
+            <div class="report-info">
+              <h3 class="report-name">Users Report</h3>
+              <p class="report-description">Complete list of all platform users with their details and activity</p>
+            </div>
+          </div>
+
+          <div class="report-body">
+            <div class="report-filters">
+              <div class="filter-group">
+                <label for="users-date-from">From Date:</label>
+                <input
+                  type="date"
+                  id="users-date-from"
+                  [(ngModel)]="usersDateFrom"
+                  class="filter-input"
+                />
+              </div>
+              <div class="filter-group">
+                <label for="users-date-to">To Date:</label>
+                <input
+                  type="date"
+                  id="users-date-to"
+                  [(ngModel)]="usersDateTo"
+                  class="filter-input"
+                />
+              </div>
+            </div>
+
+            <div class="report-actions">
+              <button
+                class="action-btn primary"
+                (click)="generateUsersReport('json')"
+                [disabled]="generatingReport() === 'users'"
+              >
+                @if (generatingReport() === 'users') {
+                  <span class="btn-spinner"></span>
+                  Generating...
+                } @else {
+                  <span class="btn-icon">📄</span>
+                  View Report
+                }
+              </button>
+              <button
+                class="action-btn secondary"
+                (click)="generateUsersReport('csv')"
+                [disabled]="generatingReport() === 'users'"
+              >
+                <span class="btn-icon">📥</span>
+                Export CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Businesses Report -->
+        <div class="report-card">
+          <div class="report-header">
+            <div class="report-icon">🏪</div>
+            <div class="report-info">
+              <h3 class="report-name">Businesses Report</h3>
+              <p class="report-description">Comprehensive data on all registered businesses and their performance</p>
+            </div>
+          </div>
+
+          <div class="report-body">
+            <div class="report-filters">
+              <div class="filter-group">
+                <label for="businesses-date-from">From Date:</label>
+                <input
+                  type="date"
+                  id="businesses-date-from"
+                  [(ngModel)]="businessesDateFrom"
+                  class="filter-input"
+                />
+              </div>
+              <div class="filter-group">
+                <label for="businesses-date-to">To Date:</label>
+                <input
+                  type="date"
+                  id="businesses-date-to"
+                  [(ngModel)]="businessesDateTo"
+                  class="filter-input"
+                />
+              </div>
+            </div>
+
+            <div class="report-actions">
+              <button
+                class="action-btn primary"
+                (click)="generateBusinessesReport('json')"
+                [disabled]="generatingReport() === 'businesses'"
+              >
+                @if (generatingReport() === 'businesses') {
+                  <span class="btn-spinner"></span>
+                  Generating...
+                } @else {
+                  <span class="btn-icon">📄</span>
+                  View Report
+                }
+              </button>
+              <button
+                class="action-btn secondary"
+                (click)="generateBusinessesReport('csv')"
+                [disabled]="generatingReport() === 'businesses'"
+              >
+                <span class="btn-icon">📥</span>
+                Export CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bookings Report -->
+        <div class="report-card">
+          <div class="report-header">
+            <div class="report-icon">📅</div>
+            <div class="report-info">
+              <h3 class="report-name">Bookings Report</h3>
+              <p class="report-description">Detailed booking history and transaction records</p>
+            </div>
+          </div>
+
+          <div class="report-body">
+            <div class="report-filters">
+              <div class="filter-group">
+                <label for="bookings-date-from">From Date:</label>
+                <input
+                  type="date"
+                  id="bookings-date-from"
+                  [(ngModel)]="bookingsDateFrom"
+                  class="filter-input"
+                />
+              </div>
+              <div class="filter-group">
+                <label for="bookings-date-to">To Date:</label>
+                <input
+                  type="date"
+                  id="bookings-date-to"
+                  [(ngModel)]="bookingsDateTo"
+                  class="filter-input"
+                />
+              </div>
+            </div>
+
+            <div class="report-filters">
+              <div class="filter-group">
+                <label for="bookings-status">Status:</label>
+                <select
+                  id="bookings-status"
+                  [(ngModel)]="bookingsStatus"
+                  class="filter-input"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="cancelled">Cancelled</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="report-actions">
+              <button
+                class="action-btn primary"
+                (click)="generateBookingsReport('json')"
+                [disabled]="generatingReport() === 'bookings'"
+              >
+                @if (generatingReport() === 'bookings') {
+                  <span class="btn-spinner"></span>
+                  Generating...
+                } @else {
+                  <span class="btn-icon">📄</span>
+                  View Report
+                }
+              </button>
+              <button
+                class="action-btn secondary"
+                (click)="generateBookingsReport('csv')"
+                [disabled]="generatingReport() === 'bookings'"
+              >
+                <span class="btn-icon">📥</span>
+                Export CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Report -->
+        <div class="report-card">
+          <div class="report-header">
+            <div class="report-icon">💰</div>
+            <div class="report-info">
+              <h3 class="report-name">Financial Report</h3>
+              <p class="report-description">Revenue, transactions, and financial analytics</p>
+            </div>
+          </div>
+
+          <div class="report-body">
+            <div class="report-filters">
+              <div class="filter-group">
+                <label for="financial-date-from">From Date:</label>
+                <input
+                  type="date"
+                  id="financial-date-from"
+                  [(ngModel)]="financialDateFrom"
+                  class="filter-input"
+                />
+              </div>
+              <div class="filter-group">
+                <label for="financial-date-to">To Date:</label>
+                <input
+                  type="date"
+                  id="financial-date-to"
+                  [(ngModel)]="financialDateTo"
+                  class="filter-input"
+                />
+              </div>
+            </div>
+
+            <div class="report-actions">
+              <button
+                class="action-btn primary"
+                (click)="generateFinancialReport('json')"
+                [disabled]="generatingReport() === 'financial'"
+              >
+                @if (generatingReport() === 'financial') {
+                  <span class="btn-spinner"></span>
+                  Generating...
+                } @else {
+                  <span class="btn-icon">📄</span>
+                  View Report
+                }
+              </button>
+              <button
+                class="action-btn secondary"
+                (click)="generateFinancialReport('csv')"
+                [disabled]="generatingReport() === 'financial'"
+              >
+                <span class="btn-icon">📥</span>
+                Export CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analytics Report -->
+        <div class="report-card">
+          <div class="report-header">
+            <div class="report-icon">📈</div>
+            <div class="report-info">
+              <h3 class="report-name">Analytics Report</h3>
+              <p class="report-description">Platform usage statistics and growth metrics</p>
+            </div>
+          </div>
+
+          <div class="report-body">
+            <div class="report-filters">
+              <div class="filter-group">
+                <label for="analytics-date-from">From Date:</label>
+                <input
+                  type="date"
+                  id="analytics-date-from"
+                  [(ngModel)]="analyticsDateFrom"
+                  class="filter-input"
+                />
+              </div>
+              <div class="filter-group">
+                <label for="analytics-date-to">To Date:</label>
+                <input
+                  type="date"
+                  id="analytics-date-to"
+                  [(ngModel)]="analyticsDateTo"
+                  class="filter-input"
+                />
+              </div>
+            </div>
+
+            <div class="report-actions">
+              <button
+                class="action-btn primary"
+                (click)="generateAnalyticsReport('json')"
+                [disabled]="generatingReport() === 'analytics'"
+              >
+                @if (generatingReport() === 'analytics') {
+                  <span class="btn-spinner"></span>
+                  Generating...
+                } @else {
+                  <span class="btn-icon">📄</span>
+                  View Report
+                }
+              </button>
+              <button
+                class="action-btn secondary"
+                (click)="generateAnalyticsReport('csv')"
+                [disabled]="generatingReport() === 'analytics'"
+              >
+                <span class="btn-icon">📥</span>
+                Export CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Report -->
+        <div class="report-card">
+          <div class="report-header">
+            <div class="report-icon">🔍</div>
+            <div class="report-info">
+              <h3 class="report-name">Activity Report</h3>
+              <p class="report-description">User activity logs and system events</p>
+            </div>
+          </div>
+
+          <div class="report-body">
+            <div class="report-filters">
+              <div class="filter-group">
+                <label for="activity-date-from">From Date:</label>
+                <input
+                  type="date"
+                  id="activity-date-from"
+                  [(ngModel)]="activityDateFrom"
+                  class="filter-input"
+                />
+              </div>
+              <div class="filter-group">
+                <label for="activity-date-to">To Date:</label>
+                <input
+                  type="date"
+                  id="activity-date-to"
+                  [(ngModel)]="activityDateTo"
+                  class="filter-input"
+                />
+              </div>
+            </div>
+
+            <div class="report-filters">
+              <div class="filter-group">
+                <label for="activity-action-type">Action Type:</label>
+                <select
+                  id="activity-action-type"
+                  [(ngModel)]="activityActionType"
+                  class="filter-input"
+                >
+                  <option value="all">All Actions</option>
+                  <option value="create">Create</option>
+                  <option value="update">Update</option>
+                  <option value="delete">Delete</option>
+                  <option value="login">Login</option>
+                  <option value="logout">Logout</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="report-actions">
+              <button
+                class="action-btn primary"
+                (click)="generateActivityReport('json')"
+                [disabled]="generatingReport() === 'activity'"
+              >
+                @if (generatingReport() === 'activity') {
+                  <span class="btn-spinner"></span>
+                  Generating...
+                } @else {
+                  <span class="btn-icon">📄</span>
+                  View Report
+                }
+              </button>
+              <button
+                class="action-btn secondary"
+                (click)="generateActivityReport('csv')"
+                [disabled]="generatingReport() === 'activity'"
+              >
+                <span class="btn-icon">📥</span>
+                Export CSV
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- Report Preview Modal -->
+  @if (showReportPreview()) {
+    <div class="modal-overlay" (click)="closeReportPreview()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ currentReport().title }}</h2>
+          <button class="close-btn" (click)="closeReportPreview()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="report-meta">
+            <p><strong>Generated:</strong> {{ currentReport().generatedAt | date:'medium' }}</p>
+            <p><strong>Total Records:</strong> {{ currentReport().totalRecords }}</p>
+          </div>
+          <div class="report-preview">
+            <pre>{{ currentReport().data | json }}</pre>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="action-btn secondary" (click)="closeReportPreview()">Close</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

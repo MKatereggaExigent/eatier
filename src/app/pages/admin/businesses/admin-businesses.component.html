@@ -22,7 +22,7 @@
           <div class="stat-label">Total Businesses</div>
         </div>
       </div>
-      
+
       <div class="stat-card">
         <div class="stat-icon">✅</div>
         <div class="stat-content">
@@ -30,7 +30,7 @@
           <div class="stat-label">Active</div>
         </div>
       </div>
-      
+
       <div class="stat-card">
         <div class="stat-icon">🔐</div>
         <div class="stat-content">
@@ -38,7 +38,7 @@
           <div class="stat-label">Verified</div>
         </div>
       </div>
-      
+
       <div class="stat-card">
         <div class="stat-icon">🍽️</div>
         <div class="stat-content">
@@ -46,7 +46,7 @@
           <div class="stat-label">Restaurants</div>
         </div>
       </div>
-      
+
       <div class="stat-card">
         <div class="stat-icon">📅</div>
         <div class="stat-content">
@@ -54,7 +54,7 @@
           <div class="stat-label">Total Bookings</div>
         </div>
       </div>
-      
+
       <div class="stat-card">
         <div class="stat-icon">⭐</div>
         <div class="stat-content">
@@ -95,7 +95,7 @@
             <span class="filter-badge">{{ filteredBusinesses().length }}</span>
           }
         </button>
-        
+
         @if (hasActiveFilters()) {
           <button
             type="button"
@@ -132,19 +132,6 @@
               [value]="filters().status"
               (change)="onFilterChange('status', $event)">
               @for (option of statusOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Subscription Filter -->
-          <div class="filter-group">
-            <label class="filter-label">Subscription</label>
-            <select
-              class="filter-select"
-              [value]="filters().subscription"
-              (change)="onFilterChange('subscription', $event)">
-              @for (option of subscriptionOptions; track option.value) {
                 <option [value]="option.value">{{ option.label }}</option>
               }
             </select>
@@ -213,10 +200,10 @@
                 <div class="business-details">
                   <h3 class="business-name">{{ business.name }}</h3>
                   <p class="business-owner">{{ business.ownerName }}</p>
-                  <p class="business-location">{{ business.city }}, {{ business.state }}</p>
+                  <p class="business-location">{{ business.country }}</p>
                 </div>
               </div>
-              
+
               <div class="business-badges">
                 <div class="type-badge" [class]="'type-' + business.businessType">
                   {{ getBusinessTypeLabel(business.businessType) }}
@@ -235,20 +222,12 @@
                   <span class="stat-value">{{ business.averageRating.toFixed(1) }}</span>
                   <span class="stat-label">({{ business.totalReviews }} reviews)</span>
                 </div>
-                
+
                 <div class="stat-item">
                   <span class="stat-icon">📅</span>
                   <span class="stat-value">{{ business.totalBookings }}</span>
                   <span class="stat-label">bookings</span>
                 </div>
-                
-                @if (business.monthlyRevenue) {
-                  <div class="stat-item">
-                    <span class="stat-icon">💰</span>
-                    <span class="stat-value">{{ formatCurrency(business.monthlyRevenue) }}</span>
-                    <span class="stat-label">monthly</span>
-                  </div>
-                }
               </div>
 
               <div class="business-details-grid">
@@ -256,19 +235,19 @@
                   <span class="detail-label">Email</span>
                   <span class="detail-value">{{ business.email }}</span>
                 </div>
-                
+
                 @if (business.phone) {
                   <div class="detail-item">
                     <span class="detail-label">Phone</span>
                     <span class="detail-value">{{ business.phone }}</span>
                   </div>
                 }
-                
+
                 <div class="detail-item">
                   <span class="detail-label">Joined</span>
                   <span class="detail-value">{{ formatDate(business.createdAt) }}</span>
                 </div>
-                
+
                 @if (business.lastLoginAt) {
                   <div class="detail-item">
                     <span class="detail-label">Last Login</span>
@@ -277,10 +256,10 @@
                 }
               </div>
 
-              @if (business.cuisineTypes.length > 0) {
+              @if (business.facilities && business.facilities.length > 0) {
                 <div class="cuisine-tags">
-                  @for (cuisine of business.cuisineTypes; track cuisine) {
-                    <span class="cuisine-tag">{{ cuisine }}</span>
+                  @for (facility of business.facilities; track facility) {
+                    <span class="cuisine-tag">{{ facility }}</span>
                   }
                 </div>
               }
@@ -293,12 +272,9 @@
                   <div class="status-badge" [class]="'status-' + business.status">
                     {{ business.status | titlecase }}
                   </div>
-                  <div class="subscription-badge" [class]="'subscription-' + business.subscriptionStatus">
-                    {{ business.subscriptionStatus | titlecase }}
-                  </div>
                 </div>
               </div>
-              
+
               <div class="business-actions">
                 <button
                   type="button"
@@ -307,7 +283,7 @@
                   title="View Details">
                   👁️
                 </button>
-                
+
                 @if (!business.verified) {
                   <button
                     type="button"
@@ -317,7 +293,7 @@
                     ✅
                   </button>
                 }
-                
+
                 @if (business.status === 'active') {
                   <button
                     type="button"
@@ -326,7 +302,7 @@
                     title="Suspend Business">
                     ⏸️
                   </button>
-                } @else if (business.status === 'suspended' || business.status === 'inactive') {
+                } @else if (business.status === 'frozen' || business.status === 'pending_deletion') {
                   <button
                     type="button"
                     class="btn-action activate-btn"
@@ -335,7 +311,7 @@
                     ▶️
                   </button>
                 }
-                
+
                 <button
                   type="button"
                   class="btn-action delete-btn"
@@ -350,4 +326,143 @@
       </div>
     }
   </section>
+
+  <!-- Business Details Modal -->
+  @if (showBusinessModal() && selectedBusiness()) {
+    <div class="modal-overlay" (click)="closeBusinessModal()">
+      <div class="modal-content business-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Business Details</h3>
+          <button type="button" class="modal-close" (click)="closeBusinessModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="business-profile">
+            <div class="profile-header">
+              <div class="profile-info">
+                <h4>{{ selectedBusiness()!.name }}</h4>
+                <p>{{ selectedBusiness()!.email }}</p>
+                <p class="business-type">{{ getBusinessTypeLabel(selectedBusiness()!.businessType) }}</p>
+              </div>
+            </div>
+
+            <div class="profile-details">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>Owner</label>
+                  <span>{{ selectedBusiness()!.ownerName }}</span>
+                </div>
+
+                <div class="detail-item">
+                  <label>Owner Email</label>
+                  <span>{{ selectedBusiness()!.ownerEmail }}</span>
+                </div>
+
+                <div class="detail-item">
+                  <label>Phone</label>
+                  <span>{{ selectedBusiness()!.phone || 'N/A' }}</span>
+                </div>
+
+                <div class="detail-item">
+                  <label>Country</label>
+                  <span>{{ selectedBusiness()!.country }}</span>
+                </div>
+
+                <div class="detail-item">
+                  <label>Status</label>
+                  <span class="status-badge" [class]="'status-' + selectedBusiness()!.status">
+                    {{ selectedBusiness()!.status | titlecase }}
+                  </span>
+                </div>
+
+                <div class="detail-item">
+                  <label>Verified</label>
+                  <span>{{ selectedBusiness()!.verified ? '✓ Yes' : '✗ No' }}</span>
+                </div>
+
+                <div class="detail-item">
+                  <label>Total Bookings</label>
+                  <span>{{ selectedBusiness()!.totalBookings }}</span>
+                </div>
+
+                <div class="detail-item">
+                  <label>Average Rating</label>
+                  <span>{{ selectedBusiness()!.averageRating.toFixed(1) }} ⭐ ({{ selectedBusiness()!.totalReviews }} reviews)</span>
+                </div>
+
+                <div class="detail-item">
+                  <label>Joined</label>
+                  <span>{{ formatDate(selectedBusiness()!.createdAt) }}</span>
+                </div>
+
+                @if (selectedBusiness()!.lastLoginAt) {
+                  <div class="detail-item">
+                    <label>Last Login</label>
+                    <span>{{ formatDate(selectedBusiness()!.lastLoginAt!) }}</span>
+                  </div>
+                }
+              </div>
+
+              @if (selectedBusiness()!.bio) {
+                <div class="detail-item full-width">
+                  <label>Bio</label>
+                  <span>{{ selectedBusiness()!.bio }}</span>
+                </div>
+              }
+
+              @if (selectedBusiness()!.address) {
+                <div class="detail-item full-width">
+                  <label>Address</label>
+                  <span>{{ selectedBusiness()!.address }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeBusinessModal()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Delete Confirmation Modal -->
+  @if (showDeleteConfirm() && selectedBusiness()) {
+    <div class="modal-overlay" (click)="cancelDelete()">
+      <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Delete Business</h3>
+          <button type="button" class="modal-close" (click)="cancelDelete()">×</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="delete-warning">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-content">
+              <h4>Are you sure you want to delete this business?</h4>
+              <p><strong>{{ selectedBusiness()!.name }}</strong></p>
+              <p>This action cannot be undone. Deleting this business will:</p>
+              <ul>
+                <li>Remove all business data from the platform</li>
+                <li>Delete all associated bookings and reviews</li>
+                <li>Remove the business owner's access</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="cancelDelete()">
+            Cancel
+          </button>
+          <button type="button" class="btn-danger" (click)="confirmDelete()">
+            Delete Business
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

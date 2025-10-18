@@ -1,7 +1,8 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { AdminService } from '../../../core/services/admin.service';
 
 interface PlatformStats {
   totalUsers: number;
@@ -51,128 +52,127 @@ interface TopPerformer {
   templateUrl: './admin-overview.component.html',
   styleUrls: ['./admin-overview.component.scss']
 })
-export class AdminOverviewComponent {
+export class AdminOverviewComponent implements OnInit {
   private authService = inject(AuthService);
+  private adminService = inject(AdminService);
 
   currentUser = this.authService.currentUser;
+  isLoading = signal(true);
 
-  // Platform statistics
+  // Platform statistics - initialized with zeros, will be populated from API
   platformStats = signal<PlatformStats>({
-    totalUsers: 12847,
-    totalBusinesses: 1256,
-    totalSpecialists: 847,
-    totalFoodEnthusiasts: 3421,
-    monthlyActiveUsers: 8934,
-    totalRevenue: 2847392,
-    monthlyRevenue: 234567,
-    totalBookings: 45678,
-    monthlyBookings: 3456
+    totalUsers: 0,
+    totalBusinesses: 0,
+    totalSpecialists: 0,
+    totalFoodEnthusiasts: 0,
+    monthlyActiveUsers: 0,
+    totalRevenue: 0,
+    monthlyRevenue: 0,
+    totalBookings: 0,
+    monthlyBookings: 0
   });
 
-  // Recent platform activity
-  recentActivity = signal<RecentActivity[]>([
-    {
-      id: '1',
-      type: 'business_registration',
-      description: 'New restaurant registered',
-      user: 'Sakura Sushi Bar',
-      timestamp: new Date('2024-01-22T10:30:00'),
-    },
-    {
-      id: '2',
-      type: 'booking',
-      description: 'High-value booking completed',
-      user: 'Sarah Johnson',
-      timestamp: new Date('2024-01-22T09:15:00'),
-      amount: 1200
-    },
-    {
-      id: '3',
-      type: 'user_registration',
-      description: 'New food enthusiast joined',
-      user: 'Michael Chen',
-      timestamp: new Date('2024-01-22T08:45:00'),
-    },
-    {
-      id: '4',
-      type: 'payment',
-      description: 'Platform commission received',
-      user: 'Nonna\'s Kitchen',
-      timestamp: new Date('2024-01-21T16:20:00'),
-      amount: 85
-    },
-    {
-      id: '5',
-      type: 'review',
-      description: '5-star review posted',
-      user: 'Emily Davis',
-      timestamp: new Date('2024-01-21T14:10:00'),
-    }
-  ]);
+  ngOnInit() {
+    this.loadDashboardData();
+  }
 
-  // System alerts
-  systemAlerts = signal<SystemAlert[]>([
-    {
-      id: '1',
-      type: 'warning',
-      title: 'High Server Load',
-      message: 'Server CPU usage is at 85%. Consider scaling resources.',
-      timestamp: new Date('2024-01-22T11:00:00'),
-      isRead: false
-    },
-    {
-      id: '2',
-      type: 'info',
-      title: 'Scheduled Maintenance',
-      message: 'System maintenance scheduled for Sunday 2 AM - 4 AM EST.',
-      timestamp: new Date('2024-01-22T09:30:00'),
-      isRead: false
-    },
-    {
-      id: '3',
-      type: 'success',
-      title: 'Payment Processing',
-      message: 'All pending payments have been processed successfully.',
-      timestamp: new Date('2024-01-21T18:00:00'),
-      isRead: true
-    }
-  ]);
+  private loadDashboardData() {
+    this.isLoading.set(true);
 
-  // Top performing businesses and specialists
-  topPerformers = signal<TopPerformer[]>([
-    {
-      id: '1',
-      name: 'The Golden Spoon',
-      type: 'business',
-      avatar: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=60&h=60&fit=crop',
-      rating: 4.9,
-      totalBookings: 234,
-      monthlyRevenue: 12450,
-      location: 'Manhattan, NY'
-    },
-    {
-      id: '2',
-      name: 'Chef Mario Rossi',
-      type: 'specialist',
-      avatar: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=60&h=60&fit=crop&crop=face',
-      rating: 4.8,
-      totalBookings: 156,
-      monthlyRevenue: 8750,
-      location: 'Brooklyn, NY'
-    },
-    {
-      id: '3',
-      name: 'Sakura Sushi Bar',
-      type: 'business',
-      rating: 4.7,
-      totalBookings: 189,
-      monthlyRevenue: 9800,
-      location: 'Queens, NY'
-    }
-  ]);
+    // Load statistics
+    this.adminService.getStatistics().subscribe({
+      next: (stats) => {
+        this.platformStats.set({
+          totalUsers: stats.totalUsers,
+          totalBusinesses: stats.totalBusinesses,
+          totalSpecialists: 0, // Not tracked separately yet
+          totalFoodEnthusiasts: 0, // Not tracked separately yet
+          monthlyActiveUsers: stats.newUsers30d,
+          totalRevenue: stats.totalRevenue,
+          monthlyRevenue: stats.revenue30d,
+          totalBookings: stats.totalBookings,
+          monthlyBookings: stats.newBookingsToday
+        });
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading statistics:', error);
+        this.isLoading.set(false);
+      }
+    });
+
+    // Load activity
+    this.adminService.getActivity(10).subscribe({
+      next: (activities) => {
+        const mappedActivities: RecentActivity[] = activities.map(act => ({
+          id: act.id,
+          type: this.mapActivityType(act.action_type),
+          description: act.description,
+          user: act.metadata?.user || 'System',
+          timestamp: new Date(act.created_at),
+          amount: act.metadata?.amount
+        }));
+        this.recentActivity.set(mappedActivities);
+      },
+      error: (error) => console.error('Error loading activity:', error)
+    });
+
+    // Load top performers
+    this.adminService.getTopPerformers(5).subscribe({
+      next: (performers) => {
+        const mappedPerformers: TopPerformer[] = performers.map(p => ({
+          id: p.id,
+          name: p.name,
+          type: 'business',
+          rating: p.rating,
+          totalBookings: p.total_bookings,
+          monthlyRevenue: p.total_revenue,
+          location: p.location
+        }));
+        this.topPerformers.set(mappedPerformers);
+      },
+      error: (error) => console.error('Error loading top performers:', error)
+    });
+
+    // Load alerts
+    this.adminService.getAlerts().subscribe({
+      next: (alerts) => {
+        const mappedAlerts: SystemAlert[] = alerts.map(a => ({
+          id: a.id,
+          type: a.type,
+          title: a.title,
+          message: a.message,
+          timestamp: new Date(a.createdAt),
+          isRead: a.isRead
+        }));
+        this.systemAlerts.set(mappedAlerts);
+      },
+      error: (error) => console.error('Error loading alerts:', error)
+    });
+  }
+
+  private mapActivityType(actionType: string): RecentActivity['type'] {
+    const typeMap: Record<string, RecentActivity['type']> = {
+      'user_registration': 'user_registration',
+      'business_registration': 'business_registration',
+      'booking': 'booking',
+      'review': 'review',
+      'payment': 'payment'
+    };
+    return typeMap[actionType] || 'user_registration';
+  }
+
+  // Recent platform activity - will be populated from API
+  recentActivity = signal<RecentActivity[]>([]);
+
+  // System alerts - will be populated from API
+  systemAlerts = signal<SystemAlert[]>([]);
+
+  // Top performing businesses and specialists - will be populated from API
+  topPerformers = signal<TopPerformer[]>([]);
 
   // Computed properties
-  unreadAlerts = computed(() => 
+  unreadAlerts = computed(() =>
     this.systemAlerts().filter(alert => !alert.isRead)
   );
 
@@ -191,7 +191,7 @@ export class AdminOverviewComponent {
   // Action methods
   markAlertAsRead(alertId: string): void {
     const alerts = this.systemAlerts();
-    const updatedAlerts = alerts.map(alert => 
+    const updatedAlerts = alerts.map(alert =>
       alert.id === alertId ? { ...alert, isRead: true } : alert
     );
     this.systemAlerts.set(updatedAlerts);
@@ -228,6 +228,15 @@ export class AdminOverviewComponent {
   }
 
   // Utility methods
+  getCurrentDate(): string {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(new Date());
+  }
+
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',

@@ -1,1 +1,1 @@
-.app-container{min-height:100vh;display:flex;flex-direction:column;position:relative;overflow-x:hidden}.main-content{flex:1;position:relative;z-index:1;animation:fadeIn 0.8s ease-out 0.2s both}
+.app-container{min-height:100vh;display:flex;flex-direction:column;position:relative;overflow-x:hidden;background:#ffffff;color:#000000}.main-content{flex:1;position:relative;z-index:1;background:#ffffff;animation:fadeIn 0.8s ease-out 0.2s both}

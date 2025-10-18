@@ -41,7 +41,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
           return true;
         } else {
           // Store the attempted URL for redirecting after login
-          localStorage.setItem('eatier_redirect_url', url);
+          localStorage.setItem('itiyum_redirect_url', url);
           return this.router.createUrlTree(['/login']);
         }
       })
@@ -78,7 +78,7 @@ export class RoleGuard implements CanActivate, CanActivateChild {
       take(1),
       map(user => {
         if (!user) {
-          localStorage.setItem('eatier_redirect_url', url);
+          localStorage.setItem('itiyum_redirect_url', url);
           return this.router.createUrlTree(['/login']);
         }
 
@@ -137,9 +137,9 @@ export class GuestGuard implements CanActivate {
 
   private getDashboardRoute(role: string): UrlTree {
     switch (role) {
-      case 'eatier':
+      case 'itiyum_admin':
         return this.router.createUrlTree(['/admin']);
-      case 'business':
+      case 'business_owner':
         return this.router.createUrlTree(['/dashboard/business']);
       case 'food_enthusiast':
         return this.router.createUrlTree(['/dashboard/food-enthusiast']);

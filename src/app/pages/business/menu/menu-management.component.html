@@ -143,100 +143,57 @@
     </div>
   }
 
-  <!-- Menus List -->
+  <!-- Menu Items List -->
   <div class="menus-section">
-    <h2>Your Menus</h2>
+    <h2>Your Menu Items</h2>
 
-    @if (isLoading() && menus().length === 0) {
+    @if (isLoading() && menuItems().length === 0) {
       <div class="loading-state">
         <span class="loading-spinner large"></span>
-        <p>Loading menus...</p>
+        <p>Loading menu items...</p>
       </div>
-    } @else if (menus().length === 0) {
+    } @else if (menuItems().length === 0) {
       <div class="empty-state">
         <span class="empty-icon">📋</span>
-        <h3>No menus yet</h3>
-        <p>Create your first menu to get started</p>
+        <h3>No menu items yet</h3>
+        <p>Create your first menu item to get started</p>
         <button type="button" class="primary-btn" (click)="createNewMenu()">
           Create Menu
         </button>
       </div>
     } @else {
       <div class="menus-grid">
-        @for (menu of menus(); track menu.id) {
-          <div class="menu-card" [class.inactive]="!menu.isActive">
-            <!-- Menu Header -->
+        @for (menuItem of menuItems(); track menuItem.id) {
+          <div class="menu-card" [class.inactive]="!menuItem.is_available">
+            <!-- Menu Item Header -->
             <div class="menu-card-header">
-              @if (menu.backgroundImage) {
-                <div class="menu-background" [style.background-image]="'url(' + menu.backgroundImage + ')'"></div>
+              @if (menuItem.image_url) {
+                <div class="menu-background" [style.background-image]="'url(' + menuItem.image_url + ')'"></div>
               }
               <div class="menu-info">
                 <div class="menu-title">
-                  <span class="menu-icon">{{ getMenuTypeIcon(menu.type) }}</span>
-                  <h3>{{ menu.name }}</h3>
+                  <span class="menu-icon">🍽️</span>
+                  <h3>{{ menuItem.item_name }}</h3>
                 </div>
-                <p class="menu-type">{{ getMenuTypeLabel(menu.type) }}</p>
-                @if (menu.description) {
-                  <p class="menu-description">{{ menu.description }}</p>
+                <p class="menu-type">{{ menuItem.category || 'Uncategorized' }}</p>
+                @if (menuItem.description) {
+                  <p class="menu-description">{{ menuItem.description }}</p>
                 }
+                <p class="menu-price">${{ menuItem.price.toFixed(2) }}</p>
               </div>
               <div class="menu-status">
-                <span class="status-badge" [class]="menu.isActive ? 'active' : 'inactive'">
-                  {{ menu.isActive ? 'Active' : 'Inactive' }}
+                <span class="status-badge" [class]="menuItem.is_available ? 'active' : 'inactive'">
+                  {{ menuItem.is_available ? 'Available' : 'Unavailable' }}
                 </span>
               </div>
             </div>
 
-            <!-- Menu Stats -->
-            <div class="menu-stats">
-              <div class="stat-item">
-                <span class="stat-icon">👁️</span>
-                <span class="stat-value">{{ menu.viewCount }}</span>
-                <span class="stat-label">Views</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-icon">🔗</span>
-                <span class="stat-value">{{ menu.accessPermissions.length }}</span>
-                <span class="stat-label">Shared</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-icon">{{ menu.isPublic ? '🌐' : '🔒' }}</span>
-                <span class="stat-label">{{ menu.isPublic ? 'Public' : 'Private' }}</span>
-              </div>
-            </div>
-
-            <!-- Access Permissions -->
-            @if (menu.accessPermissions.length > 0) {
-              <div class="access-permissions">
-                <h4>Shared Access</h4>
-                <div class="permissions-list">
-                  @for (permission of menu.accessPermissions; track permission.id) {
-                    <div class="permission-item">
-                      <div class="permission-info">
-                        <span class="permission-email">{{ permission.email }}</span>
-                        <span class="permission-level">{{ getPermissionLevelLabel(permission.permissionLevel) }}</span>
-                      </div>
-                      <div class="permission-actions">
-                        <button
-                          type="button"
-                          class="copy-link-btn"
-                          (click)="copyShareLink(permission.shareLink)"
-                          title="Copy share link"
-                        >
-                          📋
-                        </button>
-                        <button
-                          type="button"
-                          class="revoke-btn"
-                          (click)="revokeAccess(menu, permission)"
-                          title="Revoke access"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </div>
-                  }
-                </div>
+            <!-- Dietary Info -->
+            @if (menuItem.dietary_info && menuItem.dietary_info.length > 0) {
+              <div class="dietary-info">
+                @for (info of menuItem.dietary_info; track info) {
+                  <span class="dietary-badge">{{ info }}</span>
+                }
               </div>
             }
 
@@ -245,47 +202,33 @@
               <button
                 type="button"
                 class="action-btn edit"
-                (click)="editMenu(menu)"
+                (click)="editMenu(menuItem)"
                 [disabled]="isCreatingMenu() || isEditingMenu()"
               >
                 ✏️ Edit
               </button>
               <button
                 type="button"
-                class="action-btn share"
-                (click)="openAccessModal(menu)"
-              >
-                🔗 Share Access
-              </button>
-              <button
-                type="button"
                 class="action-btn toggle"
-                (click)="toggleMenuStatus(menu)"
+                (click)="toggleMenuStatus(menuItem)"
               >
-                {{ menu.isActive ? '⏸️ Deactivate' : '▶️ Activate' }}
+                {{ menuItem.is_available ? '⏸️ Mark Unavailable' : '▶️ Mark Available' }}
               </button>
               <button
                 type="button"
                 class="action-btn delete"
-                (click)="deleteMenu(menu)"
+                (click)="deleteMenu(menuItem)"
               >
                 🗑️ Delete
               </button>
             </div>
 
             <!-- Menu Footer -->
-            <div class="menu-footer">
-              <span class="last-updated">Updated {{ formatDate(menu.updatedAt) }}</span>
-              @if (menu.shareableLink) {
-                <button
-                  type="button"
-                  class="public-link-btn"
-                  (click)="copyShareLink(menu.shareableLink)"
-                >
-                  📋 Copy Public Link
-                </button>
-              }
-            </div>
+            @if (menuItem.updated_at) {
+              <div class="menu-footer">
+                <span class="last-updated">Updated {{ formatDate(menuItem.updated_at) }}</span>
+              </div>
+            }
           </div>
         }
       </div>
@@ -407,374 +350,16 @@
   </div>
 }
 
-<!-- Managing Access Modal -->
+<!-- Managing Access Modal - DISABLED (Not supported by backend) -->
+<!-- TODO: Re-enable when backend supports menu sharing features -->
+<!--
 @if (showManageAccessModal()) {
-  <div class="modal-overlay" (click)="closeManageAccessModal()">
-    <div class="modal-content manage-access-modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div class="header-content">
-          <div class="header-icon">👥</div>
-          <div class="header-text">
-            <h3>Managing Access</h3>
-            <p>Grant team members access to your menu with customizable permissions</p>
-          </div>
-        </div>
-        <button type="button" class="close-btn" (click)="closeManageAccessModal()">
-          <span class="close-icon">✕</span>
-        </button>
-      </div>
-
-      <div class="modal-body">
-        <!-- Current Access List -->
-        @if (currentAccessList().length > 0) {
-          <div class="current-access-section">
-            <div class="section-header">
-              <h4>🔗 Current Access</h4>
-              <span class="access-count">{{ currentAccessList().length }} member{{ currentAccessList().length !== 1 ? 's' : '' }}</span>
-            </div>
-
-            <div class="access-list">
-              @for (access of currentAccessList(); track access.id) {
-                <div class="access-item" [class.expired]="isAccessExpired(access)">
-                  <div class="access-avatar">
-                    <div class="avatar-circle">
-                      {{ getInitials(access.email) }}
-                    </div>
-                  </div>
-
-                  <div class="access-info">
-                    <div class="access-email">{{ access.email }}</div>
-                    <div class="access-details">
-                      <span class="permission-badge" [class]="getPermissionClass(access.permissionLevel)">
-                        {{ getPermissionIcon(access.permissionLevel) }} {{ getPermissionLevelLabel(access.permissionLevel) }}
-                      </span>
-                      <span class="access-date">
-                        @if (isAccessExpired(access)) {
-                          <span class="expired-text">⚠️ Expired {{ access.expiresAt ? formatDate(access.expiresAt) : 'Unknown' }}</span>
-                        } @else {
-                          <span class="expires-text">Expires {{ access.expiresAt ? formatDate(access.expiresAt) : 'Never' }}</span>
-                        }
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="access-actions">
-                    <button
-                      type="button"
-                      class="action-btn copy-btn"
-                      (click)="copyAccessLink(access)"
-                      title="Copy access link"
-                    >
-                      📋
-                    </button>
-                    <button
-                      type="button"
-                      class="action-btn edit-btn"
-                      (click)="editAccess(access)"
-                      title="Edit permissions"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      type="button"
-                      class="action-btn revoke-btn"
-                      (click)="revokeAccess(access)"
-                      title="Revoke access"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        }
-
-        <!-- Add New Access Form -->
-        <div class="add-access-section">
-          <div class="section-header">
-            <h4>➕ Grant New Access</h4>
-            <p>Add a team member to collaborate on your menu</p>
-          </div>
-
-          <form [formGroup]="accessForm" (ngSubmit)="onGrantAccess()" class="access-form">
-            <!-- Email Input -->
-            <div class="form-group">
-              <label for="accessEmail" class="form-label">
-                <span class="label-icon">📧</span>
-                Email Address *
-              </label>
-              <div class="input-wrapper">
-                <input
-                  id="accessEmail"
-                  type="email"
-                  formControlName="email"
-                  placeholder="colleague@restaurant.com"
-                  class="form-input"
-                  [class.error]="getFieldError(accessForm, 'email')"
-                />
-                <div class="input-icon">👤</div>
-              </div>
-              @if (getFieldError(accessForm, 'email')) {
-                <span class="field-error">
-                  <span class="error-icon">⚠️</span>
-                  {{ getFieldError(accessForm, 'email') }}
-                </span>
-              }
-            </div>
-
-            <!-- Permission Level -->
-            <div class="form-group">
-              <label class="form-label">
-                <span class="label-icon">🔐</span>
-                Access Level *
-              </label>
-              <div class="permission-options">
-                @for (level of permissionLevels; track level.value) {
-                  <label class="permission-option" [class.selected]="accessForm.get('permissionLevel')?.value === level.value">
-                    <input
-                      type="radio"
-                      formControlName="permissionLevel"
-                      [value]="level.value"
-                      class="permission-radio"
-                    />
-                    <div class="option-card">
-                      <div class="option-header">
-                        <span class="option-icon">{{ getPermissionIcon(level.value) }}</span>
-                        <span class="option-title">{{ level.label }}</span>
-                      </div>
-                      <p class="option-description">{{ level.description }}</p>
-                      <div class="option-features">
-                        @for (feature of getPermissionFeatures(level.value); track feature) {
-                          <span class="feature-item">✓ {{ feature }}</span>
-                        }
-                      </div>
-                    </div>
-                  </label>
-                }
-              </div>
-            </div>
-
-            <!-- Expiration -->
-            <div class="form-group">
-              <label for="expirationDays" class="form-label">
-                <span class="label-icon">⏰</span>
-                Access Duration
-              </label>
-              <div class="duration-options">
-                @for (duration of accessDurations; track duration.value) {
-                  <button
-                    type="button"
-                    class="duration-btn"
-                    [class.selected]="accessForm.get('expirationDays')?.value === duration.value"
-                    (click)="setAccessDuration(duration.value)"
-                  >
-                    <span class="duration-icon">{{ duration.icon }}</span>
-                    <span class="duration-label">{{ duration.label }}</span>
-                  </button>
-                }
-              </div>
-            </div>
-
-            <!-- Message -->
-            <div class="form-group">
-              <label for="accessMessage" class="form-label">
-                <span class="label-icon">💬</span>
-                Personal Message
-                <span class="optional-text">(Optional)</span>
-              </label>
-              <div class="textarea-wrapper">
-                <textarea
-                  id="accessMessage"
-                  formControlName="message"
-                  placeholder="Hi! I'm sharing our menu with you. Feel free to make updates as needed."
-                  rows="3"
-                  class="form-textarea"
-                  [class.error]="getFieldError(accessForm, 'message')"
-                ></textarea>
-                <div class="character-count">
-                  {{ accessForm.get('message')?.value?.length || 0 }}/200
-                </div>
-              </div>
-              @if (getFieldError(accessForm, 'message')) {
-                <span class="field-error">
-                  <span class="error-icon">⚠️</span>
-                  {{ getFieldError(accessForm, 'message') }}
-                </span>
-              }
-            </div>
-
-            <!-- Advanced Options -->
-            <div class="form-group advanced-options" [class.expanded]="showAdvancedOptions()">
-              <button
-                type="button"
-                class="advanced-toggle"
-                (click)="toggleAdvancedOptions()"
-              >
-                <span class="toggle-icon">{{ showAdvancedOptions() ? '🔽' : '▶️' }}</span>
-                Advanced Options
-              </button>
-
-              @if (showAdvancedOptions()) {
-                <div class="advanced-content">
-                  <div class="checkbox-group">
-                    <label class="checkbox-option">
-                      <input
-                        type="checkbox"
-                        formControlName="requirePasswordReset"
-                        class="checkbox-input"
-                      />
-                      <span class="checkbox-custom"></span>
-                      <span class="checkbox-label">Require password reset on first login</span>
-                    </label>
-
-                    <label class="checkbox-option">
-                      <input
-                        type="checkbox"
-                        formControlName="sendNotifications"
-                        class="checkbox-input"
-                      />
-                      <span class="checkbox-custom"></span>
-                      <span class="checkbox-label">Send email notifications for menu changes</span>
-                    </label>
-
-                    <label class="checkbox-option">
-                      <input
-                        type="checkbox"
-                        formControlName="allowDownload"
-                        class="checkbox-input"
-                      />
-                      <span class="checkbox-custom"></span>
-                      <span class="checkbox-label">Allow menu download/export</span>
-                    </label>
-                  </div>
-                </div>
-              }
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <div class="footer-info">
-          <span class="info-icon">💡</span>
-          <span class="info-text">Access links are secure and can be revoked at any time</span>
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" (click)="closeManageAccessModal()">
-            <span class="btn-icon">❌</span>
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="btn-primary"
-            [disabled]="isLoading() || accessForm.invalid"
-            (click)="onGrantAccess()"
-          >
-            @if (isLoading()) {
-              <span class="loading-spinner"></span>
-              <span>Granting Access...</span>
-            } @else {
-              <span class="btn-icon">🔗</span>
-              <span>Grant Access & Copy Link</span>
-            }
-          </button>
-        </div>
-      </div>
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <p>Access management feature coming soon!</p>
     </div>
   </div>
 }
+-->
 
-<!-- Access Control Modal -->
-@if (showAccessModal()) {
-  <div class="modal-overlay" (click)="closeAccessModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Grant Menu Access</h3>
-        <button type="button" class="close-btn" (click)="closeAccessModal()">✕</button>
-      </div>
-
-      <form [formGroup]="accessForm" (ngSubmit)="onSubmitAccess()" class="access-form">
-        <div class="form-group">
-          <label for="accessEmail">Email Address *</label>
-          <input
-            id="accessEmail"
-            type="email"
-            formControlName="email"
-            placeholder="colleague@example.com"
-            [class.error]="getFieldError(accessForm, 'email')"
-          />
-          @if (getFieldError(accessForm, 'email')) {
-            <span class="field-error">{{ getFieldError(accessForm, 'email') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="permissionLevel">Permission Level *</label>
-          <div class="permission-options">
-            @for (level of permissionLevels; track level.value) {
-              <label class="permission-option">
-                <input
-                  type="radio"
-                  formControlName="permissionLevel"
-                  [value]="level.value"
-                />
-                <div class="option-content">
-                  <span class="option-title">{{ level.label }}</span>
-                  <span class="option-description">{{ level.description }}</span>
-                </div>
-              </label>
-            }
-          </div>
-          @if (getFieldError(accessForm, 'permissionLevel')) {
-            <span class="field-error">{{ getFieldError(accessForm, 'permissionLevel') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="accessMessage">Optional Message</label>
-          <textarea
-            id="accessMessage"
-            formControlName="message"
-            placeholder="Add a message for the recipient..."
-            rows="3"
-          ></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="expirationDays">Access Expires (days)</label>
-          <input
-            id="expirationDays"
-            type="number"
-            formControlName="expirationDays"
-            min="1"
-            max="365"
-            [class.error]="getFieldError(accessForm, 'expirationDays')"
-          />
-          @if (getFieldError(accessForm, 'expirationDays')) {
-            <span class="field-error">{{ getFieldError(accessForm, 'expirationDays') }}</span>
-          }
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" class="secondary-btn" (click)="closeAccessModal()">
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="primary-btn"
-            [disabled]="isLoading() || accessForm.invalid"
-          >
-            @if (isLoading()) {
-              <span class="loading-spinner"></span>
-              Granting Access...
-            } @else {
-              Grant Access
-            }
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-}
+<!-- All access management UI removed - not supported by backend -->

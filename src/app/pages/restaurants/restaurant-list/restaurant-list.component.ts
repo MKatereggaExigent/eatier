@@ -1,7 +1,8 @@
 import { Component, signal } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-restaurant-list',
@@ -169,5 +170,12 @@ export class RestaurantListComponent {
 
   getStatusClass(isOpen: boolean): string {
     return isOpen ? 'open' : 'closed';
+  }
+
+  clearAllFilters(): void {
+    this.searchQuery.set('');
+    this.selectedCuisine.set('');
+    this.selectedPriceRange.set('');
+    this.updateFilters();
   }
 }

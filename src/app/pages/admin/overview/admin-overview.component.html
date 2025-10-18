@@ -1,134 +1,206 @@
 <div class="admin-overview" role="main" aria-label="Admin Dashboard Overview">
-  <!-- Header Section -->
+  <!-- Enhanced Header Section -->
   <header class="overview-header">
-    <div class="header-content">
+    <div class="header-top">
       <div class="welcome-section">
-        <h1 class="page-title">
-          <span class="title-icon">🏛️</span>
-          Eatier Platform Admin
-        </h1>
-        <p class="page-subtitle">
-          Monitor platform performance, manage users, and oversee operations
-        </p>
+        <div class="greeting">
+          <h1 class="page-title">
+            Welcome back, {{ currentUser()?.firstName || 'Admin' }}
+          </h1>
+          <p class="page-subtitle">
+            Here's what's happening with your platform today
+          </p>
+        </div>
+        <div class="header-meta">
+          <span class="current-date">{{ getCurrentDate() }}</span>
+          <span class="separator">•</span>
+          <span class="platform-status">
+            <span class="status-dot active"></span>
+            All Systems Operational
+          </span>
+        </div>
       </div>
-      <div class="alerts-summary">
+
+      <div class="header-actions">
         @if (unreadAlerts().length > 0) {
-          <div class="alerts-badge">
+          <button type="button" class="alerts-btn" (click)="viewAllReports()">
             <span class="alert-icon">🔔</span>
-            <span class="alert-count">{{ unreadAlerts().length }}</span>
-            <span class="alert-text">Unread Alerts</span>
-          </div>
+            <span class="alert-badge">{{ unreadAlerts().length }}</span>
+          </button>
         }
       </div>
     </div>
   </header>
 
-  <!-- Platform Statistics -->
-  <section class="stats-section" aria-label="Platform Statistics">
-    <div class="stats-grid">
-      <div class="stat-card users">
-        <div class="stat-icon">👥</div>
-        <div class="stat-content">
-          <h3>{{ formatNumber(platformStats().totalUsers) }}</h3>
-          <p>Total Users</p>
-          <div class="stat-change positive">{{ userGrowth() }}% active this month</div>
+  <!-- Key Metrics Dashboard - Enhanced Layout -->
+  <section class="metrics-dashboard" aria-label="Key Performance Metrics">
+    <div class="metrics-grid">
+      <!-- Primary Metric - Total Users -->
+      <div class="metric-card primary large">
+        <div class="metric-header">
+          <div class="metric-icon-wrapper users">
+            <span class="metric-icon">👥</span>
+          </div>
+          <div class="metric-trend positive">
+            <span class="trend-icon">↗</span>
+            <span class="trend-value">+{{ userGrowth() }}%</span>
+          </div>
+        </div>
+        <div class="metric-body">
+          <h2 class="metric-value">{{ formatNumber(platformStats().totalUsers) }}</h2>
+          <p class="metric-label">Total Users</p>
+          <div class="metric-details">
+            <span class="detail-item">
+              <span class="detail-value">{{ formatNumber(platformStats().monthlyActiveUsers) }}</span>
+              <span class="detail-label">Active this month</span>
+            </span>
+          </div>
+        </div>
+        <div class="metric-footer">
+          <button type="button" class="metric-action" routerLink="/admin/users">
+            View all users →
+          </button>
         </div>
       </div>
 
-      <div class="stat-card businesses">
-        <div class="stat-icon">🏪</div>
-        <div class="stat-content">
-          <h3>{{ formatNumber(platformStats().totalBusinesses) }}</h3>
-          <p>Businesses</p>
-          <div class="stat-change neutral">{{ formatNumber(platformStats().totalSpecialists) }} specialists</div>
+      <!-- Revenue Metric -->
+      <div class="metric-card success">
+        <div class="metric-header">
+          <div class="metric-icon-wrapper revenue">
+            <span class="metric-icon">💰</span>
+          </div>
+          <div class="metric-trend positive">
+            <span class="trend-icon">↗</span>
+            <span class="trend-value">+12.5%</span>
+          </div>
+        </div>
+        <div class="metric-body">
+          <h2 class="metric-value">{{ formatCurrency(platformStats().monthlyRevenue) }}</h2>
+          <p class="metric-label">Monthly Revenue</p>
+          <div class="metric-comparison">
+            <span class="comparison-text">{{ formatCurrency(platformStats().totalRevenue) }} total</span>
+          </div>
         </div>
       </div>
 
-      <div class="stat-card revenue">
-        <div class="stat-icon">💰</div>
-        <div class="stat-content">
-          <h3>{{ formatCurrency(platformStats().monthlyRevenue) }}</h3>
-          <p>Monthly Revenue</p>
-          <div class="stat-change positive">{{ formatCurrency(platformStats().totalRevenue) }} total</div>
+      <!-- Businesses Metric -->
+      <div class="metric-card info">
+        <div class="metric-header">
+          <div class="metric-icon-wrapper businesses">
+            <span class="metric-icon">🏪</span>
+          </div>
+        </div>
+        <div class="metric-body">
+          <h2 class="metric-value">{{ formatNumber(platformStats().totalBusinesses) }}</h2>
+          <p class="metric-label">Active Businesses</p>
+          <div class="metric-breakdown">
+            <span class="breakdown-item">{{ formatNumber(platformStats().totalSpecialists) }} specialists</span>
+          </div>
         </div>
       </div>
 
-      <div class="stat-card bookings">
-        <div class="stat-icon">📅</div>
-        <div class="stat-content">
-          <h3>{{ formatNumber(platformStats().monthlyBookings) }}</h3>
-          <p>Monthly Bookings</p>
-          <div class="stat-change positive">{{ formatNumber(platformStats().totalBookings) }} total</div>
+      <!-- Bookings Metric -->
+      <div class="metric-card warning">
+        <div class="metric-header">
+          <div class="metric-icon-wrapper bookings">
+            <span class="metric-icon">📅</span>
+          </div>
+          <div class="metric-trend positive">
+            <span class="trend-icon">↗</span>
+            <span class="trend-value">+8.3%</span>
+          </div>
+        </div>
+        <div class="metric-body">
+          <h2 class="metric-value">{{ formatNumber(platformStats().monthlyBookings) }}</h2>
+          <p class="metric-label">Monthly Bookings</p>
+          <div class="metric-comparison">
+            <span class="comparison-text">{{ formatNumber(platformStats().totalBookings) }} total</span>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Main Content Grid -->
-  <div class="content-grid">
-    <!-- Recent Activity -->
-    <section class="content-card activity-card" aria-label="Recent Platform Activity">
+  <!-- Enhanced Content Grid -->
+  <div class="dashboard-grid">
+    <!-- Recent Activity Stream -->
+    <section class="dashboard-card activity-stream" aria-label="Recent Platform Activity">
       <div class="card-header">
-        <h2>
-          <span class="header-icon">📊</span>
-          Recent Activity
-        </h2>
-        <button type="button" class="view-all-btn" (click)="viewAllReports()">
-          View Reports
+        <div class="header-left">
+          <h3 class="card-title">
+            <span class="title-icon">📊</span>
+            Activity Stream
+          </h3>
+          <span class="card-subtitle">Real-time platform events</span>
+        </div>
+        <button type="button" class="card-action" (click)="viewAllReports()">
+          View all
         </button>
       </div>
 
-      <div class="card-content">
-        <div class="activity-list">
-          @for (activity of recentActivity().slice(0, 5); track activity.id) {
-            <div class="activity-item" [class]="getActivityColor(activity.type)">
-              <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
-              <div class="activity-details">
-                <h4>{{ activity.description }}</h4>
-                <p class="activity-user">{{ activity.user }}</p>
+      <div class="card-body">
+        <div class="activity-timeline">
+          @for (activity of recentActivity().slice(0, 6); track activity.id) {
+            <div class="timeline-item" [attr.data-type]="activity.type">
+              <div class="timeline-marker">
+                <span class="marker-icon">{{ getActivityIcon(activity.type) }}</span>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <h4 class="timeline-title">{{ activity.description }}</h4>
+                  <span class="timeline-time">{{ formatDate(activity.timestamp) }}</span>
+                </div>
+                <p class="timeline-user">{{ activity.user }}</p>
                 @if (activity.amount) {
-                  <span class="activity-amount">{{ formatCurrency(activity.amount) }}</span>
+                  <div class="timeline-amount">
+                    <span class="amount-label">Amount:</span>
+                    <span class="amount-value">{{ formatCurrency(activity.amount) }}</span>
+                  </div>
                 }
               </div>
-              <div class="activity-time">{{ formatDate(activity.timestamp) }}</div>
             </div>
           }
         </div>
       </div>
     </section>
 
-    <!-- System Alerts -->
-    <section class="content-card alerts-card" aria-label="System Alerts">
+    <!-- System Health & Alerts -->
+    <section class="dashboard-card alerts-panel" aria-label="System Health">
       <div class="card-header">
-        <h2>
-          <span class="header-icon">🔔</span>
-          System Alerts
-          @if (unreadAlerts().length > 0) {
-            <span class="count-badge">{{ unreadAlerts().length }}</span>
-          }
-        </h2>
+        <div class="header-left">
+          <h3 class="card-title">
+            <span class="title-icon">🔔</span>
+            System Health
+            @if (unreadAlerts().length > 0) {
+              <span class="alert-count-badge">{{ unreadAlerts().length }}</span>
+            }
+          </h3>
+          <span class="card-subtitle">Alerts and notifications</span>
+        </div>
       </div>
 
-      <div class="card-content">
+      <div class="card-body">
         @if (systemAlerts().length === 0) {
-          <div class="empty-state">
+          <div class="empty-state-compact">
             <div class="empty-icon">✅</div>
-            <h3>All systems operational</h3>
-            <p>No alerts at this time</p>
+            <p class="empty-text">All systems operational</p>
           </div>
         } @else {
-          <div class="alerts-list">
-            @for (alert of systemAlerts().slice(0, 4); track alert.id) {
-              <div class="alert-item" [class]="getAlertClass(alert.type)" [class.unread]="!alert.isRead">
-                <div class="alert-icon">{{ getAlertIcon(alert.type) }}</div>
-                <div class="alert-content">
-                  <h4>{{ alert.title }}</h4>
-                  <p>{{ alert.message }}</p>
-                  <span class="alert-time">{{ formatDate(alert.timestamp) }}</span>
+          <div class="alerts-stack">
+            @for (alert of systemAlerts().slice(0, 5); track alert.id) {
+              <div class="alert-card" [attr.data-type]="alert.type" [class.unread]="!alert.isRead">
+                <div class="alert-indicator"></div>
+                <div class="alert-main">
+                  <div class="alert-header">
+                    <span class="alert-icon-badge">{{ getAlertIcon(alert.type) }}</span>
+                    <h4 class="alert-title">{{ alert.title }}</h4>
+                  </div>
+                  <p class="alert-message">{{ alert.message }}</p>
+                  <span class="alert-timestamp">{{ formatDate(alert.timestamp) }}</span>
                 </div>
                 @if (!alert.isRead) {
-                  <button type="button" class="mark-read-btn" (click)="markAlertAsRead(alert.id)">
-                    Mark Read
+                  <button type="button" class="alert-action-btn" (click)="markAlertAsRead(alert.id)" title="Mark as read">
+                    ✓
                   </button>
                 }
               </div>
@@ -182,52 +254,6 @@
               </div>
             </div>
           }
-        </div>
-      </div>
-    </section>
-
-    <!-- Quick Actions -->
-    <section class="content-card actions-card" aria-label="Quick Actions">
-      <div class="card-header">
-        <h2>
-          <span class="header-icon">⚡</span>
-          Quick Actions
-        </h2>
-      </div>
-
-      <div class="card-content">
-        <div class="actions-grid">
-          <button type="button" class="action-btn users-action" (click)="viewAllUsers()">
-            <div class="action-icon">👥</div>
-            <div class="action-content">
-              <h4>Manage Users</h4>
-              <p>View and manage all platform users</p>
-            </div>
-          </button>
-
-          <button type="button" class="action-btn businesses-action" (click)="viewAllBusinesses()">
-            <div class="action-icon">🏪</div>
-            <div class="action-content">
-              <h4>Manage Businesses</h4>
-              <p>Oversee restaurant and business accounts</p>
-            </div>
-          </button>
-
-          <button type="button" class="action-btn bookings-action" (click)="viewAllBookings()">
-            <div class="action-icon">📅</div>
-            <div class="action-content">
-              <h4>View Bookings</h4>
-              <p>Monitor all platform bookings</p>
-            </div>
-          </button>
-
-          <button type="button" class="action-btn reports-action" (click)="viewAllReports()">
-            <div class="action-icon">📊</div>
-            <div class="action-content">
-              <h4>Analytics</h4>
-              <p>View detailed platform analytics</p>
-            </div>
-          </button>
         </div>
       </div>
     </section>

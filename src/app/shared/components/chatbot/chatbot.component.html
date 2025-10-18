@@ -1,0 +1,137 @@
+<!-- Chatbot Toggle Button -->
+<button
+  type="button"
+  class="chatbot-toggle"
+  (click)="toggleChat()"
+  [class.open]="isOpen()"
+  aria-label="Toggle AI Assistant">
+  @if (isOpen()) {
+    <span class="toggle-icon">✕</span>
+  } @else {
+    <span class="toggle-icon">💬</span>
+  }
+</button>
+
+<!-- Chatbot Window -->
+@if (isOpen()) {
+  <div class="chatbot-window">
+    <!-- Header -->
+    <div class="chatbot-header">
+      <div class="header-content">
+        <div class="header-icon">🤖</div>
+        <div class="header-text">
+          <h3 class="header-title"><span class="itiyum-brand">Itiyum</span> AI Assistant</h3>
+          <p class="header-subtitle">Context-aware help for {{ currentPage() }}</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="header-btn"
+          (click)="clearHistory()"
+          title="Clear chat history">
+          🗑️
+        </button>
+        <button
+          type="button"
+          class="header-btn"
+          (click)="toggleChat()"
+          title="Close chat">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages">
+      @if (messages().length === 0) {
+        <div class="welcome-message">
+          <div class="welcome-icon">👋</div>
+                    <h4 class="welcome-title">Welcome to <span class="itiyum-brand">Itiyum</span> AI Assistant!</h4>
+          <p class="welcome-subtitle">I'm here to help you navigate the platform.</p>
+          <p class="welcome-description">
+            Ask me anything about this page or the <span class="itiyum-brand">Itiyum</span> platform in general.
+          </p>
+        </div>
+      }
+
+      @for (message of messages(); track message.timestamp) {
+        <div class="message" [class.user-message]="!message.isAI" [class.ai-message]="message.isAI">
+          <div class="message-avatar">
+            @if (message.isAI) {
+              <span class="avatar-icon">🤖</span>
+            } @else {
+              <span class="avatar-icon">👤</span>
+            }
+          </div>
+          <div class="message-content">
+            <div class="message-text">{{ message.text }}</div>
+            <div class="message-time">
+              {{ message.timestamp | date:'short' }}
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (isTyping()) {
+        <div class="message ai-message typing">
+          <div class="message-avatar">
+            <span class="avatar-icon">🤖</span>
+          </div>
+          <div class="message-content">
+            <div class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Example Prompts -->
+    @if (messages().length <= 1 && examplePrompts().length > 0) {
+      <div class="example-prompts">
+        <p class="prompts-label">Try asking:</p>
+        <div class="prompts-list">
+          @for (prompt of examplePrompts(); track prompt) {
+            <button
+              type="button"
+              class="prompt-btn"
+              (click)="sendExamplePrompt(prompt)">
+              {{ prompt }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Input -->
+    <div class="chat-input">
+      <textarea
+        class="input-field"
+        [(ngModel)]="userInput"
+        (keypress)="onKeyPress($event)"
+        placeholder="Ask me anything about this page..."
+        rows="1"
+        [disabled]="isTyping()"></textarea>
+      <button
+        type="button"
+        class="send-btn"
+        (click)="sendMessage()"
+        [disabled]="!userInput().trim() || isTyping()"
+        title="Send message">
+        <span class="send-icon">➤</span>
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="chatbot-footer">
+      <p class="footer-text">
+        <span class="footer-icon">ℹ️</span>
+        AI-powered assistant. Responses may not always be 100% accurate.
+      </p>
+    </div>
+  </div>
+}
+

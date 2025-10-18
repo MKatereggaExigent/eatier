@@ -1,8 +1,11 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { BUSINESS_PROFILE_CONSTRAINTS, BusinessProfile, BusinessProfileUpdateData } from '../../../shared/models/business-profile.model';
+import { Business, BusinessOwnerService } from '../../../core/services/business-owner.service';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
+
 import { AuthService } from '../../../core/services/auth.service';
-import { BusinessProfile, BusinessProfileUpdateData, BUSINESS_PROFILE_CONSTRAINTS } from '../../../shared/models/business-profile.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-business-profile',
@@ -11,14 +14,20 @@ import { BusinessProfile, BusinessProfileUpdateData, BUSINESS_PROFILE_CONSTRAINT
   templateUrl: './business-profile.component.html',
   styleUrls: ['./business-profile.component.scss']
 })
-export class BusinessProfileComponent implements OnInit {
+export class BusinessProfileComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private businessOwnerService = inject(BusinessOwnerService);
+  private destroy$ = new Subject<void>();
 
   profileForm: FormGroup;
+  hoursForm: FormGroup;
   isLoading = signal<boolean>(false);
   successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
+
+  // Business data from API
+  business = signal<Business | null>(null);
 
   // Form sections
   activeSection = signal<string>('basic');
@@ -54,92 +63,26 @@ export class BusinessProfileComponent implements OnInit {
   // Make Object available in template
   readonly Object = Object;
 
-  // Mock business profile data
-  currentProfile: BusinessProfile = {
-    id: '1',
-    userId: 'user-1',
-    businessName: 'Bella Italia Restaurant',
-    country: 'United States',
-    address: {
-      street: '123 Main Street',
-      city: 'New York',
-      state: 'NY',
-      country: 'United States',
-      zipCode: '10001'
-    },
-    email: 'contact@bellaitalia.com',
-    contactNumber: '+1 (555) 123-4567',
-    sustainabilityEthos: 'We source locally and use eco-friendly packaging',
-    bio: 'Authentic Italian cuisine in the heart of NYC. Family recipes passed down through generations.',
-    facilities: {
-      parking: true,
-      petFriendly: false,
-      carWash: false,
-      swimming: false,
-      wifi: true,
-      airConditioning: true,
-      outdoorSeating: true,
-      wheelchairAccessible: true
-    },
-    profilePhotos: [
-      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
-      'https://images.unsplash.com/photo-1551218808-94e220e084d2?w=400&h=300&fit=crop'
-    ],
-    backgroundImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=400&fit=crop',
-    businessHours: [
-      { day: 'Monday', isOpen: true, openTime: '11:00', closeTime: '22:00' },
-      { day: 'Tuesday', isOpen: true, openTime: '11:00', closeTime: '22:00' },
-      { day: 'Wednesday', isOpen: true, openTime: '11:00', closeTime: '22:00' },
-      { day: 'Thursday', isOpen: true, openTime: '11:00', closeTime: '22:00' },
-      { day: 'Friday', isOpen: true, openTime: '11:00', closeTime: '23:00' },
-      { day: 'Saturday', isOpen: true, openTime: '11:00', closeTime: '23:00' },
-      { day: 'Sunday', isOpen: true, openTime: '12:00', closeTime: '21:00' }
-    ],
-    isVerified: true,
-    verificationBadges: ['health_certified', 'eco_friendly'],
-    status: 'active',
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date(),
-    businessCardCustomization: {
-      primaryColor: '#667eea',
-      secondaryColor: '#764ba2',
-      logoPosition: 'top',
-      includeQR: true,
-      includeContact: true,
-      includeSocial: true
-    }
-  };
-
   constructor() {
     this.profileForm = this.fb.group({
       // Basic Information
       businessName: ['', [Validators.required, Validators.minLength(2)]],
-      country: ['', Validators.required],
       businessType: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       contactNumber: ['', [Validators.required, Validators.pattern(/^\+?[\d\s\-\(\)]+$/)]],
 
       // Address
-      street: ['', Validators.required],
+      address: ['', Validators.required],
       city: ['', Validators.required],
       state: ['', Validators.required],
       zipCode: [''],
 
       // Optional Information
-      sustainabilityEthos: ['', Validators.maxLength(200)],
-      bio: ['', Validators.maxLength(this.constraints.BIO_MAX_LENGTH)],
+      description: ['', Validators.maxLength(500)],
+      website: ['']
+    });
 
-      // Facilities
-      parking: [false],
-      petFriendly: [false],
-      carWash: [false],
-      swimming: [false],
-      wifi: [false],
-      airConditioning: [false],
-      outdoorSeating: [false],
-      wheelchairAccessible: [false],
-
-      // Business Hours
+    this.hoursForm = this.fb.group({
       mondayOpen: [false],
       mondayOpenTime: [''],
       mondayCloseTime: [''],
@@ -165,40 +108,60 @@ export class BusinessProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadProfile();
+    this.loadBusinessProfile();
   }
 
-  loadProfile(): void {
-    // In a real app, this would load from a service
-    this.populateForm(this.currentProfile);
-    this.profilePhotos.set(this.currentProfile.profilePhotos);
-    this.backgroundImage.set(this.currentProfile.backgroundImage || null);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  populateForm(profile: BusinessProfile): void {
-    this.profileForm.patchValue({
-      businessName: profile.businessName,
-      country: profile.country,
-      email: profile.email,
-      contactNumber: profile.contactNumber,
-      street: profile.address.street,
-      city: profile.address.city,
-      state: profile.address.state,
-      zipCode: profile.address.zipCode,
-      sustainabilityEthos: profile.sustainabilityEthos,
-      bio: profile.bio,
-      ...profile.facilities
-    });
+  loadBusinessProfile(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
 
-    // Populate business hours
-    profile.businessHours.forEach(hours => {
-      const dayLower = hours.day.toLowerCase();
-      this.profileForm.patchValue({
-        [`${dayLower}Open`]: hours.isOpen,
-        [`${dayLower}OpenTime`]: hours.openTime,
-        [`${dayLower}CloseTime`]: hours.closeTime
+    this.businessOwnerService.getMyBusiness()
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading business profile:', error);
+          this.errorMessage.set('Failed to load business profile. Please try again.');
+          return of({ business: null });
+        }),
+        finalize(() => {
+          this.isLoading.set(false);
+        })
+      )
+      .subscribe(response => {
+        if (response && response.business) {
+          this.business.set(response.business);
+          this.populateForm(response.business);
+        }
       });
+  }
+
+  populateForm(business: Business): void {
+    this.profileForm.patchValue({
+      businessName: business.business_name,
+      businessType: business.business_type,
+      email: business.email,
+      contactNumber: business.phone,
+      address: business.address,
+      city: '', // Not available in Business model
+      state: '', // Not available in Business model
+      zipCode: '', // Not available in Business model
+      description: business.sustainability_ethos || '',
+      website: '' // Not available in Business model
     });
+  }
+
+  resetForm(): void {
+    const currentBusiness = this.business();
+    if (currentBusiness) {
+      this.populateForm(currentBusiness);
+    } else {
+      this.profileForm.reset();
+    }
   }
 
   setActiveSection(section: string): void {
@@ -211,41 +174,38 @@ export class BusinessProfileComponent implements OnInit {
       this.errorMessage.set(null);
 
       const formValue = this.profileForm.value;
-      const updateData: BusinessProfileUpdateData = {
-        businessName: formValue.businessName,
-        country: formValue.country,
+      const updateData = {
+        business_name: formValue.businessName,
+        business_type: formValue.businessType,
         email: formValue.email,
-        contactNumber: formValue.contactNumber,
-        address: {
-          street: formValue.street,
-          city: formValue.city,
-          state: formValue.state,
-          zipCode: formValue.zipCode,
-          country: formValue.country
-        },
-        sustainabilityEthos: formValue.sustainabilityEthos,
-        bio: formValue.bio,
-        facilities: {
-          parking: formValue.parking,
-          petFriendly: formValue.petFriendly,
-          carWash: formValue.carWash,
-          swimming: formValue.swimming,
-          wifi: formValue.wifi,
-          airConditioning: formValue.airConditioning,
-          outdoorSeating: formValue.outdoorSeating,
-          wheelchairAccessible: formValue.wheelchairAccessible
-        },
-        businessHours: this.getBusinessHoursFromForm(formValue),
-        profilePhotos: this.profilePhotos(),
-        backgroundImage: this.backgroundImage() || undefined
+        contact_number: formValue.contactNumber,
+        address: formValue.address,
+        city: formValue.city,
+        state: formValue.state,
+        zip_code: formValue.zipCode,
+        description: formValue.description,
+        website: formValue.website
       };
 
-      // Mock API call
-      setTimeout(() => {
-        this.isLoading.set(false);
-        this.successMessage.set('Profile updated successfully!');
-        setTimeout(() => this.successMessage.set(null), 3000);
-      }, 1000);
+      this.businessOwnerService.updateMyBusiness(updateData)
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError(error => {
+            console.error('Error updating business profile:', error);
+            this.errorMessage.set('Failed to update business profile. Please try again.');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading.set(false);
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            this.successMessage.set('Profile updated successfully!');
+            this.loadBusinessProfile(); // Reload to get updated data
+            setTimeout(() => this.successMessage.set(null), 3000);
+          }
+        });
     } else {
       this.markFormGroupTouched();
     }

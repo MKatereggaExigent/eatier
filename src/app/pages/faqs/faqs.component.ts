@@ -52,14 +52,14 @@ export class FaqsComponent {
     {
       id: 'getting-started',
       name: 'Getting Started',
-      description: 'Everything you need to know to begin your Eatier journey',
+      description: 'Everything you need to know to begin your Itiyum journey',
       icon: '🚀',
       color: 'category-getting-started',
       faqs: [
         {
           id: 'gs-1',
-          question: 'How do I create an account on Eatier?',
-          answer: 'Creating an account is simple! Click the "Sign Up" button in the top right corner, choose your account type (Normal User, Food Enthusiast, Business Owner, or Specialist), fill in your details, and verify your email. You\'ll be ready to explore Eatier in minutes!',
+          question: 'How do I create an account on Itiyum?',
+          answer: 'Creating an account is simple! Click the "Sign Up" button in the top right corner, choose your account type (Normal User, Food Enthusiast, Business Owner, or Specialist), fill in your details, and verify your email. You\'ll be ready to explore Itiyum in minutes!',
           category: 'getting-started',
           tags: ['account', 'signup', 'registration'],
           helpfulVotes: 245,
@@ -69,7 +69,7 @@ export class FaqsComponent {
         {
           id: 'gs-2',
           question: 'What are the different types of accounts available?',
-          answer: 'Eatier offers 5 account types: <br><br><strong>Normal User:</strong> Basic food discovery and booking<br><strong>Food Enthusiast:</strong> Advanced features, reviews, social following<br><strong>Business Owner:</strong> Restaurant management, menu control, analytics<br><strong>Specialist:</strong> Chef/catering services, portfolio management<br><strong>Eatier Admin:</strong> Platform management (by invitation only)',
+          answer: 'Itiyum offers 5 account types: <br><br><strong>Normal User:</strong> Basic food discovery and booking<br><strong>Food Enthusiast:</strong> Advanced features, reviews, social following<br><strong>Business Owner:</strong> Restaurant management, menu control, analytics<br><strong>Specialist:</strong> Chef/catering services, portfolio management<br><strong>Itiyum Admin:</strong> Platform management (by invitation only)',
           category: 'getting-started',
           tags: ['account types', 'user roles', 'features'],
           helpfulVotes: 189,
@@ -78,8 +78,8 @@ export class FaqsComponent {
         },
         {
           id: 'gs-3',
-          question: 'Is Eatier free to use?',
-          answer: 'Yes! Eatier is free for Normal Users and Food Enthusiasts. Business Owners have a free trial period, then subscription plans starting at $29/month. Specialists can list their services for free with optional premium features available.',
+          question: 'Is Itiyum free to use?',
+          answer: 'Yes! Itiyum is free for Normal Users and Food Enthusiasts. Business Owners have a free trial period, then subscription plans starting at $29/month. Specialists can list their services for free with optional premium features available.',
           category: 'getting-started',
           tags: ['pricing', 'free', 'subscription'],
           helpfulVotes: 156,
@@ -101,13 +101,13 @@ export class FaqsComponent {
     {
       id: 'business-owners',
       name: 'Business Owners',
-      description: 'Restaurant and business management on Eatier',
+      description: 'Restaurant and business management on Itiyum',
       icon: '🏪',
       color: 'category-business',
       faqs: [
         {
           id: 'bo-1',
-          question: 'How do I list my restaurant on Eatier?',
+          question: 'How do I list my restaurant on Itiyum?',
           answer: 'Sign up for a Business Owner account, complete your restaurant profile with photos, menu, and location details. Our team will verify your business within 24-48 hours. Once approved, your restaurant will be visible to millions of food lovers!',
           category: 'business-owners',
           tags: ['restaurant listing', 'business registration', 'verification'],
@@ -187,7 +187,7 @@ export class FaqsComponent {
         {
           id: 'fe-3',
           question: 'How does the recommendation system work?',
-          answer: 'Our AI analyzes your dining history, preferences, reviews, and behavior to suggest restaurants you\'ll love. The more you use Eatier, the better our recommendations become. You can also follow other food enthusiasts for their recommendations.',
+          answer: 'Our AI analyzes your dining history, preferences, reviews, and behavior to suggest restaurants you\'ll love. The more you use Itiyum, the better our recommendations become. You can also follow other food enthusiasts for their recommendations.',
           category: 'food-enthusiasts',
           tags: ['recommendations', 'AI', 'personalization'],
           helpfulVotes: 143,
@@ -235,8 +235,8 @@ export class FaqsComponent {
         },
         {
           id: 'sp-3',
-          question: 'What commission does Eatier charge?',
-          answer: 'Eatier charges a 15% commission on completed bookings. This includes payment processing, customer support, and platform maintenance. There are no upfront fees or monthly subscriptions for specialists.',
+          question: 'What commission does Itiyum charge?',
+          answer: 'Itiyum charges a 15% commission on completed bookings. This includes payment processing, customer support, and platform maintenance. There are no upfront fees or monthly subscriptions for specialists.',
           category: 'specialists',
           tags: ['commission', 'fees', 'pricing', 'payment'],
           helpfulVotes: 134,
@@ -265,7 +265,7 @@ export class FaqsComponent {
         {
           id: 'tech-2',
           question: 'I\'m not receiving email notifications. How do I fix this?',
-          answer: 'Check your spam/junk folder first. Then verify your email address in account settings. Ensure notifications are enabled in your preferences. Add noreply@eatier.com to your contacts to prevent future issues.',
+          answer: 'Check your spam/junk folder first. Then verify your email address in account settings. Ensure notifications are enabled in your preferences. Add noreply@itiyum.com to your contacts to prevent future issues.',
           category: 'technical',
           tags: ['email', 'notifications', 'spam', 'settings'],
           helpfulVotes: 156,
@@ -275,7 +275,7 @@ export class FaqsComponent {
         {
           id: 'tech-3',
           question: 'How do I report a bug or technical issue?',
-          answer: 'Use the "Report Issue" button in the app menu, or email support@eatier.com with details about the problem, your device/browser, and steps to reproduce the issue. Screenshots are helpful!',
+          answer: 'Use the "Report Issue" button in the app menu, or email support@itiyum.com with details about the problem, your device/browser, and steps to reproduce the issue. Screenshots are helpful!',
           category: 'technical',
           tags: ['bug report', 'support', 'contact', 'issues'],
           helpfulVotes: 123,

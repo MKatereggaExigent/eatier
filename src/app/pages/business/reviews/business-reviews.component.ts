@@ -1,7 +1,8 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
-
+import { Component, OnInit, OnDestroy, computed, signal, inject } from '@angular/core';
+import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BusinessOwnerService, Review as APIReview } from '../../../core/services/business-owner.service';
 
 // Interfaces
 interface ReviewPhoto {
@@ -48,12 +49,16 @@ interface ReviewStats {
   templateUrl: './business-reviews.component.html',
   styleUrl: './business-reviews.component.scss'
 })
-export class BusinessReviewsComponent implements OnInit {
+export class BusinessReviewsComponent implements OnInit, OnDestroy {
+  private businessOwnerService = inject(BusinessOwnerService);
+  private destroy$ = new Subject<void>();
+
   // State management
   loading = signal(true);
   reviews = signal<Review[]>([]);
   selectedReviews = signal<string[]>([]);
   showMoreActions = signal<string | null>(null);
+  errorMessage = signal<string | null>(null);
 
   // Filters
   selectedRating = '';
@@ -135,124 +140,88 @@ export class BusinessReviewsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadReviews();
-    this.loadReviewStats();
   }
 
-  private async loadReviews(): Promise<void> {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private loadReviews(): void {
     this.loading.set(true);
+    this.errorMessage.set(null);
 
-    try {
-      // Simulate API call - replace with actual service
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    this.businessOwnerService.getReviews()
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading reviews:', error);
+          this.errorMessage.set('Failed to load reviews. Please try again.');
+          return of({ reviews: [] });
+        }),
+        finalize(() => {
+          this.loading.set(false);
+        })
+      )
+      .subscribe(response => {
+        if (response && response.reviews) {
+          // Map API reviews to component format
+          const mappedReviews: Review[] = response.reviews.map((apiReview: any) => ({
+            id: apiReview.id,
+            customerName: apiReview.customer_name || 'Anonymous',
+            customerAvatar: undefined,
+            rating: apiReview.rating,
+            comment: apiReview.review_text || '',
+            date: new Date(apiReview.review_date || apiReview.created_at),
+            status: apiReview.response_text ? 'responded' : 'pending',
+            helpfulCount: apiReview.helpful_count || 0,
+            isMarkedHelpful: false,
+            source: (apiReview.source || 'direct') as 'google' | 'yelp' | 'facebook' | 'direct',
+            businessResponse: apiReview.response_text ? {
+              content: apiReview.response_text,
+              date: new Date(apiReview.response_date || apiReview.updated_at),
+              authorName: 'Business Owner'
+            } : undefined
+          }));
 
-      const mockReviews: Review[] = [
-        {
-          id: '1',
-          customerName: 'Sarah Johnson',
-          customerAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face',
-          rating: 5,
-          comment: 'Amazing food and excellent service! The pasta was perfectly cooked and the atmosphere was wonderful. Will definitely come back with friends and family.',
-          date: new Date('2024-01-15'),
-          status: 'pending',
-          helpfulCount: 12,
-          isMarkedHelpful: false,
-          source: 'google',
-          photos: [
-            { id: '1', url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=200&h=150&fit=crop' },
-            { id: '2', url: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=200&h=150&fit=crop' }
-          ]
-        },
-        {
-          id: '2',
-          customerName: 'Mike Chen',
-          customerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face',
-          rating: 4,
-          comment: 'Great atmosphere and delicious food. The service was a bit slow during peak hours, but overall a good experience.',
-          date: new Date('2024-01-14'),
-          status: 'responded',
-          helpfulCount: 8,
-          isMarkedHelpful: true,
-          source: 'yelp',
-          businessResponse: {
-            content: 'Thank you for your feedback, Mike! We\'re glad you enjoyed the food and atmosphere. We\'re working on improving our service speed during busy times.',
-            date: new Date('2024-01-15'),
-            authorName: 'Restaurant Manager'
-          }
-        },
-        {
-          id: '3',
-          customerName: 'Emily Davis',
-          customerAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face',
-          rating: 5,
-          comment: 'Best Italian restaurant in town! The tiramisu is to die for. Highly recommend for date nights.',
-          date: new Date('2024-01-13'),
-          status: 'responded',
-          helpfulCount: 15,
-          isMarkedHelpful: false,
-          source: 'facebook',
-          businessResponse: {
-            content: 'Thank you so much, Emily! We\'re thrilled you enjoyed our tiramisu. We look forward to welcoming you back soon!',
-            date: new Date('2024-01-14'),
-            authorName: 'Chef Marco'
-          }
-        },
-        {
-          id: '4',
-          customerName: 'David Wilson',
-          rating: 2,
-          comment: 'Food was okay but service was disappointing. Had to wait 45 minutes for our order and the staff seemed overwhelmed.',
-          date: new Date('2024-01-12'),
-          status: 'pending',
-          helpfulCount: 3,
-          isMarkedHelpful: false,
-          source: 'google'
-        },
-        {
-          id: '5',
-          customerName: 'Lisa Rodriguez',
-          customerAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&h=60&fit=crop&crop=face',
-          rating: 5,
-          comment: 'Absolutely fantastic! Every dish was perfect and the wine selection is excellent. The staff was knowledgeable and friendly.',
-          date: new Date('2024-01-11'),
-          status: 'responded',
-          helpfulCount: 20,
-          isMarkedHelpful: true,
-          source: 'direct',
-          businessResponse: {
-            content: 'Lisa, thank you for such a wonderful review! We\'re so happy you enjoyed both the food and wine. Our team works hard to provide excellent service.',
-            date: new Date('2024-01-12'),
-            authorName: 'Restaurant Manager'
-          }
+          this.reviews.set(mappedReviews);
+          // Recalculate stats after loading reviews
+          this.loadReviewStats();
         }
-      ];
-
-      this.reviews.set(mockReviews);
-    } catch (error) {
-      console.error('Failed to load reviews:', error);
-    } finally {
-      this.loading.set(false);
-    }
+      });
   }
 
-  private async loadReviewStats(): Promise<void> {
-    try {
-      // Simulate API call - replace with actual service
-      await new Promise(resolve => setTimeout(resolve, 500));
+  private loadReviewStats(): void {
+    // Calculate stats from loaded reviews
+    const reviews = this.reviews();
 
-      const stats: ReviewStats = {
-        totalReviews: 247,
-        averageRating: 4.6,
-        monthlyReviews: 23,
-        responseRate: 85,
-        averageResponseTime: 6,
-        ratingChange: 0.2,
-        responseRateChange: 5
-      };
-
-      this.reviewStats.set(stats);
-    } catch (error) {
-      console.error('Failed to load review stats:', error);
+    if (reviews.length === 0) {
+      return;
     }
+
+    const totalReviews = reviews.length;
+    const averageRating = reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
+
+    // Count reviews from last month
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const monthlyReviews = reviews.filter(r => r.date >= oneMonthAgo).length;
+
+    // Calculate response rate
+    const respondedCount = reviews.filter(r => r.status === 'responded').length;
+    const responseRate = totalReviews > 0 ? (respondedCount / totalReviews) * 100 : 0;
+
+    const stats: ReviewStats = {
+      totalReviews,
+      averageRating,
+      monthlyReviews,
+      responseRate,
+      averageResponseTime: 6, // TODO: Calculate from actual response times
+      ratingChange: 0, // TODO: Calculate from historical data
+      responseRateChange: 0 // TODO: Calculate from historical data
+    };
+
+    this.reviewStats.set(stats);
   }
 
   // Filter and search methods

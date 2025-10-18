@@ -106,16 +106,28 @@
     <div class="dishes-grid">
       @for (dish of popularDishes; track dish.name) {
         <div class="dish-card">
-          <img [src]="dish.image" [alt]="dish.name" />
+          <img [src]="dish.image" [alt]="dish.name" class="dish-image" />
           <div class="dish-info">
-            <h4>{{ dish.name }}</h4>
+            <div class="dish-header">
+              <h3>{{ dish.name }}</h3>
+              <span class="dish-price">{{ dish.price }}</span>
+            </div>
             <p>{{ dish.description }}</p>
-            <span class="price">{{ dish.price }}</span>
+            <div class="dish-meta">
+              <span class="rating">
+                <span class="icon">⭐</span>
+                {{ dish.rating }}
+              </span>
+              <span class="orders">
+                <span class="icon">🔥</span>
+                {{ dish.orders }} orders
+              </span>
+            </div>
           </div>
         </div>
       }
     </div>
-    <button type="button" class="view-menu-btn">
+    <button type="button" class="view-menu-btn" (click)="viewFullMenu()">
       View Full Menu
     </button>
   </div>
@@ -124,7 +136,7 @@
   <div class="reviews-section">
     <div class="reviews-header">
       <h2>Reviews ({{ restaurant.reviewCount }})</h2>
-      <button type="button" class="write-review-btn">
+      <button type="button" class="write-review-btn" (click)="openWriteReview()">
         ✍️ Write a Review
       </button>
     </div>
@@ -150,18 +162,27 @@
           </div>
           <p class="review-comment">{{ review.comment }}</p>
           <div class="review-actions">
-            <button type="button" class="helpful-btn">
-              👍 Helpful ({{ review.helpful }})
+            <button
+              type="button"
+              class="action-btn"
+              [class.marked]="isMarkedHelpful(review.id)"
+              (click)="markHelpful(review.id)">
+              <span class="icon">{{ isMarkedHelpful(review.id) ? '👍' : '👍🏻' }}</span>
+              Helpful ({{ review.helpful }})
             </button>
-            <button type="button" class="reply-btn">
-              💬 Reply
+            <button
+              type="button"
+              class="action-btn"
+              (click)="replyToReview(review.id)">
+              <span class="icon">💬</span>
+              Reply
             </button>
           </div>
         </div>
       }
     </div>
 
-    <button type="button" class="view-all-reviews-btn">
+    <button type="button" class="view-all-reviews-btn" (click)="viewAllReviews()">
       View All Reviews
     </button>
   </div>

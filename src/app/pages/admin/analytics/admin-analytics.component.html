@@ -1,0 +1,230 @@
+<div class="admin-analytics" role="main" aria-label="Admin Analytics">
+  <!-- Header Section -->
+  <header class="analytics-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">📈</span>
+          Platform Analytics
+        </h1>
+        <p class="page-subtitle">
+          Comprehensive analytics and insights for the entire <span class="itiyum-brand">Itiyum</span> platform
+        </p>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ statistics().totalUsers }}</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🏪</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ statistics().totalBusinesses }}</div>
+          <div class="stat-label">Total Businesses</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ statistics().totalBookings }}</div>
+          <div class="stat-label">Total Bookings</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ statistics().confirmedBookings }}</div>
+          <div class="stat-label">Confirmed Bookings</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ formatCurrency(statistics().totalRevenue) }}</div>
+          <div class="stat-label">Total Revenue</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ formatCurrency(statistics().revenue30d) }}</div>
+          <div class="stat-label">Revenue (30 days)</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Analytics Content -->
+  <section class="analytics-content">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading analytics...</p>
+      </div>
+    } @else {
+      <div class="analytics-grid">
+        <!-- User Growth -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <h3>User Growth</h3>
+            <span class="card-subtitle">Last 6 months</span>
+          </div>
+          <div class="card-body">
+            @if (userGrowth().length === 0) {
+              <div class="empty-chart">
+                <div class="empty-icon">📊</div>
+                <p>No user growth data available</p>
+              </div>
+            } @else {
+              <div class="data-table">
+                @for (data of userGrowth(); track data.month) {
+                  <div class="data-row">
+                    <span class="data-label">{{ data.month }}</span>
+                    <span class="data-value">{{ data.users }} users</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Revenue Data -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <h3>Revenue Trends</h3>
+            <span class="card-subtitle">Last 6 months</span>
+          </div>
+          <div class="card-body">
+            @if (revenueData().length === 0) {
+              <div class="empty-chart">
+                <div class="empty-icon">💰</div>
+                <p>No revenue data available</p>
+              </div>
+            } @else {
+              <div class="data-table">
+                @for (data of revenueData(); track data.month) {
+                  <div class="data-row">
+                    <span class="data-label">{{ data.month }}</span>
+                    <span class="data-value">{{ formatCurrency(data.revenue) }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Booking Trends -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <h3>Booking Trends</h3>
+            <span class="card-subtitle">Last 6 months</span>
+          </div>
+          <div class="card-body">
+            @if (bookingTrends().length === 0) {
+              <div class="empty-chart">
+                <div class="empty-icon">📅</div>
+                <p>No booking data available</p>
+              </div>
+            } @else {
+              <div class="data-table">
+                @for (data of bookingTrends(); track data.month) {
+                  <div class="data-row">
+                    <span class="data-label">{{ data.month }}</span>
+                    <span class="data-value">{{ data.bookings }} bookings</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Top Countries -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <h3>Top Countries</h3>
+            <span class="card-subtitle">By user count</span>
+          </div>
+          <div class="card-body">
+            @if (topCountries().length === 0) {
+              <div class="empty-chart">
+                <div class="empty-icon">🌍</div>
+                <p>No country data available</p>
+              </div>
+            } @else {
+              <div class="data-table">
+                @for (data of topCountries(); track data.country) {
+                  <div class="data-row">
+                    <span class="data-label">{{ data.country }}</span>
+                    <span class="data-value">{{ data.user_count }} users</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Business Types -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <h3>Business Types</h3>
+            <span class="card-subtitle">Distribution</span>
+          </div>
+          <div class="card-body">
+            @if (businessTypes().length === 0) {
+              <div class="empty-chart">
+                <div class="empty-icon">🏪</div>
+                <p>No business type data available</p>
+              </div>
+            } @else {
+              <div class="data-table">
+                @for (data of businessTypes(); track data.business_type) {
+                  <div class="data-row">
+                    <span class="data-label">{{ data.business_type || 'Unknown' }}</span>
+                    <span class="data-value">{{ data.count }} businesses</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Booking Status -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <h3>Booking Status</h3>
+            <span class="card-subtitle">Distribution</span>
+          </div>
+          <div class="card-body">
+            @if (bookingStatus().length === 0) {
+              <div class="empty-chart">
+                <div class="empty-icon">📊</div>
+                <p>No booking status data available</p>
+              </div>
+            } @else {
+              <div class="data-table">
+                @for (data of bookingStatus(); track data.status) {
+                  <div class="data-row">
+                    <span class="data-label">{{ data.status | titlecase }}</span>
+                    <span class="data-value">{{ data.count }} bookings</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </section>
+</div>
+

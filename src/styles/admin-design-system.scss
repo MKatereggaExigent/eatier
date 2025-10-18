@@ -1,0 +1,309 @@
+// ===================================
+// ITIYUM ADMIN DESIGN SYSTEM
+// New York Times Inspired Clean Design
+// ===================================
+
+// ===================================
+// ADMIN COLOR PALETTE - NYT STYLE
+// ===================================
+
+:root {
+  // Admin Primary Colors - NYT Black & Grays
+  --admin-primary-50: #fafafa;
+  --admin-primary-100: #f5f5f5;
+  --admin-primary-200: #e5e5e5;
+  --admin-primary-300: #d4d4d4;
+  --admin-primary-400: #a3a3a3;
+  --admin-primary-500: #737373;
+  --admin-primary-600: #525252;
+  --admin-primary-700: #404040;
+  --admin-primary-800: #262626;
+  --admin-primary-900: #171717;
+
+  // Admin Accent Colors - NYT Blue (for links and accents)
+  --admin-accent-50: #f0f9ff;
+  --admin-accent-100: #e0f2fe;
+  --admin-accent-200: #bae6fd;
+  --admin-accent-300: #7dd3fc;
+  --admin-accent-400: #38bdf8;
+  --admin-accent-500: #0ea5e9;
+  --admin-accent-600: #0284c7;
+  --admin-accent-700: #0369a1;
+  --admin-accent-800: #075985;
+  --admin-accent-900: #0c4a6e;
+
+  // Admin Success - Subtle Green
+  --admin-success-50: #f0fdf4;
+  --admin-success-500: #16a34a;
+  --admin-success-700: #15803d;
+
+  // Admin Warning - Subtle Orange
+  --admin-warning-50: #fffbeb;
+  --admin-warning-500: #d97706;
+  --admin-warning-700: #b45309;
+
+  // Admin Error - Subtle Red
+  --admin-error-50: #fef2f2;
+  --admin-error-500: #dc2626;
+  --admin-error-700: #b91c1c;
+
+  // Admin Info - Subtle Blue
+  --admin-info-50: #f0f9ff;
+  --admin-info-500: #0284c7;
+  --admin-info-700: #0369a1;
+
+  // Clean Card Effects - No Glassmorphism
+  --admin-glass-bg: #ffffff;
+  --admin-glass-bg-strong: #ffffff;
+  --admin-glass-border: #e5e5e5;
+  --admin-glass-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --admin-glass-shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  // Background - Clean White
+  --admin-bg-gradient: #ffffff;
+  --admin-bg-gradient-alt: #fafafa;
+  --admin-bg-gradient-success: #f0fdf4;
+  --admin-bg-gradient-warning: #fffbeb;
+  --admin-bg-gradient-info: #f0f9ff;
+
+  // Card Accents - Subtle NYT Style
+  --admin-card-gradient-1: #000000;
+  --admin-card-gradient-2: #0284c7;
+  --admin-card-gradient-3: #16a34a;
+  --admin-card-gradient-4: #d97706;
+  --admin-card-gradient-5: #dc2626;
+  --admin-card-gradient-6: #525252;
+
+  // Shadows - NYT Style
+  --admin-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --admin-shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --admin-shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --admin-shadow-xl: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --admin-shadow-glow: none;
+  --admin-shadow-glow-accent: none;
+}
+
+// ===================================
+// ADMIN CARD MIXINS - NYT STYLE
+// ===================================
+
+@mixin admin-glass-card {
+  background: var(--admin-glass-bg);
+  border: 1px solid var(--admin-glass-border);
+  border-radius: 4px;
+  box-shadow: var(--admin-glass-shadow);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--admin-glass-shadow-hover);
+    transform: translateY(-2px);
+  }
+}
+
+@mixin admin-glass-card-strong {
+  background: var(--admin-glass-bg-strong);
+  border: 1px solid var(--admin-glass-border);
+  border-radius: 4px;
+  box-shadow: var(--admin-shadow-md);
+}
+
+@mixin admin-gradient-text($color) {
+  color: $color;
+}
+
+@mixin admin-shimmer-effect {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    animation: shimmer 2s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+// ===================================
+// ADMIN BUTTON STYLES
+// ===================================
+
+@mixin admin-button-primary {
+  background: #000000;
+  color: white;
+  border: 1px solid #000000;
+  padding: var(--space-3) var(--space-6);
+  border-radius: 4px;
+  font-weight: var(--font-semibold);
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: none;
+
+  &:hover {
+    background: #262626;
+    border-color: #262626;
+  }
+
+  &:active {
+    background: #404040;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@mixin admin-button-secondary {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #e5e5e5;
+  padding: var(--space-3) var(--space-6);
+  border-radius: 4px;
+  font-weight: var(--font-medium);
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #fafafa;
+    border-color: #d4d4d4;
+  }
+}
+
+// ===================================
+// ADMIN STAT CARD STYLES - NYT STYLE
+// ===================================
+
+@mixin admin-stat-card($color) {
+  @include admin-glass-card;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: $color;
+  }
+
+  .stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-3);
+  }
+
+  .stat-number {
+    font-size: var(--text-4xl);
+    font-weight: var(--font-bold);
+    color: #000000;
+    margin-bottom: var(--space-2);
+  }
+
+  .stat-label {
+    font-size: var(--text-sm);
+    color: #525252;
+    font-weight: var(--font-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-change {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+
+    &.positive {
+      color: var(--admin-success-700);
+    }
+
+    &.negative {
+      color: var(--admin-error-700);
+    }
+  }
+}
+
+// ===================================
+// ADMIN TABLE STYLES - NYT STYLE
+// ===================================
+
+@mixin admin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  thead {
+    background: #fafafa;
+
+    th {
+      padding: var(--space-4) var(--space-6);
+      text-align: left;
+      font-weight: var(--font-semibold);
+      font-size: var(--text-sm);
+      color: #000000;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid #e5e5e5;
+    }
+  }
+
+  tbody {
+    tr {
+      background: #ffffff;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #fafafa;
+      }
+
+      td {
+        padding: var(--space-4) var(--space-6);
+        border-bottom: 1px solid #e5e5e5;
+        font-size: var(--text-sm);
+        color: #404040;
+      }
+    }
+  }
+}
+
+// ===================================
+// ADMIN BADGE STYLES
+// ===================================
+
+@mixin admin-badge($color) {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba($color, 0.1);
+  color: $color;
+  border: 1px solid rgba($color, 0.2);
+}
+

@@ -1,4 +1,4 @@
-# Eatier Platform Database Schema Overview
+# Itiyum Platform Database Schema Overview
 
 ## Database Statistics
 
@@ -219,4 +219,4 @@ faqs (1) ←→ (0..*) faq_votes
 - **Index Maintenance**: Rebuild fragmented indexes
 - **Backup Verification**: Ensure backup integrity
 
-This comprehensive database schema provides a solid foundation for the Eatier platform, supporting all current features while being designed for future scalability and extensibility.
+This comprehensive database schema provides a solid foundation for the Itiyum platform, supporting all current features while being designed for future scalability and extensibility.

@@ -249,7 +249,7 @@ export class FeedbackComponent implements OnInit {
       case 'feature': return 'Feature you\'d like to see...';
       case 'business': return 'Business feature feedback...';
       case 'restaurant': return 'Restaurant experience summary...';
-      case 'compliment': return 'What you love about Eatier...';
+      case 'compliment': return 'What you love about Itiyum...';
       default: return 'Brief summary of your feedback...';
     }
   }
@@ -260,7 +260,7 @@ export class FeedbackComponent implements OnInit {
       case 'feature': return 'Describe the feature you\'d like to see. How would it help you?';
       case 'business': return 'Share your thoughts about our business features and tools...';
       case 'restaurant': return 'Tell us about your restaurant experience. What went well? What could be improved?';
-      case 'compliment': return 'We love hearing what you enjoy about Eatier! Share your positive experience...';
+      case 'compliment': return 'We love hearing what you enjoy about Itiyum! Share your positive experience...';
       default: return 'Please provide detailed feedback to help us understand your experience...';
     }
   }

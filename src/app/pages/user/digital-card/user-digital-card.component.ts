@@ -1,6 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+
+import { CommonModule } from '@angular/common';
 import { UserProfile } from '../../../shared/models/user-profile.model';
 
 @Component({
@@ -57,7 +58,7 @@ export class UserDigitalCardComponent implements OnInit {
     isVerified: true,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date(),
-    qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://eatier.com/chef/marco-rossi',
+    qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://itiyum.com/chef/marco-rossi',
     businessCardCustomization: {
       primaryColor: '#667eea',
       secondaryColor: '#764ba2',
@@ -98,7 +99,7 @@ export class UserDigitalCardComponent implements OnInit {
     setTimeout(() => {
       this.userProfile.set(this.mockProfile);
       this.qrCodeUrl.set(this.mockProfile.qrCodeUrl || '');
-      
+
       // Populate form with existing customization
       if (this.mockProfile.businessCardCustomization) {
         this.customizationForm.patchValue(this.mockProfile.businessCardCustomization);
@@ -120,12 +121,12 @@ export class UserDigitalCardComponent implements OnInit {
 
   generateQRCode(): void {
     this.isGenerating.set(true);
-    
+
     // Mock QR code generation
     setTimeout(() => {
-      const profileUrl = `https://eatier.com/chef/${this.userProfile()?.firstName?.toLowerCase()}-${this.userProfile()?.lastName?.toLowerCase()}`;
+      const profileUrl = `https://itiyum.com/chef/${this.userProfile()?.firstName?.toLowerCase()}-${this.userProfile()?.lastName?.toLowerCase()}`;
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(profileUrl)}`;
-      
+
       this.qrCodeUrl.set(qrUrl);
       this.isGenerating.set(false);
       this.successMessage.set('QR code generated successfully!');
@@ -135,18 +136,18 @@ export class UserDigitalCardComponent implements OnInit {
 
   downloadCard(format: 'png' | 'pdf' | 'svg'): void {
     this.isDownloading.set(true);
-    
+
     // Mock download process
     setTimeout(() => {
       const filename = `digital-card-${this.userProfile()?.firstName?.toLowerCase()}-${this.userProfile()?.lastName?.toLowerCase()}.${format}`;
       console.log(`Downloading digital card as ${filename}`);
-      
+
       // Create mock download
       const link = document.createElement('a');
       link.href = '#';
       link.download = filename;
       link.click();
-      
+
       this.isDownloading.set(false);
       this.successMessage.set(`Digital card downloaded as ${format.toUpperCase()}!`);
       setTimeout(() => this.successMessage.set(null), 3000);
@@ -154,12 +155,12 @@ export class UserDigitalCardComponent implements OnInit {
   }
 
   shareCard(): void {
-    const profileUrl = `https://eatier.com/chef/${this.userProfile()?.firstName?.toLowerCase()}-${this.userProfile()?.lastName?.toLowerCase()}`;
-    
+    const profileUrl = `https://itiyum.com/chef/${this.userProfile()?.firstName?.toLowerCase()}-${this.userProfile()?.lastName?.toLowerCase()}`;
+
     if (navigator.share) {
       navigator.share({
         title: `${this.userProfile()?.firstName} ${this.userProfile()?.lastName} - Professional Chef`,
-        text: `Check out ${this.userProfile()?.firstName}'s culinary profile on Eatier!`,
+        text: `Check out ${this.userProfile()?.firstName}'s culinary profile on Itiyum!`,
         url: profileUrl
       });
     } else {
@@ -173,7 +174,7 @@ export class UserDigitalCardComponent implements OnInit {
 
   saveCustomization(): void {
     const formValue = this.customizationForm.value;
-    
+
     // Mock API call to save customization
     setTimeout(() => {
       if (this.userProfile()) {
@@ -184,7 +185,7 @@ export class UserDigitalCardComponent implements OnInit {
         };
         this.userProfile.set(updatedProfile);
       }
-      
+
       this.successMessage.set('Customization saved successfully!');
       setTimeout(() => this.successMessage.set(null), 3000);
     }, 1000);

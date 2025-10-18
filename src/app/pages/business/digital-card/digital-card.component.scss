@@ -1,7 +1,58 @@
+// ===================================
+// DIGITAL CARD - NYT THEME
+// ===================================
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:host {
+  // NYT Color Palette
+  --clr-primary-600: #0284c7;
+  --clr-primary-700: #0369a1;
+  --clr-secondary-900: #000000;
+  --clr-secondary-600: #525252;
+  --clr-secondary-500: #737373;
+  --clr-secondary-400: #a3a3a3;
+  --clr-secondary-300: #d4d4d4;
+  --clr-secondary-200: #e5e5e5;
+  --clr-secondary-50: #fafafa;
+  --clr-success: #16a34a;
+  --clr-warning: #d97706;
+  --clr-error: #dc2626;
+  --clr-info: #0284c7;
+  --clr-black: #000000;
+  --clr-grey-700: #525252;
+
+  // Typography
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  // Spacing
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  // Transitions
+  --transition-normal: 0.2s ease;
+}
+
 .digital-card-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: var(--space-8);
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .card-header {
@@ -221,11 +272,12 @@
     }
 
     .primary-btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: var(--clr-primary-600);
       color: white;
       border: none;
 
       &:hover:not(:disabled) {
+        background: var(--clr-primary-700);
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
       }
@@ -269,7 +321,6 @@
 
   .business-card {
     position: relative;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 16px;
     padding: 2rem;
     color: white;
@@ -454,7 +505,7 @@
     .share-btn {
       width: 100%;
       padding: 0.875rem;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      background: var(--clr-primary-600);
       color: white;
       border: none;
       border-radius: 8px;

@@ -1,0 +1,65 @@
+:root {
+  --admin-primary-50: #fafafa;
+  --admin-primary-100: #f5f5f5;
+  --admin-primary-200: #e5e5e5;
+  --admin-primary-300: #d4d4d4;
+  --admin-primary-400: #a3a3a3;
+  --admin-primary-500: #737373;
+  --admin-primary-600: #525252;
+  --admin-primary-700: #404040;
+  --admin-primary-800: #262626;
+  --admin-primary-900: #171717;
+  --admin-accent-50: #f0f9ff;
+  --admin-accent-100: #e0f2fe;
+  --admin-accent-200: #bae6fd;
+  --admin-accent-300: #7dd3fc;
+  --admin-accent-400: #38bdf8;
+  --admin-accent-500: #0ea5e9;
+  --admin-accent-600: #0284c7;
+  --admin-accent-700: #0369a1;
+  --admin-accent-800: #075985;
+  --admin-accent-900: #0c4a6e;
+  --admin-success-50: #f0fdf4;
+  --admin-success-500: #16a34a;
+  --admin-success-700: #15803d;
+  --admin-warning-50: #fffbeb;
+  --admin-warning-500: #d97706;
+  --admin-warning-700: #b45309;
+  --admin-error-50: #fef2f2;
+  --admin-error-500: #dc2626;
+  --admin-error-700: #b91c1c;
+  --admin-info-50: #f0f9ff;
+  --admin-info-500: #0284c7;
+  --admin-info-700: #0369a1;
+  --admin-glass-bg: #ffffff;
+  --admin-glass-bg-strong: #ffffff;
+  --admin-glass-border: #e5e5e5;
+  --admin-glass-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --admin-glass-shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --admin-bg-gradient: #ffffff;
+  --admin-bg-gradient-alt: #fafafa;
+  --admin-bg-gradient-success: #f0fdf4;
+  --admin-bg-gradient-warning: #fffbeb;
+  --admin-bg-gradient-info: #f0f9ff;
+  --admin-card-gradient-1: #000000;
+  --admin-card-gradient-2: #0284c7;
+  --admin-card-gradient-3: #16a34a;
+  --admin-card-gradient-4: #d97706;
+  --admin-card-gradient-5: #dc2626;
+  --admin-card-gradient-6: #525252;
+  --admin-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --admin-shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --admin-shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --admin-shadow-xl: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --admin-shadow-glow: none;
+  --admin-shadow-glow-accent: none;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}

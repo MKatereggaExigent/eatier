@@ -1,16 +1,18 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+
+import { AdminService } from '../../../core/services/admin.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
 
 export interface AdminUser {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  role: 'eatier' | 'business' | 'food_enthusiast' | 'normal_user' | 'specialist';
-  status: 'active' | 'inactive' | 'suspended' | 'pending';
+  role: 'itiyum' | 'business' | 'food_enthusiast' | 'normal_user' | 'specialist';
+  status: 'active' | 'frozen' | 'pending_deletion' | 'deleted' | 'pending';
   createdAt: Date;
   lastLoginAt?: Date;
   emailVerified: boolean;
@@ -23,7 +25,7 @@ export interface AdminUser {
 }
 
 export interface UserFilters {
-  role: 'all' | 'eatier' | 'business' | 'food_enthusiast' | 'normal_user' | 'specialist';
+  role: 'all' | 'itiyum' | 'business' | 'food_enthusiast' | 'normal_user' | 'specialist';
   status: 'all' | 'active' | 'inactive' | 'suspended' | 'pending';
   verification: 'all' | 'verified' | 'unverified';
   sortBy: 'newest' | 'oldest' | 'name' | 'email' | 'lastLogin';
@@ -38,6 +40,7 @@ export interface UserFilters {
 })
 export class AdminUsersComponent implements OnInit {
   private authService = inject(AuthService);
+  private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
 
   currentUser = this.authService.currentUser;
@@ -46,6 +49,11 @@ export class AdminUsersComponent implements OnInit {
   isLoading = signal(false);
   users = signal<AdminUser[]>([]);
   selectedUser = signal<AdminUser | null>(null);
+
+  // Pagination
+  currentPage = signal(1);
+  pageSize = signal(20);
+  totalUsers = signal(0);
 
   // UI state
   searchQuery = signal('');
@@ -67,7 +75,7 @@ export class AdminUsersComponent implements OnInit {
   // Available options
   roleOptions = [
     { value: 'all', label: 'All Roles' },
-    { value: 'eatier', label: 'Eatier Admin' },
+    { value: 'itiyum', label: 'Itiyum Admin' },
     { value: 'business', label: 'Business Owner' },
     { value: 'food_enthusiast', label: 'Food Enthusiast' },
     { value: 'normal_user', label: 'Normal User' },
@@ -77,8 +85,9 @@ export class AdminUsersComponent implements OnInit {
   statusOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
-    { value: 'suspended', label: 'Suspended' },
+    { value: 'frozen', label: 'Frozen/Suspended' },
+    { value: 'pending_deletion', label: 'Pending Deletion' },
+    { value: 'deleted', label: 'Deleted' },
     { value: 'pending', label: 'Pending' }
   ];
 
@@ -188,11 +197,90 @@ export class AdminUsersComponent implements OnInit {
   // Data loading methods
   loadUsers(): void {
     this.isLoading.set(true);
-    // Mock data - in real app, this would be an API call
-    setTimeout(() => {
-      this.users.set(this.mockUsers);
-      this.isLoading.set(false);
-    }, 1000);
+
+    const currentFilters = this.filters();
+    const searchTerm = this.searchQuery();
+
+    // Build status filter - map 'all' to undefined
+    const statusFilter = currentFilters.status !== 'all' ? currentFilters.status : undefined;
+
+    console.log('Loading users with params:', {
+      page: this.currentPage(),
+      pageSize: this.pageSize(),
+      searchTerm,
+      statusFilter
+    });
+
+    this.adminService.getUsers(
+      this.currentPage(),
+      this.pageSize(),
+      searchTerm || undefined,
+      statusFilter
+    ).subscribe({
+      next: (response: any) => {
+        console.log('Users API response:', response);
+
+        if (!response || !response.users) {
+          console.error('Invalid response format:', response);
+          this.users.set([]);
+          this.isLoading.set(false);
+          return;
+        }
+
+        // Map backend user data to AdminUser interface
+        const mappedUsers: AdminUser[] = response.users.map((user: any) => ({
+          id: user.id,
+          email: user.email,
+          firstName: user.first_name || 'Unknown',
+          lastName: user.last_name || 'User',
+          role: this.mapBackendRole(user.role_name),
+          status: user.account_status || 'pending',
+          createdAt: new Date(user.created_at),
+          lastLoginAt: user.last_login_at ? new Date(user.last_login_at) : undefined,
+          emailVerified: user.email_verified || false,
+          phoneVerified: user.phone_verified || false,
+          avatar: user.avatar_url,
+          phone: user.phone,
+          businessName: user.business_name,
+          totalBookings: parseInt(user.total_bookings) || 0,
+          totalReviews: user.total_reviews || 0
+        }));
+
+        console.log('Mapped users:', mappedUsers);
+        this.users.set(mappedUsers);
+        this.totalUsers.set(response.total || mappedUsers.length);
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+        console.error('Error details:', {
+          status: error.status,
+          statusText: error.statusText,
+          message: error.message,
+          error: error.error
+        });
+        this.users.set([]);
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  private mapBackendRole(roleName: string | null): AdminUser['role'] {
+    if (!roleName) return 'normal_user';
+
+    const roleMap: Record<string, AdminUser['role']> = {
+      'Itiyum Admin': 'itiyum',
+      'itiyum_admin': 'itiyum',
+      'Business Owner': 'business',
+      'business_owner': 'business',
+      'Food Enthusiast': 'food_enthusiast',
+      'food_enthusiast': 'food_enthusiast',
+      'Normal User': 'normal_user',
+      'normal_user': 'normal_user',
+      'Specialist': 'specialist',
+      'specialist': 'specialist'
+    };
+    return roleMap[roleName] || 'normal_user';
   }
 
   // UI interaction methods
@@ -236,13 +324,43 @@ export class AdminUsersComponent implements OnInit {
   }
 
   suspendUser(user: AdminUser): void {
-    console.log('Suspend user:', user.id);
-    // TODO: Implement user suspension
+    if (confirm(`Are you sure you want to suspend ${user.firstName} ${user.lastName}?`)) {
+      this.adminService.suspendUser(user.id, 'Suspended by admin').subscribe({
+        next: (response) => {
+          console.log('User suspended successfully:', response);
+          // Update the user in the list
+          const users = this.users();
+          const updatedUsers = users.map(u =>
+            u.id === user.id ? { ...u, status: 'frozen' as const } : u
+          );
+          this.users.set(updatedUsers);
+        },
+        error: (error) => {
+          console.error('Error suspending user:', error);
+          alert('Failed to suspend user. Please try again.');
+        }
+      });
+    }
   }
 
   activateUser(user: AdminUser): void {
-    console.log('Activate user:', user.id);
-    // TODO: Implement user activation
+    if (confirm(`Are you sure you want to activate ${user.firstName} ${user.lastName}?`)) {
+      this.adminService.activateUser(user.id).subscribe({
+        next: (response) => {
+          console.log('User activated successfully:', response);
+          // Update the user in the list
+          const users = this.users();
+          const updatedUsers = users.map(u =>
+            u.id === user.id ? { ...u, status: 'active' as const } : u
+          );
+          this.users.set(updatedUsers);
+        },
+        error: (error) => {
+          console.error('Error activating user:', error);
+          alert('Failed to activate user. Please try again.');
+        }
+      });
+    }
   }
 
   deleteUser(user: AdminUser): void {
@@ -253,10 +371,24 @@ export class AdminUsersComponent implements OnInit {
   confirmDelete(): void {
     const user = this.selectedUser();
     if (user) {
-      console.log('Delete user:', user.id);
-      // TODO: Implement user deletion
-      this.showDeleteConfirm.set(false);
-      this.selectedUser.set(null);
+      this.adminService.deleteUser(user.id).subscribe({
+        next: (response) => {
+          console.log('User deleted successfully:', response);
+          // Remove the user from the list
+          const users = this.users();
+          const updatedUsers = users.filter(u => u.id !== user.id);
+          this.users.set(updatedUsers);
+          this.totalUsers.set(this.totalUsers() - 1);
+          this.showDeleteConfirm.set(false);
+          this.selectedUser.set(null);
+        },
+        error: (error) => {
+          console.error('Error deleting user:', error);
+          alert('Failed to delete user. Please try again.');
+          this.showDeleteConfirm.set(false);
+          this.selectedUser.set(null);
+        }
+      });
     }
   }
 
@@ -268,7 +400,7 @@ export class AdminUsersComponent implements OnInit {
   // Utility methods
   getRoleLabel(role: string): string {
     const roleMap: { [key: string]: string } = {
-      'eatier': 'Eatier Admin',
+      'itiyum': 'Itiyum Admin',
       'business': 'Business Owner',
       'food_enthusiast': 'Food Enthusiast',
       'normal_user': 'Normal User',
@@ -279,7 +411,7 @@ export class AdminUsersComponent implements OnInit {
 
   getRoleIcon(role: string): string {
     const iconMap: { [key: string]: string } = {
-      'eatier': '🏛️',
+      'itiyum': '🏛️',
       'business': '🏪',
       'food_enthusiast': '🍽️',
       'normal_user': '👤',
@@ -316,50 +448,4 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
-  // Mock data
-  private mockUsers: AdminUser[] = [
-    {
-      id: '1',
-      email: 'john.doe@example.com',
-      firstName: 'John',
-      lastName: 'Doe',
-      role: 'food_enthusiast',
-      status: 'active',
-      createdAt: new Date('2024-01-15'),
-      lastLoginAt: new Date('2024-01-30'),
-      emailVerified: true,
-      phoneVerified: true,
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-      phone: '+1234567890',
-      totalBookings: 15,
-      totalReviews: 8
-    },
-    {
-      id: '2',
-      email: 'restaurant@example.com',
-      firstName: 'Maria',
-      lastName: 'Garcia',
-      role: 'business',
-      status: 'active',
-      createdAt: new Date('2024-01-10'),
-      lastLoginAt: new Date('2024-01-29'),
-      emailVerified: true,
-      phoneVerified: false,
-      businessName: 'Maria\'s Italian Kitchen',
-      totalBookings: 245
-    },
-    {
-      id: '3',
-      email: 'chef.smith@example.com',
-      firstName: 'David',
-      lastName: 'Smith',
-      role: 'specialist',
-      status: 'active',
-      createdAt: new Date('2024-01-20'),
-      lastLoginAt: new Date('2024-01-28'),
-      emailVerified: true,
-      phoneVerified: true,
-      totalBookings: 32
-    }
-  ];
 }

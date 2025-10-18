@@ -1,8 +1,41 @@
 @charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap");
+:host {
+  --clr-primary-600: #0284c7;
+  --clr-primary-700: #0369a1;
+  --clr-secondary-50: #fafafa;
+  --clr-secondary-200: #e5e5e5;
+  --clr-secondary-300: #d4d4d4;
+  --clr-secondary-500: #737373;
+  --clr-secondary-600: #525252;
+  --clr-secondary-900: #000000;
+  --clr-success: #16a34a;
+  --clr-error: #dc2626;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-2xl: 1.5rem;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
 .menu-management-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: var(--space-8);
+  font-family: 'Roboto', sans-serif;
+  background: #ffffff;
+  color: #000000;
 }
 
 .menu-header {
@@ -25,7 +58,6 @@
 }
 
 .menu-header .create-menu-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   padding: 1rem 2rem;
@@ -213,7 +245,6 @@
 }
 
 .menu-form-section .menu-form .form-actions .primary-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
 }
@@ -552,8 +583,6 @@
   right: 0;
   bottom: 0;
   background: rgba(139, 111, 71, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -687,13 +716,11 @@
 .manage-access-modal {
   max-width: 800px;
   max-height: 90vh;
-  background: linear-gradient(135deg, #fff7ed 0%, #fef2f2 100%);
   border: 2px solid rgba(249, 115, 22, 0.2);
   box-shadow: 0 25px 50px -12px rgba(139, 111, 71, 0.25);
 }
 
 .manage-access-modal .modal-header {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   color: white;
   padding: 2rem;
   border-bottom: none;
@@ -729,8 +756,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
 }
 
 .manage-access-modal .modal-header .header-content .header-text h3 {
@@ -762,8 +787,6 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
   z-index: 2;
 }
 
@@ -814,7 +837,7 @@
   border-radius: 1rem;
   font-size: 0.75rem;
   font-weight: 600;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .manage-access-modal .modal-body .current-access-section .access-list {
@@ -849,14 +872,13 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f97316, #ea580c);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
   font-size: 0.875rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .manage-access-modal .modal-body .current-access-section .access-list .access-item .access-info {
@@ -882,7 +904,7 @@
   border-radius: 1rem;
   font-size: 0.75rem;
   font-weight: 600;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .manage-access-modal .modal-body .current-access-section .access-list .access-item .access-info .access-details .permission-badge.full-access {
@@ -903,7 +925,7 @@
 .manage-access-modal .modal-body .current-access-section .access-list .access-item .access-info .access-details .access-date {
   font-size: 0.75rem;
   color: #6b7280;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .manage-access-modal .modal-body .current-access-section .access-list .access-item .access-info .access-details .access-date .expired-text {
@@ -990,7 +1012,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 600;
   color: #8b6f47;
   margin-bottom: 0.75rem;
@@ -1085,7 +1107,7 @@
   right: 0.75rem;
   font-size: 0.75rem;
   color: #9ca3af;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .manage-access-modal .modal-body .add-access-section .access-form .form-group .field-error {
@@ -1095,7 +1117,7 @@
   color: #ef4444;
   font-size: 0.8rem;
   margin-top: 0.5rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .manage-access-modal .modal-body .add-access-section .access-form .form-group .field-error .error-icon {
@@ -1138,7 +1160,7 @@
 .manage-access-modal .modal-body .add-access-section .access-form .form-group .permission-options .permission-option .option-card .option-header .option-title {
   font-weight: 600;
   color: #8b6f47;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .manage-access-modal .modal-body .add-access-section .access-form .form-group .permission-options .permission-option .option-card .option-description {
@@ -1157,7 +1179,7 @@
 .manage-access-modal .modal-body .add-access-section .access-form .form-group .permission-options .permission-option .option-card .option-features .feature-item {
   font-size: 0.8rem;
   color: #22c55e;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .manage-access-modal .modal-body .add-access-section .access-form .form-group .permission-options .permission-option.selected .option-card {
@@ -1188,7 +1210,7 @@
   background: white;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 0.875rem;
 }
 
@@ -1219,7 +1241,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 600;
   color: #8b6f47;
   font-size: 0.9rem;
@@ -1323,7 +1345,7 @@
   gap: 0.5rem;
   color: #6b7280;
   font-size: 0.875rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .manage-access-modal .modal-footer .footer-info .info-icon {
@@ -1345,7 +1367,7 @@
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: 0.75rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
@@ -1378,7 +1400,6 @@
 }
 
 .manage-access-modal .modal-footer .modal-actions .btn-primary {
-  background: linear-gradient(135deg, #f97316, #ea580c);
   color: white;
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
 }

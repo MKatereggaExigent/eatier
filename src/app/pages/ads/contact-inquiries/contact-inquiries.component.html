@@ -9,9 +9,9 @@
         </h1>
         <p class="page-subtitle">Manage customer inquiries and communications</p>
       </div>
-      
+
       <div class="header-actions">
-        <button 
+        <button
           class="btn-secondary export-btn"
           (click)="exportInquiries()">
           📊 Export
@@ -47,22 +47,24 @@
   <!-- Filters and Search -->
   <div class="filters-section">
     <div class="search-bar">
-      <input 
-        type="text" 
+      <input
+        type="text"
         class="search-input"
         placeholder="Search inquiries..."
         [value]="searchQuery()"
-        (input)="updateSearchQuery($event.target.value)">
+        #searchInput
+        (input)="updateSearchQuery(searchInput.value)">
       <span class="search-icon">🔍</span>
     </div>
 
     <div class="filter-controls">
       <div class="filter-group">
         <label class="filter-label">Status:</label>
-        <select 
+        <select
           class="filter-select"
           [value]="filterStatus()"
-          (change)="setStatusFilter($event.target.value)">
+          #statusSelect
+          (change)="onStatusFilterChange(statusSelect.value)">
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
           <option value="in_progress">In Progress</option>
@@ -73,10 +75,11 @@
 
       <div class="filter-group">
         <label class="filter-label">Type:</label>
-        <select 
+        <select
           class="filter-select"
           [value]="filterType()"
-          (change)="setTypeFilter($event.target.value)">
+          #typeSelect
+          (change)="onTypeFilterChange(typeSelect.value)">
           <option value="all">All Types</option>
           <option value="booking">Booking</option>
           <option value="quote">Quote</option>
@@ -84,7 +87,7 @@
         </select>
       </div>
 
-      <button 
+      <button
         class="btn-secondary clear-filters"
         (click)="clearFilters()">
         Clear Filters
@@ -129,11 +132,11 @@
     } @else {
       <div class="inquiries-list">
         @for (inquiry of filteredInquiries(); track inquiry.id) {
-          <div 
+          <div
             class="inquiry-card"
             [class]="getStatusClass(inquiry.status)"
             (click)="selectInquiry(inquiry)">
-            
+
             <div class="inquiry-header">
               <div class="inquiry-meta">
                 <span class="inquiry-type" [title]="inquiry.inquiryType">
@@ -159,14 +162,14 @@
             </div>
 
             <div class="inquiry-actions">
-              <button 
+              <button
                 class="action-btn status-btn"
                 (click)="$event.stopPropagation(); updateInquiryStatus(inquiry.id, 'resolved')"
                 [disabled]="inquiry.status === 'resolved' || inquiry.status === 'closed'">
                 Mark Resolved
               </button>
               @if (inquiry.status === 'pending') {
-                <button 
+                <button
                   class="action-btn auto-response-btn"
                   (click)="$event.stopPropagation(); sendAutoResponse(inquiry.id)">
                   Auto Reply
@@ -198,7 +201,7 @@
               </span>
             </div>
           </div>
-          <button 
+          <button
             class="close-modal"
             (click)="closeInquiryDetails()">
             ✕
@@ -243,10 +246,11 @@
             <div class="management-controls">
               <div class="control-group">
                 <label>Status:</label>
-                <select 
+                <select
                   class="control-select"
                   [value]="selectedInquiry()!.status"
-                  (change)="updateInquiryStatus(selectedInquiry()!.id, $event.target.value)">
+                  #statusUpdateSelect
+                  (change)="onInquiryStatusUpdate(selectedInquiry()!.id, statusUpdateSelect.value)">
                   <option value="pending">Pending</option>
                   <option value="in_progress">In Progress</option>
                   <option value="resolved">Resolved</option>
@@ -256,10 +260,11 @@
 
               <div class="control-group">
                 <label>Priority:</label>
-                <select 
+                <select
                   class="control-select"
                   [value]="selectedInquiry()!.priority"
-                  (change)="updateInquiryPriority(selectedInquiry()!.id, $event.target.value)">
+                  #priorityUpdateSelect
+                  (change)="onInquiryPriorityUpdate(selectedInquiry()!.id, priorityUpdateSelect.value)">
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
                   <option value="high">High</option>
@@ -271,21 +276,22 @@
           <!-- Reply Section -->
           <div class="reply-section">
             <h4>Send Reply</h4>
-            <textarea 
+            <textarea
               class="reply-textarea"
               placeholder="Type your reply here..."
               [value]="replyMessage()"
-              (input)="replyMessage.set($event.target.value)"
+              #replyTextarea
+              (input)="replyMessage.set(replyTextarea.value)"
               rows="4">
             </textarea>
-            
+
             <div class="reply-actions">
-              <button 
+              <button
                 class="btn-secondary"
                 (click)="sendAutoResponse(selectedInquiry()!.id)">
                 Send Auto-Response
               </button>
-              <button 
+              <button
                 class="btn-primary"
                 [disabled]="!replyMessage().trim() || isReplying()"
                 (click)="replyToInquiry()">

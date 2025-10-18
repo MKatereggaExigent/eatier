@@ -3,6 +3,8 @@
   max-width: 1400px;
   margin: 0 auto;
   min-height: calc(100vh - 200px);
+  background: #ffffff;
+  color: #000000;
   animation: fadeIn 0.8s ease-out;
 }
 

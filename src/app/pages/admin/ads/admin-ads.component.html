@@ -1,0 +1,483 @@
+<div class="admin-ads" role="main" aria-label="Admin Ads Management">
+  <!-- Header Section -->
+  <header class="ads-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <span class="title-icon">📢</span>
+          Ads Management
+        </h1>
+        <p class="page-subtitle">
+          Manage platform advertisements and promotional campaigns
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="btn-primary" (click)="createNewAd()">
+          <span class="btn-icon">➕</span>
+          Create New Ad
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ stats().totalAds }}</div>
+          <div class="stat-label">Total Ads</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ stats().activeAds }}</div>
+          <div class="stat-label">Active Ads</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">👁️</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ formatNumber(stats().totalImpressions) }}</div>
+          <div class="stat-label">Total Impressions</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🖱️</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ formatNumber(stats().totalClicks) }}</div>
+          <div class="stat-label">Total Clicks</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ stats().averageCTR.toFixed(2) }}%</div>
+          <div class="stat-label">Average CTR</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ formatCurrency(stats().totalSpent) }}</div>
+          <div class="stat-label">Total Spent</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Filters Section -->
+  <section class="filters-section">
+    <div class="filters-container">
+      <div class="filter-group">
+        <label for="search" class="filter-label">Search</label>
+        <input
+          type="text"
+          id="search"
+          class="filter-input"
+          placeholder="Search ads..."
+          [(ngModel)]="searchQuery"
+          (input)="applyFilters()">
+      </div>
+
+      <div class="filter-group">
+        <label for="status" class="filter-label">Status</label>
+        <select
+          id="status"
+          class="filter-select"
+          [(ngModel)]="statusFilter"
+          (change)="applyFilters()">
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="paused">Paused</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="expired">Expired</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="placement" class="filter-label">Placement</label>
+        <select
+          id="placement"
+          class="filter-select"
+          [(ngModel)]="placementFilter"
+          (change)="applyFilters()">
+          <option value="all">All Placements</option>
+          <option value="homepage_banner">Homepage Banner</option>
+          <option value="sidebar">Sidebar</option>
+          <option value="search_results">Search Results</option>
+          <option value="footer">Footer</option>
+        </select>
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" class="btn-secondary" (click)="clearFilters()">
+          Clear Filters
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ads List -->
+  <section class="ads-content">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading ads...</p>
+      </div>
+    } @else if (ads().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📢</div>
+        <h3 class="empty-title">No ads found</h3>
+        <p class="empty-message">Create your first ad campaign to get started</p>
+        <button type="button" class="btn-primary" (click)="createNewAd()">
+          <span class="btn-icon">➕</span>
+          Create New Ad
+        </button>
+      </div>
+    } @else {
+      <div class="ads-grid">
+        @for (ad of ads(); track ad.id) {
+          <div class="ad-card">
+            <div class="ad-image">
+              <img [src]="ad.imageUrl" [alt]="ad.title">
+              <span class="ad-status" [ngClass]="getStatusClass(ad.status)">
+                {{ ad.status }}
+              </span>
+            </div>
+
+            <div class="ad-content">
+              <div class="ad-header">
+                <h3 class="ad-title">{{ ad.title }}</h3>
+                <span class="ad-placement">{{ getPlacementLabel(ad.placement) }}</span>
+              </div>
+
+              <p class="ad-description">{{ ad.description }}</p>
+
+              <div class="ad-stats">
+                <div class="stat-item">
+                  <span class="stat-label">Impressions</span>
+                  <span class="stat-value">{{ formatNumber(ad.impressions) }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Clicks</span>
+                  <span class="stat-value">{{ formatNumber(ad.clicks) }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">CTR</span>
+                  <span class="stat-value">{{ ad.ctr.toFixed(2) }}%</span>
+                </div>
+              </div>
+
+              <div class="ad-budget">
+                <div class="budget-bar">
+                  <div class="budget-progress" [style.width.%]="(ad.spent / ad.budget) * 100"></div>
+                </div>
+                <div class="budget-info">
+                  <span class="budget-spent">{{ formatCurrency(ad.spent) }}</span>
+                  <span class="budget-total">/ {{ formatCurrency(ad.budget) }}</span>
+                </div>
+              </div>
+
+              <div class="ad-dates">
+                <span class="date-item">
+                  <span class="date-label">Start:</span>
+                  <span class="date-value">{{ formatDate(ad.startDate) }}</span>
+                </span>
+                <span class="date-item">
+                  <span class="date-label">End:</span>
+                  <span class="date-value">{{ formatDate(ad.endDate) }}</span>
+                </span>
+              </div>
+
+              <div class="ad-actions">
+                <button type="button" class="action-btn view" (click)="viewAd(ad)" title="View Details">
+                  👁️
+                </button>
+                <button type="button" class="action-btn edit" (click)="editAd(ad)" title="Edit">
+                  ✏️
+                </button>
+                @if (ad.status === 'active') {
+                  <button type="button" class="action-btn pause" (click)="pauseAd(ad)" title="Pause">
+                    ⏸️
+                  </button>
+                } @else if (ad.status === 'paused') {
+                  <button type="button" class="action-btn resume" (click)="resumeAd(ad)" title="Resume">
+                    ▶️
+                  </button>
+                }
+                <button type="button" class="action-btn delete" (click)="deleteAd(ad)" title="Delete">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          type="button"
+          class="pagination-btn"
+          (click)="previousPage()"
+          [disabled]="currentPage() === 1">
+          ← Previous
+        </button>
+
+        <span class="pagination-info">
+          Page {{ currentPage() }} of {{ totalPages }}
+        </span>
+
+        <button
+          type="button"
+          class="pagination-btn"
+          (click)="nextPage()"
+          [disabled]="currentPage() === totalPages">
+          Next →
+        </button>
+      </div>
+    }
+  </section>
+
+  <!-- Create Ad Modal -->
+  @if (showCreateModal()) {
+    <div class="modal-overlay" (click)="closeCreateModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">Create New Ad Campaign</h2>
+          <button type="button" class="modal-close" (click)="closeCreateModal()">✕</button>
+        </div>
+
+        <form class="modal-body" (ngSubmit)="submitNewAd()">
+          <!-- Basic Information -->
+          <div class="form-section">
+            <h3 class="section-title">Basic Information</h3>
+
+            <div class="form-group">
+              <label for="title" class="form-label">
+                Ad Title <span class="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="title"
+                class="form-input"
+                [(ngModel)]="newAd.title"
+                name="title"
+                placeholder="Enter ad title"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="description" class="form-label">
+                Description <span class="required">*</span>
+              </label>
+              <textarea
+                id="description"
+                class="form-textarea"
+                [(ngModel)]="newAd.description"
+                name="description"
+                rows="3"
+                placeholder="Enter ad description"
+                required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="imageUrl" class="form-label">
+                Image URL <span class="required">*</span>
+              </label>
+              <input
+                type="url"
+                id="imageUrl"
+                class="form-input"
+                [(ngModel)]="newAd.imageUrl"
+                name="imageUrl"
+                placeholder="https://example.com/image.jpg"
+                required>
+              <p class="form-hint">Recommended size: 400x300 pixels</p>
+            </div>
+
+            <div class="form-group">
+              <label for="targetUrl" class="form-label">
+                Target URL <span class="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="targetUrl"
+                class="form-input"
+                [(ngModel)]="newAd.targetUrl"
+                name="targetUrl"
+                placeholder="/promotions/summer"
+                required>
+              <p class="form-hint">Where users will be redirected when they click the ad</p>
+            </div>
+          </div>
+
+          <!-- Placement & Visibility -->
+          <div class="form-section">
+            <h3 class="section-title">Placement & Visibility</h3>
+
+            <div class="form-group">
+              <label for="placement" class="form-label">
+                Ad Placement <span class="required">*</span>
+              </label>
+              <select
+                id="placement"
+                class="form-select"
+                [(ngModel)]="newAd.placement"
+                name="placement"
+                required>
+                <option value="">Select placement</option>
+                <option value="homepage_banner">Homepage Banner - Top of homepage (1200x400px)</option>
+                <option value="sidebar">Sidebar - Right side of pages (300x600px)</option>
+                <option value="search_results">Search Results - Between search results (728x90px)</option>
+                <option value="footer">Footer - Bottom of all pages (970x90px)</option>
+                <option value="category_page">Category Page - Top of category pages (970x250px)</option>
+                <option value="business_page">Business Page - On business detail pages (300x250px)</option>
+              </select>
+              <p class="form-hint">
+                <strong>Where this ad will appear:</strong>
+                @if (newAd.placement === 'homepage_banner') {
+                  <span class="placement-info">🏠 Displayed prominently at the top of the homepage - highest visibility</span>
+                }
+                @if (newAd.placement === 'sidebar') {
+                  <span class="placement-info">📌 Shown on the right sidebar across multiple pages</span>
+                }
+                @if (newAd.placement === 'search_results') {
+                  <span class="placement-info">🔍 Appears between search results when users search</span>
+                }
+                @if (newAd.placement === 'footer') {
+                  <span class="placement-info">⬇️ Displayed at the bottom of all pages</span>
+                }
+                @if (newAd.placement === 'category_page') {
+                  <span class="placement-info">📂 Shown at the top of category listing pages</span>
+                }
+                @if (newAd.placement === 'business_page') {
+                  <span class="placement-info">🏢 Displayed on individual business detail pages</span>
+                }
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label for="status" class="form-label">
+                Status <span class="required">*</span>
+              </label>
+              <select
+                id="status"
+                class="form-select"
+                [(ngModel)]="newAd.status"
+                name="status"
+                required>
+                <option value="draft">Draft - Not visible to users</option>
+                <option value="scheduled">Scheduled - Will go live on start date</option>
+                <option value="active">Active - Live immediately</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Budget & Schedule -->
+          <div class="form-section">
+            <h3 class="section-title">Budget & Schedule</h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="budget" class="form-label">
+                  Budget (USD) <span class="required">*</span>
+                </label>
+                <input
+                  type="number"
+                  id="budget"
+                  class="form-input"
+                  [(ngModel)]="newAd.budget"
+                  name="budget"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  required>
+              </div>
+
+              <div class="form-group">
+                <label for="spent" class="form-label">
+                  Already Spent (USD)
+                </label>
+                <input
+                  type="number"
+                  id="spent"
+                  class="form-input"
+                  [(ngModel)]="newAd.spent"
+                  name="spent"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="startDate" class="form-label">
+                  Start Date <span class="required">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  id="startDate"
+                  class="form-input"
+                  [(ngModel)]="newAd.startDate"
+                  name="startDate"
+                  required>
+              </div>
+
+              <div class="form-group">
+                <label for="endDate" class="form-label">
+                  End Date <span class="required">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  id="endDate"
+                  class="form-input"
+                  [(ngModel)]="newAd.endDate"
+                  name="endDate"
+                  required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview -->
+          @if (newAd.imageUrl && newAd.title) {
+            <div class="form-section">
+              <h3 class="section-title">Preview</h3>
+              <div class="ad-preview">
+                <img [src]="newAd.imageUrl" [alt]="newAd.title" class="preview-image">
+                <div class="preview-info">
+                  <h4>{{ newAd.title }}</h4>
+                  <p>{{ newAd.description }}</p>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Form Actions -->
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="closeCreateModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="isCreating()">
+              @if (isCreating()) {
+                <span class="btn-spinner"></span>
+                Creating...
+              } @else {
+                Create Ad Campaign
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>
+

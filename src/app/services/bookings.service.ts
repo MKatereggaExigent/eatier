@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { map, catchError, switchMap, tap } from 'rxjs/operators';
-import { DatabaseService } from './database.service';
+import { ApiService } from '../core/services/api.service';
 
 export interface Restaurant {
   id: string;
@@ -83,9 +83,7 @@ export interface AvailableTimeSlot {
   providedIn: 'root'
 })
 export class BookingsService {
-  private http = inject(HttpClient);
-  private databaseService = inject(DatabaseService);
-  private apiUrl = '/api/bookings';
+  private apiService = inject(ApiService);
 
   // State management
   private bookingsSubject = new BehaviorSubject<Booking[]>([]);
@@ -97,127 +95,120 @@ export class BookingsService {
   isLoading$ = this.isLoadingSubject.asObservable();
 
   constructor() {
-    // Initialize with mock data and test database connection
-    this.initializeBookings();
+    // Load initial data from API
+    this.loadUserBookings();
+    this.loadRestaurants();
   }
 
-  private initializeBookings(): void {
-    this.databaseService.testConnection().subscribe({
-      next: (connected) => {
-        if (connected) {
-          console.log('Database connected, loading bookings from database');
-          this.loadBookingsFromDatabase();
-          this.loadRestaurantsFromDatabase();
-        } else {
-          console.log('Database not available, using mock data');
-          this.bookingsSubject.next(this.mockBookings);
-          this.restaurantsSubject.next(this.mockRestaurants);
-        }
-      },
-      error: () => {
-        console.log('Database connection failed, using mock data');
-        this.bookingsSubject.next(this.mockBookings);
-        this.restaurantsSubject.next(this.mockRestaurants);
-      }
-    });
-  }
+  private loadUserBookings(): void {
+    const userId = localStorage.getItem('user_id') || 'temp-user';
+    this.isLoadingSubject.next(true);
 
-  // Database methods
-  private loadBookingsFromDatabase(): void {
-    this.databaseService.getUserBookings().subscribe({
-      next: (dbBookings) => {
-        const bookings = this.transformDatabaseBookings(dbBookings);
+    this.apiService.get<any>(`bookings/user/${userId}`).subscribe({
+      next: (response) => {
+        const bookings = response.bookings.map((booking: any) => this.transformBooking(booking));
         this.bookingsSubject.next(bookings);
+        this.isLoadingSubject.next(false);
       },
       error: (error) => {
-        console.error('Error loading bookings from database:', error);
-        this.bookingsSubject.next(this.mockBookings);
+        console.error('Error loading bookings:', error);
+        this.bookingsSubject.next([]);
+        this.isLoadingSubject.next(false);
       }
     });
   }
 
-  private loadRestaurantsFromDatabase(): void {
-    this.databaseService.getRestaurants().subscribe({
-      next: (dbRestaurants) => {
-        const restaurants = this.transformDatabaseRestaurants(dbRestaurants);
+  private loadRestaurants(): void {
+    this.apiService.get<any[]>('businesses').subscribe({
+      next: (businesses) => {
+        const restaurants = businesses.map(business => this.transformBusinessToRestaurant(business));
         this.restaurantsSubject.next(restaurants);
       },
       error: (error) => {
-        console.error('Error loading restaurants from database:', error);
-        this.restaurantsSubject.next(this.mockRestaurants);
+        console.error('Error loading restaurants:', error);
+        this.restaurantsSubject.next([]);
       }
     });
   }
 
-  private transformDatabaseBookings(dbBookings: any[]): Booking[] {
-    return dbBookings.map(dbBooking => ({
-      id: dbBooking.id,
-      bookingReference: dbBooking.booking_reference,
-      restaurantId: dbBooking.business_id,
+  // Transformation methods
+  private transformBooking(booking: any): Booking {
+    return {
+      id: booking.id,
+      bookingReference: booking.booking_reference,
+      restaurantId: booking.business_id,
       restaurant: {
-        id: dbBooking.business.id,
-        name: dbBooking.business.name,
-        slug: dbBooking.business.slug,
-        description: dbBooking.business.description || '',
-        cuisineTypes: dbBooking.business.cuisine_types || [],
-        priceRange: dbBooking.business.price_range || 'moderate',
-        averageRating: dbBooking.business.average_rating || 0,
-        totalReviews: dbBooking.business.total_reviews || 0,
+        id: booking.business_id,
+        name: booking.business_name,
+        slug: booking.business_name.toLowerCase().replace(/\s+/g, '-'),
+        description: '',
+        cuisineTypes: [],
+        priceRange: 'moderate',
+        averageRating: 0,
+        totalReviews: 0,
         imageUrl: `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop`,
-        address: dbBooking.business_location?.address || '',
-        city: dbBooking.business_location?.city || '',
-        state: dbBooking.business_location?.state || '',
-        phone: dbBooking.business.contact_phone || '',
-        email: dbBooking.business.contact_email || '',
-        website: dbBooking.business.website,
-        operatingHours: dbBooking.business.operating_hours || {},
-        amenities: dbBooking.business.amenities || [],
+        address: '',
+        city: '',
+        state: '',
+        phone: booking.business_phone || '',
+        email: booking.business_email || '',
+        website: '',
+        operatingHours: {},
+        amenities: [],
         acceptsReservations: true,
         maxPartySize: 12,
         advanceBookingDays: 30
       },
-      userId: dbBooking.user_id,
-      bookingDate: new Date(dbBooking.booking_date),
-      bookingTime: dbBooking.booking_time,
-      partySize: dbBooking.party_size,
-      status: dbBooking.status,
-      specialRequests: dbBooking.special_requests,
-      contactName: dbBooking.contact_name,
-      contactPhone: dbBooking.contact_phone,
-      contactEmail: dbBooking.contact_email,
-      tablePreferences: dbBooking.table_preferences,
-      occasion: dbBooking.occasion,
-      confirmedAt: dbBooking.confirmed_at ? new Date(dbBooking.confirmed_at) : undefined,
-      cancelledAt: dbBooking.cancelled_at ? new Date(dbBooking.cancelled_at) : undefined,
-      cancellationReason: dbBooking.cancellation_reason,
-      createdAt: new Date(dbBooking.created_at),
-      updatedAt: new Date(dbBooking.updated_at)
-    }));
+      userId: booking.user_id,
+      bookingDate: new Date(booking.booking_date),
+      bookingTime: booking.booking_time,
+      partySize: booking.party_size,
+      status: booking.status,
+      specialRequests: booking.special_requests,
+      contactName: booking.contact_name,
+      contactPhone: booking.contact_phone,
+      contactEmail: booking.contact_email,
+      tablePreferences: booking.table_preferences,
+      occasion: booking.occasion,
+      confirmedAt: booking.confirmed_at ? new Date(booking.confirmed_at) : undefined,
+      cancelledAt: booking.cancelled_at ? new Date(booking.cancelled_at) : undefined,
+      cancellationReason: booking.cancellation_reason,
+      createdAt: new Date(booking.created_at),
+      updatedAt: new Date(booking.updated_at)
+    };
   }
 
-  private transformDatabaseRestaurants(dbRestaurants: any[]): Restaurant[] {
-    return dbRestaurants.map(dbRestaurant => ({
-      id: dbRestaurant.id,
-      name: dbRestaurant.name,
-      slug: dbRestaurant.slug,
-      description: dbRestaurant.description || '',
-      cuisineTypes: dbRestaurant.cuisine_types || [],
-      priceRange: dbRestaurant.price_range || 'moderate',
-      averageRating: dbRestaurant.average_rating || 0,
-      totalReviews: dbRestaurant.total_reviews || 0,
-      imageUrl: `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop`,
-      address: dbRestaurant.location?.address || '',
-      city: dbRestaurant.location?.city || '',
-      state: dbRestaurant.location?.state || '',
-      phone: dbRestaurant.contact_phone || '',
-      email: dbRestaurant.contact_email || '',
-      website: dbRestaurant.website,
-      operatingHours: dbRestaurant.operating_hours || {},
-      amenities: dbRestaurant.amenities || [],
-      acceptsReservations: dbRestaurant.accepts_reservations !== false,
-      maxPartySize: dbRestaurant.max_party_size || 12,
-      advanceBookingDays: dbRestaurant.advance_booking_days || 30
-    }));
+  private transformBusinessToRestaurant(business: any): Restaurant {
+    return {
+      id: business.id,
+      name: business.business_name,
+      slug: business.business_name.toLowerCase().replace(/\s+/g, '-'),
+      description: business.bio || '',
+      cuisineTypes: [],
+      priceRange: 'moderate',
+      averageRating: 0,
+      totalReviews: 0,
+      imageUrl: business.profile_photos?.[0] || `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop`,
+      address: business.address || '',
+      city: '',
+      state: '',
+      phone: business.phone || '',
+      email: business.email || '',
+      website: '',
+      operatingHours: {
+        monday: { open: business.opens_at || '09:00', close: business.closes_at || '22:00' },
+        tuesday: { open: business.opens_at || '09:00', close: business.closes_at || '22:00' },
+        wednesday: { open: business.opens_at || '09:00', close: business.closes_at || '22:00' },
+        thursday: { open: business.opens_at || '09:00', close: business.closes_at || '22:00' },
+        friday: { open: business.opens_at || '09:00', close: business.closes_at || '22:00' },
+        saturday: { open: business.opens_at || '09:00', close: business.closes_at || '22:00' },
+        sunday: { open: business.opens_at || '09:00', close: business.closes_at || '22:00' }
+      },
+      amenities: business.facilities || [],
+      acceptsReservations: true,
+      maxPartySize: 12,
+      advanceBookingDays: 30
+    };
   }
 
   // Public API methods
@@ -243,48 +234,52 @@ export class BookingsService {
 
   // Create new booking
   createBooking(bookingRequest: BookingRequest): Observable<Booking> {
-    return this.databaseService.createBooking(bookingRequest).pipe(
-      switchMap(success => {
-        if (success) {
-          // Reload bookings to get updated list
-          this.loadBookingsFromDatabase();
-          return this.getBookings().pipe(
-            map(bookings => {
-              const newBooking = bookings.find(b =>
-                b.restaurantId === bookingRequest.restaurantId &&
-                b.bookingDate.toISOString().split('T')[0] === bookingRequest.bookingDate &&
-                b.bookingTime === bookingRequest.bookingTime
-              );
-              return newBooking || this.createMockBooking(bookingRequest);
-            })
-          );
-        } else {
-          return of(this.createMockBooking(bookingRequest));
-        }
+    const userId = localStorage.getItem('user_id') || 'temp-user';
+
+    const payload = {
+      businessId: bookingRequest.restaurantId,
+      userId,
+      bookingDate: bookingRequest.bookingDate,
+      bookingTime: bookingRequest.bookingTime,
+      partySize: bookingRequest.partySize,
+      specialRequests: bookingRequest.specialRequests,
+      contactName: bookingRequest.contactName,
+      contactPhone: bookingRequest.contactPhone,
+      contactEmail: bookingRequest.contactEmail,
+      tablePreferences: bookingRequest.tablePreferences,
+      occasion: bookingRequest.occasion
+    };
+
+    return this.apiService.post<any>('bookings', payload).pipe(
+      map(response => this.transformBooking(response)),
+      tap(booking => {
+        // Update local state
+        const currentBookings = this.bookingsSubject.value;
+        this.bookingsSubject.next([...currentBookings, booking]);
       }),
       catchError(error => {
         console.error('Error creating booking:', error);
-        return of(this.createMockBooking(bookingRequest));
+        throw error;
       })
     );
   }
 
   // Cancel booking
   cancelBooking(bookingId: string, reason?: string): Observable<boolean> {
-    return this.databaseService.cancelBooking(bookingId, reason).pipe(
-      tap(success => {
-        if (success) {
-          this.loadBookingsFromDatabase();
-        } else {
-          // Update mock data
-          const currentBookings = this.bookingsSubject.value;
-          const updatedBookings = currentBookings.map(booking =>
-            booking.id === bookingId
-              ? { ...booking, status: 'cancelled' as const, cancelledAt: new Date(), cancellationReason: reason }
-              : booking
-          );
-          this.bookingsSubject.next(updatedBookings);
-        }
+    return this.apiService.patch<any>(`bookings/${bookingId}/status`, {
+      status: 'cancelled',
+      cancellationReason: reason
+    }).pipe(
+      map(() => true),
+      tap(() => {
+        // Update local state
+        const currentBookings = this.bookingsSubject.value;
+        const updatedBookings = currentBookings.map(booking =>
+          booking.id === bookingId
+            ? { ...booking, status: 'cancelled' as const, cancelledAt: new Date(), cancellationReason: reason }
+            : booking
+        );
+        this.bookingsSubject.next(updatedBookings);
       }),
       catchError(error => {
         console.error('Error cancelling booking:', error);
@@ -295,12 +290,8 @@ export class BookingsService {
 
   // Get available time slots for a restaurant on a specific date
   getAvailableTimeSlots(restaurantId: string, date: string): Observable<AvailableTimeSlot[]> {
-    return this.databaseService.getAvailableTimeSlots(restaurantId, date).pipe(
-      catchError(error => {
-        console.error('Error getting available time slots:', error);
-        return of(this.getMockAvailableTimeSlots());
-      })
-    );
+    // Generate mock time slots since we don't have a specific endpoint for this
+    return of(this.generateAvailableTimeSlots());
   }
 
   // Get booking statistics
@@ -363,31 +354,7 @@ export class BookingsService {
     return months;
   }
 
-  private createMockBooking(request: BookingRequest): Booking {
-    const restaurant = this.mockRestaurants.find(r => r.id === request.restaurantId) || this.mockRestaurants[0];
-
-    return {
-      id: Date.now().toString(),
-      bookingReference: 'BK' + Math.random().toString(36).substr(2, 6).toUpperCase(),
-      restaurantId: request.restaurantId,
-      restaurant,
-      userId: 'current-user',
-      bookingDate: new Date(request.bookingDate),
-      bookingTime: request.bookingTime,
-      partySize: request.partySize,
-      status: 'pending',
-      specialRequests: request.specialRequests,
-      contactName: request.contactName,
-      contactPhone: request.contactPhone,
-      contactEmail: request.contactEmail,
-      tablePreferences: request.tablePreferences,
-      occasion: request.occasion,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-  }
-
-  private getMockAvailableTimeSlots(): AvailableTimeSlot[] {
+  private generateAvailableTimeSlots(): AvailableTimeSlot[] {
     const slots = [];
     for (let hour = 17; hour <= 22; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
@@ -402,60 +369,7 @@ export class BookingsService {
     return slots;
   }
 
-  // Mock data for development
-  private mockRestaurants: Restaurant[] = [
-    {
-      id: 'rest-1',
-      name: 'The Golden Spoon',
-      slug: 'the-golden-spoon',
-      description: 'Fine dining experience with contemporary American cuisine',
-      cuisineTypes: ['American', 'Contemporary'],
-      priceRange: 'expensive',
-      averageRating: 4.8,
-      totalReviews: 342,
-      imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop',
-      address: '123 Main Street',
-      city: 'New York',
-      state: 'NY',
-      phone: '(555) 123-4567',
-      email: 'reservations@goldenspoon.com',
-      website: 'https://goldenspoon.com',
-      operatingHours: {
-        monday: { open: '17:00', close: '22:00' },
-        tuesday: { open: '17:00', close: '22:00' },
-        wednesday: { open: '17:00', close: '22:00' },
-        thursday: { open: '17:00', close: '22:00' },
-        friday: { open: '17:00', close: '23:00' },
-        saturday: { open: '17:00', close: '23:00' },
-        sunday: { closed: true }
-      },
-      amenities: ['Valet Parking', 'Private Dining', 'Wine Cellar', 'Outdoor Seating'],
-      acceptsReservations: true,
-      maxPartySize: 12,
-      advanceBookingDays: 60
-    }
-  ];
+  // All data now comes from the backend API
 
-  private mockBookings: Booking[] = [
-    {
-      id: 'booking-1',
-      bookingReference: 'BK123ABC',
-      restaurantId: 'rest-1',
-      restaurant: this.mockRestaurants[0],
-      userId: 'user-1',
-      bookingDate: new Date('2024-02-15'),
-      bookingTime: '19:00',
-      partySize: 4,
-      status: 'confirmed',
-      specialRequests: 'Window table preferred, celebrating anniversary',
-      contactName: 'John Smith',
-      contactPhone: '(555) 123-4567',
-      contactEmail: 'john.smith@email.com',
-      tablePreferences: 'Window seating',
-      occasion: 'Anniversary',
-      confirmedAt: new Date('2024-01-20'),
-      createdAt: new Date('2024-01-15'),
-      updatedAt: new Date('2024-01-20')
-    }
-  ];
+
 }

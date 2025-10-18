@@ -1,7 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 import { Menu, MenuAccessPermission } from '../../../shared/models/menu.model';
+import { BusinessOwnerService, MenuItem } from '../../../core/services/business-owner.service';
+
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-menu-management',
@@ -10,12 +13,14 @@ import { Menu, MenuAccessPermission } from '../../../shared/models/menu.model';
   templateUrl: './menu-management.component.html',
   styleUrls: ['./menu-management.component.scss']
 })
-export class MenuManagementComponent implements OnInit {
+export class MenuManagementComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
+  private businessOwnerService = inject(BusinessOwnerService);
+  private destroy$ = new Subject<void>();
 
   // State management
-  menus = signal<Menu[]>([]);
-  selectedMenu = signal<Menu | null>(null);
+  menuItems = signal<MenuItem[]>([]);
+  selectedMenuItem = signal<MenuItem | null>(null);
   isCreatingMenu = signal<boolean>(false);
   isEditingMenu = signal<boolean>(false);
   showAccessModal = signal<boolean>(false);
@@ -77,57 +82,6 @@ export class MenuManagementComponent implements OnInit {
   // Character limits as specified
   readonly DESCRIPTION_MAX_LENGTH = 15;
 
-  // Mock data
-  mockMenus: Menu[] = [
-    {
-      id: '1',
-      restaurantId: 'rest-1',
-      name: 'Breakfast Menu',
-      description: 'Morning delights',
-      type: 'breakfast',
-      isActive: true,
-      categories: [],
-      items: [],
-      backgroundImage: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&h=400&fit=crop',
-      accessPermissions: [
-        {
-          id: 'perm-1',
-          email: 'chef@restaurant.com',
-          permissionLevel: 'edit_view',
-          shareLink: 'https://eatier.com/menu/share/abc123',
-          message: 'Please review and update breakfast items',
-          createdAt: new Date('2024-01-15'),
-          isActive: true
-        }
-      ],
-      shareableLink: 'https://eatier.com/menu/1/public',
-      isPublic: true,
-      viewCount: 245,
-      lastViewedAt: new Date('2024-01-20'),
-      createdAt: new Date('2024-01-01'),
-      updatedAt: new Date('2024-01-20'),
-      lastModified: new Date('2024-01-20')
-    },
-    {
-      id: '2',
-      restaurantId: 'rest-1',
-      name: 'Dinner Menu',
-      description: 'Evening specials',
-      type: 'dinner',
-      isActive: true,
-      categories: [],
-      items: [],
-      backgroundImage: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=400&fit=crop',
-      accessPermissions: [],
-      shareableLink: 'https://eatier.com/menu/2/public',
-      isPublic: false,
-      viewCount: 189,
-      createdAt: new Date('2024-01-05'),
-      updatedAt: new Date('2024-01-18'),
-      lastModified: new Date('2024-01-18')
-    }
-  ];
-
   constructor() {
     this.menuForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -156,112 +110,96 @@ export class MenuManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadMenus();
-    this.loadCurrentAccess();
   }
 
-  private loadCurrentAccess(): void {
-    // Mock current access data
-    const mockAccess: MenuAccessPermission[] = [
-      {
-        id: 'access-1',
-        email: 'chef@restaurant.com',
-        permissionLevel: 'edit_view',
-        shareLink: 'https://eatier.com/menu/access/abc123',
-        message: 'Please help manage our breakfast menu',
-        createdAt: new Date('2024-01-15'),
-        expiresAt: new Date('2024-04-15'),
-        isActive: true
-      },
-      {
-        id: 'access-2',
-        email: 'manager@restaurant.com',
-        permissionLevel: 'view_only',
-        shareLink: 'https://eatier.com/menu/access/def456',
-        message: 'View-only access for menu review',
-        createdAt: new Date('2024-01-10'),
-        expiresAt: new Date('2024-02-10'),
-        isActive: true
-      }
-    ];
-    this.currentAccessList.set(mockAccess);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadMenus(): void {
     this.isLoading.set(true);
-    // Mock API call
-    setTimeout(() => {
-      this.menus.set(this.mockMenus);
-      this.isLoading.set(false);
-    }, 500);
+    this.errorMessage.set(null);
+
+    this.businessOwnerService.getMenu()
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading menu items:', error);
+          this.errorMessage.set('Failed to load menu items. Please try again.');
+          return of({ menu: [] });
+        }),
+        finalize(() => {
+          this.isLoading.set(false);
+        })
+      )
+      .subscribe(response => {
+        this.menuItems.set(response.menu || []);
+      });
   }
 
   createNewMenu(): void {
     this.isCreatingMenu.set(true);
     this.isEditingMenu.set(false);
-    this.selectedMenu.set(null);
+    this.selectedMenuItem.set(null);
     this.menuForm.reset({
       isPublic: true,
       isActive: true
     });
   }
 
-  editMenu(menu: Menu): void {
+  editMenu(menuItem: MenuItem): void {
     this.isEditingMenu.set(true);
     this.isCreatingMenu.set(false);
-    this.selectedMenu.set(menu);
+    this.selectedMenuItem.set(menuItem);
     this.menuForm.patchValue({
-      name: menu.name,
-      description: menu.description,
-      type: menu.type,
-      backgroundImage: menu.backgroundImage,
-      isPublic: menu.isPublic,
-      isActive: menu.isActive
+      name: menuItem.item_name,
+      description: menuItem.description,
+      type: menuItem.category,
+      isActive: menuItem.is_available
     });
   }
 
   onSubmitMenu(): void {
     if (this.menuForm.valid) {
       this.isLoading.set(true);
+      this.errorMessage.set(null);
       const formValue = this.menuForm.value;
 
-      // Mock API call
-      setTimeout(() => {
-        if (this.isCreatingMenu()) {
-          const newMenu: Menu = {
-            id: Date.now().toString(),
-            restaurantId: 'rest-1',
-            name: formValue.name,
-            description: formValue.description,
-            type: formValue.type,
-            isActive: formValue.isActive,
-            categories: [],
-            items: [],
-            backgroundImage: formValue.backgroundImage,
-            accessPermissions: [],
-            shareableLink: `https://eatier.com/menu/${Date.now()}/public`,
-            isPublic: formValue.isPublic,
-            viewCount: 0,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            lastModified: new Date()
-          };
+      const menuData: MenuItem = {
+        item_name: formValue.name,
+        description: formValue.description,
+        category: formValue.type,
+        price: 0, // Default price
+        is_available: formValue.isActive
+      };
 
-          this.menus.update(menus => [...menus, newMenu]);
-          this.successMessage.set('Menu created successfully!');
-        } else if (this.isEditingMenu() && this.selectedMenu()) {
-          const updatedMenus = this.menus().map(menu =>
-            menu.id === this.selectedMenu()!.id
-              ? { ...menu, ...formValue, updatedAt: new Date(), lastModified: new Date() }
-              : menu
-          );
-          this.menus.set(updatedMenus);
-          this.successMessage.set('Menu updated successfully!');
-        }
+      const request$ = this.isEditingMenu() && this.selectedMenuItem()
+        ? this.businessOwnerService.updateMenuItem(this.selectedMenuItem()!.id!, menuData)
+        : this.businessOwnerService.createMenuItem(menuData);
 
-        this.isLoading.set(false);
-        this.cancelMenuEdit();
-        setTimeout(() => this.successMessage.set(null), 3000);
-      }, 1000);
+      request$
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError(error => {
+            console.error('Error saving menu item:', error);
+            this.errorMessage.set('Failed to save menu item. Please try again.');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading.set(false);
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            this.successMessage.set(
+              this.isEditingMenu() ? 'Menu item updated successfully!' : 'Menu item created successfully!'
+            );
+            this.loadMenus();
+            this.cancelMenuEdit();
+            setTimeout(() => this.successMessage.set(null), 3000);
+          }
+        });
     } else {
       this.markFormGroupTouched(this.menuForm);
     }
@@ -270,110 +208,87 @@ export class MenuManagementComponent implements OnInit {
   cancelMenuEdit(): void {
     this.isCreatingMenu.set(false);
     this.isEditingMenu.set(false);
-    this.selectedMenu.set(null);
+    this.selectedMenuItem.set(null);
     this.menuForm.reset();
   }
 
-  deleteMenu(menu: Menu): void {
-    if (confirm(`Are you sure you want to delete "${menu.name}"?`)) {
-      this.menus.update(menus => menus.filter(m => m.id !== menu.id));
-      this.successMessage.set('Menu deleted successfully!');
-      setTimeout(() => this.successMessage.set(null), 3000);
+  deleteMenu(menuItem: MenuItem): void {
+    if (!menuItem.id) return;
+
+    if (confirm(`Are you sure you want to delete "${menuItem.item_name}"?`)) {
+      this.isLoading.set(true);
+      this.errorMessage.set(null);
+
+      this.businessOwnerService.deleteMenuItem(menuItem.id)
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError(error => {
+            console.error('Error deleting menu item:', error);
+            this.errorMessage.set('Failed to delete menu item. Please try again.');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading.set(false);
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            this.successMessage.set('Menu item deleted successfully!');
+            this.loadMenus();
+            setTimeout(() => this.successMessage.set(null), 3000);
+          }
+        });
     }
   }
 
-  toggleMenuStatus(menu: Menu): void {
-    const updatedMenus = this.menus().map(m =>
-      m.id === menu.id
-        ? { ...m, isActive: !m.isActive, updatedAt: new Date() }
-        : m
-    );
-    this.menus.set(updatedMenus);
+  toggleMenuStatus(menuItem: MenuItem): void {
+    if (!menuItem.id) return;
+
+    const newAvailability = !menuItem.is_available;
+
+    this.businessOwnerService.toggleMenuItemAvailability(menuItem.id, newAvailability)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error toggling menu item status:', error);
+          this.errorMessage.set('Failed to update menu item status.');
+          return of(null);
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          this.loadMenus();
+        }
+      });
   }
 
+  // ============================================
+  // ACCESS MANAGEMENT METHODS - CURRENTLY DISABLED
+  // These features are not supported by the current backend API
+  // TODO: Implement when backend supports menu sharing
+  // ============================================
+
+  /*
   openAccessModal(menu: Menu): void {
-    this.selectedMenu.set(menu);
-    this.showAccessModal.set(true);
-    this.accessForm.reset({
-      permissionLevel: 'view_only',
-      expirationDays: 30
-    });
+    // Not implemented - backend doesn't support menu sharing yet
   }
 
   closeAccessModal(): void {
-    this.showAccessModal.set(false);
-    this.selectedMenu.set(null);
-    this.accessForm.reset();
+    // Not implemented
   }
 
   onSubmitAccess(): void {
-    if (this.accessForm.valid && this.selectedMenu()) {
-      this.isLoading.set(true);
-      const formValue = this.accessForm.value;
-
-      // Mock API call
-      setTimeout(() => {
-        const newPermission: MenuAccessPermission = {
-          id: Date.now().toString(),
-          email: formValue.email,
-          permissionLevel: formValue.permissionLevel,
-          shareLink: `https://eatier.com/menu/share/${Date.now()}`,
-          message: formValue.message,
-          expiresAt: formValue.expirationDays ?
-            new Date(Date.now() + formValue.expirationDays * 24 * 60 * 60 * 1000) :
-            undefined,
-          createdAt: new Date(),
-          isActive: true
-        };
-
-        const updatedMenus = this.menus().map(menu =>
-          menu.id === this.selectedMenu()!.id
-            ? { ...menu, accessPermissions: [...menu.accessPermissions, newPermission] }
-            : menu
-        );
-
-        this.menus.set(updatedMenus);
-        this.isLoading.set(false);
-        this.closeAccessModal();
-        this.successMessage.set('Access granted successfully! Share link has been generated.');
-        setTimeout(() => this.successMessage.set(null), 3000);
-      }, 1000);
-    } else {
-      this.markFormGroupTouched(this.accessForm);
-    }
+    // Not implemented
   }
 
   revokeAccess(menuOrAccess: Menu | MenuAccessPermission, permission?: MenuAccessPermission): void {
-    if (permission) {
-      // Called with menu and permission (existing functionality)
-      const menu = menuOrAccess as Menu;
-      if (confirm(`Revoke access for ${permission.email}?`)) {
-        const updatedMenus = this.menus().map(m =>
-          m.id === menu.id
-            ? { ...m, accessPermissions: m.accessPermissions.filter(p => p.id !== permission.id) }
-            : m
-        );
-        this.menus.set(updatedMenus);
-        this.successMessage.set('Access revoked successfully!');
-        setTimeout(() => this.successMessage.set(null), 3000);
-      }
-    } else {
-      // Called with just access permission (new functionality)
-      const access = menuOrAccess as MenuAccessPermission;
-      if (confirm(`Are you sure you want to revoke access for ${access.email}?`)) {
-        this.currentAccessList.update(list => list.filter(a => a.id !== access.id));
-        this.successMessage.set(`Access revoked for ${access.email}`);
-        setTimeout(() => this.successMessage.set(null), 3000);
-      }
-    }
+    // Not implemented
   }
 
   copyShareLink(link: string): void {
-    navigator.clipboard.writeText(link).then(() => {
-      this.successMessage.set('Share link copied to clipboard!');
-      setTimeout(() => this.successMessage.set(null), 2000);
-    });
+    // Not implemented
   }
+  */
 
   getMenuTypeIcon(type: string): string {
     return this.menuTypes.find(t => t.value === type)?.icon || '📋';
@@ -438,8 +353,10 @@ export class MenuManagementComponent implements OnInit {
     return this.menuForm.get('description')?.value?.length || 0;
   }
 
-  formatDate(date: Date): string {
-    return date.toLocaleDateString('en-US', {
+  formatDate(date: Date | string | undefined): string {
+    if (!date) return 'N/A';
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -486,7 +403,7 @@ export class MenuManagementComponent implements OnInit {
 
       // Mock API call to grant access
       setTimeout(() => {
-        const accessLink = `https://eatier.com/menu/access/${Date.now()}`;
+        const accessLink = `https://itiyum.com/menu/access/${Date.now()}`;
 
         // Copy link to clipboard
         navigator.clipboard.writeText(accessLink).then(() => {

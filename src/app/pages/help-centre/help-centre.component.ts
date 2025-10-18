@@ -95,14 +95,14 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
     {
       id: 'getting-started',
       title: 'Getting Started',
-      description: 'Learn the basics of using Eatier',
+      description: 'Learn the basics of using Itiyum',
       icon: '🚀',
       articles: [
         {
           id: 'create-account',
           title: 'How to create an account',
           icon: '👤',
-          content: 'Creating an account on Eatier is quick and easy. Follow these steps to get started.',
+          content: 'Creating an account on Itiyum is quick and easy. Follow these steps to get started.',
           steps: [
             'Click "Sign Up" in the top navigation',
             'Choose between User or Business account',
@@ -117,9 +117,9 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
         },
         {
           id: 'first-steps',
-          title: 'Your first steps on Eatier',
+          title: 'Your first steps on Itiyum',
           icon: '👋',
-          content: 'Welcome to Eatier! Here\'s what you should do first to get the most out of the platform.',
+          content: 'Welcome to Itiyum! Here\'s what you should do first to get the most out of the platform.',
           steps: [
             'Complete your profile with a photo and bio',
             'Explore restaurants in your area',

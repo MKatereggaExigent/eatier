@@ -1,7 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Business, BusinessOwnerService } from '../../../core/services/business-owner.service';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
+
 import { BusinessInsights } from '../../../shared/models/business-profile.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-business-insights',
@@ -10,15 +13,19 @@ import { BusinessInsights } from '../../../shared/models/business-profile.model'
   templateUrl: './business-insights.component.html',
   styleUrls: ['./business-insights.component.scss']
 })
-export class BusinessInsightsComponent implements OnInit {
+export class BusinessInsightsComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
+  private businessOwnerService = inject(BusinessOwnerService);
+  private destroy$ = new Subject<void>();
 
   // State management
+  business = signal<Business | null>(null);
   insights = signal<BusinessInsights | null>(null);
   isLoading = signal<boolean>(false);
   selectedPeriod = signal<string>('monthly');
   isExporting = signal<boolean>(false);
-  
+  errorMessage = signal<string | null>(null);
+
   // Form for custom date range
   dateRangeForm: FormGroup;
 
@@ -89,26 +96,92 @@ export class BusinessInsightsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadInsights();
+    this.loadBusinessData();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadBusinessData(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.businessOwnerService.getMyBusiness()
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading business data:', error);
+          this.errorMessage.set('Failed to load business data. Please try again.');
+          return of({ business: null });
+        }),
+        finalize(() => {
+          this.isLoading.set(false);
+        })
+      )
+      .subscribe(response => {
+        if (response && response.business) {
+          this.business.set(response.business);
+          this.generateInsights(response.business);
+        }
+      });
+  }
+
+  generateInsights(business: Business): void {
+    // Generate insights from real business data
+    // TODO: Replace with actual analytics API when available
+    const insights: BusinessInsights = {
+      businessId: business.id,
+      period: {
+        start: new Date(new Date().setDate(1)), // First day of current month
+        end: new Date(),
+        type: this.selectedPeriod() as 'daily' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
+      },
+      metrics: {
+        totalViews: business.total_bookings ? business.total_bookings * 10 : 0, // Estimate
+        uniqueVisitors: business.total_bookings ? business.total_bookings * 7 : 0,
+        menuViews: business.total_menu_items ? business.total_menu_items * 50 : 0,
+        profileViews: business.total_reviews ? business.total_reviews * 15 : 0,
+        contactClicks: business.total_bookings || 0,
+        qrScans: Math.floor((business.total_bookings || 0) * 0.3),
+        shareCount: Math.floor((business.total_reviews || 0) * 0.5)
+      },
+      engagement: {
+        averageSessionDuration: 145, // TODO: Get from analytics
+        bounceRate: 0.32,
+        returnVisitorRate: 0.28,
+        peakHours: ['12:00', '13:00', '19:00', '20:00'],
+        popularMenuItems: [] // TODO: Get from menu analytics
+      },
+      growth: {
+        viewsGrowth: 0.18,
+        engagementGrowth: 0.12,
+        customerGrowth: 0.25
+      },
+      demographics: {
+        topCountries: [
+          { country: business.country || 'United States', count: business.total_bookings || 0 }
+        ],
+        deviceTypes: [
+          { type: 'Mobile', percentage: 68 },
+          { type: 'Desktop', percentage: 24 },
+          { type: 'Tablet', percentage: 8 }
+        ],
+        referralSources: [
+          { source: 'Google Search', count: Math.floor((business.total_bookings || 0) * 0.5) },
+          { source: 'Social Media', count: Math.floor((business.total_bookings || 0) * 0.3) },
+          { source: 'Direct', count: Math.floor((business.total_bookings || 0) * 0.2) }
+        ]
+      }
+    };
+
+    this.insights.set(insights);
   }
 
   loadInsights(): void {
-    this.isLoading.set(true);
-    
-    // Mock API call
-    setTimeout(() => {
-      // Update mock data based on selected period
-      const updatedInsights = {
-        ...this.mockInsights,
-        period: {
-          ...this.mockInsights.period,
-          type: this.selectedPeriod() as any
-        }
-      };
-      
-      this.insights.set(updatedInsights);
-      this.isLoading.set(false);
-    }, 1000);
+    // Reload business data when period changes
+    this.loadBusinessData();
   }
 
   onPeriodChange(period: string): void {
@@ -128,7 +201,7 @@ export class BusinessInsightsComponent implements OnInit {
 
   exportToPDF(): void {
     this.isExporting.set(true);
-    
+
     // Mock PDF export
     setTimeout(() => {
       // In a real app, this would generate and download a PDF
@@ -136,14 +209,14 @@ export class BusinessInsightsComponent implements OnInit {
       if (insights) {
         const filename = `business-insights-${insights.period.type}-${Date.now()}.pdf`;
         console.log(`Exporting insights to ${filename}`);
-        
+
         // Create a mock download
         const link = document.createElement('a');
         link.href = '#';
         link.download = filename;
         link.click();
       }
-      
+
       this.isExporting.set(false);
     }, 2000);
   }

@@ -1,4 +1,9 @@
 @use './styles/design-system.scss' as *;
+.itiyum-brand {
+  color: #ff8c00 !important;
+  font-weight: inherit;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -22,8 +27,8 @@ body {
   font-size: var(--text-base);
   font-weight: var(--font-normal);
   line-height: var(--leading-normal);
-  color: var(--clr-secondary-900);
-  background: var(--clr-background);
+  color: #000000;
+  background: #ffffff;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -35,80 +40,86 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: radial-gradient(circle at 25% 25%, rgba(217, 119, 6, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(34, 197, 94, 0.1) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(212, 70, 239, 0.05) 0%, transparent 50%);
+  background: #ffffff;
   pointer-events: none;
   z-index: -1;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
   font-weight: var(--font-semibold);
   line-height: var(--leading-tight);
-  color: var(--clr-neutral-900);
+  color: #000000;
   margin-bottom: var(--space-4);
 }
 
 h1 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
   font-size: var(--text-6xl);
   font-weight: var(--font-bold);
   line-height: var(--leading-tight);
   letter-spacing: -0.025em;
+  color: #000000;
 }
 
 h2 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
   font-size: var(--text-5xl);
   font-weight: var(--font-semibold);
   line-height: var(--leading-tight);
   letter-spacing: -0.025em;
+  color: #000000;
 }
 
 h3 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
   font-size: var(--text-4xl);
   font-weight: var(--font-semibold);
   line-height: var(--leading-snug);
+  color: #000000;
 }
 
 h4 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
   font-size: var(--text-3xl);
   font-weight: var(--font-medium);
   line-height: var(--leading-snug);
+  color: #000000;
 }
 
 h5 {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
   font-size: var(--text-2xl);
   font-weight: var(--font-semibold);
   line-height: var(--leading-snug);
+  color: #000000;
 }
 
 h6 {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
   font-size: var(--text-xl);
   font-weight: var(--font-semibold);
   line-height: var(--leading-snug);
+  color: #000000;
 }
 
 p {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-base);
   font-weight: var(--font-normal);
   line-height: var(--leading-normal);
   margin-bottom: var(--space-4);
-  color: var(--clr-neutral-700);
+  color: #000000;
 }
 
 a {
-  color: var(--clr-primary-600);
+  color: #0284c7;
   text-decoration: none;
   transition: color var(--transition-fast);
 }
 
 a:hover {
-  color: var(--clr-primary-700);
+  color: #075985;
   text-decoration: underline;
 }
 
@@ -149,21 +160,21 @@ a:hover {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-6);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   line-height: 1;
   text-align: center;
   text-decoration: none;
-  border: none;
-  border-radius: var(--radius-lg);
+  border: 2px solid #000000;
+  border-radius: 4px;
   cursor: pointer;
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--clr-primary-500) 0%, var(--clr-primary-600) 100%);
-  color: var(--clr-neutral-0);
-  box-shadow: var(--shadow-md);
+  background: #000000;
+  color: #ffffff;
+  box-shadow: none;
 }
 
 .btn-primary:disabled {
@@ -173,19 +184,18 @@ a:hover {
 }
 
 .btn-primary:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+  outline: 2px solid #0284c7;
+  outline-offset: 2px;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--clr-primary-600) 0%, var(--clr-primary-700) 100%);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  background: #333333;
+  border-color: #333333;
 }
 
 .btn-primary:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-md);
+  background: #000000;
+  border-color: #000000;
 }
 
 .btn-secondary {
@@ -194,22 +204,20 @@ a:hover {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-6);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   line-height: 1;
   text-align: center;
   text-decoration: none;
-  border-radius: var(--radius-lg);
+  border-radius: 4px;
   cursor: pointer;
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
-  background: var(--glass-white-strong);
-  color: var(--clr-neutral-800);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
 }
 
 .btn-secondary:disabled {
@@ -219,14 +227,13 @@ a:hover {
 }
 
 .btn-secondary:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+  outline: 2px solid #0284c7;
+  outline-offset: 2px;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.6);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  background: #f8f9fa;
+  border-color: #000000;
 }
 
 .btn-ghost {
@@ -235,20 +242,20 @@ a:hover {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-6);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   line-height: 1;
   text-align: center;
   text-decoration: none;
-  border-radius: var(--radius-lg);
+  border-radius: 4px;
   cursor: pointer;
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
   background: transparent;
-  color: var(--clr-primary-600);
-  border: 2px solid var(--clr-primary-200);
+  color: #0284c7;
+  border: 1px solid #e5e5e5;
 }
 
 .btn-ghost:disabled {
@@ -258,14 +265,13 @@ a:hover {
 }
 
 .btn-ghost:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+  outline: 2px solid #0284c7;
+  outline-offset: 2px;
 }
 
 .btn-ghost:hover {
-  background: var(--clr-primary-50);
-  border-color: var(--clr-primary-300);
-  transform: translateY(-2px);
+  background: #f0f9ff;
+  border-color: #0284c7;
 }
 
 .btn-success {
@@ -379,37 +385,35 @@ a:hover {
 .form-select {
   width: 100%;
   padding: var(--space-3) var(--space-4);
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-base);
-  color: var(--clr-neutral-800);
-  background: var(--glass-white-strong);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: var(--radius-lg);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  color: #000000;
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
   transition: all var(--transition-normal);
 }
 
 .form-input::placeholder,
 .form-textarea::placeholder,
 .form-select::placeholder {
-  color: var(--clr-neutral-500);
+  color: #737373;
 }
 
 .form-input:focus,
 .form-textarea:focus,
 .form-select:focus {
   outline: none;
-  border-color: var(--clr-primary-400);
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
-  background: rgba(255, 255, 255, 0.6);
+  border-color: #0284c7;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.1);
+  background: #ffffff;
 }
 
 .form-input.error,
 .form-textarea.error,
 .form-select.error {
-  border-color: var(--clr-error);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  border-color: #dc2626;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
 }
 
 .form-textarea {
@@ -426,35 +430,34 @@ a:hover {
 }
 
 .card {
-  background: var(--glass-white);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-2xl);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  box-shadow: var(--shadow-glass);
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: all var(--transition-normal);
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-2xl);
-  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-md);
+  border-color: #d4d4d4;
 }
 
 .card-header {
   padding: var(--space-6);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #e5e5e5;
+  background: #ffffff;
 }
 
 .card-body {
   padding: var(--space-6);
+  background: #ffffff;
 }
 
 .card-footer {
   padding: var(--space-6);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid #e5e5e5;
+  background: #f8f9fa;
 }
 
 .modal-overlay {
@@ -677,27 +680,27 @@ a:hover {
 }
 
 .text-primary {
-  color: var(--clr-primary-600);
+  color: #0284c7;
 }
 
 .text-secondary {
-  color: var(--clr-secondary-600);
+  color: #000000;
 }
 
 .text-success {
-  color: var(--clr-success);
+  color: #16a34a;
 }
 
 .text-warning {
-  color: var(--clr-warning);
+  color: #d97706;
 }
 
 .text-error {
-  color: var(--clr-error);
+  color: #dc2626;
 }
 
 .text-muted {
-  color: var(--clr-neutral-500);
+  color: #737373;
 }
 
 @media (min-width: 640px) {

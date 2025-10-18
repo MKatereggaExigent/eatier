@@ -140,7 +140,7 @@ export class UserFavoritesComponent implements OnInit {
         filtered.sort((a, b) => b.visitCount - a.visitCount);
         break;
       case 'distance':
-        filtered.sort((a, b) => (a.restaurant.distance || 0) - (b.restaurant.distance || 0));
+        filtered.sort((a, b) => ((a.restaurant as any).distance || 0) - ((b.restaurant as any).distance || 0));
         break;
       case 'recent':
       default:
@@ -169,12 +169,12 @@ export class UserFavoritesComponent implements OnInit {
   // Data loading methods
   loadFavorites(): void {
     this.isLoading.set(true);
-    this.favoritesService.getFavorites().subscribe({
-      next: (favorites) => {
+    this.favoritesService.favorites$.subscribe({
+      next: (favorites: any[]) => {
         this.favorites.set(favorites);
         this.isLoading.set(false);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading favorites:', error);
         this.isLoading.set(false);
       }

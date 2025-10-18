@@ -11,6 +11,7 @@ export const routes: Routes = [
         children: [
             { path: '', redirectTo: 'about', pathMatch: 'full' },
             { path: 'about', loadComponent: () => import('./pages/about/about.component').then(m => m.AboutComponent) },
+            { path: 'advertise', loadComponent: () => import('./pages/advertise/advertise.component').then(m => m.AdvertiseComponent) },
             { path: 'help', loadComponent: () => import('./pages/help-centre/help-centre.component').then(m => m.HelpCentreComponent) },
             { path: 'feedback', loadComponent: () => import('./pages/feedback/feedback.component').then(m => m.FeedbackComponent) },
             { path: 'community', loadComponent: () => import('./pages/community/community.component').then(m => m.CommunityComponent) },
@@ -48,11 +49,11 @@ export const routes: Routes = [
         ]
     },
 
-    // Eatier Admin Dashboard - Superuser managing all accounts
+    // Itiyum Admin Dashboard - Superuser managing all accounts
     {
         path: 'admin',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: ['eatier'] },
+        data: { roles: ['itiyum_admin'] },
         loadComponent: () => import('./pages/user/dashboard/dashboard.component').then(m => m.UserDashboardComponent),
         children: [
             { path: '', redirectTo: 'overview', pathMatch: 'full' },
@@ -60,8 +61,7 @@ export const routes: Routes = [
             { path: 'users', loadComponent: () => import('./pages/admin/users/admin-users.component').then(m => m.AdminUsersComponent) },
             { path: 'businesses', loadComponent: () => import('./pages/admin/businesses/admin-businesses.component').then(m => m.AdminBusinessesComponent) },
             { path: 'bookings', loadComponent: () => import('./pages/admin/bookings/admin-bookings.component').then(m => m.AdminBookingsComponent) },
-            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
-            { path: 'ads/create', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
+            { path: 'ads', loadComponent: () => import('./pages/admin/ads/admin-ads.component').then(m => m.AdminAdsComponent) },
             { path: 'analytics', loadComponent: () => import('./pages/admin/analytics/admin-analytics.component').then(m => m.AdminAnalyticsComponent) },
             { path: 'reports', loadComponent: () => import('./pages/admin/reports/admin-reports.component').then(m => m.AdminReportsComponent) },
             { path: 'settings', loadComponent: () => import('./pages/admin/settings/admin-settings.component').then(m => m.AdminSettingsComponent) }
@@ -72,7 +72,7 @@ export const routes: Routes = [
     {
         path: 'dashboard/business',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: ['business'] },
+        data: { roles: ['business_owner', 'business'] },
         loadComponent: () => import('./pages/business/dashboard/dashboard.component').then(m => m.DashboardComponent),
         children: [
             { path: '', redirectTo: 'overview', pathMatch: 'full' },
