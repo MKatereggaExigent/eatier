@@ -4,7 +4,9 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { AdminService } from '../../../core/services/admin.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 
 export interface AdminUser {
   id: string;
@@ -19,9 +21,35 @@ export interface AdminUser {
   phoneVerified: boolean;
   avatar?: string;
   phone?: string;
+
+  // Business/Tenant Info
+  tenantName?: string;
+  tenantSlug?: string;
   businessName?: string;
+  businessId?: string;
+  businessStatus?: string;
+
+  // Activity Stats
   totalBookings?: number;
   totalReviews?: number;
+  totalCheckins?: number;
+  followingCount?: number;
+  followersCount?: number;
+  badgesCount?: number;
+  lastActivityAt?: Date;
+
+  // Profile Info
+  bio?: string;
+  location?: string;
+  dateOfBirth?: Date;
+
+  // Specialist Info
+  specialization?: string;
+  yearsOfExperience?: number;
+
+  // Food Enthusiast Info
+  dietaryPreferences?: string[];
+  favoriteCuisines?: string[];
 }
 
 export interface UserFilters {
@@ -29,6 +57,15 @@ export interface UserFilters {
   status: 'all' | 'active' | 'inactive' | 'suspended' | 'pending';
   verification: 'all' | 'verified' | 'unverified';
   sortBy: 'newest' | 'oldest' | 'name' | 'email' | 'lastLogin';
+}
+
+export interface ColumnCategory {
+  label: string;
+  columns: Array<{ key: string; label: string }>;
+}
+
+export interface ColumnCategories {
+  [key: string]: ColumnCategory;
 }
 
 @Component({
@@ -42,8 +79,12 @@ export class AdminUsersComponent implements OnInit {
   private authService = inject(AuthService);
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
+  private http = inject(HttpClient);
 
   currentUser = this.authService.currentUser;
+
+  // Expose Math for template
+  Math = Math;
 
   // State management
   isLoading = signal(false);
@@ -60,6 +101,20 @@ export class AdminUsersComponent implements OnInit {
   showFilters = signal(false);
   showUserModal = signal(false);
   showDeleteConfirm = signal(false);
+  showAddUserModal = signal(false);
+  showEditRoleModal = signal(false);
+  viewMode = signal<'cards' | 'table'>('table'); // Default to table view
+
+  // Available roles from backend
+  availableRoles = signal<any[]>([]);
+  selectedRoleForEdit = signal<string>('');
+  userForRoleEdit = signal<AdminUser | null>(null);
+
+  // Column management
+  availableColumns = signal<any[]>([]);
+  columnCategories = signal<ColumnCategories>({});
+  visibleColumns = signal<string[]>([]);
+  showColumnManager = signal(false);
 
   // Filter options
   filters = signal<UserFilters>({
@@ -69,8 +124,10 @@ export class AdminUsersComponent implements OnInit {
     sortBy: 'newest'
   });
 
-  // Form for user actions
+  // Forms
   userActionForm: FormGroup;
+  addUserForm: FormGroup;
+  editRoleForm: FormGroup;
 
   // Available options
   roleOptions = [
@@ -109,6 +166,20 @@ export class AdminUsersComponent implements OnInit {
     this.userActionForm = this.fb.group({
       status: ['', Validators.required],
       reason: ['', Validators.required]
+    });
+
+    this.addUserForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      phone: [''],
+      role: ['normal_user', Validators.required],
+      status: ['active', Validators.required]
+    });
+
+    this.editRoleForm = this.fb.group({
+      role: ['', Validators.required]
     });
   }
 
@@ -190,8 +261,17 @@ export class AdminUsersComponent implements OnInit {
     };
   });
 
+  // Pagination computed values
+  totalPages = computed(() => Math.ceil(this.totalUsers() / this.pageSize()));
+
+  hasNextPage = computed(() => this.currentPage() < this.totalPages());
+
+  hasPreviousPage = computed(() => this.currentPage() > 1);
+
   ngOnInit() {
     this.loadUsers();
+    this.loadRoles();
+    this.loadColumns();
   }
 
   // Data loading methods
@@ -283,9 +363,125 @@ export class AdminUsersComponent implements OnInit {
     return roleMap[roleName] || 'normal_user';
   }
 
+  loadRoles(): void {
+    this.http.get<any>(`${environment.apiUrl}/admin/roles`).subscribe({
+      next: (response) => {
+        this.availableRoles.set(response.roles || []);
+      },
+      error: (error) => {
+        console.error('Error loading roles:', error);
+        // Fallback to basic roles
+        this.availableRoles.set([
+          { role_name: 'normal_user', display_name: 'Normal User', category: 'customer' },
+          { role_name: 'food_enthusiast', display_name: 'Food Enthusiast', category: 'customer' },
+          { role_name: 'business_owner', display_name: 'Business Owner', category: 'business' },
+          { role_name: 'specialist', display_name: 'Specialist', category: 'customer' },
+          { role_name: 'itiyum_admin', display_name: 'Itiyum Admin', category: 'administrative' }
+        ]);
+      }
+    });
+  }
+
+  loadColumns(): void {
+    this.http.get<any>(`${environment.apiUrl}/admin/users/columns`).subscribe({
+      next: (response) => {
+        this.availableColumns.set(response.columns || []);
+        this.columnCategories.set(response.categories || {});
+
+        // Load saved column preferences from localStorage or use defaults
+        const savedColumns = localStorage.getItem('adminUsersVisibleColumns');
+        if (savedColumns) {
+          this.visibleColumns.set(JSON.parse(savedColumns));
+        } else {
+          this.visibleColumns.set(response.defaultColumns || []);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading columns:', error);
+        // Fallback to basic columns
+        this.visibleColumns.set(['email', 'firstName', 'lastName', 'role', 'status', 'tenantName', 'businessName', 'totalBookings', 'totalReviews', 'createdAt', 'lastLoginAt']);
+      }
+    });
+  }
+
+  toggleColumn(columnKey: string): void {
+    const currentColumns = this.visibleColumns();
+    if (currentColumns.includes(columnKey)) {
+      this.visibleColumns.set(currentColumns.filter(col => col !== columnKey));
+    } else {
+      this.visibleColumns.set([...currentColumns, columnKey]);
+    }
+    // Save to localStorage
+    localStorage.setItem('adminUsersVisibleColumns', JSON.stringify(this.visibleColumns()));
+  }
+
+  isColumnVisible(columnKey: string): boolean {
+    return this.visibleColumns().includes(columnKey);
+  }
+
+  openColumnManager(): void {
+    this.showColumnManager.set(true);
+  }
+
+  closeColumnManager(): void {
+    this.showColumnManager.set(false);
+  }
+
+  resetColumns(): void {
+    const defaultColumns = this.availableColumns().filter(col => col.default).map(col => col.key);
+    this.visibleColumns.set(defaultColumns);
+    localStorage.setItem('adminUsersVisibleColumns', JSON.stringify(defaultColumns));
+  }
+
+  getColumnValue(user: AdminUser, columnKey: string): any {
+    // Map camelCase keys to user properties
+    const keyMap: Record<string, keyof AdminUser> = {
+      'id': 'id',
+      'email': 'email',
+      'firstName': 'firstName',
+      'lastName': 'lastName',
+      'phone': 'phone',
+      'role': 'role',
+      'status': 'status',
+      'tenantName': 'tenantName',
+      'businessName': 'businessName',
+      'businessStatus': 'businessStatus',
+      'emailVerified': 'emailVerified',
+      'phoneVerified': 'phoneVerified',
+      'totalBookings': 'totalBookings',
+      'totalReviews': 'totalReviews',
+      'totalCheckins': 'totalCheckins',
+      'followingCount': 'followingCount',
+      'followersCount': 'followersCount',
+      'badgesCount': 'badgesCount',
+      'bio': 'bio',
+      'location': 'location',
+      'dateOfBirth': 'dateOfBirth',
+      'specialization': 'specialization',
+      'yearsOfExperience': 'yearsOfExperience',
+      'dietaryPreferences': 'dietaryPreferences',
+      'favoriteCuisines': 'favoriteCuisines',
+      'createdAt': 'createdAt',
+      'lastLoginAt': 'lastLoginAt',
+      'lastActivityAt': 'lastActivityAt'
+    };
+
+    const mappedKey = keyMap[columnKey];
+    return mappedKey ? user[mappedKey] : undefined;
+  }
+
+  getColumnLabel(columnKey: string): string {
+    const column = this.availableColumns().find(col => col.key === columnKey);
+    return column ? column.label : columnKey;
+  }
+
   // UI interaction methods
   toggleFilters(): void {
     this.showFilters.set(!this.showFilters());
+  }
+
+  toggleViewMode(): void {
+    this.viewMode.set(this.viewMode() === 'cards' ? 'table' : 'cards');
   }
 
   clearFilters(): void {
@@ -397,6 +593,90 @@ export class AdminUsersComponent implements OnInit {
     this.selectedUser.set(null);
   }
 
+  // Add User methods
+  openAddUserModal(): void {
+    this.addUserForm.reset({
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+      phone: '',
+      role: 'normal_user',
+      status: 'active'
+    });
+    this.showAddUserModal.set(true);
+  }
+
+  closeAddUserModal(): void {
+    this.showAddUserModal.set(false);
+    this.addUserForm.reset();
+  }
+
+  createUser(): void {
+    if (this.addUserForm.valid) {
+      const formValue = this.addUserForm.value;
+      this.http.post<any>(`${environment.apiUrl}/admin/users`, formValue).subscribe({
+        next: (response) => {
+          console.log('User created successfully:', response);
+          this.closeAddUserModal();
+          this.loadUsers(); // Reload users list
+          alert('User created successfully!');
+        },
+        error: (error) => {
+          console.error('Error creating user:', error);
+          alert(error.error?.error || 'Failed to create user. Please try again.');
+        }
+      });
+    } else {
+      alert('Please fill in all required fields correctly.');
+    }
+  }
+
+  // Edit Role methods
+  openEditRoleModal(user: AdminUser): void {
+    this.userForRoleEdit.set(user);
+    this.editRoleForm.patchValue({
+      role: this.mapRoleToBackend(user.role)
+    });
+    this.showEditRoleModal.set(true);
+  }
+
+  closeEditRoleModal(): void {
+    this.showEditRoleModal.set(false);
+    this.userForRoleEdit.set(null);
+    this.editRoleForm.reset();
+  }
+
+  updateUserRole(): void {
+    const user = this.userForRoleEdit();
+    if (user && this.editRoleForm.valid) {
+      const newRole = this.editRoleForm.value.role;
+      this.http.patch<any>(`${environment.apiUrl}/admin/users/${user.id}/role`, { role: newRole }).subscribe({
+        next: (response) => {
+          console.log('User role updated successfully:', response);
+          this.closeEditRoleModal();
+          this.loadUsers(); // Reload users list
+          alert('User role updated successfully!');
+        },
+        error: (error) => {
+          console.error('Error updating user role:', error);
+          alert(error.error?.error || 'Failed to update user role. Please try again.');
+        }
+      });
+    }
+  }
+
+  private mapRoleToBackend(role: AdminUser['role']): string {
+    const roleMap: Record<AdminUser['role'], string> = {
+      'itiyum': 'itiyum_admin',
+      'business': 'business_owner',
+      'food_enthusiast': 'food_enthusiast',
+      'normal_user': 'normal_user',
+      'specialist': 'specialist'
+    };
+    return roleMap[role] || 'normal_user';
+  }
+
   // Utility methods
   getRoleLabel(role: string): string {
     const roleMap: { [key: string]: string } = {
@@ -446,6 +726,73 @@ export class AdminUsersComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  // Pagination methods
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      this.loadUsers();
+    }
+  }
+
+  nextPage(): void {
+    if (this.hasNextPage()) {
+      this.currentPage.update(page => page + 1);
+      this.loadUsers();
+    }
+  }
+
+  previousPage(): void {
+    if (this.hasPreviousPage()) {
+      this.currentPage.update(page => page - 1);
+      this.loadUsers();
+    }
+  }
+
+  changePageSize(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const newSize = parseInt(target.value, 10);
+    this.pageSize.set(newSize);
+    this.currentPage.set(1); // Reset to first page
+    this.loadUsers();
+  }
+
+  getPageNumbers(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
+
+    if (total <= 7) {
+      // Show all pages if 7 or fewer
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
+
+      if (current > 3) {
+        pages.push(-1); // Ellipsis
+      }
+
+      // Show pages around current
+      const start = Math.max(2, current - 1);
+      const end = Math.min(total - 1, current + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (current < total - 2) {
+        pages.push(-1); // Ellipsis
+      }
+
+      // Always show last page
+      pages.push(total);
+    }
+
+    return pages;
   }
 
 }

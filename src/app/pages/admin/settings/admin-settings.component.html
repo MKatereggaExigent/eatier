@@ -3,51 +3,55 @@
   <header class="settings-header">
     <div class="header-content">
       <div class="title-section">
-        <h1 class="page-title">
-          <span class="title-icon">⚙️</span>
-          Platform Settings
-        </h1>
-        <p class="page-subtitle">
-          Configure platform-wide settings and system preferences
-        </p>
-      </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon">🔧</div>
-        <div class="stat-content">
-          <div class="stat-number">{{ getTotalSettings() }}</div>
-          <div class="stat-label">Total Settings</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon">✅</div>
-        <div class="stat-content">
-          <div class="stat-number">{{ getActiveSettings() }}</div>
-          <div class="stat-label">Active Features</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon">🔒</div>
-        <div class="stat-content">
-          <div class="stat-number">{{ getSecuritySettings() }}</div>
-          <div class="stat-label">Security Settings</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon">🔔</div>
-        <div class="stat-content">
-          <div class="stat-number">{{ getNotificationSettings() }}</div>
-          <div class="stat-label">Notifications</div>
-        </div>
+        <h1 class="page-title">Platform Settings</h1>
+        <p class="page-subtitle">Configure platform-wide settings and system preferences</p>
       </div>
     </div>
   </header>
+
+  <!-- Tab Navigation -->
+  <nav class="tab-navigation">
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeTab() === 'general'"
+      (click)="setActiveTab('general')">
+      <span class="tab-icon">⚙️</span>
+      General
+    </button>
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeTab() === 'security'"
+      (click)="setActiveTab('security')">
+      <span class="tab-icon">🔒</span>
+      Security
+    </button>
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeTab() === 'notifications'"
+      (click)="setActiveTab('notifications')">
+      <span class="tab-icon">🔔</span>
+      Notifications
+    </button>
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeTab() === 'bookings'"
+      (click)="setActiveTab('bookings')">
+      <span class="tab-icon">📅</span>
+      Bookings
+    </button>
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeTab() === 'businesses'"
+      (click)="setActiveTab('businesses')">
+      <span class="tab-icon">🏪</span>
+      Businesses
+    </button>
+  </nav>
 
   <!-- Settings Content -->
   <section class="settings-content">
@@ -57,121 +61,611 @@
         <p>Loading settings...</p>
       </div>
     } @else {
-      <div class="settings-grid">
-        @for (category of settingCategories(); track category.id) {
-          <div class="settings-category">
-            <div class="category-header">
-              <div class="category-icon">{{ category.icon }}</div>
-              <div class="category-info">
-                <h3 class="category-name">{{ category.name }}</h3>
-                <p class="category-description">{{ category.description }}</p>
+      <!-- General Settings Tab -->
+      @if (activeTab() === 'general') {
+        <div class="settings-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">General Settings</h2>
+            <p class="panel-description">Basic platform configuration and preferences</p>
+          </div>
+
+          <div class="settings-form">
+            <!-- Platform Information -->
+            <div class="form-section">
+              <h3 class="section-title">Platform Information</h3>
+
+              <div class="form-group">
+                <label for="platformName" class="form-label">Platform Name</label>
+                <input
+                  type="text"
+                  id="platformName"
+                  class="form-input"
+                  [(ngModel)]="platformName"
+                  placeholder="Enter platform name">
+              </div>
+
+              <div class="form-group">
+                <label for="platformSlug" class="form-label">Platform Slug</label>
+                <input
+                  type="text"
+                  id="platformSlug"
+                  class="form-input"
+                  [value]="platformSlug()"
+                  disabled
+                  placeholder="Platform slug (read-only)">
+                <p class="form-help">The platform slug cannot be changed</p>
+              </div>
+
+              <div class="form-group">
+                <label for="platformDomain" class="form-label">Custom Domain</label>
+                <input
+                  type="text"
+                  id="platformDomain"
+                  class="form-input"
+                  [(ngModel)]="platformDomain"
+                  placeholder="e.g., app.itiyum.com">
+              </div>
+
+              <div class="form-group">
+                <label for="platformLogoUrl" class="form-label">Logo URL</label>
+                <input
+                  type="url"
+                  id="platformLogoUrl"
+                  class="form-input"
+                  [(ngModel)]="platformLogoUrl"
+                  placeholder="https://example.com/logo.png">
               </div>
             </div>
 
-            <div class="category-settings">
-              @for (setting of category.settings; track setting.id) {
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-name" [for]="setting.id">{{ setting.name }}</label>
-                    <p class="setting-description">{{ setting.description }}</p>
-                  </div>
+            <!-- Subscription Information -->
+            <div class="form-section">
+              <h3 class="section-title">Subscription</h3>
 
-                  <div class="setting-control">
-                    @switch (setting.type) {
-                      @case ('toggle') {
-                        <label class="toggle-switch">
-                          <input
-                            type="checkbox"
-                            [id]="setting.id"
-                            [(ngModel)]="setting.value"
-                            (change)="updateSetting(setting)">
-                          <span class="toggle-slider"></span>
-                        </label>
-                      }
-
-                      @case ('text') {
-                        <input
-                          type="text"
-                          [id]="setting.id"
-                          class="setting-input"
-                          [(ngModel)]="setting.value"
-                          (blur)="updateSetting(setting)"
-                          [required]="setting.required || false">
-                      }
-
-                      @case ('number') {
-                        <input
-                          type="number"
-                          [id]="setting.id"
-                          class="setting-input"
-                          [(ngModel)]="setting.value"
-                          (blur)="updateSetting(setting)"
-                          [required]="setting.required || false">
-                      }
-
-                      @case ('select') {
-                        <select
-                          [id]="setting.id"
-                          class="setting-select"
-                          [(ngModel)]="setting.value"
-                          (change)="updateSetting(setting)">
-                          @for (option of setting.options; track option.value) {
-                            <option [value]="option.value">{{ option.label }}</option>
-                          }
-                        </select>
-                      }
-
-                      @case ('textarea') {
-                        <textarea
-                          [id]="setting.id"
-                          class="setting-textarea"
-                          [(ngModel)]="setting.value"
-                          (blur)="updateSetting(setting)"
-                          [required]="setting.required || false"
-                          rows="3">
-                        </textarea>
-                      }
-                    }
-                  </div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Plan</span>
+                  <span class="info-value">{{ subscriptionPlan() }}</span>
                 </div>
-              }
+                <div class="info-item">
+                  <span class="info-label">Status</span>
+                  <span class="info-value status-badge" [class.active]="subscriptionStatus() === 'active'">
+                    {{ subscriptionStatus() }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Localization -->
+            <div class="form-section">
+              <h3 class="section-title">Localization</h3>
+
+              <div class="form-group">
+                <label for="defaultLanguage" class="form-label">Default Language</label>
+                <select id="defaultLanguage" class="form-select" [(ngModel)]="defaultLanguage">
+                  <option value="en">English</option>
+                  <option value="fr">French</option>
+                  <option value="sw">Swahili</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="defaultTimezone" class="form-label">Default Timezone</label>
+                <input
+                  type="text"
+                  id="defaultTimezone"
+                  class="form-input"
+                  [(ngModel)]="defaultTimezone"
+                  placeholder="UTC">
+              </div>
+
+              <div class="form-group">
+                <label for="defaultCurrency" class="form-label">Default Currency</label>
+                <select id="defaultCurrency" class="form-select" [(ngModel)]="defaultCurrency">
+                  <option value="UGX">UGX - Ugandan Shilling</option>
+                  <option value="USD">USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="GBP">GBP - British Pound</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- System Toggles -->
+            <div class="form-section">
+              <h3 class="section-title">System Settings</h3>
+
+              <div class="toggle-group">
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="maintenanceMode" class="toggle-label">Maintenance Mode</label>
+                    <p class="toggle-description">Enable maintenance mode to prevent user access</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="maintenanceMode" [(ngModel)]="maintenanceMode">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="allowRegistrations" class="toggle-label">Allow New Registrations</label>
+                    <p class="toggle-description">Allow new users to register on the platform</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="allowRegistrations" [(ngModel)]="allowRegistrations">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-primary"
+                (click)="saveGeneralSettings()"
+                [disabled]="isSaving()">
+                @if (isSaving()) {
+                  <span class="btn-spinner"></span>
+                  Saving...
+                } @else {
+                  Save General Settings
+                }
+              </button>
             </div>
           </div>
-        }
-      </div>
+        </div>
+      }
 
-      <!-- Save Actions -->
-      <div class="settings-actions">
-        <button
-          type="button"
-          class="btn-primary save-btn"
-          (click)="saveAllSettings()"
-          [disabled]="isSaving()">
-          @if (isSaving()) {
-            <span class="btn-spinner"></span>
-            Saving...
-          } @else {
-            <span class="btn-icon">💾</span>
-            Save All Changes
-          }
-        </button>
+      <!-- Security Settings Tab -->
+      @if (activeTab() === 'security') {
+        <div class="settings-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Security Settings</h2>
+            <p class="panel-description">Configure security and authentication settings</p>
+          </div>
 
-        <button
-          type="button"
-          class="btn-secondary reset-btn"
-          (click)="resetToDefaults()">
-          <span class="btn-icon">🔄</span>
-          Reset to Defaults
-        </button>
+          <div class="settings-form">
+            <!-- Session Management -->
+            <div class="form-section">
+              <h3 class="section-title">Session Management</h3>
 
-        <button
-          type="button"
-          class="btn-secondary export-btn"
-          (click)="exportSettings()">
-          <span class="btn-icon">📤</span>
-          Export Settings
-        </button>
-      </div>
+              <div class="form-group">
+                <label for="sessionTimeout" class="form-label">Session Timeout (minutes)</label>
+                <input
+                  type="number"
+                  id="sessionTimeout"
+                  class="form-input"
+                  [(ngModel)]="sessionTimeout"
+                  min="5"
+                  max="1440"
+                  placeholder="30">
+                <p class="form-help">How long before inactive sessions expire</p>
+              </div>
+            </div>
+
+            <!-- Login Security -->
+            <div class="form-section">
+              <h3 class="section-title">Login Security</h3>
+
+              <div class="form-group">
+                <label for="maxLoginAttempts" class="form-label">Max Login Attempts</label>
+                <input
+                  type="number"
+                  id="maxLoginAttempts"
+                  class="form-input"
+                  [(ngModel)]="maxLoginAttempts"
+                  min="3"
+                  max="10"
+                  placeholder="5">
+              </div>
+
+              <div class="form-group">
+                <label for="lockoutDuration" class="form-label">Lockout Duration (minutes)</label>
+                <input
+                  type="number"
+                  id="lockoutDuration"
+                  class="form-input"
+                  [(ngModel)]="lockoutDuration"
+                  min="5"
+                  max="60"
+                  placeholder="15">
+              </div>
+
+              <div class="toggle-group">
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="twoFactorEnabled" class="toggle-label">Two-Factor Authentication</label>
+                    <p class="toggle-description">Enable two-factor authentication for all users</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="twoFactorEnabled" [(ngModel)]="twoFactorEnabled">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Password Requirements -->
+            <div class="form-section">
+              <h3 class="section-title">Password Requirements</h3>
+
+              <div class="form-group">
+                <label for="passwordMinLength" class="form-label">Minimum Password Length</label>
+                <input
+                  type="number"
+                  id="passwordMinLength"
+                  class="form-input"
+                  [(ngModel)]="passwordMinLength"
+                  min="6"
+                  max="32"
+                  placeholder="8">
+              </div>
+
+              <div class="toggle-group">
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="passwordRequireUppercase" class="toggle-label">Require Uppercase Letter</label>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="passwordRequireUppercase" [(ngModel)]="passwordRequireUppercase">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="passwordRequireLowercase" class="toggle-label">Require Lowercase Letter</label>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="passwordRequireLowercase" [(ngModel)]="passwordRequireLowercase">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="passwordRequireNumber" class="toggle-label">Require Number</label>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="passwordRequireNumber" [(ngModel)]="passwordRequireNumber">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="passwordRequireSpecial" class="toggle-label">Require Special Character</label>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="passwordRequireSpecial" [(ngModel)]="passwordRequireSpecial">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-primary"
+                (click)="saveSecuritySettings()"
+                [disabled]="isSaving()">
+                @if (isSaving()) {
+                  <span class="btn-spinner"></span>
+                  Saving...
+                } @else {
+                  Save Security Settings
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Notifications Settings Tab -->
+      @if (activeTab() === 'notifications') {
+        <div class="settings-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Notification Settings</h2>
+            <p class="panel-description">Configure email and push notifications</p>
+          </div>
+
+          <div class="settings-form">
+            <!-- Notification Channels -->
+            <div class="form-section">
+              <h3 class="section-title">Notification Channels</h3>
+
+              <div class="toggle-group">
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="emailNotifications" class="toggle-label">Email Notifications</label>
+                    <p class="toggle-description">Send notifications via email</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="emailNotifications" [(ngModel)]="emailNotifications">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="pushNotifications" class="toggle-label">Push Notifications</label>
+                    <p class="toggle-description">Send push notifications to mobile devices</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="pushNotifications" [(ngModel)]="pushNotifications">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="smsNotifications" class="toggle-label">SMS Notifications</label>
+                    <p class="toggle-description">Send notifications via SMS</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="smsNotifications" [(ngModel)]="smsNotifications">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="form-section">
+              <h3 class="section-title">Notification Preferences</h3>
+
+              <div class="form-group">
+                <label for="adminEmail" class="form-label">Admin Email</label>
+                <input
+                  type="email"
+                  id="adminEmail"
+                  class="form-input"
+                  [(ngModel)]="adminEmail"
+                  placeholder="admin@itiyum.com">
+                <p class="form-help">Email address for admin notifications</p>
+              </div>
+
+              <div class="form-group">
+                <label for="notificationFrequency" class="form-label">Notification Frequency</label>
+                <select id="notificationFrequency" class="form-select" [(ngModel)]="notificationFrequency">
+                  <option value="realtime">Real-time</option>
+                  <option value="daily">Daily Digest</option>
+                  <option value="weekly">Weekly Digest</option>
+                  <option value="never">Never</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Notification Templates -->
+            <div class="form-section">
+              <h3 class="section-title">Notification Templates</h3>
+              <p class="section-description">{{ activeNotificationTemplates() }} of {{ totalNotificationTemplates() }} templates are active</p>
+
+              @if (notificationTemplates().length > 0) {
+                <div class="templates-list">
+                  @for (template of notificationTemplates(); track template.id) {
+                    <div class="template-item">
+                      <div class="template-info">
+                        <span class="template-name">{{ template.name }}</span>
+                        <span class="template-meta">{{ template.type }} • {{ template.channel }}</span>
+                      </div>
+                      <span class="template-status" [class.active]="template.is_active">
+                        {{ template.is_active ? 'Active' : 'Inactive' }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="empty-state">No notification templates found</p>
+              }
+            </div>
+
+            <!-- Save Button -->
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-primary"
+                (click)="saveNotificationSettings()"
+                [disabled]="isSaving()">
+                @if (isSaving()) {
+                  <span class="btn-spinner"></span>
+                  Saving...
+                } @else {
+                  Save Notification Settings
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Bookings Settings Tab -->
+      @if (activeTab() === 'bookings') {
+        <div class="settings-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Booking Settings</h2>
+            <p class="panel-description">Configure booking and reservation settings</p>
+          </div>
+
+          <div class="settings-form">
+            <!-- Booking Behavior -->
+            <div class="form-section">
+              <h3 class="section-title">Booking Behavior</h3>
+
+              <div class="toggle-group">
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="autoConfirmBookings" class="toggle-label">Auto-Confirm Bookings</label>
+                    <p class="toggle-description">Automatically confirm bookings without manual approval</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="autoConfirmBookings" [(ngModel)]="autoConfirmBookings">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="allowDoubleBooking" class="toggle-label">Allow Double Booking</label>
+                    <p class="toggle-description">Allow multiple bookings for the same time slot</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="allowDoubleBooking" [(ngModel)]="allowDoubleBooking">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="requirePaymentUpfront" class="toggle-label">Require Payment Upfront</label>
+                    <p class="toggle-description">Require payment before confirming bookings</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="requirePaymentUpfront" [(ngModel)]="requirePaymentUpfront">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Booking Limits -->
+            <div class="form-section">
+              <h3 class="section-title">Booking Limits</h3>
+
+              <div class="form-group">
+                <label for="bookingCancellationHours" class="form-label">Cancellation Window (hours)</label>
+                <input
+                  type="number"
+                  id="bookingCancellationHours"
+                  class="form-input"
+                  [(ngModel)]="bookingCancellationHours"
+                  min="1"
+                  max="168"
+                  placeholder="24">
+                <p class="form-help">Minimum hours before booking time to allow cancellation</p>
+              </div>
+
+              <div class="form-group">
+                <label for="maxAdvanceBookingDays" class="form-label">Max Advance Booking (days)</label>
+                <input
+                  type="number"
+                  id="maxAdvanceBookingDays"
+                  class="form-input"
+                  [(ngModel)]="maxAdvanceBookingDays"
+                  min="1"
+                  max="365"
+                  placeholder="90">
+                <p class="form-help">Maximum days in advance users can book</p>
+              </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-primary"
+                (click)="saveBookingSettings()"
+                [disabled]="isSaving()">
+                @if (isSaving()) {
+                  <span class="btn-spinner"></span>
+                  Saving...
+                } @else {
+                  Save Booking Settings
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Businesses Settings Tab -->
+      @if (activeTab() === 'businesses') {
+        <div class="settings-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Business Settings</h2>
+            <p class="panel-description">Configure business registration and verification</p>
+          </div>
+
+          <div class="settings-form">
+            <!-- Business Registration -->
+            <div class="form-section">
+              <h3 class="section-title">Business Registration</h3>
+
+              <div class="toggle-group">
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="requireVerification" class="toggle-label">Require Verification</label>
+                    <p class="toggle-description">Require businesses to be verified before going live</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="requireVerification" [(ngModel)]="requireVerification">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="autoApproveBusinesses" class="toggle-label">Auto-Approve Businesses</label>
+                    <p class="toggle-description">Automatically approve new business registrations</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="autoApproveBusinesses" [(ngModel)]="autoApproveBusinesses">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <label for="requireBusinessDocuments" class="toggle-label">Require Business Documents</label>
+                    <p class="toggle-description">Require businesses to upload registration documents</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="requireBusinessDocuments" [(ngModel)]="requireBusinessDocuments">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Business Limits -->
+            <div class="form-section">
+              <h3 class="section-title">Business Limits</h3>
+
+              <div class="form-group">
+                <label for="maxBusinessesPerUser" class="form-label">Max Businesses Per User</label>
+                <input
+                  type="number"
+                  id="maxBusinessesPerUser"
+                  class="form-input"
+                  [(ngModel)]="maxBusinessesPerUser"
+                  min="1"
+                  max="50"
+                  placeholder="5">
+                <p class="form-help">Maximum number of businesses a user can own</p>
+              </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-primary"
+                (click)="saveBusinessSettings()"
+                [disabled]="isSaving()">
+                @if (isSaving()) {
+                  <span class="btn-spinner"></span>
+                  Saving...
+                } @else {
+                  Save Business Settings
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     }
   </section>
 

@@ -1,18 +1,29 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+
 import { AdminService } from '../../../core/services/admin.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 export interface AdminBooking {
   id: string;
+  bookingReference?: string;
   bookingDate: Date;
   bookingTime: string;
   partySize: number;
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   specialRequests?: string;
-  totalAmount?: number;
+  bookingTier?: 'basic' | 'standard' | 'premium' | 'priority';
+  tierPrice?: number;
+  contactName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  tablePreferences?: string;
+  occasion?: string;
+  confirmedAt?: Date;
+  cancelledAt?: Date;
+  cancellationReason?: string;
   createdAt: Date;
   updatedAt: Date;
   userId: string;
@@ -21,7 +32,6 @@ export interface AdminBooking {
   userPhone?: string;
   businessId: string;
   businessName: string;
-  businessType: string;
   businessEmail: string;
   businessPhone?: string;
 }
@@ -46,15 +56,28 @@ export class AdminBookingsComponent implements OnInit {
 
   currentUser = this.authService.currentUser;
 
+  // Expose Math for template
+  Math = Math;
+
   // State management
   isLoading = signal(false);
   bookings = signal<AdminBooking[]>([]);
   selectedBooking = signal<AdminBooking | null>(null);
 
+  // Pagination
+  currentPage = signal(1);
+  pageSize = signal(20);
+  totalBookings = signal(0);
+
   // UI state
   searchQuery = signal('');
   showFilters = signal(false);
   showBookingModal = signal(false);
+  showConfirmDialog = signal(false);
+  showCancelDialog = signal(false);
+  pendingAction = signal<{ type: 'confirm' | 'cancel', booking: AdminBooking | null }>({ type: 'confirm', booking: null });
+  cancelReason = signal('');
+  viewMode = signal<'cards' | 'table'>('table'); // Default to table view
 
   // Filter options
   filters = signal<BookingFilters>({
@@ -80,51 +103,9 @@ export class AdminBookingsComponent implements OnInit {
   ];
 
   // Computed properties
+  // Server-side filtering is already applied, so just return the bookings
   filteredBookings = computed(() => {
-    let filtered = this.bookings();
-    const query = this.searchQuery().toLowerCase();
-    const currentFilters = this.filters();
-
-    // Search filter
-    if (query) {
-      filtered = filtered.filter(booking =>
-        booking.userName.toLowerCase().includes(query) ||
-        booking.userEmail.toLowerCase().includes(query) ||
-        booking.businessName.toLowerCase().includes(query)
-      );
-    }
-
-    // Status filter
-    if (currentFilters.status !== 'all') {
-      filtered = filtered.filter(booking => booking.status === currentFilters.status);
-    }
-
-    // Date range filter
-    if (currentFilters.dateFrom) {
-      const fromDate = new Date(currentFilters.dateFrom);
-      filtered = filtered.filter(booking => new Date(booking.bookingDate) >= fromDate);
-    }
-
-    if (currentFilters.dateTo) {
-      const toDate = new Date(currentFilters.dateTo);
-      filtered = filtered.filter(booking => new Date(booking.bookingDate) <= toDate);
-    }
-
-    // Sort
-    filtered.sort((a, b) => {
-      switch (currentFilters.sortBy) {
-        case 'oldest':
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        case 'newest':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        case 'date':
-          return new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime();
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
+    return this.bookings();
   });
 
   hasActiveFilters = computed(() => {
@@ -143,9 +124,16 @@ export class AdminBookingsComponent implements OnInit {
       pending: bookings.filter(b => b.status === 'pending').length,
       cancelled: bookings.filter(b => b.status === 'cancelled').length,
       completed: bookings.filter(b => b.status === 'completed').length,
-      totalRevenue: bookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0)
+      totalRevenue: bookings.reduce((sum, b) => sum + (b.tierPrice || 0), 0)
     };
   });
+
+  // Pagination computed values
+  totalPages = computed(() => Math.ceil(this.totalBookings() / this.pageSize()));
+
+  hasNextPage = computed(() => this.currentPage() < this.totalPages());
+
+  hasPreviousPage = computed(() => this.currentPage() > 1);
 
   ngOnInit() {
     this.loadBookings();
@@ -154,13 +142,13 @@ export class AdminBookingsComponent implements OnInit {
   // Data loading methods
   loadBookings(): void {
     this.isLoading.set(true);
-    
+
     const currentFilters = this.filters();
     const searchTerm = this.searchQuery();
-    
+
     this.adminService.getBookings(
-      1,
-      100,
+      this.currentPage(),
+      this.pageSize(),
       searchTerm || undefined,
       currentFilters.status,
       undefined,
@@ -168,14 +156,25 @@ export class AdminBookingsComponent implements OnInit {
       currentFilters.dateTo || undefined
     ).subscribe({
       next: (response: any) => {
+        this.totalBookings.set(response.total || 0);
         const mappedBookings: AdminBooking[] = response.bookings.map((booking: any) => ({
           id: booking.id,
+          bookingReference: booking.booking_reference,
           bookingDate: new Date(booking.booking_date),
           bookingTime: booking.booking_time,
           partySize: booking.party_size,
           status: booking.status,
           specialRequests: booking.special_requests,
-          totalAmount: booking.total_amount ? parseFloat(booking.total_amount) : undefined,
+          bookingTier: booking.booking_tier,
+          tierPrice: booking.tier_price ? parseFloat(booking.tier_price) : undefined,
+          contactName: booking.contact_name,
+          contactPhone: booking.contact_phone,
+          contactEmail: booking.contact_email,
+          tablePreferences: booking.table_preferences,
+          occasion: booking.occasion,
+          confirmedAt: booking.confirmed_at ? new Date(booking.confirmed_at) : undefined,
+          cancelledAt: booking.cancelled_at ? new Date(booking.cancelled_at) : undefined,
+          cancellationReason: booking.cancellation_reason,
           createdAt: new Date(booking.created_at),
           updatedAt: new Date(booking.updated_at),
           userId: booking.user_id,
@@ -184,11 +183,10 @@ export class AdminBookingsComponent implements OnInit {
           userPhone: booking.user_phone,
           businessId: booking.business_id,
           businessName: booking.business_name || 'Unknown',
-          businessType: booking.business_type || '',
           businessEmail: booking.business_email || '',
           businessPhone: booking.business_phone
         }));
-        
+
         this.bookings.set(mappedBookings);
         this.isLoading.set(false);
       },
@@ -226,11 +224,11 @@ export class AdminBookingsComponent implements OnInit {
   onSearchInput(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.searchQuery.set(target.value);
-    
+
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
-    
+
     this.searchTimeout = setTimeout(() => {
       this.loadBookings();
     }, 500);
@@ -253,42 +251,63 @@ export class AdminBookingsComponent implements OnInit {
   }
 
   confirmBooking(booking: AdminBooking): void {
-    if (confirm(`Confirm booking for ${booking.userName} at ${booking.businessName}?`)) {
-      this.adminService.confirmBooking(booking.id).subscribe({
-        next: () => {
-          const bookings = this.bookings();
-          const updatedBookings = bookings.map(b =>
-            b.id === booking.id ? { ...b, status: 'confirmed' as const } : b
-          );
-          this.bookings.set(updatedBookings);
-          alert('Booking confirmed successfully.');
-        },
-        error: (error) => {
-          console.error('Error confirming booking:', error);
-          alert('Failed to confirm booking. Please try again.');
-        }
-      });
-    }
+    this.pendingAction.set({ type: 'confirm', booking });
+    this.showConfirmDialog.set(true);
   }
 
   cancelBooking(booking: AdminBooking): void {
-    const reason = prompt(`Enter reason for cancelling booking for ${booking.userName}:`);
-    if (reason !== null) {
-      this.adminService.cancelBooking(booking.id, reason).subscribe({
-        next: () => {
-          const bookings = this.bookings();
-          const updatedBookings = bookings.map(b =>
-            b.id === booking.id ? { ...b, status: 'cancelled' as const } : b
-          );
-          this.bookings.set(updatedBookings);
-          alert('Booking cancelled successfully.');
-        },
-        error: (error) => {
-          console.error('Error cancelling booking:', error);
-          alert('Failed to cancel booking. Please try again.');
-        }
-      });
+    this.pendingAction.set({ type: 'cancel', booking });
+    this.cancelReason.set('');
+    this.showCancelDialog.set(true);
+  }
+
+  executeConfirmBooking(): void {
+    const action = this.pendingAction();
+    if (!action.booking) return;
+
+    this.adminService.confirmBooking(action.booking.id).subscribe({
+      next: () => {
+        this.loadBookings(); // Reload to get fresh data
+        this.showConfirmDialog.set(false);
+      },
+      error: (error) => {
+        console.error('Error confirming booking:', error);
+        alert('Failed to confirm booking. Please try again.');
+      }
+    });
+  }
+
+  executeCancelBooking(): void {
+    const action = this.pendingAction();
+    const reason = this.cancelReason();
+
+    if (!action.booking || !reason.trim()) {
+      alert('Please provide a cancellation reason.');
+      return;
     }
+
+    this.adminService.cancelBooking(action.booking.id, reason).subscribe({
+      next: () => {
+        this.loadBookings(); // Reload to get fresh data
+        this.showCancelDialog.set(false);
+        this.cancelReason.set('');
+      },
+      error: (error) => {
+        console.error('Error cancelling booking:', error);
+        alert('Failed to cancel booking. Please try again.');
+      }
+    });
+  }
+
+  closeConfirmDialog(): void {
+    this.showConfirmDialog.set(false);
+    this.pendingAction.set({ type: 'confirm', booking: null });
+  }
+
+  closeCancelDialog(): void {
+    this.showCancelDialog.set(false);
+    this.pendingAction.set({ type: 'cancel', booking: null });
+    this.cancelReason.set('');
   }
 
   // Utility methods
@@ -305,6 +324,97 @@ export class AdminBookingsComponent implements OnInit {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
+  }
+
+  formatTime(time: string): string {
+    // Convert 24-hour time to 12-hour format
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  }
+
+  getStatusBadgeClass(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'pending': 'warning',
+      'confirmed': 'success',
+      'cancelled': 'error',
+      'completed': 'info'
+    };
+    return statusMap[status] || 'secondary';
+  }
+
+  // View toggle method
+  toggleViewMode(): void {
+    this.viewMode.set(this.viewMode() === 'cards' ? 'table' : 'cards');
+  }
+
+  // Pagination methods
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      this.loadBookings();
+    }
+  }
+
+  nextPage(): void {
+    if (this.hasNextPage()) {
+      this.currentPage.update(page => page + 1);
+      this.loadBookings();
+    }
+  }
+
+  previousPage(): void {
+    if (this.hasPreviousPage()) {
+      this.currentPage.update(page => page - 1);
+      this.loadBookings();
+    }
+  }
+
+  changePageSize(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const newSize = parseInt(target.value, 10);
+    this.pageSize.set(newSize);
+    this.currentPage.set(1); // Reset to first page
+    this.loadBookings();
+  }
+
+  getPageNumbers(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
+
+    if (total <= 7) {
+      // Show all pages if 7 or fewer
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
+
+      if (current > 3) {
+        pages.push(-1); // Ellipsis
+      }
+
+      // Show pages around current
+      const start = Math.max(2, current - 1);
+      const end = Math.min(total - 1, current + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (current < total - 2) {
+        pages.push(-1); // Ellipsis
+      }
+
+      // Always show last page
+      pages.push(total);
+    }
+
+    return pages;
   }
 }
 

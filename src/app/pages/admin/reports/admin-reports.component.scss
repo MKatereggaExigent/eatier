@@ -471,6 +471,20 @@
 }
 
 // Responsive
+// Medium screens (tablets and small laptops - 13 inch)
+@media (max-width: 1366px) {
+  .admin-reports {
+    padding: 1.5rem;
+  }
+
+  .reports-header {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+// Small screens (mobile)
 @media (max-width: 768px) {
   .admin-reports {
     padding: 1rem;

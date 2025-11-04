@@ -82,7 +82,7 @@ router.get('/:userId/activity', async (req, res) => {
 
     // Get recent reviews
     const reviewsQuery = `
-      SELECT 
+      SELECT
         r.id,
         'review' as type,
         b.business_name,
@@ -98,7 +98,7 @@ router.get('/:userId/activity', async (req, res) => {
 
     // Get recent bookings
     const bookingsQuery = `
-      SELECT 
+      SELECT
         bk.id,
         'booking' as type,
         b.business_name,
@@ -114,7 +114,7 @@ router.get('/:userId/activity', async (req, res) => {
 
     // Get recent favorites
     const favoritesQuery = `
-      SELECT 
+      SELECT
         f.id,
         'favorite' as type,
         b.business_name,
@@ -171,7 +171,7 @@ router.get('/:userId/favorites', async (req, res) => {
     }
 
     const result = await pool.query(`
-      SELECT 
+      SELECT
         f.id,
         f.user_id,
         f.business_id,

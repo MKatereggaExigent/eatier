@@ -327,18 +327,37 @@ export class AdminService {
   }
 
   /**
+   * Update platform settings
+   */
+  updateSettings(data: any): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/settings`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
    * Get all ads with optional filters
    */
-  getAds(params?: { page?: number; limit?: number; search?: string; status?: string; placement?: string }): Observable<any> {
+  getAds(params?: { page?: number; limit?: number; search?: string; status?: string; placement?: string; advertiser_id?: string }): Observable<any> {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.search) queryParams.append('search', params.search);
     if (params?.status) queryParams.append('status', params.status);
     if (params?.placement) queryParams.append('placement', params.placement);
+    if (params?.advertiser_id) queryParams.append('advertiser_id', params.advertiser_id);
 
     const queryString = queryParams.toString();
     return this.http.get(`${this.apiUrl}/ads${queryString ? '?' + queryString : ''}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get all advertisers who have created ads
+   */
+  getAdvertisers(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/ads/advertisers`, {
       headers: this.getHeaders()
     });
   }

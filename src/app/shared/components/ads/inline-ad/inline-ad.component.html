@@ -1,0 +1,29 @@
+@if (ad(); as currentAd) {
+  <div class="inline-ad" (click)="onAdClick(currentAd)">
+    <span class="ad-label">Sponsored Content</span>
+    
+    <div class="ad-wrapper">
+      @if (currentAd.image_url) {
+        <div class="ad-image-container">
+          <img [src]="currentAd.image_url" [alt]="currentAd.title" class="ad-image">
+        </div>
+      }
+
+      <div class="ad-content">
+        @if (currentAd.business_name) {
+          <p class="ad-business">{{ currentAd.business_name }}</p>
+        }
+        <h3 class="ad-title">{{ currentAd.title }}</h3>
+        <p class="ad-description">{{ currentAd.description }}</p>
+        
+        <button class="ad-cta">
+          {{ currentAd.cta_text }}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+}
+

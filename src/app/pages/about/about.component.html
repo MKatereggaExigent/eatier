@@ -58,54 +58,14 @@
 
   <!-- Mission Statement -->
   <section class="mission-section">
-    <div class="mission-container">
-      <div class="mission-content">
-        <h2 class="section-title">Our Mission</h2>
-        <p class="mission-text">
-          <span class="itiyum-brand">Itiyum</span> bridges the gap between food businesses and their communities, empowering everyone
-          from restaurant owners to food enthusiasts with the tools they need to succeed. Whether
-          you're managing a restaurant, exploring new cuisines, or showcasing your culinary expertise,
-          <span class="itiyum-brand">Itiyum</span> is your platform for growth and connection.
-        </p>
-      </div>
-
-      <!-- Advertisement Inset Carousel -->
-      <a routerLink="/advertise"
-         class="ad-inset"
-         (mouseenter)="pauseAdCarousel()"
-         (mouseleave)="resumeAdCarousel()">
-        <div class="ad-carousel-container">
-          <!-- Carousel Slides -->
-          @for (slide of adCarouselSlides; track slide.stat; let i = $index) {
-            <div class="ad-carousel-slide"
-                 [class.active]="currentAdSlide() === i"
-                 [style.background]="slide.gradient">
-              <div class="ad-slide-overlay"></div>
-              <div class="ad-slide-content">
-                <div class="ad-badge">Featured</div>
-                <div class="ad-icon">{{ slide.icon }}</div>
-                <div class="ad-stat">{{ slide.stat }}</div>
-                <div class="ad-label">{{ slide.label }}</div>
-                <div class="ad-trend">{{ slide.trend }}</div>
-                <p class="ad-description">{{ slide.description }}</p>
-                <div class="ad-cta">
-                  <span>Start Advertising</span>
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          }
-
-          <!-- Carousel Indicators -->
-          <div class="ad-carousel-indicators">
-            @for (slide of adCarouselSlides; track slide.stat; let i = $index) {
-              <div class="ad-indicator" [class.active]="currentAdSlide() === i"></div>
-            }
-          </div>
-        </div>
-      </a>
+    <div class="mission-content">
+      <h2 class="section-title">Our Mission</h2>
+      <p class="mission-text">
+        <span class="itiyum-brand">Itiyum</span> bridges the gap between food businesses and their communities, empowering everyone
+        from restaurant owners to food enthusiasts with the tools they need to succeed. Whether
+        you're managing a restaurant, exploring new cuisines, or showcasing your culinary expertise,
+        <span class="itiyum-brand">Itiyum</span> is your platform for growth and connection.
+      </p>
     </div>
   </section>
 

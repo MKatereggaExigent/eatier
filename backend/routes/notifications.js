@@ -7,6 +7,140 @@ const { authenticateToken } = require('../middleware/auth');
 router.use(authenticateToken);
 
 // ===================================
+// USER NOTIFICATIONS (FEED)
+// ===================================
+
+// Mock notifications for demo
+const mockNotifications = [
+  {
+    id: '1',
+    user_id: null,
+    type: 'booking',
+    title: 'Booking Confirmed',
+    message: 'Your table reservation at The Savory Kitchen has been confirmed for tomorrow at 7:00 PM.',
+    timestamp: new Date(Date.now() - 1000 * 60 * 30),
+    read: false,
+    action_url: '/dashboard/bookings',
+    icon: '📅'
+  },
+  {
+    id: '2',
+    user_id: null,
+    type: 'review',
+    title: 'New Review',
+    message: 'Someone left a 5-star review for your restaurant!',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+    read: false,
+    action_url: '/dashboard/reviews',
+    icon: '⭐'
+  },
+  {
+    id: '3',
+    user_id: null,
+    type: 'success',
+    title: 'Payment Successful',
+    message: 'Your payment of $45.00 has been processed successfully.',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5),
+    read: true,
+    icon: '✅'
+  },
+  {
+    id: '4',
+    user_id: null,
+    type: 'info',
+    title: 'Profile Update',
+    message: 'Your profile has been successfully updated.',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
+    read: true,
+    icon: 'ℹ️'
+  },
+  {
+    id: '5',
+    user_id: null,
+    type: 'message',
+    title: 'New Message',
+    message: 'You have a new message from Urban Brew Cafe.',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48),
+    read: true,
+    action_url: '/messages',
+    icon: '💬'
+  }
+];
+
+/**
+ * GET /api/notifications
+ * Get all notifications for the current user
+ */
+router.get('/', async (req, res) => {
+  try {
+    // Return mock notifications for now
+    // TODO: Replace with actual database query when notifications table is created
+    res.json(mockNotifications);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ error: 'Failed to fetch notifications' });
+  }
+});
+
+/**
+ * PATCH /api/notifications/:id/read
+ * Mark a specific notification as read
+ */
+router.patch('/:id/read', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Update mock notification
+    const notification = mockNotifications.find(n => n.id === id);
+    if (notification) {
+      notification.read = true;
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    res.status(500).json({ error: 'Failed to mark notification as read' });
+  }
+});
+
+/**
+ * PATCH /api/notifications/read-all
+ * Mark all notifications as read for current user
+ */
+router.patch('/read-all', async (req, res) => {
+  try {
+    mockNotifications.forEach(n => {
+      n.read = true;
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error marking all notifications as read:', error);
+    res.status(500).json({ error: 'Failed to mark all notifications as read' });
+  }
+});
+
+/**
+ * DELETE /api/notifications/:id
+ * Delete a specific notification
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const index = mockNotifications.findIndex(n => n.id === id);
+    if (index > -1) {
+      mockNotifications.splice(index, 1);
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    res.status(500).json({ error: 'Failed to delete notification' });
+  }
+});
+
+// ===================================
 // NOTIFICATION SETTINGS
 // ===================================
 
@@ -20,7 +154,7 @@ router.get('/settings', async (req, res) => {
     const tenantId = req.user.tenant_id;
 
     const result = await pool.query(`
-      SELECT 
+      SELECT
         email_messages,
         email_updates,
         email_customer_alerts,
@@ -48,7 +182,7 @@ router.get('/settings', async (req, res) => {
       const defaultSettings = await pool.query(`
         INSERT INTO notification_settings (tenant_id, user_id)
         VALUES ($1, $2)
-        RETURNING 
+        RETURNING
           email_messages,
           email_updates,
           email_customer_alerts,
@@ -190,7 +324,7 @@ router.get('/activity-log', async (req, res) => {
 
     // Build query
     let query = `
-      SELECT 
+      SELECT
         id,
         action,
         entity_type,

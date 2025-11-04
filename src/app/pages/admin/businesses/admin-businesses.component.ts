@@ -1,38 +1,40 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { AdminService } from '../../../core/services/admin.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
-import { AdminService } from '../../../core/services/admin.service';
 
 export interface AdminBusiness {
   id: string;
   name: string;
-  email: string;
+  slug: string;
+  description?: string;
+  cuisineTypes?: string[];
+  priceRange?: string;
+  email?: string;
+  phone?: string;
+  websiteUrl?: string;
+  status: 'active' | 'pending' | 'suspended' | 'inactive';
   ownerName: string;
   ownerEmail: string;
-  businessType: string;
-  status: 'active' | 'frozen' | 'pending_deletion' | 'deleted';
+  ownerId: string;
   createdAt: Date;
+  updatedAt: Date;
   lastLoginAt?: Date;
   verified: boolean;
-  address?: string;
-  country: string;
-  phone?: string;
-  bio?: string;
-  sustainabilityEthos?: string;
-  opensAt?: string;
-  closesAt?: string;
-  facilities?: string[];
+  isFeatured: boolean;
+  verificationDate?: Date;
   averageRating: number;
   totalReviews: number;
   totalBookings: number;
 }
 
 export interface BusinessFilters {
-  businessType: string;
   status: string;
   verification: string;
+  priceRange: string;
   sortBy: 'newest' | 'oldest' | 'name' | 'rating' | 'bookings';
 }
 
@@ -49,49 +51,55 @@ export class AdminBusinessesComponent implements OnInit {
 
   currentUser = this.authService.currentUser;
 
+  // Expose Math for template
+  Math = Math;
+
   // State management
   isLoading = signal(false);
   businesses = signal<AdminBusiness[]>([]);
   selectedBusiness = signal<AdminBusiness | null>(null);
+
+  // Pagination
+  currentPage = signal(1);
+  pageSize = signal(20);
+  totalBusinesses = signal(0);
 
   // UI state
   searchQuery = signal('');
   showFilters = signal(false);
   showBusinessModal = signal(false);
   showDeleteConfirm = signal(false);
+  viewMode = signal<'cards' | 'table'>('table'); // Default to table view
 
   // Filter options
   filters = signal<BusinessFilters>({
-    businessType: 'all',
     status: 'all',
     verification: 'all',
+    priceRange: 'all',
     sortBy: 'newest'
   });
 
   // Available options
-  businessTypeOptions = [
-    { value: 'all', label: 'All Types' },
-    { value: 'restaurant', label: 'Restaurant' },
-    { value: 'cafe', label: 'Cafe' },
-    { value: 'bar', label: 'Bar' },
-    { value: 'food_truck', label: 'Food Truck' },
-    { value: 'catering', label: 'Catering' },
-    { value: 'bakery', label: 'Bakery' },
-    { value: 'other', label: 'Other' }
-  ];
-
   statusOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'active', label: 'Active' },
-    { value: 'frozen', label: 'Frozen/Suspended' },
-    { value: 'pending_deletion', label: 'Pending Deletion' },
-    { value: 'deleted', label: 'Deleted' }
+    { value: 'pending', label: 'Pending' },
+    { value: 'suspended', label: 'Suspended' },
+    { value: 'inactive', label: 'Inactive' }
   ];
 
   verificationOptions = [
     { value: 'all', label: 'All Businesses' },
     { value: 'verified', label: 'Verified' },
     { value: 'unverified', label: 'Unverified' }
+  ];
+
+  priceRangeOptions = [
+    { value: 'all', label: 'All Price Ranges' },
+    { value: 'budget', label: 'Budget ($)' },
+    { value: 'moderate', label: 'Moderate ($$)' },
+    { value: 'expensive', label: 'Expensive ($$$)' },
+    { value: 'luxury', label: 'Luxury ($$$$)' }
   ];
 
   sortOptions = [
@@ -113,14 +121,9 @@ export class AdminBusinessesComponent implements OnInit {
       filtered = filtered.filter(business =>
         business.name.toLowerCase().includes(query) ||
         business.ownerName.toLowerCase().includes(query) ||
-        business.email.toLowerCase().includes(query) ||
-        business.country.toLowerCase().includes(query)
+        (business.email && business.email.toLowerCase().includes(query)) ||
+        (business.description && business.description.toLowerCase().includes(query))
       );
-    }
-
-    // Business type filter
-    if (currentFilters.businessType !== 'all') {
-      filtered = filtered.filter(business => business.businessType === currentFilters.businessType);
     }
 
     // Status filter
@@ -135,6 +138,11 @@ export class AdminBusinessesComponent implements OnInit {
       } else {
         filtered = filtered.filter(business => !business.verified);
       }
+    }
+
+    // Price range filter
+    if (currentFilters.priceRange !== 'all') {
+      filtered = filtered.filter(business => business.priceRange === currentFilters.priceRange);
     }
 
     // Sort
@@ -160,9 +168,9 @@ export class AdminBusinessesComponent implements OnInit {
 
   hasActiveFilters = computed(() => {
     const currentFilters = this.filters();
-    return currentFilters.businessType !== 'all' ||
-           currentFilters.status !== 'all' ||
+    return currentFilters.status !== 'all' ||
            currentFilters.verification !== 'all' ||
+           currentFilters.priceRange !== 'all' ||
            this.searchQuery().length > 0;
   });
 
@@ -172,7 +180,7 @@ export class AdminBusinessesComponent implements OnInit {
       total: businesses.length,
       active: businesses.filter(b => b.status === 'active').length,
       verified: businesses.filter(b => b.verified).length,
-      restaurants: businesses.filter(b => b.businessType === 'restaurant').length,
+      featured: businesses.filter(b => b.isFeatured).length,
       totalBookings: businesses.reduce((sum, b) => sum + b.totalBookings, 0),
       averageRating: businesses.length > 0 ?
         businesses.reduce((sum, b) => sum + b.averageRating, 0) / businesses.length : 0
@@ -183,6 +191,13 @@ export class AdminBusinessesComponent implements OnInit {
     this.loadBusinesses();
   }
 
+  // Computed values
+  totalPages = computed(() => Math.ceil(this.totalBusinesses() / this.pageSize()));
+
+  hasNextPage = computed(() => this.currentPage() < this.totalPages());
+
+  hasPreviousPage = computed(() => this.currentPage() > 1);
+
   // Data loading methods
   loadBusinesses(): void {
     this.isLoading.set(true);
@@ -191,33 +206,39 @@ export class AdminBusinessesComponent implements OnInit {
     const searchTerm = this.searchQuery();
 
     this.adminService.getBusinesses(
-      1,
-      100,
+      this.currentPage(),
+      this.pageSize(),
       searchTerm || undefined,
       currentFilters.status,
-      currentFilters.businessType,
+      undefined, // business_type removed
       currentFilters.verification
     ).subscribe({
       next: (response: any) => {
+        this.totalBusinesses.set(response.total || 0);
         const mappedBusinesses: AdminBusiness[] = response.businesses.map((business: any) => ({
           id: business.id,
           name: business.business_name,
+          slug: business.slug,
+          description: business.description,
+          cuisineTypes: Array.isArray(business.cuisine_types)
+            ? business.cuisine_types
+            : (typeof business.cuisine_types === 'string'
+              ? business.cuisine_types.replace(/[{}]/g, '').split(',')
+              : []),
+          priceRange: business.price_range,
           email: business.email,
+          phone: business.phone,
+          websiteUrl: business.website_url,
+          status: business.account_status || 'active',
           ownerName: business.owner_name || 'Unknown',
           ownerEmail: business.owner_email || '',
-          businessType: business.business_type || 'other',
-          status: business.account_status || 'active',
+          ownerId: business.owner_id,
           createdAt: new Date(business.created_at),
+          updatedAt: new Date(business.updated_at),
           lastLoginAt: business.last_login_at ? new Date(business.last_login_at) : undefined,
           verified: business.email_verified || false,
-          address: business.address,
-          country: business.country || '',
-          phone: business.phone,
-          bio: business.bio,
-          sustainabilityEthos: business.sustainability_ethos,
-          opensAt: business.opens_at,
-          closesAt: business.closes_at,
-          facilities: business.facilities || [],
+          isFeatured: business.is_featured || false,
+          verificationDate: business.verification_date ? new Date(business.verification_date) : undefined,
           averageRating: parseFloat(business.average_rating) || 0,
           totalReviews: parseInt(business.total_reviews) || 0,
           totalBookings: parseInt(business.total_bookings) || 0
@@ -239,11 +260,15 @@ export class AdminBusinessesComponent implements OnInit {
     this.showFilters.set(!this.showFilters());
   }
 
+  toggleViewMode(): void {
+    this.viewMode.set(this.viewMode() === 'cards' ? 'table' : 'cards');
+  }
+
   clearFilters(): void {
     this.filters.set({
-      businessType: 'all',
       status: 'all',
       verification: 'all',
+      priceRange: 'all',
       sortBy: 'newest'
     });
     this.searchQuery.set('');
@@ -315,7 +340,7 @@ export class AdminBusinessesComponent implements OnInit {
           // Update the business in the list
           const businesses = this.businesses();
           const updatedBusinesses = businesses.map(b =>
-            b.id === business.id ? { ...b, status: 'frozen' as const } : b
+            b.id === business.id ? { ...b, status: 'suspended' as const } : b
           );
           this.businesses.set(updatedBusinesses);
           alert(`${business.name} has been suspended.`);
@@ -382,36 +407,14 @@ export class AdminBusinessesComponent implements OnInit {
   }
 
   // Utility methods
-  getBusinessTypeLabel(type: string): string {
-    const typeMap: { [key: string]: string } = {
-      'restaurant': 'Restaurant',
-      'cafe': 'Cafe',
-      'bar': 'Bar',
-      'food_truck': 'Food Truck',
-      'catering': 'Catering'
+  getPriceRangeLabel(range: string): string {
+    const rangeMap: { [key: string]: string } = {
+      'budget': '$',
+      'moderate': '$$',
+      'expensive': '$$$',
+      'luxury': '$$$$'
     };
-    return typeMap[type] || type;
-  }
-
-  getBusinessTypeIcon(type: string): string {
-    const iconMap: { [key: string]: string } = {
-      'restaurant': '🍽️',
-      'cafe': '☕',
-      'bar': '🍺',
-      'food_truck': '🚚',
-      'catering': '🎉'
-    };
-    return iconMap[type] || '🏪';
-  }
-
-  getStatusColor(status: string): string {
-    const colorMap: { [key: string]: string } = {
-      'active': 'success',
-      'inactive': 'warning',
-      'suspended': 'danger',
-      'pending_verification': 'info'
-    };
-    return colorMap[status] || 'secondary';
+    return rangeMap[range] || range;
   }
 
   formatDate(date: Date): string {
@@ -429,7 +432,75 @@ export class AdminBusinessesComponent implements OnInit {
     }).format(amount);
   }
 
-  getStarRating(rating: number): string {
-    return '⭐'.repeat(Math.floor(rating)) + (rating % 1 >= 0.5 ? '⭐' : '');
+  getCuisineDisplay(cuisines: string[] | undefined): string {
+    if (!cuisines || cuisines.length === 0) return 'N/A';
+    return cuisines.slice(0, 3).join(', ') + (cuisines.length > 3 ? '...' : '');
+  }
+
+  // Pagination methods
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      this.loadBusinesses();
+    }
+  }
+
+  nextPage(): void {
+    if (this.hasNextPage()) {
+      this.currentPage.update(page => page + 1);
+      this.loadBusinesses();
+    }
+  }
+
+  previousPage(): void {
+    if (this.hasPreviousPage()) {
+      this.currentPage.update(page => page - 1);
+      this.loadBusinesses();
+    }
+  }
+
+  changePageSize(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const newSize = parseInt(target.value, 10);
+    this.pageSize.set(newSize);
+    this.currentPage.set(1); // Reset to first page
+    this.loadBusinesses();
+  }
+
+  getPageNumbers(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
+
+    if (total <= 7) {
+      // Show all pages if 7 or fewer
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
+
+      if (current > 3) {
+        pages.push(-1); // Ellipsis
+      }
+
+      // Show pages around current
+      const start = Math.max(2, current - 1);
+      const end = Math.min(total - 1, current + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (current < total - 2) {
+        pages.push(-1); // Ellipsis
+      }
+
+      // Always show last page
+      pages.push(total);
+    }
+
+    return pages;
   }
 }

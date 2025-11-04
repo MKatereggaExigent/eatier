@@ -116,6 +116,20 @@
         </select>
       </div>
 
+      <div class="filter-group">
+        <label for="business" class="filter-label">Advertiser</label>
+        <select
+          id="business"
+          class="filter-select"
+          [(ngModel)]="businessFilter"
+          (change)="applyFilters()">
+          <option value="all">All Advertisers</option>
+          @for (business of businesses(); track business.id) {
+            <option [value]="business.id">{{ business.name }}</option>
+          }
+        </select>
+      </div>
+
       <div class="filter-actions">
         <button type="button" class="btn-secondary" (click)="clearFilters()">
           Clear Filters
@@ -157,6 +171,13 @@
                 <h3 class="ad-title">{{ ad.title }}</h3>
                 <span class="ad-placement">{{ getPlacementLabel(ad.placement) }}</span>
               </div>
+
+              @if (ad.businessName) {
+                <div class="ad-business">
+                  <span class="business-icon">🏢</span>
+                  <span class="business-name">{{ ad.businessName }}</span>
+                </div>
+              }
 
               <p class="ad-description">{{ ad.description }}</p>
 
@@ -259,6 +280,24 @@
           <!-- Basic Information -->
           <div class="form-section">
             <h3 class="section-title">Basic Information</h3>
+
+            <div class="form-group">
+              <label for="business" class="form-label">
+                Business <span class="required">*</span>
+              </label>
+              <select
+                id="business"
+                class="form-select"
+                [(ngModel)]="newAd.advertiserId"
+                name="advertiserId"
+                required>
+                <option value="">Select a business</option>
+                @for (business of businesses(); track business.id) {
+                  <option [value]="business.id">{{ business.name }}</option>
+                }
+              </select>
+              <p class="form-hint">Select the business this ad is for</p>
+            </div>
 
             <div class="form-group">
               <label for="title" class="form-label">
@@ -476,6 +515,530 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  }
+
+  <!-- View Details Modal -->
+  @if (showDetailsModal() && selectedAd()) {
+    <div class="modal-overlay" (click)="closeDetailsModal()">
+      <div class="modal-content details-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">Ad Details</h2>
+          <button type="button" class="modal-close" (click)="closeDetailsModal()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="details-section">
+            <h3 class="section-title">Basic Information</h3>
+            <div class="details-grid">
+              <div class="detail-item">
+                <span class="detail-label">Title</span>
+                <span class="detail-value">{{ selectedAd()!.title }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Status</span>
+                <span class="detail-value">
+                  <span class="status-badge" [ngClass]="getStatusClass(selectedAd()!.status)">
+                    {{ selectedAd()!.status }}
+                  </span>
+                </span>
+              </div>
+              <div class="detail-item full-width">
+                <span class="detail-label">Description</span>
+                <span class="detail-value">{{ selectedAd()!.description }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Placement</span>
+                <span class="detail-value">{{ getPlacementLabel(selectedAd()!.placement) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Target URL</span>
+                <span class="detail-value">
+                  <a [href]="selectedAd()!.targetUrl" target="_blank" class="detail-link">
+                    {{ selectedAd()!.targetUrl }}
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="details-section">
+            <h3 class="section-title">Performance Metrics</h3>
+            <div class="details-grid">
+              <div class="detail-item">
+                <span class="detail-label">Impressions</span>
+                <span class="detail-value">{{ formatNumber(selectedAd()!.impressions) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Clicks</span>
+                <span class="detail-value">{{ formatNumber(selectedAd()!.clicks) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Click-Through Rate</span>
+                <span class="detail-value">{{ selectedAd()!.ctr.toFixed(2) }}%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="details-section">
+            <h3 class="section-title">Budget & Schedule</h3>
+            <div class="details-grid">
+              <div class="detail-item">
+                <span class="detail-label">Total Budget</span>
+                <span class="detail-value">{{ formatCurrency(selectedAd()!.budget) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Amount Spent</span>
+                <span class="detail-value">{{ formatCurrency(selectedAd()!.spent) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Start Date</span>
+                <span class="detail-value">{{ formatDate(selectedAd()!.startDate) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">End Date</span>
+                <span class="detail-value">{{ formatDate(selectedAd()!.endDate) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="details-section">
+            <h3 class="section-title">Ad Preview</h3>
+            <div class="ad-preview-large">
+              <img [src]="selectedAd()!.imageUrl" [alt]="selectedAd()!.title" class="preview-image">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeDetailsModal()">
+            Close
+          </button>
+          <button type="button" class="btn-primary" (click)="closeDetailsModal(); editAd(selectedAd()!)">
+            Edit Ad
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Edit Ad Modal -->
+  @if (showEditModal() && selectedAd()) {
+    <div class="modal-overlay" (click)="closeEditModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">Edit Ad Campaign</h2>
+          <button type="button" class="modal-close" (click)="closeEditModal()">✕</button>
+        </div>
+
+        <form class="modal-body" (ngSubmit)="saveEditedAd()">
+          <!-- Basic Information -->
+          <div class="form-section">
+            <h3 class="section-title">Basic Information</h3>
+
+            <div class="form-group">
+              <label for="edit-business" class="form-label">
+                Business <span class="required">*</span>
+              </label>
+              <select
+                id="edit-business"
+                class="form-select"
+                [(ngModel)]="editAdForm.advertiserId"
+                name="advertiserId"
+                required>
+                <option value="">Select a business</option>
+                @for (business of businesses(); track business.id) {
+                  <option [value]="business.id">{{ business.name }}</option>
+                }
+              </select>
+              <p class="form-hint">Select the business this ad is for</p>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-title" class="form-label">
+                Ad Title <span class="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="edit-title"
+                class="form-input"
+                [(ngModel)]="editAdForm.title"
+                name="title"
+                placeholder="Enter ad title"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-description" class="form-label">
+                Description <span class="required">*</span>
+              </label>
+              <textarea
+                id="edit-description"
+                class="form-textarea"
+                [(ngModel)]="editAdForm.description"
+                name="description"
+                rows="3"
+                placeholder="Enter ad description"
+                required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Ad Image <span class="required">*</span>
+              </label>
+
+              <!-- Image Upload Options -->
+              <div class="image-upload-section">
+                <div class="upload-tabs">
+                  <button
+                    type="button"
+                    class="upload-tab"
+                    [class.active]="imageUploadMethod() === 'url'"
+                    (click)="imageUploadMethod.set('url')">
+                    🔗 Image URL
+                  </button>
+                  <button
+                    type="button"
+                    class="upload-tab"
+                    [class.active]="imageUploadMethod() === 'upload'"
+                    (click)="imageUploadMethod.set('upload')">
+                    📤 Upload File
+                  </button>
+                </div>
+
+                <!-- URL Input -->
+                @if (imageUploadMethod() === 'url') {
+                  <div class="upload-option">
+                    <input
+                      type="url"
+                      id="edit-imageUrl"
+                      class="form-input"
+                      [(ngModel)]="editAdForm.imageUrl"
+                      name="imageUrl"
+                      placeholder="https://example.com/image.jpg"
+                      required>
+                    <p class="form-hint">Enter the URL of your ad image (Recommended: 400x300 pixels)</p>
+                  </div>
+                }
+
+                <!-- File Upload -->
+                @if (imageUploadMethod() === 'upload') {
+                  <div class="upload-option">
+                    <div class="file-upload-area">
+                      <input
+                        type="file"
+                        id="edit-imageFile"
+                        class="file-input"
+                        accept="image/*"
+                        (change)="onImageFileSelected($event)"
+                        #fileInput>
+                      <label for="edit-imageFile" class="file-upload-label">
+                        <div class="upload-icon">📸</div>
+                        <div class="upload-text">
+                          <strong>Click to upload</strong> or drag and drop
+                        </div>
+                        <div class="upload-hint">PNG, JPG, GIF up to 10MB</div>
+                      </label>
+                      @if (selectedFileName()) {
+                        <div class="selected-file">
+                          <span class="file-icon">✓</span>
+                          <span class="file-name">{{ selectedFileName() }}</span>
+                          <button type="button" class="remove-file-btn" (click)="removeSelectedFile()">✕</button>
+                        </div>
+                      }
+                    </div>
+                    <p class="form-hint">
+                      💡 <strong>Note:</strong> File upload will create a temporary preview. In production, this would upload to cloud storage.
+                    </p>
+                  </div>
+                }
+
+                <!-- Current Image Preview -->
+                @if (editAdForm.imageUrl) {
+                  <div class="current-image-preview">
+                    <label class="preview-label">Current Image:</label>
+                    <img [src]="editAdForm.imageUrl" [alt]="editAdForm.title" class="current-image">
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-targetUrl" class="form-label">
+                Target URL <span class="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="edit-targetUrl"
+                class="form-input"
+                [(ngModel)]="editAdForm.targetUrl"
+                name="targetUrl"
+                placeholder="/promotions/summer"
+                required>
+              <p class="form-hint">Where users will be redirected when they click the ad</p>
+            </div>
+          </div>
+
+          <!-- Placement & Visibility -->
+          <div class="form-section">
+            <h3 class="section-title">Placement & Visibility</h3>
+
+            <div class="form-group">
+              <label for="edit-placement" class="form-label">
+                Ad Placement <span class="required">*</span>
+              </label>
+              <select
+                id="edit-placement"
+                class="form-select"
+                [(ngModel)]="editAdForm.placement"
+                name="placement"
+                required>
+                <option value="">Select placement</option>
+                <option value="homepage_banner">Homepage Banner - Top of homepage (1200x400px)</option>
+                <option value="sidebar_ad">Sidebar - Right side of pages (300x600px)</option>
+                <option value="inline_content">Inline Content - Between content (728x90px)</option>
+                <option value="footer_banner">Footer - Bottom of all pages (970x90px)</option>
+                <option value="featured_spot">Featured Spot - Premium placement (600x400px)</option>
+                <option value="mobile_banner">Mobile Banner - Mobile optimized (320x50px)</option>
+              </select>
+              <p class="form-hint">
+                <strong>Where this ad will appear:</strong>
+                @if (editAdForm.placement === 'homepage_banner') {
+                  <span class="placement-info">🏠 Displayed prominently at the top of the homepage - highest visibility</span>
+                }
+                @if (editAdForm.placement === 'sidebar_ad') {
+                  <span class="placement-info">📌 Shown on the right sidebar across multiple pages</span>
+                }
+                @if (editAdForm.placement === 'inline_content') {
+                  <span class="placement-info">📄 Appears between content sections</span>
+                }
+                @if (editAdForm.placement === 'footer_banner') {
+                  <span class="placement-info">⬇️ Displayed at the bottom of all pages</span>
+                }
+                @if (editAdForm.placement === 'featured_spot') {
+                  <span class="placement-info">⭐ Premium featured placement</span>
+                }
+                @if (editAdForm.placement === 'mobile_banner') {
+                  <span class="placement-info">📱 Optimized for mobile devices</span>
+                }
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-status" class="form-label">
+                Status <span class="required">*</span>
+              </label>
+              <select
+                id="edit-status"
+                class="form-select"
+                [(ngModel)]="editAdForm.status"
+                name="status"
+                required>
+                <option value="draft">Draft - Not visible to users</option>
+                <option value="scheduled">Scheduled - Will go live on start date</option>
+                <option value="active">Active - Live now</option>
+                <option value="paused">Paused - Temporarily stopped</option>
+                <option value="expired">Expired - Campaign ended</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Budget & Schedule -->
+          <div class="form-section">
+            <h3 class="section-title">Budget & Schedule</h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-budget" class="form-label">
+                  Budget (USD) <span class="required">*</span>
+                </label>
+                <input
+                  type="number"
+                  id="edit-budget"
+                  class="form-input"
+                  [(ngModel)]="editAdForm.budget"
+                  name="budget"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  required>
+              </div>
+
+              <div class="form-group">
+                <label for="edit-spent" class="form-label">
+                  Already Spent (USD)
+                </label>
+                <input
+                  type="number"
+                  id="edit-spent"
+                  class="form-input"
+                  [(ngModel)]="editAdForm.spent"
+                  name="spent"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-startDate" class="form-label">
+                  Start Date <span class="required">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  id="edit-startDate"
+                  class="form-input"
+                  [(ngModel)]="editAdForm.startDate"
+                  name="startDate"
+                  required>
+              </div>
+
+              <div class="form-group">
+                <label for="edit-endDate" class="form-label">
+                  End Date <span class="required">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  id="edit-endDate"
+                  class="form-input"
+                  [(ngModel)]="editAdForm.endDate"
+                  name="endDate"
+                  required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview -->
+          @if (editAdForm.imageUrl && editAdForm.title) {
+            <div class="form-section">
+              <h3 class="section-title">Preview</h3>
+              <div class="ad-preview">
+                <img [src]="editAdForm.imageUrl" [alt]="editAdForm.title" class="preview-image">
+                <div class="preview-info">
+                  <h4>{{ editAdForm.title }}</h4>
+                  <p>{{ editAdForm.description }}</p>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Form Actions -->
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="closeEditModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="isUpdating()">
+              @if (isUpdating()) {
+                <span class="btn-spinner"></span>
+                Saving...
+              } @else {
+                Save Changes
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Pause Confirmation Dialog -->
+  @if (showPauseDialog() && selectedAd()) {
+    <div class="modal-overlay" (click)="closePauseDialog()">
+      <div class="modal-dialog confirm-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Pause Ad Campaign</h3>
+          <button type="button" class="close-btn" (click)="closePauseDialog()" title="Close dialog">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="confirmation-icon warning">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+
+          <p class="confirmation-message">
+            Are you sure you want to pause the ad campaign <strong>"{{ selectedAd()!.title }}"</strong>?
+          </p>
+
+          <p class="confirmation-details">
+            The ad will stop being displayed to users immediately. You can resume it later.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closePauseDialog()">
+            Cancel
+          </button>
+          <button type="button" class="btn-warning" (click)="confirmPauseAd()" [disabled]="isUpdating()">
+            @if (isUpdating()) {
+              <span class="btn-spinner"></span>
+              Pausing...
+            } @else {
+              Pause Ad
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Delete Confirmation Dialog -->
+  @if (showDeleteDialog() && selectedAd()) {
+    <div class="modal-overlay" (click)="closeDeleteDialog()">
+      <div class="modal-dialog confirm-dialog danger" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Delete Ad Campaign</h3>
+          <button type="button" class="close-btn" (click)="closeDeleteDialog()" title="Close dialog">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="confirmation-icon danger">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </div>
+
+          <p class="confirmation-message">
+            Are you sure you want to delete the ad campaign <strong>"{{ selectedAd()!.title }}"</strong>?
+          </p>
+
+          <p class="confirmation-details danger">
+            ⚠️ This action cannot be undone. All campaign data and statistics will be permanently deleted.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeDeleteDialog()">
+            Cancel
+          </button>
+          <button type="button" class="btn-danger" (click)="confirmDeleteAd()" [disabled]="isUpdating()">
+            @if (isUpdating()) {
+              <span class="btn-spinner"></span>
+              Deleting...
+            } @else {
+              Delete Ad
+            }
+          </button>
+        </div>
       </div>
     </div>
   }

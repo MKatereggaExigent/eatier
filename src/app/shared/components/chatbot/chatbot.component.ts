@@ -1,10 +1,11 @@
-import { Component, signal, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { NavigationEnd, Router } from '@angular/router';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Router, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 interface ChatMessage {
   text: string;
@@ -61,7 +62,7 @@ export class ChatbotComponent implements OnInit, OnDestroy {
 
     // Extract page name from URL
     let pageName = 'home';
-    if (url.includes('/admin/overview')) {
+    if (url.includes('/admin/insights/overview')) {
       pageName = 'admin-overview';
       this.examplePrompts.set([
         'What are the current platform statistics?',

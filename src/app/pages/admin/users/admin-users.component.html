@@ -84,6 +84,65 @@
 
       <!-- Filter Controls -->
       <div class="filter-controls">
+        <!-- Add User Button -->
+        <button
+          type="button"
+          class="add-user-btn"
+          (click)="openAddUserModal()"
+          title="Add New User">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <line x1="19" y1="8" x2="19" y2="14"></line>
+            <line x1="22" y1="11" x2="16" y2="11"></line>
+          </svg>
+          <span>Add User</span>
+        </button>
+
+        <!-- Column Manager Button -->
+        <button
+          type="button"
+          class="column-manager-btn"
+          (click)="openColumnManager()"
+          title="Manage Columns">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Columns</span>
+        </button>
+
+        <!-- View Mode Toggle -->
+        <div class="view-toggle">
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="viewMode() === 'cards'"
+            (click)="toggleViewMode()"
+            title="Card View">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="viewMode() === 'table'"
+            (click)="toggleViewMode()"
+            title="Table View">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
         <button
           type="button"
           class="filter-toggle-btn"
@@ -187,12 +246,15 @@
           <p>No users are currently registered on the platform.</p>
         }
       </div>
-    } @else {
+    } @else if (viewMode() === 'table') {
+      <!-- Table View -->
       <div class="users-table-container">
         <table class="users-table">
           <thead>
             <tr>
               <th>User</th>
+              <th>Tenant/Company</th>
+              <th>Business</th>
               <th>Role</th>
               <th>Status</th>
               <th>Verification</th>
@@ -218,10 +280,26 @@
                   <div class="user-details">
                     <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
                     <div class="user-email">{{ user.email }}</div>
-                    @if (user.businessName) {
-                      <div class="business-name">{{ user.businessName }}</div>
-                    }
                   </div>
+                </td>
+
+                <!-- Tenant/Company -->
+                <td class="tenant-info">
+                  <div class="tenant-name">{{ user.tenantName || 'N/A' }}</div>
+                </td>
+
+                <!-- Business -->
+                <td class="business-info">
+                  @if (user.businessName) {
+                    <div class="business-name">{{ user.businessName }}</div>
+                    @if (user.businessStatus) {
+                      <div class="business-status status-{{ user.businessStatus }}">
+                        {{ user.businessStatus | titlecase }}
+                      </div>
+                    }
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
                 </td>
 
                 <!-- Role -->
@@ -280,6 +358,14 @@
                       👁️
                     </button>
 
+                    <button
+                      type="button"
+                      class="btn-action role-btn"
+                      (click)="openEditRoleModal(user)"
+                      title="Change Role">
+                      🔑
+                    </button>
+
                     @if (user.status === 'active') {
                       <button
                         type="button"
@@ -311,6 +397,148 @@
             }
           </tbody>
         </table>
+      </div>
+    } @else {
+      <!-- Card View -->
+      <div class="users-grid">
+        @for (user of filteredUsers(); track user.id) {
+          <div class="user-card" [class]="'status-' + user.status">
+            <!-- Card Header -->
+            <div class="card-header">
+              <div class="user-avatar">
+                @if (user.avatar) {
+                  <img [src]="user.avatar" [alt]="user.firstName + ' ' + user.lastName" class="avatar-image">
+                } @else {
+                  <div class="avatar-placeholder">
+                    {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+                  </div>
+                }
+              </div>
+              <div class="user-info">
+                <h3 class="user-name">{{ user.firstName }} {{ user.lastName }}</h3>
+                <p class="user-email">{{ user.email }}</p>
+                @if (user.tenantName) {
+                  <p class="tenant-name">🏢 {{ user.tenantName }}</p>
+                }
+                @if (user.businessName) {
+                  <p class="business-name">🏪 {{ user.businessName }}</p>
+                }
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body">
+              <div class="card-detail">
+                <span class="detail-label">Role</span>
+                <div class="role-badge" [class]="'role-' + user.role">
+                  <span class="role-icon">{{ getRoleIcon(user.role) }}</span>
+                  <span class="role-text">{{ getRoleLabel(user.role) }}</span>
+                </div>
+              </div>
+
+              <div class="card-detail">
+                <span class="detail-label">Status</span>
+                <div class="status-badge" [class]="'status-' + user.status">
+                  {{ user.status | titlecase }}
+                </div>
+              </div>
+
+              <div class="card-detail">
+                <span class="detail-label">Verification</span>
+                <div class="verification-badges">
+                  <span class="verification-badge" [class.verified]="user.emailVerified">
+                    📧 {{ user.emailVerified ? 'Email ✓' : 'Email ✗' }}
+                  </span>
+                  @if (user.phone) {
+                    <span class="verification-badge" [class.verified]="user.phoneVerified">
+                      📱 {{ user.phoneVerified ? 'Phone ✓' : 'Phone ✗' }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <div class="card-detail">
+                <span class="detail-label">Joined</span>
+                <span class="detail-value">{{ formatDate(user.createdAt) }}</span>
+              </div>
+
+              <div class="card-detail">
+                <span class="detail-label">Last Login</span>
+                <span class="detail-value">
+                  @if (user.lastLoginAt) {
+                    {{ formatDateTime(user.lastLoginAt) }}
+                  } @else {
+                    <span class="never-logged-in">Never</span>
+                  }
+                </span>
+              </div>
+
+              @if (user.totalBookings !== undefined || user.totalReviews !== undefined) {
+                <div class="card-stats">
+                  @if (user.totalBookings !== undefined) {
+                    <div class="stat-item">
+                      <span class="stat-icon">📅</span>
+                      <span class="stat-value">{{ user.totalBookings }}</span>
+                      <span class="stat-label">Bookings</span>
+                    </div>
+                  }
+                  @if (user.totalReviews !== undefined) {
+                    <div class="stat-item">
+                      <span class="stat-icon">⭐</span>
+                      <span class="stat-value">{{ user.totalReviews }}</span>
+                      <span class="stat-label">Reviews</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer">
+              <button
+                type="button"
+                class="btn-card view-btn"
+                (click)="viewUserDetails(user)"
+                title="View Details">
+                👁️ View
+              </button>
+
+              <button
+                type="button"
+                class="btn-card role-btn"
+                (click)="openEditRoleModal(user)"
+                title="Change Role">
+                🔑 Role
+              </button>
+
+              @if (user.status === 'active') {
+                <button
+                  type="button"
+                  class="btn-card suspend-btn"
+                  (click)="suspendUser(user)"
+                  title="Suspend User">
+                  ⏸️ Suspend
+                </button>
+              } @else if (user.status === 'frozen' || user.status === 'pending_deletion') {
+                <button
+                  type="button"
+                  class="btn-card activate-btn"
+                  (click)="activateUser(user)"
+                  title="Activate User">
+                  ▶️ Activate
+                </button>
+              }
+
+              <button
+                type="button"
+                class="btn-card delete-btn"
+                (click)="deleteUser(user)"
+                title="Delete User">
+                🗑️ Delete
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
   </section>
@@ -446,6 +674,289 @@
           Delete User
         </button>
       </div>
+    </div>
+  </div>
+}
+
+<!-- Add User Modal -->
+@if (showAddUserModal()) {
+  <div class="modal-overlay" (click)="closeAddUserModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add New User</h3>
+        <button type="button" class="close-btn" (click)="closeAddUserModal()" aria-label="Close">×</button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="addUserForm" class="add-user-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">First Name *</label>
+              <input
+                type="text"
+                id="firstName"
+                formControlName="firstName"
+                class="form-control"
+                placeholder="Enter first name">
+              @if (addUserForm.get('firstName')?.invalid && addUserForm.get('firstName')?.touched) {
+                <span class="error-message">First name is required</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last Name *</label>
+              <input
+                type="text"
+                id="lastName"
+                formControlName="lastName"
+                class="form-control"
+                placeholder="Enter last name">
+              @if (addUserForm.get('lastName')?.invalid && addUserForm.get('lastName')?.touched) {
+                <span class="error-message">Last name is required</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-control"
+              placeholder="user@example.com">
+            @if (addUserForm.get('email')?.invalid && addUserForm.get('email')?.touched) {
+              <span class="error-message">Valid email is required</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password *</label>
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              class="form-control"
+              placeholder="Minimum 8 characters">
+            @if (addUserForm.get('password')?.invalid && addUserForm.get('password')?.touched) {
+              <span class="error-message">Password must be at least 8 characters</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input
+              type="tel"
+              id="phone"
+              formControlName="phone"
+              class="form-control"
+              placeholder="+1 (555) 123-4567">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="role">Role *</label>
+              <select id="role" formControlName="role" class="form-control">
+                <option value="">Select a role</option>
+                @for (role of availableRoles(); track role.role_name) {
+                  <option [value]="role.role_name">
+                    {{ role.display_name }}
+                    @if (role.category) {
+                      <span class="role-category">({{ role.category }})</span>
+                    }
+                  </option>
+                }
+              </select>
+              @if (addUserForm.get('role')?.invalid && addUserForm.get('role')?.touched) {
+                <span class="error-message">Role is required</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="status">Status *</label>
+              <select id="status" formControlName="status" class="form-control">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeAddUserModal()">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="createUser()"
+          [disabled]="!addUserForm.valid">
+          Create User
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Edit Role Modal -->
+@if (showEditRoleModal()) {
+  <div class="modal-overlay" (click)="closeEditRoleModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Change User Role</h3>
+        <button type="button" class="close-btn" (click)="closeEditRoleModal()" aria-label="Close">×</button>
+      </div>
+
+      <div class="modal-body">
+        @if (userForRoleEdit()) {
+          <div class="user-info-section">
+            <p><strong>User:</strong> {{ userForRoleEdit()!.firstName }} {{ userForRoleEdit()!.lastName }}</p>
+            <p><strong>Email:</strong> {{ userForRoleEdit()!.email }}</p>
+            <p><strong>Current Role:</strong> {{ getRoleLabel(userForRoleEdit()!.role) }}</p>
+          </div>
+
+          <form [formGroup]="editRoleForm" class="edit-role-form">
+            <div class="form-group">
+              <label for="newRole">New Role *</label>
+              <select id="newRole" formControlName="role" class="form-control">
+                @for (role of availableRoles(); track role.role_name) {
+                  <option [value]="role.role_name">
+                    {{ role.display_name }}
+                    @if (role.category) {
+                      - {{ role.category }}
+                    }
+                  </option>
+                }
+              </select>
+            </div>
+          </form>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeEditRoleModal()">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="updateUserRole()"
+          [disabled]="!editRoleForm.valid">
+          Update Role
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Column Manager Modal -->
+@if (showColumnManager()) {
+  <div class="modal-overlay" (click)="closeColumnManager()">
+    <div class="modal-content column-manager-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Manage Table Columns</h3>
+        <button type="button" class="close-btn" (click)="closeColumnManager()" aria-label="Close">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="column-manager-description">
+          Select which columns you want to display in the users table. Your preferences will be saved automatically.
+        </p>
+
+        <div class="column-categories">
+          @for (category of columnCategories() | keyvalue; track category.key) {
+            <div class="column-category">
+              <h4 class="category-title">{{ $any(category.value).label }}</h4>
+              <div class="column-checkboxes">
+                @for (column of $any(category.value).columns; track column.key) {
+                  <label class="column-checkbox-label">
+                    <input
+                      type="checkbox"
+                      [checked]="isColumnVisible(column.key)"
+                      (change)="toggleColumn(column.key)"
+                      class="column-checkbox">
+                    <span class="column-label-text">
+                      {{ column.label }}
+                      @if (column.description) {
+                        <span class="column-description">- {{ column.description }}</span>
+                      }
+                    </span>
+                  </label>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="resetColumns()">
+          Reset to Default
+        </button>
+        <button type="button" class="btn-primary" (click)="closeColumnManager()">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Pagination -->
+@if (totalUsers() > 0) {
+  <div class="pagination-container">
+    <div class="pagination-info">
+      <span class="pagination-text">
+        Showing {{ ((currentPage() - 1) * pageSize()) + 1 }} to {{ Math.min(currentPage() * pageSize(), totalUsers()) }} of {{ totalUsers() }} users
+      </span>
+      <div class="page-size-selector">
+        <label for="pageSize">Items per page:</label>
+        <select id="pageSize" [value]="pageSize()" (change)="changePageSize($event)" class="page-size-select">
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="pagination-controls">
+      <button
+        type="button"
+        class="pagination-btn"
+        [disabled]="!hasPreviousPage()"
+        (click)="previousPage()"
+        title="Previous Page">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      @for (page of getPageNumbers(); track page) {
+        @if (page === -1) {
+          <span class="pagination-ellipsis">...</span>
+        } @else {
+          <button
+            type="button"
+            class="pagination-btn"
+            [class.active]="page === currentPage()"
+            (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        }
+      }
+
+      <button
+        type="button"
+        class="pagination-btn"
+        [disabled]="!hasNextPage()"
+        (click)="nextPage()"
+        title="Next Page">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
     </div>
   </div>
 }

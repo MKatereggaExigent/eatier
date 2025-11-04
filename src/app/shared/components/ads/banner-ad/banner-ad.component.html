@@ -1,0 +1,79 @@
+@if (currentAd(); as ad) {
+  <div class="banner-ad-container">
+    <div class="banner-ad" [class.has-image]="ad.image_url">
+      <!-- Ad Image/Video -->
+      @if (ad.video_url) {
+        <div class="ad-media">
+          <video [src]="ad.video_url" autoplay muted loop playsinline class="ad-video"></video>
+        </div>
+      } @else if (ad.image_url) {
+        <div class="ad-media">
+          <img [src]="ad.image_url" [alt]="ad.title" class="ad-image">
+        </div>
+      }
+
+      <!-- Ad Content -->
+      <div class="ad-content">
+        <div class="ad-header">
+          <span class="ad-label">Sponsored</span>
+          @if (ad.business_name) {
+            <span class="ad-business">{{ ad.business_name }}</span>
+          }
+        </div>
+
+        <h3 class="ad-title">{{ ad.title }}</h3>
+        <p class="ad-description">{{ ad.description }}</p>
+
+        <button 
+          class="ad-cta" 
+          (click)="onAdClick(ad)"
+          [attr.aria-label]="ad.cta_text + ' - ' + ad.title">
+          {{ ad.cta_text }}
+          <svg class="cta-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Navigation Controls -->
+      @if (ads().length > 1) {
+        <div class="ad-controls">
+          <button 
+            class="control-btn prev" 
+            (click)="previousAd()"
+            aria-label="Previous ad">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 16L6 10L12 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="ad-indicators">
+            @for (ad of ads(); track ad.id; let i = $index) {
+              <button 
+                class="indicator" 
+                [class.active]="i === currentAdIndex()"
+                (click)="goToAd(i)"
+                [attr.aria-label]="'Go to ad ' + (i + 1)">
+              </button>
+            }
+          </div>
+
+          <button 
+            class="control-btn next" 
+            (click)="nextAd()"
+            aria-label="Next ad">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M8 16L14 10L8 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <!-- Placeholder when no ads available -->
+  <div class="banner-ad-placeholder">
+    <!-- Empty state - could show default content -->
+  </div>
+}
+

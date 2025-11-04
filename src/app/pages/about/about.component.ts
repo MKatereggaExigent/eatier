@@ -19,15 +19,6 @@ interface CarouselSlide {
   category: 'restaurant' | 'cuisine' | 'people';
 }
 
-interface AdCarouselSlide {
-  gradient: string;
-  icon: string;
-  stat: string;
-  label: string;
-  trend: string;
-  description: string;
-}
-
 @Component({
   selector: 'app-about',
   standalone: true,
@@ -37,9 +28,7 @@ interface AdCarouselSlide {
 })
 export class AboutComponent implements OnInit, OnDestroy {
   currentSlide = signal<number>(0);
-  currentAdSlide = signal<number>(0);
   private carouselInterval: any;
-  private adCarouselInterval: any;
 
   carouselSlides: CarouselSlide[] = [
     {
@@ -74,49 +63,12 @@ export class AboutComponent implements OnInit, OnDestroy {
     }
   ];
 
-  adCarouselSlides: AdCarouselSlide[] = [
-    {
-      gradient: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
-      icon: '📈',
-      stat: '10,000+',
-      label: 'Active Users',
-      trend: '+25% this month',
-      description: 'Join thousands of food enthusiasts discovering new experiences'
-    },
-    {
-      gradient: 'linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)',
-      icon: '🎯',
-      stat: '500+',
-      label: 'Partner Restaurants',
-      trend: '+15% growth',
-      description: 'Reach customers actively searching for dining experiences'
-    },
-    {
-      gradient: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
-      icon: '⚡',
-      stat: '85%',
-      label: 'Conversion Rate',
-      trend: 'Industry leading',
-      description: 'Turn views into customers with targeted advertising'
-    },
-    {
-      gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-      icon: '💰',
-      stat: '$2.5M+',
-      label: 'Revenue Generated',
-      trend: '+40% YoY',
-      description: 'Our partners see real ROI from advertising campaigns'
-    }
-  ];
-
   ngOnInit(): void {
     this.startCarousel();
-    this.startAdCarousel();
   }
 
   ngOnDestroy(): void {
     this.stopCarousel();
-    this.stopAdCarousel();
   }
 
   startCarousel(): void {
@@ -145,33 +97,6 @@ export class AboutComponent implements OnInit, OnDestroy {
 
   goToSlide(index: number): void {
     this.currentSlide.set(index);
-  }
-
-  // Ad Carousel Methods
-  startAdCarousel(): void {
-    this.adCarouselInterval = setInterval(() => {
-      this.nextAdSlide();
-    }, 3000); // Change ad slide every 3 seconds
-  }
-
-  stopAdCarousel(): void {
-    if (this.adCarouselInterval) {
-      clearInterval(this.adCarouselInterval);
-    }
-  }
-
-  nextAdSlide(): void {
-    this.currentAdSlide.update(current =>
-      current === this.adCarouselSlides.length - 1 ? 0 : current + 1
-    );
-  }
-
-  pauseAdCarousel(): void {
-    this.stopAdCarousel();
-  }
-
-  resumeAdCarousel(): void {
-    this.startAdCarousel();
   }
 
   userGroups: UserGroup[] = [

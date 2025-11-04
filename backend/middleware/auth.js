@@ -6,14 +6,17 @@ const pool = require('../config/database');
  */
 async function authenticateToken(req, res, next) {
   try {
-    // Get token from Authorization header
+    // Get token from Authorization header or cookie
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const headerToken = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const cookieToken = req.cookies?.access_token;
+
+    const token = headerToken || cookieToken;
 
     if (!token) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Authentication required',
-        message: 'No token provided' 
+        message: 'No token provided'
       });
     }
 
@@ -22,26 +25,23 @@ async function authenticateToken(req, res, next) {
 
     // Get user from database with tenant information
     const result = await pool.query(`
-      SELECT 
-        u.id, 
-        u.email, 
-        u.first_name, 
-        u.last_name, 
+      SELECT
+        u.id,
+        u.email,
+        u.first_name,
+        u.last_name,
         u.tenant_id,
-        t.slug as tenant_slug,
-        (SELECT r.slug FROM user_roles ur
-         JOIN roles r ON ur.role_id = r.id
-         WHERE ur.user_id = u.id
-         LIMIT 1) as role_slug
+        u.role,
+        t.slug as tenant_slug
       FROM users u
       LEFT JOIN tenants t ON u.tenant_id = t.id
       WHERE u.id = $1
     `, [decoded.userId]);
 
     if (result.rows.length === 0) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Authentication failed',
-        message: 'User not found' 
+        message: 'User not found'
       });
     }
 
@@ -55,29 +55,29 @@ async function authenticateToken(req, res, next) {
       lastName: user.last_name,
       tenant_id: user.tenant_id,
       tenantSlug: user.tenant_slug,
-      role: user.role_slug
+      role: user.role || 'normal_user'
     };
 
     next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Authentication failed',
-        message: 'Invalid token' 
+        message: 'Invalid token'
       });
     }
-    
+
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Authentication failed',
-        message: 'Token expired' 
+        message: 'Token expired'
       });
     }
 
     console.error('Authentication error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'Authentication error',
-      message: 'Internal server error' 
+      message: 'Internal server error'
     });
   }
 }
@@ -87,8 +87,12 @@ async function authenticateToken(req, res, next) {
  */
 async function optionalAuth(req, res, next) {
   try {
+    // Get token from Authorization header or cookie
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const headerToken = authHeader && authHeader.split(' ')[1];
+    const cookieToken = req.cookies?.access_token;
+
+    const token = headerToken || cookieToken;
 
     if (!token) {
       // No token provided, continue without user
@@ -100,17 +104,14 @@ async function optionalAuth(req, res, next) {
 
     // Get user from database
     const result = await pool.query(`
-      SELECT 
-        u.id, 
-        u.email, 
-        u.first_name, 
-        u.last_name, 
+      SELECT
+        u.id,
+        u.email,
+        u.first_name,
+        u.last_name,
         u.tenant_id,
-        t.slug as tenant_slug,
-        (SELECT r.slug FROM user_roles ur
-         JOIN roles r ON ur.role_id = r.id
-         WHERE ur.user_id = u.id
-         LIMIT 1) as role_slug
+        u.role,
+        t.slug as tenant_slug
       FROM users u
       LEFT JOIN tenants t ON u.tenant_id = t.id
       WHERE u.id = $1
@@ -125,7 +126,7 @@ async function optionalAuth(req, res, next) {
         lastName: user.last_name,
         tenant_id: user.tenant_id,
         tenantSlug: user.tenant_slug,
-        role: user.role_slug
+        role: user.role || 'normal_user'
       };
     }
 
@@ -141,15 +142,15 @@ async function optionalAuth(req, res, next) {
  */
 function requireAdmin(req, res, next) {
   if (!req.user) {
-    return res.status(401).json({ 
-      error: 'Authentication required' 
+    return res.status(401).json({
+      error: 'Authentication required'
     });
   }
 
   if (req.user.role !== 'itiyum_admin') {
-    return res.status(403).json({ 
+    return res.status(403).json({
       error: 'Forbidden',
-      message: 'Admin access required' 
+      message: 'Admin access required'
     });
   }
 
@@ -161,15 +162,15 @@ function requireAdmin(req, res, next) {
  */
 function requireBusinessOwner(req, res, next) {
   if (!req.user) {
-    return res.status(401).json({ 
-      error: 'Authentication required' 
+    return res.status(401).json({
+      error: 'Authentication required'
     });
   }
 
   if (req.user.role !== 'business_owner' && req.user.role !== 'itiyum_admin') {
-    return res.status(403).json({ 
+    return res.status(403).json({
       error: 'Forbidden',
-      message: 'Business owner access required' 
+      message: 'Business owner access required'
     });
   }
 

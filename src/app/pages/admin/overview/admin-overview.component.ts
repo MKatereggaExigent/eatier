@@ -1,8 +1,9 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+
+import { AdminService } from '../../../core/services/admin.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
-import { AdminService } from '../../../core/services/admin.service';
 
 interface PlatformStats {
   totalUsers: number;
@@ -58,6 +59,9 @@ export class AdminOverviewComponent implements OnInit {
 
   currentUser = this.authService.currentUser;
   isLoading = signal(true);
+
+  // View mode: 'cards' or 'table'
+  viewMode = signal<'cards' | 'table'>('cards');
 
   // Platform statistics - initialized with zeros, will be populated from API
   platformStats = signal<PlatformStats>({
@@ -225,6 +229,10 @@ export class AdminOverviewComponent implements OnInit {
   viewAllReports(): void {
     console.log('Navigate to reports');
     // TODO: Navigate to reports page
+  }
+
+  toggleViewMode(): void {
+    this.viewMode.set(this.viewMode() === 'cards' ? 'table' : 'cards');
   }
 
   // Utility methods

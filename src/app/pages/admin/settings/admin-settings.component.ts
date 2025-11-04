@@ -1,27 +1,30 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
-import { AdminService } from '../../../core/services/admin.service';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
-interface SettingCategory {
+import { AdminService } from '../../../core/services/admin.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
+interface TenantSettings {
   id: string;
   name: string;
-  description: string;
-  icon: string;
-  settings: Setting[];
+  slug: string;
+  domain: string | null;
+  logo_url: string | null;
+  subscription_plan: string;
+  subscription_status: string;
+  created_at: string;
+  updated_at: string;
 }
 
-interface Setting {
+interface NotificationTemplate {
   id: string;
-  key: string;
   name: string;
-  description: string;
-  type: 'toggle' | 'text' | 'number' | 'select' | 'textarea';
-  value: any;
-  options?: { label: string; value: any }[];
-  required?: boolean;
+  type: string;
+  channel: string;
+  is_active: boolean;
+  created_at: string;
 }
 
 @Component({
@@ -40,21 +43,120 @@ export class AdminSettingsComponent implements OnInit {
   isLoading = signal<boolean>(false);
   isSaving = signal<boolean>(false);
   showSuccessMessage = signal<boolean>(false);
+  activeTab = signal<string>('general');
 
   // Settings data
-  settingCategories = signal<SettingCategory[]>([]);
+  tenantSettings = signal<TenantSettings | null>(null);
+  notificationTemplates = signal<NotificationTemplate[]>([]);
+
+  // General Settings
+  platformName = signal<string>('');
+  platformSlug = signal<string>('');
+  platformDomain = signal<string>('');
+  platformLogoUrl = signal<string>('');
+  subscriptionPlan = signal<string>('');
+  subscriptionStatus = signal<string>('');
+  defaultLanguage = signal<string>('en');
+  defaultTimezone = signal<string>('UTC');
+  defaultCurrency = signal<string>('USD');
+  maintenanceMode = signal<boolean>(false);
+  allowRegistrations = signal<boolean>(true);
+
+  // Security Settings
+  sessionTimeout = signal<number>(30);
+  passwordMinLength = signal<number>(8);
+  maxLoginAttempts = signal<number>(5);
+  lockoutDuration = signal<number>(15);
+  twoFactorEnabled = signal<boolean>(false);
+  passwordRequireUppercase = signal<boolean>(true);
+  passwordRequireLowercase = signal<boolean>(true);
+  passwordRequireNumber = signal<boolean>(true);
+  passwordRequireSpecial = signal<boolean>(false);
+
+  // Notification Settings
+  emailNotifications = signal<boolean>(true);
+  pushNotifications = signal<boolean>(true);
+  smsNotifications = signal<boolean>(false);
+  adminEmail = signal<string>('admin@itiyum.com');
+  notificationFrequency = signal<string>('realtime');
+
+  // Booking Settings
+  autoConfirmBookings = signal<boolean>(false);
+  bookingCancellationHours = signal<number>(24);
+  maxAdvanceBookingDays = signal<number>(90);
+  requirePaymentUpfront = signal<boolean>(false);
+  allowDoubleBooking = signal<boolean>(false);
+
+  // Business Settings
+  requireVerification = signal<boolean>(true);
+  autoApproveBusinesses = signal<boolean>(false);
+  maxBusinessesPerUser = signal<number>(5);
+  requireBusinessDocuments = signal<boolean>(true);
+
+  // Computed values for notification templates
+  activeNotificationTemplates = computed(() =>
+    this.notificationTemplates().filter(t => t.is_active).length
+  );
+  totalNotificationTemplates = computed(() =>
+    this.notificationTemplates().length
+  );
 
   ngOnInit(): void {
     this.loadSettings();
   }
 
-  // Load settings
   loadSettings(): void {
     this.isLoading.set(true);
 
     this.adminService.getSettings().subscribe({
       next: (response) => {
-        this.mapSettingsToCategories(response.settings);
+        this.tenantSettings.set(response.tenant);
+        this.notificationTemplates.set(response.notificationTemplates || []);
+
+        // General Settings
+        this.platformName.set(response.settings.general.platform_name || '');
+        this.platformSlug.set(response.settings.general.platform_slug || '');
+        this.platformDomain.set(response.settings.general.platform_domain || '');
+        this.platformLogoUrl.set(response.settings.general.logo_url || '');
+        this.subscriptionPlan.set(response.settings.general.subscription_plan || '');
+        this.subscriptionStatus.set(response.settings.general.subscription_status || '');
+        this.defaultLanguage.set(response.settings.general.default_language || 'en');
+        this.defaultTimezone.set(response.settings.general.default_timezone || 'UTC');
+        this.defaultCurrency.set(response.settings.general.default_currency || 'USD');
+        this.maintenanceMode.set(response.settings.general.maintenance_mode || false);
+        this.allowRegistrations.set(response.settings.general.allow_registrations !== false);
+
+        // Security Settings
+        this.sessionTimeout.set(response.settings.security.session_timeout || 30);
+        this.passwordMinLength.set(response.settings.security.password_min_length || 8);
+        this.maxLoginAttempts.set(response.settings.security.max_login_attempts || 5);
+        this.lockoutDuration.set(response.settings.security.lockout_duration || 15);
+        this.twoFactorEnabled.set(response.settings.security.two_factor_enabled || false);
+        this.passwordRequireUppercase.set(response.settings.security.password_require_uppercase !== false);
+        this.passwordRequireLowercase.set(response.settings.security.password_require_lowercase !== false);
+        this.passwordRequireNumber.set(response.settings.security.password_require_number !== false);
+        this.passwordRequireSpecial.set(response.settings.security.password_require_special || false);
+
+        // Notification Settings
+        this.emailNotifications.set(response.settings.notifications.email_notifications !== false);
+        this.pushNotifications.set(response.settings.notifications.push_notifications !== false);
+        this.smsNotifications.set(response.settings.notifications.sms_notifications || false);
+        this.adminEmail.set(response.settings.notifications.admin_email || 'admin@itiyum.com');
+        this.notificationFrequency.set(response.settings.notifications.notification_frequency || 'realtime');
+
+        // Booking Settings
+        this.autoConfirmBookings.set(response.settings.bookings.auto_confirm_bookings || false);
+        this.bookingCancellationHours.set(response.settings.bookings.booking_cancellation_hours || 24);
+        this.maxAdvanceBookingDays.set(response.settings.bookings.max_advance_booking_days || 90);
+        this.requirePaymentUpfront.set(response.settings.bookings.require_payment_upfront || false);
+        this.allowDoubleBooking.set(response.settings.bookings.allow_double_booking || false);
+
+        // Business Settings
+        this.requireVerification.set(response.settings.businesses.require_verification !== false);
+        this.autoApproveBusinesses.set(response.settings.businesses.auto_approve_businesses || false);
+        this.maxBusinessesPerUser.set(response.settings.businesses.max_businesses_per_user || 5);
+        this.requireBusinessDocuments.set(response.settings.businesses.require_business_documents !== false);
+
         this.isLoading.set(false);
       },
       error: (error) => {
@@ -64,290 +166,144 @@ export class AdminSettingsComponent implements OnInit {
     });
   }
 
-  // Map API settings to frontend categories
-  mapSettingsToCategories(apiSettings: any): void {
-    const categories: SettingCategory[] = [];
-
-    // General Settings
-    if (apiSettings.general) {
-      categories.push({
-        id: 'general',
-        name: 'General Settings',
-        description: 'Basic platform configuration and preferences',
-        icon: '⚙️',
-        settings: this.mapSettings(apiSettings.general, {
-          platform_name: { name: 'Platform Name', type: 'text', required: true },
-          platform_tagline: { name: 'Platform Tagline', type: 'text' },
-          maintenance_mode: { name: 'Maintenance Mode', type: 'toggle' },
-          allow_registrations: { name: 'Allow New Registrations', type: 'toggle' },
-          default_language: { name: 'Default Language', type: 'select', options: [
-            { label: 'English', value: 'en' },
-            { label: 'French', value: 'fr' },
-            { label: 'Swahili', value: 'sw' }
-          ]},
-          default_timezone: { name: 'Default Timezone', type: 'text' },
-          default_currency: { name: 'Default Currency', type: 'select', options: [
-            { label: 'UGX - Ugandan Shilling', value: 'UGX' },
-            { label: 'USD - US Dollar', value: 'USD' },
-            { label: 'EUR - Euro', value: 'EUR' }
-          ]}
-        })
-      });
-    }
-
-    // Security Settings
-    if (apiSettings.security) {
-      categories.push({
-        id: 'security',
-        name: 'Security Settings',
-        description: 'Security and authentication configuration',
-        icon: '🔒',
-        settings: this.mapSettings(apiSettings.security, {
-          two_factor_required: { name: 'Require Two-Factor Authentication', type: 'toggle' },
-          session_timeout: { name: 'Session Timeout (minutes)', type: 'number' },
-          password_min_length: { name: 'Minimum Password Length', type: 'number' },
-          max_login_attempts: { name: 'Max Login Attempts', type: 'number' },
-          lockout_duration: { name: 'Lockout Duration (minutes)', type: 'number' },
-          password_require_uppercase: { name: 'Require Uppercase Letter', type: 'toggle' },
-          password_require_lowercase: { name: 'Require Lowercase Letter', type: 'toggle' },
-          password_require_number: { name: 'Require Number', type: 'toggle' },
-          password_require_special: { name: 'Require Special Character', type: 'toggle' }
-        })
-      });
-    }
-
-    // Multi-tenancy Settings
-    if (apiSettings.multi_tenancy) {
-      categories.push({
-        id: 'multi_tenancy',
-        name: 'Multi-Tenancy Settings',
-        description: 'Tenant management and isolation settings',
-        icon: '🏢',
-        settings: this.mapSettings(apiSettings.multi_tenancy, {
-          allow_tenant_creation: { name: 'Allow Tenant Creation', type: 'toggle' },
-          tenant_isolation_strict: { name: 'Strict Tenant Isolation', type: 'toggle' },
-          max_tenants: { name: 'Maximum Tenants', type: 'number' },
-          tenant_auto_approve: { name: 'Auto-Approve Tenants', type: 'toggle' },
-          cross_tenant_search: { name: 'Cross-Tenant Search', type: 'toggle' }
-        })
-      });
-    }
-
-    // RBAC Settings
-    if (apiSettings.rbac) {
-      categories.push({
-        id: 'rbac',
-        name: 'RBAC Settings',
-        description: 'Role-based access control configuration',
-        icon: '👥',
-        settings: this.mapSettings(apiSettings.rbac, {
-          enable_rbac: { name: 'Enable RBAC', type: 'toggle' },
-          default_user_role: { name: 'Default User Role', type: 'text' },
-          allow_role_self_assignment: { name: 'Allow Self Role Assignment', type: 'toggle' },
-          max_roles_per_user: { name: 'Max Roles Per User', type: 'number' },
-          permission_inheritance: { name: 'Permission Inheritance', type: 'toggle' },
-          audit_permission_changes: { name: 'Audit Permission Changes', type: 'toggle' }
-        })
-      });
-    }
-
-    // Notification Settings
-    if (apiSettings.notifications) {
-      categories.push({
-        id: 'notifications',
-        name: 'Notification Settings',
-        description: 'Configure email and push notifications',
-        icon: '🔔',
-        settings: this.mapSettings(apiSettings.notifications, {
-          email_notifications: { name: 'Email Notifications', type: 'toggle' },
-          push_notifications: { name: 'Push Notifications', type: 'toggle' },
-          sms_notifications: { name: 'SMS Notifications', type: 'toggle' },
-          notification_frequency: { name: 'Notification Frequency', type: 'select', options: [
-            { label: 'Real-time', value: 'realtime' },
-            { label: 'Daily', value: 'daily' },
-            { label: 'Weekly', value: 'weekly' },
-            { label: 'Never', value: 'never' }
-          ]},
-          admin_email: { name: 'Admin Email', type: 'text' }
-        })
-      });
-    }
-
-    // Booking Settings
-    if (apiSettings.bookings) {
-      categories.push({
-        id: 'bookings',
-        name: 'Booking Settings',
-        description: 'Configure booking and reservation settings',
-        icon: '📅',
-        settings: this.mapSettings(apiSettings.bookings, {
-          auto_confirm_bookings: { name: 'Auto-Confirm Bookings', type: 'toggle' },
-          booking_cancellation_hours: { name: 'Cancellation Window (hours)', type: 'number' },
-          max_advance_booking_days: { name: 'Max Advance Booking (days)', type: 'number' },
-          require_payment_upfront: { name: 'Require Payment Upfront', type: 'toggle' },
-          allow_double_booking: { name: 'Allow Double Booking', type: 'toggle' }
-        })
-      });
-    }
-
-    // Payment Settings
-    if (apiSettings.payments) {
-      categories.push({
-        id: 'payments',
-        name: 'Payment Settings',
-        description: 'Configure payment processing and fees',
-        icon: '💳',
-        settings: this.mapSettings(apiSettings.payments, {
-          platform_fee_percentage: { name: 'Platform Fee (%)', type: 'number' },
-          payment_methods: { name: 'Accepted Payment Methods', type: 'select', options: [
-            { label: 'All Methods', value: 'all' },
-            { label: 'Credit/Debit Cards Only', value: 'cards' },
-            { label: 'Mobile Money Only', value: 'mobile' }
-          ]},
-          auto_payout: { name: 'Automatic Payouts', type: 'toggle' },
-          payout_delay_days: { name: 'Payout Delay (days)', type: 'number' },
-          minimum_payout_amount: { name: 'Minimum Payout Amount', type: 'number' }
-        })
-      });
-    }
-
-    // Business Settings
-    if (apiSettings.businesses) {
-      categories.push({
-        id: 'businesses',
-        name: 'Business Settings',
-        description: 'Configure business registration and verification',
-        icon: '🏪',
-        settings: this.mapSettings(apiSettings.businesses, {
-          require_verification: { name: 'Require Verification', type: 'toggle' },
-          auto_approve_businesses: { name: 'Auto-Approve Businesses', type: 'toggle' },
-          max_businesses_per_user: { name: 'Max Businesses Per User', type: 'number' },
-          require_business_documents: { name: 'Require Business Documents', type: 'toggle' }
-        })
-      });
-    }
-
-    this.settingCategories.set(categories);
+  setActiveTab(tab: string): void {
+    this.activeTab.set(tab);
   }
 
-  // Helper to map settings
-  mapSettings(apiSettings: any, mapping: any): Setting[] {
-    const settings: Setting[] = [];
-
-    for (const [key, config] of Object.entries(mapping)) {
-      const apiSetting = apiSettings.find((s: any) => s.key === key);
-      if (apiSetting) {
-        settings.push({
-          id: apiSetting.id,
-          key: apiSetting.key,
-          name: (config as any).name,
-          description: apiSetting.description,
-          type: (config as any).type,
-          value: apiSetting.value,
-          options: (config as any).options,
-          required: (config as any).required || false
-        });
-      }
-    }
-
-    return settings;
-  }
-
-  // Computed methods
-  getTotalSettings(): number {
-    return this.settingCategories().reduce((total, category) => total + category.settings.length, 0);
-  }
-
-  getActiveSettings(): number {
-    return this.settingCategories().reduce((total, category) =>
-      total + category.settings.filter(s => s.type === 'toggle' && s.value === true).length, 0);
-  }
-
-  getSecuritySettings(): number {
-    const securityCategory = this.settingCategories().find(c => c.id === 'security');
-    return securityCategory ? securityCategory.settings.length : 0;
-  }
-
-  getNotificationSettings(): number {
-    const notificationCategory = this.settingCategories().find(c => c.id === 'notifications');
-    return notificationCategory ? notificationCategory.settings.length : 0;
-  }
-
-  // Action methods
-  updateSetting(setting: Setting): void {
-    this.adminService.updateSetting(setting.id, setting.value).subscribe({
-      next: (response) => {
-        console.log('Setting updated:', setting.name, setting.value);
-      },
-      error: (error) => {
-        console.error('Error updating setting:', error);
-        // Revert the value on error
-        this.loadSettings();
-      }
-    });
-  }
-
-  saveAllSettings(): void {
+  saveGeneralSettings(): void {
     this.isSaving.set(true);
 
-    // Collect all settings to save
-    const allSettings: any[] = [];
-    this.settingCategories().forEach(category => {
-      category.settings.forEach(setting => {
-        allSettings.push({ id: setting.id, value: setting.value });
-      });
-    });
-
-    // Save all settings sequentially
-    let savedCount = 0;
-    const saveNext = (index: number) => {
-      if (index >= allSettings.length) {
-        this.isSaving.set(false);
-        this.showSuccessMessage.set(true);
-
-        // Hide success message after 3 seconds
-        setTimeout(() => {
-          this.showSuccessMessage.set(false);
-        }, 3000);
-
-        console.log('All settings saved');
-        return;
+    const data = {
+      name: this.platformName(),
+      domain: this.platformDomain(),
+      logo_url: this.platformLogoUrl(),
+      settings: {
+        default_language: this.defaultLanguage(),
+        default_timezone: this.defaultTimezone(),
+        default_currency: this.defaultCurrency(),
+        maintenance_mode: this.maintenanceMode(),
+        allow_registrations: this.allowRegistrations()
       }
-
-      const setting = allSettings[index];
-      this.adminService.updateSetting(setting.id, setting.value).subscribe({
-        next: () => {
-          savedCount++;
-          saveNext(index + 1);
-        },
-        error: (error) => {
-          console.error('Error saving setting:', error);
-          this.isSaving.set(false);
-          // Reload settings on error
-          this.loadSettings();
-        }
-      });
     };
 
-    saveNext(0);
+    this.adminService.updateSettings(data).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.showSuccessMessage.set(true);
+        setTimeout(() => this.showSuccessMessage.set(false), 3000);
+      },
+      error: (error) => {
+        console.error('Error saving settings:', error);
+        this.isSaving.set(false);
+      }
+    });
   }
 
-  resetToDefaults(): void {
-    if (confirm('Are you sure you want to reset all settings to their default values?')) {
-      console.log('Reset to defaults');
-      // In production, this would reset all settings to defaults
-    }
+  saveSecuritySettings(): void {
+    this.isSaving.set(true);
+
+    const data = {
+      settings: {
+        session_timeout: this.sessionTimeout(),
+        password_min_length: this.passwordMinLength(),
+        max_login_attempts: this.maxLoginAttempts(),
+        lockout_duration: this.lockoutDuration(),
+        two_factor_enabled: this.twoFactorEnabled(),
+        password_require_uppercase: this.passwordRequireUppercase(),
+        password_require_lowercase: this.passwordRequireLowercase(),
+        password_require_number: this.passwordRequireNumber(),
+        password_require_special: this.passwordRequireSpecial()
+      }
+    };
+
+    this.adminService.updateSettings(data).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.showSuccessMessage.set(true);
+        setTimeout(() => this.showSuccessMessage.set(false), 3000);
+      },
+      error: (error) => {
+        console.error('Error saving settings:', error);
+        this.isSaving.set(false);
+      }
+    });
   }
 
-  exportSettings(): void {
-    const settingsData = JSON.stringify(this.settingCategories(), null, 2);
-    const blob = new Blob([settingsData], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `itiyum-settings-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    window.URL.revokeObjectURL(url);
-    console.log('Settings exported');
+  saveNotificationSettings(): void {
+    this.isSaving.set(true);
+
+    const data = {
+      settings: {
+        email_notifications: this.emailNotifications(),
+        push_notifications: this.pushNotifications(),
+        sms_notifications: this.smsNotifications(),
+        admin_email: this.adminEmail(),
+        notification_frequency: this.notificationFrequency()
+      }
+    };
+
+    this.adminService.updateSettings(data).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.showSuccessMessage.set(true);
+        setTimeout(() => this.showSuccessMessage.set(false), 3000);
+      },
+      error: (error) => {
+        console.error('Error saving settings:', error);
+        this.isSaving.set(false);
+      }
+    });
   }
+
+  saveBookingSettings(): void {
+    this.isSaving.set(true);
+
+    const data = {
+      settings: {
+        auto_confirm_bookings: this.autoConfirmBookings(),
+        booking_cancellation_hours: this.bookingCancellationHours(),
+        max_advance_booking_days: this.maxAdvanceBookingDays(),
+        require_payment_upfront: this.requirePaymentUpfront(),
+        allow_double_booking: this.allowDoubleBooking()
+      }
+    };
+
+    this.adminService.updateSettings(data).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.showSuccessMessage.set(true);
+        setTimeout(() => this.showSuccessMessage.set(false), 3000);
+      },
+      error: (error) => {
+        console.error('Error saving settings:', error);
+        this.isSaving.set(false);
+      }
+    });
+  }
+
+  saveBusinessSettings(): void {
+    this.isSaving.set(true);
+
+    const data = {
+      settings: {
+        require_verification: this.requireVerification(),
+        auto_approve_businesses: this.autoApproveBusinesses(),
+        max_businesses_per_user: this.maxBusinessesPerUser(),
+        require_business_documents: this.requireBusinessDocuments()
+      }
+    };
+
+    this.adminService.updateSettings(data).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.showSuccessMessage.set(true);
+        setTimeout(() => this.showSuccessMessage.set(false), 3000);
+      },
+      error: (error) => {
+        console.error('Error saving settings:', error);
+        this.isSaving.set(false);
+      }
+    });
+  }
+
 }

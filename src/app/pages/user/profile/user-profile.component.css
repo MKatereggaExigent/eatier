@@ -1,0 +1,585 @@
+.user-profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.profile-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--clr-black);
+  margin-bottom: 0.5rem;
+}
+
+.profile-header p {
+  color: var(--clr-grey-700);
+  font-size: 1rem;
+}
+
+.success-message, .error-message {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.success-message {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.profile-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.profile-tabs .tab-button {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: var(--clr-grey-700);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-tabs .tab-button:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.profile-tabs .tab-button.active {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+
+.profile-form .form-section {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.profile-form .form-section h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--clr-black);
+  margin-bottom: 2rem;
+}
+
+.profile-form .form-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--clr-black);
+  margin: 2rem 0 1rem 0;
+}
+
+.profile-form .form-section .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-form .form-section .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.profile-form .form-section .form-group label {
+  display: block;
+  font-weight: 600;
+  color: var(--clr-black);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.profile-form .form-section .form-group input, .profile-form .form-section .form-group select, .profile-form .form-section .form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.profile-form .form-section .form-group input:focus, .profile-form .form-section .form-group select:focus, .profile-form .form-section .form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.profile-form .form-section .form-group input.error, .profile-form .form-section .form-group select.error, .profile-form .form-section .form-group textarea.error {
+  border-color: #ef4444;
+}
+
+.profile-form .form-section .form-group input::placeholder, .profile-form .form-section .form-group select::placeholder, .profile-form .form-section .form-group textarea::placeholder {
+  color: #9ca3af;
+}
+
+.profile-form .form-section .form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.profile-form .form-section .form-group .field-error {
+  display: block;
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.profile-form .form-section .form-group .character-count {
+  font-size: 0.75rem;
+  color: var(--clr-grey-700);
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+.profile-form .form-section .form-group .character-count.limit-warning {
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+.profile-form .form-section .form-group .age-display {
+  font-size: 0.75rem;
+  color: var(--clr-grey-700);
+  margin-top: 0.25rem;
+}
+
+.profile-form .specialty-section, .profile-form .certification-section {
+  margin-top: 2rem;
+}
+
+.profile-form .specialty-section h3, .profile-form .certification-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--clr-black);
+  margin-bottom: 1rem;
+}
+
+.profile-form .specialty-section .specialty-list, .profile-form .specialty-section .certification-list, .profile-form .certification-section .specialty-list, .profile-form .certification-section .certification-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.profile-form .specialty-section .specialty-list .specialty-item, .profile-form .specialty-section .specialty-list .certification-item, .profile-form .specialty-section .certification-list .specialty-item, .profile-form .specialty-section .certification-list .certification-item, .profile-form .certification-section .specialty-list .specialty-item, .profile-form .certification-section .specialty-list .certification-item, .profile-form .certification-section .certification-list .specialty-item, .profile-form .certification-section .certification-list .certification-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f3f4f6;
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.profile-form .specialty-section .specialty-list .specialty-item .dish-name, .profile-form .specialty-section .specialty-list .specialty-item .cert-name, .profile-form .specialty-section .specialty-list .certification-item .dish-name, .profile-form .specialty-section .specialty-list .certification-item .cert-name, .profile-form .specialty-section .certification-list .specialty-item .dish-name, .profile-form .specialty-section .certification-list .specialty-item .cert-name, .profile-form .specialty-section .certification-list .certification-item .dish-name, .profile-form .specialty-section .certification-list .certification-item .cert-name, .profile-form .certification-section .specialty-list .specialty-item .dish-name, .profile-form .certification-section .specialty-list .specialty-item .cert-name, .profile-form .certification-section .specialty-list .certification-item .dish-name, .profile-form .certification-section .specialty-list .certification-item .cert-name, .profile-form .certification-section .certification-list .specialty-item .dish-name, .profile-form .certification-section .certification-list .specialty-item .cert-name, .profile-form .certification-section .certification-list .certification-item .dish-name, .profile-form .certification-section .certification-list .certification-item .cert-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--clr-black);
+}
+
+.profile-form .specialty-section .specialty-list .specialty-item .remove-btn, .profile-form .specialty-section .specialty-list .certification-item .remove-btn, .profile-form .specialty-section .certification-list .specialty-item .remove-btn, .profile-form .specialty-section .certification-list .certification-item .remove-btn, .profile-form .certification-section .specialty-list .specialty-item .remove-btn, .profile-form .certification-section .specialty-list .certification-item .remove-btn, .profile-form .certification-section .certification-list .specialty-item .remove-btn, .profile-form .certification-section .certification-list .certification-item .remove-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.profile-form .specialty-section .specialty-list .specialty-item .remove-btn:hover, .profile-form .specialty-section .specialty-list .certification-item .remove-btn:hover, .profile-form .specialty-section .certification-list .specialty-item .remove-btn:hover, .profile-form .specialty-section .certification-list .certification-item .remove-btn:hover, .profile-form .certification-section .specialty-list .specialty-item .remove-btn:hover, .profile-form .certification-section .specialty-list .certification-item .remove-btn:hover, .profile-form .certification-section .certification-list .specialty-item .remove-btn:hover, .profile-form .certification-section .certification-list .certification-item .remove-btn:hover {
+  background: #fef2f2;
+}
+
+.profile-form .specialty-section .add-specialty, .profile-form .specialty-section .add-certification, .profile-form .certification-section .add-specialty, .profile-form .certification-section .add-certification {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.profile-form .specialty-section .add-specialty input, .profile-form .specialty-section .add-certification input, .profile-form .certification-section .add-specialty input, .profile-form .certification-section .add-certification input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.profile-form .specialty-section .add-specialty input:focus, .profile-form .specialty-section .add-certification input:focus, .profile-form .certification-section .add-specialty input:focus, .profile-form .certification-section .add-certification input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.profile-form .specialty-section .add-specialty .add-btn, .profile-form .specialty-section .add-certification .add-btn, .profile-form .certification-section .add-specialty .add-btn, .profile-form .certification-section .add-certification .add-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-form .specialty-section .add-specialty .add-btn:hover, .profile-form .specialty-section .add-certification .add-btn:hover, .profile-form .certification-section .add-specialty .add-btn:hover, .profile-form .certification-section .add-certification .add-btn:hover {
+  background: #5a67d8;
+}
+
+.profile-form .media-group {
+  margin-bottom: 2rem;
+}
+
+.profile-form .media-group h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--clr-black);
+  margin-bottom: 1rem;
+}
+
+.profile-form .media-group .media-description {
+  font-size: 0.875rem;
+  color: var(--clr-grey-700);
+  margin-bottom: 1rem;
+}
+
+.profile-form .media-group .photo-preview, .profile-form .media-group .background-preview {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.profile-form .media-group .photo-preview img, .profile-form .media-group .background-preview img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+}
+
+.profile-form .media-group .photo-preview .remove-photo, .profile-form .media-group .photo-preview .remove-background, .profile-form .media-group .background-preview .remove-photo, .profile-form .media-group .background-preview .remove-background {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-form .media-group .photo-preview .remove-photo:hover, .profile-form .media-group .photo-preview .remove-background:hover, .profile-form .media-group .background-preview .remove-photo:hover, .profile-form .media-group .background-preview .remove-background:hover {
+  background: #dc2626;
+}
+
+.profile-form .media-group .background-preview img {
+  width: 300px;
+  height: 150px;
+}
+
+.profile-form .media-group .photo-upload, .profile-form .media-group .background-upload {
+  cursor: pointer;
+}
+
+.profile-form .media-group .photo-upload .upload-placeholder, .profile-form .media-group .background-upload .upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  background: #f9fafb;
+  transition: all 0.2s ease;
+}
+
+.profile-form .media-group .photo-upload .upload-placeholder.large, .profile-form .media-group .background-upload .upload-placeholder.large {
+  width: 300px;
+  height: 150px;
+}
+
+.profile-form .media-group .photo-upload .upload-placeholder .upload-icon, .profile-form .media-group .background-upload .upload-placeholder .upload-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.profile-form .media-group .photo-upload .upload-placeholder span, .profile-form .media-group .background-upload .upload-placeholder span {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--clr-grey-700);
+}
+
+.profile-form .media-group .photo-upload:hover .upload-placeholder, .profile-form .media-group .background-upload:hover .upload-placeholder {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.profile-form .media-group .portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.profile-form .media-group .portfolio-grid .portfolio-item {
+  position: relative;
+}
+
+.profile-form .media-group .portfolio-grid .portfolio-item img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #e5e7eb;
+}
+
+.profile-form .media-group .portfolio-grid .portfolio-item .remove-portfolio {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.profile-form .media-group .portfolio-grid .portfolio-item .remove-portfolio:hover {
+  background: #dc2626;
+}
+
+.profile-form .media-group .portfolio-grid .portfolio-upload {
+  cursor: pointer;
+}
+
+.profile-form .media-group .portfolio-grid .portfolio-upload .upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  background: #f9fafb;
+  transition: all 0.2s ease;
+}
+
+.profile-form .media-group .portfolio-grid .portfolio-upload .upload-placeholder .upload-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.profile-form .media-group .portfolio-grid .portfolio-upload .upload-placeholder span {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--clr-grey-700);
+}
+
+.profile-form .media-group .portfolio-grid .portfolio-upload:hover .upload-placeholder {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.profile-form .privacy-group {
+  margin-bottom: 2rem;
+}
+
+.profile-form .privacy-group h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--clr-black);
+  margin-bottom: 1rem;
+}
+
+.profile-form .privacy-group .visibility-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.profile-form .privacy-group .visibility-options .visibility-option {
+  display: block;
+  cursor: pointer;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.profile-form .privacy-group .visibility-options .visibility-option:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.profile-form .privacy-group .visibility-options .visibility-option input[type="radio"] {
+  display: none;
+}
+
+.profile-form .privacy-group .visibility-options .visibility-option input[type="radio"]:checked + .option-content .option-title {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.profile-form .privacy-group .visibility-options .visibility-option .option-content .option-title {
+  display: block;
+  font-weight: 500;
+  color: var(--clr-black);
+  margin-bottom: 0.25rem;
+}
+
+.profile-form .privacy-group .visibility-options .visibility-option .option-content .option-description {
+  font-size: 0.875rem;
+  color: var(--clr-grey-700);
+}
+
+.profile-form .privacy-group .privacy-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.profile-form .privacy-group .privacy-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+.profile-form .privacy-group .privacy-checkbox .checkmark {
+  font-weight: 500;
+  color: var(--clr-black);
+}
+
+.profile-form .form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.profile-form .form-actions .secondary-button, .profile-form .form-actions .primary-button {
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.profile-form .form-actions .secondary-button:disabled, .profile-form .form-actions .primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.profile-form .form-actions .secondary-button {
+  background: white;
+  color: var(--clr-grey-700);
+  border: 2px solid #e5e7eb;
+}
+
+.profile-form .form-actions .secondary-button:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.profile-form .form-actions .primary-button {
+  color: white;
+  border: none;
+}
+
+.profile-form .form-actions .primary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.profile-form .form-actions .primary-button .loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .user-profile-container {
+    padding: 1rem;
+  }
+  .profile-tabs {
+    justify-content: stretch;
+  }
+  .profile-tabs .tab-button {
+    flex: 1;
+    text-align: center;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+  .profile-form .form-section .form-row {
+    grid-template-columns: 1fr;
+  }
+  .media-group .background-preview img,
+  .media-group .background-upload .upload-placeholder.large {
+    width: 100%;
+    max-width: 300px;
+  }
+  .media-group .portfolio-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .form-actions {
+    flex-direction: column;
+  }
+  .form-actions .secondary-button, .form-actions .primary-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

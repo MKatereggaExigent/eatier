@@ -11,7 +11,6 @@ export const routes: Routes = [
         children: [
             { path: '', redirectTo: 'about', pathMatch: 'full' },
             { path: 'about', loadComponent: () => import('./pages/about/about.component').then(m => m.AboutComponent) },
-            { path: 'advertise', loadComponent: () => import('./pages/advertise/advertise.component').then(m => m.AdvertiseComponent) },
             { path: 'help', loadComponent: () => import('./pages/help-centre/help-centre.component').then(m => m.HelpCentreComponent) },
             { path: 'feedback', loadComponent: () => import('./pages/feedback/feedback.component').then(m => m.FeedbackComponent) },
             { path: 'community', loadComponent: () => import('./pages/community/community.component').then(m => m.CommunityComponent) },

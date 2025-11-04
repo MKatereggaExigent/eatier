@@ -2,7 +2,10 @@ import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { BannerAdComponent } from '../../shared/components/ads/banner-ad/banner-ad.component';
 import { CommonModule } from '@angular/common';
+import { InlineAdComponent } from '../../shared/components/ads/inline-ad/inline-ad.component';
+import { SidebarAdComponent } from '../../shared/components/ads/sidebar-ad/sidebar-ad.component';
 
 interface CarouselSlide {
   image: string;
@@ -13,7 +16,7 @@ interface CarouselSlide {
 @Component({
   selector: 'app-advertise',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, BannerAdComponent, SidebarAdComponent, InlineAdComponent],
   templateUrl: './advertise.component.html',
   styleUrl: './advertise.component.scss'
 })

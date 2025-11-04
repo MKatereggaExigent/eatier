@@ -1,9 +1,11 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, computed, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
+import { BannerAdComponent } from '../../shared/components/ads/banner-ad/banner-ad.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { SidebarAdComponent } from '../../shared/components/ads/sidebar-ad/sidebar-ad.component';
 
 // Interfaces
 interface HelpArticle {
@@ -41,7 +43,7 @@ interface ChatMessage {
 @Component({
   selector: 'app-help-centre',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, FormsModule, BannerAdComponent, SidebarAdComponent],
   templateUrl: './help-centre.component.html',
   styleUrl: './help-centre.component.scss'
 })

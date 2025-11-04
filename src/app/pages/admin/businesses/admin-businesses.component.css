@@ -1,325 +1,318 @@
-@charset "UTF-8";
 @use '../../../../styles/admin-pages.scss' as *;
-.admin-businesses {
+.admin-businesses-page {
   min-height: 100vh;
   background: #fafafa;
-  padding: var(--space-8) clamp(var(--space-4), 4vw, var(--space-12));
+  padding: 2rem clamp(1rem, 4vw, 3rem);
 }
 
-.businesses-header {
-  margin-bottom: var(--space-10);
+.page-header {
+  margin-bottom: 2rem;
 }
 
-.businesses-header .header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-6);
-  flex-wrap: wrap;
-  margin-bottom: var(--space-8);
+.page-header .header-top {
+  margin-bottom: 1.5rem;
 }
 
-.businesses-header .header-content .title-section {
-  flex: 1;
-  min-width: 300px;
-}
-
-.businesses-header .header-content .title-section .page-title {
-  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
-  font-size: clamp(2rem, 5vw, 2.5rem);
+.page-header .header-top .title-section .page-title {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
   font-weight: 700;
-  color: #000000;
-  margin-bottom: var(--space-3);
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
+  color: #000;
+  margin: 0 0 0.5rem 0;
 }
 
-.businesses-header .header-content .title-section .page-subtitle {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: var(--text-lg);
+.page-header .header-top .title-section .page-subtitle {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
   color: #525252;
-  line-height: 1.6;
+  margin: 0;
 }
 
-.businesses-header .stats-grid {
+.page-header .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-4);
-  margin-bottom: var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
 }
 
-.businesses-header .stats-grid .stat-card {
-  background: #ffffff;
+.page-header .stats-grid .stat-card {
+  background: #fff;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
-  padding: var(--space-5);
+  padding: 1.25rem;
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  gap: 1rem;
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
 }
 
-.businesses-header .stats-grid .stat-card::before {
+.page-header .stats-grid .stat-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background: #000000;
-  transition: all 0.3s ease;
+  background: #000;
+  transition: all 0.2s ease;
 }
 
-.businesses-header .stats-grid .stat-card:hover {
-  background: #fafafa;
+.page-header .stats-grid .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-color: #d4d4d4;
 }
 
-.businesses-header .stats-grid .stat-card:hover::before {
+.page-header .stats-grid .stat-card:hover::before {
   height: 4px;
   background: #0284c7;
 }
 
-.businesses-header .stats-grid .stat-card:hover .stat-icon {
+.page-header .stats-grid .stat-card:hover .stat-icon {
   transform: scale(1.1);
-  background: #0284c7;
-  color: #ffffff;
 }
 
-.businesses-header .stats-grid .stat-card .stat-icon {
-  font-size: var(--text-2xl);
-  width: 48px;
-  height: 48px;
+.page-header .stats-grid .stat-card .stat-icon {
+  font-size: 1.5rem;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #f0f9ff;
-  color: #0284c7;
-  border-radius: 4px;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
 }
 
-.businesses-header .stats-grid .stat-card .stat-content {
+.page-header .stats-grid .stat-card .stat-content {
   flex: 1;
-  min-width: 0;
 }
 
-.businesses-header .stats-grid .stat-card .stat-content .stat-number {
-  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
-  font-size: var(--text-2xl);
-  font-weight: var(--font-bold);
-  color: #000000;
+.page-header .stats-grid .stat-card .stat-content .stat-value {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
   line-height: 1.2;
-  margin-bottom: var(--space-1);
 }
 
-.businesses-header .stats-grid .stat-card .stat-content .stat-label {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: var(--text-sm);
+.page-header .stats-grid .stat-card .stat-content .stat-label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.75rem;
   color: #737373;
-  font-weight: var(--font-medium);
-  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
 }
 
 .controls-section {
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 4px;
-  padding: var(--space-5);
-  margin-bottom: var(--space-6);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  margin-bottom: 2rem;
 }
 
-.controls-section .controls-content {
+.controls-section .controls-wrapper {
   display: flex;
-  gap: var(--space-4);
+  gap: 1rem;
   align-items: center;
   flex-wrap: wrap;
 }
 
-.controls-section .controls-content .search-controls {
+.controls-section .search-bar {
   flex: 1;
   min-width: 300px;
-}
-
-.controls-section .controls-content .search-controls .search-input-wrapper {
   position: relative;
-  width: 100%;
 }
 
-.controls-section .controls-content .search-controls .search-input-wrapper .search-input {
+.controls-section .search-bar .search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #737373;
+  pointer-events: none;
+}
+
+.controls-section .search-bar .search-input {
   width: 100%;
-  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-12);
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: var(--text-base);
-  color: #000000;
-  background: #ffffff;
-  transition: all 0.3s ease;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
-.controls-section .controls-content .search-controls .search-input-wrapper .search-input::placeholder {
-  color: #a3a3a3;
-}
-
-.controls-section .controls-content .search-controls .search-input-wrapper .search-input:focus {
+.controls-section .search-bar .search-input:focus {
   outline: none;
   border-color: #0284c7;
   box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
 }
 
-.controls-section .controls-content .search-controls .search-input-wrapper .search-icon {
-  position: absolute;
-  left: var(--space-4);
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: var(--text-lg);
-  color: #737373;
-  pointer-events: none;
+.controls-section .search-bar .search-input::placeholder {
+  color: #a3a3a3;
 }
 
-.controls-section .controls-content .filter-controls {
+.controls-section .filter-controls {
   display: flex;
-  gap: var(--space-3);
+  gap: 0.75rem;
   align-items: center;
 }
 
-.controls-section .controls-content .filter-controls .filter-toggle-btn,
-.controls-section .controls-content .filter-controls .clear-filters-btn {
-  padding: var(--space-3) var(--space-5);
-  border-radius: 4px;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.controls-section .controls-content .filter-controls .filter-toggle-btn {
-  background: #ffffff;
+.controls-section .filter-btn,
+.controls-section .clear-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
   border: 1px solid #e5e5e5;
-  color: #404040;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  position: relative;
+  border-radius: 4px;
+  background: #fff;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #262626;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.controls-section .controls-content .filter-controls .filter-toggle-btn .btn-icon {
-  font-size: var(--text-sm);
-  transition: transform 0.3s ease;
-}
-
-.controls-section .controls-content .filter-controls .filter-toggle-btn.active {
-  background: #f0f9ff;
-  border-color: #0284c7;
-  color: #0284c7;
-}
-
-.controls-section .controls-content .filter-controls .filter-toggle-btn.active .btn-icon {
-  transform: rotate(180deg);
-}
-
-.controls-section .controls-content .filter-controls .filter-toggle-btn:hover {
+.controls-section .filter-btn:hover,
+.controls-section .clear-btn:hover {
   background: #fafafa;
   border-color: #d4d4d4;
 }
 
-.controls-section .controls-content .filter-controls .filter-toggle-btn .filter-badge {
+.controls-section .filter-btn.active,
+.controls-section .clear-btn.active {
   background: #0284c7;
-  color: #ffffff;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: var(--text-xs);
-  font-weight: var(--font-semibold);
-  margin-left: var(--space-1);
+  border-color: #0284c7;
+  color: #fff;
 }
 
-.controls-section .controls-content .filter-controls .clear-filters-btn {
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
+.controls-section .filter-btn.active svg,
+.controls-section .clear-btn.active svg {
+  stroke: #fff;
+}
+
+.controls-section .filter-btn svg,
+.controls-section .clear-btn svg {
+  stroke: #525252;
+  transition: stroke 0.2s ease;
+}
+
+.controls-section .filter-btn .filter-count,
+.controls-section .clear-btn .filter-count {
+  background: #fff;
+  color: #0284c7;
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.controls-section .clear-btn {
+  background: #fef2f2;
+  border-color: #fecaca;
   color: #dc2626;
 }
 
-.controls-section .controls-content .filter-controls .clear-filters-btn:hover {
-  background: #fef2f2;
-  border-color: #dc2626;
+.controls-section .clear-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.controls-section .view-toggle {
+  display: flex;
+  gap: 0.25rem;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  padding: 0.25rem;
+}
+
+.controls-section .view-toggle .toggle-btn {
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.controls-section .view-toggle .toggle-btn svg {
+  stroke: #737373;
+  transition: stroke 0.2s ease;
+}
+
+.controls-section .view-toggle .toggle-btn:hover {
+  background: #fafafa;
+}
+
+.controls-section .view-toggle .toggle-btn:hover svg {
+  stroke: #262626;
+}
+
+.controls-section .view-toggle .toggle-btn.active {
+  background: #0284c7;
+}
+
+.controls-section .view-toggle .toggle-btn.active svg {
+  stroke: #fff;
 }
 
 .controls-section .filter-panel {
-  margin-top: var(--space-5);
-  padding-top: var(--space-5);
-  border-top: 1px solid #e5e5e5;
-  animation: slideDown 0.3s ease;
+  margin-top: 1rem;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  padding: 1.5rem;
 }
 
 .controls-section .filter-panel .filter-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-4);
+  gap: 1rem;
 }
 
-.controls-section .filter-panel .filter-grid .filter-group .filter-label {
-  display: block;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: #404040;
-  margin-bottom: var(--space-2);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.controls-section .filter-panel .filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.controls-section .filter-panel .filter-grid .filter-group .filter-select {
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
+.controls-section .filter-panel .filter-group .filter-label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #262626;
+}
+
+.controls-section .filter-panel .filter-group .filter-select {
+  padding: 0.625rem 0.875rem;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: var(--text-base);
-  color: #000000;
-  background: #ffffff;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  background: #fff;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
-.controls-section .filter-panel .filter-grid .filter-group .filter-select:focus {
+.controls-section .filter-panel .filter-group .filter-select:focus {
   outline: none;
   border-color: #0284c7;
   box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
 }
 
-.controls-section .filter-panel .filter-grid .filter-group .filter-select:hover {
-  border-color: #d4d4d4;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .businesses-section .loading-state,
 .businesses-section .empty-state {
-  background: #ffffff;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #fff;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
-  padding: var(--space-16) var(--space-8);
-  text-align: center;
 }
 
 .businesses-section .loading-state .loading-spinner,
@@ -330,44 +323,44 @@
   border-top-color: #0284c7;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto var(--space-4);
+  margin: 0 auto 1rem;
 }
 
 .businesses-section .loading-state .empty-icon,
 .businesses-section .empty-state .empty-icon {
   font-size: 4rem;
-  margin-bottom: var(--space-4);
+  margin-bottom: 1rem;
 }
 
 .businesses-section .loading-state h3,
 .businesses-section .empty-state h3 {
-  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
-  font-size: var(--text-2xl);
-  font-weight: var(--font-bold);
-  color: #000000;
-  margin-bottom: var(--space-2);
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.5rem 0;
 }
 
 .businesses-section .loading-state p,
 .businesses-section .empty-state p {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: var(--text-base);
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
   color: #737373;
-  margin-bottom: var(--space-4);
+  margin: 0 0 1.5rem 0;
 }
 
 .businesses-section .loading-state .btn-secondary,
 .businesses-section .empty-state .btn-secondary {
-  padding: var(--space-3) var(--space-6);
-  background: #ffffff;
+  padding: 0.75rem 1.5rem;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: #404040;
+  background: #fff;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #262626;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .businesses-section .loading-state .btn-secondary:hover,
@@ -376,95 +369,899 @@
   border-color: #d4d4d4;
 }
 
-.businesses-section .businesses-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: var(--space-6);
-}
-
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
+  to {
     transform: rotate(360deg);
   }
 }
 
-.coming-soon {
-  background: #ffffff;
+.table-container {
+  background: #fff;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
-  padding: var(--space-16) var(--space-8);
-  text-align: center;
-  margin-top: var(--space-8);
+  overflow-x: auto;
+  overflow-y: visible;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
-.coming-soon .coming-soon-icon {
-  font-size: 4rem;
-  margin-bottom: var(--space-6);
+.table-container .businesses-table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+  font-family: 'Roboto', sans-serif;
 }
 
-.coming-soon h2 {
-  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
-  font-size: var(--text-3xl);
-  font-weight: 700;
-  color: #000000;
-  margin-bottom: var(--space-4);
-}
-
-.coming-soon p {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: var(--text-lg);
-  color: #525252;
-  margin-bottom: var(--space-4);
-  line-height: 1.6;
-}
-
-.coming-soon ul {
-  list-style: none;
-  padding: 0;
-  margin: var(--space-6) auto 0;
-  max-width: 600px;
-  text-align: left;
-}
-
-.coming-soon ul li {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: var(--text-base);
-  color: #404040;
-  padding: var(--space-3) var(--space-4);
-  margin-bottom: var(--space-2);
+.table-container .businesses-table thead {
   background: #fafafa;
-  border-left: 4px solid #0284c7;
-  border-radius: 4px;
+  border-bottom: 2px solid #e5e5e5;
 }
 
-.coming-soon ul li::before {
-  content: '✓';
-  margin-right: var(--space-3);
+.table-container .businesses-table thead th {
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #525252;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.table-container .businesses-table tbody .business-row {
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.2s ease;
+}
+
+.table-container .businesses-table tbody .business-row:hover {
+  background: #fafafa;
+}
+
+.table-container .businesses-table tbody .business-row td {
+  padding: 1rem;
+  font-size: 0.875rem;
+  vertical-align: top;
+}
+
+.table-container .businesses-table tbody .business-row .business-cell .business-info .business-name {
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 0.25rem;
+}
+
+.table-container .businesses-table tbody .business-row .business-cell .business-info .business-desc {
+  font-size: 0.8125rem;
+  color: #737373;
+  margin-bottom: 0.25rem;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-container .businesses-table tbody .business-row .business-cell .business-info .featured-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.table-container .businesses-table tbody .business-row .owner-cell .owner-name {
+  font-weight: 500;
+  color: #000;
+  margin-bottom: 0.25rem;
+}
+
+.table-container .businesses-table tbody .business-row .owner-cell .owner-email {
+  font-size: 0.8125rem;
+  color: #737373;
+}
+
+.table-container .businesses-table tbody .business-row .cuisine-cell {
+  color: #525252;
+}
+
+.table-container .businesses-table tbody .business-row .price-cell .price-badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.table-container .businesses-table tbody .business-row .price-cell .price-badge.price-budget {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.table-container .businesses-table tbody .business-row .price-cell .price-badge.price-moderate {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.table-container .businesses-table tbody .business-row .price-cell .price-badge.price-expensive {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.table-container .businesses-table tbody .business-row .price-cell .price-badge.price-luxury {
+  background: #fce7f3;
+  color: #9f1239;
+}
+
+.table-container .businesses-table tbody .business-row .price-cell .text-muted {
+  color: #a3a3a3;
+}
+
+.table-container .businesses-table tbody .business-row .status-cell .status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.table-container .businesses-table tbody .business-row .status-cell .status-badge.status-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.table-container .businesses-table tbody .business-row .status-cell .status-badge.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.table-container .businesses-table tbody .business-row .status-cell .status-badge.status-suspended {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.table-container .businesses-table tbody .business-row .status-cell .status-badge.status-inactive {
+  background: #f5f5f5;
+  color: #525252;
+}
+
+.table-container .businesses-table tbody .business-row .status-cell .verified-icon {
+  margin-left: 0.5rem;
   color: #16a34a;
+  font-weight: 600;
+}
+
+.table-container .businesses-table tbody .business-row .rating-cell .rating-value {
+  font-weight: 500;
+  color: #000;
+  margin-bottom: 0.25rem;
+}
+
+.table-container .businesses-table tbody .business-row .rating-cell .rating-count {
+  font-size: 0.8125rem;
+  color: #737373;
+}
+
+.table-container .businesses-table tbody .business-row .bookings-cell {
+  font-weight: 500;
+  color: #000;
+}
+
+.table-container .businesses-table tbody .business-row .date-cell {
+  color: #525252;
+  font-size: 0.8125rem;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn {
+  padding: 0.5rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn:hover {
+  background: #fafafa;
+  border-color: #d4d4d4;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn.view-btn:hover {
+  background: #eff6ff;
+  border-color: #0284c7;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn.view-btn:hover svg {
+  stroke: #0284c7;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn.verify-btn:hover {
+  background: #dcfce7;
+  border-color: #16a34a;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn.verify-btn:hover svg {
+  stroke: #16a34a;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn.suspend-btn:hover {
+  background: #fef3c7;
+  border-color: #ca8a04;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn.suspend-btn:hover svg {
+  stroke: #ca8a04;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn.activate-btn:hover {
+  background: #dcfce7;
+  border-color: #16a34a;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn.activate-btn:hover svg {
+  stroke: #16a34a;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn.delete-btn:hover {
+  background: #fee2e2;
+  border-color: #dc2626;
+}
+
+.table-container .businesses-table tbody .business-row .actions-cell .action-buttons .action-btn.delete-btn:hover svg {
+  stroke: #dc2626;
+}
+
+.businesses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.businesses-grid .business-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.businesses-grid .business-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #d4d4d4;
+}
+
+.businesses-grid .business-card .card-header {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.businesses-grid .business-card .card-header .card-title-section {
+  margin-bottom: 0.75rem;
+}
+
+.businesses-grid .business-card .card-header .card-title-section .card-title {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1.25rem;
   font-weight: 700;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+}
+
+.businesses-grid .business-card .card-header .card-title-section .card-description {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  color: #737373;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.businesses-grid .business-card .card-header .card-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.businesses-grid .business-card .card-header .card-badges .featured-badge,
+.businesses-grid .business-card .card-header .card-badges .verified-badge {
+  padding: 0.25rem 0.625rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.businesses-grid .business-card .card-header .card-badges .featured-badge {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.businesses-grid .business-card .card-header .card-badges .verified-badge {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.businesses-grid .business-card .card-body {
+  margin-bottom: 1rem;
+}
+
+.businesses-grid .business-card .card-body .info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+}
+
+.businesses-grid .business-card .card-body .info-row .info-label {
+  color: #737373;
+  font-weight: 500;
+}
+
+.businesses-grid .business-card .card-body .info-row .info-value {
+  color: #000;
+  font-weight: 400;
+}
+
+.businesses-grid .business-card .card-body .info-row .price-badge {
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.businesses-grid .business-card .card-body .info-row .price-badge.price-budget {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.businesses-grid .business-card .card-body .info-row .price-badge.price-moderate {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.businesses-grid .business-card .card-body .info-row .price-badge.price-expensive {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.businesses-grid .business-card .card-body .info-row .price-badge.price-luxury {
+  background: #fce7f3;
+  color: #9f1239;
+}
+
+.businesses-grid .business-card .card-body .card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f5f5f5;
+}
+
+.businesses-grid .business-card .card-body .card-stats .stat-item {
+  text-align: center;
+}
+
+.businesses-grid .business-card .card-body .card-stats .stat-item .stat-label {
+  font-size: 0.75rem;
+  color: #737373;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.businesses-grid .business-card .card-body .card-stats .stat-item .stat-value {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 0.125rem;
+}
+
+.businesses-grid .business-card .card-body .card-stats .stat-item .stat-sub {
+  font-size: 0.75rem;
+  color: #737373;
+}
+
+.businesses-grid .business-card .card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #f5f5f5;
+}
+
+.businesses-grid .business-card .card-footer .status-section .status-badge {
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.businesses-grid .business-card .card-footer .status-section .status-badge.status-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.businesses-grid .business-card .card-footer .status-section .status-badge.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.businesses-grid .business-card .card-footer .status-section .status-badge.status-suspended {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.businesses-grid .business-card .card-footer .status-section .status-badge.status-inactive {
+  background: #f5f5f5;
+  color: #525252;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn {
+  padding: 0.5rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn:hover {
+  background: #fafafa;
+  border-color: #d4d4d4;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn.view-btn:hover {
+  background: #eff6ff;
+  border-color: #0284c7;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn.view-btn:hover svg {
+  stroke: #0284c7;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn.verify-btn:hover {
+  background: #dcfce7;
+  border-color: #16a34a;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn.verify-btn:hover svg {
+  stroke: #16a34a;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn.suspend-btn:hover {
+  background: #fef3c7;
+  border-color: #ca8a04;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn.suspend-btn:hover svg {
+  stroke: #ca8a04;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn.activate-btn:hover {
+  background: #dcfce7;
+  border-color: #16a34a;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn.activate-btn:hover svg {
+  stroke: #16a34a;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn.delete-btn:hover {
+  background: #fee2e2;
+  border-color: #dc2626;
+}
+
+.businesses-grid .business-card .card-footer .action-buttons .action-btn.delete-btn:hover svg {
+  stroke: #dc2626;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-overlay .modal-content {
+  background: #fff;
+  border-radius: 4px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-overlay .modal-content .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.modal-overlay .modal-content .modal-header h3 {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.modal-overlay .modal-content .modal-header .modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  color: #737373;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.modal-overlay .modal-content .modal-header .modal-close:hover {
+  color: #000;
+}
+
+.modal-overlay .modal-content .modal-body {
+  padding: 1.5rem;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-header {
+  margin-bottom: 1.5rem;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-header .profile-info h4 {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-header .profile-info p {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  color: #737373;
+  margin: 0 0 0.25rem 0;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-header .profile-info .business-description {
+  color: #525252;
+  line-height: 1.5;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #737373;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item span {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  color: #000;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item span a {
+  color: #0284c7;
+  text-decoration: none;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item span a:hover {
+  text-decoration: underline;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item .status-badge,
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item .price-badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item .status-badge.status-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item .status-badge.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item .status-badge.status-suspended {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item .status-badge.status-inactive {
+  background: #f5f5f5;
+  color: #525252;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item .price-badge.price-budget {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item .price-badge.price-moderate {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item .price-badge.price-expensive {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.modal-overlay .modal-content .modal-body .business-profile .profile-details .detail-grid .detail-item .price-badge.price-luxury {
+  background: #fce7f3;
+  color: #9f1239;
+}
+
+.modal-overlay .modal-content .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e5e5;
+}
+
+.modal-overlay .modal-content .modal-footer .btn-secondary,
+.modal-overlay .modal-content .modal-footer .btn-danger {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-overlay .modal-content .modal-footer .btn-secondary {
+  background: #fff;
+  color: #262626;
+}
+
+.modal-overlay .modal-content .modal-footer .btn-secondary:hover {
+  background: #fafafa;
+  border-color: #d4d4d4;
+}
+
+.modal-overlay .modal-content .modal-footer .btn-danger {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+.modal-overlay .modal-content .modal-footer .btn-danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.modal-overlay .delete-modal {
+  max-width: 400px;
+}
+
+.modal-overlay .delete-modal .modal-body {
+  text-align: center;
+}
+
+.modal-overlay .delete-modal .modal-body .warning-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.modal-overlay .delete-modal .modal-body h4 {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+}
+
+.modal-overlay .delete-modal .modal-body p {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  color: #737373;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: #fff;
+  border-top: 1px solid #e5e5e5;
+  margin-top: 2rem;
 }
 
 @media (max-width: 768px) {
-  .admin-businesses {
-    padding: var(--space-4);
-  }
-  .businesses-header .header-content {
+  .pagination-container {
     flex-direction: column;
-    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+  }
+}
+
+.pagination-container .pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .pagination-container .pagination-info {
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+}
+
+.pagination-container .pagination-info .pagination-text {
+  font-size: 0.875rem;
+  color: #525252;
+  font-family: 'Roboto', sans-serif;
+}
+
+.pagination-container .pagination-info .page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-container .pagination-info .page-size-selector label {
+  font-size: 0.875rem;
+  color: #525252;
+  font-family: 'Roboto', sans-serif;
+}
+
+.pagination-container .pagination-info .page-size-selector .page-size-select {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: 'Roboto', sans-serif;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-container .pagination-info .page-size-selector .page-size-select:hover {
+  border-color: #0284c7;
+}
+
+.pagination-container .pagination-info .page-size-selector .page-size-select:focus {
+  outline: none;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.pagination-container .pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pagination-container .pagination-controls .pagination-btn {
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #d4d4d4;
+  background: #fff;
+  color: #262626;
+  font-size: 0.875rem;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-container .pagination-controls .pagination-btn:hover:not(:disabled) {
+  background: #fafafa;
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+.pagination-container .pagination-controls .pagination-btn:hover:not(:disabled) svg {
+  stroke: #0284c7;
+}
+
+.pagination-container .pagination-controls .pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-container .pagination-controls .pagination-btn.active {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #fff;
+  font-weight: 600;
+}
+
+.pagination-container .pagination-controls .pagination-btn svg {
+  stroke: #525252;
+  transition: stroke 0.2s ease;
+}
+
+.pagination-container .pagination-controls .pagination-ellipsis {
+  padding: 0 0.5rem;
+  color: #737373;
+  font-size: 0.875rem;
+  font-family: 'Roboto', sans-serif;
+}
+
+@media (max-width: 1366px) {
+  .admin-businesses {
+    padding: 1.5rem;
   }
   .businesses-header .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  .admin-businesses {
+    padding: 1rem;
+  }
+  .businesses-header .header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
   .businesses-header .stats-grid {
     grid-template-columns: 1fr;
   }
-  .coming-soon {
-    padding: var(--space-8) var(--space-4);
+  .table-container .businesses-table {
+    min-width: 800px;
   }
 }

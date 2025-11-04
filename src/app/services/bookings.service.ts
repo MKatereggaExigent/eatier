@@ -1,8 +1,9 @@
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
-import { map, catchError, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
+
 import { ApiService } from '../core/services/api.service';
+import { HttpClient } from '@angular/common/http';
 
 export interface Restaurant {
   id: string;
@@ -61,6 +62,57 @@ export interface BookingRequest {
   contactEmail: string;
   tablePreferences?: string;
   occasion?: string;
+  bookingTier?: 'basic' | 'standard' | 'premium' | 'priority'; // NEW
+}
+
+export interface BookingTier {
+  tier: 'basic' | 'standard' | 'premium' | 'priority';
+  tier_name: string;
+  tier_description: string;
+  tier_color: string;
+  tier_icon: string;
+  benefits: string[];
+  priority_level: number;
+  allows_cancellation: boolean;
+  allows_modification: boolean;
+  gets_confirmation_priority: boolean;
+  gets_table_preference: boolean;
+  gets_special_requests: boolean;
+}
+
+export interface BusinessCapacitySettings {
+  total_capacity: number;
+  tables_count: number;
+  slot_duration_minutes: number;
+  basic_tier_price: number;
+  standard_tier_price: number;
+  premium_tier_price: number;
+  priority_tier_price: number;
+  enable_tier_system: boolean;
+}
+
+export interface TimeSlot {
+  id: string;
+  slot_date: string;
+  slot_time: string;
+  slot_end_time: string;
+  total_capacity: number;
+  basic_capacity: number;
+  standard_capacity: number;
+  premium_capacity: number;
+  priority_capacity: number;
+  basic_booked: number;
+  standard_booked: number;
+  premium_booked: number;
+  priority_booked: number;
+  total_booked: number;
+  is_available: boolean;
+  is_blocked: boolean;
+  block_reason?: string;
+  tier_capacity?: number;
+  tier_booked?: number;
+  tier_available?: number;
+  is_tier_available?: boolean;
 }
 
 export interface BookingStats {
@@ -247,7 +299,8 @@ export class BookingsService {
       contactPhone: bookingRequest.contactPhone,
       contactEmail: bookingRequest.contactEmail,
       tablePreferences: bookingRequest.tablePreferences,
-      occasion: bookingRequest.occasion
+      occasion: bookingRequest.occasion,
+      bookingTier: bookingRequest.bookingTier || 'basic' // NEW
     };
 
     return this.apiService.post<any>('bookings', payload).pipe(
@@ -367,6 +420,104 @@ export class BookingsService {
       }
     }
     return slots;
+  }
+
+  // NEW: Booking tier and availability methods
+
+  // Get all booking tiers with benefits
+  getBookingTiers(): Observable<BookingTier[]> {
+    return this.apiService.get<any>('booking-availability/tiers').pipe(
+      map(response => response.tiers),
+      catchError(error => {
+        console.error('Error fetching booking tiers:', error);
+        return of([]);
+      })
+    );
+  }
+
+  // Get business capacity settings
+  getBusinessCapacitySettings(businessId: string): Observable<BusinessCapacitySettings> {
+    return this.apiService.get<any>(`booking-availability/business/${businessId}/settings`).pipe(
+      map(response => response.settings),
+      catchError(error => {
+        console.error('Error fetching business settings:', error);
+        return of({
+          total_capacity: 50,
+          tables_count: 10,
+          slot_duration_minutes: 90,
+          basic_tier_price: 0.00,
+          standard_tier_price: 5.00,
+          premium_tier_price: 15.00,
+          priority_tier_price: 25.00,
+          enable_tier_system: true
+        });
+      })
+    );
+  }
+
+  // Get available time slots for a business on a specific date
+  getAvailableSlots(businessId: string, date: string, tier: string = 'basic'): Observable<TimeSlot[]> {
+    return this.apiService.get<any>(`booking-availability/business/${businessId}/slots`, {
+      params: { date, tier }
+    }).pipe(
+      map(response => response.slots),
+      catchError(error => {
+        console.error('Error fetching available slots:', error);
+        return of([]);
+      })
+    );
+  }
+
+  // Check if a specific slot is available
+  checkSlotAvailability(
+    businessId: string,
+    date: string,
+    time: string,
+    tier: string = 'basic',
+    partySize: number = 1
+  ): Observable<{ is_available: boolean; slot: TimeSlot | null }> {
+    return this.apiService.post<any>('booking-availability/check', {
+      businessId,
+      date,
+      time,
+      tier,
+      partySize
+    }).pipe(
+      catchError(error => {
+        console.error('Error checking slot availability:', error);
+        return of({ is_available: false, slot: null });
+      })
+    );
+  }
+
+  // Add to waitlist
+  addToWaitlist(
+    businessId: string,
+    userId: string,
+    preferredDate: string,
+    preferredTime: string,
+    partySize: number,
+    tier: string,
+    contactName: string,
+    contactPhone: string,
+    contactEmail: string
+  ): Observable<any> {
+    return this.apiService.post<any>('booking-availability/waitlist', {
+      businessId,
+      userId,
+      preferredDate,
+      preferredTime,
+      partySize,
+      tier,
+      contactName,
+      contactPhone,
+      contactEmail
+    }).pipe(
+      catchError(error => {
+        console.error('Error adding to waitlist:', error);
+        throw error;
+      })
+    );
   }
 
   // All data now comes from the backend API

@@ -238,6 +238,13 @@
   padding: var(--space-8);
   min-height: 100vh;
   animation: fadeIn 0.8s ease-out 0.2s both;
+  overflow-x: hidden;
+}
+
+@media (max-width: 1366px) {
+  .dashboard-content {
+    padding: var(--space-6);
+  }
 }
 
 @media (max-width: 1024px) {

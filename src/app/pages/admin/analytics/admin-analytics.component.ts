@@ -1,8 +1,9 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+
+import { AdminService } from '../../../core/services/admin.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
-import { AdminService } from '../../../core/services/admin.service';
 
 interface Statistics {
   totalUsers: number;
@@ -173,6 +174,108 @@ export class AdminAnalyticsComponent implements OnInit {
 
   formatNumber(num: number): string {
     return new Intl.NumberFormat('en-US').format(num);
+  }
+
+  getMaxValue(data: any[], key: string): number {
+    if (data.length === 0) return 1;
+    return Math.max(...data.map(item => Number(item[key]) || 0));
+  }
+
+  getTotalCount(data: any[]): number {
+    return data.reduce((sum, item) => sum + (Number(item.count) || 0), 0);
+  }
+
+  getRotation(data: any[], index: number): number {
+    let rotation = 0;
+    for (let i = 0; i < index; i++) {
+      rotation += (data[i].count / this.getTotalCount(data)) * 360;
+    }
+    return rotation;
+  }
+
+  getDonutColor(index: number): string {
+    const colors = [
+      '#3b82f6', // blue
+      '#8b5cf6', // purple
+      '#ec4899', // pink
+      '#f59e0b', // amber
+      '#10b981', // emerald
+      '#06b6d4', // cyan
+      '#f97316', // orange
+      '#6366f1'  // indigo
+    ];
+    return colors[index % colors.length];
+  }
+
+  // Line chart points generator
+  getLineChartPoints(data: any[], key: string): string {
+    if (data.length === 0) return '';
+    const maxValue = this.getMaxValue(data, key);
+    return data.map((item, i) => {
+      const x = 50 + (i * (500 / (data.length - 1)));
+      const y = 250 - ((item[key] / maxValue) * 200);
+      return `${x},${y}`;
+    }).join(' ');
+  }
+
+  // Pie/Donut chart path generator
+  getPieSlicePath(data: any[], index: number, cx: number, cy: number, radius: number, innerRadius: number = 0): string {
+    const total = this.getTotalCount(data);
+    let startAngle = 0;
+
+    // Calculate start angle
+    for (let i = 0; i < index; i++) {
+      startAngle += (data[i].count / total) * 360;
+    }
+
+    const sliceAngle = (data[index].count / total) * 360;
+    const endAngle = startAngle + sliceAngle;
+
+    // Convert to radians
+    const startRad = (startAngle - 90) * Math.PI / 180;
+    const endRad = (endAngle - 90) * Math.PI / 180;
+
+    // Calculate outer arc points
+    const x1 = cx + radius * Math.cos(startRad);
+    const y1 = cy + radius * Math.sin(startRad);
+    const x2 = cx + radius * Math.cos(endRad);
+    const y2 = cy + radius * Math.sin(endRad);
+
+    const largeArc = sliceAngle > 180 ? 1 : 0;
+
+    if (innerRadius === 0) {
+      // Pie chart
+      return `M ${cx},${cy} L ${x1},${y1} A ${radius},${radius} 0 ${largeArc},1 ${x2},${y2} Z`;
+    } else {
+      // Donut chart
+      const x3 = cx + innerRadius * Math.cos(startRad);
+      const y3 = cy + innerRadius * Math.sin(startRad);
+      const x4 = cx + innerRadius * Math.cos(endRad);
+      const y4 = cy + innerRadius * Math.sin(endRad);
+
+      return `M ${x1},${y1} A ${radius},${radius} 0 ${largeArc},1 ${x2},${y2} L ${x4},${y4} A ${innerRadius},${innerRadius} 0 ${largeArc},0 ${x3},${y3} Z`;
+    }
+  }
+
+  // Status color mapping
+  getStatusColor(status: string): string {
+    const colors: { [key: string]: string } = {
+      'pending': '#f59e0b',
+      'confirmed': '#10b981',
+      'cancelled': '#ef4444',
+      'completed': '#3b82f6',
+      'no_show': '#6b7280'
+    };
+    return colors[status.toLowerCase()] || '#737373';
+  }
+
+  // Business type color mapping
+  getBusinessTypeColor(index: number): string {
+    const colors = [
+      '#0284c7', '#7c3aed', '#db2777', '#ea580c',
+      '#059669', '#0891b2', '#4f46e5', '#be123c'
+    ];
+    return colors[index % colors.length];
   }
 }
 

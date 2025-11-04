@@ -1,9 +1,10 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
+import { Component, OnInit, inject, signal } from '@angular/core';
+
 import { AdminService } from '../../../core/services/admin.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 interface Ad {
   id: string;
@@ -21,6 +22,9 @@ interface Ad {
   startDate: string;
   endDate: string;
   createdAt: string;
+  businessName?: string;
+  advertiserName?: string;
+  advertiserId?: string;
 }
 
 interface AdStats {
@@ -60,6 +64,10 @@ export class AdminAdsComponent implements OnInit {
   searchQuery = signal<string>('');
   statusFilter = signal<string>('all');
   placementFilter = signal<string>('all');
+  businessFilter = signal<string>('all');
+
+  // Businesses list for filter
+  businesses = signal<Array<{id: string, name: string, ownerName: string}>>([]);
 
   // Pagination
   currentPage = signal<number>(1);
@@ -69,6 +77,17 @@ export class AdminAdsComponent implements OnInit {
   // Modal state
   showCreateModal = signal<boolean>(false);
   isCreating = signal<boolean>(false);
+  showDetailsModal = signal<boolean>(false);
+  showEditModal = signal<boolean>(false);
+  showPauseDialog = signal<boolean>(false);
+  showDeleteDialog = signal<boolean>(false);
+  selectedAd = signal<Ad | null>(null);
+  isUpdating = signal<boolean>(false);
+
+  // Image upload state
+  imageUploadMethod = signal<'url' | 'upload'>('url');
+  selectedFileName = signal<string>('');
+  selectedFileUrl = signal<string>('');
 
   // New ad form data
   newAd = {
@@ -81,12 +100,48 @@ export class AdminAdsComponent implements OnInit {
     budget: 0,
     spent: 0,
     startDate: '',
-    endDate: ''
+    endDate: '',
+    advertiserId: ''
+  };
+
+  // Edit ad form data
+  editAdForm = {
+    title: '',
+    description: '',
+    imageUrl: '',
+    targetUrl: '',
+    placement: '',
+    status: 'draft',
+    budget: 0,
+    spent: 0,
+    startDate: '',
+    endDate: '',
+    advertiserId: ''
   };
 
   ngOnInit(): void {
     this.loadAds();
     this.loadStats();
+    this.loadBusinesses();
+  }
+
+  loadBusinesses(): void {
+    // Load advertisers for the filter dropdown
+    this.adminService.getAdvertisers().subscribe({
+      next: (response) => {
+        const advertiserList = response.advertisers.map((advertiser: any) => ({
+          id: advertiser.id,
+          name: advertiser.name,
+          email: advertiser.email,
+          businessName: advertiser.business_name,
+          adCount: advertiser.ad_count
+        }));
+        this.businesses.set(advertiserList);
+      },
+      error: (error) => {
+        console.error('Error loading advertisers:', error);
+      }
+    });
   }
 
   loadAds(): void {
@@ -97,7 +152,8 @@ export class AdminAdsComponent implements OnInit {
       limit: this.pageSize(),
       search: this.searchQuery() || undefined,
       status: this.statusFilter() !== 'all' ? this.statusFilter() : undefined,
-      placement: this.placementFilter() !== 'all' ? this.placementFilter() : undefined
+      placement: this.placementFilter() !== 'all' ? this.placementFilter() : undefined,
+      advertiser_id: this.businessFilter() !== 'all' ? this.businessFilter() : undefined
     };
 
     this.adminService.getAds(params).subscribe({
@@ -113,11 +169,14 @@ export class AdminAdsComponent implements OnInit {
           impressions: parseInt(ad.impressions) || 0,
           clicks: parseInt(ad.clicks) || 0,
           ctr: parseFloat(ad.ctr) || 0,
-          budget: parseFloat(ad.budget) || 0,
-          spent: parseFloat(ad.spent) || 0,
+          budget: parseFloat(ad.total_budget) || 0,
+          spent: parseFloat(ad.spent_amount) || 0,
           startDate: ad.start_date,
           endDate: ad.end_date,
-          createdAt: ad.created_at
+          createdAt: ad.created_at,
+          businessName: ad.business_name,
+          advertiserName: ad.advertiser_name,
+          advertiserId: ad.advertiser_id
         }));
 
         this.ads.set(adsData);
@@ -160,68 +219,186 @@ export class AdminAdsComponent implements OnInit {
     this.searchQuery.set('');
     this.statusFilter.set('all');
     this.placementFilter.set('all');
+    this.businessFilter.set('all');
     this.applyFilters();
   }
 
   // Ad actions
   viewAd(ad: Ad): void {
-    // TODO: Navigate to ad details page or open modal
-    console.log('View ad:', ad);
-    alert(`Viewing ad: ${ad.title}\n\nThis would open a detailed view of the ad.`);
+    this.selectedAd.set(ad);
+    this.showDetailsModal.set(true);
+  }
+
+  closeDetailsModal(): void {
+    this.showDetailsModal.set(false);
+    this.selectedAd.set(null);
   }
 
   editAd(ad: Ad): void {
-    // TODO: Navigate to ad edit page or open modal
-    console.log('Edit ad:', ad);
-    alert(`Editing ad: ${ad.title}\n\nThis would open an edit form for the ad.`);
+    this.selectedAd.set(ad);
+    // Populate edit form with current ad data
+    this.editAdForm = {
+      title: ad.title,
+      description: ad.description,
+      imageUrl: ad.imageUrl,
+      targetUrl: ad.targetUrl,
+      placement: ad.placement,
+      status: ad.status,
+      budget: ad.budget,
+      spent: ad.spent,
+      startDate: ad.startDate,
+      endDate: ad.endDate,
+      advertiserId: ad.advertiserId || ''
+    };
+    this.showEditModal.set(true);
+  }
+
+  closeEditModal(): void {
+    this.showEditModal.set(false);
+    this.selectedAd.set(null);
+    this.imageUploadMethod.set('url');
+    this.selectedFileName.set('');
+    this.selectedFileUrl.set('');
+  }
+
+  onImageFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+
+      // Validate file size (10MB max)
+      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+      if (file.size > maxSize) {
+        alert('File size must be less than 10MB');
+        return;
+      }
+
+      // Store filename
+      this.selectedFileName.set(file.name);
+
+      // Create temporary URL for preview
+      const tempUrl = URL.createObjectURL(file);
+      this.selectedFileUrl.set(tempUrl);
+      this.editAdForm.imageUrl = tempUrl;
+
+      // In production, you would upload the file to cloud storage here
+      // and get back a permanent URL to store in editAdForm.imageUrl
+      console.log('File selected:', file.name, 'Size:', (file.size / 1024).toFixed(2), 'KB');
+    }
+  }
+
+  removeSelectedFile(): void {
+    this.selectedFileName.set('');
+    this.selectedFileUrl.set('');
+    this.editAdForm.imageUrl = '';
+
+    // Reset file input
+    const fileInput = document.getElementById('edit-imageFile') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
+  saveEditedAd(): void {
+    const ad = this.selectedAd();
+    if (!ad) return;
+
+    this.isUpdating.set(true);
+    this.adminService.updateAd(ad.id, this.editAdForm).subscribe({
+      next: () => {
+        this.isUpdating.set(false);
+        this.closeEditModal();
+        this.loadAds();
+        this.loadStats();
+      },
+      error: (error) => {
+        console.error('Error updating ad:', error);
+        this.isUpdating.set(false);
+        alert('Failed to update ad. Please try again.');
+      }
+    });
   }
 
   pauseAd(ad: Ad): void {
-    if (confirm(`Are you sure you want to pause the ad "${ad.title}"?`)) {
-      this.adminService.updateAd(ad.id, { status: 'paused' }).subscribe({
-        next: () => {
-          alert('Ad paused successfully');
-          this.loadAds();
-          this.loadStats();
-        },
-        error: (error) => {
-          console.error('Error pausing ad:', error);
-          alert('Failed to pause ad. Please try again.');
-        }
-      });
-    }
+    this.selectedAd.set(ad);
+    this.showPauseDialog.set(true);
+  }
+
+  closePauseDialog(): void {
+    this.showPauseDialog.set(false);
+    this.selectedAd.set(null);
+  }
+
+  confirmPauseAd(): void {
+    const ad = this.selectedAd();
+    if (!ad) return;
+
+    this.isUpdating.set(true);
+    this.adminService.updateAd(ad.id, { status: 'paused' }).subscribe({
+      next: () => {
+        this.isUpdating.set(false);
+        this.closePauseDialog();
+        this.loadAds();
+        this.loadStats();
+      },
+      error: (error) => {
+        console.error('Error pausing ad:', error);
+        this.isUpdating.set(false);
+        alert('Failed to pause ad. Please try again.');
+      }
+    });
   }
 
   resumeAd(ad: Ad): void {
-    if (confirm(`Are you sure you want to resume the ad "${ad.title}"?`)) {
-      this.adminService.updateAd(ad.id, { status: 'active' }).subscribe({
-        next: () => {
-          alert('Ad resumed successfully');
-          this.loadAds();
-          this.loadStats();
-        },
-        error: (error) => {
-          console.error('Error resuming ad:', error);
-          alert('Failed to resume ad. Please try again.');
-        }
-      });
-    }
+    this.isUpdating.set(true);
+    this.adminService.updateAd(ad.id, { status: 'active' }).subscribe({
+      next: () => {
+        this.isUpdating.set(false);
+        this.loadAds();
+        this.loadStats();
+      },
+      error: (error) => {
+        console.error('Error resuming ad:', error);
+        this.isUpdating.set(false);
+        alert('Failed to resume ad. Please try again.');
+      }
+    });
   }
 
   deleteAd(ad: Ad): void {
-    if (confirm(`Are you sure you want to delete the ad "${ad.title}"?\n\nThis action cannot be undone.`)) {
-      this.adminService.deleteAd(ad.id).subscribe({
-        next: () => {
-          alert('Ad deleted successfully');
-          this.loadAds();
-          this.loadStats();
-        },
-        error: (error) => {
-          console.error('Error deleting ad:', error);
-          alert('Failed to delete ad. Please try again.');
-        }
-      });
-    }
+    this.selectedAd.set(ad);
+    this.showDeleteDialog.set(true);
+  }
+
+  closeDeleteDialog(): void {
+    this.showDeleteDialog.set(false);
+    this.selectedAd.set(null);
+  }
+
+  confirmDeleteAd(): void {
+    const ad = this.selectedAd();
+    if (!ad) return;
+
+    this.isUpdating.set(true);
+    this.adminService.deleteAd(ad.id).subscribe({
+      next: () => {
+        this.isUpdating.set(false);
+        this.closeDeleteDialog();
+        this.loadAds();
+        this.loadStats();
+      },
+      error: (error) => {
+        console.error('Error deleting ad:', error);
+        this.isUpdating.set(false);
+        alert('Failed to delete ad. Please try again.');
+      }
+    });
   }
 
   createNewAd(): void {
@@ -245,7 +422,8 @@ export class AdminAdsComponent implements OnInit {
       budget: 0,
       spent: 0,
       startDate: '',
-      endDate: ''
+      endDate: '',
+      advertiserId: ''
     };
   }
 

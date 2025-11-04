@@ -1,8 +1,10 @@
 import { Component, computed, signal } from '@angular/core';
 
+import { BannerAdComponent } from '../../shared/components/ads/banner-ad/banner-ad.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { SidebarAdComponent } from '../../shared/components/ads/sidebar-ad/sidebar-ad.component';
 
 interface FAQ {
   id: string;
@@ -37,7 +39,7 @@ interface FAQStats {
   standalone: true,
   templateUrl: './faqs.component.html',
   styleUrls: ['./faqs.component.scss'],
-  imports: [CommonModule, FormsModule, RouterModule]
+  imports: [CommonModule, FormsModule, RouterModule, BannerAdComponent, SidebarAdComponent]
 })
 export class FaqsComponent {
   // State management

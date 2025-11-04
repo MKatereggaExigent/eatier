@@ -22,6 +22,35 @@
       </div>
 
       <div class="header-actions">
+        <!-- View Mode Toggle -->
+        <div class="view-toggle">
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="viewMode() === 'cards'"
+            (click)="toggleViewMode()"
+            title="Card View">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="viewMode() === 'table'"
+            (click)="toggleViewMode()"
+            title="Table View">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
         @if (unreadAlerts().length > 0) {
           <button type="button" class="alerts-btn" (click)="viewAllReports()">
             <span class="alert-icon">🔔</span>
@@ -34,91 +63,162 @@
 
   <!-- Key Metrics Dashboard - Enhanced Layout -->
   <section class="metrics-dashboard" aria-label="Key Performance Metrics">
-    <div class="metrics-grid">
-      <!-- Primary Metric - Total Users -->
-      <div class="metric-card primary large">
-        <div class="metric-header">
-          <div class="metric-icon-wrapper users">
-            <span class="metric-icon">👥</span>
+    @if (viewMode() === 'cards') {
+      <!-- Card View -->
+      <div class="metrics-grid">
+        <!-- Primary Metric - Total Users -->
+        <div class="metric-card primary">
+          <div class="metric-header">
+            <div class="metric-icon-wrapper users">
+              <span class="metric-icon">👥</span>
+            </div>
+            <div class="metric-trend positive">
+              <span class="trend-icon">↗</span>
+              <span class="trend-value">+{{ userGrowth() }}%</span>
+            </div>
           </div>
-          <div class="metric-trend positive">
-            <span class="trend-icon">↗</span>
-            <span class="trend-value">+{{ userGrowth() }}%</span>
+          <div class="metric-body">
+            <h2 class="metric-value">{{ formatNumber(platformStats().totalUsers) }}</h2>
+            <p class="metric-label">Total Users</p>
+            <div class="metric-details">
+              <span class="detail-item">
+                <span class="detail-value">{{ formatNumber(platformStats().monthlyActiveUsers) }}</span>
+                <span class="detail-label">Active this month</span>
+              </span>
+            </div>
           </div>
         </div>
-        <div class="metric-body">
-          <h2 class="metric-value">{{ formatNumber(platformStats().totalUsers) }}</h2>
-          <p class="metric-label">Total Users</p>
-          <div class="metric-details">
-            <span class="detail-item">
-              <span class="detail-value">{{ formatNumber(platformStats().monthlyActiveUsers) }}</span>
-              <span class="detail-label">Active this month</span>
-            </span>
-          </div>
-        </div>
-        <div class="metric-footer">
-          <button type="button" class="metric-action" routerLink="/admin/users">
-            View all users →
-          </button>
-        </div>
-      </div>
 
-      <!-- Revenue Metric -->
-      <div class="metric-card success">
-        <div class="metric-header">
-          <div class="metric-icon-wrapper revenue">
-            <span class="metric-icon">💰</span>
+        <!-- Revenue Metric -->
+        <div class="metric-card success">
+          <div class="metric-header">
+            <div class="metric-icon-wrapper revenue">
+              <span class="metric-icon">💰</span>
+            </div>
+            <div class="metric-trend positive">
+              <span class="trend-icon">↗</span>
+              <span class="trend-value">+12.5%</span>
+            </div>
           </div>
-          <div class="metric-trend positive">
-            <span class="trend-icon">↗</span>
-            <span class="trend-value">+12.5%</span>
+          <div class="metric-body">
+            <h2 class="metric-value">{{ formatCurrency(platformStats().monthlyRevenue) }}</h2>
+            <p class="metric-label">Monthly Revenue</p>
+            <div class="metric-comparison">
+              <span class="comparison-text">{{ formatCurrency(platformStats().totalRevenue) }} total</span>
+            </div>
           </div>
         </div>
-        <div class="metric-body">
-          <h2 class="metric-value">{{ formatCurrency(platformStats().monthlyRevenue) }}</h2>
-          <p class="metric-label">Monthly Revenue</p>
-          <div class="metric-comparison">
-            <span class="comparison-text">{{ formatCurrency(platformStats().totalRevenue) }} total</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- Businesses Metric -->
-      <div class="metric-card info">
-        <div class="metric-header">
-          <div class="metric-icon-wrapper businesses">
-            <span class="metric-icon">🏪</span>
+        <!-- Businesses Metric -->
+        <div class="metric-card info">
+          <div class="metric-header">
+            <div class="metric-icon-wrapper businesses">
+              <span class="metric-icon">🏪</span>
+            </div>
+          </div>
+          <div class="metric-body">
+            <h2 class="metric-value">{{ formatNumber(platformStats().totalBusinesses) }}</h2>
+            <p class="metric-label">Active Businesses</p>
+            <div class="metric-breakdown">
+              <span class="breakdown-item">{{ formatNumber(platformStats().totalSpecialists) }} specialists</span>
+            </div>
           </div>
         </div>
-        <div class="metric-body">
-          <h2 class="metric-value">{{ formatNumber(platformStats().totalBusinesses) }}</h2>
-          <p class="metric-label">Active Businesses</p>
-          <div class="metric-breakdown">
-            <span class="breakdown-item">{{ formatNumber(platformStats().totalSpecialists) }} specialists</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- Bookings Metric -->
-      <div class="metric-card warning">
-        <div class="metric-header">
-          <div class="metric-icon-wrapper bookings">
-            <span class="metric-icon">📅</span>
+        <!-- Bookings Metric -->
+        <div class="metric-card warning">
+          <div class="metric-header">
+            <div class="metric-icon-wrapper bookings">
+              <span class="metric-icon">📅</span>
+            </div>
+            <div class="metric-trend positive">
+              <span class="trend-icon">↗</span>
+              <span class="trend-value">+8.3%</span>
+            </div>
           </div>
-          <div class="metric-trend positive">
-            <span class="trend-icon">↗</span>
-            <span class="trend-value">+8.3%</span>
-          </div>
-        </div>
-        <div class="metric-body">
-          <h2 class="metric-value">{{ formatNumber(platformStats().monthlyBookings) }}</h2>
-          <p class="metric-label">Monthly Bookings</p>
-          <div class="metric-comparison">
-            <span class="comparison-text">{{ formatNumber(platformStats().totalBookings) }} total</span>
+          <div class="metric-body">
+            <h2 class="metric-value">{{ formatNumber(platformStats().monthlyBookings) }}</h2>
+            <p class="metric-label">Monthly Bookings</p>
+            <div class="metric-comparison">
+              <span class="comparison-text">{{ formatNumber(platformStats().totalBookings) }} total</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    } @else {
+      <!-- Table View -->
+      <div class="metrics-table-container">
+        <table class="metrics-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Current Value</th>
+              <th>Monthly</th>
+              <th>Total</th>
+              <th>Trend</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="table-metric-name">
+                  <span class="table-icon">👥</span>
+                  <span>Users</span>
+                </div>
+              </td>
+              <td class="value-cell">{{ formatNumber(platformStats().totalUsers) }}</td>
+              <td class="monthly-cell">{{ formatNumber(platformStats().monthlyActiveUsers) }} active</td>
+              <td class="total-cell">{{ formatNumber(platformStats().totalUsers) }}</td>
+              <td class="trend-cell positive">
+                <span class="trend-badge">↗ +{{ userGrowth() }}%</span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="table-metric-name">
+                  <span class="table-icon">💰</span>
+                  <span>Revenue</span>
+                </div>
+              </td>
+              <td class="value-cell">{{ formatCurrency(platformStats().monthlyRevenue) }}</td>
+              <td class="monthly-cell">{{ formatCurrency(platformStats().monthlyRevenue) }}</td>
+              <td class="total-cell">{{ formatCurrency(platformStats().totalRevenue) }}</td>
+              <td class="trend-cell positive">
+                <span class="trend-badge">↗ +12.5%</span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="table-metric-name">
+                  <span class="table-icon">🏪</span>
+                  <span>Businesses</span>
+                </div>
+              </td>
+              <td class="value-cell">{{ formatNumber(platformStats().totalBusinesses) }}</td>
+              <td class="monthly-cell">-</td>
+              <td class="total-cell">{{ formatNumber(platformStats().totalBusinesses) }}</td>
+              <td class="trend-cell neutral">
+                <span class="trend-badge">-</span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="table-metric-name">
+                  <span class="table-icon">📅</span>
+                  <span>Bookings</span>
+                </div>
+              </td>
+              <td class="value-cell">{{ formatNumber(platformStats().monthlyBookings) }}</td>
+              <td class="monthly-cell">{{ formatNumber(platformStats().monthlyBookings) }}</td>
+              <td class="total-cell">{{ formatNumber(platformStats().totalBookings) }}</td>
+              <td class="trend-cell positive">
+                <span class="trend-badge">↗ +8.3%</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    }
   </section>
 
   <!-- Enhanced Content Grid -->

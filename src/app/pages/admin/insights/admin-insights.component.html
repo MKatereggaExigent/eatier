@@ -1,0 +1,25 @@
+<div class="insights-container">
+  <!-- Tab Navigation -->
+  <div class="insights-tabs">
+    <nav class="tab-nav" role="tablist" aria-label="Insights navigation">
+      @for (tab of tabs; track tab.path) {
+        <a
+          [routerLink]="tab.path"
+          routerLinkActive="active"
+          class="tab-link"
+          role="tab"
+          [attr.aria-selected]="isActiveTab(tab.path)"
+          [attr.aria-label]="'Navigate to ' + tab.label">
+          <span class="tab-icon" aria-hidden="true">{{ tab.icon }}</span>
+          <span class="tab-label">{{ tab.label }}</span>
+        </a>
+      }
+    </nav>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="insights-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+

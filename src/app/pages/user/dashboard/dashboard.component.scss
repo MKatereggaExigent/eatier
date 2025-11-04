@@ -241,6 +241,11 @@
   padding: var(--space-8);
   min-height: 100vh;
   animation: fadeIn 0.8s ease-out 0.2s both;
+  overflow-x: hidden; // Prevent horizontal overflow
+
+  @media (max-width: 1366px) {
+    padding: var(--space-6);
+  }
 
   @media (max-width: 1024px) {
     margin-left: 0;

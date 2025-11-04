@@ -1,95 +1,154 @@
-<div class="admin-bookings" role="main" aria-label="Admin Bookings Management">
-  <!-- Header Section -->
-  <header class="bookings-header">
-    <div class="header-content">
+<div class="admin-bookings-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-top">
       <div class="title-section">
-        <h1 class="page-title">
-          <span class="title-icon">📅</span>
-          Bookings Management
-        </h1>
-        <p class="page-subtitle">
-          Manage all platform bookings, monitor reservations, and handle booking requests
-        </p>
+        <h1 class="page-title">Bookings Management</h1>
+        <p class="page-subtitle">Manage all platform bookings, monitor reservations, and handle booking requests</p>
       </div>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- Stats Grid -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon">📅</div>
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ bookingStats().total }}</div>
           <div class="stat-label">Total Bookings</div>
         </div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon">✅</div>
+      <div class="stat-card confirmed">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ bookingStats().confirmed }}</div>
           <div class="stat-label">Confirmed</div>
         </div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon">⏳</div>
+      <div class="stat-card pending">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ bookingStats().pending }}</div>
           <div class="stat-label">Pending</div>
         </div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon">❌</div>
+      <div class="stat-card cancelled">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ bookingStats().cancelled }}</div>
           <div class="stat-label">Cancelled</div>
         </div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon">✔️</div>
+      <div class="stat-card completed">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ bookingStats().completed }}</div>
           <div class="stat-label">Completed</div>
         </div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon">💰</div>
+      <div class="stat-card revenue">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ formatCurrency(bookingStats().totalRevenue) }}</div>
           <div class="stat-label">Total Revenue</div>
         </div>
       </div>
     </div>
-  </header>
+  </div>
 
-  <!-- Controls Section -->
-  <section class="controls-section">
-    <div class="controls-content">
-      <!-- Search and Filter Toggle -->
-      <div class="search-controls">
-        <div class="search-input-wrapper">
-          <input
-            type="text"
-            class="search-input"
-            placeholder="Search bookings by customer, business, or email..."
-            [value]="searchQuery()"
-            (input)="onSearchInput($event)"
-            aria-label="Search bookings">
-          <span class="search-icon">🔍</span>
-        </div>
+  <!-- Controls -->
+  <div class="controls-section">
+    <div class="controls-row">
+      <!-- Search -->
+      <div class="search-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by customer, business, or email..."
+          [value]="searchQuery()"
+          (input)="onSearchInput($event)">
       </div>
 
-      <!-- Filter Controls -->
-      <div class="filter-controls">
+      <!-- Right Controls -->
+      <div class="right-controls">
+        <!-- View Toggle -->
+        <div class="view-toggle">
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="viewMode() === 'cards'"
+            (click)="toggleViewMode()"
+            title="Card View">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="viewMode() === 'table'"
+            (click)="toggleViewMode()"
+            title="Table View">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Filter Toggle -->
         <button
           type="button"
-          class="filter-toggle-btn"
-          (click)="toggleFilters()"
-          [class.active]="showFilters()">
-          <span class="btn-icon">🔽</span>
+          class="filter-btn"
+          [class.active]="showFilters()"
+          (click)="toggleFilters()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
           Filters
           @if (hasActiveFilters()) {
             <span class="filter-badge">{{ filteredBookings().length }}</span>
@@ -97,10 +156,7 @@
         </button>
 
         @if (hasActiveFilters()) {
-          <button
-            type="button"
-            class="clear-filters-btn"
-            (click)="clearFilters()">
+          <button type="button" class="clear-btn" (click)="clearFilters()">
             Clear Filters
           </button>
         }
@@ -159,30 +215,42 @@
         </div>
       </div>
     }
-  </section>
+  </div>
 
-  <!-- Bookings List -->
-  <section class="bookings-section">
-    @if (isLoading()) {
-      <div class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>Loading bookings...</p>
-      </div>
-    } @else if (filteredBookings().length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">📅</div>
-        <h3>No bookings found</h3>
-        @if (hasActiveFilters()) {
-          <p>Try adjusting your filters or search terms.</p>
-          <button type="button" class="btn-secondary" (click)="clearFilters()">
-            Clear Filters
-          </button>
-        } @else {
-          <p>No bookings have been made on the platform yet.</p>
-        }
-      </div>
-    } @else {
-      <div class="bookings-table-wrapper">
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading bookings...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @else if (filteredBookings().length === 0) {
+    <div class="empty-state">
+      <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      <h3>No bookings found</h3>
+      @if (hasActiveFilters()) {
+        <p>Try adjusting your filters or search terms.</p>
+        <button type="button" class="btn-secondary" (click)="clearFilters()">
+          Clear Filters
+        </button>
+      } @else {
+        <p>No bookings have been made on the platform yet.</p>
+      }
+    </div>
+  }
+
+  <!-- Bookings Content -->
+  @else {
+    <!-- Table View -->
+    @if (viewMode() === 'table') {
+      <div class="table-container">
         <table class="bookings-table">
           <thead>
             <tr>
@@ -198,7 +266,7 @@
           </thead>
           <tbody>
             @for (booking of filteredBookings(); track booking.id) {
-              <tr [class]="'status-' + booking.status">
+              <tr>
                 <td>
                   <div class="booking-date">
                     {{ formatDate(booking.bookingDate) }}
@@ -206,7 +274,7 @@
                 </td>
                 <td>
                   <div class="booking-time">
-                    {{ booking.bookingTime }}
+                    {{ formatTime(booking.bookingTime) }}
                   </div>
                 </td>
                 <td>
@@ -218,7 +286,9 @@
                 <td>
                   <div class="business-info">
                     <div class="business-name">{{ booking.businessName }}</div>
-                    <div class="business-type">{{ booking.businessType }}</div>
+                    @if (booking.bookingTier) {
+                      <div class="business-type">{{ booking.bookingTier | titlecase }} Tier</div>
+                    }
                   </div>
                 </td>
                 <td>
@@ -228,41 +298,49 @@
                 </td>
                 <td>
                   <div class="amount">
-                    {{ booking.totalAmount ? formatCurrency(booking.totalAmount) : 'N/A' }}
+                    {{ booking.tierPrice ? formatCurrency(booking.tierPrice) : 'Free' }}
                   </div>
                 </td>
                 <td>
-                  <div class="status-badge" [class]="'status-' + booking.status">
+                  <span class="status-badge" [class]="'status-' + booking.status">
                     {{ booking.status | titlecase }}
-                  </div>
+                  </span>
                 </td>
                 <td>
-                  <div class="booking-actions">
+                  <div class="action-buttons">
                     <button
                       type="button"
-                      class="btn-action view-btn"
+                      class="action-btn view-btn"
                       (click)="viewBookingDetails(booking)"
                       title="View Details">
-                      👁️
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
                     </button>
 
                     @if (booking.status === 'pending') {
                       <button
                         type="button"
-                        class="btn-action confirm-btn"
+                        class="action-btn confirm-btn"
                         (click)="confirmBooking(booking)"
                         title="Confirm Booking">
-                        ✅
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
                       </button>
                     }
 
                     @if (booking.status === 'pending' || booking.status === 'confirmed') {
                       <button
                         type="button"
-                        class="btn-action cancel-btn"
+                        class="action-btn cancel-btn"
                         (click)="cancelBooking(booking)"
                         title="Cancel Booking">
-                        ❌
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
                       </button>
                     }
                   </div>
@@ -272,7 +350,489 @@
           </tbody>
         </table>
       </div>
+    } @else {
+      <!-- Card View -->
+      <div class="bookings-grid">
+        @for (booking of filteredBookings(); track booking.id) {
+          <div class="booking-card">
+            <div class="card-header">
+              <div class="booking-info">
+                <div class="booking-date-time">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  <span>{{ formatDate(booking.bookingDate) }} at {{ formatTime(booking.bookingTime) }}</span>
+                </div>
+              </div>
+              <span class="status-badge" [class]="'status-' + booking.status">
+                {{ booking.status | titlecase }}
+              </span>
+            </div>
+
+            <div class="card-body">
+              <div class="info-row">
+                <div class="info-label">Customer</div>
+                <div class="info-value">
+                  <div class="customer-name">{{ booking.userName }}</div>
+                  <div class="customer-email">{{ booking.userEmail }}</div>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="info-label">Business</div>
+                <div class="info-value">
+                  <div class="business-name">{{ booking.businessName }}</div>
+                  @if (booking.bookingTier) {
+                    <div class="business-type">{{ booking.bookingTier | titlecase }} Tier</div>
+                  }
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="info-label">Party Size</div>
+                <div class="info-value">
+                  {{ booking.partySize }} {{ booking.partySize === 1 ? 'person' : 'people' }}
+                </div>
+              </div>
+
+              @if (booking.tierPrice) {
+                <div class="info-row">
+                  <div class="info-label">Tier Price</div>
+                  <div class="info-value amount">
+                    {{ formatCurrency(booking.tierPrice) }}
+                  </div>
+                </div>
+              }
+
+              @if (booking.specialRequests) {
+                <div class="info-row">
+                  <div class="info-label">Special Requests</div>
+                  <div class="info-value special-requests">
+                    {{ booking.specialRequests }}
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="card-footer">
+              <button
+                type="button"
+                class="btn-secondary"
+                (click)="viewBookingDetails(booking)">
+                View Details
+              </button>
+
+              @if (booking.status === 'pending') {
+                <button
+                  type="button"
+                  class="btn-success"
+                  (click)="confirmBooking(booking)">
+                  Confirm
+                </button>
+              }
+
+              @if (booking.status === 'pending' || booking.status === 'confirmed') {
+                <button
+                  type="button"
+                  class="btn-danger"
+                  (click)="cancelBooking(booking)">
+                  Cancel
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
     }
-  </section>
+
+    <!-- Pagination -->
+    @if (totalBookings() > 0) {
+      <div class="pagination-container">
+        <div class="pagination-info">
+          <span class="pagination-text">
+            Showing {{ ((currentPage() - 1) * pageSize()) + 1 }} to {{ Math.min(currentPage() * pageSize(), totalBookings()) }} of {{ totalBookings() }} bookings
+          </span>
+          <div class="page-size-selector">
+            <label for="pageSize">Items per page:</label>
+            <select id="pageSize" [value]="pageSize()" (change)="changePageSize($event)" class="page-size-select">
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pagination-controls">
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="!hasPreviousPage()"
+            (click)="previousPage()"
+            title="Previous Page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          @for (page of getPageNumbers(); track page) {
+            @if (page === -1) {
+              <span class="pagination-ellipsis">...</span>
+            } @else {
+              <button
+                type="button"
+                class="pagination-btn"
+                [class.active]="page === currentPage()"
+                (click)="goToPage(page)">
+                {{ page }}
+              </button>
+            }
+          }
+
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="!hasNextPage()"
+            (click)="nextPage()"
+            title="Next Page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
+  }
 </div>
 
+<!-- Confirm Booking Dialog -->
+@if (showConfirmDialog() && pendingAction().booking) {
+  <div class="modal-overlay" (click)="closeConfirmDialog()">
+    <div class="modal-dialog confirm-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirm Booking</h3>
+        <button type="button" class="close-btn" (click)="closeConfirmDialog()" title="Close dialog">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="confirmation-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+
+        <p class="confirmation-message">
+          Are you sure you want to confirm this booking?
+        </p>
+
+        <div class="booking-summary">
+          <div class="summary-row">
+            <span class="label">Customer:</span>
+            <span class="value">{{ pendingAction().booking!.userName }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Business:</span>
+            <span class="value">{{ pendingAction().booking!.businessName }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Date & Time:</span>
+            <span class="value">{{ formatDate(pendingAction().booking!.bookingDate) }} at {{ formatTime(pendingAction().booking!.bookingTime) }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Party Size:</span>
+            <span class="value">{{ pendingAction().booking!.partySize }} {{ pendingAction().booking!.partySize === 1 ? 'person' : 'people' }}</span>
+          </div>
+          @if (pendingAction().booking!.bookingTier) {
+            <div class="summary-row">
+              <span class="label">Tier:</span>
+              <span class="value tier-badge">{{ pendingAction().booking!.bookingTier | titlecase }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeConfirmDialog()">
+          Cancel
+        </button>
+        <button type="button" class="btn-success" (click)="executeConfirmBooking()">
+          Confirm Booking
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Cancel Booking Dialog -->
+@if (showCancelDialog() && pendingAction().booking) {
+  <div class="modal-overlay" (click)="closeCancelDialog()">
+    <div class="modal-dialog cancel-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Cancel Booking</h3>
+        <button type="button" class="close-btn" (click)="closeCancelDialog()" title="Close dialog">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="confirmation-icon warning">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+
+        <p class="confirmation-message">
+          Are you sure you want to cancel this booking?
+        </p>
+
+        <div class="booking-summary">
+          <div class="summary-row">
+            <span class="label">Customer:</span>
+            <span class="value">{{ pendingAction().booking!.userName }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Business:</span>
+            <span class="value">{{ pendingAction().booking!.businessName }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Date & Time:</span>
+            <span class="value">{{ formatDate(pendingAction().booking!.bookingDate) }} at {{ formatTime(pendingAction().booking!.bookingTime) }}</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cancelReason">Cancellation Reason *</label>
+          <textarea
+            id="cancelReason"
+            rows="4"
+            class="form-control"
+            placeholder="Please provide a reason for cancellation..."
+            [value]="cancelReason()"
+            (input)="cancelReason.set($any($event.target).value)"
+            required></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeCancelDialog()">
+          Keep Booking
+        </button>
+        <button type="button" class="btn-danger" (click)="executeCancelBooking()">
+          Cancel Booking
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Booking Details Modal -->
+@if (showBookingModal() && selectedBooking()) {
+  <div class="modal-overlay" (click)="closeBookingModal()">
+    <div class="modal-dialog details-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Booking Details</h3>
+        <button type="button" class="close-btn" (click)="closeBookingModal()" title="Close dialog">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="details-section">
+          <h4>Booking Information</h4>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Booking Reference</span>
+              <span class="detail-value">{{ selectedBooking()!.bookingReference || 'N/A' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Status</span>
+              <span class="detail-value">
+                <span class="status-badge" [class]="'status-' + selectedBooking()!.status">
+                  {{ selectedBooking()!.status | titlecase }}
+                </span>
+              </span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Date</span>
+              <span class="detail-value">{{ formatDate(selectedBooking()!.bookingDate) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Time</span>
+              <span class="detail-value">{{ formatTime(selectedBooking()!.bookingTime) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Party Size</span>
+              <span class="detail-value">{{ selectedBooking()!.partySize }} {{ selectedBooking()!.partySize === 1 ? 'person' : 'people' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Booking Tier</span>
+              <span class="detail-value tier-badge">{{ selectedBooking()!.bookingTier | titlecase }}</span>
+            </div>
+            @if (selectedBooking()!.tierPrice) {
+              <div class="detail-item">
+                <span class="detail-label">Tier Price</span>
+                <span class="detail-value">{{ formatCurrency(selectedBooking()!.tierPrice!) }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="details-section">
+          <h4>Customer Information</h4>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Name</span>
+              <span class="detail-value">{{ selectedBooking()!.userName }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Email</span>
+              <span class="detail-value">{{ selectedBooking()!.userEmail }}</span>
+            </div>
+            @if (selectedBooking()!.userPhone) {
+              <div class="detail-item">
+                <span class="detail-label">Phone</span>
+                <span class="detail-value">{{ selectedBooking()!.userPhone }}</span>
+              </div>
+            }
+            @if (selectedBooking()!.contactName) {
+              <div class="detail-item">
+                <span class="detail-label">Contact Name</span>
+                <span class="detail-value">{{ selectedBooking()!.contactName }}</span>
+              </div>
+            }
+            @if (selectedBooking()!.contactPhone) {
+              <div class="detail-item">
+                <span class="detail-label">Contact Phone</span>
+                <span class="detail-value">{{ selectedBooking()!.contactPhone }}</span>
+              </div>
+            }
+            @if (selectedBooking()!.contactEmail) {
+              <div class="detail-item">
+                <span class="detail-label">Contact Email</span>
+                <span class="detail-value">{{ selectedBooking()!.contactEmail }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="details-section">
+          <h4>Business Information</h4>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Business Name</span>
+              <span class="detail-value">{{ selectedBooking()!.businessName }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Business Email</span>
+              <span class="detail-value">{{ selectedBooking()!.businessEmail }}</span>
+            </div>
+            @if (selectedBooking()!.businessPhone) {
+              <div class="detail-item">
+                <span class="detail-label">Business Phone</span>
+                <span class="detail-value">{{ selectedBooking()!.businessPhone }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (selectedBooking()!.tablePreferences || selectedBooking()!.occasion || selectedBooking()!.specialRequests) {
+          <div class="details-section">
+            <h4>Additional Details</h4>
+            <div class="details-grid">
+              @if (selectedBooking()!.occasion) {
+                <div class="detail-item full-width">
+                  <span class="detail-label">Occasion</span>
+                  <span class="detail-value">{{ selectedBooking()!.occasion }}</span>
+                </div>
+              }
+              @if (selectedBooking()!.tablePreferences) {
+                <div class="detail-item full-width">
+                  <span class="detail-label">Table Preferences</span>
+                  <span class="detail-value">{{ selectedBooking()!.tablePreferences }}</span>
+                </div>
+              }
+              @if (selectedBooking()!.specialRequests) {
+                <div class="detail-item full-width">
+                  <span class="detail-label">Special Requests</span>
+                  <span class="detail-value">{{ selectedBooking()!.specialRequests }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (selectedBooking()!.confirmedAt || selectedBooking()!.cancelledAt) {
+          <div class="details-section">
+            <h4>Status History</h4>
+            <div class="details-grid">
+              @if (selectedBooking()!.confirmedAt) {
+                <div class="detail-item">
+                  <span class="detail-label">Confirmed At</span>
+                  <span class="detail-value">{{ formatDate(selectedBooking()!.confirmedAt!) }}</span>
+                </div>
+              }
+              @if (selectedBooking()!.cancelledAt) {
+                <div class="detail-item">
+                  <span class="detail-label">Cancelled At</span>
+                  <span class="detail-value">{{ formatDate(selectedBooking()!.cancelledAt!) }}</span>
+                </div>
+              }
+              @if (selectedBooking()!.cancellationReason) {
+                <div class="detail-item full-width">
+                  <span class="detail-label">Cancellation Reason</span>
+                  <span class="detail-value">{{ selectedBooking()!.cancellationReason }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="details-section">
+          <h4>System Information</h4>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Created At</span>
+              <span class="detail-value">{{ formatDate(selectedBooking()!.createdAt) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Last Updated</span>
+              <span class="detail-value">{{ formatDate(selectedBooking()!.updatedAt) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        @if (selectedBooking()!.status === 'pending') {
+          <button type="button" class="btn-success" (click)="confirmBooking(selectedBooking()!); closeBookingModal()">
+            Confirm Booking
+          </button>
+        }
+        @if (selectedBooking()!.status === 'pending' || selectedBooking()!.status === 'confirmed') {
+          <button type="button" class="btn-danger" (click)="cancelBooking(selectedBooking()!); closeBookingModal()">
+            Cancel Booking
+          </button>
+        }
+        <button type="button" class="btn-secondary" (click)="closeBookingModal()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+}
