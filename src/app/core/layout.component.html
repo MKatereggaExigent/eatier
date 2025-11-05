@@ -16,6 +16,11 @@
           </a>
         </li>
         <li class="nav-item">
+          <a routerLink="/grow" routerLinkActive="active" class="nav-link">
+            📈 Grow
+          </a>
+        </li>
+        <li class="nav-item">
           <a routerLink="/restaurants" routerLinkActive="active" class="nav-link">
             🍽️ Restaurants
           </a>
@@ -110,10 +115,187 @@
     </div>
   </nav>
 
-  <!-- Main Content -->
+  <!-- Search Modal -->
+  @if (showSearchModal()) {
+    <div class="search-modal" (click)="$event.stopPropagation()">
+      <div class="search-modal-content">
+        <div class="search-modal-header">
+          <h3>Search</h3>
+          <button type="button" class="close-btn" (click)="toggleSearch()">✕</button>
+        </div>
+        <div class="search-input-wrapper">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search restaurants, dishes, reviews..."
+            [value]="searchQuery()"
+            (input)="onSearchInput($event)"
+            autofocus
+          />
+          @if (searchQuery()) {
+            <button type="button" class="clear-search-btn" (click)="clearSearch()">✕</button>
+          }
+        </div>
+
+        <!-- Search Results -->
+        <div class="search-results">
+          @if (isSearching()) {
+            <div class="search-loading">
+              <div class="spinner"></div>
+              <p>Searching...</p>
+            </div>
+          } @else if (hasResults() && searchResults().length > 0) {
+            <div class="results-list">
+              @for (result of searchResults(); track result.id) {
+                <div class="result-item" (click)="navigateToResult(result)">
+                  <span class="result-icon">{{ result.icon }}</span>
+                  <div class="result-content">
+                    <div class="result-title">{{ result.title }}</div>
+                    @if (result.subtitle) {
+                      <div class="result-subtitle">{{ result.subtitle }}</div>
+                    }
+                    @if (result.description) {
+                      <div class="result-description">{{ result.description }}</div>
+                    }
+                  </div>
+                  <span class="result-type">{{ result.type }}</span>
+                </div>
+              }
+            </div>
+          } @else if (searchQuery().trim().length >= 2) {
+            <div class="no-results">
+              <span class="empty-icon">🔍</span>
+              <p>No results found for "{{ searchQuery() }}"</p>
+            </div>
+          } @else {
+            <div class="search-suggestions">
+              <p class="suggestions-title">Try searching for:</p>
+              <div class="suggestion-chips">
+                <button type="button" class="suggestion-chip" (click)="searchSuggestion('pizza')">🍕 Pizza</button>
+                <button type="button" class="suggestion-chip" (click)="searchSuggestion('coffee')">☕ Coffee</button>
+                <button type="button" class="suggestion-chip" (click)="searchSuggestion('sushi')">🍣 Sushi</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Notifications Panel -->
+  @if (showNotifications()) {
+    <div class="notifications-panel" (click)="$event.stopPropagation()">
+      <div class="notifications-header">
+        <div class="header-left">
+          <h3>Notifications</h3>
+          @if (unreadCount() > 0) {
+            <span class="unread-badge">{{ unreadCount() }}</span>
+          }
+        </div>
+        <div class="header-actions">
+          @if (isLoggedIn() && notifications().length > 0) {
+            <button type="button" class="mark-all-btn" (click)="markAllAsRead()">Mark all read</button>
+          }
+          <button type="button" class="close-btn" (click)="toggleNotifications()">✕</button>
+        </div>
+      </div>
+
+      <div class="notifications-content">
+        @if (!isLoggedIn()) {
+          <!-- Login prompt for non-authenticated users -->
+          <div class="auth-prompt">
+            <span class="auth-icon">🔐</span>
+            <h4>Login to See Your Notifications</h4>
+            <p>Create an account or login to receive personalized notifications about your bookings, reviews, and more.</p>
+            <div class="auth-buttons">
+              <button type="button" class="btn-primary" routerLink="/auth/login" (click)="toggleNotifications()">Login</button>
+              <button type="button" class="btn-secondary" routerLink="/auth/register" (click)="toggleNotifications()">Sign Up</button>
+            </div>
+          </div>
+
+          <!-- System-wide notifications for non-authenticated users -->
+          <div class="system-notifications-section">
+            <h5 class="section-title">Latest Updates</h5>
+            @for (notification of notifications(); track notification.id) {
+              <div class="notification-item system-notification"
+                   [class.unread]="!notification.read"
+                   (click)="navigateToNotificationAction(notification)">
+                <span class="notification-icon">{{ notification.icon }}</span>
+                <div class="notification-content">
+                  <p class="notification-title">{{ notification.title }}</p>
+                  <p class="notification-message">{{ notification.message }}</p>
+                  <span class="notification-time">{{ getTimeAgo(notification.timestamp) }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- User-specific notifications for authenticated users -->
+          @if (notifications().length === 0) {
+            <div class="empty-state">
+              <span class="empty-icon">🔔</span>
+              <p>No notifications yet</p>
+              <span class="empty-hint">You'll see updates about your bookings, reviews, and more here.</span>
+            </div>
+          } @else {
+            @for (notification of notifications(); track notification.id) {
+              <div class="notification-item"
+                   [class.unread]="!notification.read"
+                   (click)="navigateToNotificationAction(notification)">
+                <span class="notification-icon">{{ notification.icon }}</span>
+                <div class="notification-content">
+                  <p class="notification-title">{{ notification.title }}</p>
+                  <p class="notification-message">{{ notification.message }}</p>
+                  <span class="notification-time">{{ getTimeAgo(notification.timestamp) }}</span>
+                </div>
+                <div class="notification-actions">
+                  @if (!notification.read) {
+                    <button type="button"
+                            class="action-btn"
+                            (click)="markAsRead(notification.id); $event.stopPropagation()"
+                            title="Mark as read">
+                      ✓
+                    </button>
+                  }
+                  <button type="button"
+                          class="action-btn delete-btn"
+                          (click)="deleteNotification(notification.id); $event.stopPropagation()"
+                          title="Delete">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            }
+          }
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Header Ad - Floating on top -->
+  <div class="header-ad-overlay">
+    <app-header-ad></app-header-ad>
+  </div>
+
+  <!-- Left Sidebar Ad - Floating on top -->
+  <div class="left-sidebar-ad-overlay">
+    <app-left-sidebar-ad></app-left-sidebar-ad>
+  </div>
+
+  <!-- Right Sidebar Ad - Floating on top -->
+  <div class="right-sidebar-ad-overlay">
+    <app-right-sidebar-ad></app-right-sidebar-ad>
+  </div>
+
+  <!-- Main Content - Full Width -->
   <main class="main-wrapper">
     <router-outlet></router-outlet>
   </main>
+
+  <!-- Footer Ad - Floating on top -->
+  <div class="footer-ad-overlay">
+    <app-footer-ad></app-footer-ad>
+  </div>
 
   <!-- Glassmorphic Footer -->
   <footer class="footer">

@@ -13,75 +13,121 @@
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         Home
       </a>
+      <a routerLink="/about" routerLinkActive="active" class="nav-link">
+        About
+      </a>
+      <a routerLink="/grow" routerLinkActive="active" class="nav-link">
+        Grow
+      </a>
+      <a routerLink="/restaurants" routerLinkActive="active" class="nav-link">
+        Restaurants
+      </a>
       <a routerLink="/community" routerLinkActive="active" class="nav-link">
         Community
       </a>
-      <a routerLink="/about" routerLinkActive="active" class="nav-link">
-        About
+      <a routerLink="/faqs" routerLinkActive="active" class="nav-link">
+        FAQs
+      </a>
+      <a routerLink="/help" routerLinkActive="active" class="nav-link">
+        Help
       </a>
     </div>
 
     <!-- Right Side Actions -->
     <div class="navbar-actions">
-      <!-- Search -->
-      <div class="search-container">
-        <div class="search-input-wrapper">
+      <!-- Search Icon Button -->
+      <div class="search-icon-container">
+        <button
+          class="icon-btn search-btn"
+          (click)="toggleSearchModal($event)"
+          type="button"
+          title="Search"
+          aria-label="Search"
+        >
           <span class="search-icon">🔍</span>
-          <input
-            type="text"
-            class="search-input"
-            placeholder="Search businesses, food..."
-            [value]="searchQuery()"
-            (input)="onSearchInput($event)"
-            (focus)="onSearchFocus()"
-          />
-          @if (searchQuery()) {
-            <button class="clear-search-btn" (click)="clearSearch()" type="button">
-              <span>✕</span>
-            </button>
+        </button>
+      </div>
+
+      <!-- Search Modal -->
+      @if (showSearchModal()) {
+        <div class="search-modal">
+          <div class="search-modal-header">
+            <div class="search-modal-input-wrapper">
+              <span class="search-modal-icon">🔍</span>
+              <input
+                type="text"
+                class="search-modal-input"
+                placeholder="Search businesses, food, posts..."
+                [value]="searchQuery()"
+                (input)="onSearchInput($event)"
+                (focus)="onSearchFocus()"
+                autofocus
+              />
+              @if (searchQuery()) {
+                <button class="clear-search-btn" (click)="clearSearch()" type="button">
+                  <span>✕</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Search Results -->
+          @if (showSearchResults() && (isSearching() || hasResults())) {
+            <div class="search-modal-results">
+              @if (isSearching()) {
+                <div class="search-loading">
+                  <div class="spinner"></div>
+                  <span>Searching...</span>
+                </div>
+              } @else if (hasResults()) {
+                <div class="search-results">
+                  @for (result of searchResults(); track result.id) {
+                    <div class="search-result-item" (click)="navigateToResult(result)">
+                      <div class="result-icon">{{ result.icon }}</div>
+                      <div class="result-content">
+                        <div class="result-title">{{ result.title }}</div>
+                        @if (result.subtitle) {
+                          <div class="result-subtitle">{{ result.subtitle }}</div>
+                        }
+                        @if (result.description) {
+                          <div class="result-description">{{ result.description }}</div>
+                        }
+                      </div>
+                      <div class="result-type">{{ result.type }}</div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="search-empty">
+                  <span class="empty-icon">🔍</span>
+                  <p>No results found</p>
+                </div>
+              }
+            </div>
+          } @else if (searchQuery().trim().length === 0) {
+            <div class="search-suggestions">
+              <p class="suggestions-title">Try searching for:</p>
+              <div class="suggestion-chips">
+                <button class="suggestion-chip" (click)="searchSuggestion('pizza')">🍕 Pizza</button>
+                <button class="suggestion-chip" (click)="searchSuggestion('coffee')">☕ Coffee</button>
+                <button class="suggestion-chip" (click)="searchSuggestion('sushi')">🍣 Sushi</button>
+                <button class="suggestion-chip" (click)="searchSuggestion('dessert')">🍰 Dessert</button>
+              </div>
+            </div>
           }
         </div>
-
-        <!-- Search Results Dropdown -->
-        @if (showSearchResults() && (isSearching() || hasResults())) {
-          <div class="search-dropdown">
-            @if (isSearching()) {
-              <div class="search-loading">
-                <div class="spinner"></div>
-                <span>Searching...</span>
-              </div>
-            } @else if (hasResults()) {
-              <div class="search-results">
-                @for (result of searchResults(); track result.id) {
-                  <div class="search-result-item" (click)="navigateToResult(result)">
-                    <div class="result-icon">{{ result.icon }}</div>
-                    <div class="result-content">
-                      <div class="result-title">{{ result.title }}</div>
-                      @if (result.subtitle) {
-                        <div class="result-subtitle">{{ result.subtitle }}</div>
-                      }
-                      @if (result.description) {
-                        <div class="result-description">{{ result.description }}</div>
-                      }
-                    </div>
-                    <div class="result-type">{{ result.type }}</div>
-                  </div>
-                }
-              </div>
-            } @else {
-              <div class="search-empty">
-                <span class="empty-icon">🔍</span>
-                <p>No results found</p>
-              </div>
-            }
-          </div>
-        }
-      </div>
+      }
 
       <!-- Notifications (Authenticated Users Only) -->
       @if (isAuthenticated()) {
         <div class="notifications-container">
-          <button class="icon-btn notifications-btn" (click)="toggleNotifications($event)" type="button">
+          <button
+            class="icon-btn notifications-btn"
+            (click)="toggleNotifications($event)"
+            type="button"
+            title="Notifications"
+            aria-label="Notifications"
+          >
             <span class="notification-icon">🔔</span>
             @if (unreadCount() > 0) {
               <span class="notification-badge">{{ unreadCount() }}</span>
@@ -151,11 +197,14 @@
       <!-- User Menu (Authenticated) -->
       @if (isAuthenticated()) {
         <div class="user-menu-container">
-          <button class="user-menu-trigger" (click)="toggleUserMenu($event)" type="button">
-            <div class="user-avatar">
-              <span>{{ user()?.firstName?.charAt(0)?.toUpperCase() || 'U' }}</span>
-            </div>
-            <span class="chevron-icon">▼</span>
+          <button
+            class="icon-btn user-menu-btn"
+            (click)="toggleUserMenu($event)"
+            type="button"
+            title="Account"
+            aria-label="User menu"
+          >
+            <span class="user-icon">👤</span>
           </button>
 
           @if (showUserMenu()) {
@@ -261,13 +310,29 @@
         <span class="link-icon">🏠</span>
         <span>Home</span>
       </a>
+      <a routerLink="/about" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+        <span class="link-icon">ℹ️</span>
+        <span>About</span>
+      </a>
+      <a routerLink="/grow" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+        <span class="link-icon">📈</span>
+        <span>Grow</span>
+      </a>
+      <a routerLink="/restaurants" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+        <span class="link-icon">🍽️</span>
+        <span>Restaurants</span>
+      </a>
       <a routerLink="/community" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
         <span class="link-icon">👥</span>
         <span>Community</span>
       </a>
-      <a routerLink="/about" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">ℹ️</span>
-        <span>About</span>
+      <a routerLink="/faqs" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+        <span class="link-icon">❓</span>
+        <span>FAQs</span>
+      </a>
+      <a routerLink="/help" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+        <span class="link-icon">🆘</span>
+        <span>Help</span>
       </a>
 
       @if (isAuthenticated()) {

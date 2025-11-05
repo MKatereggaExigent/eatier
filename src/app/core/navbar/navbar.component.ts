@@ -1,11 +1,12 @@
-import { Component, computed, effect, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { Notification, NotificationService } from '../services/notification.service';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { AuthService } from '../services/auth.service';
-import { NotificationService, Notification } from '../services/notification.service';
-import { SearchService, SearchResult } from '../services/search.service';
+import { SearchResult, SearchService } from '../services/search.service';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+
+import { AuthService } from '../services/auth.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-navbar',
@@ -26,6 +27,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showUserMenu = signal(false);
   showGuestMenu = signal(false);
   showNotifications = signal(false);
+  showSearchModal = signal(false);
   showSearchResults = signal(false);
   showMobileMenu = signal(false);
   isScrolled = signal(false);
@@ -42,8 +44,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private searchSubject = new Subject<string>();
 
   ngOnInit(): void {
+    console.log('🚀 Navbar initialized');
+    console.log('👤 Is authenticated:', this.isAuthenticated());
+    console.log('👥 Current user:', this.user());
+
     // Load notifications if user is authenticated
     if (this.isAuthenticated()) {
+      console.log('📥 Loading notifications for authenticated user');
       this.notificationService.loadNotifications();
     }
 
@@ -93,7 +100,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (!target.closest('.notifications-container')) {
       this.showNotifications.set(false);
     }
-    if (!target.closest('.search-container')) {
+    if (!target.closest('.search-icon-container') && !target.closest('.search-modal')) {
+      this.showSearchModal.set(false);
       this.showSearchResults.set(false);
     }
   }
@@ -114,10 +122,49 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   toggleNotifications(event: Event): void {
+    console.log('🔔 Notification icon clicked!');
+    console.log('Event:', event);
+    console.log('Current showNotifications value:', this.showNotifications());
+    console.log('Is authenticated:', this.isAuthenticated());
+    console.log('Notifications count:', this.notifications().length);
+    console.log('Unread count:', this.unreadCount());
     event.stopPropagation();
-    this.showNotifications.update(v => !v);
+    this.showNotifications.update(v => {
+      console.log('Updating showNotifications from', v, 'to', !v);
+      return !v;
+    });
+    console.log('New showNotifications value:', this.showNotifications());
     this.showUserMenu.set(false);
     this.showGuestMenu.set(false);
+    this.showSearchModal.set(false);
+  }
+
+  toggleSearchModal(event: Event): void {
+    console.log('🔍 Search icon clicked!');
+    console.log('Event:', event);
+    console.log('Current showSearchModal value:', this.showSearchModal());
+    event.stopPropagation();
+    this.showSearchModal.update(v => {
+      console.log('Updating showSearchModal from', v, 'to', !v);
+      return !v;
+    });
+    console.log('New showSearchModal value:', this.showSearchModal());
+    this.showUserMenu.set(false);
+    this.showGuestMenu.set(false);
+    this.showNotifications.set(false);
+    if (this.showSearchModal()) {
+      console.log('Search modal is now open, focusing input...');
+      // Focus the search input when modal opens
+      setTimeout(() => {
+        const searchInput = document.querySelector('.search-modal-input') as HTMLInputElement;
+        console.log('Search input element:', searchInput);
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }, 100);
+    } else {
+      console.log('Search modal is now closed');
+    }
   }
 
   toggleMobileMenu(): void {
@@ -128,6 +175,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showUserMenu.set(false);
     this.showGuestMenu.set(false);
     this.showNotifications.set(false);
+    this.showSearchModal.set(false);
     this.showMobileMenu.set(false);
   }
 
@@ -151,9 +199,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showSearchResults.set(false);
   }
 
+  searchSuggestion(term: string): void {
+    this.searchQuery.set(term);
+    this.searchSubject.next(term);
+    this.showSearchResults.set(true);
+  }
+
   navigateToResult(result: SearchResult): void {
     this.router.navigate([result.link]);
     this.clearSearch();
+    this.showSearchModal.set(false);
   }
 
   // Notification methods

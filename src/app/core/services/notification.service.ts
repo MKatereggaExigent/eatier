@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { Observable, catchError, of, tap } from 'rxjs';
+
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, catchError, of } from 'rxjs';
 
 export interface Notification {
   id: string;
@@ -33,10 +34,10 @@ export class NotificationService {
     if (this.isInitialized) {
       return; // Already loaded
     }
-    
+
     this.isInitialized = true;
     this.isLoading.set(true);
-    
+
     // Try API first, fall back to mock data
     this.http.get<Notification[]>(`${this.apiUrl}/notifications`)
       .pipe(

@@ -1,0 +1,77 @@
+@if (currentAd(); as ad) {
+  <div class="header-ad-container" [class.fade-animation]="animationType === 'fade'" [class.carousel-animation]="animationType === 'carousel'">
+    <div class="header-ad" [class.transitioning]="isTransitioning()" (click)="onAdClick(ad)">
+      <!-- Background Image/Video -->
+      @if (ad.video_url) {
+        <div class="ad-background">
+          <video [src]="ad.video_url" autoplay muted loop playsinline class="ad-video"></video>
+          <div class="ad-overlay"></div>
+        </div>
+      } @else if (ad.image_url) {
+        <div class="ad-background">
+          <img [src]="ad.image_url" [alt]="ad.title" class="ad-image">
+          <div class="ad-overlay"></div>
+        </div>
+      } @else {
+        <div class="ad-background gradient-bg">
+          <div class="ad-overlay"></div>
+        </div>
+      }
+
+      <!-- Ad Content -->
+      <div class="ad-content">
+        <div class="ad-header">
+          <span class="ad-label">✨ Sponsored</span>
+          @if (ad.business_name) {
+            <span class="ad-business">{{ ad.business_name }}</span>
+          }
+        </div>
+
+        <h2 class="ad-title">{{ ad.title }}</h2>
+        <p class="ad-description">{{ ad.description }}</p>
+
+        <button class="ad-cta" (click)="onAdClick(ad); $event.stopPropagation()">
+          {{ ad.cta_text }}
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="cta-icon">
+            <path d="M7 15L13 10L7 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Navigation Controls -->
+      @if (ads().length > 1) {
+        <div class="ad-controls">
+          <button 
+            class="control-btn prev" 
+            (click)="previousAd(); $event.stopPropagation()"
+            aria-label="Previous ad">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="ad-indicators">
+            @for (ad of ads(); track ad.id; let i = $index) {
+              <button 
+                class="indicator" 
+                [class.active]="i === currentAdIndex()"
+                (click)="goToAd(i); $event.stopPropagation()"
+                [attr.aria-label]="'Go to ad ' + (i + 1)">
+              </button>
+            }
+          </div>
+
+          <button 
+            class="control-btn next" 
+            (click)="nextAd(); $event.stopPropagation()"
+            aria-label="Next ad">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}
+

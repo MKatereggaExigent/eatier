@@ -1,0 +1,272 @@
+<div class="grow-page">
+  <!-- Hero Section with Carousel -->
+  <section class="hero-carousel">
+    <div class="carousel-container">
+      @for (slide of carouselSlides; track slide.title; let i = $index) {
+        <div class="carousel-slide" [class.active]="currentSlide() === i">
+          <img [src]="slide.image" [alt]="slide.title" class="carousel-image" />
+        </div>
+      }
+    </div>
+
+    <!-- Hero Content (stays fixed over carousel) -->
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Advertise Your Services
+      </h1>
+      <p class="hero-subtitle">
+        Whether you're a restaurant, caterer, chef, waiter, or barista—promote your brand to the right diners and partners. 
+        Choose your ad type, pick the regions and countries you want to reach (e.g., East Africa → Kenya, Ethiopia), 
+        set your budget, and go live in minutes.
+      </p>
+      <div class="hero-stats">
+        @for (stat of stats; track stat.label) {
+          <div class="stat-item">
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+          </div>
+        }
+      </div>
+      <div class="hero-cta">
+        @if (isAuthenticated() && canAdvertise()) {
+          <button type="button" class="btn-primary" (click)="navigateToCreateAd()">
+            <span>Create Your First Ad</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+          <button type="button" class="btn-secondary" (click)="navigateToManageAds()">
+            <span>Manage My Ads</span>
+          </button>
+        } @else {
+          <a routerLink="/register" class="btn-primary">
+            <span>Get Started</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </a>
+          <a routerLink="/login" class="btn-secondary">
+            <span>Sign In</span>
+          </a>
+        }
+      </div>
+    </div>
+
+    <!-- Carousel Controls -->
+    <div class="carousel-controls">
+      <button type="button" class="carousel-btn prev" (click)="prevSlide()" aria-label="Previous slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+      </button>
+      <div class="carousel-indicators">
+        @for (slide of carouselSlides; track slide.title; let i = $index) {
+          <button 
+            type="button"
+            class="indicator" 
+            [class.active]="currentSlide() === i"
+            (click)="goToSlide(i)"
+            [attr.aria-label]="'Go to slide ' + (i + 1)"
+          ></button>
+        }
+      </div>
+      <button type="button" class="carousel-btn next" (click)="nextSlide()" aria-label="Next slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Ad Types Section -->
+  <section class="ad-types-section">
+    <div class="section-header">
+      <h2 class="section-title">Ad Types</h2>
+      <p class="section-subtitle">
+        Choose the advertising format that best suits your business goals
+      </p>
+    </div>
+
+    <div class="ad-types-grid">
+      @for (adType of adTypes; track adType.id) {
+        <article class="ad-type-card">
+          <div class="card-icon">{{ adType.icon }}</div>
+          <h3 class="card-title">{{ adType.title }}</h3>
+          <p class="card-description">{{ adType.description }}</p>
+          <ul class="card-features">
+            @for (feature of adType.features; track feature) {
+              <li class="feature-item">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 11.708-.708L6.5 10.293l6.646-6.647a.5.5 0 01.708 0z"/>
+                </svg>
+                <span>{{ feature }}</span>
+              </li>
+            }
+          </ul>
+          <div class="card-pricing">{{ adType.pricing }}</div>
+        </article>
+      }
+    </div>
+
+    <div class="billing-note">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+      </svg>
+      <p><strong>Billing:</strong> All ads are paid. Pricing starts at $5 / €5 / £5 (or the equivalent in your selected currency).</p>
+    </div>
+  </section>
+
+  <!-- Geo-Targeting Section -->
+  <section class="geo-targeting-section">
+    <div class="section-header">
+      <h2 class="section-title">Target Your Ideal Audience</h2>
+      <p class="section-subtitle">
+        Choose specific regions and countries to reach the right diners and partners
+      </p>
+    </div>
+
+    <div class="geo-targeting-content">
+      <div class="geo-visual">
+        <div class="globe-icon">🌍</div>
+        <div class="targeting-stats">
+          <div class="stat">
+            <span class="stat-number">11</span>
+            <span class="stat-label">Regions</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">116</span>
+            <span class="stat-label">Countries</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="geo-examples">
+        <h3 class="examples-title">Example Targeting</h3>
+        <div class="examples-grid">
+          @for (region of regions; track region.name) {
+            <div class="example-card">
+              <div class="example-region">{{ region.name }}</div>
+              <div class="example-countries">
+                @for (country of region.countries; track country) {
+                  <span class="country-tag">{{ country }}</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bookings & Availability Section -->
+  <section class="bookings-section">
+    <div class="section-header">
+      <h2 class="section-title">Bookings & Availability</h2>
+      <p class="section-subtitle">
+        Make it easy for customers to hire you
+      </p>
+    </div>
+
+    <div class="bookings-content">
+      <div class="booking-states">
+        <div class="state-card available">
+          <div class="state-icon">✅</div>
+          <h3 class="state-title">When Available</h3>
+          <div class="state-buttons">
+            <button type="button" class="btn-primary">Book Now</button>
+            <button type="button" class="btn-secondary">See Calendar</button>
+          </div>
+          <div class="state-secondary">
+            <button type="button" class="btn-link">Enquire Now</button>
+            <button type="button" class="btn-link">Get a Quote</button>
+          </div>
+        </div>
+
+        <div class="state-card fully-booked">
+          <div class="state-icon">📅</div>
+          <h3 class="state-title">When Fully Booked</h3>
+          <div class="state-buttons">
+            <button type="button" class="btn-disabled" disabled>Fully Booked</button>
+            <button type="button" class="btn-secondary">See Calendar</button>
+          </div>
+          <div class="state-secondary">
+            <button type="button" class="btn-link">Enquire Now</button>
+            <button type="button" class="btn-link">Get a Quote</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-note">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+        </svg>
+        <p>"Book Now" only shows if there is an open slot within the next 90 days. "Fully Booked" shows if no bookable slots exist in that window.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact & Enquiries Section -->
+  <section class="enquiries-section">
+    <div class="section-header">
+      <h2 class="section-title">Contact & Enquiries</h2>
+      <p class="section-subtitle">
+        Every message gets an instant acknowledgement so you never miss a lead
+      </p>
+    </div>
+
+    <div class="enquiry-example">
+      <div class="enquiry-card">
+        <div class="enquiry-icon">📧</div>
+        <h3 class="enquiry-title">Auto-Acknowledgement</h3>
+        <div class="enquiry-message">
+          <p class="message-greeting">Hi, Jess.</p>
+          <p class="message-body">
+            Thank you for getting in touch. This message acknowledges receipt of your enquiry. 
+            We'll get back to you shortly.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2 class="cta-title">Ready to Grow Your Business?</h2>
+      <p class="cta-subtitle">
+        Join thousands of businesses already advertising on Itiyum
+      </p>
+      <div class="cta-buttons">
+        @if (isAuthenticated() && canAdvertise()) {
+          <button type="button" class="btn-primary large" (click)="navigateToCreateAd()">
+            <span>Create Your First Ad</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+          <button type="button" class="btn-secondary large" (click)="navigateToManageAds()">
+            <span>Manage My Ads</span>
+          </button>
+        } @else if (isAuthenticated()) {
+          <div class="upgrade-message">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <p>Advertising is available for Business Owners and Specialists. Please upgrade your account to access this feature.</p>
+          </div>
+        } @else {
+          <a routerLink="/register" class="btn-primary large">
+            <span>Get Started</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </a>
+          <a routerLink="/login" class="btn-secondary large">
+            <span>Sign In</span>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+</div>
+
