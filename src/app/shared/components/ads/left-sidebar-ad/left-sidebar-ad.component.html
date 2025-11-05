@@ -1,8 +1,9 @@
-@if (currentAd(); as ad) {
-  <div class="sidebar-ad-container left-sidebar">
-    <div class="sidebar-ad" [class.transitioning]="isTransitioning()" (click)="onAdClick(ad)">
-      <span class="ad-label">💎 Premium</span>
-      
+<!-- Stacked Sidebar Ads -->
+<div class="sidebar-ads-stack">
+  @for (ad of ads(); track ad.id) {
+    <div class="sidebar-ad-card" (click)="onAdClick(ad)">
+      <span class="ad-label">💎 Ad</span>
+
       @if (ad.image_url) {
         <div class="ad-image-wrapper">
           <img [src]="ad.image_url" [alt]="ad.title" class="ad-image">
@@ -20,7 +21,7 @@
         }
         <h4 class="ad-title">{{ ad.title }}</h4>
         <p class="ad-description">{{ ad.description }}</p>
-        
+
         <button class="ad-cta" (click)="onAdClick(ad); $event.stopPropagation()">
           {{ ad.cta_text }}
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="cta-icon">
@@ -28,18 +29,7 @@
           </svg>
         </button>
       </div>
-
-      @if (ads().length > 1) {
-        <div class="ad-indicators">
-          @for (ad of ads(); track ad.id; let i = $index) {
-            <div 
-              class="indicator" 
-              [class.active]="i === currentAdIndex()">
-            </div>
-          }
-        </div>
-      }
     </div>
-  </div>
-}
+  }
+</div>
 

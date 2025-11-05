@@ -272,27 +272,30 @@
     </div>
   }
 
-  <!-- Header Ad - Floating on top -->
+  <!-- Header Ad - Full Width at Top -->
   <div class="header-ad-overlay">
     <app-header-ad></app-header-ad>
   </div>
 
-  <!-- Left Sidebar Ad - Floating on top -->
-  <div class="left-sidebar-ad-overlay">
-    <app-left-sidebar-ad></app-left-sidebar-ad>
+  <!-- 3-Column Grid Layout: Left Sidebar | Main Content | Right Sidebar -->
+  <div class="content-grid">
+    <!-- Left Sidebar Ads -->
+    <aside class="left-sidebar-ads">
+      <app-left-sidebar-ad></app-left-sidebar-ad>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- Right Sidebar Ads -->
+    <aside class="right-sidebar-ads">
+      <app-right-sidebar-ad></app-right-sidebar-ad>
+    </aside>
   </div>
 
-  <!-- Right Sidebar Ad - Floating on top -->
-  <div class="right-sidebar-ad-overlay">
-    <app-right-sidebar-ad></app-right-sidebar-ad>
-  </div>
-
-  <!-- Main Content - Full Width -->
-  <main class="main-wrapper">
-    <router-outlet></router-outlet>
-  </main>
-
-  <!-- Footer Ad - Floating on top -->
+  <!-- Footer Ad - Full Width at Bottom -->
   <div class="footer-ad-overlay">
     <app-footer-ad></app-footer-ad>
   </div>
