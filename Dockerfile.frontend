@@ -1,0 +1,20 @@
+FROM node:20.19.5-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install -g @angular/cli@20.1.0-next.0
+RUN npm install
+
+# Copy application files
+COPY . .
+
+# Expose port
+EXPOSE 4200
+
+# Start the development server
+CMD ["npm", "start", "--", "--host", "0.0.0.0", "--poll", "2000"]
+

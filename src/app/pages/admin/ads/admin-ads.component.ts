@@ -1,10 +1,10 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 
 import { AdminService } from '../../../core/services/admin.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 
 interface Ad {
   id: string;
@@ -13,7 +13,8 @@ interface Ad {
   imageUrl: string;
   targetUrl: string;
   placement: string;
-  status: 'active' | 'paused' | 'scheduled' | 'expired';
+  category?: string;
+  status: 'active' | 'paused' | 'scheduled' | 'expired' | 'draft';
   impressions: number;
   clicks: number;
   ctr: number;
@@ -46,6 +47,7 @@ interface AdStats {
 export class AdminAdsComponent implements OnInit {
   private authService = inject(AuthService);
   private adminService = inject(AdminService);
+  private router = inject(Router);
   currentUser = this.authService.currentUser;
 
   // State signals
@@ -59,6 +61,20 @@ export class AdminAdsComponent implements OnInit {
     averageCTR: 0,
     totalSpent: 0
   });
+
+  // Error states
+  loadError = signal<string | null>(null);
+  statsError = signal<string | null>(null);
+  actionError = signal<string | null>(null);
+
+  // Action loading states
+  isPausing = signal<string | null>(null); // stores ad ID being paused
+  isResuming = signal<string | null>(null); // stores ad ID being resumed
+  isDeleting = signal<string | null>(null); // stores ad ID being deleted
+
+  // Toast notification
+  toastMessage = signal<string | null>(null);
+  toastType = signal<'success' | 'error' | 'info'>('info');
 
   // Filter signals
   searchQuery = signal<string>('');
@@ -146,6 +162,7 @@ export class AdminAdsComponent implements OnInit {
 
   loadAds(): void {
     this.isLoading.set(true);
+    this.loadError.set(null);
 
     const params = {
       page: this.currentPage(),
@@ -165,6 +182,7 @@ export class AdminAdsComponent implements OnInit {
           imageUrl: ad.image_url,
           targetUrl: ad.target_url,
           placement: ad.placement,
+          category: ad.category,
           status: ad.status,
           impressions: parseInt(ad.impressions) || 0,
           clicks: parseInt(ad.clicks) || 0,
@@ -182,13 +200,18 @@ export class AdminAdsComponent implements OnInit {
         this.ads.set(adsData);
         this.totalAds.set(response.pagination.totalAds);
         this.isLoading.set(false);
+        this.loadError.set(null);
       },
       error: (error) => {
         console.error('Error loading ads:', error);
+        this.loadError.set('Failed to load ads. Please try again.');
         this.isLoading.set(false);
-        alert('Failed to load ads. Please try again.');
       }
     });
+  }
+
+  retryLoadAds(): void {
+    this.loadAds();
   }
 
   loadStats(): void {
@@ -221,6 +244,32 @@ export class AdminAdsComponent implements OnInit {
     this.placementFilter.set('all');
     this.businessFilter.set('all');
     this.applyFilters();
+  }
+
+  // Toast notification methods
+  showToast(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
+    this.toastMessage.set(message);
+    this.toastType.set(type);
+    setTimeout(() => {
+      this.toastMessage.set(null);
+    }, 5000); // Auto-hide after 5 seconds
+  }
+
+  hideToast(): void {
+    this.toastMessage.set(null);
+  }
+
+  // Navigation methods
+  viewAdDetails(ad: Ad): void {
+    this.router.navigate(['/admin/ads', ad.id]);
+  }
+
+  createNewAd(): void {
+    this.router.navigate(['/admin/ads/create']);
+  }
+
+  editAdNavigate(ad: Ad): void {
+    this.router.navigate(['/admin/ads', ad.id, 'edit']);
   }
 
   // Ad actions
@@ -316,11 +365,12 @@ export class AdminAdsComponent implements OnInit {
         this.closeEditModal();
         this.loadAds();
         this.loadStats();
+        this.showToast(`Ad "${ad.title}" has been updated successfully.`, 'success');
       },
       error: (error) => {
         console.error('Error updating ad:', error);
         this.isUpdating.set(false);
-        alert('Failed to update ad. Please try again.');
+        this.showToast('Failed to update ad. Please try again.', 'error');
       }
     });
   }
@@ -342,33 +392,37 @@ export class AdminAdsComponent implements OnInit {
     this.isUpdating.set(true);
     this.adminService.updateAd(ad.id, { status: 'paused' }).subscribe({
       next: () => {
-        this.isUpdating.set(false);
-        this.closePauseDialog();
         this.loadAds();
         this.loadStats();
+        this.showToast(`Ad "${ad.title}" has been paused.`, 'success');
+        this.isUpdating.set(false);
+        this.closePauseDialog();
       },
       error: (error) => {
         console.error('Error pausing ad:', error);
+        this.showToast('Failed to pause ad. Please try again.', 'error');
         this.isUpdating.set(false);
-        alert('Failed to pause ad. Please try again.');
       }
     });
   }
 
   resumeAd(ad: Ad): void {
-    this.isUpdating.set(true);
-    this.adminService.updateAd(ad.id, { status: 'active' }).subscribe({
-      next: () => {
-        this.isUpdating.set(false);
-        this.loadAds();
-        this.loadStats();
-      },
-      error: (error) => {
-        console.error('Error resuming ad:', error);
-        this.isUpdating.set(false);
-        alert('Failed to resume ad. Please try again.');
-      }
-    });
+    if (confirm(`Are you sure you want to resume the ad "${ad.title}"?`)) {
+      this.isResuming.set(ad.id);
+      this.adminService.updateAd(ad.id, { status: 'active' }).subscribe({
+        next: () => {
+          this.loadAds();
+          this.loadStats();
+          this.showToast(`Ad "${ad.title}" has been resumed.`, 'success');
+          this.isResuming.set(null);
+        },
+        error: (error) => {
+          console.error('Error resuming ad:', error);
+          this.showToast('Failed to resume ad. Please try again.', 'error');
+          this.isResuming.set(null);
+        }
+      });
+    }
   }
 
   deleteAd(ad: Ad): void {
@@ -388,22 +442,18 @@ export class AdminAdsComponent implements OnInit {
     this.isUpdating.set(true);
     this.adminService.deleteAd(ad.id).subscribe({
       next: () => {
-        this.isUpdating.set(false);
-        this.closeDeleteDialog();
         this.loadAds();
         this.loadStats();
+        this.showToast(`Ad "${ad.title}" has been deleted.`, 'success');
+        this.isUpdating.set(false);
+        this.closeDeleteDialog();
       },
       error: (error) => {
         console.error('Error deleting ad:', error);
+        this.showToast('Failed to delete ad. Please try again.', 'error');
         this.isUpdating.set(false);
-        alert('Failed to delete ad. Please try again.');
       }
     });
-  }
-
-  createNewAd(): void {
-    this.resetNewAdForm();
-    this.showCreateModal.set(true);
   }
 
   closeCreateModal(): void {

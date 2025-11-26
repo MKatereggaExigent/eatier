@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log
+dist
+.angular
+.git
+.gitignore
+*.md
+backend/node_modules
+backend.log
+frontend.log
+.env.local
+.env.*.local
+

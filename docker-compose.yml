@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: itiyum-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: itiyum_platform
+      POSTGRES_USER: itiyum_user
+      POSTGRES_PASSWORD: itiyum_secure_password_2024
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5466:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U itiyum_user -d itiyum_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - itiyum-network
+
+  # Backend API (Node.js/Express)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: itiyum-backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: itiyum_platform
+      DB_USER: itiyum_user
+      DB_PASSWORD: itiyum_secure_password_2024
+      PORT: 3001
+      NODE_ENV: development
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_EXPIRES_IN: 24h
+      CORS_ORIGIN: http://localhost:4200
+      FRONTEND_URL: http://localhost:4200
+      OPENAI_API_KEY: sk-placeholder-key-for-development
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - itiyum-network
+
+  # Frontend (Angular)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: itiyum-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+    ports:
+      - "4200:4200"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - itiyum-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  itiyum-network:
+    driver: bridge

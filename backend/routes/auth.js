@@ -139,24 +139,10 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Set tenant context for RLS
-    await client.query("SELECT set_tenant_context('itiyum')");
-
-    // Get tenant ID (default to 'itiyum' tenant)
-    const tenantResult = await client.query(
-      "SELECT id FROM tenants WHERE slug = 'itiyum' LIMIT 1"
-    );
-
-    if (tenantResult.rows.length === 0) {
-      return res.status(500).json({ error: 'Tenant not found' });
-    }
-
-    const tenantId = tenantResult.rows[0].id;
-
     // Check if user already exists
     const existingUser = await client.query(
-      'SELECT id FROM users WHERE email = $1 AND tenant_id = $2',
-      [email, tenantId]
+      'SELECT id FROM users WHERE email = $1',
+      [email]
     );
 
     if (existingUser.rows.length > 0) {
@@ -167,15 +153,30 @@ router.post('/register', async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user with role
+    // Get default tenant
+    const tenantResult = await client.query(
+      "SELECT id FROM tenants WHERE slug = 'itiyum' LIMIT 1"
+    );
+
+    if (tenantResult.rows.length === 0) {
+      client.release();
+      return res.status(500).json({ error: 'Default tenant not found' });
+    }
+
+    const tenantId = tenantResult.rows[0].id;
+
+    // Set tenant context for RLS
+    await client.query("SELECT set_tenant_context('itiyum')");
+
+    // Create user with role and tenant
     const result = await client.query(`
       INSERT INTO users (
-        tenant_id, email, password_hash, first_name, last_name, phone, role, status
+        email, password_hash, first_name, last_name, phone, role, status, tenant_id
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')
-      RETURNING id, email, first_name, last_name, phone, role, status, created_at
+      VALUES ($1, $2, $3, $4, $5, $6, 'active', $7)
+      RETURNING id, email, first_name, last_name, phone, role, status, tenant_id, created_at
     `, [
-      tenantId, email, hashedPassword, firstName, lastName, phone, role
+      email, hashedPassword, firstName, lastName, phone, role, tenantId
     ]);
 
     const user = result.rows[0];
@@ -184,9 +185,9 @@ router.post('/register', async (req, res) => {
     if (role === 'business_owner' && businessName) {
       await client.query(`
         INSERT INTO businesses (
-          tenant_id, owner_id, business_name, status
-        ) VALUES ($1, $2, $3, 'pending')
-      `, [tenantId, user.id, businessName]);
+          owner_id, business_name, status, tenant_id
+        ) VALUES ($1, $2, 'pending', $3)
+      `, [user.id, businessName, tenantId]);
     }
 
     // Get security settings for session timeout
@@ -197,7 +198,7 @@ router.post('/register', async (req, res) => {
       userId: user.id,
       email: user.email,
       role: role,
-      tenant_id: tenantId
+      tenant_id: user.tenant_id
     };
 
     const accessToken = await generateAccessToken(tokenPayload, securitySettings.sessionTimeout);
@@ -240,32 +241,20 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    // Set tenant context for RLS
-    await client.query("SELECT set_tenant_context('itiyum')");
-
-    // Get tenant ID
-    const tenantResult = await client.query(
-      "SELECT id FROM tenants WHERE slug = 'itiyum' LIMIT 1"
-    );
-
-    if (tenantResult.rows.length === 0) {
-      return res.status(500).json({ error: 'Tenant not found' });
-    }
-
-    const tenantId = tenantResult.rows[0].id;
-
     // Get security settings
     const securitySettings = await getSecuritySettings();
 
-    // Find user with role information and login attempt data
+    // Find user with role information, tenant, and login attempt data
     const result = await client.query(`
       SELECT
         u.id, u.email, u.password_hash, u.first_name, u.last_name, u.phone,
-        u.avatar_url, u.status, u.tenant_id, u.role,
-        u.failed_login_attempts, u.locked_until
+        u.avatar_url, u.status, u.role, u.tenant_id,
+        u.failed_login_attempts, u.locked_until,
+        t.slug as tenant_slug
       FROM users u
-      WHERE u.email = $1 AND u.tenant_id = $2
-    `, [email, tenantId]);
+      LEFT JOIN tenants t ON u.tenant_id = t.id
+      WHERE u.email = $1
+    `, [email]);
 
     if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Invalid email or password' });
@@ -322,6 +311,11 @@ router.post('/login', async (req, res) => {
           attemptsRemaining
         });
       }
+    }
+
+    // Set tenant context for RLS
+    if (user.tenant_slug) {
+      await client.query(`SELECT set_tenant_context('${user.tenant_slug}')`);
     }
 
     // Successful login - reset failed attempts and locked_until

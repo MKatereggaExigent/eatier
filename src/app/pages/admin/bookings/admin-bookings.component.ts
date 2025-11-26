@@ -1,10 +1,10 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 
 import { AdminService } from '../../../core/services/admin.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 
 export interface AdminBooking {
   id: string;
@@ -53,6 +53,7 @@ export interface BookingFilters {
 export class AdminBookingsComponent implements OnInit {
   private authService = inject(AuthService);
   private adminService = inject(AdminService);
+  private router = inject(Router);
 
   currentUser = this.authService.currentUser;
 
@@ -63,6 +64,19 @@ export class AdminBookingsComponent implements OnInit {
   isLoading = signal(false);
   bookings = signal<AdminBooking[]>([]);
   selectedBooking = signal<AdminBooking | null>(null);
+
+  // Error states
+  loadError = signal<string | null>(null);
+  actionError = signal<string | null>(null);
+
+  // Action loading states
+  isConfirming = signal<string | null>(null); // stores booking ID being confirmed
+  isCancelling = signal<string | null>(null); // stores booking ID being cancelled
+  isCompleting = signal<string | null>(null); // stores booking ID being completed
+
+  // Toast notification
+  toastMessage = signal<string | null>(null);
+  toastType = signal<'success' | 'error' | 'info'>('info');
 
   // Pagination
   currentPage = signal(1);
@@ -142,6 +156,7 @@ export class AdminBookingsComponent implements OnInit {
   // Data loading methods
   loadBookings(): void {
     this.isLoading.set(true);
+    this.loadError.set(null);
 
     const currentFilters = this.filters();
     const searchTerm = this.searchQuery();
@@ -189,13 +204,18 @@ export class AdminBookingsComponent implements OnInit {
 
         this.bookings.set(mappedBookings);
         this.isLoading.set(false);
+        this.loadError.set(null);
       },
       error: (error) => {
         console.error('Error loading bookings:', error);
+        this.loadError.set('Failed to load bookings. Please try again.');
         this.isLoading.set(false);
-        alert('Failed to load bookings. Please try again.');
       }
     });
+  }
+
+  retryLoadBookings(): void {
+    this.loadBookings();
   }
 
   // UI interaction methods
@@ -241,13 +261,25 @@ export class AdminBookingsComponent implements OnInit {
 
   // Booking actions
   viewBookingDetails(booking: AdminBooking): void {
-    this.selectedBooking.set(booking);
-    this.showBookingModal.set(true);
+    this.router.navigate(['/admin/bookings', booking.id]);
   }
 
   closeBookingModal(): void {
     this.selectedBooking.set(null);
     this.showBookingModal.set(false);
+  }
+
+  // Toast notification methods
+  showToast(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
+    this.toastMessage.set(message);
+    this.toastType.set(type);
+    setTimeout(() => {
+      this.toastMessage.set(null);
+    }, 5000); // Auto-hide after 5 seconds
+  }
+
+  hideToast(): void {
+    this.toastMessage.set(null);
   }
 
   confirmBooking(booking: AdminBooking): void {
@@ -265,14 +297,18 @@ export class AdminBookingsComponent implements OnInit {
     const action = this.pendingAction();
     if (!action.booking) return;
 
+    this.isConfirming.set(action.booking.id);
     this.adminService.confirmBooking(action.booking.id).subscribe({
       next: () => {
         this.loadBookings(); // Reload to get fresh data
         this.showConfirmDialog.set(false);
+        this.showToast(`Booking for ${action.booking!.userName} has been confirmed.`, 'success');
+        this.isConfirming.set(null);
       },
       error: (error) => {
         console.error('Error confirming booking:', error);
-        alert('Failed to confirm booking. Please try again.');
+        this.showToast('Failed to confirm booking. Please try again.', 'error');
+        this.isConfirming.set(null);
       }
     });
   }
@@ -282,19 +318,23 @@ export class AdminBookingsComponent implements OnInit {
     const reason = this.cancelReason();
 
     if (!action.booking || !reason.trim()) {
-      alert('Please provide a cancellation reason.');
+      this.showToast('Please provide a cancellation reason.', 'error');
       return;
     }
 
+    this.isCancelling.set(action.booking.id);
     this.adminService.cancelBooking(action.booking.id, reason).subscribe({
       next: () => {
         this.loadBookings(); // Reload to get fresh data
         this.showCancelDialog.set(false);
         this.cancelReason.set('');
+        this.showToast(`Booking for ${action.booking!.userName} has been cancelled.`, 'success');
+        this.isCancelling.set(null);
       },
       error: (error) => {
         console.error('Error cancelling booking:', error);
-        alert('Failed to cancel booking. Please try again.');
+        this.showToast('Failed to cancel booking. Please try again.', 'error');
+        this.isCancelling.set(null);
       }
     });
   }
@@ -308,6 +348,15 @@ export class AdminBookingsComponent implements OnInit {
     this.showCancelDialog.set(false);
     this.pendingAction.set({ type: 'cancel', booking: null });
     this.cancelReason.set('');
+  }
+
+  // Navigation methods
+  viewUserDetails(userId: string): void {
+    this.router.navigate(['/admin/users', userId]);
+  }
+
+  viewBusinessDetails(businessId: string): void {
+    this.router.navigate(['/admin/businesses', businessId]);
   }
 
   // Utility methods

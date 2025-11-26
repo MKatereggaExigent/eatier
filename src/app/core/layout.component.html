@@ -47,16 +47,36 @@
         <button type="button" class="search-btn" title="Search" (click)="toggleSearch(); $event.stopPropagation()">
           🔍
         </button>
-        <button type="button" class="notifications-btn" title="Notifications" (click)="toggleNotifications(); $event.stopPropagation()">
-          🔔
-        </button>
+
+        <!-- Notifications - Only show for authenticated users -->
+        @if (isLoggedIn()) {
+          <button type="button" class="notifications-btn" title="Notifications" (click)="toggleNotifications(); $event.stopPropagation()">
+            🔔
+            @if (unreadCount() > 0) {
+              <span class="notification-badge">{{ unreadCount() }}</span>
+            }
+          </button>
+        }
+
         <div class="profile-dropdown" (click)="$event.stopPropagation()">
-          <button type="button" class="profile-btn" title="Profile" (click)="toggleProfileMenu()">
-            <img
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face"
-              alt="Profile"
-              class="profile-avatar"
-            />
+          <button type="button" class="profile-btn" title="@if (isLoggedIn()) { Profile } @else { Account }" (click)="toggleProfileMenu()">
+            @if (isLoggedIn()) {
+              <!-- Show user avatar or initials when logged in -->
+              @if (currentUser()?.avatar) {
+                <img
+                  [src]="currentUser()?.avatar"
+                  alt="Profile"
+                  class="profile-avatar"
+                />
+              } @else {
+                <div class="profile-avatar-initials">
+                  {{ userInitials() }}
+                </div>
+              }
+            } @else {
+              <!-- Show generic user icon when not logged in -->
+              <span class="profile-icon-guest">👤</span>
+            }
           </button>
           <!-- Profile Dropdown Menu -->
           @if (showProfileMenu()) {

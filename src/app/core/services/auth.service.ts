@@ -12,13 +12,19 @@ import {
   UserStatus
 } from '../../shared/models/user.model';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { Injectable, computed, signal } from '@angular/core';
-import { delay, map, tap } from 'rxjs/operators';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { catchError, delay, map, tap } from 'rxjs/operators';
+
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = environment.apiUrl;
+
   private readonly TOKEN_KEY = 'itiyum_token';
   private readonly REFRESH_TOKEN_KEY = 'itiyum_refresh_token';
   private readonly USER_KEY = 'itiyum_user';
@@ -62,13 +68,6 @@ export class AuthService {
     if (token && userJson) {
       try {
         const user = JSON.parse(userJson) as User;
-        // Check if user has old role names and clear auth data if so
-        const oldRoles = ['business_owner', 'individual_user', 'chef', 'waitstaff', 'admin'];
-        if (oldRoles.includes(user.role as any)) {
-          console.log('Clearing auth data due to old role format:', user.role);
-          this.clearAuthData();
-          return;
-        }
         this.setCurrentUser(user);
       } catch (error) {
         console.error('Error parsing stored user data:', error);
@@ -105,10 +104,17 @@ export class AuthService {
   login(credentials: LoginCredentials): Observable<AuthResponse> {
     this.setLoading(true);
 
-    // Mock authentication - replace with actual API call
-    return this.mockLogin(credentials).pipe(
+    // Call actual backend API
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials, {
+      withCredentials: true // Include cookies for HTTP-only cookie handling
+    }).pipe(
       tap(response => {
         this.handleAuthSuccess(response);
+      }),
+      catchError(error => {
+        this.setLoading(false);
+        const errorMessage = error.error?.error || error.error?.message || 'Login failed. Please try again.';
+        return throwError(() => new Error(errorMessage));
       }),
       tap(() => this.setLoading(false))
     );
@@ -128,10 +134,17 @@ export class AuthService {
   register(registrationData: UserRegistrationData): Observable<AuthResponse> {
     this.setLoading(true);
 
-    // Mock registration - replace with actual API call
-    return this.mockRegister(registrationData).pipe(
+    // Call actual backend API
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, registrationData, {
+      withCredentials: true // Include cookies for HTTP-only cookie handling
+    }).pipe(
       tap(response => {
         this.handleAuthSuccess(response);
+      }),
+      catchError(error => {
+        this.setLoading(false);
+        const errorMessage = error.error?.error || error.error?.message || 'Registration failed. Please try again.';
+        return throwError(() => new Error(errorMessage));
       }),
       tap(() => this.setLoading(false))
     );
@@ -258,9 +271,18 @@ export class AuthService {
   }
 
   private handleAuthSuccess(response: AuthResponse): void {
-    localStorage.setItem(this.TOKEN_KEY, response.token);
-    localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
+    // Store access token (backend also sets HTTP-only cookie)
+    localStorage.setItem(this.TOKEN_KEY, response.accessToken);
+
+    // Store refresh token if provided (backend also sets HTTP-only cookie)
+    if (response.refreshToken) {
+      localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
+    }
+
+    // Store user information
     localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
+
+    // Update current user state
     this.setCurrentUser(response.user);
   }
 
@@ -291,7 +313,7 @@ export class AuthService {
         if (registeredUser && registeredUser.password === credentials.password) {
           console.log('Login successful for registered user:', credentials.email);
           return {
-            token: this.generateToken(),
+            accessToken: this.generateToken(),
             refreshToken: this.generateToken(),
             user: registeredUser.user,
             expiresIn: 3600
@@ -529,7 +551,7 @@ export class AuthService {
 
         return {
           user,
-          token: this.generateToken(),
+          accessToken: this.generateToken(),
           refreshToken: this.generateToken(),
           expiresIn: 3600
         };
@@ -545,7 +567,7 @@ export class AuthService {
 
     return of({
       user: currentUser,
-      token: 'new-mock-jwt-token',
+      accessToken: 'new-mock-jwt-token',
       refreshToken: 'new-mock-refresh-token',
       expiresIn: 3600
     }).pipe(delay(500));
@@ -597,7 +619,7 @@ export class AuthService {
 
         return {
           user: socialUser,
-          token: this.generateToken(),
+          accessToken: this.generateToken(),
           refreshToken: this.generateToken(),
           expiresIn: 3600
         };
@@ -653,7 +675,7 @@ export class AuthService {
 
     return {
       user,
-      token: 'mock-jwt-token',
+      accessToken: 'mock-jwt-token',
       refreshToken: 'mock-refresh-token',
       expiresIn: 3600
     };
@@ -703,7 +725,7 @@ export class AuthService {
 
     return {
       user,
-      token: 'mock-jwt-token',
+      accessToken: 'mock-jwt-token',
       refreshToken: 'mock-refresh-token',
       expiresIn: 3600
     };
@@ -779,7 +801,7 @@ export class AuthService {
 
     return {
       user,
-      token: 'mock-jwt-token',
+      accessToken: 'mock-jwt-token',
       refreshToken: 'mock-refresh-token',
       expiresIn: 3600
     };
@@ -817,7 +839,7 @@ export class AuthService {
 
     return {
       user,
-      token: 'mock-admin-token-' + Date.now(),
+      accessToken: 'mock-admin-token-' + Date.now(),
       refreshToken: 'mock-admin-refresh-token-' + Date.now(),
       expiresIn: 3600
     };
@@ -883,7 +905,7 @@ export class AuthService {
 
     return {
       user,
-      token: 'mock-food-enthusiast-token-' + Date.now(),
+      accessToken: 'mock-food-enthusiast-token-' + Date.now(),
       refreshToken: 'mock-food-enthusiast-refresh-token-' + Date.now(),
       expiresIn: 3600
     };

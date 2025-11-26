@@ -1,10 +1,10 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 
 import { AdminService } from '../../../core/services/admin.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 
 export interface AdminBusiness {
   id: string;
@@ -48,6 +48,7 @@ export interface BusinessFilters {
 export class AdminBusinessesComponent implements OnInit {
   private authService = inject(AuthService);
   private adminService = inject(AdminService);
+  private router = inject(Router);
 
   currentUser = this.authService.currentUser;
 
@@ -58,6 +59,19 @@ export class AdminBusinessesComponent implements OnInit {
   isLoading = signal(false);
   businesses = signal<AdminBusiness[]>([]);
   selectedBusiness = signal<AdminBusiness | null>(null);
+
+  // Error states
+  loadError = signal<string | null>(null);
+  actionError = signal<string | null>(null);
+
+  // Action loading states
+  isActivating = signal<string | null>(null); // stores business ID being activated
+  isSuspending = signal<string | null>(null); // stores business ID being suspended
+  isDeleting = signal<string | null>(null); // stores business ID being deleted
+
+  // Toast notification
+  toastMessage = signal<string | null>(null);
+  toastType = signal<'success' | 'error' | 'info'>('info');
 
   // Pagination
   currentPage = signal(1);
@@ -201,6 +215,7 @@ export class AdminBusinessesComponent implements OnInit {
   // Data loading methods
   loadBusinesses(): void {
     this.isLoading.set(true);
+    this.loadError.set(null);
 
     const currentFilters = this.filters();
     const searchTerm = this.searchQuery();
@@ -246,13 +261,18 @@ export class AdminBusinessesComponent implements OnInit {
 
         this.businesses.set(mappedBusinesses);
         this.isLoading.set(false);
+        this.loadError.set(null);
       },
       error: (error) => {
         console.error('Error loading businesses:', error);
+        this.loadError.set('Failed to load businesses. Please try again.');
         this.isLoading.set(false);
-        alert('Failed to load businesses. Please try again.');
       }
     });
+  }
+
+  retryLoadBusinesses(): void {
+    this.loadBusinesses();
   }
 
   // UI interaction methods
@@ -303,8 +323,11 @@ export class AdminBusinessesComponent implements OnInit {
 
   // Business actions
   viewBusinessDetails(business: AdminBusiness): void {
-    this.selectedBusiness.set(business);
-    this.showBusinessModal.set(true);
+    this.router.navigate(['/admin/businesses', business.id]);
+  }
+
+  editBusiness(business: AdminBusiness): void {
+    this.router.navigate(['/admin/businesses', business.id, 'edit']);
   }
 
   closeBusinessModal(): void {
@@ -312,7 +335,21 @@ export class AdminBusinessesComponent implements OnInit {
     this.showBusinessModal.set(false);
   }
 
+  // Toast notification methods
+  showToast(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
+    this.toastMessage.set(message);
+    this.toastType.set(type);
+    setTimeout(() => {
+      this.toastMessage.set(null);
+    }, 5000); // Auto-hide after 5 seconds
+  }
+
+  hideToast(): void {
+    this.toastMessage.set(null);
+  }
+
   verifyBusiness(business: AdminBusiness): void {
+    // TODO: Replace with custom confirmation modal
     if (confirm(`Are you sure you want to verify ${business.name}?`)) {
       this.adminService.verifyBusiness(business.id).subscribe({
         next: () => {
@@ -322,19 +359,21 @@ export class AdminBusinessesComponent implements OnInit {
             b.id === business.id ? { ...b, verified: true } : b
           );
           this.businesses.set(updatedBusinesses);
-          alert(`${business.name} has been verified successfully.`);
+          this.showToast(`${business.name} has been verified successfully.`, 'success');
         },
         error: (error) => {
           console.error('Error verifying business:', error);
-          alert('Failed to verify business. Please try again.');
+          this.showToast('Failed to verify business. Please try again.', 'error');
         }
       });
     }
   }
 
   suspendBusiness(business: AdminBusiness): void {
+    // TODO: Replace with custom input modal
     const reason = prompt(`Enter reason for suspending ${business.name}:`);
     if (reason !== null) {
+      this.isSuspending.set(business.id);
       this.adminService.suspendBusiness(business.id, reason).subscribe({
         next: () => {
           // Update the business in the list
@@ -343,18 +382,22 @@ export class AdminBusinessesComponent implements OnInit {
             b.id === business.id ? { ...b, status: 'suspended' as const } : b
           );
           this.businesses.set(updatedBusinesses);
-          alert(`${business.name} has been suspended.`);
+          this.showToast(`${business.name} has been suspended.`, 'success');
+          this.isSuspending.set(null);
         },
         error: (error) => {
           console.error('Error suspending business:', error);
-          alert('Failed to suspend business. Please try again.');
+          this.showToast('Failed to suspend business. Please try again.', 'error');
+          this.isSuspending.set(null);
         }
       });
     }
   }
 
   activateBusiness(business: AdminBusiness): void {
+    // TODO: Replace with custom confirmation modal
     if (confirm(`Are you sure you want to activate ${business.name}?`)) {
+      this.isActivating.set(business.id);
       this.adminService.activateBusiness(business.id).subscribe({
         next: () => {
           // Update the business in the list
@@ -363,11 +406,13 @@ export class AdminBusinessesComponent implements OnInit {
             b.id === business.id ? { ...b, status: 'active' as const } : b
           );
           this.businesses.set(updatedBusinesses);
-          alert(`${business.name} has been activated.`);
+          this.showToast(`${business.name} has been activated.`, 'success');
+          this.isActivating.set(null);
         },
         error: (error) => {
           console.error('Error activating business:', error);
-          alert('Failed to activate business. Please try again.');
+          this.showToast('Failed to activate business. Please try again.', 'error');
+          this.isActivating.set(null);
         }
       });
     }
@@ -381,21 +426,25 @@ export class AdminBusinessesComponent implements OnInit {
   confirmDelete(): void {
     const business = this.selectedBusiness();
     if (business) {
+      this.isDeleting.set(business.id);
       this.adminService.deleteBusiness(business.id).subscribe({
         next: () => {
           // Remove the business from the list
           const businesses = this.businesses();
           const updatedBusinesses = businesses.filter(b => b.id !== business.id);
           this.businesses.set(updatedBusinesses);
+          this.totalBusinesses.update(total => total - 1);
           this.showDeleteConfirm.set(false);
           this.selectedBusiness.set(null);
-          alert(`${business.name} has been deleted successfully.`);
+          this.showToast(`${business.name} has been deleted successfully.`, 'success');
+          this.isDeleting.set(null);
         },
         error: (error) => {
           console.error('Error deleting business:', error);
-          alert('Failed to delete business. Please try again.');
+          this.showToast('Failed to delete business. Please try again.', 'error');
           this.showDeleteConfirm.set(false);
           this.selectedBusiness.set(null);
+          this.isDeleting.set(null);
         }
       });
     }

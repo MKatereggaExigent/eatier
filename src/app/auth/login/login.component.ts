@@ -110,47 +110,6 @@ export class LoginComponent {
     }
   }
 
-  // Demo login methods for testing
-  loginAsBusinessOwner(): void {
-    this.loginForm.patchValue({
-      email: 'business@example.com',
-      password: 'password123'
-    });
-    this.onSubmit();
-  }
-
-  loginAsIndividualUser(): void {
-    this.loginForm.patchValue({
-      email: 'user@example.com',
-      password: 'password123'
-    });
-    this.onSubmit();
-  }
-
-  loginAsChef(): void {
-    this.loginForm.patchValue({
-      email: 'chef@example.com',
-      password: 'password123'
-    });
-    this.onSubmit();
-  }
-
-  loginAsNormalUser(): void {
-    this.loginForm.patchValue({
-      email: 'normaluser@example.com',
-      password: 'password123'
-    });
-    this.onSubmit();
-  }
-
-  loginAsAdmin(): void {
-    this.loginForm.patchValue({
-      email: 'admin@example.com',
-      password: 'password123'
-    });
-    this.onSubmit();
-  }
-
   // Social Login Methods
   loginWithGoogle(): void {
     this.errorMessage.set(null);

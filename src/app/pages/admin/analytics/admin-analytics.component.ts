@@ -1,9 +1,9 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 
 import { AdminService } from '../../../core/services/admin.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 
 interface Statistics {
   totalUsers: number;
@@ -47,6 +47,31 @@ interface BookingStatus {
   count: number;
 }
 
+interface AIInsight {
+  title: string;
+  description: string;
+  type: 'positive' | 'warning' | 'critical' | 'neutral';
+  priority: 'high' | 'medium' | 'low';
+  recommendation: string;
+}
+
+interface RevenueForecast {
+  month: string;
+  predicted_total: number;
+  predicted_subscription: number;
+  predicted_commission: number;
+  confidence: 'high' | 'medium' | 'low';
+  reasoning: string;
+}
+
+interface Anomaly {
+  metric: string;
+  description: string;
+  severity: 'high' | 'medium' | 'low';
+  impact: string;
+  suggested_action: string;
+}
+
 @Component({
   selector: 'app-admin-analytics',
   standalone: true,
@@ -57,11 +82,20 @@ interface BookingStatus {
 export class AdminAnalyticsComponent implements OnInit {
   private authService = inject(AuthService);
   private adminService = inject(AdminService);
+  private router = inject(Router);
 
   currentUser = this.authService.currentUser;
 
   // State management
   isLoading = signal(false);
+
+  // Error states
+  loadError = signal<string | null>(null);
+  statsError = signal<string | null>(null);
+
+  // Toast notification
+  toastMessage = signal<string | null>(null);
+  toastType = signal<'success' | 'error' | 'info'>('info');
 
   // Statistics
   statistics = signal<Statistics>({
@@ -84,12 +118,22 @@ export class AdminAnalyticsComponent implements OnInit {
   businessTypes = signal<BusinessType[]>([]);
   bookingStatus = signal<BookingStatus[]>([]);
 
+  // AI-powered analytics
+  aiInsights = signal<AIInsight[]>([]);
+  revenueForecast = signal<RevenueForecast[]>([]);
+  forecastTrend = signal<string>('stable');
+  forecastGrowthRate = signal<number>(0);
+  anomalies = signal<Anomaly[]>([]);
+  isLoadingAI = signal<boolean>(false);
+
   ngOnInit() {
     this.loadAnalytics();
+    this.loadAIInsights();
   }
 
   loadAnalytics(): void {
     this.isLoading.set(true);
+    this.loadError.set(null);
 
     this.adminService.getAnalytics().subscribe({
       next: (response: any) => {
@@ -155,13 +199,100 @@ export class AdminAnalyticsComponent implements OnInit {
         );
 
         this.isLoading.set(false);
+        this.loadError.set(null);
       },
       error: (error) => {
         console.error('Error loading analytics:', error);
+        this.loadError.set('Failed to load analytics. Please try again.');
         this.isLoading.set(false);
-        alert('Failed to load analytics. Please try again.');
+        this.showToast('Failed to load analytics. Please try again.', 'error');
       }
     });
+  }
+
+  retryLoadAnalytics(): void {
+    this.loadAnalytics();
+  }
+
+  loadAIInsights(): void {
+    this.isLoadingAI.set(true);
+
+    this.adminService.getAIInsights().subscribe({
+      next: (response) => {
+        this.aiInsights.set(response.insights || []);
+        this.revenueForecast.set(response.forecast || []);
+        this.forecastTrend.set(response.forecastTrend || 'stable');
+        this.forecastGrowthRate.set(response.forecastGrowthRate || 0);
+        this.anomalies.set(response.anomalies || []);
+        this.isLoadingAI.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading AI insights:', error);
+        this.isLoadingAI.set(false);
+        this.showToast('AI insights temporarily unavailable', 'info');
+      }
+    });
+  }
+
+  // Toast notification methods
+  showToast(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
+    this.toastMessage.set(message);
+    this.toastType.set(type);
+    setTimeout(() => {
+      this.toastMessage.set(null);
+    }, 5000); // Auto-hide after 5 seconds
+  }
+
+  hideToast(): void {
+    this.toastMessage.set(null);
+  }
+
+  // Navigation methods
+  viewAllUsers(): void {
+    this.router.navigate(['/admin/users']);
+  }
+
+  viewAllBusinesses(): void {
+    this.router.navigate(['/admin/businesses']);
+  }
+
+  viewAllBookings(): void {
+    this.router.navigate(['/admin/bookings']);
+  }
+
+  viewUsersByCountry(country: string): void {
+    // Navigate to users page with country filter
+    this.router.navigate(['/admin/users'], { queryParams: { country } });
+  }
+
+  viewUsersByRole(role: string): void {
+    // Navigate to users page with role filter
+    this.router.navigate(['/admin/users'], { queryParams: { role } });
+  }
+
+  viewBusinessesByType(businessType: string): void {
+    // Navigate to businesses page with type filter
+    this.router.navigate(['/admin/businesses'], { queryParams: { type: businessType } });
+  }
+
+  viewBusinessesByPriceRange(priceRange: string): void {
+    // Navigate to businesses page with price range filter
+    this.router.navigate(['/admin/businesses'], { queryParams: { priceRange } });
+  }
+
+  viewBookingsByStatus(status: string): void {
+    // Navigate to bookings page with status filter
+    this.router.navigate(['/admin/bookings'], { queryParams: { status } });
+  }
+
+  exportAnalytics(): void {
+    // TODO: Implement analytics export functionality
+    this.showToast('Export functionality coming soon!', 'info');
+  }
+
+  refreshAnalytics(): void {
+    this.loadAnalytics();
+    this.showToast('Analytics refreshed successfully!', 'success');
   }
 
   // Utility methods
@@ -174,6 +305,22 @@ export class AdminAnalyticsComponent implements OnInit {
 
   formatNumber(num: number): string {
     return new Intl.NumberFormat('en-US').format(num);
+  }
+
+  formatRole(role: string): string {
+    // Convert snake_case to Title Case
+    return role
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  formatPriceRange(priceRange: string): string {
+    // Convert snake_case to Title Case
+    return priceRange
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
   getMaxValue(data: any[], key: string): number {

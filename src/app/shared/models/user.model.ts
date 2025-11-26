@@ -275,8 +275,9 @@ export interface LoginCredentials {
 }
 
 export interface AuthResponse {
+  message?: string;
   user: User;
-  token: string;
-  refreshToken: string;
+  accessToken: string;
+  refreshToken?: string;
   expiresIn: number;
 }

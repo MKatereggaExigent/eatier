@@ -5,19 +5,68 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface AdminStatistics {
+  // User metrics
   totalUsers: number;
+  newUsers30d: number;
+  newUsers7d: number;
+  businessOwners: number;
+  foodEnthusiasts: number;
+  normalUsers: number;
+  specialists: number;
+
+  // Business metrics
   totalBusinesses: number;
+  activeBusinesses: number;
+  pendingBusinesses: number;
+  suspendedBusinesses: number;
+  newBusinesses30d: number;
+  featuredBusinesses: number;
+  avgBusinessRating: number;
+
+  // Subscription metrics (REVENUE STREAM #1)
+  totalSubscriptions: number;
+  activeSubscriptions: number;
+  cancelledSubscriptions: number;
+  expiredSubscriptions: number;
+  freePlanCount: number;
+  starterPlanCount: number;
+  professionalPlanCount: number;
+  enterprisePlanCount: number;
+  monthlySubscriptionRevenue: number;
+  totalPotentialRevenue: number;
+
+  // Booking metrics (REVENUE STREAM #2)
   totalBookings: number;
   confirmedBookings: number;
+  completedBookings: number;
+  cancelledBookings: number;
+  bookings30d: number;
+  bookings7d: number;
+  avgPartySize: number;
+
+  // Ad metrics (REVENUE STREAM #3)
+  totalCampaigns: number;
+  activeCampaigns: number;
+  completedCampaigns: number;
+  pausedCampaigns: number;
+  totalAdBudget: number;
+  totalAdSpent: number;
+  totalImpressions: number;
+  totalClicks: number;
+  totalConversions: number;
+  avgCTR: number;
+
+  // Revenue breakdown
+  subscriptionRevenue: number;
+  adRevenue: number;
+  commissionRevenue: number;
   totalRevenue: number;
-  newUsers30d: number;
-  newBusinesses30d: number;
-  newUsersToday: number;
-  newBusinessesToday: number;
-  newBookingsToday: number;
-  pendingBookings: number;
-  revenue30d: number;
-  lastUpdated: Date;
+
+  // Legacy/computed fields
+  monthlyActiveUsers: number;
+  monthlyRevenue: number;
+  monthlyBookings: number;
+  lastUpdated?: Date;
 }
 
 export interface ActivityLog {
@@ -47,6 +96,33 @@ export interface SystemAlert {
   message: string;
   isRead: boolean;
   createdAt: Date;
+}
+
+export interface GeoLocation {
+  id: string;
+  name: string;
+  state: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+  businesses: number;
+  users: number;
+  bookings: number;
+  revenue: number;
+}
+
+export interface RegionalStats {
+  id: string;
+  name: string;
+  businesses: number;
+  users: number;
+  bookings: number;
+  revenue: number;
+}
+
+export interface GeographicalDistribution {
+  locations: GeoLocation[];
+  regions: RegionalStats[];
 }
 
 @Injectable({
@@ -403,6 +479,24 @@ export class AdminService {
    */
   deleteAd(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/ads/${id}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get geographical distribution data
+   */
+  getGeographicalDistribution(): Observable<GeographicalDistribution> {
+    return this.http.get<GeographicalDistribution>(`${this.apiUrl}/geographical-distribution`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get AI-powered analytics insights
+   */
+  getAIInsights(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/analytics/ai-insights`, {
       headers: this.getHeaders()
     });
   }

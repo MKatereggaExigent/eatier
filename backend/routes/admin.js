@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('../config/database');
+const analyticsAIService = require('../services/analyticsAIService');
 const router = express.Router();
 
 // Middleware to check admin role
@@ -10,36 +11,228 @@ const requireAdmin = (req, res, next) => {
 };
 
 // ===================================
-// STATISTICS
+// STATISTICS - COMPREHENSIVE PLATFORM METRICS
 // ===================================
 router.get('/statistics', requireAdmin, async (req, res) => {
   try {
+    // Get comprehensive platform statistics
     const stats = await pool.query(`
+      WITH
+      -- User metrics
+      user_metrics AS (
+        SELECT
+          COUNT(*) as total_users,
+          COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_users_30d,
+          COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE - INTERVAL '7 days') as new_users_7d,
+          COUNT(*) FILTER (WHERE role = 'business_owner') as business_owners,
+          COUNT(*) FILTER (WHERE role = 'food_enthusiast') as food_enthusiasts,
+          COUNT(*) FILTER (WHERE role = 'normal_user') as normal_users,
+          COUNT(*) FILTER (WHERE role = 'specialist') as specialists
+        FROM users
+      ),
+      -- Business metrics
+      business_metrics AS (
+        SELECT
+          COUNT(*) as total_businesses,
+          COUNT(*) FILTER (WHERE status = 'active') as active_businesses,
+          COUNT(*) FILTER (WHERE status = 'pending_verification') as pending_businesses,
+          COUNT(*) FILTER (WHERE status = 'suspended') as suspended_businesses,
+          COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_businesses_30d,
+          COUNT(*) FILTER (WHERE is_featured = true) as featured_businesses,
+          AVG(average_rating) as avg_business_rating,
+          SUM(total_bookings) as total_business_bookings
+        FROM businesses
+      ),
+      -- Subscription metrics
+      subscription_metrics AS (
+        SELECT
+          COUNT(*) as total_subscriptions,
+          COUNT(*) FILTER (WHERE status = 'active') as active_subscriptions,
+          COUNT(*) FILTER (WHERE status = 'cancelled') as cancelled_subscriptions,
+          COUNT(*) FILTER (WHERE status = 'expired') as expired_subscriptions,
+          COUNT(*) FILTER (WHERE plan = 'free') as free_plan_count,
+          COUNT(*) FILTER (WHERE plan = 'starter') as starter_plan_count,
+          COUNT(*) FILTER (WHERE plan = 'professional') as professional_plan_count,
+          COUNT(*) FILTER (WHERE plan = 'enterprise') as enterprise_plan_count,
+          SUM(monthly_price) FILTER (WHERE status = 'active') as monthly_subscription_revenue,
+          SUM(monthly_price) as total_potential_revenue
+        FROM business_subscriptions
+      ),
+      -- Booking metrics
+      booking_metrics AS (
+        SELECT
+          COUNT(*) as total_bookings,
+          COUNT(*) FILTER (WHERE status = 'confirmed') as confirmed_bookings,
+          COUNT(*) FILTER (WHERE status = 'completed') as completed_bookings,
+          COUNT(*) FILTER (WHERE status = 'cancelled') as cancelled_bookings,
+          COUNT(*) FILTER (WHERE booking_date >= CURRENT_DATE - INTERVAL '30 days') as bookings_30d,
+          COUNT(*) FILTER (WHERE booking_date >= CURRENT_DATE - INTERVAL '7 days') as bookings_7d,
+          AVG(party_size) as avg_party_size,
+          COUNT(*) FILTER (WHERE status = 'completed') * 5.00 as estimated_commission
+        FROM bookings
+      ),
+      -- Ad campaign metrics (if table exists)
+      ad_metrics AS (
+        SELECT
+          0 as total_campaigns,
+          0 as active_campaigns,
+          0 as completed_campaigns,
+          0 as paused_campaigns,
+          0.00 as total_ad_budget,
+          0.00 as total_ad_spent,
+          0 as total_impressions,
+          0 as total_clicks,
+          0 as total_conversions,
+          0.00 as avg_ctr,
+          0.00 as ad_revenue
+      ),
+      -- Revenue breakdown
+      revenue_metrics AS (
+        SELECT
+          COALESCE(SUM(monthly_price) FILTER (WHERE status = 'active'), 0) as subscription_revenue,
+          0.00 as ad_revenue,
+          COALESCE((SELECT COUNT(*) * 5.00 FROM bookings WHERE status = 'completed'), 0) as commission_revenue
+        FROM business_subscriptions
+      )
+
       SELECT
-        (SELECT COUNT(*) FROM users) as total_users,
-        (SELECT COUNT(*) FROM businesses) as total_businesses,
-        (SELECT COUNT(*) FROM bookings) as total_bookings,
-        (SELECT COUNT(*) FROM bookings WHERE status = 'confirmed') as confirmed_bookings,
-        (SELECT COUNT(*) FROM bookings WHERE status = 'completed') * 50.00 as total_revenue,
-        (SELECT COUNT(*) FROM users WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_users_30d,
-        (SELECT COUNT(*) FROM businesses WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_businesses_30d
+        -- User metrics
+        um.total_users,
+        um.new_users_30d,
+        um.new_users_7d,
+        um.business_owners,
+        um.food_enthusiasts,
+        um.normal_users,
+        um.specialists,
+
+        -- Business metrics
+        bm.total_businesses,
+        bm.active_businesses,
+        bm.pending_businesses,
+        bm.suspended_businesses,
+        bm.new_businesses_30d,
+        bm.featured_businesses,
+        COALESCE(bm.avg_business_rating, 0) as avg_business_rating,
+        COALESCE(bm.total_business_bookings, 0) as total_business_bookings,
+
+        -- Subscription metrics
+        COALESCE(sm.total_subscriptions, 0) as total_subscriptions,
+        COALESCE(sm.active_subscriptions, 0) as active_subscriptions,
+        COALESCE(sm.cancelled_subscriptions, 0) as cancelled_subscriptions,
+        COALESCE(sm.expired_subscriptions, 0) as expired_subscriptions,
+        COALESCE(sm.free_plan_count, 0) as free_plan_count,
+        COALESCE(sm.starter_plan_count, 0) as starter_plan_count,
+        COALESCE(sm.professional_plan_count, 0) as professional_plan_count,
+        COALESCE(sm.enterprise_plan_count, 0) as enterprise_plan_count,
+        COALESCE(sm.monthly_subscription_revenue, 0) as monthly_subscription_revenue,
+        COALESCE(sm.total_potential_revenue, 0) as total_potential_revenue,
+
+        -- Booking metrics
+        COALESCE(bkm.total_bookings, 0) as total_bookings,
+        COALESCE(bkm.confirmed_bookings, 0) as confirmed_bookings,
+        COALESCE(bkm.completed_bookings, 0) as completed_bookings,
+        COALESCE(bkm.cancelled_bookings, 0) as cancelled_bookings,
+        COALESCE(bkm.bookings_30d, 0) as bookings_30d,
+        COALESCE(bkm.bookings_7d, 0) as bookings_7d,
+        COALESCE(bkm.avg_party_size, 0) as avg_party_size,
+        COALESCE(bkm.estimated_commission, 0) as estimated_commission,
+
+        -- Ad metrics
+        COALESCE(am.total_campaigns, 0) as total_campaigns,
+        COALESCE(am.active_campaigns, 0) as active_campaigns,
+        COALESCE(am.completed_campaigns, 0) as completed_campaigns,
+        COALESCE(am.paused_campaigns, 0) as paused_campaigns,
+        COALESCE(am.total_ad_budget, 0) as total_ad_budget,
+        COALESCE(am.total_ad_spent, 0) as total_ad_spent,
+        COALESCE(am.total_impressions, 0) as total_impressions,
+        COALESCE(am.total_clicks, 0) as total_clicks,
+        COALESCE(am.total_conversions, 0) as total_conversions,
+        COALESCE(am.avg_ctr, 0) as avg_ctr,
+        COALESCE(am.ad_revenue, 0) as ad_revenue,
+
+        -- Revenue breakdown
+        COALESCE(rm.subscription_revenue, 0) as subscription_revenue,
+        COALESCE(rm.ad_revenue, 0) as ad_platform_revenue,
+        COALESCE(rm.commission_revenue, 0) as commission_revenue,
+        COALESCE(rm.subscription_revenue + rm.ad_revenue + rm.commission_revenue, 0) as total_revenue
+
+      FROM user_metrics um
+      CROSS JOIN business_metrics bm
+      LEFT JOIN subscription_metrics sm ON true
+      LEFT JOIN booking_metrics bkm ON true
+      LEFT JOIN ad_metrics am ON true
+      CROSS JOIN revenue_metrics rm
     `);
 
     const row = stats.rows[0];
 
     res.json({
+      // User metrics
       totalUsers: parseInt(row.total_users) || 0,
+      newUsers30d: parseInt(row.new_users_30d) || 0,
+      newUsers7d: parseInt(row.new_users_7d) || 0,
+      businessOwners: parseInt(row.business_owners) || 0,
+      foodEnthusiasts: parseInt(row.food_enthusiasts) || 0,
+      normalUsers: parseInt(row.normal_users) || 0,
+      specialists: parseInt(row.specialists) || 0,
+
+      // Business metrics
       totalBusinesses: parseInt(row.total_businesses) || 0,
+      activeBusinesses: parseInt(row.active_businesses) || 0,
+      pendingBusinesses: parseInt(row.pending_businesses) || 0,
+      suspendedBusinesses: parseInt(row.suspended_businesses) || 0,
+      newBusinesses30d: parseInt(row.new_businesses_30d) || 0,
+      featuredBusinesses: parseInt(row.featured_businesses) || 0,
+      avgBusinessRating: parseFloat(row.avg_business_rating) || 0,
+
+      // Subscription metrics
+      totalSubscriptions: parseInt(row.total_subscriptions) || 0,
+      activeSubscriptions: parseInt(row.active_subscriptions) || 0,
+      cancelledSubscriptions: parseInt(row.cancelled_subscriptions) || 0,
+      expiredSubscriptions: parseInt(row.expired_subscriptions) || 0,
+      freePlanCount: parseInt(row.free_plan_count) || 0,
+      starterPlanCount: parseInt(row.starter_plan_count) || 0,
+      professionalPlanCount: parseInt(row.professional_plan_count) || 0,
+      enterprisePlanCount: parseInt(row.enterprise_plan_count) || 0,
+      monthlySubscriptionRevenue: parseFloat(row.monthly_subscription_revenue) || 0,
+      totalPotentialRevenue: parseFloat(row.total_potential_revenue) || 0,
+
+      // Booking metrics
       totalBookings: parseInt(row.total_bookings) || 0,
       confirmedBookings: parseInt(row.confirmed_bookings) || 0,
+      completedBookings: parseInt(row.completed_bookings) || 0,
+      cancelledBookings: parseInt(row.cancelled_bookings) || 0,
+      bookings30d: parseInt(row.bookings_30d) || 0,
+      bookings7d: parseInt(row.bookings_7d) || 0,
+      avgPartySize: parseFloat(row.avg_party_size) || 0,
+
+      // Ad metrics
+      totalCampaigns: parseInt(row.total_campaigns) || 0,
+      activeCampaigns: parseInt(row.active_campaigns) || 0,
+      completedCampaigns: parseInt(row.completed_campaigns) || 0,
+      pausedCampaigns: parseInt(row.paused_campaigns) || 0,
+      totalAdBudget: parseFloat(row.total_ad_budget) || 0,
+      totalAdSpent: parseFloat(row.total_ad_spent) || 0,
+      totalImpressions: parseInt(row.total_impressions) || 0,
+      totalClicks: parseInt(row.total_clicks) || 0,
+      totalConversions: parseInt(row.total_conversions) || 0,
+      avgCTR: parseFloat(row.avg_ctr) || 0,
+
+      // Revenue breakdown
+      subscriptionRevenue: parseFloat(row.subscription_revenue) || 0,
+      adRevenue: parseFloat(row.ad_platform_revenue) || 0,
+      commissionRevenue: parseFloat(row.commission_revenue) || 0,
       totalRevenue: parseFloat(row.total_revenue) || 0,
-      newUsers30d: parseInt(row.new_users_30d) || 0,
-      newBusinesses30d: parseInt(row.new_businesses_30d) || 0,
+
+      // Legacy fields for backward compatibility
+      monthlyActiveUsers: parseInt(row.new_users_30d) || 0,
+      monthlyRevenue: parseFloat(row.total_revenue) || 0,
+      monthlyBookings: parseInt(row.bookings_30d) || 0,
       newUsersToday: 0,
       newBusinessesToday: 0,
       newBookingsToday: 0,
-      pendingBookings: 0,
-      revenue30d: 0
+      pendingBookings: parseInt(row.confirmed_bookings) || 0,
+      revenue30d: parseFloat(row.total_revenue) || 0
     });
   } catch (error) {
     console.error('Error fetching statistics:', error);
@@ -380,6 +573,361 @@ router.get('/ads', requireAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error fetching ads:', error);
     res.status(500).json({ error: 'Failed to fetch ads', details: error.message });
+  }
+});
+
+// ===================================
+// ANALYTICS - COMPREHENSIVE PLATFORM ANALYTICS
+// ===================================
+router.get('/analytics', requireAdmin, async (req, res) => {
+  try {
+    // Get comprehensive platform statistics with revenue breakdown
+    const stats = await pool.query(`
+      WITH revenue_breakdown AS (
+        SELECT
+          -- Subscription revenue (monthly recurring)
+          COALESCE(SUM(monthly_price), 0) as subscription_revenue,
+          -- Commission revenue ($5 per completed booking)
+          COALESCE((SELECT COUNT(*) FROM bookings WHERE status = 'completed') * 5.00, 0) as commission_revenue,
+          -- Ad revenue (hardcoded to 0 for now - will be implemented when ad system is ready)
+          0 as ad_revenue
+        FROM business_subscriptions
+        WHERE status = 'active'
+      )
+      SELECT
+        -- User metrics
+        (SELECT COUNT(*) FROM users) as total_users,
+        (SELECT COUNT(*) FROM users WHERE role = 'business_owner') as business_owners,
+        (SELECT COUNT(*) FROM users WHERE role = 'food_enthusiast') as food_enthusiasts,
+        (SELECT COUNT(*) FROM users WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_users_30d,
+        (SELECT COUNT(*) FROM users WHERE created_at >= CURRENT_DATE - INTERVAL '7 days') as new_users_7d,
+
+        -- Business metrics
+        (SELECT COUNT(*) FROM businesses) as total_businesses,
+        (SELECT COUNT(*) FROM businesses WHERE status = 'active') as active_businesses,
+        (SELECT COUNT(*) FROM businesses WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_businesses_30d,
+
+        -- Subscription metrics
+        (SELECT COUNT(*) FROM business_subscriptions WHERE status = 'active') as active_subscriptions,
+        (SELECT COUNT(*) FROM business_subscriptions WHERE status = 'cancelled') as cancelled_subscriptions,
+
+        -- Booking metrics
+        (SELECT COUNT(*) FROM bookings) as total_bookings,
+        (SELECT COUNT(*) FROM bookings WHERE status = 'confirmed') as confirmed_bookings,
+        (SELECT COUNT(*) FROM bookings WHERE status = 'completed') as completed_bookings,
+        (SELECT COUNT(*) FROM bookings WHERE status = 'cancelled') as cancelled_bookings,
+        (SELECT COUNT(*) FROM bookings WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_bookings_30d,
+        (SELECT COUNT(*) FROM bookings WHERE created_at >= CURRENT_DATE - INTERVAL '7 days') as new_bookings_7d,
+        (SELECT COALESCE(AVG(party_size), 0) FROM bookings) as avg_party_size,
+
+        -- Revenue metrics
+        rb.subscription_revenue,
+        rb.commission_revenue,
+        rb.ad_revenue,
+        (rb.subscription_revenue + rb.commission_revenue + rb.ad_revenue) as total_revenue,
+
+        -- 30-day revenue
+        (
+          SELECT COALESCE(SUM(monthly_price), 0)
+          FROM business_subscriptions
+          WHERE status = 'active' AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+        ) as subscription_revenue_30d,
+        (SELECT COUNT(*) FROM bookings WHERE status = 'completed' AND created_at >= CURRENT_DATE - INTERVAL '30 days') * 5.00 as commission_revenue_30d,
+        0 as ad_revenue_30d
+      FROM revenue_breakdown rb
+    `);
+
+    // Get user growth (last 12 months)
+    const userGrowth = await pool.query(`
+      SELECT
+        TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') as month,
+        TO_CHAR(DATE_TRUNC('month', created_at), 'Mon YYYY') as month_label,
+        COUNT(*) as users,
+        COUNT(*) FILTER (WHERE role = 'business_owner') as business_owners,
+        COUNT(*) FILTER (WHERE role = 'food_enthusiast') as food_enthusiasts
+      FROM users
+      WHERE created_at >= CURRENT_DATE - INTERVAL '12 months'
+      GROUP BY DATE_TRUNC('month', created_at)
+      ORDER BY DATE_TRUNC('month', created_at) ASC
+    `);
+
+    // Get revenue trends (last 12 months) - breakdown by source
+    const revenueTrends = await pool.query(`
+      WITH monthly_data AS (
+        SELECT generate_series(
+          DATE_TRUNC('month', CURRENT_DATE - INTERVAL '12 months'),
+          DATE_TRUNC('month', CURRENT_DATE),
+          '1 month'::interval
+        ) as month
+      ),
+      subscription_revenue AS (
+        SELECT
+          DATE_TRUNC('month', created_at) as month,
+          SUM(monthly_price) as revenue
+        FROM business_subscriptions
+        WHERE status = 'active' AND created_at >= CURRENT_DATE - INTERVAL '12 months'
+        GROUP BY DATE_TRUNC('month', created_at)
+      ),
+      commission_revenue AS (
+        SELECT
+          DATE_TRUNC('month', created_at) as month,
+          COUNT(*) * 5.00 as revenue
+        FROM bookings
+        WHERE status = 'completed' AND created_at >= CURRENT_DATE - INTERVAL '12 months'
+        GROUP BY DATE_TRUNC('month', created_at)
+      )
+      SELECT
+        TO_CHAR(md.month, 'YYYY-MM') as month,
+        TO_CHAR(md.month, 'Mon YYYY') as month_label,
+        COALESCE(sr.revenue, 0) as subscription_revenue,
+        COALESCE(cr.revenue, 0) as commission_revenue,
+        0 as ad_revenue,
+        COALESCE(sr.revenue, 0) + COALESCE(cr.revenue, 0) as total_revenue
+      FROM monthly_data md
+      LEFT JOIN subscription_revenue sr ON md.month = sr.month
+      LEFT JOIN commission_revenue cr ON md.month = cr.month
+      ORDER BY md.month ASC
+    `);
+
+    // Get booking trends (last 12 months)
+    const bookingTrends = await pool.query(`
+      SELECT
+        TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') as month,
+        TO_CHAR(DATE_TRUNC('month', created_at), 'Mon YYYY') as month_label,
+        COUNT(*) as total_bookings,
+        COUNT(*) FILTER (WHERE status = 'confirmed') as confirmed,
+        COUNT(*) FILTER (WHERE status = 'completed') as completed,
+        COUNT(*) FILTER (WHERE status = 'cancelled') as cancelled
+      FROM bookings
+      WHERE created_at >= CURRENT_DATE - INTERVAL '12 months'
+      GROUP BY DATE_TRUNC('month', created_at)
+      ORDER BY DATE_TRUNC('month', created_at) ASC
+    `);
+
+    // Get subscription plan distribution
+    const subscriptionPlans = await pool.query(`
+      SELECT
+        plan as plan_type,
+        plan::text as name,
+        COUNT(*) as count,
+        COUNT(*) FILTER (WHERE status = 'active') as active_count,
+        COALESCE(SUM(monthly_price) FILTER (WHERE status = 'active'), 0) as total_revenue
+      FROM business_subscriptions
+      GROUP BY plan
+      ORDER BY
+        CASE plan
+          WHEN 'free' THEN 1
+          WHEN 'starter' THEN 2
+          WHEN 'professional' THEN 3
+          WHEN 'enterprise' THEN 4
+        END
+    `);
+
+    // Get booking status distribution
+    const bookingStatus = await pool.query(`
+      SELECT
+        status,
+        COUNT(*) as count
+      FROM bookings
+      GROUP BY status
+      ORDER BY count DESC
+    `);
+
+    // Get top performing businesses (by bookings)
+    const topBusinesses = await pool.query(`
+      SELECT
+        b.id,
+        b.name,
+        bl.city,
+        COUNT(bk.id) as total_bookings,
+        COUNT(bk.id) FILTER (WHERE bk.status = 'completed') as completed_bookings,
+        COUNT(bk.id) FILTER (WHERE bk.status = 'completed') * 5.00 as commission_earned,
+        COALESCE(b.average_rating, 0) as avg_rating
+      FROM businesses b
+      LEFT JOIN business_locations bl ON b.id = bl.business_id AND bl.is_primary = true
+      LEFT JOIN bookings bk ON b.id = bk.business_id
+      GROUP BY b.id, b.name, bl.city, b.average_rating
+      HAVING COUNT(bk.id) > 0
+      ORDER BY total_bookings DESC
+      LIMIT 10
+    `);
+
+    // Get user role distribution
+    const userRoles = await pool.query(`
+      SELECT
+        role,
+        COUNT(*) as count
+      FROM users
+      GROUP BY role
+      ORDER BY count DESC
+    `);
+
+    // Get business status distribution
+    const businessStatus = await pool.query(`
+      SELECT
+        status,
+        COUNT(*) as count
+      FROM businesses
+      GROUP BY status
+      ORDER BY count DESC
+    `);
+
+    // Calculate conversion metrics
+    const conversionMetrics = await pool.query(`
+      SELECT
+        (SELECT COUNT(*) FROM users WHERE role = 'business_owner') as total_business_owners,
+        (SELECT COUNT(DISTINCT owner_id) FROM businesses) as owners_with_businesses,
+        (SELECT COUNT(*) FROM businesses) as total_businesses,
+        (SELECT COUNT(*) FROM businesses WHERE status = 'active') as active_businesses,
+        (SELECT COUNT(*) FROM business_subscriptions WHERE status = 'active') as active_subscriptions,
+        (SELECT COUNT(*) FROM bookings) as total_bookings,
+        (SELECT COUNT(*) FROM bookings WHERE status = 'confirmed' OR status = 'completed') as successful_bookings
+    `);
+
+    res.json({
+      statistics: {
+        ...stats.rows[0],
+        // Add conversion rates
+        business_owner_conversion: stats.rows[0].total_businesses > 0
+          ? (stats.rows[0].total_businesses / stats.rows[0].business_owners * 100).toFixed(2)
+          : 0,
+        booking_conversion: stats.rows[0].total_bookings > 0
+          ? (stats.rows[0].completed_bookings / stats.rows[0].total_bookings * 100).toFixed(2)
+          : 0,
+        subscription_rate: stats.rows[0].total_businesses > 0
+          ? (stats.rows[0].active_subscriptions / stats.rows[0].total_businesses * 100).toFixed(2)
+          : 0
+      },
+      userGrowth: userGrowth.rows,
+      revenueTrends: revenueTrends.rows,
+      bookingTrends: bookingTrends.rows,
+      subscriptionPlans: subscriptionPlans.rows,
+      bookingStatus: bookingStatus.rows,
+      topBusinesses: topBusinesses.rows,
+      userRoles: userRoles.rows,
+      businessStatus: businessStatus.rows,
+      conversionMetrics: conversionMetrics.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Error fetching analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch analytics', details: error.message });
+  }
+});
+
+// ===================================
+// GEOGRAPHICAL DISTRIBUTION
+// ===================================
+router.get('/geographical-distribution', requireAdmin, async (req, res) => {
+  try {
+    // Query business locations with aggregated data
+    const distribution = await pool.query(`
+      SELECT
+        bl.city,
+        bl.state,
+        bl.country,
+        bl.latitude,
+        bl.longitude,
+        COUNT(DISTINCT bl.business_id) as business_count,
+        COUNT(DISTINCT u.id) as user_count,
+        COUNT(DISTINCT bk.id) as booking_count,
+        COALESCE(SUM(CASE WHEN bk.status = 'completed' THEN 5.00 ELSE 0 END), 0) as revenue
+      FROM business_locations bl
+      LEFT JOIN businesses b ON bl.business_id = b.id
+      LEFT JOIN users u ON b.owner_id = u.id
+      LEFT JOIN bookings bk ON b.id = bk.business_id
+      WHERE bl.latitude IS NOT NULL
+        AND bl.longitude IS NOT NULL
+        AND bl.city IS NOT NULL
+      GROUP BY bl.city, bl.state, bl.country, bl.latitude, bl.longitude
+      ORDER BY business_count DESC, booking_count DESC
+    `);
+
+    // Transform data for frontend
+    const locations = distribution.rows.map((row, index) => ({
+      id: `loc-${index + 1}`,
+      name: row.city,
+      state: row.state,
+      country: row.country,
+      latitude: parseFloat(row.latitude) || 0,
+      longitude: parseFloat(row.longitude) || 0,
+      businesses: parseInt(row.business_count) || 0,
+      users: parseInt(row.user_count) || 0,
+      bookings: parseInt(row.booking_count) || 0,
+      revenue: parseFloat(row.revenue) || 0
+    }));
+
+    // Get regional aggregation
+    const regionalStats = await pool.query(`
+      SELECT
+        bl.state as region_name,
+        COUNT(DISTINCT bl.business_id) as business_count,
+        COUNT(DISTINCT u.id) as user_count,
+        COUNT(DISTINCT bk.id) as booking_count,
+        COALESCE(SUM(CASE WHEN bk.status = 'completed' THEN 5.00 ELSE 0 END), 0) as revenue
+      FROM business_locations bl
+      LEFT JOIN businesses b ON bl.business_id = b.id
+      LEFT JOIN users u ON b.owner_id = u.id
+      LEFT JOIN bookings bk ON b.id = bk.business_id
+      WHERE bl.state IS NOT NULL
+      GROUP BY bl.state
+      ORDER BY business_count DESC
+      LIMIT 10
+    `);
+
+    const regions = regionalStats.rows.map((row, index) => ({
+      id: `region-${index + 1}`,
+      name: row.region_name,
+      businesses: parseInt(row.business_count) || 0,
+      users: parseInt(row.user_count) || 0,
+      bookings: parseInt(row.booking_count) || 0,
+      revenue: parseFloat(row.revenue) || 0
+    }));
+
+    res.json({
+      locations,
+      regions
+    });
+
+  } catch (error) {
+    console.error('Error fetching geographical distribution:', error);
+    res.status(500).json({
+      error: 'Failed to fetch geographical distribution',
+      details: error.message
+    });
+  }
+});
+
+// ===================================
+// AI-POWERED ANALYTICS
+// ===================================
+router.get('/analytics/ai-insights', requireAdmin, async (req, res) => {
+  try {
+    // First, get the regular analytics data
+    const analyticsResponse = await fetch('http://localhost:3001/api/admin/analytics');
+    const analyticsData = await analyticsResponse.json();
+
+    // Generate AI insights
+    const [insights, forecast, anomalies] = await Promise.all([
+      analyticsAIService.generateInsights(analyticsData),
+      analyticsAIService.generateRevenueForecast(analyticsData.revenueTrends),
+      analyticsAIService.detectAnomalies(analyticsData)
+    ]);
+
+    res.json({
+      insights: insights.insights || [],
+      forecast: forecast.forecast || [],
+      forecastTrend: forecast.trend || 'stable',
+      forecastGrowthRate: forecast.growth_rate || 0,
+      anomalies: anomalies.anomalies || [],
+      generatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error generating AI insights:', error);
+    res.status(500).json({
+      error: 'Failed to generate AI insights',
+      details: error.message
+    });
   }
 });
 
