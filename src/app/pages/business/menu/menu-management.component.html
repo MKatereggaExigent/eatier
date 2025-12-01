@@ -164,16 +164,16 @@
     } @else {
       <div class="menus-grid">
         @for (menuItem of menuItems(); track menuItem.id) {
-          <div class="menu-card" [class.inactive]="!menuItem.is_available">
+          <div class="menu-card" [class.inactive]="!menuItem.is_active">
             <!-- Menu Item Header -->
             <div class="menu-card-header">
-              @if (menuItem.image_url) {
-                <div class="menu-background" [style.background-image]="'url(' + menuItem.image_url + ')'"></div>
+              @if (menuItem.background_image) {
+                <div class="menu-background" [style.background-image]="'url(' + menuItem.background_image + ')'"></div>
               }
               <div class="menu-info">
                 <div class="menu-title">
                   <span class="menu-icon">🍽️</span>
-                  <h3>{{ menuItem.item_name }}</h3>
+                  <h3>{{ menuItem.title }}</h3>
                 </div>
                 <p class="menu-type">{{ menuItem.category || 'Uncategorized' }}</p>
                 @if (menuItem.description) {
@@ -182,20 +182,13 @@
                 <p class="menu-price">${{ menuItem.price.toFixed(2) }}</p>
               </div>
               <div class="menu-status">
-                <span class="status-badge" [class]="menuItem.is_available ? 'active' : 'inactive'">
-                  {{ menuItem.is_available ? 'Available' : 'Unavailable' }}
+                <span class="status-badge" [class]="menuItem.is_active ? 'active' : 'inactive'">
+                  {{ menuItem.is_active ? 'Available' : 'Unavailable' }}
                 </span>
               </div>
             </div>
 
-            <!-- Dietary Info -->
-            @if (menuItem.dietary_info && menuItem.dietary_info.length > 0) {
-              <div class="dietary-info">
-                @for (info of menuItem.dietary_info; track info) {
-                  <span class="dietary-badge">{{ info }}</span>
-                }
-              </div>
-            }
+
 
             <!-- Menu Actions -->
             <div class="menu-actions">
@@ -212,7 +205,7 @@
                 class="action-btn toggle"
                 (click)="toggleMenuStatus(menuItem)"
               >
-                {{ menuItem.is_available ? '⏸️ Mark Unavailable' : '▶️ Mark Available' }}
+                {{ menuItem.is_active ? '⏸️ Mark Unavailable' : '▶️ Mark Available' }}
               </button>
               <button
                 type="button"

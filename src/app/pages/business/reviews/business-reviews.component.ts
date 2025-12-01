@@ -171,14 +171,14 @@ export class BusinessReviewsComponent implements OnInit, OnDestroy {
             customerName: apiReview.customer_name || 'Anonymous',
             customerAvatar: undefined,
             rating: apiReview.rating,
-            comment: apiReview.review_text || '',
-            date: new Date(apiReview.review_date || apiReview.created_at),
-            status: apiReview.response_text ? 'responded' : 'pending',
+            comment: apiReview.comment || '',
+            date: new Date(apiReview.created_at),
+            status: apiReview.response_from_owner ? 'responded' : 'pending',
             helpfulCount: apiReview.helpful_count || 0,
             isMarkedHelpful: false,
-            source: (apiReview.source || 'direct') as 'google' | 'yelp' | 'facebook' | 'direct',
-            businessResponse: apiReview.response_text ? {
-              content: apiReview.response_text,
+            source: 'direct' as 'google' | 'yelp' | 'facebook' | 'direct',
+            businessResponse: apiReview.response_from_owner ? {
+              content: apiReview.response_from_owner,
               date: new Date(apiReview.response_date || apiReview.updated_at),
               authorName: 'Business Owner'
             } : undefined

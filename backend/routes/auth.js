@@ -110,7 +110,10 @@ router.post('/register', async (req, res) => {
       gender,
       role = 'normal_user',
       businessName,
-      businessType
+      businessType,
+      businessAddress,
+      businessCountry,
+      addressDetails
     } = req.body;
 
     // Check if registrations are allowed
@@ -230,8 +233,9 @@ router.post('/register', async (req, res) => {
     if (role === 'business_owner' && businessName) {
       const businessResult = await client.query(`
         INSERT INTO businesses (
-          owner_id, business_name, business_type, email, phone, country, tenant_id, account_status
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')
+          owner_id, business_name, business_type, email, phone, country, tenant_id, account_status,
+          address, formatted_address, latitude, longitude, place_id
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', $8, $9, $10, $11, $12)
         RETURNING id
       `, [
         user.id,
@@ -239,8 +243,13 @@ router.post('/register', async (req, res) => {
         businessType || 'restaurant',
         email,
         phone,
-        country || 'South Africa',
-        tenantId
+        businessCountry || country || 'South Africa',
+        tenantId,
+        businessAddress || null,
+        addressDetails?.formattedAddress || null,
+        addressDetails?.latitude || null,
+        addressDetails?.longitude || null,
+        addressDetails?.placeId || null
       ]);
 
       businessId = businessResult.rows[0].id;

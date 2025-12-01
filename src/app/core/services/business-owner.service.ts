@@ -49,13 +49,12 @@ export interface MenuItem {
   id?: string;
   tenant_id?: string;
   business_id?: string;
-  item_name: string;
+  title: string;
   description?: string;
   price: number;
   category?: string;
-  image_url?: string;
-  dietary_info?: string[];
-  is_available: boolean;
+  background_image?: string;
+  is_active: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -194,9 +193,9 @@ export class BusinessOwnerService {
     });
   }
 
-  toggleMenuItemAvailability(itemId: string, isAvailable: boolean): Observable<{ message: string; item: MenuItem }> {
-    return this.http.patch<{ message: string; item: MenuItem }>(`${this.apiUrl}/menu/${itemId}/availability`, 
-      { is_available: isAvailable }, 
+  toggleMenuItemAvailability(itemId: string, isActive: boolean): Observable<{ message: string; item: MenuItem }> {
+    return this.http.patch<{ message: string; item: MenuItem }>(`${this.apiUrl}/menu/${itemId}/availability`,
+      { is_active: isActive },
       { headers: this.getHeaders() }
     );
   }

@@ -68,7 +68,27 @@ export const routes: Routes = [
         ]
     },
 
-    // Business Dashboard - Restaurant owners showcasing their businesses
+    // Business Dashboard - Short URL (preferred)
+    {
+        path: 'business',
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: ['business_owner', 'business'] },
+        loadComponent: () => import('./pages/business/dashboard/dashboard.component').then(m => m.DashboardComponent),
+        children: [
+            { path: '', redirectTo: 'overview', pathMatch: 'full' },
+            { path: 'overview', loadComponent: () => import('./pages/business/overview/overview.component').then(m => m.OverviewComponent) },
+            { path: 'profile', loadComponent: () => import('./pages/business/profile/business-profile.component').then(m => m.BusinessProfileComponent) },
+            { path: 'menu', loadComponent: () => import('./pages/business/menu/menu-management.component').then(m => m.MenuManagementComponent) },
+            { path: 'reviews', loadComponent: () => import('./pages/business/reviews/business-reviews.component').then(m => m.BusinessReviewsComponent) },
+            { path: 'insights', loadComponent: () => import('./pages/business/insights/business-insights.component').then(m => m.BusinessInsightsComponent) },
+            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
+            { path: 'ads/create', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
+            { path: 'digital-card', loadComponent: () => import('./pages/business/digital-card/digital-card.component').then(m => m.DigitalCardComponent) },
+            { path: 'accounts', loadComponent: () => import('./pages/business/accounts/accounts-center.component').then(m => m.AccountsCenterComponent) }
+        ]
+    },
+
+    // Business Dashboard - Long URL (backward compatibility)
     {
         path: 'dashboard/business',
         canActivate: [AuthGuard, RoleGuard],

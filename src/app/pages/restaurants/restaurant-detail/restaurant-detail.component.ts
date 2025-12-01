@@ -1,7 +1,10 @@
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import { CommonModule } from '@angular/common';
+import { PublicBusinessService, PublicBusiness } from '../../../core/services/public-business.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-restaurant-detail',
@@ -12,116 +15,34 @@ import { CommonModule } from '@angular/common';
 })
 export class RestaurantDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private publicBusinessService = inject(PublicBusinessService);
+  private http = inject(HttpClient);
 
   restaurantId = signal<string>('');
+  isLoading = signal<boolean>(true);
+  errorMessage = signal<string | null>(null);
 
-  // Mock data - replace with actual service calls
-  restaurant = {
-    id: '1',
-    name: 'Bella Italia',
-    cuisine: 'Italian',
-    priceRange: '$$',
-    rating: 4.5,
-    reviewCount: 127,
-    images: [
-      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop'
-    ],
-    address: '123 Main St, Downtown',
-    phone: '(555) 123-4567',
-    website: 'www.bellaitalia.com',
-    hours: [
-      { day: 'Monday', hours: '11:00 AM - 10:00 PM' },
-      { day: 'Tuesday', hours: '11:00 AM - 10:00 PM' },
-      { day: 'Wednesday', hours: '11:00 AM - 10:00 PM' },
-      { day: 'Thursday', hours: '11:00 AM - 10:00 PM' },
-      { day: 'Friday', hours: '11:00 AM - 11:00 PM' },
-      { day: 'Saturday', hours: '11:00 AM - 11:00 PM' },
-      { day: 'Sunday', hours: '12:00 PM - 9:00 PM' }
-    ],
-    description: 'Authentic Italian cuisine in the heart of downtown. Family-owned restaurant serving traditional recipes passed down through generations.',
-    features: ['Delivery', 'Takeout', 'Dine-in', 'Outdoor Seating', 'Wine Bar'],
-    isOpen: true
-  };
+  // Restaurant data from API
+  restaurant = signal<any>({
+    id: '',
+    name: '',
+    cuisine: '',
+    priceRange: '$',
+    rating: 0,
+    reviewCount: 0,
+    images: [],
+    address: '',
+    phone: '',
+    website: '',
+    hours: [],
+    description: '',
+    features: [],
+    isOpen: false
+  });
 
-  recentReviews = [
-    {
-      id: '1',
-      customerName: 'Sarah Johnson',
-      rating: 5,
-      comment: 'Amazing food and excellent service! The pasta was perfectly cooked and the tiramisu was heavenly. Will definitely come back.',
-      date: new Date('2024-01-15'),
-      helpful: 12
-    },
-    {
-      id: '2',
-      customerName: 'Mike Chen',
-      rating: 4,
-      comment: 'Great atmosphere and delicious food. The pizza was authentic and the staff was very friendly. Highly recommended!',
-      date: new Date('2024-01-14'),
-      helpful: 8
-    },
-    {
-      id: '3',
-      customerName: 'Emily Davis',
-      rating: 5,
-      comment: 'Best Italian restaurant in town! The ingredients are fresh and the flavors are incredible. Love the cozy ambiance.',
-      date: new Date('2024-01-13'),
-      helpful: 15
-    }
-  ];
-
-  popularDishes = [
-    {
-      name: 'Spaghetti Carbonara',
-      price: '$18.99',
-      description: 'Classic Roman pasta with eggs, cheese, and pancetta',
-      image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=300&h=200&fit=crop',
-      rating: 4.8,
-      orders: 234
-    },
-    {
-      name: 'Margherita Pizza',
-      price: '$16.99',
-      description: 'Traditional pizza with fresh mozzarella, tomatoes, and basil',
-      image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=300&h=200&fit=crop',
-      rating: 4.7,
-      orders: 189
-    },
-    {
-      name: 'Tiramisu',
-      price: '$8.99',
-      description: 'Classic Italian dessert with coffee-soaked ladyfingers',
-      image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=300&h=200&fit=crop',
-      rating: 4.9,
-      orders: 156
-    },
-    {
-      name: 'Osso Buco',
-      price: '$24.99',
-      description: 'Braised veal shanks with vegetables and white wine',
-      image: 'https://images.unsplash.com/photo-1598866594230-a7c12756260f?w=300&h=200&fit=crop',
-      rating: 4.6,
-      orders: 98
-    },
-    {
-      name: 'Panna Cotta',
-      price: '$7.99',
-      description: 'Creamy Italian dessert with berry compote',
-      image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=300&h=200&fit=crop',
-      rating: 4.5,
-      orders: 112
-    },
-    {
-      name: 'Lasagna Bolognese',
-      price: '$19.99',
-      description: 'Layers of pasta with rich meat sauce and béchamel',
-      image: 'https://images.unsplash.com/photo-1619895092538-128341789043?w=300&h=200&fit=crop',
-      rating: 4.8,
-      orders: 203
-    }
-  ];
+  // Reviews and dishes loaded from API - filtered by business_id
+  recentReviews = signal<any[]>([]);
+  popularDishes = signal<any[]>([]);
 
   // Track helpful clicks per review
   helpfulClicked = signal<{ [key: string]: boolean }>({});
@@ -134,8 +55,150 @@ export class RestaurantDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.restaurantId.set(params['id']);
-      // In a real app, you would fetch restaurant data based on the ID
+      const businessId = params['id'];
+      this.restaurantId.set(businessId);
+      this.loadRestaurantData(businessId);
+      this.loadMenuItems(businessId);
+      this.loadReviews(businessId);
+    });
+  }
+
+  loadRestaurantData(businessId: string): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.publicBusinessService.getBusinessById(businessId).subscribe({
+      next: (response) => {
+        const business = response.business;
+
+        // Map business data to restaurant format
+        const images = business.profilePhotos && business.profilePhotos.length > 0
+          ? business.profilePhotos
+          : [
+              'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=600&fit=crop',
+              'https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop',
+              'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop'
+            ];
+
+        const hours = this.generateHoursFromOpenClose(business.opensAt, business.closesAt);
+        const isOpen = this.isBusinessOpen(business.opensAt, business.closesAt);
+
+        this.restaurant.set({
+          id: business.id,
+          name: business.businessName,
+          cuisine: business.businessType,
+          priceRange: '$', // Default, could be added to business model later
+          rating: 0, // Will be calculated from reviews later
+          reviewCount: 0, // Will be fetched from reviews later
+          images,
+          address: business.address || 'Address not provided',
+          phone: business.phone || 'Phone not provided',
+          website: business.email || '', // Using email as fallback
+          hours,
+          description: business.bio || `Welcome to ${business.businessName}. ${business.sustainabilityEthos || ''}`,
+          features: business.facilities || [],
+          isOpen
+        });
+
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading restaurant:', error);
+        this.errorMessage.set('Failed to load restaurant details. Please try again later.');
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  private generateHoursFromOpenClose(opensAt?: string, closesAt?: string): any[] {
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    if (!opensAt || !closesAt) {
+      return days.map(day => ({ day, hours: 'Hours not available' }));
+    }
+
+    const hoursString = `${opensAt} - ${closesAt}`;
+    return days.map(day => ({ day, hours: hoursString }));
+  }
+
+  private isBusinessOpen(opensAt?: string, closesAt?: string): boolean {
+    if (!opensAt || !closesAt) {
+      return false;
+    }
+
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+
+    const [openHour, openMin] = opensAt.split(':').map(Number);
+    const [closeHour, closeMin] = closesAt.split(':').map(Number);
+
+    const openTime = openHour * 60 + openMin;
+    const closeTime = closeHour * 60 + closeMin;
+
+    return currentTime >= openTime && currentTime <= closeTime;
+  }
+
+  loadMenuItems(businessId: string): void {
+    // Fetch menu items for this specific business only
+    this.http.get<any[]>(`${environment.apiUrl}/menus/business/${businessId}`).subscribe({
+      next: (menus) => {
+        // Map menu items to dish format for display
+        const dishes = menus.map((menu: any) => ({
+          name: menu.title,
+          price: `$${menu.price.toFixed(2)}`,
+          description: menu.description,
+          image: menu.backgroundImage || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop',
+          rating: 0, // No ratings yet
+          orders: 0  // No order tracking yet
+        }));
+
+        this.popularDishes.set(dishes);
+      },
+      error: (error) => {
+        console.error('Error loading menu items:', error);
+        // Keep empty array on error
+        this.popularDishes.set([]);
+      }
+    });
+  }
+
+  loadReviews(businessId: string): void {
+    // Fetch reviews for this specific business only
+    this.http.get<any>(`${environment.apiUrl}/reviews/business/${businessId}`).subscribe({
+      next: (response) => {
+        const reviews = response.reviews || [];
+
+        // Map reviews to component format
+        const mappedReviews = reviews.map((review: any) => ({
+          id: review.id,
+          customerName: review.customerName,
+          rating: review.rating,
+          title: review.title,
+          comment: review.comment,
+          date: new Date(review.createdAt),
+          helpful: review.helpfulCount,
+          notHelpful: review.notHelpfulCount,
+          responseFromOwner: review.responseFromOwner,
+          responseDate: review.responseDate ? new Date(review.responseDate) : null,
+          isVerifiedVisit: review.isVerifiedVisit
+        }));
+
+        this.recentReviews.set(mappedReviews);
+
+        // Update restaurant rating and review count
+        if (response.stats) {
+          this.restaurant.update(r => ({
+            ...r,
+            rating: response.stats.averageRating || 0,
+            reviewCount: response.stats.reviewCount || 0
+          }));
+        }
+      },
+      error: (error) => {
+        console.error('Error loading reviews:', error);
+        // Keep empty array on error
+        this.recentReviews.set([]);
+      }
     });
   }
 
@@ -153,21 +216,30 @@ export class RestaurantDetailComponent implements OnInit {
 
   getCurrentDayHours(): string {
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    const todayHours = this.restaurant.hours.find(h => h.day === today);
+    const todayHours = this.restaurant().hours.find((h: any) => h.day === today);
     return todayHours ? todayHours.hours : 'Hours not available';
   }
 
   callRestaurant(): void {
-    window.open(`tel:${this.restaurant.phone}`, '_self');
+    window.open(`tel:${this.restaurant().phone}`, '_self');
   }
 
   getDirections(): void {
-    const address = encodeURIComponent(this.restaurant.address);
+    const address = encodeURIComponent(this.restaurant().address);
     window.open(`https://maps.google.com?q=${address}`, '_blank');
   }
 
   visitWebsite(): void {
-    window.open(`https://${this.restaurant.website}`, '_blank');
+    const website = this.restaurant().website;
+    if (website) {
+      // Check if it's an email or actual website
+      if (website.includes('@')) {
+        window.open(`mailto:${website}`, '_self');
+      } else {
+        const url = website.startsWith('http') ? website : `https://${website}`;
+        window.open(url, '_blank');
+      }
+    }
   }
 
   // View full menu - navigate to menu page or open modal
@@ -192,14 +264,14 @@ export class RestaurantDetailComponent implements OnInit {
 
     if (clicked[reviewId]) {
       // Already clicked, unmark
-      const review = this.recentReviews.find(r => r.id === reviewId);
+      const review = this.recentReviews().find((r: any) => r.id === reviewId);
       if (review) {
         review.helpful--;
       }
       this.helpfulClicked.set({ ...clicked, [reviewId]: false });
     } else {
       // Mark as helpful
-      const review = this.recentReviews.find(r => r.id === reviewId);
+      const review = this.recentReviews().find((r: any) => r.id === reviewId);
       if (review) {
         review.helpful++;
       }
@@ -234,6 +306,6 @@ export class RestaurantDetailComponent implements OnInit {
     // this.router.navigate(['/restaurants', this.restaurantId(), 'reviews']);
 
     // Option 2: Show alert for now
-    alert(`Viewing all ${this.restaurant.reviewCount} reviews... This will navigate to a dedicated reviews page or expand the current section.`);
+    alert(`Viewing all ${this.restaurant().reviewCount} reviews... This will navigate to a dedicated reviews page or expand the current section.`);
   }
 }

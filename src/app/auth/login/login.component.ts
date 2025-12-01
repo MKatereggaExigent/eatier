@@ -98,7 +98,7 @@ export class LoginComponent {
         return '/admin/overview';
       case 'business_owner':
       case 'business':
-        return '/dashboard/business/overview';
+        return '/business/overview';
       case 'food_enthusiast':
         return '/dashboard/food-enthusiast/overview';
       case 'specialist':

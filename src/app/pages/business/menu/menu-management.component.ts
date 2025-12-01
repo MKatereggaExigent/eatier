@@ -153,10 +153,10 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
     this.isCreatingMenu.set(false);
     this.selectedMenuItem.set(menuItem);
     this.menuForm.patchValue({
-      name: menuItem.item_name,
+      name: menuItem.title,
       description: menuItem.description,
       type: menuItem.category,
-      isActive: menuItem.is_available
+      isActive: menuItem.is_active
     });
   }
 
@@ -167,11 +167,12 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
       const formValue = this.menuForm.value;
 
       const menuData: MenuItem = {
-        item_name: formValue.name,
+        title: formValue.name,
         description: formValue.description,
         category: formValue.type,
-        price: 0, // Default price
-        is_available: formValue.isActive
+        price: formValue.price || 0,
+        background_image: formValue.backgroundImage,
+        is_active: formValue.isActive
       };
 
       const request$ = this.isEditingMenu() && this.selectedMenuItem()
@@ -215,7 +216,7 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
   deleteMenu(menuItem: MenuItem): void {
     if (!menuItem.id) return;
 
-    if (confirm(`Are you sure you want to delete "${menuItem.item_name}"?`)) {
+    if (confirm(`Are you sure you want to delete "${menuItem.title}"?`)) {
       this.isLoading.set(true);
       this.errorMessage.set(null);
 
@@ -244,7 +245,7 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
   toggleMenuStatus(menuItem: MenuItem): void {
     if (!menuItem.id) return;
 
-    const newAvailability = !menuItem.is_available;
+    const newAvailability = !menuItem.is_active;
 
     this.businessOwnerService.toggleMenuItemAvailability(menuItem.id, newAvailability)
       .pipe(

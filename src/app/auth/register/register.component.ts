@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { UserRegistrationData, UserRole } from '../../shared/models/user.model';
 
 import { AuthService } from '../../core/services/auth.service';
+import { GoogleMapsService } from '../../core/services/google-maps.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -17,6 +18,7 @@ export class RegisterComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private googleMapsService = inject(GoogleMapsService);
 
   registerForm: FormGroup;
   isLoading = this.authService.isLoading;
@@ -24,6 +26,9 @@ export class RegisterComponent {
   showPassword = signal<boolean>(false);
   showConfirmPassword = signal<boolean>(false);
   selectedRole = signal<UserRole>(UserRole.NORMAL_USER);
+  addressSuggestions = signal<any[]>([]);
+  selectedPlaceId = signal<string | null>(null);
+  addressDetails = signal<any>(null);
 
   readonly UserRole = UserRole;
 
@@ -37,6 +42,9 @@ export class RegisterComponent {
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],
       businessName: [''], // For business owners
+      businessType: [''], // For business owners
+      businessAddress: [''], // For business owners
+      businessCountry: [''], // For business owners
       experience: [0], // For chefs and waitstaff
       specialties: [[]], // For chefs
       agreeToTerms: [false, Validators.requiredTrue],
@@ -63,9 +71,22 @@ export class RegisterComponent {
         phone: formValue.phone || undefined,
         role: formValue.role,
         businessName: formValue.businessName || undefined,
+        businessType: formValue.businessType || undefined,
+        businessAddress: formValue.businessAddress || undefined,
+        businessCountry: formValue.businessCountry || undefined,
         experience: formValue.experience || undefined,
         specialties: formValue.specialties || undefined
       };
+
+      // Add address details if available
+      if (this.addressDetails()) {
+        (registrationData as any).addressDetails = {
+          placeId: this.addressDetails().placeId,
+          latitude: this.addressDetails().latitude,
+          longitude: this.addressDetails().longitude,
+          formattedAddress: this.addressDetails().formattedAddress
+        };
+      }
 
       this.authService.register(registrationData).subscribe({
         next: (response) => {
@@ -134,11 +155,17 @@ export class RegisterComponent {
 
   private updateFormValidation(role: UserRole): void {
     const businessNameControl = this.registerForm.get('businessName');
+    const businessTypeControl = this.registerForm.get('businessType');
+    const businessAddressControl = this.registerForm.get('businessAddress');
+    const businessCountryControl = this.registerForm.get('businessCountry');
     const experienceControl = this.registerForm.get('experience');
     const specialtiesControl = this.registerForm.get('specialties');
 
     // Reset all conditional validators
     businessNameControl?.clearValidators();
+    businessTypeControl?.clearValidators();
+    businessAddressControl?.clearValidators();
+    businessCountryControl?.clearValidators();
     experienceControl?.clearValidators();
     specialtiesControl?.clearValidators();
 
@@ -146,6 +173,9 @@ export class RegisterComponent {
     switch (role) {
       case UserRole.BUSINESS:
         businessNameControl?.setValidators([Validators.required, Validators.minLength(2)]);
+        businessTypeControl?.setValidators([Validators.required]);
+        businessAddressControl?.setValidators([Validators.required]);
+        businessCountryControl?.setValidators([Validators.required]);
         break;
       case UserRole.SPECIALIST:
         experienceControl?.setValidators([Validators.required, Validators.min(0)]);
@@ -155,6 +185,9 @@ export class RegisterComponent {
 
     // Update validity
     businessNameControl?.updateValueAndValidity();
+    businessTypeControl?.updateValueAndValidity();
+    businessAddressControl?.updateValueAndValidity();
+    businessCountryControl?.updateValueAndValidity();
     experienceControl?.updateValueAndValidity();
     specialtiesControl?.updateValueAndValidity();
   }
@@ -216,6 +249,44 @@ export class RegisterComponent {
         return '/dashboard/user/overview';
       default:
         return '/dashboard/user/overview';
+    }
+  }
+
+  // Google Maps Address Autocomplete
+  async onAddressInput(value: string): Promise<void> {
+    if (!value || value.length < 3) {
+      this.addressSuggestions.set([]);
+      return;
+    }
+
+    try {
+      const predictions = await this.googleMapsService.getPlacePredictions(value);
+      this.addressSuggestions.set(predictions);
+    } catch (error) {
+      console.error('Error fetching address suggestions:', error);
+      this.addressSuggestions.set([]);
+    }
+  }
+
+  async selectAddress(suggestion: any): Promise<void> {
+    try {
+      const placeDetails = await this.googleMapsService.getPlaceDetails(suggestion.place_id);
+
+      // Update form with address details
+      this.registerForm.patchValue({
+        businessAddress: placeDetails.formattedAddress,
+        businessCountry: placeDetails.addressComponents.country || ''
+      });
+
+      // Store place details for submission
+      this.selectedPlaceId.set(placeDetails.placeId);
+      this.addressDetails.set(placeDetails);
+
+      // Clear suggestions
+      this.addressSuggestions.set([]);
+    } catch (error) {
+      console.error('Error fetching place details:', error);
+      this.errorMessage.set('Failed to fetch address details. Please try again.');
     }
   }
 }

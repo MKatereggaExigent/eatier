@@ -365,7 +365,7 @@ router.get('/menu', async (req, res) => {
     const result = await pool.query(`
       SELECT * FROM menus
       WHERE business_id = $1 AND tenant_id = $2
-      ORDER BY category, item_name
+      ORDER BY category, title
     `, [businessId, tenantId]);
 
     res.json({ menu: result.rows });
@@ -384,10 +384,10 @@ router.post('/menu', async (req, res) => {
   try {
     const userId = req.user.id;
     const tenantId = req.user.tenant_id;
-    const { item_name, description, price, category, image_url, dietary_info, is_available } = req.body;
+    const { title, description, price, category, background_image } = req.body;
 
-    if (!item_name || !price) {
-      return res.status(400).json({ error: 'Item name and price are required' });
+    if (!title || !price || !category) {
+      return res.status(400).json({ error: 'Title, price, and category are required' });
     }
 
     // Get business ID
@@ -403,10 +403,10 @@ router.post('/menu', async (req, res) => {
 
     // Insert menu item
     const result = await pool.query(`
-      INSERT INTO menus (tenant_id, business_id, item_name, description, price, category, image_url, dietary_info, is_available)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      INSERT INTO menus (tenant_id, business_id, title, description, price, category, background_image, is_active)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
-    `, [tenantId, businessId, item_name, description, price, category, image_url, dietary_info, is_available !== false]);
+    `, [tenantId, businessId, title, description || '', price, category, background_image, true]);
 
     res.status(201).json({
       message: 'Menu item created successfully',
@@ -428,7 +428,7 @@ router.put('/menu/:id', async (req, res) => {
     const userId = req.user.id;
     const tenantId = req.user.tenant_id;
     const menuId = req.params.id;
-    const { item_name, description, price, category, image_url, dietary_info, is_available } = req.body;
+    const { title, description, price, category, background_image, is_active } = req.body;
 
     // Verify ownership
     const ownerCheck = await pool.query(`
@@ -445,17 +445,16 @@ router.put('/menu/:id', async (req, res) => {
     const result = await pool.query(`
       UPDATE menus
       SET
-        item_name = COALESCE($1, item_name),
+        title = COALESCE($1, title),
         description = COALESCE($2, description),
         price = COALESCE($3, price),
         category = COALESCE($4, category),
-        image_url = COALESCE($5, image_url),
-        dietary_info = COALESCE($6, dietary_info),
-        is_available = COALESCE($7, is_available),
+        background_image = COALESCE($5, background_image),
+        is_active = COALESCE($6, is_active),
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = $8
+      WHERE id = $7
       RETURNING *
-    `, [item_name, description, price, category, image_url, dietary_info, is_available, menuId]);
+    `, [title, description, price, category, background_image, is_active, menuId]);
 
     res.json({
       message: 'Menu item updated successfully',
@@ -509,7 +508,7 @@ router.patch('/menu/:id/availability', async (req, res) => {
     const userId = req.user.id;
     const tenantId = req.user.tenant_id;
     const menuId = req.params.id;
-    const { is_available } = req.body;
+    const { is_active } = req.body;
 
     // Verify ownership
     const ownerCheck = await pool.query(`
@@ -525,10 +524,10 @@ router.patch('/menu/:id/availability', async (req, res) => {
     // Update availability
     const result = await pool.query(`
       UPDATE menus
-      SET is_available = $1, updated_at = CURRENT_TIMESTAMP
+      SET is_active = $1, updated_at = CURRENT_TIMESTAMP
       WHERE id = $2
       RETURNING *
-    `, [is_available, menuId]);
+    `, [is_active, menuId]);
 
     res.json({
       message: 'Menu item availability updated successfully',

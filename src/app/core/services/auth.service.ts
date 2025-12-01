@@ -172,16 +172,17 @@ export class AuthService {
   }
 
   refreshToken(): Observable<AuthResponse> {
-    const refreshToken = localStorage.getItem(this.REFRESH_TOKEN_KEY);
-
-    if (!refreshToken) {
-      return throwError(() => new Error('No refresh token available'));
-    }
-
-    // Mock refresh - replace with actual API call
-    return this.mockRefreshToken(refreshToken).pipe(
+    // Call actual backend API - refresh token is in HTTP-only cookie
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/refresh`, {}, {
+      withCredentials: true // Include cookies for HTTP-only cookie handling
+    }).pipe(
       tap(response => {
         this.handleAuthSuccess(response);
+      }),
+      catchError(error => {
+        console.error('Token refresh failed:', error);
+        this.logout();
+        return throwError(() => new Error('Session expired. Please login again.'));
       })
     );
   }
@@ -271,6 +272,10 @@ export class AuthService {
   }
 
   private handleAuthSuccess(response: AuthResponse): void {
+    console.log('🔑 Auth Success - Storing token and user data');
+    console.log('🔑 Access Token:', response.accessToken?.substring(0, 20) + '...');
+    console.log('🔑 User:', response.user.email);
+
     // Store access token (backend also sets HTTP-only cookie)
     localStorage.setItem(this.TOKEN_KEY, response.accessToken);
 
@@ -284,6 +289,8 @@ export class AuthService {
 
     // Update current user state
     this.setCurrentUser(response.user);
+
+    console.log('🔑 Token stored in localStorage:', localStorage.getItem(this.TOKEN_KEY)?.substring(0, 20) + '...');
   }
 
   private clearAuthData(): void {

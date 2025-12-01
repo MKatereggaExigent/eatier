@@ -39,11 +39,13 @@
           <span class="stat-number">{{ stats().reviews }}</span>
           <span class="stat-label">Reviews</span>
         </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <span class="stat-number">{{ stats().avgRating > 0 ? stats().avgRating.toFixed(1) + '★' : 'N/A' }}</span>
-          <span class="stat-label">Avg Rating</span>
-        </div>
+        @if (stats().reviews > 0) {
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">{{ stats().avgRating.toFixed(1) }}★</span>
+            <span class="stat-label">Avg Rating</span>
+          </div>
+        }
       </div>
     </div>
   </div>
@@ -118,23 +120,35 @@
               {{ getStatusText(restaurant.isOpen) }}
             </div>
 
-            <!-- Distance Badge -->
-            <div class="distance-badge glass-morphic">
-              <span class="distance-icon">📍</span>
-              {{ restaurant.distance }}
-            </div>
+            <!-- Distance Badge - Only show if available -->
+            @if (restaurant.distance && restaurant.distance !== 'N/A') {
+              <div class="distance-badge glass-morphic">
+                <span class="distance-icon">📍</span>
+                {{ restaurant.distance }}
+              </div>
+            }
 
-            <!-- Rating Badge -->
+            <!-- Rating Badge - Show "New" if no reviews -->
             <div class="rating-badge glass-morphic">
-              <span class="rating-star">⭐</span>
-              <span class="rating-value">{{ restaurant.rating }}</span>
+              @if (restaurant.reviewCount > 0) {
+                <span class="rating-star">⭐</span>
+                <span class="rating-value">{{ restaurant.rating.toFixed(1) }}</span>
+              } @else {
+                <span class="new-badge">New</span>
+              }
             </div>
           </div>
 
           <div class="card-content">
             <div class="card-header">
               <h3 class="restaurant-name">{{ restaurant.name }}</h3>
-              <div class="review-count">{{ restaurant.reviewCount }} reviews</div>
+              <div class="review-count">
+                @if (restaurant.reviewCount > 0) {
+                  {{ restaurant.reviewCount }} {{ restaurant.reviewCount === 1 ? 'review' : 'reviews' }}
+                } @else {
+                  <span class="no-reviews">No reviews yet</span>
+                }
+              </div>
             </div>
 
             <div class="restaurant-meta">
@@ -142,10 +156,17 @@
               <span class="price-badge">{{ restaurant.priceRange }}</span>
             </div>
 
-            <p class="restaurant-address">
-              <span class="address-icon">📍</span>
-              {{ restaurant.address }}
-            </p>
+            @if (restaurant.address && restaurant.address !== 'Address not provided') {
+              <p class="restaurant-address">
+                <span class="address-icon">📍</span>
+                {{ restaurant.address }}
+              </p>
+            } @else {
+              <p class="restaurant-address no-address">
+                <span class="address-icon">📍</span>
+                <span class="setup-required">Address setup required</span>
+              </p>
+            }
 
             <div class="restaurant-features">
               @for (feature of restaurant.features; track feature) {

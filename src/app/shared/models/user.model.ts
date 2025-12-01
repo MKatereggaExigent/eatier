@@ -262,6 +262,8 @@ export interface UserRegistrationData {
   // Additional fields based on role
   businessName?: string; // for business owners
   businessType?: BusinessOwner['businessType']; // for business owners
+  businessAddress?: string; // for business owners
+  businessCountry?: string; // for business owners
   preferences?: NormalUser['preferences'] | FoodEnthusiast['preferences']; // for users
   specialistType?: Specialist['specialistType']; // for specialists
   specialties?: string[]; // for specialists

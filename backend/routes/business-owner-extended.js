@@ -346,7 +346,7 @@ router.post('/reviews/:id/respond', async (req, res) => {
     const result = await pool.query(`
       UPDATE reviews
       SET
-        response_text = $1,
+        response_from_owner = $1,
         response_date = NOW(),
         updated_at = NOW()
       WHERE id = $2 AND business_id = $3 AND tenant_id = $4
@@ -394,7 +394,7 @@ router.put('/reviews/:id/respond', async (req, res) => {
     const result = await pool.query(`
       UPDATE reviews
       SET
-        response_text = $1,
+        response_from_owner = $1,
         updated_at = NOW()
       WHERE id = $2 AND business_id = $3 AND tenant_id = $4
       RETURNING *
@@ -440,7 +440,7 @@ router.delete('/reviews/:id/respond', async (req, res) => {
     const result = await pool.query(`
       UPDATE reviews
       SET
-        response_text = NULL,
+        response_from_owner = NULL,
         response_date = NULL,
         updated_at = NOW()
       WHERE id = $1 AND business_id = $2 AND tenant_id = $3

@@ -117,6 +117,71 @@
               <span class="field-error">{{ getFieldError('businessName') }}</span>
             }
           </div>
+
+          <div class="form-group">
+            <label for="businessType">Business Type *</label>
+            <select
+              id="businessType"
+              formControlName="businessType"
+              [class.error]="getFieldError('businessType')"
+            >
+              <option value="">Select business type</option>
+              <option value="restaurant">Restaurant</option>
+              <option value="cafe">Café</option>
+              <option value="bar">Bar</option>
+              <option value="bakery">Bakery</option>
+              <option value="food_truck">Food Truck</option>
+              <option value="catering">Catering Service</option>
+              <option value="other">Other</option>
+            </select>
+            @if (getFieldError('businessType')) {
+              <span class="field-error">{{ getFieldError('businessType') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="businessAddress">Business Address *</label>
+            <input
+              id="businessAddress"
+              type="text"
+              formControlName="businessAddress"
+              placeholder="Start typing your address..."
+              [class.error]="getFieldError('businessAddress')"
+              (input)="onAddressInput($any($event.target).value)"
+            />
+            @if (addressSuggestions().length > 0) {
+              <div class="address-suggestions">
+                @for (suggestion of addressSuggestions(); track suggestion.place_id) {
+                  <div class="suggestion-item" (click)="selectAddress(suggestion)">
+                    <span class="suggestion-icon">📍</span>
+                    <div class="suggestion-text">
+                      <div class="suggestion-main">{{ suggestion.structured_formatting.main_text }}</div>
+                      <div class="suggestion-secondary">{{ suggestion.structured_formatting.secondary_text }}</div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+            @if (getFieldError('businessAddress')) {
+              <span class="field-error">{{ getFieldError('businessAddress') }}</span>
+            }
+            <small class="field-hint">We'll use Google Maps to verify your location</small>
+          </div>
+
+          <div class="form-group">
+            <label for="businessCountry">Country *</label>
+            <input
+              id="businessCountry"
+              type="text"
+              formControlName="businessCountry"
+              placeholder="Country"
+              [class.error]="getFieldError('businessCountry')"
+              readonly
+            />
+            @if (getFieldError('businessCountry')) {
+              <span class="field-error">{{ getFieldError('businessCountry') }}</span>
+            }
+          </div>
         </div>
       }
 

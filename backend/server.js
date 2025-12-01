@@ -73,6 +73,7 @@ const analyticsRoutes = require('./routes/analytics');
 const businessAdsRoutes = require('./routes/business-ads');
 const adsPublicRoutes = require('./routes/ads-public');
 const publicStatsRoutes = require('./routes/public-stats');
+const reviewsRoutes = require('./routes/reviews');
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -81,6 +82,7 @@ app.use('/api/users', userDataRoutes); // User stats, activity, favorites
 app.use('/api/users', userRoutes); // User profile management
 app.use('/api/businesses', businessRoutes);
 app.use('/api/menus', menuRoutes);
+app.use('/api/reviews', reviewsRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/insights', insightsRoutes);
 app.use('/api/ads', adsRoutes);

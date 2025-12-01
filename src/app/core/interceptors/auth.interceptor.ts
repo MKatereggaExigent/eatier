@@ -9,10 +9,32 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // Clone request to add credentials (cookies)
-  const authReq = req.clone({
+  // Get token from localStorage
+  const token = localStorage.getItem('itiyum_token');
+
+  // Debug logging
+  if (req.url.includes('/api/')) {
+    console.log('🔐 Interceptor - URL:', req.url);
+    console.log('🔐 Interceptor - Token exists:', !!token);
+    if (token) {
+      console.log('🔐 Interceptor - Token preview:', token.substring(0, 20) + '...');
+    }
+  }
+
+  // Clone request to add credentials (cookies) and Authorization header
+  let authReq = req.clone({
     withCredentials: true
   });
+
+  // Add Authorization header if token exists
+  if (token) {
+    authReq = authReq.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    console.log('🔐 Interceptor - Added Authorization header');
+  }
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -26,10 +48,22 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         // Try to refresh the token
         return authService.refreshToken().pipe(
           switchMap(() => {
+            // Get the new token
+            const newToken = localStorage.getItem('itiyum_token');
+
             // Retry the original request with new token
-            const retryReq = req.clone({
+            let retryReq = req.clone({
               withCredentials: true
             });
+
+            if (newToken) {
+              retryReq = retryReq.clone({
+                setHeaders: {
+                  Authorization: `Bearer ${newToken}`
+                }
+              });
+            }
+
             return next(retryReq);
           }),
           catchError((refreshError) => {
