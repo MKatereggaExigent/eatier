@@ -1,8 +1,24 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { PublicBusinessService, PublicBusiness } from '../../../core/services/public-business.service';
+import { PublicStatsService } from '../../../core/services/public-stats.service';
+
+interface Restaurant {
+  id: string;
+  name: string;
+  cuisine: string;
+  priceRange: string;
+  rating: number;
+  reviewCount: number;
+  image: string;
+  address: string;
+  distance: string;
+  isOpen: boolean;
+  features: string[];
+}
 
 @Component({
   selector: 'app-restaurant-list',
@@ -11,13 +27,24 @@ import { RouterModule } from '@angular/router';
   templateUrl: './restaurant-list.component.html',
   styleUrls: ['./restaurant-list.component.scss']
 })
-export class RestaurantListComponent {
+export class RestaurantListComponent implements OnInit {
+  private publicBusinessService = inject(PublicBusinessService);
+  private publicStatsService = inject(PublicStatsService);
+
   searchQuery = signal<string>('');
   selectedCuisine = signal<string>('');
   selectedPriceRange = signal<string>('');
 
-  // Mock data - replace with actual service calls
-  restaurants = [
+  restaurants = signal<Restaurant[]>([]);
+  stats = signal({
+    restaurants: 0,
+    cuisines: 0,
+    reviews: 0,
+    avgRating: 0
+  });
+
+  // Mock data - will be removed after loading real data
+  mockRestaurants: Restaurant[] = [
     {
       id: '1',
       name: 'Bella Italia',
@@ -106,11 +133,89 @@ export class RestaurantListComponent {
     { label: 'Fine Dining ($$$$)', value: '$$$$' }
   ];
 
-  filteredRestaurants = signal(this.restaurants);
+  filteredRestaurants = signal<Restaurant[]>([]);
 
-  constructor() {
-    // Watch for filter changes
-    this.updateFilters();
+  ngOnInit(): void {
+    this.loadRestaurants();
+    this.loadStatistics();
+  }
+
+  loadRestaurants(): void {
+    this.publicBusinessService.getBusinesses({ limit: 100 }).subscribe({
+      next: (response) => {
+        const restaurants = response.businesses.map(business => this.mapBusinessToRestaurant(business));
+        this.restaurants.set(restaurants);
+        this.updateFilters();
+
+        // Update cuisines from real data
+        const uniqueCuisines = new Set(restaurants.map(r => r.cuisine));
+        this.cuisineTypes = ['All Cuisines', ...Array.from(uniqueCuisines).sort()];
+      },
+      error: (error) => {
+        console.error('Error loading restaurants:', error);
+        // Fall back to mock data on error
+        this.restaurants.set(this.mockRestaurants);
+        this.updateFilters();
+      }
+    });
+  }
+
+  loadStatistics(): void {
+    this.publicStatsService.getStatistics().subscribe({
+      next: (data) => {
+        this.stats.set({
+          restaurants: data.restaurants,
+          cuisines: 0, // Will be calculated from loaded restaurants
+          reviews: data.reviews,
+          avgRating: 0 // Will be calculated when reviews exist
+        });
+      },
+      error: (error) => {
+        console.error('Error loading statistics:', error);
+      }
+    });
+  }
+
+  private mapBusinessToRestaurant(business: PublicBusiness): Restaurant {
+    // Get primary photo or use placeholder
+    const image = business.profilePhotos && business.profilePhotos.length > 0
+      ? business.profilePhotos[0]
+      : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop';
+
+    // Determine if open based on current time and business hours
+    const isOpen = this.isBusinessOpen(business.opensAt, business.closesAt);
+
+    // Map facilities to features
+    const features = business.facilities || [];
+
+    return {
+      id: business.id,
+      name: business.businessName,
+      cuisine: business.businessType,
+      priceRange: '$$', // Default, could be enhanced with actual pricing data
+      rating: 0, // Will be populated when reviews are available
+      reviewCount: 0, // Will be populated when reviews are available
+      image,
+      address: business.address || 'Address not provided',
+      distance: 'N/A', // Would need geolocation to calculate
+      isOpen,
+      features
+    };
+  }
+
+  private isBusinessOpen(opensAt?: string, closesAt?: string): boolean {
+    if (!opensAt || !closesAt) return true; // Assume open if hours not set
+
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+
+    const [openHour, openMin] = opensAt.split(':').map(Number);
+    const [closeHour, closeMin] = closesAt.split(':').map(Number);
+
+    const openTime = openHour * 60 + openMin;
+    const closeTime = closeHour * 60 + closeMin;
+
+    return currentTime >= openTime && currentTime <= closeTime;
   }
 
   onSearchChange(query: string): void {
@@ -129,7 +234,7 @@ export class RestaurantListComponent {
   }
 
   private updateFilters(): void {
-    let filtered = this.restaurants;
+    let filtered = this.restaurants();
 
     // Filter by search query
     const query = this.searchQuery().toLowerCase();

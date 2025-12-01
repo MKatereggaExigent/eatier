@@ -109,7 +109,8 @@ router.post('/register', async (req, res) => {
       dateOfBirth,
       gender,
       role = 'normal_user',
-      businessName
+      businessName,
+      businessType
     } = req.body;
 
     // Check if registrations are allowed
@@ -146,48 +147,103 @@ router.post('/register', async (req, res) => {
     );
 
     if (existingUser.rows.length > 0) {
-      client.release();
       return res.status(409).json({ error: 'User already exists with this email' });
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Get default tenant
-    const tenantResult = await client.query(
-      "SELECT id FROM tenants WHERE slug = 'itiyum' LIMIT 1"
-    );
+    let tenantId;
+    let businessId = null;
 
-    if (tenantResult.rows.length === 0) {
-      client.release();
-      return res.status(500).json({ error: 'Default tenant not found' });
+    // Determine tenant based on role
+    if (role === 'business_owner') {
+      // Business owners get their own tenant (their restaurant)
+      if (!businessName) {
+        return res.status(400).json({ error: 'Business name is required for business owners' });
+      }
+
+      // Create a new tenant for this business
+      const slug = businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const tenantResult = await client.query(`
+        INSERT INTO tenants (name, slug, status)
+        VALUES ($1, $2, 'active')
+        RETURNING id
+      `, [businessName, slug]);
+
+      tenantId = tenantResult.rows[0].id;
+    } else if (role === 'itiyum_admin') {
+      // Platform admins belong to the Itiyum platform tenant
+      const tenantResult = await client.query(
+        "SELECT id FROM tenants WHERE slug = 'itiyum' LIMIT 1"
+      );
+
+      if (tenantResult.rows.length === 0) {
+        return res.status(500).json({ error: 'Platform tenant not found' });
+      }
+
+      tenantId = tenantResult.rows[0].id;
+    } else {
+      // Normal users, food enthusiasts, specialists belong to platform tenant by default
+      // (They can be associated with specific businesses through bookings/posts)
+      const tenantResult = await client.query(
+        "SELECT id FROM tenants WHERE slug = 'itiyum' LIMIT 1"
+      );
+
+      if (tenantResult.rows.length === 0) {
+        return res.status(500).json({ error: 'Platform tenant not found' });
+      }
+
+      tenantId = tenantResult.rows[0].id;
     }
 
-    const tenantId = tenantResult.rows[0].id;
-
-    // Set tenant context for RLS
-    await client.query("SELECT set_tenant_context('itiyum')");
-
-    // Create user with role and tenant
+    // Create user (without role - will be added via user_roles table)
     const result = await client.query(`
       INSERT INTO users (
-        email, password_hash, first_name, last_name, phone, role, status, tenant_id
+        email, password_hash, first_name, last_name, phone, tenant_id, account_status
       )
-      VALUES ($1, $2, $3, $4, $5, $6, 'active', $7)
-      RETURNING id, email, first_name, last_name, phone, role, status, tenant_id, created_at
+      VALUES ($1, $2, $3, $4, $5, $6, 'active')
+      RETURNING id, email, first_name, last_name, phone, tenant_id, account_status, created_at
     `, [
-      email, hashedPassword, firstName, lastName, phone, role, tenantId
+      email, hashedPassword, firstName, lastName, phone, tenantId
     ]);
 
     const user = result.rows[0];
 
+    // Assign role to user via user_roles table
+    const roleResult = await client.query(
+      "SELECT id FROM roles WHERE name = $1 LIMIT 1",
+      [role === 'business_owner' ? 'Business Owner' :
+       role === 'food_enthusiast' ? 'Food Enthusiast' :
+       role === 'specialist' ? 'Specialist' :
+       role === 'itiyum_admin' ? 'Itiyum Admin' : 'Normal User']
+    );
+
+    if (roleResult.rows.length > 0) {
+      await client.query(`
+        INSERT INTO user_roles (user_id, role_id)
+        VALUES ($1, $2)
+      `, [user.id, roleResult.rows[0].id]);
+    }
+
     // If business owner, create business record
     if (role === 'business_owner' && businessName) {
-      await client.query(`
+      const businessResult = await client.query(`
         INSERT INTO businesses (
-          owner_id, business_name, status, tenant_id
-        ) VALUES ($1, $2, 'pending', $3)
-      `, [user.id, businessName, tenantId]);
+          owner_id, business_name, business_type, email, phone, country, tenant_id, account_status
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')
+        RETURNING id
+      `, [
+        user.id,
+        businessName,
+        businessType || 'restaurant',
+        email,
+        phone,
+        country || 'South Africa',
+        tenantId
+      ]);
+
+      businessId = businessResult.rows[0].id;
     }
 
     // Get security settings for session timeout
@@ -207,6 +263,12 @@ router.post('/register', async (req, res) => {
     // Set HTTP-only cookies with dynamic session timeout
     setAuthCookies(res, accessToken, refreshToken, securitySettings.sessionTimeout);
 
+    // Get tenant info for response
+    const tenantInfo = await client.query(
+      'SELECT name, slug FROM tenants WHERE id = $1',
+      [tenantId]
+    );
+
     res.status(201).json({
       message: 'User registered successfully',
       user: {
@@ -215,10 +277,12 @@ router.post('/register', async (req, res) => {
         firstName: user.first_name,
         lastName: user.last_name,
         phone: user.phone,
-        role: user.role,
-        accountStatus: user.status,
-        createdAt: user.created_at
+        role: role,
+        accountStatus: user.account_status,
+        createdAt: user.created_at,
+        tenant: tenantInfo.rows[0]
       },
+      ...(businessId && { businessId }),
       accessToken, // Also send in response for initial setup
       expiresIn: securitySettings.sessionTimeout * 60 // Convert minutes to seconds
     });
@@ -248,12 +312,16 @@ router.post('/login', async (req, res) => {
     const result = await client.query(`
       SELECT
         u.id, u.email, u.password_hash, u.first_name, u.last_name, u.phone,
-        u.avatar_url, u.status, u.role, u.tenant_id,
-        u.failed_login_attempts, u.locked_until,
-        t.slug as tenant_slug
+        u.profile_photo as avatar_url, u.account_status, u.tenant_id,
+        t.slug as tenant_slug,
+        array_agg(DISTINCT r.name) as roles
       FROM users u
       LEFT JOIN tenants t ON u.tenant_id = t.id
+      LEFT JOIN user_roles ur ON u.id = ur.user_id
+      LEFT JOIN roles r ON ur.role_id = r.id
       WHERE u.email = $1
+      GROUP BY u.id, u.email, u.password_hash, u.first_name, u.last_name, u.phone,
+               u.profile_photo, u.account_status, u.tenant_id, t.slug
     `, [email]);
 
     if (result.rows.length === 0) {
@@ -262,21 +330,11 @@ router.post('/login', async (req, res) => {
 
     const user = result.rows[0];
 
-    // Check if account is locked
-    if (user.locked_until && new Date(user.locked_until) > new Date()) {
-      const minutesRemaining = Math.ceil((new Date(user.locked_until) - new Date()) / 60000);
-      return res.status(423).json({
-        error: 'Account temporarily locked',
-        message: `Too many failed login attempts. Account is locked for ${minutesRemaining} more minute(s).`,
-        lockedUntil: user.locked_until
-      });
-    }
-
     // Check account status
-    if (user.status !== 'active') {
+    if (user.account_status !== 'active') {
       return res.status(403).json({
-        error: `Account is ${user.status}`,
-        accountStatus: user.status
+        error: `Account is ${user.account_status}`,
+        accountStatus: user.account_status
       });
     }
 
@@ -284,45 +342,10 @@ router.post('/login', async (req, res) => {
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
 
     if (!isValidPassword) {
-      // Increment failed login attempts
-      const newFailedAttempts = (user.failed_login_attempts || 0) + 1;
-      let lockedUntil = null;
-
-      // Check if we should lock the account
-      if (newFailedAttempts >= securitySettings.maxLoginAttempts) {
-        lockedUntil = new Date(Date.now() + securitySettings.lockoutDuration * 60 * 1000);
-        await client.query(
-          'UPDATE users SET failed_login_attempts = $1, locked_until = $2 WHERE id = $3',
-          [newFailedAttempts, lockedUntil, user.id]
-        );
-        return res.status(423).json({
-          error: 'Account locked',
-          message: `Too many failed login attempts. Account is locked for ${securitySettings.lockoutDuration} minutes.`,
-          lockedUntil
-        });
-      } else {
-        await client.query(
-          'UPDATE users SET failed_login_attempts = $1 WHERE id = $2',
-          [newFailedAttempts, user.id]
-        );
-        const attemptsRemaining = securitySettings.maxLoginAttempts - newFailedAttempts;
-        return res.status(401).json({
-          error: 'Invalid email or password',
-          attemptsRemaining
-        });
-      }
+      return res.status(401).json({
+        error: 'Invalid email or password'
+      });
     }
-
-    // Set tenant context for RLS
-    if (user.tenant_slug) {
-      await client.query(`SELECT set_tenant_context('${user.tenant_slug}')`);
-    }
-
-    // Successful login - reset failed attempts and locked_until
-    await client.query(
-      'UPDATE users SET failed_login_attempts = 0, locked_until = NULL WHERE id = $1',
-      [user.id]
-    );
 
     // Update last_login_at timestamp
     await client.query(`
@@ -331,11 +354,15 @@ router.post('/login', async (req, res) => {
       WHERE id = $1
     `, [user.id]);
 
+    // Get primary role for token
+    const primaryRole = user.roles && user.roles.length > 0 ?
+      user.roles[0].toLowerCase().replace(' ', '_') : 'normal_user';
+
     // Generate access and refresh tokens with dynamic session timeout
     const tokenPayload = {
       userId: user.id,
       email: user.email,
-      role: user.role,
+      role: primaryRole,
       tenant_id: user.tenant_id
     };
 
@@ -354,8 +381,9 @@ router.post('/login', async (req, res) => {
         lastName: user.last_name,
         phone: user.phone,
         profilePhoto: user.avatar_url,
-        accountStatus: user.status,
-        role: user.role
+        accountStatus: user.account_status,
+        role: primaryRole,
+        roles: user.roles
       },
       accessToken, // Also send in response for initial setup
       expiresIn: securitySettings.sessionTimeout * 60 // Convert minutes to seconds

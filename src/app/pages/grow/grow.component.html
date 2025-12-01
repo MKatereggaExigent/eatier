@@ -15,12 +15,12 @@
         Advertise Your Services
       </h1>
       <p class="hero-subtitle">
-        Whether you're a restaurant, caterer, chef, waiter, or barista—promote your brand to the right diners and partners. 
-        Choose your ad type, pick the regions and countries you want to reach (e.g., East Africa → Kenya, Ethiopia), 
+        Whether you're a restaurant, caterer, chef, waiter, or barista—promote your brand to the right diners and partners.
+        Choose your ad type, pick the regions and countries you want to reach (e.g., East Africa → Kenya, Ethiopia),
         set your budget, and go live in minutes.
       </p>
       <div class="hero-stats">
-        @for (stat of stats; track stat.label) {
+        @for (stat of stats(); track stat.label) {
           <div class="stat-item">
             <div class="stat-value">{{ stat.value }}</div>
             <div class="stat-label">{{ stat.label }}</div>
@@ -61,9 +61,9 @@
       </button>
       <div class="carousel-indicators">
         @for (slide of carouselSlides; track slide.title; let i = $index) {
-          <button 
+          <button
             type="button"
-            class="indicator" 
+            class="indicator"
             [class.active]="currentSlide() === i"
             (click)="goToSlide(i)"
             [attr.aria-label]="'Go to slide ' + (i + 1)"
@@ -221,7 +221,7 @@
         <div class="enquiry-message">
           <p class="message-greeting">Hi, Jess.</p>
           <p class="message-body">
-            Thank you for getting in touch. This message acknowledges receipt of your enquiry. 
+            Thank you for getting in touch. This message acknowledges receipt of your enquiry.
             We'll get back to you shortly.
           </p>
         </div>

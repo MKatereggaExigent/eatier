@@ -23,7 +23,7 @@ async function authenticateToken(req, res, next) {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
 
-    // Get user from database with tenant information
+    // Get user from database with tenant information and roles
     const result = await pool.query(`
       SELECT
         u.id,
@@ -31,11 +31,18 @@ async function authenticateToken(req, res, next) {
         u.first_name,
         u.last_name,
         u.tenant_id,
-        u.role,
-        t.slug as tenant_slug
+        u.account_status,
+        t.slug as tenant_slug,
+        array_agg(DISTINCT r.name) as roles,
+        array_agg(DISTINCT p.name) as permissions
       FROM users u
       LEFT JOIN tenants t ON u.tenant_id = t.id
+      LEFT JOIN user_roles ur ON u.id = ur.user_id
+      LEFT JOIN roles r ON ur.role_id = r.id
+      LEFT JOIN role_permissions rp ON r.id = rp.role_id
+      LEFT JOIN permissions p ON rp.permission_id = p.id
       WHERE u.id = $1
+      GROUP BY u.id, u.email, u.first_name, u.last_name, u.tenant_id, u.account_status, t.slug
     `, [decoded.userId]);
 
     if (result.rows.length === 0) {
@@ -47,7 +54,15 @@ async function authenticateToken(req, res, next) {
 
     const user = result.rows[0];
 
-    // Attach user to request
+    // Check if account is active
+    if (user.account_status !== 'active') {
+      return res.status(403).json({
+        error: 'Account not active',
+        message: `Your account is ${user.account_status}. Please contact support.`
+      });
+    }
+
+    // Attach user to request with RBAC data
     req.user = {
       id: user.id,
       email: user.email,
@@ -55,7 +70,10 @@ async function authenticateToken(req, res, next) {
       lastName: user.last_name,
       tenant_id: user.tenant_id,
       tenantSlug: user.tenant_slug,
-      role: user.role || 'normal_user'
+      roles: user.roles || ['Normal User'],
+      permissions: user.permissions || [],
+      // For backward compatibility, set primary role
+      role: user.roles && user.roles.length > 0 ? user.roles[0].toLowerCase().replace(' ', '_') : 'normal_user'
     };
 
     next();
@@ -102,7 +120,7 @@ async function optionalAuth(req, res, next) {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
 
-    // Get user from database
+    // Get user from database with RBAC data
     const result = await pool.query(`
       SELECT
         u.id,
@@ -110,11 +128,18 @@ async function optionalAuth(req, res, next) {
         u.first_name,
         u.last_name,
         u.tenant_id,
-        u.role,
-        t.slug as tenant_slug
+        u.account_status,
+        t.slug as tenant_slug,
+        array_agg(DISTINCT r.name) as roles,
+        array_agg(DISTINCT p.name) as permissions
       FROM users u
       LEFT JOIN tenants t ON u.tenant_id = t.id
+      LEFT JOIN user_roles ur ON u.id = ur.user_id
+      LEFT JOIN roles r ON ur.role_id = r.id
+      LEFT JOIN role_permissions rp ON r.id = rp.role_id
+      LEFT JOIN permissions p ON rp.permission_id = p.id
       WHERE u.id = $1
+      GROUP BY u.id, u.email, u.first_name, u.last_name, u.tenant_id, u.account_status, t.slug
     `, [decoded.userId]);
 
     if (result.rows.length > 0) {
@@ -126,7 +151,9 @@ async function optionalAuth(req, res, next) {
         lastName: user.last_name,
         tenant_id: user.tenant_id,
         tenantSlug: user.tenant_slug,
-        role: user.role || 'normal_user'
+        roles: user.roles || ['Normal User'],
+        permissions: user.permissions || [],
+        role: user.roles && user.roles.length > 0 ? user.roles[0].toLowerCase().replace(' ', '_') : 'normal_user'
       };
     }
 
@@ -177,10 +204,72 @@ function requireBusinessOwner(req, res, next) {
   next();
 }
 
+/**
+ * Require specific permission(s)
+ * Usage: requirePermission('Create Users') or requirePermission(['Create Users', 'Delete Users'])
+ */
+function requirePermission(requiredPermissions) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Authentication required'
+      });
+    }
+
+    const permissions = Array.isArray(requiredPermissions) ? requiredPermissions : [requiredPermissions];
+    const userPermissions = req.user.permissions || [];
+
+    // Check if user has at least one of the required permissions
+    const hasPermission = permissions.some(perm => userPermissions.includes(perm));
+
+    if (!hasPermission) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: `Required permission(s): ${permissions.join(' or ')}`,
+        userPermissions: userPermissions
+      });
+    }
+
+    next();
+  };
+}
+
+/**
+ * Require specific role(s)
+ * Usage: requireRole('Itiyum Admin') or requireRole(['Itiyum Admin', 'Business Owner'])
+ */
+function requireRole(requiredRoles) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Authentication required'
+      });
+    }
+
+    const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+    const userRoles = req.user.roles || [];
+
+    // Check if user has at least one of the required roles
+    const hasRole = roles.some(role => userRoles.includes(role));
+
+    if (!hasRole) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: `Required role(s): ${roles.join(' or ')}`,
+        userRoles: userRoles
+      });
+    }
+
+    next();
+  };
+}
+
 module.exports = {
   authenticateToken,
   optionalAuth,
   requireAdmin,
-  requireBusinessOwner
+  requireBusinessOwner,
+  requirePermission,
+  requireRole
 };
 

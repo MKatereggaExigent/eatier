@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, inject } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { PublicStatsService } from '../../core/services/public-stats.service';
 
 interface UserGroup {
   id: string;
@@ -27,8 +28,18 @@ interface CarouselSlide {
   styleUrl: './about.component.scss'
 })
 export class AboutComponent implements OnInit, OnDestroy {
+  private publicStatsService = inject(PublicStatsService);
+
   currentSlide = signal<number>(0);
   private carouselInterval: any;
+
+  // Stats will be populated from database
+  stats = signal<Array<{ value: string; label: string }>>([
+    { value: '0', label: 'Active Users' },
+    { value: '0', label: 'Restaurants' },
+    { value: '0', label: 'Reviews' },
+    { value: '0', label: 'Specialists' }
+  ]);
 
   carouselSlides: CarouselSlide[] = [
     {
@@ -65,6 +76,38 @@ export class AboutComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.startCarousel();
+    this.loadStatistics();
+  }
+
+  /**
+   * Load real statistics from the database
+   */
+  loadStatistics(): void {
+    this.publicStatsService.getStatistics().subscribe({
+      next: (data) => {
+        this.stats.set([
+          { value: this.formatNumber(data.activeUsers), label: 'Active Users' },
+          { value: this.formatNumber(data.restaurants), label: 'Restaurants' },
+          { value: this.formatNumber(data.reviews), label: 'Reviews' },
+          { value: this.formatNumber(data.specialists), label: 'Specialists' }
+        ]);
+      },
+      error: (error) => {
+        console.error('Error loading statistics:', error);
+        // Keep default values (0) on error
+      }
+    });
+  }
+
+  /**
+   * Format numbers for display (e.g., 1234 -> "1.2K+")
+   */
+  formatNumber(num: number): string {
+    if (num === 0) return '0';
+    if (num < 1000) return num.toString();
+    if (num < 10000) return `${(num / 1000).toFixed(1)}K+`;
+    if (num < 1000000) return `${Math.floor(num / 1000)}K+`;
+    return `${(num / 1000000).toFixed(1)}M+`;
   }
 
   ngOnDestroy(): void {
@@ -175,12 +218,5 @@ export class AboutComponent implements OnInit, OnDestroy {
       color: '#cbd5e0',
       gradient: 'linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%)'
     }
-  ];
-
-  stats = [
-    { value: '10K+', label: 'Active Users' },
-    { value: '500+', label: 'Restaurants' },
-    { value: '50K+', label: 'Reviews' },
-    { value: '5K+', label: 'Specialists' }
   ];
 }

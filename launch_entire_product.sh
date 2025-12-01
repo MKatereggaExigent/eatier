@@ -55,7 +55,7 @@ if pg_isready -q 2>/dev/null; then
 else
     print_warning "PostgreSQL is not running. Starting..."
     brew services start postgresql@14 2>/dev/null || brew services start postgresql 2>/dev/null
-    
+
     # Wait for PostgreSQL to start
     print_status "Waiting for PostgreSQL to start..."
     for i in {1..10}; do
@@ -71,32 +71,119 @@ else
     done
 fi
 
-# Step 2: Verify database exists
+# Step 2: Verify database exists and is initialized
 print_status "Checking database..."
 if psql -U michaelkateregga -d itiyum_platform -c "SELECT 1;" > /dev/null 2>&1; then
     print_success "Database 'itiyum_platform' is accessible"
+
+    # Check if database has tables (is initialized)
+    print_status "Checking if database is initialized..."
+    TABLE_COUNT=$(psql -U michaelkateregga -d itiyum_platform -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';" 2>/dev/null | xargs)
+
+    if [ "$TABLE_COUNT" -eq 0 ]; then
+        print_warning "Database is empty. Initializing schema and admin user..."
+
+        # Run database migrations using the backend script
+        cd backend
+        print_status "Running database migrations..."
+        node scripts/run-migrations.js
+
+        if [ $? -eq 0 ]; then
+            print_success "Database initialized successfully"
+            print_success "Admin user created: admin@itiyum.com / Admin@123"
+        else
+            print_error "Database initialization failed"
+            print_error "Please check the error messages above"
+            cd ..
+            exit 1
+        fi
+        cd ..
+    else
+        print_success "Database schema is initialized ($TABLE_COUNT tables found)"
+    fi
 else
     print_error "Database 'itiyum_platform' is not accessible"
-    print_warning "Please create the database first or restore from backup"
-    exit 1
+    print_warning "Creating database..."
+
+    # Try to create the database
+    if createdb -U michaelkateregga itiyum_platform 2>/dev/null; then
+        print_success "Database created successfully"
+
+        # Initialize the database
+        print_status "Initializing database schema..."
+        cd backend
+        node scripts/run-migrations.js
+
+        if [ $? -eq 0 ]; then
+            print_success "Database initialized successfully"
+            print_success "Admin user created: admin@itiyum.com / Admin@123"
+        else
+            print_error "Database initialization failed"
+            cd ..
+            exit 1
+        fi
+        cd ..
+    else
+        print_error "Failed to create database"
+        print_warning "Please create the database manually: createdb itiyum_platform"
+        exit 1
+    fi
 fi
 
-# Step 3: Check Node.js version
-print_status "Checking Node.js version..."
-if command -v nvm &> /dev/null; then
-    # Load nvm
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    
-    # Use Node.js 20.19.5
-    print_status "Switching to Node.js 20.19.5..."
-    nvm use 20.19.5 > /dev/null 2>&1 || {
-        print_error "Node.js 20.19.5 not found. Please install it with: nvm install 20.19.5"
-        exit 1
-    }
-    print_success "Using Node.js $(node --version)"
+# Step 3: Load nvm and check Node.js version
+print_status "Setting up Node.js environment..."
+
+# Load nvm if it exists
+export NVM_DIR="$HOME/.nvm"
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+    \. "$NVM_DIR/nvm.sh"
+    print_success "nvm loaded successfully"
+
+    # Required Node.js version (Angular CLI requirement)
+    REQUIRED_NODE_VERSION="22.12.0"
+
+    # Check if required version is installed
+    if nvm ls "$REQUIRED_NODE_VERSION" &> /dev/null; then
+        print_status "Switching to Node.js $REQUIRED_NODE_VERSION..."
+        nvm use "$REQUIRED_NODE_VERSION" > /dev/null 2>&1
+        print_success "Using Node.js $(node --version)"
+    else
+        print_warning "Node.js $REQUIRED_NODE_VERSION not found. Installing..."
+        nvm install "$REQUIRED_NODE_VERSION"
+        nvm use "$REQUIRED_NODE_VERSION"
+        print_success "Installed and using Node.js $(node --version)"
+    fi
 else
-    print_warning "nvm not found. Using system Node.js $(node --version)"
+    print_warning "nvm not found at $NVM_DIR"
+    print_status "Current Node.js version: $(node --version)"
+
+    # Check if current Node.js version meets minimum requirements
+    CURRENT_VERSION=$(node --version | sed 's/v//')
+    MAJOR_VERSION=$(echo $CURRENT_VERSION | cut -d. -f1)
+    MINOR_VERSION=$(echo $CURRENT_VERSION | cut -d. -f2)
+
+    # Angular CLI requires Node.js >= 20.19 or >= 22.12
+    if [ "$MAJOR_VERSION" -eq 20 ] && [ "$MINOR_VERSION" -lt 19 ]; then
+        print_error "Node.js version $CURRENT_VERSION is too old"
+        print_error "Angular CLI requires Node.js >= v20.19 or >= v22.12"
+        print_error "Please install nvm and run this script again, or upgrade your system Node.js"
+        print_error ""
+        print_error "To install nvm, run:"
+        print_error "  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash"
+        exit 1
+    elif [ "$MAJOR_VERSION" -eq 21 ]; then
+        print_error "Node.js version $CURRENT_VERSION is not supported"
+        print_error "Angular CLI requires Node.js >= v20.19 or >= v22.12"
+        print_error "Please install nvm and run this script again"
+        exit 1
+    elif [ "$MAJOR_VERSION" -eq 22 ] && [ "$MINOR_VERSION" -lt 12 ]; then
+        print_error "Node.js version $CURRENT_VERSION is too old"
+        print_error "Angular CLI requires Node.js >= v22.12"
+        print_error "Please install nvm and run this script again, or upgrade your system Node.js"
+        exit 1
+    fi
+
+    print_success "Node.js version meets requirements"
 fi
 
 # Step 4: Kill existing processes on ports 3001 and 4200
@@ -167,14 +254,14 @@ for i in {1..120}; do
         print_success "Frontend running at: http://localhost:4200"
         break
     fi
-    
+
     # Show progress every 10 seconds
     if [ $((i % 10)) -eq 0 ]; then
         print_status "Still building... ($i seconds elapsed)"
     fi
-    
+
     sleep 1
-    
+
     if [ $i -eq 120 ]; then
         print_error "Frontend failed to start. Check frontend.log for details"
         tail -30 frontend.log

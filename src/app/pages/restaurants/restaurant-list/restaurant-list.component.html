@@ -26,22 +26,22 @@
       <!-- Quick Stats -->
       <div class="quick-stats glass-morphic">
         <div class="stat-item">
-          <span class="stat-number">500+</span>
+          <span class="stat-number">{{ stats().restaurants }}</span>
           <span class="stat-label">Restaurants</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item">
-          <span class="stat-number">25+</span>
+          <span class="stat-number">{{ cuisineTypes.length - 1 }}</span>
           <span class="stat-label">Cuisines</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item">
-          <span class="stat-number">10k+</span>
+          <span class="stat-number">{{ stats().reviews }}</span>
           <span class="stat-label">Reviews</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item">
-          <span class="stat-number">4.2★</span>
+          <span class="stat-number">{{ stats().avgRating > 0 ? stats().avgRating.toFixed(1) + '★' : 'N/A' }}</span>
           <span class="stat-label">Avg Rating</span>
         </div>
       </div>

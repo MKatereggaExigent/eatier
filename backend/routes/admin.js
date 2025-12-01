@@ -1,14 +1,12 @@
 const express = require('express');
 const pool = require('../config/database');
 const analyticsAIService = require('../services/analyticsAIService');
+const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const router = express.Router();
 
-// Middleware to check admin role
-const requireAdmin = (req, res, next) => {
-  // TODO: Implement proper JWT authentication
-  // For now, allow all requests
-  next();
-};
+// Apply authentication and admin check to all routes
+router.use(authenticateToken);
+router.use(requireAdmin);
 
 // ===================================
 // STATISTICS - COMPREHENSIVE PLATFORM METRICS
@@ -784,6 +782,37 @@ router.get('/analytics', requireAdmin, async (req, res) => {
         (SELECT COUNT(*) FROM bookings WHERE status = 'confirmed' OR status = 'completed') as successful_bookings
     `);
 
+    // Get top countries by user count
+    const topCountries = await pool.query(`
+      SELECT
+        COALESCE(bl.country, 'Unknown') as country,
+        COUNT(DISTINCT b.owner_id) as user_count
+      FROM business_locations bl
+      INNER JOIN businesses b ON bl.business_id = b.id
+      WHERE bl.country IS NOT NULL AND bl.country != ''
+      GROUP BY bl.country
+      ORDER BY user_count DESC
+      LIMIT 10
+    `);
+
+    // Get business types distribution (by cuisine type)
+    const businessTypes = await pool.query(`
+      SELECT
+        UNNEST(cuisine_types)::text as business_type,
+        COUNT(*) as count
+      FROM businesses
+      WHERE cuisine_types IS NOT NULL AND array_length(cuisine_types, 1) > 0
+      GROUP BY UNNEST(cuisine_types)
+      ORDER BY count DESC
+      LIMIT 10
+    `);
+
+    // Get revenue data for charts (same as revenueTrends but formatted for frontend)
+    const revenueData = revenueTrends.rows.map(row => ({
+      month: row.month_label,
+      revenue: parseFloat(row.total_revenue) || 0
+    }));
+
     res.json({
       statistics: {
         ...stats.rows[0],
@@ -799,11 +828,14 @@ router.get('/analytics', requireAdmin, async (req, res) => {
           : 0
       },
       userGrowth: userGrowth.rows,
+      revenueData: revenueData,
       revenueTrends: revenueTrends.rows,
       bookingTrends: bookingTrends.rows,
       subscriptionPlans: subscriptionPlans.rows,
       bookingStatus: bookingStatus.rows,
       topBusinesses: topBusinesses.rows,
+      topCountries: topCountries.rows,
+      businessTypes: businessTypes.rows,
       userRoles: userRoles.rows,
       businessStatus: businessStatus.rows,
       conversionMetrics: conversionMetrics.rows[0]

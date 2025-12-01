@@ -286,8 +286,138 @@ export class AdminAnalyticsComponent implements OnInit {
   }
 
   exportAnalytics(): void {
-    // TODO: Implement analytics export functionality
-    this.showToast('Export functionality coming soon!', 'info');
+    try {
+      // Prepare data for export
+      const exportData = {
+        generatedAt: new Date().toISOString(),
+        statistics: this.statistics(),
+        userGrowth: this.userGrowth(),
+        revenueData: this.revenueData(),
+        bookingTrends: this.bookingTrends(),
+        topCountries: this.topCountries(),
+        businessTypes: this.businessTypes(),
+        bookingStatus: this.bookingStatus(),
+        aiInsights: this.aiInsights(),
+        revenueForecast: this.revenueForecast(),
+        anomalies: this.anomalies()
+      };
+
+      // Convert to CSV format
+      const csv = this.convertToCSV(exportData);
+
+      // Create blob and download
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+
+      link.setAttribute('href', url);
+      link.setAttribute('download', `analytics-export-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      this.showToast('Analytics exported successfully!', 'success');
+    } catch (error) {
+      console.error('Export error:', error);
+      this.showToast('Failed to export analytics', 'error');
+    }
+  }
+
+  private convertToCSV(data: any): string {
+    let csv = '';
+
+    // Add header
+    csv += 'Itiyum Platform Analytics Report\n';
+    csv += `Generated: ${new Date().toLocaleString()}\n\n`;
+
+    // Statistics Section
+    csv += 'PLATFORM STATISTICS\n';
+    csv += 'Metric,Value\n';
+    const stats = data.statistics;
+    csv += `Total Users,${stats.total_users}\n`;
+    csv += `Business Owners,${stats.business_owners}\n`;
+    csv += `Food Enthusiasts,${stats.food_enthusiasts}\n`;
+    csv += `Total Businesses,${stats.total_businesses}\n`;
+    csv += `Active Businesses,${stats.active_businesses}\n`;
+    csv += `Total Bookings,${stats.total_bookings}\n`;
+    csv += `Confirmed Bookings,${stats.confirmed_bookings}\n`;
+    csv += `Completed Bookings,${stats.completed_bookings}\n`;
+    csv += `Total Revenue,$${stats.total_revenue}\n`;
+    csv += `Subscription Revenue,$${stats.subscription_revenue}\n`;
+    csv += `Commission Revenue,$${stats.commission_revenue}\n\n`;
+
+    // User Growth Section
+    csv += 'USER GROWTH (MONTHLY)\n';
+    csv += 'Month,Total Users,Business Owners,Food Enthusiasts\n';
+    data.userGrowth.forEach((item: any) => {
+      csv += `${item.month_label},${item.users},${item.business_owners},${item.food_enthusiasts}\n`;
+    });
+    csv += '\n';
+
+    // Revenue Trends Section
+    csv += 'REVENUE TRENDS (MONTHLY)\n';
+    csv += 'Month,Revenue\n';
+    data.revenueData.forEach((item: any) => {
+      csv += `${item.month},$${item.revenue}\n`;
+    });
+    csv += '\n';
+
+    // Booking Trends Section
+    csv += 'BOOKING TRENDS\n';
+    csv += 'Month,Total Bookings,Confirmed,Completed,Cancelled\n';
+    data.bookingTrends.forEach((item: any) => {
+      csv += `${item.month_label},${item.total_bookings},${item.confirmed},${item.completed},${item.cancelled}\n`;
+    });
+    csv += '\n';
+
+    // Top Countries Section
+    csv += 'TOP COUNTRIES\n';
+    csv += 'Country,User Count\n';
+    data.topCountries.forEach((item: any) => {
+      csv += `${item.country},${item.user_count}\n`;
+    });
+    csv += '\n';
+
+    // Business Types Section
+    csv += 'BUSINESS TYPES\n';
+    csv += 'Type,Count\n';
+    data.businessTypes.forEach((item: any) => {
+      csv += `${item.business_type},${item.count}\n`;
+    });
+    csv += '\n';
+
+    // AI Insights Section
+    if (data.aiInsights.length > 0) {
+      csv += 'AI INSIGHTS\n';
+      csv += 'Priority,Type,Title,Description,Recommendation\n';
+      data.aiInsights.forEach((item: any) => {
+        csv += `${item.priority},${item.type},"${item.title}","${item.description}","${item.recommendation}"\n`;
+      });
+      csv += '\n';
+    }
+
+    // Revenue Forecast Section
+    if (data.revenueForecast.length > 0) {
+      csv += 'REVENUE FORECAST\n';
+      csv += 'Month,Predicted Total,Predicted Subscription,Predicted Commission,Confidence,Reasoning\n';
+      data.revenueForecast.forEach((item: any) => {
+        csv += `${item.month},$${item.predicted_total},$${item.predicted_subscription},$${item.predicted_commission},${item.confidence},"${item.reasoning}"\n`;
+      });
+      csv += '\n';
+    }
+
+    // Anomalies Section
+    if (data.anomalies.length > 0) {
+      csv += 'ANOMALIES DETECTED\n';
+      csv += 'Severity,Metric,Description,Impact,Suggested Action\n';
+      data.anomalies.forEach((item: any) => {
+        csv += `${item.severity},${item.metric},"${item.description}","${item.impact}","${item.suggested_action}"\n`;
+      });
+    }
+
+    return csv;
   }
 
   refreshAnalytics(): void {

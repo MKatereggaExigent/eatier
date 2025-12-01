@@ -72,6 +72,7 @@ const searchRoutes = require('./routes/search');
 const analyticsRoutes = require('./routes/analytics');
 const businessAdsRoutes = require('./routes/business-ads');
 const adsPublicRoutes = require('./routes/ads-public');
+const publicStatsRoutes = require('./routes/public-stats');
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -96,6 +97,7 @@ app.use('/api/search', searchRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/business-ads', businessAdsRoutes);
 app.use('/api/ads-public', adsPublicRoutes); // Public ad serving endpoints
+app.use('/api/public', publicStatsRoutes); // Public statistics endpoint
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

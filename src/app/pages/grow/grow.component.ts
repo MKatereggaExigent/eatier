@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { PublicStatsService } from '../../core/services/public-stats.service';
 import { CommonModule } from '@angular/common';
 
 interface AdType {
@@ -23,6 +24,7 @@ interface AdType {
 export class GrowComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private publicStatsService = inject(PublicStatsService);
 
   isAuthenticated = this.authService.isAuthenticated;
   currentUser = this.authService.currentUser;
@@ -49,11 +51,12 @@ export class GrowComponent implements OnInit, OnDestroy {
     }
   ];
 
-  stats = [
-    { value: '50K+', label: 'Active Diners' },
-    { value: '120+', label: 'Countries' },
-    { value: '95%', label: 'Success Rate' }
-  ];
+  // Stats will be populated from database
+  stats = signal<Array<{ value: string; label: string }>>([
+    { value: '0', label: 'Active Users' },
+    { value: '0', label: 'Restaurants' },
+    { value: '0', label: 'Reviews' }
+  ]);
 
   adTypes: AdType[] = [
     {
@@ -106,10 +109,41 @@ export class GrowComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.startCarousel();
+    this.loadStatistics();
   }
 
   ngOnDestroy(): void {
     this.stopCarousel();
+  }
+
+  /**
+   * Load real statistics from the database
+   */
+  loadStatistics(): void {
+    this.publicStatsService.getStatistics().subscribe({
+      next: (data) => {
+        this.stats.set([
+          { value: this.formatNumber(data.activeUsers), label: 'Active Users' },
+          { value: this.formatNumber(data.restaurants), label: 'Restaurants' },
+          { value: this.formatNumber(data.reviews), label: 'Reviews' }
+        ]);
+      },
+      error: (error) => {
+        console.error('Error loading statistics:', error);
+        // Keep default values (0) on error
+      }
+    });
+  }
+
+  /**
+   * Format numbers for display (e.g., 1234 -> "1.2K+")
+   */
+  formatNumber(num: number): string {
+    if (num === 0) return '0';
+    if (num < 1000) return num.toString();
+    if (num < 10000) return `${(num / 1000).toFixed(1)}K+`;
+    if (num < 1000000) return `${Math.floor(num / 1000)}K+`;
+    return `${(num / 1000000).toFixed(1)}M+`;
   }
 
   startCarousel(): void {
@@ -125,13 +159,13 @@ export class GrowComponent implements OnInit, OnDestroy {
   }
 
   nextSlide(): void {
-    this.currentSlide.update(current => 
+    this.currentSlide.update(current =>
       current === this.carouselSlides.length - 1 ? 0 : current + 1
     );
   }
 
   prevSlide(): void {
-    this.currentSlide.update(current => 
+    this.currentSlide.update(current =>
       current === 0 ? this.carouselSlides.length - 1 : current - 1
     );
   }
