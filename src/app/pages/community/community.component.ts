@@ -1,7 +1,8 @@
 import { CommunityService, FeaturedChef, CommunityPost as ServiceCommunityPost, TrendingTopic } from '../../core/services/community.service';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
+import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -43,6 +44,11 @@ interface CommunityComment {
 export class CommunityComponent implements OnInit {
   private fb = inject(FormBuilder);
   private communityService = inject(CommunityService);
+  private authService = inject(AuthService);
+
+  // Auth state
+  currentUser = this.authService.currentUser;
+  isAuthenticated = this.authService.isAuthenticated;
 
   // State management
   posts = signal<ServiceCommunityPost[]>([]);
@@ -65,114 +71,6 @@ export class CommunityComponent implements OnInit {
 
   // Expose Math to template
   Math = Math;
-
-  // Mock data
-  mockPosts: CommunityPost[] = [
-    {
-      id: '1',
-      authorId: 'chef-1',
-      authorName: 'Chef Marco Rossi',
-      authorAvatar: 'https://images.unsplash.com/photo-1583394293214-28a5b0a8e8b8?w=100&h=100&fit=crop&crop=face',
-      authorType: 'chef',
-      content: 'Just finished creating a new pasta dish with locally sourced ingredients! The secret is in the fresh basil and homemade sauce. What do you think? 🍝',
-      images: [
-        'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=600&h=400&fit=crop'
-      ],
-      likes: 127,
-      comments: 23,
-      shares: 8,
-      createdAt: new Date('2024-01-20T10:30:00'),
-      isLiked: false,
-      tags: ['pasta', 'italian', 'fresh', 'local']
-    },
-    {
-      id: '2',
-      authorId: 'business-1',
-      authorName: 'Bella Italia Restaurant',
-      authorAvatar: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=100&h=100&fit=crop',
-      authorType: 'business',
-      content: 'We\'re excited to announce our new sustainable packaging initiative! All our takeout orders now come in 100% biodegradable containers. Small steps towards a greener future! 🌱',
-      images: [
-        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop'
-      ],
-      likes: 89,
-      comments: 15,
-      shares: 12,
-      createdAt: new Date('2024-01-19T15:45:00'),
-      isLiked: true,
-      tags: ['sustainability', 'eco-friendly', 'packaging', 'green']
-    },
-    {
-      id: '3',
-      authorId: 'chef-2',
-      authorName: 'Chef Sarah Kim',
-      authorAvatar: 'https://images.unsplash.com/photo-1494790108755-2616c6d4e6e8?w=100&h=100&fit=crop&crop=face',
-      authorType: 'chef',
-      content: 'Teaching a cooking class this weekend! We\'ll be making traditional Korean BBQ with a modern twist. Limited spots available - who\'s interested? 🥢',
-      likes: 156,
-      comments: 34,
-      shares: 19,
-      createdAt: new Date('2024-01-18T09:15:00'),
-      isLiked: false,
-      tags: ['cooking-class', 'korean', 'bbq', 'workshop']
-    },
-    {
-      id: '4',
-      authorId: 'user-1',
-      authorName: 'Food Lover Mike',
-      authorAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-      authorType: 'user',
-      content: 'Had the most amazing brunch at @BellaItalia today! The eggs benedict was perfection. Highly recommend to anyone in the area! 🍳',
-      images: [
-        'https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&h=400&fit=crop'
-      ],
-      likes: 45,
-      comments: 8,
-      shares: 3,
-      createdAt: new Date('2024-01-17T11:20:00'),
-      isLiked: true,
-      tags: ['brunch', 'eggs-benedict', 'review', 'recommendation']
-    }
-  ];
-
-  mockTrendingTopics = [
-    '#SustainableCooking',
-    '#LocalIngredients',
-    '#PlantBased',
-    '#FoodWaste',
-    '#CookingTips',
-    '#SeasonalMenu',
-    '#FarmToTable',
-    '#VeganRecipes'
-  ];
-
-  mockFeaturedChefs = [
-    {
-      id: 'chef-1',
-      name: 'Chef Marco Rossi',
-      avatar: 'https://images.unsplash.com/photo-1583394293214-28a5b0a8e8b8?w=100&h=100&fit=crop&crop=face',
-      specialty: 'Italian Cuisine',
-      followers: 12500,
-      isFollowing: false
-    },
-    {
-      id: 'chef-2',
-      name: 'Chef Sarah Kim',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616c6d4e6e8?w=100&h=100&fit=crop&crop=face',
-      specialty: 'Korean Fusion',
-      followers: 8900,
-      isFollowing: true
-    },
-    {
-      id: 'chef-3',
-      name: 'Chef David Chen',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-      specialty: 'Modern Asian',
-      followers: 15200,
-      isFollowing: false
-    }
-  ];
 
   constructor() {
     this.postForm = this.fb.group({
@@ -206,10 +104,9 @@ export class CommunityComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading posts:', error);
-        // Fallback to mock data
-        this.posts.set(this.mockPosts);
-        this.totalPosts.set(this.mockPosts.length);
-        this.totalPages.set(Math.ceil(this.mockPosts.length / this.pageSize()));
+        this.posts.set([]);
+        this.totalPosts.set(0);
+        this.totalPages.set(1);
         this.isLoading.set(false);
       }
     });
@@ -221,8 +118,7 @@ export class CommunityComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading trending topics:', error);
-        // Fallback to mock data
-        this.trendingTopics.set(this.mockTrendingTopics.map(topic => ({ name: topic, count: Math.floor(Math.random() * 1000) + 100 })));
+        this.trendingTopics.set([]);
       }
     });
 
@@ -230,13 +126,10 @@ export class CommunityComponent implements OnInit {
     this.communityService.getFeaturedChefs().subscribe({
       next: (chefs) => {
         this.featuredChefs.set(chefs);
-        this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Error loading featured chefs:', error);
-        // Fallback to mock data
-        this.featuredChefs.set(this.mockFeaturedChefs);
-        this.isLoading.set(false);
+        this.featuredChefs.set([]);
       }
     });
   }
@@ -342,6 +235,14 @@ export class CommunityComponent implements OnInit {
   }
 
   onCreatePost(): void {
+    // Check if user is logged in
+    const user = this.currentUser();
+    if (!user || !user.id) {
+      this.postSuccessMessage.set('❌ Please log in to create a post.');
+      setTimeout(() => this.postSuccessMessage.set(''), 5000);
+      return;
+    }
+
     if (this.postForm.valid) {
       this.isSubmittingPost.set(true);
       this.postSuccessMessage.set('');
@@ -351,7 +252,7 @@ export class CommunityComponent implements OnInit {
         content: formValue.content,
         images: this.selectedImages().length > 0 ? this.selectedImages() : (formValue.images ? [formValue.images] : []),
         tags: formValue.tags ? formValue.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0) : [],
-        authorId: 'current-user-id' // In real app, get from auth service
+        authorId: user.id
       };
 
       this.communityService.createPost(postData).subscribe({
@@ -370,42 +271,25 @@ export class CommunityComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error creating post:', error);
-          // Fallback to local creation
-          const newPost: ServiceCommunityPost = {
-            id: Date.now().toString(),
-            authorId: 'current-user',
-            authorName: 'You',
-            authorAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-            authorType: 'user',
-            content: formValue.content,
-            images: this.selectedImages().length > 0 ? this.selectedImages() : (formValue.images ? [formValue.images] : []),
-            likes: 0,
-            comments: 0,
-            shares: 0,
-            createdAt: new Date(),
-            isLiked: false,
-            tags: formValue.tags ? formValue.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0) : []
-          };
-
-          this.posts.update(posts => [newPost, ...posts]);
-          this.postForm.reset();
-          this.selectedImages.set([]);
           this.isSubmittingPost.set(false);
-          this.postSuccessMessage.set('✅ Post created successfully!');
+          this.postSuccessMessage.set('❌ Failed to create post. Please try again.');
 
-          // Switch back to feed tab to show the new post
-          this.activeTab.set('feed');
-
-          // Clear success message after 3 seconds
-          setTimeout(() => this.postSuccessMessage.set(''), 3000);
+          // Clear error message after 5 seconds
+          setTimeout(() => this.postSuccessMessage.set(''), 5000);
         }
       });
     }
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: Date | string): string {
     const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    const dateObj = date instanceof Date ? date : new Date(date);
+
+    if (isNaN(dateObj.getTime())) {
+      return 'Unknown';
+    }
+
+    const diffInHours = Math.floor((now.getTime() - dateObj.getTime()) / (1000 * 60 * 60));
 
     if (diffInHours < 1) {
       return 'Just now';
@@ -439,6 +323,26 @@ export class CommunityComponent implements OnInit {
     if (imageUrl && imageUrl.trim()) {
       this.selectedImages.update(images => [...images, imageUrl.trim()]);
       this.postForm.patchValue({ images: '' });
+    }
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const files = Array.from(input.files);
+      files.forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (e: ProgressEvent<FileReader>) => {
+            if (e.target?.result) {
+              this.selectedImages.update(images => [...images, e.target!.result as string]);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      // Reset input so same file can be selected again
+      input.value = '';
     }
   }
 

@@ -105,6 +105,11 @@
     </div>
   </div>
 
+  <!-- Sponsored Banner Ad -->
+  <div class="sponsored-banner">
+    <app-banner-ad placement="restaurant_list_banner" [autoRotate]="true" [rotationInterval]="8000" [limit]="3"></app-banner-ad>
+  </div>
+
   <!-- Restaurant Grid -->
   <div class="restaurant-grid">
     @for (restaurant of filteredRestaurants(); track restaurant.id) {

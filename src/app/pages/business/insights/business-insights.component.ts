@@ -1,7 +1,8 @@
 import { Business, BusinessOwnerService } from '../../../core/services/business-owner.service';
+import { BusinessInsightsResponse, InsightsService } from '../../../core/services/insights.service';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
+import { Subject, catchError, finalize, forkJoin, of, switchMap, takeUntil } from 'rxjs';
 
 import { BusinessInsights } from '../../../shared/models/business-profile.model';
 import { CommonModule } from '@angular/common';
@@ -16,11 +17,13 @@ import { CommonModule } from '@angular/common';
 export class BusinessInsightsComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private businessOwnerService = inject(BusinessOwnerService);
+  private insightsService = inject(InsightsService);
   private destroy$ = new Subject<void>();
 
   // State management
   business = signal<Business | null>(null);
   insights = signal<BusinessInsights | null>(null);
+  insightsData = signal<BusinessInsightsResponse | null>(null);
   isLoading = signal<boolean>(false);
   selectedPeriod = signal<string>('monthly');
   isExporting = signal<boolean>(false);
@@ -32,8 +35,8 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
   // Period options
   readonly periodOptions = [
     { value: 'daily', label: 'Daily', icon: '📅' },
+    { value: 'weekly', label: 'Weekly', icon: '📆' },
     { value: 'monthly', label: 'Monthly', icon: '📊' },
-    { value: 'quarterly', label: 'Quarterly', icon: '📈' },
     { value: 'yearly', label: 'Yearly', icon: '📋' },
     { value: 'custom', label: 'Custom Range', icon: '🗓️' }
   ];
@@ -75,23 +78,73 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
       .subscribe(response => {
         if (response && response.business) {
           this.business.set(response.business);
-          this.generateInsights(response.business);
+          this.fetchInsights(response.business.id);
         }
       });
   }
 
-  generateInsights(business: Business): void {
-    // Generate insights from real business data
-    // TODO: Replace with actual analytics API when available
+  fetchInsights(businessId: string): void {
+    const period = this.selectedPeriod() as 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+
+    if (period === 'custom') {
+      const formValue = this.dateRangeForm.value;
+      startDate = formValue.startDate;
+      endDate = formValue.endDate;
+    }
+
+    this.insightsService.getBusinessInsights(businessId, period, startDate, endDate)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error fetching insights:', error);
+          // Fall back to business data if API fails
+          const business = this.business();
+          if (business) {
+            this.generateFallbackInsights(business);
+          }
+          return of(null);
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          this.insightsData.set(response);
+          this.convertToBusinessInsights(response);
+        }
+      });
+  }
+
+  convertToBusinessInsights(data: BusinessInsightsResponse): void {
+    // Map 'weekly' to 'daily' for the BusinessInsights type which doesn't support 'weekly'
+    const periodType = data.period.type === 'weekly' ? 'daily' : data.period.type;
+
+    const insights: BusinessInsights = {
+      businessId: data.businessId,
+      period: {
+        start: new Date(data.period.start),
+        end: new Date(data.period.end),
+        type: periodType as 'daily' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
+      },
+      metrics: data.metrics,
+      engagement: data.engagement,
+      growth: data.growth,
+      demographics: data.demographics
+    };
+    this.insights.set(insights);
+  }
+
+  generateFallbackInsights(business: Business): void {
+    // Fallback to estimated data if API fails
     const insights: BusinessInsights = {
       businessId: business.id,
       period: {
-        start: new Date(new Date().setDate(1)), // First day of current month
+        start: new Date(new Date().setDate(1)),
         end: new Date(),
         type: this.selectedPeriod() as 'daily' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
       },
       metrics: {
-        totalViews: business.total_bookings ? business.total_bookings * 10 : 0, // Estimate
+        totalViews: business.total_bookings ? business.total_bookings * 10 : 0,
         uniqueVisitors: business.total_bookings ? business.total_bookings * 7 : 0,
         menuViews: business.total_menu_items ? business.total_menu_items * 50 : 0,
         profileViews: business.total_reviews ? business.total_reviews * 15 : 0,
@@ -100,40 +153,45 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
         shareCount: Math.floor((business.total_reviews || 0) * 0.5)
       },
       engagement: {
-        averageSessionDuration: 145, // TODO: Get from analytics
-        bounceRate: 0.32,
-        returnVisitorRate: 0.28,
-        peakHours: ['12:00', '13:00', '19:00', '20:00'],
-        popularMenuItems: [] // TODO: Get from menu analytics
+        averageSessionDuration: 0,
+        bounceRate: 0,
+        returnVisitorRate: 0,
+        peakHours: [],
+        popularMenuItems: []
       },
       growth: {
-        viewsGrowth: 0.18,
-        engagementGrowth: 0.12,
-        customerGrowth: 0.25
+        viewsGrowth: 0,
+        engagementGrowth: 0,
+        customerGrowth: 0
       },
       demographics: {
         topCountries: [
-          { country: business.country || 'United States', count: business.total_bookings || 0 }
+          { country: business.country || 'Unknown', count: business.total_bookings || 0 }
         ],
         deviceTypes: [
-          { type: 'Mobile', percentage: 68 },
-          { type: 'Desktop', percentage: 24 },
-          { type: 'Tablet', percentage: 8 }
+          { type: 'Mobile', percentage: 0 },
+          { type: 'Desktop', percentage: 0 },
+          { type: 'Tablet', percentage: 0 }
         ],
         referralSources: [
-          { source: 'Google Search', count: Math.floor((business.total_bookings || 0) * 0.5) },
-          { source: 'Social Media', count: Math.floor((business.total_bookings || 0) * 0.3) },
-          { source: 'Direct', count: Math.floor((business.total_bookings || 0) * 0.2) }
+          { source: 'Google Search', count: 0 },
+          { source: 'Social Media', count: 0 },
+          { source: 'Direct', count: 0 }
         ]
       }
     };
-
     this.insights.set(insights);
   }
 
   loadInsights(): void {
-    // Reload business data when period changes
-    this.loadBusinessData();
+    const business = this.business();
+    if (business) {
+      this.isLoading.set(true);
+      this.fetchInsights(business.id);
+      setTimeout(() => this.isLoading.set(false), 1000);
+    } else {
+      this.loadBusinessData();
+    }
   }
 
   onPeriodChange(period: string): void {

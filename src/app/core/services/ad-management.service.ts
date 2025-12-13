@@ -284,12 +284,26 @@ export class AdManagementService {
     }
   }
 
+  async startCampaign(campaignId: string): Promise<void> {
+    try {
+      const currentUser = this.authService.currentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+      await this.apiService.post(`business-ads/my-ads/${campaignId}/start?userId=${currentUser.id}`, {}).toPromise();
+    } catch (error) {
+      console.error('Error starting campaign:', error);
+      throw error;
+    }
+  }
+
   async pauseCampaign(campaignId: string): Promise<void> {
     try {
-      await this.apiService.put(`ads/campaigns/${campaignId}`, {
-        status: 'paused',
-        isActive: false
-      }).toPromise();
+      const currentUser = this.authService.currentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+      await this.apiService.post(`business-ads/my-ads/${campaignId}/pause?userId=${currentUser.id}`, {}).toPromise();
     } catch (error) {
       console.error('Error pausing campaign:', error);
       throw error;
@@ -298,10 +312,11 @@ export class AdManagementService {
 
   async resumeCampaign(campaignId: string): Promise<void> {
     try {
-      await this.apiService.put(`ads/campaigns/${campaignId}`, {
-        status: 'active',
-        isActive: true
-      }).toPromise();
+      const currentUser = this.authService.currentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+      await this.apiService.post(`business-ads/my-ads/${campaignId}/resume?userId=${currentUser.id}`, {}).toPromise();
     } catch (error) {
       console.error('Error resuming campaign:', error);
       throw error;
@@ -310,7 +325,11 @@ export class AdManagementService {
 
   async deleteCampaign(campaignId: string): Promise<void> {
     try {
-      await this.apiService.delete(`ads/campaigns/${campaignId}`).toPromise();
+      const currentUser = this.authService.currentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+      await this.apiService.delete(`business-ads/my-ads/${campaignId}?userId=${currentUser.id}`).toPromise();
     } catch (error) {
       console.error('Error deleting campaign:', error);
       throw error;

@@ -7,13 +7,37 @@ router.get('/posts', async (req, res) => {
   try {
     const { page = 1, limit = 10, author_type } = req.query;
     const offset = (page - 1) * limit;
-    
-    let query = `
-      SELECT 
+
+    // Build the WHERE clause
+    let whereClause = 'WHERE cp.is_active = true';
+    if (author_type) {
+      if (author_type === 'chef') {
+        whereClause += ` AND u.is_chef = true`;
+      } else if (author_type === 'business') {
+        whereClause += ` AND b.id IS NOT NULL`;
+      } else if (author_type === 'user') {
+        whereClause += ` AND u.is_chef = false AND b.id IS NULL`;
+      }
+    }
+
+    // Get total count
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM community_posts cp
+      JOIN users u ON cp.author_id = u.id
+      LEFT JOIN businesses b ON u.id = b.owner_id
+      ${whereClause}
+    `;
+    const countResult = await pool.query(countQuery);
+    const total = parseInt(countResult.rows[0].total) || 0;
+
+    // Get posts
+    const query = `
+      SELECT
         cp.*,
         u.first_name || ' ' || u.last_name as author_name,
         u.profile_photo as author_avatar,
-        CASE 
+        CASE
           WHEN u.is_chef THEN 'chef'
           WHEN b.id IS NOT NULL THEN 'business'
           ELSE 'user'
@@ -21,52 +45,48 @@ router.get('/posts', async (req, res) => {
       FROM community_posts cp
       JOIN users u ON cp.author_id = u.id
       LEFT JOIN businesses b ON u.id = b.owner_id
-      WHERE cp.is_active = true
+      ${whereClause}
+      ORDER BY cp.created_at DESC
+      LIMIT $1 OFFSET $2
     `;
-    
-    const params = [];
-    
-    if (author_type) {
-      if (author_type === 'chef') {
-        query += ` AND u.is_chef = true`;
-      } else if (author_type === 'business') {
-        query += ` AND b.id IS NOT NULL`;
-      } else if (author_type === 'user') {
-        query += ` AND u.is_chef = false AND b.id IS NULL`;
-      }
-    }
-    
-    query += ` ORDER BY cp.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-    params.push(limit, offset);
-    
-    const result = await pool.query(query, params);
-    
+
+    const result = await pool.query(query, [parseInt(limit), parseInt(offset)]);
+
+    // Default avatars
+    const defaultAvatars = [
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face'
+    ];
+
     // Transform the data to match frontend expectations
-    const posts = result.rows.map(post => ({
+    const posts = result.rows.map((post, index) => ({
       id: post.id,
       authorId: post.author_id,
       authorName: post.author_name,
-      authorAvatar: post.author_avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-      authorType: post.author_type_actual,
+      authorAvatar: post.author_avatar || defaultAvatars[index % defaultAvatars.length],
+      authorType: post.author_type_actual || post.author_type,
       content: post.content,
       images: post.images || [],
-      likes: post.likes_count,
-      comments: post.comments_count,
-      shares: post.shares_count,
+      likes: post.likes_count || 0,
+      comments: post.comments_count || 0,
+      shares: post.shares_count || 0,
       createdAt: post.created_at,
       isLiked: false, // TODO: Check if current user liked this post
       tags: post.tags || []
     }));
-    
+
     res.json({
       posts,
+      total,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        hasMore: posts.length === parseInt(limit)
+        hasMore: posts.length === parseInt(limit),
+        totalPages: Math.ceil(total / parseInt(limit))
       }
     });
-    
+
   } catch (error) {
     console.error('Error fetching community posts:', error);
     res.status(500).json({ error: 'Failed to fetch community posts' });
@@ -77,22 +97,22 @@ router.get('/posts', async (req, res) => {
 router.post('/posts', async (req, res) => {
   try {
     const { content, images = [], tags = [], authorId } = req.body;
-    
+
     if (!content || !authorId) {
       return res.status(400).json({ error: 'Content and author ID are required' });
     }
-    
+
     const result = await pool.query(`
       INSERT INTO community_posts (author_id, content, images, tags)
       VALUES ($1, $2, $3, $4)
       RETURNING *
     `, [authorId, content, images, tags]);
-    
+
     const post = result.rows[0];
-    
+
     // Get author details
     const authorResult = await pool.query(`
-      SELECT 
+      SELECT
         u.first_name || ' ' || u.last_name as author_name,
         u.profile_photo as author_avatar,
         u.is_chef,
@@ -101,9 +121,9 @@ router.post('/posts', async (req, res) => {
       LEFT JOIN businesses b ON u.id = b.owner_id
       WHERE u.id = $1
     `, [authorId]);
-    
+
     const author = authorResult.rows[0];
-    
+
     const responsePost = {
       id: post.id,
       authorId: post.author_id,
@@ -119,9 +139,9 @@ router.post('/posts', async (req, res) => {
       isLiked: false,
       tags: post.tags || []
     };
-    
+
     res.status(201).json(responsePost);
-    
+
   } catch (error) {
     console.error('Error creating community post:', error);
     res.status(500).json({ error: 'Failed to create community post' });
@@ -133,19 +153,19 @@ router.post('/posts/:postId/like', async (req, res) => {
   try {
     const { postId } = req.params;
     const { userId } = req.body;
-    
+
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });
     }
-    
+
     // Check if user already liked this post
     const existingLike = await pool.query(`
       SELECT id FROM post_likes WHERE post_id = $1 AND user_id = $2
     `, [postId, userId]);
-    
+
     let isLiked;
     let likesChange;
-    
+
     if (existingLike.rows.length > 0) {
       // Unlike the post
       await pool.query(`DELETE FROM post_likes WHERE post_id = $1 AND user_id = $2`, [postId, userId]);
@@ -159,17 +179,17 @@ router.post('/posts/:postId/like', async (req, res) => {
       isLiked = true;
       likesChange = 1;
     }
-    
+
     // Get updated likes count
     const postResult = await pool.query(`SELECT likes_count FROM community_posts WHERE id = $1`, [postId]);
     const likesCount = postResult.rows[0]?.likes_count || 0;
-    
+
     res.json({
       isLiked,
       likesCount,
       change: likesChange
     });
-    
+
   } catch (error) {
     console.error('Error toggling post like:', error);
     res.status(500).json({ error: 'Failed to toggle post like' });
@@ -179,20 +199,15 @@ router.post('/posts/:postId/like', async (req, res) => {
 // Get trending topics
 router.get('/trending', async (req, res) => {
   try {
-    // Mock trending topics for now - in a real app, this would be calculated from post tags
-    const trendingTopics = [
-      { name: '#SustainableCooking', count: 1247 },
-      { name: '#LocalIngredients', count: 892 },
-      { name: '#PlantBased', count: 756 },
-      { name: '#FoodWaste', count: 634 },
-      { name: '#CookingTips', count: 589 },
-      { name: '#SeasonalMenu', count: 445 },
-      { name: '#FarmToTable', count: 398 },
-      { name: '#VeganRecipes', count: 367 }
-    ];
-    
-    res.json(trendingTopics);
-    
+    const result = await pool.query(`
+      SELECT name, post_count as count
+      FROM trending_topics
+      ORDER BY post_count DESC
+      LIMIT 20
+    `);
+
+    res.json(result.rows);
+
   } catch (error) {
     console.error('Error fetching trending topics:', error);
     res.status(500).json({ error: 'Failed to fetch trending topics' });
@@ -203,12 +218,15 @@ router.get('/trending', async (req, res) => {
 router.get('/featured-chefs', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT 
+      SELECT
         u.id,
         u.first_name || ' ' || u.last_name as name,
         u.profile_photo as avatar,
         u.bio,
-        u.specialty_dishes[1] as specialty,
+        COALESCE(
+          (SELECT ss.service_name FROM specialist_services ss WHERE ss.specialist_id = u.id ORDER BY ss.base_price DESC LIMIT 1),
+          'Culinary Arts'
+        ) as specialty,
         COALESCE(cf.followers_count, 0) as followers
       FROM users u
       LEFT JOIN (
@@ -220,18 +238,25 @@ router.get('/featured-chefs', async (req, res) => {
       ORDER BY cf.followers_count DESC NULLS LAST, u.created_at DESC
       LIMIT 10
     `);
-    
-    const featuredChefs = result.rows.map(chef => ({
+
+    // Default avatars for chefs
+    const defaultAvatars = [
+      'https://images.unsplash.com/photo-1583394293214-28a5b0a8e8b8?w=100&h=100&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=100&h=100&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1581349485608-9469926a8e5e?w=100&h=100&fit=crop&crop=face'
+    ];
+
+    const featuredChefs = result.rows.map((chef, index) => ({
       id: chef.id,
       name: chef.name,
-      avatar: chef.avatar || 'https://images.unsplash.com/photo-1583394293214-28a5b0a8e8b8?w=100&h=100&fit=crop&crop=face',
-      specialty: chef.specialty || 'Culinary Arts',
-      followers: chef.followers,
+      avatar: chef.avatar || defaultAvatars[index % defaultAvatars.length],
+      specialty: chef.specialty || chef.bio?.substring(0, 50) || 'Culinary Arts',
+      followers: parseInt(chef.followers) || 0,
       isFollowing: false // TODO: Check if current user is following
     }));
-    
+
     res.json(featuredChefs);
-    
+
   } catch (error) {
     console.error('Error fetching featured chefs:', error);
     res.status(500).json({ error: 'Failed to fetch featured chefs' });
@@ -243,19 +268,19 @@ router.post('/chefs/:chefId/follow', async (req, res) => {
   try {
     const { chefId } = req.params;
     const { userId } = req.body;
-    
+
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });
     }
-    
+
     // Check if user already follows this chef
     const existingFollow = await pool.query(`
       SELECT id FROM chef_follows WHERE follower_id = $1 AND chef_id = $2
     `, [userId, chefId]);
-    
+
     let isFollowing;
     let followersChange;
-    
+
     if (existingFollow.rows.length > 0) {
       // Unfollow the chef
       await pool.query(`DELETE FROM chef_follows WHERE follower_id = $1 AND chef_id = $2`, [userId, chefId]);
@@ -267,19 +292,19 @@ router.post('/chefs/:chefId/follow', async (req, res) => {
       isFollowing = true;
       followersChange = 1;
     }
-    
+
     // Get updated followers count
     const followersResult = await pool.query(`
       SELECT COUNT(*) as followers_count FROM chef_follows WHERE chef_id = $1
     `, [chefId]);
     const followersCount = parseInt(followersResult.rows[0]?.followers_count || 0);
-    
+
     res.json({
       isFollowing,
       followersCount,
       change: followersChange
     });
-    
+
   } catch (error) {
     console.error('Error toggling chef follow:', error);
     res.status(500).json({ error: 'Failed to toggle chef follow' });

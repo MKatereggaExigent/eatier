@@ -195,19 +195,22 @@
                   <button class="btn-icon" (click)="viewCampaignDetails(campaign)" title="View Details">
                     👁️
                   </button>
+                  @if (campaign.status === 'draft') {
+                    <button class="btn-icon btn-success" (click)="startCampaign(campaign.id)" title="Start Campaign">
+                      ▶️
+                    </button>
+                    <button class="btn-icon" (click)="editCampaign(campaign)" title="Edit">
+                      ✏️
+                    </button>
+                  }
                   @if (campaign.status === 'active') {
-                    <button class="btn-icon" (click)="pauseCampaign(campaign.id)" title="Pause">
+                    <button class="btn-icon btn-warning" (click)="pauseCampaign(campaign.id)" title="Pause">
                       ⏸️
                     </button>
                   }
                   @if (campaign.status === 'paused') {
-                    <button class="btn-icon" (click)="resumeCampaign(campaign.id)" title="Resume">
+                    <button class="btn-icon btn-success" (click)="resumeCampaign(campaign.id)" title="Resume">
                       ▶️
-                    </button>
-                  }
-                  @if (campaign.status === 'draft') {
-                    <button class="btn-icon" (click)="editCampaign(campaign)" title="Edit">
-                      ✏️
                     </button>
                   }
                   <button class="btn-icon btn-danger" (click)="confirmDeleteCampaign(campaign)" title="Delete">
@@ -346,22 +349,25 @@
       </div>
 
       <div class="modal-footer">
+        @if (selectedCampaign()!.status === 'draft') {
+          <button type="button" class="btn-success" (click)="startCampaign(selectedCampaign()!.id); closeDetailsModal()">
+            ▶️ Start Campaign
+          </button>
+          <button type="button" class="btn-primary" (click)="editCampaign(selectedCampaign()!); closeDetailsModal()">
+            ✏️ Edit Campaign
+          </button>
+        }
         @if (selectedCampaign()!.status === 'active') {
-          <button class="btn-secondary" (click)="pauseCampaign(selectedCampaign()!.id); closeDetailsModal()">
+          <button type="button" class="btn-warning" (click)="pauseCampaign(selectedCampaign()!.id); closeDetailsModal()">
             ⏸️ Pause Campaign
           </button>
         }
         @if (selectedCampaign()!.status === 'paused') {
-          <button class="btn-primary" (click)="resumeCampaign(selectedCampaign()!.id); closeDetailsModal()">
+          <button type="button" class="btn-success" (click)="resumeCampaign(selectedCampaign()!.id); closeDetailsModal()">
             ▶️ Resume Campaign
           </button>
         }
-        @if (selectedCampaign()!.status === 'draft') {
-          <button class="btn-primary" (click)="editCampaign(selectedCampaign()!); closeDetailsModal()">
-            ✏️ Edit Campaign
-          </button>
-        }
-        <button class="btn-secondary" (click)="closeDetailsModal()">Close</button>
+        <button type="button" class="btn-secondary" (click)="closeDetailsModal()">Close</button>
       </div>
     </div>
   </div>

@@ -71,6 +71,17 @@
     <!-- Feed Tab -->
     @if (activeTab() === 'feed' && !isLoading()) {
       <div class="feed-section">
+        @if (posts().length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3>No posts yet</h3>
+            <p>Be the first to share something with the community!</p>
+            <button type="button" class="primary-btn" (click)="setActiveTab('create')">
+              ✍️ Create a Post
+            </button>
+          </div>
+        }
+
         <div class="posts-container">
           @for (post of posts(); track post.id) {
             <div class="post-card">
@@ -181,60 +192,190 @@
     <!-- Trending Tab -->
     @if (activeTab() === 'trending' && !isLoading()) {
       <div class="trending-section">
-        <h2>🔥 Trending Topics</h2>
-        <div class="trending-topics">
-          @for (topic of trendingTopics(); track topic.name) {
-            <div class="trending-topic">
-              <span class="topic-name">{{ topic.name }}</span>
-              <span class="topic-count">{{ topic.count }} posts</span>
-            </div>
-          }
+        <!-- Section Header -->
+        <div class="section-header">
+          <h2>🔥 Trending Topics</h2>
+          <p class="section-subtitle">Discover what the culinary community is talking about</p>
         </div>
 
-        <h2>📈 Popular Posts</h2>
-        <div class="popular-posts">
-          @for (post of posts().slice(0, 3); track post.id) {
-            <div class="popular-post-card">
-              <div class="post-preview">
-                <img [src]="post.authorAvatar" [alt]="post.authorName" class="mini-avatar" title="{{ post.authorName }}" />
-                <div class="post-info">
-                  <div class="post-title">{{ post.content.substring(0, 100) }}...</div>
-                  <div class="post-stats">
-                    ❤️ {{ post.likes }} • 💬 {{ post.comments }} • 🔗 {{ post.shares }}
+        @if (trendingTopics().length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">📊</div>
+            <h3>No trending topics yet</h3>
+            <p>Start posting with hashtags to create trends!</p>
+          </div>
+        } @else {
+          <div class="trending-topics-grid">
+            @for (topic of trendingTopics().slice(0, 12); track topic.name; let i = $index) {
+              <div class="trending-topic-card" [class.top-3]="i < 3">
+                <div class="rank-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                  {{ i < 3 ? '' : '#' + (i + 1) }}
+                  @if (i === 0) { 🥇 }
+                  @if (i === 1) { 🥈 }
+                  @if (i === 2) { 🥉 }
+                </div>
+                <div class="topic-content">
+                  <span class="topic-name">{{ topic.name }}</span>
+                  <div class="topic-stats">
+                    <span class="topic-count">{{ topic.count.toLocaleString() }} posts</span>
+                    @if (i < 3) {
+                      <span class="trending-badge">🔥 Hot</span>
+                    }
                   </div>
                 </div>
+                <div class="topic-arrow">→</div>
               </div>
-            </div>
-          }
+            }
+          </div>
+        }
+
+        <!-- Popular Posts Section -->
+        <div class="section-header popular-section">
+          <h2>📈 Popular Posts</h2>
+          <p class="section-subtitle">Most engaged posts from the community</p>
         </div>
+
+        @if (posts().length === 0) {
+          <div class="empty-state small">
+            <div class="empty-icon">📝</div>
+            <h3>No popular posts yet</h3>
+            <p>Be the first to share something amazing!</p>
+          </div>
+        } @else {
+          <div class="popular-posts-grid">
+            @for (post of posts().slice(0, 6); track post.id; let i = $index) {
+              <div class="popular-post-card" [class.featured]="i === 0">
+                @if (i === 0) {
+                  <div class="featured-badge">⭐ Featured</div>
+                }
+                <div class="post-author-section">
+                  <img [src]="post.authorAvatar" [alt]="post.authorName" class="post-avatar" title="{{ post.authorName }}" />
+                  <div class="author-details">
+                    <span class="author-name">{{ post.authorName }}</span>
+                    <span class="post-type-badge" [class]="post.authorType">{{ post.authorType }}</span>
+                  </div>
+                </div>
+                <div class="post-content-preview">
+                  {{ post.content.substring(0, 120) }}{{ post.content.length > 120 ? '...' : '' }}
+                </div>
+                @if (post.images && post.images.length > 0) {
+                  <div class="post-image-preview">
+                    <img [src]="post.images[0]" alt="Post image" class="preview-image" title="Post image" />
+                  </div>
+                }
+                <div class="post-engagement">
+                  <span class="engagement-item">❤️ {{ post.likes }}</span>
+                  <span class="engagement-item">💬 {{ post.comments }}</span>
+                  <span class="engagement-item">🔗 {{ post.shares }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
       </div>
     }
 
     <!-- Featured Chefs Tab -->
     @if (activeTab() === 'chefs' && !isLoading()) {
       <div class="chefs-section">
-        <h2>👨‍🍳 Featured Chefs</h2>
-        <div class="chefs-grid">
-          @for (chef of featuredChefs(); track chef.id) {
-            <div class="chef-card">
-              <img [src]="chef.avatar" [alt]="chef.name" class="chef-avatar" title="{{ chef.name }}" />
-              <div class="chef-info">
-                <h3>{{ chef.name }}</h3>
-                <p class="chef-specialty">{{ chef.specialty }}</p>
-                <div class="chef-stats">
-                  <span class="followers">👥 {{ chef.followers.toLocaleString() }} followers</span>
+        <!-- Section Header -->
+        <div class="section-header">
+          <h2>👨‍🍳 Featured Chefs</h2>
+          <p class="section-subtitle">Meet the culinary experts in our community</p>
+        </div>
+
+        @if (featuredChefs().length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">👨‍🍳</div>
+            <h3>No featured chefs yet</h3>
+            <p>Our culinary experts will appear here soon. Are you a chef? Register as a specialist!</p>
+            <button type="button" class="cta-btn" routerLink="/specialists">Become a Chef →</button>
+          </div>
+        } @else {
+          <!-- Top Chef Spotlight -->
+          @if (featuredChefs().length > 0) {
+            <div class="top-chef-spotlight">
+              <div class="spotlight-badge">⭐ Top Chef This Week</div>
+              <div class="spotlight-content">
+                <div class="spotlight-avatar-wrapper">
+                  <img [src]="featuredChefs()[0].avatar" [alt]="featuredChefs()[0].name" class="spotlight-avatar" title="{{ featuredChefs()[0].name }}" />
+                  <div class="verified-badge">✓</div>
                 </div>
-                <button
-                  type="button"
-                  class="follow-btn"
-                  [class.following]="chef.isFollowing"
-                  (click)="followChef(chef)"
-                >
-                  {{ chef.isFollowing ? '✓ Following' : '+ Follow' }}
-                </button>
+                <div class="spotlight-info">
+                  <h3>{{ featuredChefs()[0].name }}</h3>
+                  <p class="chef-specialty">{{ featuredChefs()[0].specialty }}</p>
+                  <div class="spotlight-stats">
+                    <div class="stat-item">
+                      <span class="stat-value">{{ featuredChefs()[0].followers.toLocaleString() }}</span>
+                      <span class="stat-label">Followers</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                      <span class="stat-value">⭐</span>
+                      <span class="stat-label">Featured</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    class="follow-btn large"
+                    [class.following]="featuredChefs()[0].isFollowing"
+                    (click)="followChef(featuredChefs()[0])"
+                  >
+                    {{ featuredChefs()[0].isFollowing ? '✓ Following' : '+ Follow Chef' }}
+                  </button>
+                </div>
               </div>
             </div>
           }
+
+          <!-- Chefs Grid -->
+          <div class="chefs-grid-section">
+            <h3 class="grid-title">More Talented Chefs</h3>
+            <div class="chefs-grid">
+              @for (chef of featuredChefs().slice(1); track chef.id; let i = $index) {
+                <div class="chef-card" [class.verified]="i < 2">
+                  <div class="card-header">
+                    @if (i < 2) {
+                      <span class="chef-badge verified">✓ Verified</span>
+                    }
+                  </div>
+                  <div class="avatar-wrapper">
+                    <img [src]="chef.avatar" [alt]="chef.name" class="chef-avatar" title="{{ chef.name }}" />
+                  </div>
+                  <div class="chef-info">
+                    <h4>{{ chef.name }}</h4>
+                    <p class="chef-specialty">{{ chef.specialty }}</p>
+                    <div class="chef-stats">
+                      <span class="followers-count">
+                        <span class="count">{{ chef.followers.toLocaleString() }}</span>
+                        <span class="label">followers</span>
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      class="follow-btn"
+                      [class.following]="chef.isFollowing"
+                      (click)="followChef(chef)"
+                    >
+                      {{ chef.isFollowing ? '✓ Following' : '+ Follow' }}
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Become a Chef CTA -->
+        <div class="become-chef-cta">
+          <div class="cta-content">
+            <div class="cta-icon">🍳</div>
+            <div class="cta-text">
+              <h3>Are you a chef?</h3>
+              <p>Join our community of culinary experts and share your passion with food lovers.</p>
+            </div>
+            <button type="button" class="cta-btn" routerLink="/specialists">Register as Chef →</button>
+          </div>
         </div>
       </div>
     }
@@ -242,123 +383,234 @@
     <!-- Create Post Tab -->
     @if (activeTab() === 'create' && !isLoading()) {
       <div class="create-post-section">
-        <h2>✍️ Create New Post</h2>
+        <!-- Section Header -->
+        <div class="section-header">
+          <h2>✍️ Create New Post</h2>
+          <p class="section-subtitle">Share your culinary experiences with the community</p>
+        </div>
 
-        <!-- Success Message -->
-        @if (postSuccessMessage()) {
-          <div class="success-message">
-            {{ postSuccessMessage() }}
+        <!-- Login Required Message -->
+        @if (!isAuthenticated()) {
+          <div class="login-required-card">
+            <div class="login-icon">🔐</div>
+            <h3>Login Required</h3>
+            <p>You need to be logged in to create a post and share your culinary experiences with the community.</p>
+            <a routerLink="/auth/login" class="login-btn">Log In to Continue</a>
+            <p class="signup-hint">Don't have an account? <a routerLink="/auth/register">Sign up here</a></p>
           </div>
-        }
+        } @else {
 
-        <form [formGroup]="postForm" (ngSubmit)="onCreatePost()" class="create-post-form">
-          <div class="form-group">
-            <label for="postContent">What's on your mind?</label>
-            <textarea
-              id="postContent"
-              formControlName="content"
-              placeholder="Share your culinary thoughts, recipes, or food experiences..."
-              rows="6"
-              class="post-textarea"
-            ></textarea>
-
-            <!-- Character Counter -->
-            <div class="character-counter" [class.exceeded]="isCharacterLimitExceeded()">
-              {{ getCharacterCount() }} / 1000 characters
-              @if (isCharacterLimitExceeded()) {
-                <span class="error-text"> ({{ Math.abs(getRemainingCharacters()) }} over limit)</span>
-              }
-            </div>
-
-            @if (postForm.get('content')?.invalid && postForm.get('content')?.touched) {
-              <span class="field-error">
-                @if (postForm.get('content')?.errors?.['required']) {
-                  Content is required
-                }
-                @if (postForm.get('content')?.errors?.['minlength']) {
-                  Please write at least 10 characters
-                }
-                @if (postForm.get('content')?.errors?.['maxlength']) {
-                  Maximum 1000 characters allowed
-                }
-              </span>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="postImages">Add Images (Optional)</label>
-            <div class="image-input-wrapper">
-              <input
-                id="postImages"
-                type="url"
-                formControlName="images"
-                placeholder="https://example.com/image.jpg"
-                class="post-input"
-              />
-              <button
-                type="button"
-                class="add-image-btn"
-                (click)="addImageUrl()"
-                [disabled]="!postForm.get('images')?.value"
-              >
-                ➕ Add
-              </button>
-            </div>
-
-            <!-- Image Preview -->
-            @if (selectedImages().length > 0) {
-              <div class="image-preview-grid">
-                @for (image of selectedImages(); track $index) {
-                  <div class="image-preview-item">
-                    <img [src]="image" [alt]="'Preview ' + ($index + 1)" class="preview-image" />
-                    <button
-                      type="button"
-                      class="remove-image-btn"
-                      (click)="removeImage($index)"
-                      title="Remove image"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                }
+        <div class="create-post-layout">
+          <!-- Main Form -->
+          <div class="form-container">
+            <!-- Success Message -->
+            @if (postSuccessMessage()) {
+              <div class="success-message">
+                <span class="success-icon">✓</span>
+                {{ postSuccessMessage() }}
               </div>
             }
+
+            <form [formGroup]="postForm" (ngSubmit)="onCreatePost()" class="create-post-form">
+              <!-- Content Section -->
+              <div class="form-section">
+                <div class="section-label">
+                  <span class="label-icon">💭</span>
+                  <span class="label-text">Your Message</span>
+                </div>
+                <div class="form-group">
+                  <textarea
+                    id="postContent"
+                    formControlName="content"
+                    placeholder="Share your culinary thoughts, recipes, food experiences, or ask the community for advice..."
+                    rows="8"
+                    class="post-textarea"
+                  ></textarea>
+
+                  <div class="textarea-footer">
+                    <div class="character-counter" [class.exceeded]="isCharacterLimitExceeded()">
+                      <span class="counter-icon">📊</span>
+                      {{ getCharacterCount() }} / 1000
+                      @if (isCharacterLimitExceeded()) {
+                        <span class="error-text"> ({{ Math.abs(getRemainingCharacters()) }} over)</span>
+                      }
+                    </div>
+                  </div>
+
+                  @if (postForm.get('content')?.invalid && postForm.get('content')?.touched) {
+                    <span class="field-error">
+                      @if (postForm.get('content')?.errors?.['required']) {
+                        Content is required
+                      }
+                      @if (postForm.get('content')?.errors?.['minlength']) {
+                        Please write at least 10 characters
+                      }
+                      @if (postForm.get('content')?.errors?.['maxlength']) {
+                        Maximum 1000 characters allowed
+                      }
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <!-- Images Section -->
+              <div class="form-section">
+                <div class="section-label">
+                  <span class="label-icon">📸</span>
+                  <span class="label-text">Add Images</span>
+                  <span class="optional-badge">Optional</span>
+                </div>
+                <div class="form-group">
+                  <!-- File Upload Button -->
+                  <div class="file-upload-wrapper">
+                    <input
+                      #fileInput
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      (change)="onFileSelected($event)"
+                      class="file-input-hidden"
+                    />
+                    <button
+                      type="button"
+                      class="browse-btn"
+                      (click)="fileInput.click()"
+                    >
+                      <span class="browse-icon">📁</span>
+                      <span>Browse Files</span>
+                    </button>
+                    <span class="upload-hint">or paste URL below</span>
+                  </div>
+
+                  <!-- URL Input -->
+                  <div class="image-input-wrapper">
+                    <input
+                      id="postImages"
+                      type="url"
+                      formControlName="images"
+                      placeholder="Paste image URL (e.g., https://example.com/food.jpg)"
+                      class="post-input"
+                    />
+                    <button
+                      type="button"
+                      class="add-image-btn"
+                      (click)="addImageUrl()"
+                      [disabled]="!postForm.get('images')?.value"
+                    >
+                      ➕ Add
+                    </button>
+                  </div>
+
+                  <!-- Image Preview Grid -->
+                  @if (selectedImages().length > 0) {
+                    <div class="images-section">
+                      <div class="images-header">
+                        <span>{{ selectedImages().length }} image{{ selectedImages().length > 1 ? 's' : '' }} added</span>
+                      </div>
+                      <div class="image-preview-grid">
+                        @for (image of selectedImages(); track $index) {
+                          <div class="image-preview-item">
+                            <img [src]="image" [alt]="'Preview ' + ($index + 1)" class="preview-image" title="Image preview" />
+                            <button
+                              type="button"
+                              class="remove-image-btn"
+                              (click)="removeImage($index)"
+                              title="Remove image"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Tags Section -->
+              <div class="form-section">
+                <div class="section-label">
+                  <span class="label-icon">🏷️</span>
+                  <span class="label-text">Add Tags</span>
+                  <span class="optional-badge">Optional</span>
+                </div>
+                <div class="form-group">
+                  <input
+                    id="postTags"
+                    type="text"
+                    formControlName="tags"
+                    placeholder="cooking, recipe, italian (separate with commas)"
+                    class="post-input"
+                  />
+                  <small class="hint-text">Use hashtags to help others discover your post</small>
+                </div>
+              </div>
+
+              <!-- Form Actions -->
+              <div class="form-actions">
+                <button
+                  type="button"
+                  class="secondary-btn"
+                  (click)="postForm.reset(); selectedImages.set([])"
+                  [disabled]="isSubmittingPost()"
+                >
+                  🗑️ Clear All
+                </button>
+                <button
+                  type="submit"
+                  class="primary-btn"
+                  [disabled]="postForm.invalid || isSubmittingPost()"
+                >
+                  @if (isSubmittingPost()) {
+                    <span class="spinner">⏳</span> Posting...
+                  } @else {
+                    📝 Share Post
+                  }
+                </button>
+              </div>
+            </form>
           </div>
 
-          <div class="form-group">
-            <label for="postTags">Tags (Optional)</label>
-            <input
-              id="postTags"
-              type="text"
-              formControlName="tags"
-              placeholder="cooking, recipe, italian (separate with commas)"
-              class="post-input"
-            />
-            <small class="hint-text">💡 Use tags to help others discover your post</small>
-          </div>
+          <!-- Tips Sidebar -->
+          <div class="tips-sidebar">
+            <div class="tips-card">
+              <h4>💡 Posting Tips</h4>
+              <ul class="tips-list">
+                <li>
+                  <span class="tip-icon">📝</span>
+                  <span>Be descriptive - share the story behind your dish</span>
+                </li>
+                <li>
+                  <span class="tip-icon">📸</span>
+                  <span>Add high-quality photos to attract more engagement</span>
+                </li>
+                <li>
+                  <span class="tip-icon">🏷️</span>
+                  <span>Use relevant tags like #recipe, #cooking, #foodie</span>
+                </li>
+                <li>
+                  <span class="tip-icon">🤝</span>
+                  <span>Ask questions to start conversations</span>
+                </li>
+                <li>
+                  <span class="tip-icon">⭐</span>
+                  <span>Share recipes, tips, or restaurant recommendations</span>
+                </li>
+              </ul>
+            </div>
 
-          <div class="form-actions">
-            <button
-              type="button"
-              class="secondary-btn"
-              (click)="postForm.reset(); selectedImages.set([])"
-              [disabled]="isSubmittingPost()"
-            >
-              🗑️ Clear
-            </button>
-            <button
-              type="submit"
-              class="primary-btn"
-              [disabled]="postForm.invalid || isSubmittingPost()"
-            >
-              @if (isSubmittingPost()) {
-                <span class="spinner">⏳</span> Posting...
-              } @else {
-                📝 Share Post
-              }
-            </button>
+            <div class="guidelines-card">
+              <h4>📋 Community Guidelines</h4>
+              <ul class="guidelines-list">
+                <li>Be respectful and constructive</li>
+                <li>Share original content when possible</li>
+                <li>No spam or promotional content</li>
+                <li>Credit sources when sharing recipes</li>
+              </ul>
+            </div>
           </div>
-        </form>
+        </div>
+        }
       </div>
     }
   </div>

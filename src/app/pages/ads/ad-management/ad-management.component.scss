@@ -355,8 +355,25 @@
         transform: scale(1.1);
       }
 
-      &.btn-danger:hover {
-        background: #fee2e2;
+      &.btn-success {
+        color: #10b981;
+        &:hover {
+          background: #d1fae5;
+        }
+      }
+
+      &.btn-warning {
+        color: #f59e0b;
+        &:hover {
+          background: #fef3c7;
+        }
+      }
+
+      &.btn-danger {
+        color: #ef4444;
+        &:hover {
+          background: #fee2e2;
+        }
       }
     }
   }
@@ -610,6 +627,28 @@
 
     &:hover {
       background: #e5e7eb;
+    }
+  }
+
+  .btn-success {
+    background: #10b981;
+    color: white;
+
+    &:hover {
+      background: #059669;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+  }
+
+  .btn-warning {
+    background: #f59e0b;
+    color: white;
+
+    &:hover {
+      background: #d97706;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
     }
   }
 

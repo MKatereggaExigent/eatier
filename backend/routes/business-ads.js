@@ -715,6 +715,38 @@ router.post('/my-ads/:adId/payment', async (req, res) => {
 // 5. AD STATUS MANAGEMENT
 // =====================================================
 
+// Start ad (activate a draft ad without payment - for testing/demo purposes)
+router.post('/my-ads/:adId/start', async (req, res) => {
+  try {
+    const { adId } = req.params;
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    const result = await pool.query(`
+      UPDATE ad_campaigns
+      SET status = 'active', is_active = true, payment_required = false, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1 AND user_id = $2 AND status = 'draft'
+      RETURNING *
+    `, [adId, userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Ad not found or not in draft status' });
+    }
+
+    res.json({
+      message: 'Ad started successfully',
+      ad: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Error starting ad:', error);
+    res.status(500).json({ error: 'Failed to start ad' });
+  }
+});
+
 // Pause ad
 router.post('/my-ads/:adId/pause', async (req, res) => {
   try {

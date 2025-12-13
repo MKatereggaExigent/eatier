@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { PublicBusiness, PublicBusinessService } from '../../../core/services/public-business.service';
 
+import { BannerAdComponent } from '../../../shared/components/ads/banner-ad/banner-ad.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PublicStatsService } from '../../../core/services/public-stats.service';
@@ -23,7 +24,12 @@ interface Restaurant {
 @Component({
   selector: 'app-restaurant-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    BannerAdComponent
+  ],
   templateUrl: './restaurant-list.component.html',
   styleUrls: ['./restaurant-list.component.scss']
 })

@@ -160,13 +160,17 @@ export class AdCreationComponent implements OnInit {
   successMessage = signal<string | null>(null);
 
   // Computed properties
+  // Writable signals for reactive form dependencies
+  currentRegionValue = signal<string>('east-africa');
+  currentCountriesValue = signal<string[]>(['Kenya']);
+
   selectedAdType = computed(() => {
     const typeValue = this.basicInfoForm?.get('type')?.value;
     return this.adTypes.find(type => type.value === typeValue);
   });
 
   selectedRegion = computed(() => {
-    const regionValue = this.targetingForm?.get('region')?.value;
+    const regionValue = this.currentRegionValue();
     return this.regions.find(region => region.value === regionValue);
   });
 
@@ -175,7 +179,7 @@ export class AdCreationComponent implements OnInit {
   });
 
   availableCities = computed(() => {
-    const selectedCountries = this.targetingForm?.get('countries')?.value || [];
+    const selectedCountries = this.currentCountriesValue();
     const cities: string[] = [];
     selectedCountries.forEach((country: string) => {
       if (this.cities[country]) {
@@ -491,6 +495,20 @@ export class AdCreationComponent implements OnInit {
     this.contentForm.valueChanges.subscribe(triggerValidation);
     this.budgetForm.valueChanges.subscribe(triggerValidation);
     this.scheduleForm.valueChanges.subscribe(triggerValidation);
+
+    // Update region signal when form value changes (for computed signals to react)
+    this.targetingForm.get('region')?.valueChanges.subscribe(regionValue => {
+      this.currentRegionValue.set(regionValue);
+    });
+    // Initialize signal with current form value
+    this.currentRegionValue.set(this.targetingForm.get('region')?.value || 'east-africa');
+
+    // Update countries signal when form value changes (for computed signals to react)
+    this.targetingForm.get('countries')?.valueChanges.subscribe(countriesValue => {
+      this.currentCountriesValue.set(countriesValue || []);
+    });
+    // Initialize signal with current form value
+    this.currentCountriesValue.set(this.targetingForm.get('countries')?.value || []);
 
     // Update CTA text when CTA type changes
     this.contentForm.get('ctaType')?.valueChanges.subscribe(ctaType => {

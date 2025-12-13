@@ -1,14 +1,16 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { 
-  PublicSpecialistService, 
-  SpecialistDetail, 
-  SpecialistService,
-  BookingRequest 
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import {
+  BookingRequest,
+  PublicSpecialistService,
+  SpecialistDetail,
+  SpecialistService
 } from '../../../core/services/public-specialist.service';
+import { Component, OnInit, inject, signal } from '@angular/core';
+
 import { AuthService } from '../../../core/services/auth.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { InsightsService } from '../../../core/services/insights.service';
 
 @Component({
   selector: 'app-specialist-detail',
@@ -22,17 +24,23 @@ export class SpecialistDetailComponent implements OnInit {
   private router = inject(Router);
   private publicSpecialistService = inject(PublicSpecialistService);
   private authService = inject(AuthService);
+  private insightsService = inject(InsightsService);
 
   specialist = signal<SpecialistDetail | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
-  
+
+  // Analytics tracking
+  private sessionId = this.generateSessionId();
+  private sessionStartTime = Date.now();
+  private pagesVisited = 1;
+
   // Booking form
   showBookingForm = signal(false);
   bookingLoading = signal(false);
   bookingSuccess = signal(false);
   bookingError = signal<string | null>(null);
-  
+
   selectedService = signal<SpecialistService | null>(null);
   bookingForm = signal<BookingRequest>({
     bookingDate: '',
@@ -72,6 +80,8 @@ export class SpecialistDetailComponent implements OnInit {
       next: (specialist) => {
         this.specialist.set(specialist);
         this.loading.set(false);
+        // Track page view for the specialist (using specialist ID as business ID for analytics)
+        this.trackPageView(specialist.id, 'specialist_profile');
       },
       error: (err) => {
         console.error('Error loading specialist:', err);
@@ -88,12 +98,12 @@ export class SpecialistDetailComponent implements OnInit {
 
   openBookingForm(): void {
     if (!this.authService.isAuthenticated()) {
-      this.router.navigate(['/login'], { 
-        queryParams: { returnUrl: this.router.url } 
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
       });
       return;
     }
-    
+
     const user = this.authService.currentUser();
     if (user) {
       this.bookingForm.update(form => ({
@@ -153,6 +163,102 @@ export class SpecialistDetailComponent implements OnInit {
     const guests = this.bookingForm().guestCount;
     if (!service) return 0;
     return service.basePrice + (service.pricePerPerson * guests);
+  }
+
+  // Analytics tracking methods
+  private generateSessionId(): string {
+    const stored = sessionStorage.getItem('analytics_session_id');
+    if (stored) return stored;
+    const newId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    sessionStorage.setItem('analytics_session_id', newId);
+    return newId;
+  }
+
+  private trackPageView(businessId: string, pageType: string): void {
+    const deviceInfo = this.insightsService.getDeviceInfo();
+    const user = this.authService.currentUser();
+    const isReturningVisitor = this.insightsService.isReturningVisitor(businessId);
+
+    this.insightsService.trackPageView({
+      businessId,
+      userId: user?.id,
+      pageType,
+      sessionId: this.sessionId,
+      deviceType: deviceInfo.deviceType,
+      browser: deviceInfo.browser,
+      os: deviceInfo.os,
+      referrer: document.referrer || 'direct',
+      isReturningVisitor
+    }).subscribe();
+
+    this.setupSessionTracking(businessId);
+  }
+
+  private setupSessionTracking(businessId: string): void {
+    if ((window as any).__specialistSessionTrackingSet) return;
+    (window as any).__specialistSessionTrackingSet = true;
+
+    const trackEnd = () => {
+      const duration = Math.round((Date.now() - this.sessionStartTime) / 1000);
+      const payload = JSON.stringify({
+        businessId,
+        sessionId: this.sessionId,
+        duration,
+        pagesVisited: this.pagesVisited
+      });
+
+      const url = `${this.insightsService['apiUrl']}/insights/track/session-end`;
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
+      }
+    };
+
+    window.addEventListener('beforeunload', trackEnd);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        trackEnd();
+      }
+    });
+  }
+
+  private trackContactClick(businessId: string, clickType: string): void {
+    const deviceInfo = this.insightsService.getDeviceInfo();
+    const user = this.authService.currentUser();
+
+    this.insightsService.trackContactClick({
+      businessId,
+      userId: user?.id,
+      clickType,
+      sessionId: this.sessionId,
+      deviceType: deviceInfo.deviceType,
+      browser: deviceInfo.browser,
+      os: deviceInfo.os
+    }).subscribe();
+  }
+
+  shareSpecialist(): void {
+    const specialist = this.specialist();
+    if (!specialist) return;
+
+    const shareData = {
+      title: specialist.fullName,
+      text: `Check out ${specialist.fullName} - Private Chef`,
+      url: window.location.href
+    };
+
+    if (navigator.share) {
+      navigator.share(shareData).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+    }
+
+    // Track share (using specialist ID as business ID for analytics)
+    this.insightsService.trackShare({
+      businessId: specialist.id,
+      platform: 'native',
+      sessionId: this.sessionId,
+      deviceType: this.insightsService.getDeviceInfo().deviceType
+    }).subscribe();
   }
 }
 

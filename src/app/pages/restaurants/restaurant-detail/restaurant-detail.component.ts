@@ -3,9 +3,11 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PublicBusiness, PublicBusinessService } from '../../../core/services/public-business.service';
 
+import { AuthService } from '../../../core/services/auth.service';
 import { BookingsService } from '../../../services/bookings.service';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { InsightsService } from '../../../core/services/insights.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -21,10 +23,15 @@ export class RestaurantDetailComponent implements OnInit {
   private bookingsService = inject(BookingsService);
   private http = inject(HttpClient);
   private fb = inject(FormBuilder);
+  private insightsService = inject(InsightsService);
+  private authService = inject(AuthService);
 
   restaurantId = signal<string>('');
   isLoading = signal<boolean>(true);
   errorMessage = signal<string | null>(null);
+  private sessionId = this.generateSessionId();
+  private sessionStartTime = Date.now();
+  private pagesVisited = 1;
 
   // Booking modal state
   showBookingModal = signal<boolean>(false);
@@ -150,6 +157,9 @@ export class RestaurantDetailComponent implements OnInit {
           isOpen
         });
 
+        // Track page view for analytics
+        this.trackPageView(business.id, 'profile');
+
         this.isLoading.set(false);
       },
       error: (error) => {
@@ -271,15 +281,18 @@ export class RestaurantDetailComponent implements OnInit {
   }
 
   callRestaurant(): void {
+    this.trackContactClick('phone');
     window.open(`tel:${this.restaurant().phone}`, '_self');
   }
 
   getDirections(): void {
+    this.trackContactClick('directions');
     const address = encodeURIComponent(this.restaurant().address);
     window.open(`https://maps.google.com?q=${address}`, '_blank');
   }
 
   visitWebsite(): void {
+    this.trackContactClick('website');
     const website = this.restaurant().website;
     if (website) {
       // Check if it's an email or actual website
@@ -294,11 +307,43 @@ export class RestaurantDetailComponent implements OnInit {
 
   // View full menu - navigate to menu page or open modal
   viewFullMenu(): void {
+    // Track menu view for analytics
+    this.trackPageView(this.restaurantId(), 'menu');
+    this.pagesVisited++;
+
     // Option 1: Navigate to menu page
     // this.router.navigate(['/restaurants', this.restaurantId(), 'menu']);
 
     // Option 2: Show alert for now (you can implement a modal later)
     alert('Opening full menu... This will navigate to the menu page or open a modal with the complete menu.');
+  }
+
+  // Share restaurant - track and open share dialog
+  shareRestaurant(platform?: string): void {
+    const businessId = this.restaurantId();
+    if (!businessId) return;
+
+    const deviceInfo = this.insightsService.getDeviceInfo();
+
+    this.insightsService.trackShare({
+      businessId,
+      platform: platform || 'native',
+      sessionId: this.sessionId,
+      deviceType: deviceInfo.deviceType
+    }).subscribe();
+
+    // Native share if available
+    if (navigator.share) {
+      navigator.share({
+        title: this.restaurant().name,
+        text: `Check out ${this.restaurant().name} on iTiYum!`,
+        url: window.location.href
+      }).catch(console.error);
+    } else {
+      // Fallback: copy link to clipboard
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
   }
 
   // Write a review - open review modal
@@ -469,5 +514,87 @@ export class RestaurantDetailComponent implements OnInit {
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 90);
     return maxDate.toISOString().split('T')[0];
+  }
+
+  // ==================== ANALYTICS TRACKING ====================
+
+  private generateSessionId(): string {
+    // Check if session ID exists in sessionStorage, otherwise create new one
+    let sessionId = sessionStorage.getItem('analytics_session_id');
+    if (!sessionId) {
+      sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      sessionStorage.setItem('analytics_session_id', sessionId);
+    }
+    return sessionId;
+  }
+
+  private trackPageView(businessId: string, pageType: string): void {
+    const deviceInfo = this.insightsService.getDeviceInfo();
+    const user = this.authService.currentUser();
+    const isReturningVisitor = this.insightsService.isReturningVisitor(businessId);
+
+    this.insightsService.trackPageView({
+      businessId,
+      userId: user?.id,
+      pageType,
+      sessionId: this.sessionId,
+      deviceType: deviceInfo.deviceType,
+      browser: deviceInfo.browser,
+      os: deviceInfo.os,
+      referrer: document.referrer || 'direct',
+      isReturningVisitor
+    }).subscribe();
+
+    // Track session end on page unload
+    this.setupSessionTracking(businessId);
+  }
+
+  private setupSessionTracking(businessId: string): void {
+    // Only set up once
+    if ((window as any).__sessionTrackingSet) return;
+    (window as any).__sessionTrackingSet = true;
+
+    const trackEnd = () => {
+      const duration = Math.round((Date.now() - this.sessionStartTime) / 1000);
+
+      // Use sendBeacon for reliable tracking on page unload
+      const payload = JSON.stringify({
+        businessId,
+        sessionId: this.sessionId,
+        duration,
+        pagesVisited: this.pagesVisited
+      });
+
+      const url = `${this.insightsService['apiUrl']}/insights/track/session-end`;
+
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
+      }
+    };
+
+    window.addEventListener('beforeunload', trackEnd);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        trackEnd();
+      }
+    });
+  }
+
+  private trackContactClick(clickType: string): void {
+    const businessId = this.restaurantId();
+    if (!businessId) return;
+
+    const deviceInfo = this.insightsService.getDeviceInfo();
+    const user = this.authService.currentUser();
+
+    this.insightsService.trackContactClick({
+      businessId,
+      userId: user?.id,
+      clickType,
+      sessionId: this.sessionId,
+      deviceType: deviceInfo.deviceType,
+      browser: deviceInfo.browser,
+      os: deviceInfo.os
+    }).subscribe();
   }
 }

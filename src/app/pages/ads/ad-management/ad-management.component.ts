@@ -183,6 +183,18 @@ export class AdManagementComponent implements OnInit {
     this.router.navigate(['ads', campaign.id, 'edit'], { relativeTo: this.route.parent });
   }
 
+  startCampaign(campaignId: string): void {
+    this.adService.startCampaign(campaignId).then(() => {
+      this.successMessage.set('Campaign started successfully');
+      this.loadCampaigns();
+      setTimeout(() => this.successMessage.set(null), 3000);
+    }).catch(error => {
+      console.error('Error starting campaign:', error);
+      this.errorMessage.set('Failed to start campaign');
+      setTimeout(() => this.errorMessage.set(null), 3000);
+    });
+  }
+
   pauseCampaign(campaignId: string): void {
     this.adService.pauseCampaign(campaignId).then(() => {
       this.successMessage.set('Campaign paused successfully');

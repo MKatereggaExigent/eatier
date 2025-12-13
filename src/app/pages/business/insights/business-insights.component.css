@@ -256,18 +256,12 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.metrics-grid .metric-card.primary {
-  color: white;
-  border: none;
+.metrics-grid .metric-card.primary .metric-content h4 {
+  color: var(--clr-black);
 }
 
-.metrics-grid .metric-card.primary .metric-content h4, .metrics-grid .metric-card.primary .metric-content p {
-  color: white;
-}
-
-.metrics-grid .metric-card.primary .growth-indicator {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+.metrics-grid .metric-card.primary .metric-content p {
+  color: var(--clr-grey-700);
 }
 
 .metrics-grid .metric-card .metric-icon {

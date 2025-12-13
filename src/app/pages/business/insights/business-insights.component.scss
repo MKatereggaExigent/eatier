@@ -269,16 +269,12 @@
     }
 
     &.primary {
-      color: white;
-      border: none;
-
-      .metric-content h4, .metric-content p {
-        color: white;
+      .metric-content h4 {
+        color: var(--clr-black);
       }
 
-      .growth-indicator {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
+      .metric-content p {
+        color: var(--clr-grey-700);
       }
     }
 
