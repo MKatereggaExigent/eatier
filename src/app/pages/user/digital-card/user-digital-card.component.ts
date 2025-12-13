@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
+import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { UserProfile } from '../../../shared/models/user-profile.model';
 
@@ -41,37 +42,8 @@ export class UserDigitalCardComponent implements OnInit {
     { value: 'creative', label: 'Creative', preview: '🎨' }
   ];
 
-  // Mock user profile
-  mockProfile: UserProfile = {
-    id: '1',
-    userId: 'user-1',
-    firstName: 'Marco',
-    lastName: 'Rossi',
-    country: 'United States',
-    email: 'marco.rossi@example.com',
-    phone: '+1 (555) 987-6543',
-    specialtyDishes: ['Pasta Carbonara', 'Risotto Milanese', 'Tiramisu'],
-    bio: 'Professional chef with 15+ years experience in Italian cuisine. Passionate about authentic flavors.',
-    experience: 15,
-    profilePhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop',
-    status: 'active',
-    isVerified: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date(),
-    qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://itiyum.com/chef/marco-rossi',
-    businessCardCustomization: {
-      primaryColor: '#667eea',
-      secondaryColor: '#764ba2',
-      layout: 'professional',
-      includeQR: true,
-      includeContact: true,
-      includeSpecialties: true,
-      includeBio: true
-    },
-    profileVisibility: 'public',
-    showContactInfo: true,
-    showLocation: false
-  };
+  // Inject auth service for current user data
+  private authService = inject(AuthService);
 
   constructor() {
     this.customizationForm = this.fb.group({
@@ -95,16 +67,49 @@ export class UserDigitalCardComponent implements OnInit {
   }
 
   loadUserProfile(): void {
-    // Mock API call
-    setTimeout(() => {
-      this.userProfile.set(this.mockProfile);
-      this.qrCodeUrl.set(this.mockProfile.qrCodeUrl || '');
+    const user = this.authService.currentUser();
 
-      // Populate form with existing customization
-      if (this.mockProfile.businessCardCustomization) {
-        this.customizationForm.patchValue(this.mockProfile.businessCardCustomization);
+    if (user) {
+      // Create profile from authenticated user data
+      const profile: UserProfile = {
+        id: user.id,
+        userId: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        country: '',
+        email: user.email,
+        phone: '',
+        specialtyDishes: [],
+        bio: '',
+        experience: 0,
+        profilePhoto: '',
+        status: 'active',
+        isVerified: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('https://itiyum.com/user/' + user.id)}`,
+        businessCardCustomization: {
+          primaryColor: '#667eea',
+          secondaryColor: '#764ba2',
+          layout: 'professional',
+          includeQR: true,
+          includeContact: true,
+          includeSpecialties: true,
+          includeBio: true
+        },
+        profileVisibility: 'public',
+        showContactInfo: true,
+        showLocation: false
+      };
+
+      this.userProfile.set(profile);
+      this.qrCodeUrl.set(profile.qrCodeUrl || '');
+
+      // Populate form with default customization
+      if (profile.businessCardCustomization) {
+        this.customizationForm.patchValue(profile.businessCardCustomization);
       }
-    }, 500);
+    }
   }
 
   updatePreview(): void {

@@ -540,5 +540,142 @@ router.patch('/menu/:id/availability', async (req, res) => {
   }
 });
 
-module.exports = router;
+// ===================================
+// REVIEWS MANAGEMENT
+// ===================================
 
+/**
+ * GET /api/business-owner/reviews
+ * Get reviews for the business owner's business
+ */
+router.get('/reviews', async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
+    const { page = 1, limit = 20, rating } = req.query;
+    const offset = (page - 1) * limit;
+
+    // First get the business ID for this owner
+    const businessResult = await pool.query(
+      'SELECT id FROM businesses WHERE owner_id = $1 AND tenant_id = $2 LIMIT 1',
+      [userId, tenantId]
+    );
+
+    if (businessResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    const businessId = businessResult.rows[0].id;
+
+    // Build query to get reviews
+    let query = `
+      SELECT
+        r.*,
+        u.first_name || ' ' || u.last_name as customer_name,
+        u.email as customer_email,
+        u.profile_photo as customer_avatar
+      FROM reviews r
+      JOIN users u ON r.user_id = u.id
+      WHERE r.business_id = $1 AND r.tenant_id = $2
+    `;
+    const params = [businessId, tenantId];
+
+    // Optional filter by rating
+    if (rating) {
+      query += ` AND r.rating = $${params.length + 1}`;
+      params.push(rating);
+    }
+
+    query += ` ORDER BY r.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
+
+    const result = await pool.query(query, params);
+
+    // Get total count for pagination
+    let countQuery = `
+      SELECT COUNT(*) FROM reviews
+      WHERE business_id = $1 AND tenant_id = $2
+    `;
+    const countParams = [businessId, tenantId];
+
+    if (rating) {
+      countQuery += ` AND rating = $3`;
+      countParams.push(rating);
+    }
+
+    const countResult = await pool.query(countQuery, countParams);
+    const total = parseInt(countResult.rows[0].count);
+
+    res.json({
+      reviews: result.rows,
+      total,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        hasMore: offset + result.rows.length < total
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    res.status(500).json({ error: 'Failed to fetch reviews' });
+  }
+});
+
+/**
+ * POST /api/business-owner/reviews/:reviewId/response
+ * Respond to a review
+ */
+router.post('/reviews/:reviewId/response', async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
+    const { reviewId } = req.params;
+    const { response } = req.body;
+
+    if (!response || response.trim() === '') {
+      return res.status(400).json({ error: 'Response cannot be empty' });
+    }
+
+    // First get the business ID for this owner
+    const businessResult = await pool.query(
+      'SELECT id FROM businesses WHERE owner_id = $1 AND tenant_id = $2 LIMIT 1',
+      [userId, tenantId]
+    );
+
+    if (businessResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    const businessId = businessResult.rows[0].id;
+
+    // Verify the review belongs to this business
+    const reviewCheck = await pool.query(
+      'SELECT id FROM reviews WHERE id = $1 AND business_id = $2',
+      [reviewId, businessId]
+    );
+
+    if (reviewCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Review not found for this business' });
+    }
+
+    // Update the review with the owner's response
+    const result = await pool.query(`
+      UPDATE reviews
+      SET response_from_owner = $1, response_date = CURRENT_TIMESTAMP
+      WHERE id = $2
+      RETURNING *
+    `, [response.trim(), reviewId]);
+
+    res.json({
+      message: 'Response added successfully',
+      review: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Error responding to review:', error);
+    res.status(500).json({ error: 'Failed to respond to review' });
+  }
+});
+
+module.exports = router;

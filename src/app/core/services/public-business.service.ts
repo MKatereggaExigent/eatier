@@ -23,6 +23,7 @@ export interface PublicBusiness {
   profilePhotos?: string[];
   backgroundImage?: string;
   accountStatus: string;
+  priceRange?: string; // Auto-calculated: 'budget', 'moderate', 'expensive', 'luxury'
   createdAt: string;
   updatedAt: string;
 }
@@ -58,7 +59,7 @@ export class PublicBusinessService {
       });
     }
 
-    const url = queryParams.toString() 
+    const url = queryParams.toString()
       ? `${this.apiUrl}?${queryParams.toString()}`
       : this.apiUrl;
 

@@ -1,25 +1,34 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
-import { AdManagementService } from '../../../core/services/ad-management.service';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
-  AdType,
-  Currency,
-  BillingCycle,
-  AdCreationForm,
-  GeographicTargeting,
-  DemographicTargeting,
-  AdContent,
   AdBudget,
+  AdContent,
+  AdCreationForm,
   AdSchedule,
-  CTAType
+  AdType,
+  BillingCycle,
+  CTAType,
+  Currency,
+  DemographicTargeting,
+  GeographicTargeting
 } from '../../../core/models/ad-management.models';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+
+import { AdManagementService } from '../../../core/services/ad-management.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CommonModule } from '@angular/common';
 
 interface StepValidation {
   isValid: boolean;
   errors: string[];
+}
+
+interface UploadedMedia {
+  id: string;
+  url: string;
+  name: string;
+  type: 'image' | 'video';
+  file?: File;
 }
 
 @Component({
@@ -34,23 +43,38 @@ export class AdCreationComponent implements OnInit {
   private adService = inject(AdManagementService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   // Make Math available in template
   Math = Math;
 
+  // Edit mode signals
+  isEditMode = signal(false);
+  editCampaignId = signal<string | null>(null);
+  isLoadingCampaign = signal(false);
+
   // Signals
   currentUser = this.authService.currentUser;
   currentStep = signal(1);
-  totalSteps = signal(5);
+  totalSteps = signal(6); // Added tier/placement step
   isLoading = signal(false);
   isSubmitting = signal(false);
+  formsInitialized = signal(false); // Track form initialization
+  formChangeCounter = signal(0); // Trigger reactivity on form changes
 
-  // Form groups for each step
-  basicInfoForm!: FormGroup;
-  targetingForm!: FormGroup;
-  contentForm!: FormGroup;
-  budgetForm!: FormGroup;
-  scheduleForm!: FormGroup;
+  // Ad Tiers and Placements
+  adTiers = signal<any[]>([]);
+  adPlacements = signal<any[]>([]);
+  selectedTier = signal<any | null>(null);
+  selectedPlacement = signal<any | null>(null);
+
+  // Form groups for each step - initialize with empty form groups
+  basicInfoForm: FormGroup = new FormGroup({});
+  tierPlacementForm: FormGroup = new FormGroup({});
+  targetingForm: FormGroup = new FormGroup({});
+  contentForm: FormGroup = new FormGroup({});
+  budgetForm: FormGroup = new FormGroup({});
+  scheduleForm: FormGroup = new FormGroup({});
 
   // Data options
   adTypes: { value: AdType; label: string; description: string; minBudget: number }[] = [
@@ -85,6 +109,7 @@ export class AdCreationComponent implements OnInit {
   ];
 
   regions = [
+    { value: 'southern-africa', label: 'Southern Africa', countries: ['South Africa', 'Botswana', 'Zimbabwe', 'Namibia', 'Mozambique'] },
     { value: 'east-africa', label: 'East Africa', countries: ['Kenya', 'Uganda', 'Tanzania', 'Ethiopia', 'Rwanda'] },
     { value: 'west-africa', label: 'West Africa', countries: ['Nigeria', 'Ghana', 'Senegal', 'Mali', 'Burkina Faso'] },
     { value: 'north-america', label: 'North America', countries: ['United States', 'Canada', 'Mexico'] },
@@ -92,6 +117,7 @@ export class AdCreationComponent implements OnInit {
   ];
 
   cities: { [country: string]: string[] } = {
+    'South Africa': ['Johannesburg', 'Cape Town', 'Durban', 'Pretoria', 'Port Elizabeth', 'Sandton', 'Rosebank'],
     'Kenya': ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret'],
     'Uganda': ['Kampala', 'Entebbe', 'Jinja', 'Mbale', 'Gulu'],
     'Tanzania': ['Dar es Salaam', 'Arusha', 'Mwanza', 'Dodoma', 'Mbeya'],
@@ -109,6 +135,29 @@ export class AdCreationComponent implements OnInit {
     { value: 'call_now', label: 'Call Now' },
     { value: 'email_now', label: 'Email Now' }
   ];
+
+  // User type options for multi-select
+  userTypeOptions = [
+    { value: 'food_enthusiast', label: 'Food Enthusiasts' },
+    { value: 'normal_user', label: 'Regular Users' },
+    { value: 'business_owner', label: 'Business Owners' },
+    { value: 'specialist', label: 'Food Specialists' }
+  ];
+
+  // Objective options
+  objectiveOptions = [
+    { value: 'brand-awareness', label: 'Increase Brand Awareness' },
+    { value: 'drive-bookings', label: 'Drive Bookings' },
+    { value: 'promote-menu', label: 'Promote New Menu Items' },
+    { value: 'increase-followers', label: 'Increase Social Media Followers' },
+    { value: 'website-traffic', label: 'Drive Website Traffic' }
+  ];
+
+  // Uploaded media
+  uploadedImages = signal<UploadedMedia[]>([]);
+  uploadedVideos = signal<UploadedMedia[]>([]);
+  errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
 
   // Computed properties
   selectedAdType = computed(() => {
@@ -137,26 +186,48 @@ export class AdCreationComponent implements OnInit {
   });
 
   stepValidation = computed(() => {
+    // Trigger reactivity on formsInitialized signal and form changes
+    const initialized = this.formsInitialized();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _changeCounter = this.formChangeCounter(); // Track form changes
+
+    // If forms aren't initialized yet, return default invalid state
+    if (!initialized) {
+      return [
+        { isValid: true, errors: [] }, // Step 0 (placeholder)
+        { isValid: false, errors: ['Form not yet initialized'] },
+        { isValid: false, errors: [] },
+        { isValid: false, errors: [] },
+        { isValid: false, errors: [] },
+        { isValid: false, errors: [] },
+        { isValid: false, errors: [] }
+      ] as StepValidation[];
+    }
+
     const validations: StepValidation[] = [
       { isValid: true, errors: [] }, // Step 0 (placeholder)
       {
-        isValid: this.basicInfoForm?.valid || false,
+        isValid: this.basicInfoForm.valid,
         errors: this.getFormErrors(this.basicInfoForm)
       },
       {
-        isValid: this.targetingForm?.valid || false,
+        isValid: this.tierPlacementForm.valid,
+        errors: this.getFormErrors(this.tierPlacementForm)
+      },
+      {
+        isValid: this.targetingForm.valid,
         errors: this.getFormErrors(this.targetingForm)
       },
       {
-        isValid: this.contentForm?.valid || false,
+        isValid: this.contentForm.valid,
         errors: this.getFormErrors(this.contentForm)
       },
       {
-        isValid: this.budgetForm?.valid || false,
+        isValid: this.budgetForm.valid,
         errors: this.getFormErrors(this.budgetForm)
       },
       {
-        isValid: this.scheduleForm?.valid || false,
+        isValid: this.scheduleForm.valid,
         errors: this.getFormErrors(this.scheduleForm)
       }
     ];
@@ -170,6 +241,175 @@ export class AdCreationComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForms();
+    this.formsInitialized.set(true); // Signal that forms are ready
+    this.loadTiersAndPlacements();
+
+    // Check if we're in edit mode
+    const adId = this.route.snapshot.paramMap.get('adId');
+    if (adId) {
+      this.isEditMode.set(true);
+      this.editCampaignId.set(adId);
+      this.loadCampaignForEdit(adId);
+    }
+  }
+
+  // Load campaign data for editing
+  private async loadCampaignForEdit(campaignId: string): Promise<void> {
+    this.isLoadingCampaign.set(true);
+    try {
+      const campaign = await this.adService.getCampaignById(campaignId);
+      if (campaign) {
+        this.populateFormsWithCampaign(campaign);
+      } else {
+        this.errorMessage.set('Campaign not found');
+        this.router.navigate(['../'], { relativeTo: this.route });
+      }
+    } catch (error) {
+      console.error('Error loading campaign:', error);
+      this.errorMessage.set('Failed to load campaign data');
+    } finally {
+      this.isLoadingCampaign.set(false);
+    }
+  }
+
+  // Populate forms with campaign data
+  private populateFormsWithCampaign(campaign: any): void {
+    // Basic Info
+    this.basicInfoForm.patchValue({
+      title: campaign.title || '',
+      description: campaign.description || '',
+      type: campaign.type || 'promoted',
+      category: campaign.category || 'restaurant',
+      objectives: campaign.objectives || ['brand-awareness']
+    });
+
+    // Tier and Placement
+    if (campaign.tierId && campaign.placementId) {
+      this.tierPlacementForm.patchValue({
+        tierId: campaign.tierId,
+        placementId: campaign.placementId
+      });
+    }
+
+    // Targeting
+    this.targetingForm.patchValue({
+      region: campaign.targeting?.geographic?.regions?.[0] || 'east-africa',
+      countries: campaign.targeting?.geographic?.countries || ['Kenya'],
+      cities: campaign.targeting?.geographic?.cities || [],
+      radius: campaign.targeting?.geographic?.radius || 25,
+      ageMin: campaign.targeting?.demographic?.ageRange?.min || 18,
+      ageMax: campaign.targeting?.demographic?.ageRange?.max || 65,
+      gender: campaign.targeting?.demographic?.gender || ['all'],
+      languages: campaign.targeting?.demographic?.languages || ['English'],
+      userTypes: campaign.targeting?.targetAudience || ['food_enthusiast', 'normal_user'],
+      interests: campaign.targeting?.interests || [],
+      keywords: campaign.targeting?.keywords || [],
+      excludedKeywords: campaign.targeting?.excludedKeywords || []
+    });
+
+    // Content
+    this.contentForm.patchValue({
+      headline: campaign.content?.text?.headline || '',
+      description: campaign.content?.text?.description || '',
+      subheading: campaign.content?.text?.subheading || '',
+      ctaType: campaign.content?.callToAction?.type || 'book_now',
+      ctaText: campaign.content?.callToAction?.text || 'Book Now',
+      ctaUrl: campaign.content?.callToAction?.url || '',
+      ctaPhone: campaign.content?.callToAction?.phoneNumber || '',
+      ctaEmail: campaign.content?.callToAction?.email || ''
+    });
+
+    // Load existing images
+    if (campaign.content?.images?.length > 0) {
+      const images = campaign.content.images.map((img: any, index: number) => ({
+        id: img.id || `existing-${index}`,
+        url: img.url,
+        name: `Image ${index + 1}`,
+        type: 'image' as const
+      }));
+      this.uploadedImages.set(images);
+      this.contentForm.patchValue({ images: campaign.content.images });
+    }
+
+    // Load existing videos
+    if (campaign.content?.videos?.length > 0) {
+      const videos = campaign.content.videos.map((vid: any, index: number) => ({
+        id: vid.id || `existing-video-${index}`,
+        url: vid.url,
+        name: `Video ${index + 1}`,
+        type: 'video' as const
+      }));
+      this.uploadedVideos.set(videos);
+      this.contentForm.patchValue({ videos: campaign.content.videos });
+    }
+
+    // Budget
+    this.budgetForm.patchValue({
+      totalBudget: campaign.budget?.totalBudget || 100,
+      dailyBudget: campaign.budget?.dailyBudget || 10,
+      currency: campaign.budget?.currency || 'USD',
+      billingCycle: campaign.budget?.billingCycle || 'daily'
+    });
+
+    // Schedule - use direct properties from transformed campaign
+    const startDateValue = campaign.startDate ? new Date(campaign.startDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+    const endDateValue = campaign.endDate ? new Date(campaign.endDate).toISOString().split('T')[0] : '';
+    this.scheduleForm.patchValue({
+      startDate: startDateValue,
+      endDate: endDateValue,
+      runContinuously: !campaign.endDate,
+      timezone: 'UTC'
+    });
+
+    // Trigger form change counter to update validation
+    this.formChangeCounter.update(c => c + 1);
+  }
+
+  // Load ad tiers and placements from backend
+  private async loadTiersAndPlacements(): Promise<void> {
+    try {
+      const tiers = await this.adService.getAdTiers();
+      this.adTiers.set(tiers);
+      // Select first tier by default
+      if (tiers.length > 0) {
+        this.selectTier(tiers[0]);
+      }
+    } catch (error) {
+      console.error('Error loading tiers:', error);
+    }
+  }
+
+  selectTier(tier: any): void {
+    this.selectedTier.set(tier);
+    this.tierPlacementForm.patchValue({ tierId: tier.id });
+    // Load placements for this tier
+    this.loadPlacementsForTier(tier.id);
+  }
+
+  private async loadPlacementsForTier(tierId: string): Promise<void> {
+    try {
+      const placements = await this.adService.getAdPlacements(tierId);
+      this.adPlacements.set(placements);
+      // Select first placement by default
+      if (placements.length > 0) {
+        this.selectPlacement(placements[0]);
+      }
+    } catch (error) {
+      console.error('Error loading placements:', error);
+    }
+  }
+
+  selectPlacement(placement: any): void {
+    this.selectedPlacement.set(placement);
+    this.tierPlacementForm.patchValue({ placementId: placement.id });
+  }
+
+  // Custom validator for non-empty arrays
+  private arrayNotEmpty(control: any): { [key: string]: boolean } | null {
+    if (!control.value || !Array.isArray(control.value) || control.value.length === 0) {
+      return { required: true };
+    }
+    return null;
   }
 
   private initializeForms(): void {
@@ -178,21 +418,27 @@ export class AdCreationComponent implements OnInit {
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
       type: ['promoted', Validators.required],
-      category: ['', Validators.required],
-      objectives: [[], Validators.required]
+      category: ['restaurant', Validators.required],
+      objectives: [['brand-awareness'], this.arrayNotEmpty.bind(this)]
+    });
+
+    // Tier and Placement Form (Step 2)
+    this.tierPlacementForm = this.fb.group({
+      tierId: ['', Validators.required],
+      placementId: ['', Validators.required]
     });
 
     // Targeting Form
     this.targetingForm = this.fb.group({
       region: ['east-africa', Validators.required],
-      countries: [[], Validators.required],
+      countries: [['Kenya'], this.arrayNotEmpty.bind(this)],
       cities: [[]],
       radius: [25, [Validators.min(5), Validators.max(100)]],
       ageMin: [18, [Validators.min(13), Validators.max(100)]],
       ageMax: [65, [Validators.min(13), Validators.max(100)]],
       gender: [['all'], Validators.required],
       languages: [['English'], Validators.required],
-      userTypes: [['food_enthusiast', 'normal_user'], Validators.required],
+      userTypes: [['food_enthusiast', 'normal_user'], this.arrayNotEmpty.bind(this)],
       interests: [[]],
       keywords: [[]],
       excludedKeywords: [[]]
@@ -233,6 +479,19 @@ export class AdCreationComponent implements OnInit {
   }
 
   private setupFormWatchers(): void {
+    // Track all form changes to trigger validation updates
+    const triggerValidation = () => {
+      this.formChangeCounter.update(c => c + 1);
+    };
+
+    // Watch all forms for changes
+    this.basicInfoForm.valueChanges.subscribe(triggerValidation);
+    this.tierPlacementForm.valueChanges.subscribe(triggerValidation);
+    this.targetingForm.valueChanges.subscribe(triggerValidation);
+    this.contentForm.valueChanges.subscribe(triggerValidation);
+    this.budgetForm.valueChanges.subscribe(triggerValidation);
+    this.scheduleForm.valueChanges.subscribe(triggerValidation);
+
     // Update CTA text when CTA type changes
     this.contentForm.get('ctaType')?.valueChanges.subscribe(ctaType => {
       const ctaOption = this.ctaTypes.find(option => option.value === ctaType);
@@ -278,7 +537,11 @@ export class AdCreationComponent implements OnInit {
 
   // Form submission
   async submitCampaign(): Promise<void> {
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
     if (!this.isFormValid()) {
+      this.errorMessage.set('Please complete all required fields before launching the campaign.');
       return;
     }
 
@@ -286,15 +549,27 @@ export class AdCreationComponent implements OnInit {
 
     try {
       const campaignData = this.buildCampaignData();
-      const campaign = await this.adService.createCampaign(campaignData);
+
+      let campaign;
+      if (this.isEditMode() && this.editCampaignId()) {
+        // Update existing campaign
+        campaign = await this.adService.updateCampaign(this.editCampaignId()!, campaignData);
+        this.successMessage.set('Campaign updated successfully! Redirecting...');
+      } else {
+        // Create new campaign
+        campaign = await this.adService.createCampaign(campaignData);
+        this.successMessage.set('Campaign created successfully! Redirecting...');
+      }
 
       // Navigate back to ad management dashboard
-      this.router.navigate(['/dashboard/business/ads'], {
-        queryParams: { created: campaign.id }
-      });
-    } catch (error) {
-      console.error('Error creating campaign:', error);
-      // Handle error (show toast, etc.)
+      setTimeout(() => {
+        this.router.navigate(['/business/ads'], {
+          queryParams: { [this.isEditMode() ? 'updated' : 'created']: campaign.id }
+        });
+      }, 1500);
+    } catch (error: any) {
+      console.error('Error saving campaign:', error);
+      this.errorMessage.set(error?.message || `Failed to ${this.isEditMode() ? 'update' : 'create'} campaign. Please try again.`);
     } finally {
       this.isSubmitting.set(false);
     }
@@ -303,6 +578,7 @@ export class AdCreationComponent implements OnInit {
   private isFormValid(): boolean {
     return [
       this.basicInfoForm,
+      this.tierPlacementForm,
       this.targetingForm,
       this.contentForm,
       this.budgetForm,
@@ -312,6 +588,7 @@ export class AdCreationComponent implements OnInit {
 
   private buildCampaignData(): AdCreationForm {
     const basicInfo = this.basicInfoForm.value;
+    const tierPlacement = this.tierPlacementForm.value;
     const targeting = this.targetingForm.value;
     const content = this.contentForm.value;
     const budget = this.budgetForm.value;
@@ -324,6 +601,12 @@ export class AdCreationComponent implements OnInit {
         type: basicInfo.type,
         category: basicInfo.category,
         objectives: basicInfo.objectives
+      },
+      tierPlacement: {
+        tierId: tierPlacement.tierId,
+        placementId: tierPlacement.placementId,
+        tierName: this.selectedTier()?.displayName || '',
+        placementName: this.selectedPlacement()?.displayName || ''
       },
       targeting: {
         geographic: {
@@ -400,6 +683,7 @@ export class AdCreationComponent implements OnInit {
     const titles = [
       '',
       'Basic Information',
+      'Ad Tier & Placement',
       'Targeting & Audience',
       'Ad Content & Creative',
       'Budget & Pricing',
@@ -412,27 +696,135 @@ export class AdCreationComponent implements OnInit {
     return (this.currentStep() / this.totalSteps()) * 100;
   }
 
-  // File upload methods (placeholder)
+  // File upload methods
   onImageUpload(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      // Handle image upload
-      console.log('Image upload:', input.files);
+      const newImages: UploadedMedia[] = [];
+      for (let i = 0; i < input.files.length; i++) {
+        const file = input.files[i];
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const media: UploadedMedia = {
+            id: crypto.randomUUID(),
+            url: e.target?.result as string,
+            name: file.name,
+            type: 'image',
+            file: file
+          };
+          this.uploadedImages.update(images => [...images, media]);
+          // Update form control
+          const currentImages = this.contentForm.get('images')?.value || [];
+          this.contentForm.patchValue({ images: [...currentImages, { url: media.url, id: media.id }] });
+        };
+        reader.readAsDataURL(file);
+      }
     }
   }
 
   onVideoUpload(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      // Handle video upload
-      console.log('Video upload:', input.files);
+      for (let i = 0; i < input.files.length; i++) {
+        const file = input.files[i];
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const media: UploadedMedia = {
+            id: crypto.randomUUID(),
+            url: e.target?.result as string,
+            name: file.name,
+            type: 'video',
+            file: file
+          };
+          this.uploadedVideos.update(videos => [...videos, media]);
+          // Update form control
+          const currentVideos = this.contentForm.get('videos')?.value || [];
+          this.contentForm.patchValue({ videos: [...currentVideos, { url: media.url, id: media.id }] });
+        };
+        reader.readAsDataURL(file);
+      }
     }
+  }
+
+  removeImage(imageId: string): void {
+    this.uploadedImages.update(images => images.filter(img => img.id !== imageId));
+    const currentImages = this.contentForm.get('images')?.value || [];
+    this.contentForm.patchValue({ images: currentImages.filter((img: any) => img.id !== imageId) });
+  }
+
+  removeVideo(videoId: string): void {
+    this.uploadedVideos.update(videos => videos.filter(vid => vid.id !== videoId));
+    const currentVideos = this.contentForm.get('videos')?.value || [];
+    this.contentForm.patchValue({ videos: currentVideos.filter((vid: any) => vid.id !== videoId) });
+  }
+
+  // Multi-select helper methods
+  toggleCountry(country: string): void {
+    const currentCountries = this.targetingForm.get('countries')?.value || [];
+    const index = currentCountries.indexOf(country);
+    if (index === -1) {
+      this.targetingForm.patchValue({ countries: [...currentCountries, country] });
+    } else {
+      this.targetingForm.patchValue({ countries: currentCountries.filter((c: string) => c !== country) });
+    }
+    // Reset cities when countries change
+    this.targetingForm.patchValue({ cities: [] });
+  }
+
+  isCountrySelected(country: string): boolean {
+    const countries = this.targetingForm.get('countries')?.value || [];
+    return countries.includes(country);
+  }
+
+  toggleCity(city: string): void {
+    const currentCities = this.targetingForm.get('cities')?.value || [];
+    const index = currentCities.indexOf(city);
+    if (index === -1) {
+      this.targetingForm.patchValue({ cities: [...currentCities, city] });
+    } else {
+      this.targetingForm.patchValue({ cities: currentCities.filter((c: string) => c !== city) });
+    }
+  }
+
+  isCitySelected(city: string): boolean {
+    const cities = this.targetingForm.get('cities')?.value || [];
+    return cities.includes(city);
+  }
+
+  toggleUserType(userType: string): void {
+    const currentTypes = this.targetingForm.get('userTypes')?.value || [];
+    const index = currentTypes.indexOf(userType);
+    if (index === -1) {
+      this.targetingForm.patchValue({ userTypes: [...currentTypes, userType] });
+    } else {
+      this.targetingForm.patchValue({ userTypes: currentTypes.filter((t: string) => t !== userType) });
+    }
+  }
+
+  isUserTypeSelected(userType: string): boolean {
+    const types = this.targetingForm.get('userTypes')?.value || [];
+    return types.includes(userType);
+  }
+
+  toggleObjective(objective: string): void {
+    const currentObjectives = this.basicInfoForm.get('objectives')?.value || [];
+    const index = currentObjectives.indexOf(objective);
+    if (index === -1) {
+      this.basicInfoForm.patchValue({ objectives: [...currentObjectives, objective] });
+    } else {
+      this.basicInfoForm.patchValue({ objectives: currentObjectives.filter((o: string) => o !== objective) });
+    }
+  }
+
+  isObjectiveSelected(objective: string): boolean {
+    const objectives = this.basicInfoForm.get('objectives')?.value || [];
+    return objectives.includes(objective);
   }
 
   // Cancel creation
   cancelCreation(): void {
     if (confirm('Are you sure you want to cancel? All progress will be lost.')) {
-      this.router.navigate(['/dashboard/business/ads']);
+      this.router.navigate(['/business/ads']);
     }
   }
 }

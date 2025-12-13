@@ -3,15 +3,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
-const { Pool } = require('pg');
 
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'itiyum_platform',
-  user: process.env.DB_USER || 'michaelkateregga',
-  password: process.env.DB_PASSWORD || ''
-});
+// Use the shared database pool from database.js
+const pool = require('./database');
 
 // Helper function to find or create user from OAuth profile
 async function findOrCreateOAuthUser(profile, provider) {

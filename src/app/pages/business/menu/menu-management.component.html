@@ -1,358 +1,342 @@
 <div class="menu-management-container">
-  <!-- Header -->
-  <div class="menu-header">
+  <!-- Modern Header with Gradient -->
+  <div class="page-header">
     <div class="header-content">
-      <h1>🍽️ Menu Management Toolkit</h1>
-      <p>This tool allows you to update your menu whether you want to delete an item on the menu or adding more eating options. It also allows for adding pricing options. Give access to your menu to someone else to manage your menu from anywhere</p>
-    </div>
-    <div class="header-actions">
-      <button
-        type="button"
-        class="create-menu-btn"
-        (click)="openCreateMenuModal()"
-      >
-        ➕ Create My Menu
-      </button>
-      <button
-        type="button"
-        class="manage-access-btn"
-        (click)="openManageAccessModal()"
-      >
-        👥 Managing Access
-      </button>
+      <div class="header-title-section">
+        <div class="icon-wrapper">
+          <span class="header-icon">🍽️</span>
+        </div>
+        <div class="title-text">
+          <h1>Menu Management</h1>
+          <p class="subtitle">Create, manage, and organize your restaurant's menu items</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="openCreateMenuModal()"
+          [disabled]="isLoading()"
+        >
+          <span class="btn-icon">➕</span>
+          <span class="btn-text">Add Menu Item</span>
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Success/Error Messages -->
+  <!-- Alert Messages -->
   @if (successMessage()) {
-    <div class="success-message">
-      <span class="success-icon">✅</span>
-      {{ successMessage() }}
+    <div class="alert alert-success">
+      <span class="alert-icon">✅</span>
+      <span class="alert-message">{{ successMessage() }}</span>
+      <button type="button" class="alert-close" (click)="successMessage.set(null)">×</button>
     </div>
   }
 
   @if (errorMessage()) {
-    <div class="error-message">
-      <span class="error-icon">⚠️</span>
-      {{ errorMessage() }}
+    <div class="alert alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span class="alert-message">{{ errorMessage() }}</span>
+      <button type="button" class="alert-close" (click)="errorMessage.set(null)">×</button>
     </div>
   }
 
-  <!-- Menu Creation/Edit Form -->
-  @if (isCreatingMenu() || isEditingMenu()) {
-    <div class="menu-form-section">
-      <div class="form-header">
-        <h2>{{ isCreatingMenu() ? 'Create New Menu' : 'Edit Menu' }}</h2>
-        <button type="button" class="close-btn" (click)="cancelMenuEdit()">✕</button>
-      </div>
-
-      <form [formGroup]="menuForm" (ngSubmit)="onSubmitMenu()" class="menu-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="menuName">Menu Name *</label>
-            <input
-              id="menuName"
-              type="text"
-              formControlName="name"
-              placeholder="e.g., Breakfast Menu"
-              [class.error]="getFieldError(menuForm, 'name')"
-            />
-            @if (getFieldError(menuForm, 'name')) {
-              <span class="field-error">{{ getFieldError(menuForm, 'name') }}</span>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="menuType">Menu Type *</label>
-            <select
-              id="menuType"
-              formControlName="type"
-              [class.error]="getFieldError(menuForm, 'type')"
-            >
-              <option value="">Select menu type</option>
-              @for (type of menuTypes; track type.value) {
-                <option [value]="type.value">{{ type.icon }} {{ type.label }}</option>
-              }
-            </select>
-            @if (getFieldError(menuForm, 'type')) {
-              <span class="field-error">{{ getFieldError(menuForm, 'type') }}</span>
-            }
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="menuDescription">Description (15 characters max, no emojis)</label>
-          <input
-            id="menuDescription"
-            type="text"
-            formControlName="description"
-            placeholder="Brief description"
-            maxlength="15"
-            [class.error]="getFieldError(menuForm, 'description')"
-          />
-          <div class="character-count" [class.limit-warning]="getDescriptionCharacterCount() > 12">
-            {{ getDescriptionCharacterCount() }}/15 characters
-          </div>
-          @if (getFieldError(menuForm, 'description')) {
-            <span class="field-error">{{ getFieldError(menuForm, 'description') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="backgroundImage">Background Image URL</label>
-          <input
-            id="backgroundImage"
-            type="url"
-            formControlName="backgroundImage"
-            placeholder="https://example.com/image.jpg"
-          />
-        </div>
-
-        <div class="form-options">
-          <label class="checkbox-label">
-            <input type="checkbox" formControlName="isPublic" />
-            <span class="checkmark"></span>
-            Make menu publicly accessible
-          </label>
-
-          <label class="checkbox-label">
-            <input type="checkbox" formControlName="isActive" />
-            <span class="checkmark"></span>
-            Menu is active
-          </label>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="secondary-btn" (click)="cancelMenuEdit()">
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="primary-btn"
-            [disabled]="isLoading() || menuForm.invalid"
-          >
-            @if (isLoading()) {
-              <span class="loading-spinner"></span>
-              {{ isCreatingMenu() ? 'Creating...' : 'Updating...' }}
-            } @else {
-              {{ isCreatingMenu() ? 'Create Menu' : 'Update Menu' }}
-            }
-          </button>
-        </div>
-      </form>
-    </div>
-  }
-
-  <!-- Menu Items List -->
-  <div class="menus-section">
-    <h2>Your Menu Items</h2>
-
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Loading State -->
     @if (isLoading() && menuItems().length === 0) {
       <div class="loading-state">
-        <span class="loading-spinner large"></span>
+        <div class="spinner"></div>
         <p>Loading menu items...</p>
       </div>
-    } @else if (menuItems().length === 0) {
+    }
+
+    <!-- Empty State -->
+    @if (!isLoading() && menuItems().length === 0) {
       <div class="empty-state">
-        <span class="empty-icon">📋</span>
-        <h3>No menu items yet</h3>
-        <p>Create your first menu item to get started</p>
-        <button type="button" class="primary-btn" (click)="createNewMenu()">
-          Create Menu
+        <div class="empty-icon">🍽️</div>
+        <h3>No Menu Items Yet</h3>
+        <p>Start building your menu by adding your first item</p>
+        <button type="button" class="btn btn-primary" (click)="openCreateMenuModal()">
+          <span class="btn-icon">➕</span>
+          <span class="btn-text">Add Your First Item</span>
         </button>
       </div>
-    } @else {
-      <div class="menus-grid">
-        @for (menuItem of menuItems(); track menuItem.id) {
-          <div class="menu-card" [class.inactive]="!menuItem.is_active">
-            <!-- Menu Item Header -->
-            <div class="menu-card-header">
-              @if (menuItem.background_image) {
-                <div class="menu-background" [style.background-image]="'url(' + menuItem.background_image + ')'"></div>
-              }
-              <div class="menu-info">
-                <div class="menu-title">
-                  <span class="menu-icon">🍽️</span>
-                  <h3>{{ menuItem.title }}</h3>
+    }
+
+    <!-- Menu Items Grid -->
+    @if (menuItems().length > 0) {
+      <div class="menu-grid">
+        @for (item of menuItems(); track item.id) {
+          <div class="menu-card" [class.inactive]="!item.is_active">
+            <!-- Card Image -->
+            <div class="card-image"
+                 [style.background-image]="item.background_image ? 'url(' + item.background_image + ')' : 'url(https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop)'">
+              <div class="image-overlay"></div>
+            </div>
+
+            <!-- Card Content -->
+            <div class="card-content">
+              <div class="card-header">
+                <div class="card-title-section">
+                  <h3 class="card-title">{{ item.title }}</h3>
+                  @if (item.category) {
+                    <span class="card-category">{{ getCategoryLabel(item.category) }}</span>
+                  }
                 </div>
-                <p class="menu-type">{{ menuItem.category || 'Uncategorized' }}</p>
-                @if (menuItem.description) {
-                  <p class="menu-description">{{ menuItem.description }}</p>
-                }
-                <p class="menu-price">${{ menuItem.price.toFixed(2) }}</p>
+                <div class="card-status">
+                  <span class="status-badge" [class.active]="item.is_active" [class.inactive]="!item.is_active">
+                    {{ item.is_active ? 'Available' : 'Unavailable' }}
+                  </span>
+                </div>
               </div>
-              <div class="menu-status">
-                <span class="status-badge" [class]="menuItem.is_active ? 'active' : 'inactive'">
-                  {{ menuItem.is_active ? 'Available' : 'Unavailable' }}
-                </span>
+
+              @if (item.description) {
+                <p class="card-description">{{ item.description }}</p>
+              }
+
+              <div class="card-price">
+                <span class="price-label">Price:</span>
+                <span class="price-value">${{ formatPrice(item.price) }}</span>
               </div>
+
+              @if (item.updated_at) {
+                <div class="card-meta">
+                  <span class="meta-icon">🕒</span>
+                  <span class="meta-text">Updated {{ formatDate(item.updated_at) }}</span>
+                </div>
+              }
             </div>
 
-
-
-            <!-- Menu Actions -->
-            <div class="menu-actions">
+            <!-- Card Actions -->
+            <div class="card-actions">
               <button
                 type="button"
-                class="action-btn edit"
-                (click)="editMenu(menuItem)"
-                [disabled]="isCreatingMenu() || isEditingMenu()"
+                class="action-btn action-edit"
+                (click)="editMenu(item)"
+                [disabled]="isLoading()"
+                title="Edit item"
               >
-                ✏️ Edit
+                <span class="action-icon">✏️</span>
+                <span class="action-text">Edit</span>
               </button>
               <button
                 type="button"
-                class="action-btn toggle"
-                (click)="toggleMenuStatus(menuItem)"
+                class="action-btn action-toggle"
+                (click)="toggleMenuStatus(item)"
+                [disabled]="isLoading()"
+                [title]="item.is_active ? 'Mark as unavailable' : 'Mark as available'"
               >
-                {{ menuItem.is_active ? '⏸️ Mark Unavailable' : '▶️ Mark Available' }}
+                <span class="action-icon">{{ item.is_active ? '⏸️' : '▶️' }}</span>
+                <span class="action-text">{{ item.is_active ? 'Disable' : 'Enable' }}</span>
               </button>
               <button
                 type="button"
-                class="action-btn delete"
-                (click)="deleteMenu(menuItem)"
+                class="action-btn action-delete"
+                (click)="deleteMenu(item)"
+                [disabled]="isLoading()"
+                title="Delete item"
               >
-                🗑️ Delete
+                <span class="action-icon">🗑️</span>
+                <span class="action-text">Delete</span>
               </button>
             </div>
-
-            <!-- Menu Footer -->
-            @if (menuItem.updated_at) {
-              <div class="menu-footer">
-                <span class="last-updated">Updated {{ formatDate(menuItem.updated_at) }}</span>
-              </div>
-            }
           </div>
         }
       </div>
     }
   </div>
-</div>
 
-<!-- Create Menu Modal -->
-@if (showCreateMenuModal()) {
-  <div class="modal-overlay" (click)="closeCreateMenuModal()">
-    <div class="modal-content create-menu-modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>🍽️ Create My Menu</h3>
-        <p>Whether you want to create a breakfast, lunch or dinner menus, simply tap below. You can always edit here to update anything on the menu</p>
-        <button type="button" class="close-btn" (click)="closeCreateMenuModal()">✕</button>
-      </div>
-
-      <form [formGroup]="menuForm" (ngSubmit)="createNewMenu()" class="create-menu-form">
-        <div class="form-group">
-          <label for="menuTitle">Menu title (e.g. breakfast, lunch, dinner, beverages, dessert) *</label>
-          <input
-            id="menuTitle"
-            type="text"
-            formControlName="name"
-            placeholder="Enter menu title"
-            [class.error]="getFieldError(menuForm, 'name')"
-          />
-          @if (getFieldError(menuForm, 'name')) {
-            <span class="field-error">{{ getFieldError(menuForm, 'name') }}</span>
-          }
+  <!-- Create/Edit Modal -->
+  @if (showCreateMenuModal() || isEditingMenu()) {
+    <div class="modal-overlay" (click)="closeCreateMenuModal()">
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <span class="modal-icon">{{ isEditingMenu() ? '✏️' : '➕' }}</span>
+            {{ isEditingMenu() ? 'Edit Menu Item' : 'Add New Menu Item' }}
+          </h2>
+          <button type="button" class="modal-close" (click)="closeCreateMenuModal()" aria-label="Close">×</button>
         </div>
 
-        <div class="form-group">
-          <label for="menuType">Menu Type *</label>
-          <select
-            id="menuType"
-            formControlName="type"
-            [class.error]="getFieldError(menuForm, 'type')"
-          >
-            <option value="">Select menu type</option>
-            @for (type of menuTypes; track type.value) {
-              <option [value]="type.value">{{ type.icon }} {{ type.label }}</option>
+        <form [formGroup]="menuForm" (ngSubmit)="onSubmitMenu()">
+          <div class="modal-body">
+            <div class="modal-form">
+              <!-- Item Name -->
+              <div class="form-group">
+            <label for="menuName" class="form-label">
+              Item Name <span class="required">*</span>
+            </label>
+            <input
+              id="menuName"
+              type="text"
+              formControlName="name"
+              class="form-input"
+              placeholder="e.g., Grilled Chicken Salad"
+              [class.error]="getFieldError(menuForm, 'name')"
+            />
+            @if (getFieldError(menuForm, 'name')) {
+              <span class="form-error">{{ getFieldError(menuForm, 'name') }}</span>
             }
-          </select>
-          @if (getFieldError(menuForm, 'type')) {
-            <span class="field-error">{{ getFieldError(menuForm, 'type') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="backgroundImage">1 background image</label>
-          <input
-            id="backgroundImage"
-            type="file"
-            accept="image/*"
-            (change)="onBackgroundImageUpload($event)"
-            class="file-input"
-          />
-          @if (menuForm.get('backgroundImage')?.value) {
-            <div class="image-preview">
-              <img [src]="menuForm.get('backgroundImage')?.value" alt="Background preview" />
-            </div>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="price">Price *</label>
-          <input
-            id="price"
-            type="number"
-            formControlName="price"
-            placeholder="0.00"
-            min="0"
-            step="0.01"
-            [class.error]="getFieldError(menuForm, 'price')"
-          />
-          @if (getFieldError(menuForm, 'price')) {
-            <span class="field-error">{{ getFieldError(menuForm, 'price') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="description">Description – character limit 15 with no emojis *</label>
-          <input
-            id="description"
-            type="text"
-            formControlName="description"
-            placeholder="Brief description"
-            maxlength="15"
-            [class.error]="getFieldError(menuForm, 'description')"
-          />
-          <div class="character-count" [class.limit-warning]="getDescriptionCharacterCount() > 12">
-            {{ getDescriptionCharacterCount() }}/{{ DESCRIPTION_MAX_LENGTH }} characters
           </div>
-          @if (getFieldError(menuForm, 'description')) {
-            <span class="field-error">{{ getFieldError(menuForm, 'description') }}</span>
-          }
-        </div>
 
-        <div class="modal-actions">
-          <button type="button" class="secondary-btn" (click)="closeCreateMenuModal()">
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="primary-btn"
-            [disabled]="isLoading() || menuForm.invalid"
-          >
-            @if (isLoading()) {
-              <span class="loading-spinner"></span>
-              Creating...
-            } @else {
-              Save Changes
+          <!-- Category -->
+          <div class="form-group">
+            <label for="menuType" class="form-label">
+              Category <span class="required">*</span>
+            </label>
+            <select
+              id="menuType"
+              formControlName="type"
+              class="form-select"
+              [class.error]="getFieldError(menuForm, 'type')"
+            >
+              <option value="" disabled>Select a category</option>
+              @for (type of menuTypes; track type.value) {
+                <option [value]="type.value">{{ type.icon }} {{ type.label }}</option>
+              }
+            </select>
+            @if (getFieldError(menuForm, 'type')) {
+              <span class="form-error">{{ getFieldError(menuForm, 'type') }}</span>
             }
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-}
+          </div>
 
-<!-- Managing Access Modal - DISABLED (Not supported by backend) -->
-<!-- TODO: Re-enable when backend supports menu sharing features -->
-<!--
-@if (showManageAccessModal()) {
-  <div class="modal-overlay">
-    <div class="modal-content">
-      <p>Access management feature coming soon!</p>
-    </div>
-  </div>
-}
--->
+          <!-- Price -->
+          <div class="form-group">
+            <label for="menuPrice" class="form-label">
+              Price <span class="required">*</span>
+            </label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">$</span>
+              <input
+                id="menuPrice"
+                type="number"
+                formControlName="price"
+                class="form-input"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+                [class.error]="getFieldError(menuForm, 'price')"
+              />
+            </div>
+            @if (getFieldError(menuForm, 'price')) {
+              <span class="form-error">{{ getFieldError(menuForm, 'price') }}</span>
+            }
+          </div>
 
-<!-- All access management UI removed - not supported by backend -->
+          <!-- Description -->
+          <div class="form-group">
+            <label for="menuDescription" class="form-label">
+              Description <span class="required">*</span>
+              <span class="label-hint">({{ DESCRIPTION_MAX_LENGTH }} characters max, no emojis)</span>
+            </label>
+            <textarea
+              id="menuDescription"
+              formControlName="description"
+              class="form-textarea"
+              placeholder="Describe your menu item..."
+              rows="4"
+              [maxlength]="DESCRIPTION_MAX_LENGTH"
+              [class.error]="getFieldError(menuForm, 'description')"
+            ></textarea>
+            <div class="form-meta">
+              <span class="char-count" [class.warning]="menuForm.get('description')?.value?.length > DESCRIPTION_MAX_LENGTH - 50">
+                {{ menuForm.get('description')?.value?.length || 0 }}/{{ DESCRIPTION_MAX_LENGTH }} characters
+              </span>
+            </div>
+            @if (getFieldError(menuForm, 'description')) {
+              <span class="form-error">{{ getFieldError(menuForm, 'description') }}</span>
+            }
+          </div>
+
+          <!-- Image Upload/URL -->
+          <div class="form-group">
+            <label class="form-label">
+              Menu Item Image <span class="optional">(Optional)</span>
+            </label>
+
+            <!-- Image Preview -->
+            @if (imagePreviewUrl()) {
+              <div class="image-preview-container">
+                <img [src]="imagePreviewUrl()" alt="Preview" class="image-preview" />
+                <button type="button" class="remove-image-btn" (click)="removeSelectedImage()" aria-label="Remove image">
+                  ✕
+                </button>
+              </div>
+            }
+
+            <!-- File Upload Button -->
+            <div class="image-upload-section">
+              <input
+                type="file"
+                id="imageFileInput"
+                accept="image/*"
+                (change)="onImageFileSelected($event)"
+                class="file-input-hidden"
+              />
+              <label for="imageFileInput" class="btn btn-secondary btn-file-upload">
+                <span class="btn-icon">📁</span>
+                <span class="btn-text">Browse Image</span>
+              </label>
+              <span class="upload-hint">or</span>
+            </div>
+
+            <!-- URL Input -->
+            <input
+              id="backgroundImage"
+              type="url"
+              formControlName="backgroundImage"
+              class="form-input"
+              placeholder="https://example.com/image.jpg"
+              [disabled]="!!imagePreviewUrl()"
+            />
+            <span class="form-hint">Upload an image file or provide a direct URL (Max 5MB)</span>
+          </div>
+
+          <!-- Availability Toggle -->
+          <div class="form-group">
+            <label class="form-label">Availability</label>
+            <div class="toggle-group">
+              <label class="toggle-switch">
+                <input type="checkbox" formControlName="isActive" />
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label">
+                {{ menuForm.get('isActive')?.value ? 'Available' : 'Unavailable' }}
+              </span>
+            </div>
+            <span class="form-hint">Toggle to make this item available or unavailable to customers</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="closeCreateMenuModal()"
+              [disabled]="isLoading()"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="isLoading() || menuForm.invalid"
+            >
+              @if (isLoading()) {
+                <span class="btn-spinner"></span>
+                {{ isEditingMenu() ? 'Updating...' : 'Creating...' }}
+              } @else {
+                <span class="btn-icon">{{ isEditingMenu() ? '💾' : '💾' }}</span>
+                <span class="btn-text">{{ isEditingMenu() ? 'Update Item' : 'Create Item' }}</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,21 @@
+# Vercel
+.vercel
+
+# Environment files - keep these local only!
+.env
+.env.local
+.env.production
+.env.neon
+
+# Keep example file for reference
+!.env.example
+
+# Logs
+*.log
+server.log
+
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store

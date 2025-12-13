@@ -1,7 +1,9 @@
-import { Component, Input, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Ad, AdServingService } from '../../../../core/services/ad-serving.service';
+import { Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Subscription, interval } from 'rxjs';
+
 import { CommonModule } from '@angular/common';
-import { AdServingService, Ad } from '../../../../core/services/ad-serving.service';
-import { interval, Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-banner-ad',
@@ -17,17 +19,18 @@ export class BannerAdComponent implements OnInit, OnDestroy {
   @Input() limit: number = 5;
 
   private adService = inject(AdServingService);
-  
+  private router = inject(Router);
+
   ads = signal<Ad[]>([]);
   currentAdIndex = signal<number>(0);
   currentAd = signal<Ad | null>(null);
-  
+
   private adsSubscription?: Subscription;
   private rotationSubscription?: Subscription;
 
   ngOnInit(): void {
     this.loadAds();
-    
+
     if (this.autoRotate) {
       this.startRotation();
     }
@@ -86,8 +89,71 @@ export class BannerAdComponent implements OnInit, OnDestroy {
 
   onAdClick(ad: Ad): void {
     this.adService.trackClick(ad.id);
-    if (ad.cta_url) {
-      window.open(ad.cta_url, '_blank', 'noopener,noreferrer');
+
+    // Handle different CTA types
+    switch (ad.cta_type) {
+      case 'book_now':
+        // Navigate to restaurant detail page with booking tab or booking modal
+        if (ad.business_id) {
+          this.router.navigate(['/restaurants', ad.business_id], {
+            queryParams: { action: 'book' }
+          });
+        }
+        break;
+
+      case 'view_menu':
+        // Navigate to restaurant detail page with menu tab
+        if (ad.business_id) {
+          this.router.navigate(['/restaurants', ad.business_id], {
+            queryParams: { tab: 'menu' }
+          });
+        }
+        break;
+
+      case 'call_now':
+        // Open phone dialer if phone number exists
+        if (ad.phone) {
+          window.location.href = `tel:${ad.phone}`;
+        } else if (ad.business_id) {
+          // Fallback to restaurant page with contact info
+          this.router.navigate(['/restaurants', ad.business_id], {
+            queryParams: { tab: 'contact' }
+          });
+        }
+        break;
+
+      case 'visit_website':
+        // Open external website or fallback to restaurant page
+        if (ad.website) {
+          window.open(ad.website, '_blank', 'noopener,noreferrer');
+        } else if (ad.cta_url) {
+          window.open(ad.cta_url, '_blank', 'noopener,noreferrer');
+        } else if (ad.business_id) {
+          this.router.navigate(['/restaurants', ad.business_id]);
+        }
+        break;
+
+      case 'get_deal':
+      case 'order_now':
+        // Navigate to restaurant page with deals/order section or external URL
+        if (ad.cta_url) {
+          window.open(ad.cta_url, '_blank', 'noopener,noreferrer');
+        } else if (ad.business_id) {
+          this.router.navigate(['/restaurants', ad.business_id], {
+            queryParams: { action: 'order' }
+          });
+        }
+        break;
+
+      case 'learn_more':
+      default:
+        // Navigate to restaurant detail page or external URL
+        if (ad.cta_url) {
+          window.open(ad.cta_url, '_blank', 'noopener,noreferrer');
+        } else if (ad.business_id) {
+          this.router.navigate(['/restaurants', ad.business_id]);
+        }
+        break;
     }
   }
 

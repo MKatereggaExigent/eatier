@@ -22,7 +22,7 @@ DB_USER="itiyum_user"
 DB_PASSWORD="itiyum_secure_password_2024"
 DB_HOST="localhost"
 DB_PORT="5432"
-BACKEND_PORT="3000"
+BACKEND_PORT="3001"
 FRONTEND_PORT="4200"
 
 # Print banner
@@ -219,7 +219,7 @@ start_services() {
     # Start backend
     echo -e "${YELLOW}Starting backend server on port $BACKEND_PORT...${NC}"
     cd backend
-    npm run dev > ../backend.log 2>&1 &
+    node server.js > ../backend.log 2>&1 &
     BACKEND_PID=$!
     cd ..
     echo -e "${GREEN}✓ Backend started (PID: $BACKEND_PID)${NC}"
@@ -227,13 +227,15 @@ start_services() {
     # Wait for backend to start
     echo -e "${YELLOW}Waiting for backend to start...${NC}"
     for i in {1..30}; do
-        if curl -s http://localhost:$BACKEND_PORT/health >/dev/null 2>&1; then
+        if curl -s http://localhost:$BACKEND_PORT/api/auth/status >/dev/null 2>&1; then
+            echo -e "${GREEN}✓ Backend is responding${NC}"
             break
         fi
         sleep 1
         if [ $i -eq 30 ]; then
             echo -e "${RED}❌ Backend failed to start within 30 seconds${NC}"
             echo -e "${YELLOW}Check backend.log for details${NC}"
+            tail -20 backend.log
         fi
     done
 

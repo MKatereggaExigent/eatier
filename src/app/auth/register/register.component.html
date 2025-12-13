@@ -174,13 +174,13 @@
               id="businessCountry"
               type="text"
               formControlName="businessCountry"
-              placeholder="Country"
+              placeholder="Enter country or select from address above"
               [class.error]="getFieldError('businessCountry')"
-              readonly
             />
             @if (getFieldError('businessCountry')) {
               <span class="field-error">{{ getFieldError('businessCountry') }}</span>
             }
+            <small class="field-hint">This will be auto-filled when you select an address above</small>
           </div>
         </div>
       }

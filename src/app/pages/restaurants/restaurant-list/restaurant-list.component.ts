@@ -1,10 +1,10 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { PublicBusiness, PublicBusinessService } from '../../../core/services/public-business.service';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { PublicBusinessService, PublicBusiness } from '../../../core/services/public-business.service';
 import { PublicStatsService } from '../../../core/services/public-stats.service';
+import { RouterModule } from '@angular/router';
 
 interface Restaurant {
   id: string;
@@ -43,74 +43,8 @@ export class RestaurantListComponent implements OnInit {
     avgRating: 0
   });
 
-  // Mock data - will be removed after loading real data
-  mockRestaurants: Restaurant[] = [
-    {
-      id: '1',
-      name: 'Bella Italia',
-      cuisine: 'Italian',
-      priceRange: '$$',
-      rating: 4.5,
-      reviewCount: 127,
-      image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop',
-      address: '123 Main St, Downtown',
-      distance: '0.5 miles',
-      isOpen: true,
-      features: ['Delivery', 'Takeout', 'Dine-in']
-    },
-    {
-      id: '2',
-      name: 'Sushi Zen',
-      cuisine: 'Japanese',
-      priceRange: '$$$',
-      rating: 4.7,
-      reviewCount: 89,
-      image: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop',
-      address: '456 Oak Ave, Midtown',
-      distance: '1.2 miles',
-      isOpen: true,
-      features: ['Takeout', 'Dine-in']
-    },
-    {
-      id: '3',
-      name: 'The Burger Joint',
-      cuisine: 'American',
-      priceRange: '$',
-      rating: 4.2,
-      reviewCount: 203,
-      image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop',
-      address: '789 Pine St, Uptown',
-      distance: '2.1 miles',
-      isOpen: false,
-      features: ['Delivery', 'Takeout']
-    },
-    {
-      id: '4',
-      name: 'Mediterranean Delight',
-      cuisine: 'Mediterranean',
-      priceRange: '$$',
-      rating: 4.4,
-      reviewCount: 156,
-      image: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400&h=300&fit=crop',
-      address: '321 Elm St, Downtown',
-      distance: '0.8 miles',
-      isOpen: true,
-      features: ['Delivery', 'Takeout', 'Dine-in', 'Outdoor Seating']
-    },
-    {
-      id: '5',
-      name: 'Taco Fiesta',
-      cuisine: 'Mexican',
-      priceRange: '$',
-      rating: 4.3,
-      reviewCount: 178,
-      image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop',
-      address: '654 Maple Ave, Southside',
-      distance: '1.8 miles',
-      isOpen: true,
-      features: ['Delivery', 'Takeout', 'Dine-in']
-    }
-  ];
+  // Error state for when API fails
+  loadError = signal<string | null>(null);
 
   cuisineTypes = [
     'All Cuisines',
@@ -141,6 +75,7 @@ export class RestaurantListComponent implements OnInit {
   }
 
   loadRestaurants(): void {
+    this.loadError.set(null);
     this.publicBusinessService.getBusinesses({ limit: 100 }).subscribe({
       next: (response) => {
         const restaurants = response.businesses.map(business => this.mapBusinessToRestaurant(business));
@@ -153,8 +88,8 @@ export class RestaurantListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading restaurants:', error);
-        // Fall back to mock data on error
-        this.restaurants.set(this.mockRestaurants);
+        this.loadError.set('Unable to load restaurants. Please try again later.');
+        this.restaurants.set([]);
         this.updateFilters();
       }
     });
@@ -192,7 +127,7 @@ export class RestaurantListComponent implements OnInit {
       id: business.id,
       name: business.businessName,
       cuisine: business.businessType,
-      priceRange: '$$', // Default, could be enhanced with actual pricing data
+      priceRange: this.convertPriceRangeToSymbol(business.priceRange), // Auto-calculated from menu prices
       rating: 0, // Will be populated when reviews are available
       reviewCount: 0, // Will be populated when reviews are available
       image,
@@ -201,6 +136,20 @@ export class RestaurantListComponent implements OnInit {
       isOpen,
       features
     };
+  }
+
+  /**
+   * Convert price range tier to display symbols
+   * Based on industry standards (Yelp, Google, OpenTable)
+   */
+  private convertPriceRangeToSymbol(priceRange?: string): string {
+    const priceMap: { [key: string]: string } = {
+      'budget': '$',      // $0-15 average
+      'moderate': '$$',   // $16-30 average
+      'expensive': '$$$', // $31-60 average
+      'luxury': '$$$$'    // $61+ average
+    };
+    return priceMap[priceRange || 'moderate'] || '$$';
   }
 
   private isBusinessOpen(opensAt?: string, closesAt?: string): boolean {

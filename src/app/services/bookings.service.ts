@@ -129,6 +129,7 @@ export interface AvailableTimeSlot {
   time: string;
   available: boolean;
   maxPartySize?: number;
+  currentBookings?: number;
 }
 
 @Injectable({
@@ -171,9 +172,11 @@ export class BookingsService {
   }
 
   private loadRestaurants(): void {
-    this.apiService.get<any[]>('businesses').subscribe({
-      next: (businesses) => {
-        const restaurants = businesses.map(business => this.transformBusinessToRestaurant(business));
+    this.apiService.get<any>('businesses').subscribe({
+      next: (response) => {
+        // Handle both array and object responses
+        const businessesArray = Array.isArray(response) ? response : (response.businesses || []);
+        const restaurants = businessesArray.map((business: any) => this.transformBusinessToRestaurant(business));
         this.restaurantsSubject.next(restaurants);
       },
       error: (error) => {
@@ -185,14 +188,15 @@ export class BookingsService {
 
   // Transformation methods
   private transformBooking(booking: any): Booking {
+    const businessName = booking.business_name || 'Unknown Restaurant';
     return {
       id: booking.id,
       bookingReference: booking.booking_reference,
       restaurantId: booking.business_id,
       restaurant: {
         id: booking.business_id,
-        name: booking.business_name,
-        slug: booking.business_name.toLowerCase().replace(/\s+/g, '-'),
+        name: businessName,
+        slug: businessName.toLowerCase().replace(/\s+/g, '-'),
         description: '',
         cuisineTypes: [],
         priceRange: 'moderate',
@@ -231,10 +235,11 @@ export class BookingsService {
   }
 
   private transformBusinessToRestaurant(business: any): Restaurant {
+    const businessName = business.business_name || business.name || 'Unknown Business';
     return {
       id: business.id,
-      name: business.business_name,
-      slug: business.business_name.toLowerCase().replace(/\s+/g, '-'),
+      name: businessName,
+      slug: businessName.toLowerCase().replace(/\s+/g, '-'),
       description: business.bio || '',
       cuisineTypes: [],
       priceRange: 'moderate',
@@ -342,9 +347,22 @@ export class BookingsService {
   }
 
   // Get available time slots for a restaurant on a specific date
-  getAvailableTimeSlots(restaurantId: string, date: string): Observable<AvailableTimeSlot[]> {
-    // Generate mock time slots since we don't have a specific endpoint for this
-    return of(this.generateAvailableTimeSlots());
+  getAvailableTimeSlots(restaurantId: string, date: string, tier: string = 'basic'): Observable<AvailableTimeSlot[]> {
+    return this.apiService.get<any>(`bookings/slots/${restaurantId}?date=${date}&tier=${tier}`).pipe(
+      map(response => {
+        return response.slots.map((slot: any) => ({
+          time: slot.slot_time,
+          available: slot.is_available,
+          maxPartySize: slot.max_capacity,
+          currentBookings: slot.current_bookings
+        }));
+      }),
+      catchError(error => {
+        console.error('Error fetching available time slots:', error);
+        // Fallback to mock data if API fails
+        return of(this.generateAvailableTimeSlots());
+      })
+    );
   }
 
   // Get booking statistics

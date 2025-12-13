@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Business, BusinessOwnerService } from '../../../core/services/business-owner.service';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
+
 import { BusinessProfile } from '../../../shared/models/business-profile.model';
 import { CommonModule } from '@angular/common';
-import { BusinessOwnerService, Business } from '../../../core/services/business-owner.service';
 
 @Component({
   selector: 'app-digital-card',
@@ -47,60 +48,7 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
     { value: 'bottom', label: 'Logo Bottom', preview: '🔻' }
   ];
 
-  // Mock business profile
-  mockProfile: BusinessProfile = {
-    id: '1',
-    userId: 'user-1',
-    businessName: 'Bella Italia Restaurant',
-    country: 'United States',
-    address: {
-      street: '123 Main Street',
-      city: 'New York',
-      state: 'NY',
-      country: 'United States',
-      zipCode: '10001'
-    },
-    email: 'contact@bellaitalia.com',
-    contactNumber: '+1 (555) 123-4567',
-    bio: 'Authentic Italian cuisine in the heart of NYC. Family recipes passed down through generations.',
-    facilities: {
-      parking: true,
-      petFriendly: false,
-      carWash: false,
-      swimming: false,
-      wifi: true,
-      airConditioning: true,
-      outdoorSeating: true,
-      wheelchairAccessible: true
-    },
-    profilePhotos: [
-      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop'
-    ],
-    backgroundImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=400&fit=crop',
-    businessHours: [
-      { day: 'Monday', isOpen: true, openTime: '11:00', closeTime: '22:00' },
-      { day: 'Tuesday', isOpen: true, openTime: '11:00', closeTime: '22:00' },
-      { day: 'Wednesday', isOpen: true, openTime: '11:00', closeTime: '22:00' },
-      { day: 'Thursday', isOpen: true, openTime: '11:00', closeTime: '22:00' },
-      { day: 'Friday', isOpen: true, openTime: '11:00', closeTime: '23:00' },
-      { day: 'Saturday', isOpen: true, openTime: '11:00', closeTime: '23:00' },
-      { day: 'Sunday', isOpen: true, openTime: '12:00', closeTime: '21:00' }
-    ],
-    isVerified: true,
-    verificationBadges: ['health_certified', 'eco_friendly'],
-    status: 'active',
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date(),
-    qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://itiyum.com/business/bella-italia',
-    businessCardCustomization: {
-      primaryColor: '#667eea',
-      secondaryColor: '#764ba2',
-      logoPosition: 'top',
-      includeQR: true,
-      includeContact: true,
-      includeSocial: true
-    }
-  };
+
 
   constructor() {
     this.customizationForm = this.fb.group({

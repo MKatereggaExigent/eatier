@@ -1,423 +1,392 @@
-<div class="ad-management-dashboard" role="main" aria-label="Ad Management Dashboard">
-  <!-- Header Section -->
-  <header class="dashboard-header">
+<div class="ads-management-container">
+  <!-- Page Header -->
+  <div class="page-header">
     <div class="header-content">
-      <div class="title-section">
-        <h1 class="page-title">
-          <span class="title-icon">📢</span>
-          Manage My Ads
-        </h1>
-        <p class="page-subtitle">
-          Create, manage, and track your advertising campaigns
-        </p>
-      </div>
-
-      <div class="header-actions">
-        <button
-          type="button"
-          class="btn-primary create-campaign-btn"
-          (click)="openCreateCampaignModal()"
-          aria-label="Create new advertising campaign">
-          <span class="btn-icon">➕</span>
-          Create Campaign
-        </button>
-      </div>
+      <h1>Ad Campaign Management</h1>
+      <p>Create, manage, and track your advertising campaigns</p>
     </div>
-  </header>
+    <button class="btn-primary" (click)="openCreateCampaign()">
+      <span class="icon">➕</span>
+      Create Campaign
+    </button>
+  </div>
 
-  <!-- Navigation Tabs -->
-  <nav class="dashboard-tabs" role="tablist">
-    <button
-      type="button"
-      class="tab-button"
-      [class.active]="selectedTab() === 'overview'"
-      (click)="selectTab('overview')"
-      role="tab"
-      [attr.aria-selected]="selectedTab() === 'overview'"
-      aria-controls="overview-panel">
-      <span class="tab-icon">📊</span>
-      Overview
-    </button>
-    <button
-      type="button"
-      class="tab-button"
-      [class.active]="selectedTab() === 'campaigns'"
-      (click)="selectTab('campaigns')"
-      role="tab"
-      [attr.aria-selected]="selectedTab() === 'campaigns'"
-      aria-controls="campaigns-panel">
-      <span class="tab-icon">📋</span>
-      Campaigns
-    </button>
-    <button
-      type="button"
-      class="tab-button"
-      [class.active]="selectedTab() === 'analytics'"
-      (click)="selectTab('analytics')"
-      role="tab"
-      [attr.aria-selected]="selectedTab() === 'analytics'"
-      aria-controls="analytics-panel">
-      <span class="tab-icon">📈</span>
-      Analytics
-    </button>
-    <button
-      type="button"
-      class="tab-button"
-      [class.active]="selectedTab() === 'payments'"
-      (click)="selectTab('payments')"
-      role="tab"
-      [attr.aria-selected]="selectedTab() === 'payments'"
-      aria-controls="payments-panel">
-      <span class="tab-icon">💳</span>
-      Payments
-    </button>
-  </nav>
-
-  <!-- Loading State -->
-  @if (isLoading()) {
-    <div class="loading-container">
-      <div class="loading-spinner"></div>
-      <p class="loading-text">Loading your ad campaigns...</p>
+  <!-- Success/Error Messages -->
+  @if (successMessage()) {
+    <div class="alert alert-success">
+      <span class="icon">✅</span>
+      {{ successMessage() }}
     </div>
   }
 
-  <!-- Overview Tab -->
-  @if (selectedTab() === 'overview' && !isLoading()) {
-    <div class="tab-content" id="overview-panel" role="tabpanel">
-      <!-- Stats Cards -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">📊</div>
-          <div class="stat-content">
-            <h3 class="stat-value">{{ formatNumber(dashboardStats().totalCampaigns) }}</h3>
-            <p class="stat-label">Total Campaigns</p>
-            <span class="stat-detail">{{ dashboardStats().activeCampaigns }} active</span>
-          </div>
-        </div>
+  @if (errorMessage()) {
+    <div class="alert alert-error">
+      <span class="icon">⚠️</span>
+      {{ errorMessage() }}
+    </div>
+  }
 
-        <div class="stat-card">
-          <div class="stat-icon">💰</div>
-          <div class="stat-content">
-            <h3 class="stat-value">{{ formatCurrency(dashboardStats().totalSpend) }}</h3>
-            <p class="stat-label">Total Spend</p>
-            <span class="stat-detail">{{ formatCurrency(totalBudgetRemaining()) }} remaining</span>
-          </div>
-        </div>
+  <!-- Statistics Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <div class="stat-label">Total Campaigns</div>
+        <div class="stat-value">{{ statistics().total }}</div>
+      </div>
+    </div>
 
-        <div class="stat-card">
-          <div class="stat-icon">👁️</div>
-          <div class="stat-content">
-            <h3 class="stat-value">{{ formatNumber(dashboardStats().totalImpressions) }}</h3>
-            <p class="stat-label">Total Impressions</p>
-            <span class="stat-detail">{{ formatPercentage(dashboardStats().averageCTR) }} CTR</span>
-          </div>
-        </div>
+    <div class="stat-card">
+      <div class="stat-icon">🟢</div>
+      <div class="stat-content">
+        <div class="stat-label">Active</div>
+        <div class="stat-value">{{ statistics().active }}</div>
+      </div>
+    </div>
 
-        <div class="stat-card">
-          <div class="stat-icon">🎯</div>
-          <div class="stat-content">
-            <h3 class="stat-value">{{ formatNumber(dashboardStats().totalConversions) }}</h3>
-            <p class="stat-label">Total Conversions</p>
-            <span class="stat-detail">{{ formatPercentage(dashboardStats().averageROAS) }} ROAS</span>
-          </div>
+    <div class="stat-card">
+      <div class="stat-icon">📝</div>
+      <div class="stat-content">
+        <div class="stat-label">Draft</div>
+        <div class="stat-value">{{ statistics().draft }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">⏸️</div>
+      <div class="stat-content">
+        <div class="stat-label">Paused</div>
+        <div class="stat-value">{{ statistics().paused }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-content">
+        <div class="stat-label">Total Spend</div>
+        <div class="stat-value">{{ formatCurrency(statistics().totalSpend) }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">👁️</div>
+      <div class="stat-content">
+        <div class="stat-label">Impressions</div>
+        <div class="stat-value">{{ formatNumber(statistics().totalImpressions) }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">🖱️</div>
+      <div class="stat-content">
+        <div class="stat-label">Clicks</div>
+        <div class="stat-value">{{ formatNumber(statistics().totalClicks) }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-content">
+        <div class="stat-label">Avg CTR</div>
+        <div class="stat-value">
+          {{ statistics().totalImpressions > 0 ? formatPercentage((statistics().totalClicks / statistics().totalImpressions) * 100) : '0.00%' }}
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Quick Actions -->
-      <div class="quick-actions-section">
-        <h2 class="section-title">Quick Actions</h2>
-        <div class="quick-actions-grid">
-          <button type="button" class="quick-action-card" (click)="openCreateCampaignModal()">
-            <div class="action-icon">🚀</div>
-            <h3 class="action-title">Create New Campaign</h3>
-            <p class="action-description">Launch a new advertising campaign</p>
-          </button>
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="statusFilter">Status</label>
+      <select id="statusFilter" [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()">
+        <option value="all">All Statuses</option>
+        <option value="draft">Draft</option>
+        <option value="active">Active</option>
+        <option value="paused">Paused</option>
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
 
-          <button type="button" class="quick-action-card" (click)="selectTab('analytics')">
-            <div class="action-icon">📊</div>
-            <h3 class="action-title">View Analytics</h3>
-            <p class="action-description">Analyze campaign performance</p>
-          </button>
+    <div class="filter-group">
+      <label for="searchQuery">Search</label>
+      <input
+        type="text"
+        id="searchQuery"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Search by title or description..."
+      />
+    </div>
 
-          <button type="button" class="quick-action-card" (click)="addPaymentMethod()">
-            <div class="action-icon">💳</div>
-            <h3 class="action-title">Add Payment Method</h3>
-            <p class="action-description">Add a new payment card</p>
-          </button>
-        </div>
+    <button class="btn-secondary" (click)="clearFilters()">Clear Filters</button>
+  </div>
+
+  <!-- Campaigns Table -->
+  <div class="table-container">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading campaigns...</p>
       </div>
-
-      <!-- Recent Campaigns -->
-      @if (campaigns().length > 0) {
-        <div class="recent-campaigns-section">
-          <h2 class="section-title">Recent Campaigns</h2>
-          <div class="campaigns-list">
-            @for (campaign of campaigns().slice(0, 3); track campaign.id) {
-              <div class="campaign-card">
-                <div class="campaign-header">
-                  <h3 class="campaign-title">{{ campaign.title }}</h3>
-                  <span class="campaign-status" [class]="getCampaignStatusClass(campaign.status)">
-                    {{ campaign.status | titlecase }}
-                  </span>
+    } @else if (filteredCampaigns().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📢</div>
+        <h3>No campaigns found</h3>
+        <p>Create your first campaign to start advertising</p>
+        <button class="btn-primary" (click)="openCreateCampaign()">Create Campaign</button>
+      </div>
+    } @else {
+      <table class="campaigns-table">
+        <thead>
+          <tr>
+            <th>Campaign</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Budget</th>
+            <th>Spent</th>
+            <th>Impressions</th>
+            <th>Clicks</th>
+            <th>CTR</th>
+            <th>Dates</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (campaign of filteredCampaigns(); track campaign.id) {
+            <tr>
+              <td>
+                <div class="campaign-info">
+                  <div class="campaign-title">{{ campaign.title }}</div>
+                  <div class="campaign-description">{{ campaign.description }}</div>
                 </div>
-                <div class="campaign-meta">
-                  <span class="campaign-type">{{ getAdTypeLabel(campaign.type) }}</span>
-                  <span class="campaign-date">{{ getRelativeTime(campaign.createdAt) }}</span>
-                </div>
-                <div class="campaign-stats">
-                  <div class="stat-item">
-                    <span class="stat-label">Spend:</span>
-                    <span class="stat-value">{{ formatCurrency(campaign.budget.spentAmount) }}</span>
+              </td>
+              <td>
+                <span class="type-badge">{{ campaign.type }}</span>
+              </td>
+              <td>
+                <span [class]="'status-badge ' + getStatusBadgeClass(campaign.status)">
+                  {{ getStatusIcon(campaign.status) }} {{ campaign.status }}
+                </span>
+              </td>
+              <td>{{ formatCurrency(campaign.totalBudget, campaign.currency) }}</td>
+              <td>
+                <div class="spend-info">
+                  <div>{{ formatCurrency(campaign.spentAmount, campaign.currency) }}</div>
+                  <div class="spend-percentage">
+                    {{ campaign.totalBudget > 0 ? formatPercentage((campaign.spentAmount / campaign.totalBudget) * 100) : '0%' }}
                   </div>
-                  <div class="stat-item">
-                    <span class="stat-label">Impressions:</span>
-                    <span class="stat-value">{{ formatNumber(campaign.analytics.impressions) }}</span>
-                  </div>
-                  <div class="stat-item">
-                    <span class="stat-label">CTR:</span>
-                    <span class="stat-value">{{ formatPercentage(campaign.analytics.clickThroughRate) }}</span>
-                  </div>
                 </div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- Top Performing Campaign -->
-      @if (topPerformingCampaign()) {
-        <div class="top-performer-section">
-          <h2 class="section-title">🏆 Top Performing Campaign</h2>
-          <div class="top-performer-card">
-            <div class="performer-header">
-              <h3 class="performer-title">{{ topPerformingCampaign()!.title }}</h3>
-              <div class="performer-badge">Best ROAS</div>
-            </div>
-            <div class="performer-stats">
-              <div class="performer-stat">
-                <span class="stat-label">Return on Ad Spend</span>
-                <span class="stat-value highlight">{{ formatPercentage(topPerformingCampaign()!.analytics.returnOnAdSpend) }}</span>
-              </div>
-              <div class="performer-stat">
-                <span class="stat-label">Total Conversions</span>
-                <span class="stat-value">{{ formatNumber(topPerformingCampaign()!.analytics.conversions) }}</span>
-              </div>
-              <div class="performer-stat">
-                <span class="stat-label">Cost per Conversion</span>
-                <span class="stat-value">{{ formatCurrency(topPerformingCampaign()!.analytics.costPerConversion) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      }
-    </div>
-  }
-
-  <!-- Campaigns Tab -->
-  @if (selectedTab() === 'campaigns' && !isLoading()) {
-    <div class="tab-content" id="campaigns-panel" role="tabpanel">
-      <div class="campaigns-header">
-        <h2 class="section-title">All Campaigns</h2>
-        <div class="campaigns-filters">
-          <select class="filter-select" aria-label="Filter campaigns by status">
-            <option value="all">All Campaigns</option>
-            <option value="active">Active</option>
-            <option value="paused">Paused</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
-      </div>
-
-      @if (campaigns().length === 0) {
-        <div class="empty-state">
-          <div class="empty-icon">📢</div>
-          <h3 class="empty-title">No campaigns yet</h3>
-          <p class="empty-description">Create your first advertising campaign to get started</p>
-          <button type="button" class="btn-primary" (click)="openCreateCampaignModal()">
-            Create Your First Campaign
-          </button>
-        </div>
-      } @else {
-        <div class="campaigns-table-container">
-          <table class="campaigns-table" role="table">
-            <thead>
-              <tr>
-                <th scope="col">Campaign</th>
-                <th scope="col">Type</th>
-                <th scope="col">Status</th>
-                <th scope="col">Budget</th>
-                <th scope="col">Spend</th>
-                <th scope="col">Impressions</th>
-                <th scope="col">CTR</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (campaign of campaigns(); track campaign.id) {
-                <tr class="campaign-row">
-                  <td class="campaign-info">
-                    <div class="campaign-name">{{ campaign.title }}</div>
-                    <div class="campaign-date">Created {{ getRelativeTime(campaign.createdAt) }}</div>
-                  </td>
-                  <td>
-                    <span class="campaign-type-badge">{{ getAdTypeLabel(campaign.type) }}</span>
-                  </td>
-                  <td>
-                    <span class="status-badge" [class]="getCampaignStatusClass(campaign.status)">
-                      {{ campaign.status | titlecase }}
-                    </span>
-                  </td>
-                  <td>{{ formatCurrency(campaign.budget.totalBudget) }}</td>
-                  <td>{{ formatCurrency(campaign.budget.spentAmount) }}</td>
-                  <td>{{ formatNumber(campaign.analytics.impressions) }}</td>
-                  <td>{{ formatPercentage(campaign.analytics.clickThroughRate) }}</td>
-                  <td>
-                    <div class="campaign-actions">
-                      @if (campaign.status === 'active') {
-                        <button 
-                          type="button" 
-                          class="action-btn pause-btn"
-                          (click)="pauseCampaign(campaign.id)"
-                          title="Pause campaign">
-                          ⏸️
-                        </button>
-                      }
-                      @if (campaign.status === 'paused') {
-                        <button 
-                          type="button" 
-                          class="action-btn resume-btn"
-                          (click)="resumeCampaign(campaign.id)"
-                          title="Resume campaign">
-                          ▶️
-                        </button>
-                      }
-                      <button 
-                        type="button" 
-                        class="action-btn edit-btn"
-                        title="Edit campaign">
-                        ✏️
-                      </button>
-                      <button 
-                        type="button" 
-                        class="action-btn delete-btn"
-                        (click)="deleteCampaign(campaign.id)"
-                        title="Delete campaign">
-                        🗑️
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-    </div>
-  }
-
-  <!-- Analytics Tab -->
-  @if (selectedTab() === 'analytics' && !isLoading()) {
-    <div class="tab-content" id="analytics-panel" role="tabpanel">
-      <h2 class="section-title">Campaign Analytics</h2>
-      <div class="analytics-placeholder">
-        <div class="placeholder-icon">📊</div>
-        <h3>Detailed Analytics Coming Soon</h3>
-        <p>Advanced analytics and insights will be available here</p>
-      </div>
-    </div>
-  }
-
-  <!-- Payments Tab -->
-  @if (selectedTab() === 'payments' && !isLoading()) {
-    <div class="tab-content" id="payments-panel" role="tabpanel">
-      <h2 class="section-title">Payment Methods & Billing</h2>
-      
-      <!-- Payment Methods -->
-      <div class="payment-methods-section">
-        <div class="section-header">
-          <h3 class="subsection-title">Payment Methods</h3>
-          <button type="button" class="btn-secondary" (click)="addPaymentMethod()">
-            <span class="btn-icon">➕</span>
-            Add Payment Method
-          </button>
-        </div>
-
-        @if (paymentMethods().length === 0) {
-          <div class="empty-payment-methods">
-            <div class="empty-icon">💳</div>
-            <h4>No payment methods added</h4>
-            <p>Add a payment method to start advertising</p>
-          </div>
-        } @else {
-          <div class="payment-methods-list">
-            @for (method of paymentMethods(); track method.id) {
-              <div class="payment-method-card">
-                <div class="method-info">
-                  <div class="method-type">{{ method.type | titlecase }}</div>
-                  <div class="method-details">**** **** **** {{ method.cardNumber }}</div>
-                  <div class="method-expiry">Expires {{ method.expiryDate }}</div>
-                </div>
-                <div class="method-actions">
-                  @if (method.isDefault) {
-                    <span class="default-badge">Default</span>
+              </td>
+              <td>{{ formatNumber(campaign.impressions) }}</td>
+              <td>{{ formatNumber(campaign.clicks) }}</td>
+              <td>{{ formatPercentage(campaign.clickThroughRate) }}</td>
+              <td>
+                <div class="date-info">
+                  <div>{{ formatDate(campaign.startDate) }}</div>
+                  @if (campaign.endDate) {
+                    <div class="end-date">to {{ formatDate(campaign.endDate) }}</div>
                   }
-                  <button 
-                    type="button" 
-                    class="remove-btn"
-                    (click)="removePaymentMethod(method.id)"
-                    title="Remove payment method">
-                    Remove
+                </div>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-icon" (click)="viewCampaignDetails(campaign)" title="View Details">
+                    👁️
+                  </button>
+                  @if (campaign.status === 'active') {
+                    <button class="btn-icon" (click)="pauseCampaign(campaign.id)" title="Pause">
+                      ⏸️
+                    </button>
+                  }
+                  @if (campaign.status === 'paused') {
+                    <button class="btn-icon" (click)="resumeCampaign(campaign.id)" title="Resume">
+                      ▶️
+                    </button>
+                  }
+                  @if (campaign.status === 'draft') {
+                    <button class="btn-icon" (click)="editCampaign(campaign)" title="Edit">
+                      ✏️
+                    </button>
+                  }
+                  <button class="btn-icon btn-danger" (click)="confirmDeleteCampaign(campaign)" title="Delete">
+                    🗑️
                   </button>
                 </div>
-              </div>
-            }
-          </div>
-        }
-      </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
 
-      <!-- Recent Transactions -->
-      <div class="transactions-section">
-        <h3 class="subsection-title">Recent Transactions</h3>
-        @if (recentTransactions().length === 0) {
-          <div class="empty-transactions">
-            <p>No transactions yet</p>
-          </div>
-        } @else {
-          <div class="transactions-list">
-            @for (transaction of recentTransactions(); track transaction.id) {
-              <div class="transaction-item">
-                <div class="transaction-info">
-                  <div class="transaction-description">{{ transaction.description }}</div>
-                  <div class="transaction-date">{{ getRelativeTime(transaction.createdAt) }}</div>
-                </div>
-                <div class="transaction-amount">
-                  <span class="amount" [class.negative]="transaction.type === 'charge'">
-                    {{ transaction.type === 'charge' ? '-' : '+' }}{{ formatCurrency(transaction.amount, transaction.currency) }}
-                  </span>
-                  <span class="transaction-status" [class]="'status-' + transaction.status">
-                    {{ transaction.status | titlecase }}
-                  </span>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </div>
+  <!-- Pagination -->
+  @if (!isLoading() && filteredCampaigns().length > 0) {
+    <div class="pagination">
+      <button
+        class="btn-secondary"
+        (click)="previousPage()"
+        [disabled]="currentPage() === 1"
+      >
+        ← Previous
+      </button>
+      <span class="page-info">Page {{ currentPage() }}</span>
+      <button
+        class="btn-secondary"
+        (click)="nextPage()"
+        [disabled]="!hasMore()"
+      >
+        Next →
+      </button>
     </div>
   }
 </div>
 
-<!-- Create Campaign Modal (placeholder) -->
-@if (showCreateCampaignModal()) {
-  <div class="modal-overlay" (click)="closeCreateCampaignModal()">
+<!-- Campaign Details Modal -->
+@if (showDetailsModal() && selectedCampaign()) {
+  <div class="modal-overlay" (click)="closeDetailsModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>Create New Campaign</h2>
-        <button type="button" class="modal-close" (click)="closeCreateCampaignModal()">×</button>
+        <h2>Campaign Details</h2>
+        <button class="btn-close" (click)="closeDetailsModal()">×</button>
       </div>
+
       <div class="modal-body">
-        <p>Campaign creation form will be implemented here</p>
+        <div class="detail-section">
+          <h3>Campaign Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Title</label>
+              <div>{{ selectedCampaign()!.title }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Description</label>
+              <div>{{ selectedCampaign()!.description }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Type</label>
+              <div>{{ selectedCampaign()!.type }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Status</label>
+              <div>
+                <span [class]="'status-badge ' + getStatusBadgeClass(selectedCampaign()!.status)">
+                  {{ getStatusIcon(selectedCampaign()!.status) }} {{ selectedCampaign()!.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Budget & Spending</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Total Budget</label>
+              <div>{{ formatCurrency(selectedCampaign()!.totalBudget, selectedCampaign()!.currency) }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Daily Budget</label>
+              <div>{{ formatCurrency(selectedCampaign()!.dailyBudget, selectedCampaign()!.currency) }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Spent Amount</label>
+              <div>{{ formatCurrency(selectedCampaign()!.spentAmount, selectedCampaign()!.currency) }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Remaining</label>
+              <div>{{ formatCurrency(selectedCampaign()!.remainingAmount, selectedCampaign()!.currency) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Performance Metrics</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Impressions</label>
+              <div>{{ formatNumber(selectedCampaign()!.impressions) }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Clicks</label>
+              <div>{{ formatNumber(selectedCampaign()!.clicks) }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Conversions</label>
+              <div>{{ formatNumber(selectedCampaign()!.conversions) }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Click-Through Rate</label>
+              <div>{{ formatPercentage(selectedCampaign()!.clickThroughRate) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Schedule</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Start Date</label>
+              <div>{{ formatDate(selectedCampaign()!.startDate) }}</div>
+            </div>
+            @if (selectedCampaign()!.endDate) {
+              <div class="detail-item">
+                <label>End Date</label>
+                <div>{{ formatDate(selectedCampaign()!.endDate) }}</div>
+              </div>
+            }
+            <div class="detail-item">
+              <label>Created</label>
+              <div>{{ formatDate(selectedCampaign()!.createdAt) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        @if (selectedCampaign()!.status === 'active') {
+          <button class="btn-secondary" (click)="pauseCampaign(selectedCampaign()!.id); closeDetailsModal()">
+            ⏸️ Pause Campaign
+          </button>
+        }
+        @if (selectedCampaign()!.status === 'paused') {
+          <button class="btn-primary" (click)="resumeCampaign(selectedCampaign()!.id); closeDetailsModal()">
+            ▶️ Resume Campaign
+          </button>
+        }
+        @if (selectedCampaign()!.status === 'draft') {
+          <button class="btn-primary" (click)="editCampaign(selectedCampaign()!); closeDetailsModal()">
+            ✏️ Edit Campaign
+          </button>
+        }
+        <button class="btn-secondary" (click)="closeDetailsModal()">Close</button>
       </div>
     </div>
   </div>
 }
+
+<!-- Delete Confirmation Dialog -->
+@if (showDeleteDialog() && selectedCampaign()) {
+  <div class="modal-overlay" (click)="closeDeleteDialog()">
+    <div class="modal-content modal-small" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Confirm Delete</h2>
+        <button class="btn-close" (click)="closeDeleteDialog()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p>Are you sure you want to delete the campaign <strong>"{{ selectedCampaign()!.title }}"</strong>?</p>
+        <p class="warning-text">This action cannot be undone.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeDeleteDialog()">Cancel</button>
+        <button class="btn-danger" (click)="deleteCampaign()">Delete Campaign</button>
+      </div>
+    </div>
+  </div>
+}
+
+

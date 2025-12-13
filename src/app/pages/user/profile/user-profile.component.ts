@@ -1,7 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { USER_PROFILE_CONSTRAINTS, UserProfile, UserProfileUpdateData } from '../../../shared/models/user-profile.model';
+
+import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { UserProfile, UserProfileUpdateData, USER_PROFILE_CONSTRAINTS } from '../../../shared/models/user-profile.model';
 
 @Component({
   selector: 'app-user-profile',
@@ -12,6 +14,7 @@ import { UserProfile, UserProfileUpdateData, USER_PROFILE_CONSTRAINTS } from '..
 })
 export class UserProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
 
   // State management
   profileForm: FormGroup;
@@ -19,6 +22,7 @@ export class UserProfileComponent implements OnInit {
   successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
   activeSection = signal<string>('basic');
+  currentProfile = signal<UserProfile | null>(null);
 
   // File uploads
   profilePhoto = signal<string | null>(null);
@@ -45,51 +49,7 @@ export class UserProfileComponent implements OnInit {
     { value: 'connections_only', label: 'Connections Only', description: 'Only your connections can view your profile' }
   ];
 
-  // Mock user profile data
-  currentProfile: UserProfile = {
-    id: '1',
-    userId: 'user-1',
-    firstName: 'Marco',
-    lastName: 'Rossi',
-    country: 'United States',
-    dateOfBirth: new Date('1985-06-15'),
-    gender: 'male',
-    email: 'marco.rossi@example.com',
-    phone: '+1 (555) 987-6543',
-    address: {
-      city: 'New York',
-      state: 'NY',
-      country: 'United States',
-      zipCode: '10001'
-    },
-    specialtyDishes: ['Pasta Carbonara', 'Risotto Milanese', 'Tiramisu', 'Osso Buco'],
-    bio: 'Professional chef with 15+ years experience in Italian cuisine. Passionate about authentic flavors and traditional techniques.',
-    experience: 15,
-    certifications: ['Culinary Arts Diploma', 'Food Safety Certification', 'Wine Sommelier Level 1'],
-    profilePhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop',
-    backgroundPhoto: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop',
-    portfolioImages: [
-      'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop',
-      'https://images.unsplash.com/photo-1551218808-94e220e084d2?w=400&h=300&fit=crop',
-      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop'
-    ],
-    status: 'active',
-    isVerified: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date(),
-    businessCardCustomization: {
-      primaryColor: '#667eea',
-      secondaryColor: '#764ba2',
-      layout: 'professional',
-      includeQR: true,
-      includeContact: true,
-      includeSpecialties: true,
-      includeBio: true
-    },
-    profileVisibility: 'public',
-    showContactInfo: true,
-    showLocation: false
-  };
+
 
   constructor() {
     this.profileForm = this.fb.group({
@@ -125,11 +85,46 @@ export class UserProfileComponent implements OnInit {
   }
 
   loadProfile(): void {
-    // In a real app, this would load from a service
-    this.populateForm(this.currentProfile);
-    this.profilePhoto.set(this.currentProfile.profilePhoto || null);
-    this.backgroundPhoto.set(this.currentProfile.backgroundPhoto || null);
-    this.portfolioImages.set(this.currentProfile.portfolioImages || []);
+    const user = this.authService.currentUser();
+
+    if (user) {
+      // Create profile from authenticated user data
+      const profile: UserProfile = {
+        id: user.id,
+        userId: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        country: '',
+        email: user.email,
+        phone: '',
+        specialtyDishes: [],
+        bio: '',
+        experience: 0,
+        profilePhoto: '',
+        status: 'active',
+        isVerified: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        businessCardCustomization: {
+          primaryColor: '#667eea',
+          secondaryColor: '#764ba2',
+          layout: 'professional',
+          includeQR: true,
+          includeContact: true,
+          includeSpecialties: true,
+          includeBio: true
+        },
+        profileVisibility: 'public',
+        showContactInfo: true,
+        showLocation: false
+      };
+
+      this.currentProfile.set(profile);
+      this.populateForm(profile);
+      this.profilePhoto.set(profile.profilePhoto || null);
+      this.backgroundPhoto.set(profile.backgroundPhoto || null);
+      this.portfolioImages.set(profile.portfolioImages || []);
+    }
   }
 
   populateForm(profile: UserProfile): void {
@@ -239,26 +234,34 @@ export class UserProfileComponent implements OnInit {
   }
 
   addSpecialtyDish(dish: string): void {
-    if (dish.trim() && this.currentProfile.specialtyDishes && this.currentProfile.specialtyDishes.length < this.constraints.MAX_SPECIALTY_DISHES) {
-      this.currentProfile.specialtyDishes.push(dish.trim());
+    const profile = this.currentProfile();
+    if (dish.trim() && profile?.specialtyDishes && profile.specialtyDishes.length < this.constraints.MAX_SPECIALTY_DISHES) {
+      profile.specialtyDishes.push(dish.trim());
+      this.currentProfile.set(profile);
     }
   }
 
   removeSpecialtyDish(index: number): void {
-    if (this.currentProfile.specialtyDishes) {
-      this.currentProfile.specialtyDishes.splice(index, 1);
+    const profile = this.currentProfile();
+    if (profile?.specialtyDishes) {
+      profile.specialtyDishes.splice(index, 1);
+      this.currentProfile.set(profile);
     }
   }
 
   addCertification(cert: string): void {
-    if (cert.trim() && this.currentProfile.certifications && this.currentProfile.certifications.length < this.constraints.MAX_CERTIFICATIONS) {
-      this.currentProfile.certifications.push(cert.trim());
+    const profile = this.currentProfile();
+    if (cert.trim() && profile?.certifications && profile.certifications.length < this.constraints.MAX_CERTIFICATIONS) {
+      profile.certifications.push(cert.trim());
+      this.currentProfile.set(profile);
     }
   }
 
   removeCertification(index: number): void {
-    if (this.currentProfile.certifications) {
-      this.currentProfile.certifications.splice(index, 1);
+    const profile = this.currentProfile();
+    if (profile?.certifications) {
+      profile.certifications.splice(index, 1);
+      this.currentProfile.set(profile);
     }
   }
 
@@ -332,7 +335,8 @@ export class UserProfileComponent implements OnInit {
   }
 
   calculateAge(): number | null {
-    const birthDate = this.currentProfile.dateOfBirth;
+    const profile = this.currentProfile();
+    const birthDate = profile?.dateOfBirth;
     if (!birthDate) return null;
 
     const today = new Date();

@@ -1,26 +1,39 @@
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { PublicBusiness, PublicBusinessService } from '../../../core/services/public-business.service';
 
+import { BookingsService } from '../../../services/bookings.service';
 import { CommonModule } from '@angular/common';
-import { PublicBusinessService, PublicBusiness } from '../../../core/services/public-business.service';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-restaurant-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule],
   templateUrl: './restaurant-detail.component.html',
   styleUrls: ['./restaurant-detail.component.scss']
 })
 export class RestaurantDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private publicBusinessService = inject(PublicBusinessService);
+  private bookingsService = inject(BookingsService);
   private http = inject(HttpClient);
+  private fb = inject(FormBuilder);
 
   restaurantId = signal<string>('');
   isLoading = signal<boolean>(true);
   errorMessage = signal<string | null>(null);
+
+  // Booking modal state
+  showBookingModal = signal<boolean>(false);
+  isSubmittingBooking = signal<boolean>(false);
+  bookingSuccess = signal<boolean>(false);
+  bookingReference = signal<string>('');
+  bookingError = signal<string | null>(null);
+  availableTimeSlots = signal<any[]>([]);
+  isLoadingSlots = signal<boolean>(false);
 
   // Restaurant data from API
   restaurant = signal<any>({
@@ -53,6 +66,19 @@ export class RestaurantDetailComponent implements OnInit {
   // Track if write review modal is open
   showWriteReviewModal = signal(false);
 
+  // Booking form
+  bookingForm: FormGroup = this.fb.group({
+    bookingDate: ['', Validators.required],
+    bookingTime: ['', Validators.required],
+    partySize: [2, [Validators.required, Validators.min(1), Validators.max(20)]],
+    contactName: ['', Validators.required],
+    contactPhone: ['', Validators.required],
+    contactEmail: ['', [Validators.required, Validators.email]],
+    specialRequests: [''],
+    tablePreferences: [''],
+    occasion: ['']
+  });
+
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const businessId = params['id'];
@@ -60,6 +86,30 @@ export class RestaurantDetailComponent implements OnInit {
       this.loadRestaurantData(businessId);
       this.loadMenuItems(businessId);
       this.loadReviews(businessId);
+    });
+
+    // Handle query parameters for actions (e.g., ?action=book)
+    this.route.queryParams.subscribe(queryParams => {
+      const action = queryParams['action'];
+      const tab = queryParams['tab'];
+
+      if (action === 'book' || action === 'order') {
+        // Slight delay to ensure restaurant data is loaded
+        setTimeout(() => {
+          this.openBookingModal();
+        }, 500);
+      }
+
+      // Handle tab navigation (can be extended later)
+      if (tab === 'menu') {
+        // Scroll to menu section
+        setTimeout(() => {
+          const menuSection = document.getElementById('menu-section');
+          if (menuSection) {
+            menuSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 500);
+      }
     });
   }
 
@@ -307,5 +357,117 @@ export class RestaurantDetailComponent implements OnInit {
 
     // Option 2: Show alert for now
     alert(`Viewing all ${this.restaurant().reviewCount} reviews... This will navigate to a dedicated reviews page or expand the current section.`);
+  }
+
+  // ============ BOOKING FUNCTIONALITY ============
+
+  openBookingModal(): void {
+    this.showBookingModal.set(true);
+    this.bookingSuccess.set(false);
+    this.bookingError.set(null);
+    this.bookingForm.reset({
+      partySize: 2,
+      bookingDate: '',
+      bookingTime: '',
+      contactName: '',
+      contactPhone: '',
+      contactEmail: '',
+      specialRequests: '',
+      tablePreferences: '',
+      occasion: ''
+    });
+  }
+
+  closeBookingModal(): void {
+    this.showBookingModal.set(false);
+    this.bookingSuccess.set(false);
+    this.bookingError.set(null);
+    this.bookingReference.set('');
+    this.availableTimeSlots.set([]);
+  }
+
+  onDateChange(event: any): void {
+    const selectedDate = event.target.value;
+    if (selectedDate) {
+      this.loadAvailableTimeSlots(selectedDate);
+    }
+  }
+
+  loadAvailableTimeSlots(date: string): void {
+    this.isLoadingSlots.set(true);
+    this.availableTimeSlots.set([]);
+
+    this.bookingsService.getAvailableTimeSlots(this.restaurantId(), date, 'basic').subscribe({
+      next: (slots) => {
+        this.availableTimeSlots.set(slots);
+        this.isLoadingSlots.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading time slots:', error);
+        this.isLoadingSlots.set(false);
+      }
+    });
+  }
+
+  submitBooking(): void {
+    if (this.bookingForm.invalid) {
+      Object.keys(this.bookingForm.controls).forEach(key => {
+        this.bookingForm.get(key)?.markAsTouched();
+      });
+      return;
+    }
+
+    this.isSubmittingBooking.set(true);
+    this.bookingError.set(null);
+
+    const formValue = this.bookingForm.value;
+    const bookingRequest = {
+      restaurantId: this.restaurantId(),
+      bookingDate: formValue.bookingDate,
+      bookingTime: formValue.bookingTime,
+      partySize: formValue.partySize,
+      contactName: formValue.contactName,
+      contactPhone: formValue.contactPhone,
+      contactEmail: formValue.contactEmail,
+      specialRequests: formValue.specialRequests || '',
+      tablePreferences: formValue.tablePreferences || '',
+      occasion: formValue.occasion || '',
+      bookingTier: 'basic' as const
+    };
+
+    this.bookingsService.createBooking(bookingRequest).subscribe({
+      next: (response: any) => {
+        this.isSubmittingBooking.set(false);
+        this.bookingSuccess.set(true);
+        this.bookingReference.set(response.booking_reference || response.id);
+
+        // Reset form
+        this.bookingForm.reset({ partySize: 2 });
+
+        // Auto-close modal after 5 seconds
+        setTimeout(() => {
+          this.closeBookingModal();
+        }, 5000);
+      },
+      error: (error) => {
+        this.isSubmittingBooking.set(false);
+        this.bookingError.set(
+          error.error?.error || 'Failed to create booking. Please try again.'
+        );
+        console.error('Booking error:', error);
+      }
+    });
+  }
+
+  // Get minimum date for booking (today)
+  getMinDate(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  // Get maximum date for booking (90 days from now)
+  getMaxDate(): string {
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + 90);
+    return maxDate.toISOString().split('T')[0];
   }
 }

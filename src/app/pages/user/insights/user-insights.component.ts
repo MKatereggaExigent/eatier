@@ -1,6 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+
+import { CommonModule } from '@angular/common';
 import { UserInsights } from '../../../shared/models/user-profile.model';
 
 @Component({
@@ -18,7 +19,7 @@ export class UserInsightsComponent implements OnInit {
   isLoading = signal<boolean>(false);
   selectedPeriod = signal<string>('monthly');
   isExporting = signal<boolean>(false);
-  
+
   // Form for custom date range
   dateRangeForm: FormGroup;
 
@@ -31,54 +32,7 @@ export class UserInsightsComponent implements OnInit {
     { value: 'custom', label: 'Custom Range', icon: '🗓️' }
   ];
 
-  // Mock insights data
-  mockInsights: UserInsights = {
-    userId: 'user-1',
-    period: {
-      start: new Date('2024-01-01'),
-      end: new Date('2024-01-31'),
-      type: 'monthly'
-    },
-    metrics: {
-      profileViews: 1234,
-      uniqueVisitors: 892,
-      contactClicks: 156,
-      qrScans: 89,
-      portfolioViews: 567,
-      businessCardShares: 45
-    },
-    engagement: {
-      averageSessionDuration: 185, // seconds
-      returnVisitorRate: 0.34,
-      peakHours: ['10:00', '14:00', '18:00', '20:00'],
-      topReferrers: ['Google Search', 'LinkedIn', 'Instagram', 'Direct']
-    },
-    professional: {
-      inquiries: 23,
-      bookingRequests: 12,
-      reviewsReceived: 8,
-      averageRating: 4.7
-    },
-    demographics: {
-      topCountries: [
-        { country: 'United States', count: 456 },
-        { country: 'Canada', count: 123 },
-        { country: 'United Kingdom', count: 89 },
-        { country: 'Australia', count: 67 }
-      ],
-      deviceTypes: [
-        { type: 'Mobile', percentage: 72 },
-        { type: 'Desktop', percentage: 21 },
-        { type: 'Tablet', percentage: 7 }
-      ],
-      ageGroups: [
-        { range: '25-34', percentage: 35 },
-        { range: '35-44', percentage: 28 },
-        { range: '45-54', percentage: 22 },
-        { range: '18-24', percentage: 15 }
-      ]
-    }
-  };
+
 
   constructor() {
     this.dateRangeForm = this.fb.group({
@@ -93,21 +47,47 @@ export class UserInsightsComponent implements OnInit {
 
   loadInsights(): void {
     this.isLoading.set(true);
-    
-    // Mock API call
+
+    // TODO: Replace with actual API call when analytics endpoint is available
     setTimeout(() => {
-      // Update mock data based on selected period
-      const updatedInsights = {
-        ...this.mockInsights,
+      // Create empty insights structure - data will be populated when analytics API is available
+      const emptyInsights: UserInsights = {
+        userId: '',
         period: {
-          ...this.mockInsights.period,
-          type: this.selectedPeriod() as any
+          start: new Date(new Date().setDate(1)), // First day of current month
+          end: new Date(),
+          type: this.selectedPeriod() as 'daily' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
+        },
+        metrics: {
+          profileViews: 0,
+          uniqueVisitors: 0,
+          contactClicks: 0,
+          qrScans: 0,
+          portfolioViews: 0,
+          businessCardShares: 0
+        },
+        engagement: {
+          averageSessionDuration: 0,
+          returnVisitorRate: 0,
+          peakHours: [],
+          topReferrers: []
+        },
+        professional: {
+          inquiries: 0,
+          bookingRequests: 0,
+          reviewsReceived: 0,
+          averageRating: 0
+        },
+        demographics: {
+          topCountries: [],
+          deviceTypes: [],
+          ageGroups: []
         }
       };
-      
-      this.insights.set(updatedInsights);
+
+      this.insights.set(emptyInsights);
       this.isLoading.set(false);
-    }, 1000);
+    }, 500);
   }
 
   onPeriodChange(period: string): void {
@@ -127,21 +107,21 @@ export class UserInsightsComponent implements OnInit {
 
   exportToPDF(): void {
     this.isExporting.set(true);
-    
+
     // Mock PDF export
     setTimeout(() => {
       const insights = this.insights();
       if (insights) {
         const filename = `user-insights-${insights.period.type}-${Date.now()}.pdf`;
         console.log(`Exporting insights to ${filename}`);
-        
+
         // Create a mock download
         const link = document.createElement('a');
         link.href = '#';
         link.download = filename;
         link.click();
       }
-      
+
       this.isExporting.set(false);
     }, 2000);
   }
@@ -221,7 +201,7 @@ export class UserInsightsComponent implements OnInit {
   getInquiryConversionRate(): number {
     const insights = this.insights();
     if (!insights) return 0;
-    
+
     const { inquiries, bookingRequests } = insights.professional;
     return inquiries > 0 ? (bookingRequests / inquiries) * 100 : 0;
   }

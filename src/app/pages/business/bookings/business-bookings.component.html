@@ -1,0 +1,304 @@
+<div class="bookings-management-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>📅 Bookings Management</h1>
+      <p>Manage and track all your restaurant bookings</p>
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  @if (successMessage()) {
+    <div class="alert alert-success">
+      <span class="alert-icon">✅</span>
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">
+      <span class="alert-icon">❌</span>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Statistics Cards -->
+  <div class="statistics-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics().total }}</div>
+        <div class="stat-label">Total Bookings</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-pending">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics().pending }}</div>
+        <div class="stat-label">Pending</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-confirmed">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics().confirmed }}</div>
+        <div class="stat-label">Confirmed</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-today">
+      <div class="stat-icon">📅</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics().today }}</div>
+        <div class="stat-label">Today's Bookings</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="statusFilter">Status</label>
+        <select
+          id="statusFilter"
+          [value]="statusFilter()"
+          (change)="onStatusFilterChange($any($event.target).value)"
+          class="filter-select">
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="searchQuery">Search</label>
+        <input
+          id="searchQuery"
+          type="text"
+          [value]="searchQuery()"
+          (input)="onSearchChange($any($event.target).value)"
+          placeholder="Search by name, email, or phone..."
+          class="filter-input">
+      </div>
+
+      <div class="filter-group">
+        <label for="dateFrom">From Date</label>
+        <input
+          id="dateFrom"
+          type="date"
+          [value]="dateFrom()"
+          (change)="dateFrom.set($any($event.target).value); onDateFilterChange()"
+          class="filter-input">
+      </div>
+
+      <div class="filter-group">
+        <label for="dateTo">To Date</label>
+        <input
+          id="dateTo"
+          type="date"
+          [value]="dateTo()"
+          (change)="dateTo.set($any($event.target).value); onDateFilterChange()"
+          class="filter-input">
+      </div>
+
+      <div class="filter-group">
+        <button type="button" (click)="clearFilters()" class="btn-clear-filters">
+          Clear Filters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookings Table -->
+  <div class="bookings-table-container">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading bookings...</p>
+      </div>
+    } @else if (filteredBookings().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>No bookings found</h3>
+        <p>There are no bookings matching your filters.</p>
+      </div>
+    } @else {
+      <table class="bookings-table">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Customer</th>
+            <th>Contact</th>
+            <th>Party Size</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (booking of filteredBookings(); track booking.id) {
+            <tr>
+              <td>
+                <div class="booking-datetime">
+                  <div class="booking-date">{{ formatDate(booking.booking_date) }}</div>
+                  <div class="booking-time">{{ formatTime(booking.booking_time) }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="customer-info">
+                  <div class="customer-name">{{ booking.customer_name }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="contact-info">
+                  <div class="contact-email">{{ booking.customer_email }}</div>
+                  <div class="contact-phone">{{ booking.customer_phone }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="party-size">
+                  <span class="party-icon">👥</span>
+                  {{ booking.party_size }} {{ booking.party_size === 1 ? 'guest' : 'guests' }}
+                </div>
+              </td>
+              <td>
+                <span [class]="'status-badge ' + getStatusBadgeClass(booking.status)">
+                  {{ getStatusIcon(booking.status) }} {{ booking.status }}
+                </span>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  (click)="viewBookingDetails(booking)"
+                  class="btn-view-details">
+                  View Details
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="currentPage() === 1"
+          class="btn-pagination">
+          ← Previous
+        </button>
+        <span class="pagination-info">
+          Page {{ currentPage() }} • {{ totalBookings() }} total bookings
+        </span>
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="!hasMore()"
+          class="btn-pagination">
+          Next →
+        </button>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Booking Details Modal -->
+@if (showDetailsModal() && selectedBooking()) {
+  <div class="modal-overlay" (click)="closeDetailsModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Booking Details</h2>
+        <button type="button" (click)="closeDetailsModal()" class="btn-close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="detail-section">
+          <h3>Customer Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Name</label>
+              <div>{{ selectedBooking()!.customer_name }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Email</label>
+              <div>{{ selectedBooking()!.customer_email }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Phone</label>
+              <div>{{ selectedBooking()!.customer_phone }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Booking Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Date</label>
+              <div>{{ formatDate(selectedBooking()!.booking_date) }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Time</label>
+              <div>{{ formatTime(selectedBooking()!.booking_time) }}</div>
+            </div>
+            <div class="detail-item">
+              <label>Party Size</label>
+              <div>{{ selectedBooking()!.party_size }} guests</div>
+            </div>
+            <div class="detail-item">
+              <label>Status</label>
+              <div>
+                <span [class]="'status-badge ' + getStatusBadgeClass(selectedBooking()!.status)">
+                  {{ getStatusIcon(selectedBooking()!.status) }} {{ selectedBooking()!.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        @if (selectedBooking()!.special_requests) {
+          <div class="detail-section">
+            <h3>Special Requests</h3>
+            <p class="special-requests">{{ selectedBooking()!.special_requests }}</p>
+          </div>
+        }
+
+        <div class="detail-section">
+          <h3>Update Status</h3>
+          <div class="status-actions">
+            @if (selectedBooking()!.status !== 'confirmed') {
+              <button
+                type="button"
+                (click)="updateBookingStatus(selectedBooking()!.id, 'confirmed')"
+                class="btn-status btn-confirm">
+                ✅ Confirm
+              </button>
+            }
+            @if (selectedBooking()!.status !== 'completed') {
+              <button
+                type="button"
+                (click)="updateBookingStatus(selectedBooking()!.id, 'completed')"
+                class="btn-status btn-complete">
+                🎉 Complete
+              </button>
+            }
+            @if (selectedBooking()!.status !== 'cancelled') {
+              <button
+                type="button"
+                (click)="updateBookingStatus(selectedBooking()!.id, 'cancelled')"
+                class="btn-status btn-cancel">
+                ❌ Cancel
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+

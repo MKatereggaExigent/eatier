@@ -22,7 +22,7 @@
 
   <!-- Navigation Tabs -->
   <div class="accounts-tabs">
-    <button 
+    <button
       type="button"
       class="tab-button"
       [class.active]="activeSection() === 'overview'"
@@ -30,7 +30,7 @@
     >
       📊 Overview
     </button>
-    <button 
+    <button
       type="button"
       class="tab-button"
       [class.active]="activeSection() === 'notifications'"
@@ -38,7 +38,7 @@
     >
       🔔 Notifications
     </button>
-    <button 
+    <button
       type="button"
       class="tab-button"
       [class.active]="activeSection() === 'activity'"
@@ -46,7 +46,7 @@
     >
       📋 Activity
     </button>
-    <button 
+    <button
       type="button"
       class="tab-button"
       [class.active]="activeSection() === 'security'"
@@ -60,7 +60,7 @@
   @if (activeSection() === 'overview') {
     <div class="section-content">
       <h2>Account Overview</h2>
-      
+
       <div class="overview-cards">
         <div class="overview-card">
           <div class="card-icon">📊</div>
@@ -108,11 +108,11 @@
   @if (activeSection() === 'notifications') {
     <div class="section-content">
       <h2>Notification Settings</h2>
-      
+
       <form [formGroup]="notificationForm" (ngSubmit)="onNotificationSubmit()" class="notification-form">
         <div class="notification-group">
           <h3>Email Notifications</h3>
-          
+
           <label class="notification-item">
             <input type="checkbox" formControlName="messages" />
             <div class="notification-content">
@@ -173,7 +173,7 @@
   @if (activeSection() === 'activity') {
     <div class="section-content">
       <h2>Account Activity</h2>
-      
+
       <div class="activity-list">
         @for (activity of accountActivity(); track activity.id) {
           <div class="activity-item">
@@ -185,9 +185,9 @@
               </div>
               <div class="activity-details">
                 @if (activity.details) {
-                  <span>{{ activity.details | json }}</span>
+                  <span class="activity-description">{{ formatActivityDetails(activity.details) }}</span>
                 }
-                <span class="activity-location">{{ activity.ipAddress }}</span>
+                <span class="activity-location">IP: {{ activity.ipAddress }}</span>
               </div>
             </div>
           </div>
@@ -200,7 +200,7 @@
   @if (activeSection() === 'security') {
     <div class="section-content">
       <h2>Security Settings</h2>
-      
+
       <div class="security-options">
         <div class="security-item">
           <div class="security-content">

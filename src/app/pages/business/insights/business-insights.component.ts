@@ -38,55 +38,7 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
     { value: 'custom', label: 'Custom Range', icon: '🗓️' }
   ];
 
-  // Mock insights data
-  mockInsights: BusinessInsights = {
-    businessId: 'business-1',
-    period: {
-      start: new Date('2024-01-01'),
-      end: new Date('2024-01-31'),
-      type: 'monthly'
-    },
-    metrics: {
-      totalViews: 2456,
-      uniqueVisitors: 1834,
-      menuViews: 1567,
-      profileViews: 889,
-      contactClicks: 234,
-      qrScans: 156,
-      shareCount: 89
-    },
-    engagement: {
-      averageSessionDuration: 145, // seconds
-      bounceRate: 0.32,
-      returnVisitorRate: 0.28,
-      peakHours: ['12:00', '13:00', '19:00', '20:00'],
-      popularMenuItems: ['Margherita Pizza', 'Caesar Salad', 'Tiramisu', 'Pasta Carbonara']
-    },
-    growth: {
-      viewsGrowth: 0.18, // 18% increase
-      engagementGrowth: 0.12, // 12% increase
-      customerGrowth: 0.25 // 25% increase
-    },
-    demographics: {
-      topCountries: [
-        { country: 'United States', count: 1245 },
-        { country: 'Canada', count: 234 },
-        { country: 'United Kingdom', count: 189 },
-        { country: 'Australia', count: 166 }
-      ],
-      deviceTypes: [
-        { type: 'Mobile', percentage: 68 },
-        { type: 'Desktop', percentage: 24 },
-        { type: 'Tablet', percentage: 8 }
-      ],
-      referralSources: [
-        { source: 'Google Search', count: 892 },
-        { source: 'Social Media', count: 456 },
-        { source: 'Direct', count: 334 },
-        { source: 'Referral', count: 152 }
-      ]
-    }
-  };
+
 
   constructor() {
     this.dateRangeForm = this.fb.group({

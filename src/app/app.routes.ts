@@ -27,6 +27,16 @@ export const routes: Routes = [
                 path: 'restaurants/:id',
                 loadComponent: () => import('./pages/restaurants/restaurant-detail/restaurant-detail.component').then(m => m.RestaurantDetailComponent)
             },
+
+            // Public specialist discovery
+            {
+                path: 'specialists',
+                loadComponent: () => import('./pages/specialists/specialist-list/specialist-list.component').then(m => m.SpecialistListComponent)
+            },
+            {
+                path: 'specialists/:id',
+                loadComponent: () => import('./pages/specialists/specialist-detail/specialist-detail.component').then(m => m.SpecialistDetailComponent)
+            },
         ]
     },
 
@@ -79,10 +89,12 @@ export const routes: Routes = [
             { path: 'overview', loadComponent: () => import('./pages/business/overview/overview.component').then(m => m.OverviewComponent) },
             { path: 'profile', loadComponent: () => import('./pages/business/profile/business-profile.component').then(m => m.BusinessProfileComponent) },
             { path: 'menu', loadComponent: () => import('./pages/business/menu/menu-management.component').then(m => m.MenuManagementComponent) },
+            { path: 'bookings', loadComponent: () => import('./pages/business/bookings/business-bookings.component').then(m => m.BusinessBookingsComponent) },
             { path: 'reviews', loadComponent: () => import('./pages/business/reviews/business-reviews.component').then(m => m.BusinessReviewsComponent) },
             { path: 'insights', loadComponent: () => import('./pages/business/insights/business-insights.component').then(m => m.BusinessInsightsComponent) },
-            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
+            { path: 'ads/:adId/edit', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
             { path: 'ads/create', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
+            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
             { path: 'digital-card', loadComponent: () => import('./pages/business/digital-card/digital-card.component').then(m => m.DigitalCardComponent) },
             { path: 'accounts', loadComponent: () => import('./pages/business/accounts/accounts-center.component').then(m => m.AccountsCenterComponent) }
         ]
@@ -99,10 +111,12 @@ export const routes: Routes = [
             { path: 'overview', loadComponent: () => import('./pages/business/overview/overview.component').then(m => m.OverviewComponent) },
             { path: 'profile', loadComponent: () => import('./pages/business/profile/business-profile.component').then(m => m.BusinessProfileComponent) },
             { path: 'menu', loadComponent: () => import('./pages/business/menu/menu-management.component').then(m => m.MenuManagementComponent) },
+            { path: 'bookings', loadComponent: () => import('./pages/business/bookings/business-bookings.component').then(m => m.BusinessBookingsComponent) },
             { path: 'reviews', loadComponent: () => import('./pages/business/reviews/business-reviews.component').then(m => m.BusinessReviewsComponent) },
             { path: 'insights', loadComponent: () => import('./pages/business/insights/business-insights.component').then(m => m.BusinessInsightsComponent) },
-            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
+            { path: 'ads/:adId/edit', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
             { path: 'ads/create', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
+            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
             { path: 'digital-card', loadComponent: () => import('./pages/business/digital-card/digital-card.component').then(m => m.DigitalCardComponent) },
             { path: 'accounts', loadComponent: () => import('./pages/business/accounts/accounts-center.component').then(m => m.AccountsCenterComponent) }
         ]
@@ -121,8 +135,9 @@ export const routes: Routes = [
             { path: 'reviews', loadComponent: () => import('./pages/food-enthusiast/reviews/food-enthusiast-reviews.component').then(m => m.FoodEnthusiastReviewsComponent) },
             { path: 'profile', loadComponent: () => import('./pages/user/profile/user-profile.component').then(m => m.UserProfileComponent) },
             { path: 'favorites', loadComponent: () => import('./pages/user/favorites/user-favorites.component').then(m => m.UserFavoritesComponent) },
-            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
+            { path: 'ads/:adId/edit', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
             { path: 'ads/create', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
+            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
             { path: 'insights', loadComponent: () => import('./pages/user/insights/user-insights.component').then(m => m.UserInsightsComponent) },
             { path: 'digital-card', loadComponent: () => import('./pages/user/digital-card/user-digital-card.component').then(m => m.UserDigitalCardComponent) },
             { path: 'legacy-access', loadComponent: () => import('./pages/user/legacy-access/legacy-access.component').then(m => m.LegacyAccessComponent) },
@@ -142,8 +157,9 @@ export const routes: Routes = [
             { path: 'profile', loadComponent: () => import('./pages/user/profile/user-profile.component').then(m => m.UserProfileComponent) },
             { path: 'favorites', loadComponent: () => import('./pages/user/favorites/user-favorites.component').then(m => m.UserFavoritesComponent) },
             { path: 'reviews', loadComponent: () => import('./pages/user/reviews/user-reviews.component').then(m => m.UserReviewsComponent) },
-            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
+            { path: 'ads/:adId/edit', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
             { path: 'ads/create', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
+            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
             { path: 'insights', loadComponent: () => import('./pages/user/insights/user-insights.component').then(m => m.UserInsightsComponent) },
             { path: 'digital-card', loadComponent: () => import('./pages/user/digital-card/user-digital-card.component').then(m => m.UserDigitalCardComponent) },
             { path: 'legacy-access', loadComponent: () => import('./pages/user/legacy-access/legacy-access.component').then(m => m.LegacyAccessComponent) },
@@ -163,8 +179,9 @@ export const routes: Routes = [
             { path: 'overview', loadComponent: () => import('./pages/specialist/overview/specialist-overview.component').then(m => m.SpecialistOverviewComponent) },
             { path: 'portfolio', loadComponent: () => import('./pages/specialist/portfolio/portfolio-management.component').then(m => m.PortfolioManagementComponent) },
             { path: 'availability', loadComponent: () => import('./pages/specialist/availability/availability-management.component').then(m => m.AvailabilityManagementComponent) },
-            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
+            { path: 'ads/:adId/edit', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
             { path: 'ads/create', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
+            { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
             { path: 'profile', loadComponent: () => import('./pages/user/profile/user-profile.component').then(m => m.UserProfileComponent) },
             { path: 'insights', loadComponent: () => import('./pages/user/insights/user-insights.component').then(m => m.UserInsightsComponent) },
             { path: 'digital-card', loadComponent: () => import('./pages/user/digital-card/user-digital-card.component').then(m => m.UserDigitalCardComponent) },

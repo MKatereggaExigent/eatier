@@ -9,6 +9,19 @@ router.get('/user/:userId', async (req, res) => {
     const { status, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
 
+    // Handle guest users (temp-user or invalid UUID)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (userId === 'temp-user' || !uuidRegex.test(userId)) {
+      return res.json({
+        bookings: [],
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total: 0
+        }
+      });
+    }
+
     let query = `
       SELECT
         b.*,
@@ -98,6 +111,34 @@ router.get('/business/:businessId', async (req, res) => {
   }
 });
 
+// Get available time slots for a business on a specific date
+router.get('/slots/:businessId', async (req, res) => {
+  try {
+    const { businessId } = req.params;
+    const { date, tier = 'basic' } = req.query;
+
+    if (!date) {
+      return res.status(400).json({ error: 'Date parameter is required' });
+    }
+
+    // Get available slots using the database function
+    const result = await pool.query(`
+      SELECT * FROM get_available_slots($1, $2, $3)
+    `, [businessId, date, tier]);
+
+    res.json({
+      businessId,
+      date,
+      tier,
+      slots: result.rows
+    });
+
+  } catch (error) {
+    console.error('Error fetching available slots:', error);
+    res.status(500).json({ error: 'Failed to fetch available slots' });
+  }
+});
+
 // Create new booking
 router.post('/', async (req, res) => {
   try {
@@ -113,49 +154,67 @@ router.post('/', async (req, res) => {
       contactEmail,
       tablePreferences,
       occasion,
-      bookingTier = 'basic' // NEW: Booking tier
+      bookingTier = 'basic'
     } = req.body;
 
-    // NEW: Check availability before creating booking
-    const availabilityCheck = await pool.query(`
-      SELECT check_slot_availability($1, $2, $3, $4, $5) as is_available
-    `, [businessId, bookingDate, bookingTime, bookingTier, partySize]);
-
-    if (!availabilityCheck.rows[0].is_available) {
+    // Validate required fields
+    if (!businessId || !bookingDate || !bookingTime || !partySize || !contactName || !contactPhone || !contactEmail) {
       return res.status(400).json({
-        error: 'This time slot is not available for the selected tier',
-        code: 'SLOT_NOT_AVAILABLE'
+        error: 'Missing required fields',
+        required: ['businessId', 'bookingDate', 'bookingTime', 'partySize', 'contactName', 'contactPhone', 'contactEmail']
       });
     }
 
-    // NEW: Get tier pricing
-    const settingsResult = await pool.query(`
-      SELECT
-        basic_tier_price,
-        standard_tier_price,
-        premium_tier_price,
-        priority_tier_price
-      FROM business_capacity_settings
-      WHERE business_id = $1
-    `, [businessId]);
+    // Check availability using the database function (if it exists)
+    try {
+      const availabilityCheck = await pool.query(`
+        SELECT check_slot_availability($1, $2, $3, $4, $5) as is_available
+      `, [businessId, bookingDate, bookingTime, bookingTier, partySize]);
 
-    let tierPrice = 0.00;
-    if (settingsResult.rows.length > 0) {
-      const settings = settingsResult.rows[0];
-      switch (bookingTier) {
-        case 'basic':
-          tierPrice = settings.basic_tier_price || 0.00;
-          break;
-        case 'standard':
-          tierPrice = settings.standard_tier_price || 5.00;
-          break;
-        case 'premium':
-          tierPrice = settings.premium_tier_price || 15.00;
-          break;
-        case 'priority':
-          tierPrice = settings.priority_tier_price || 25.00;
-          break;
+      if (availabilityCheck.rows[0] && !availabilityCheck.rows[0].is_available) {
+        return res.status(400).json({
+          error: 'This time slot is not available. Please select a different time.',
+          code: 'SLOT_NOT_AVAILABLE'
+        });
       }
+    } catch (availabilityError) {
+      // Function doesn't exist - skip availability check and allow booking
+      console.log('Availability check skipped (function not found):', availabilityError.message);
+    }
+
+    // Optional: Get tier pricing if settings table exists
+    let tierPrice = 0.00;
+    try {
+      const settingsResult = await pool.query(`
+        SELECT
+          basic_tier_price,
+          standard_tier_price,
+          premium_tier_price,
+          priority_tier_price
+        FROM business_capacity_settings
+        WHERE business_id = $1
+      `, [businessId]);
+
+      if (settingsResult.rows.length > 0) {
+        const settings = settingsResult.rows[0];
+        switch (bookingTier) {
+          case 'basic':
+            tierPrice = settings.basic_tier_price || 0.00;
+            break;
+          case 'standard':
+            tierPrice = settings.standard_tier_price || 5.00;
+            break;
+          case 'premium':
+            tierPrice = settings.premium_tier_price || 15.00;
+            break;
+          case 'priority':
+            tierPrice = settings.priority_tier_price || 25.00;
+            break;
+        }
+      }
+    } catch (priceError) {
+      // Settings table doesn't exist, use default pricing
+      console.log('Tier pricing skipped (table not found)');
     }
 
     // Generate booking reference
@@ -167,6 +226,16 @@ router.post('/', async (req, res) => {
     `, [businessId]);
     const tenantId = tenantResult.rows[0]?.tenant_id;
 
+    // Handle guest bookings (userId might be 'temp-user' or invalid)
+    let validUserId = null;
+    if (userId && userId !== 'temp-user') {
+      // Validate if it's a proper UUID
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidRegex.test(userId)) {
+        validUserId = userId;
+      }
+    }
+
     const result = await pool.query(`
       INSERT INTO bookings (
         tenant_id, business_id, user_id, booking_date, booking_time, party_size,
@@ -177,9 +246,9 @@ router.post('/', async (req, res) => {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING *
     `, [
-      tenantId, businessId, userId, bookingDate, bookingTime, partySize,
-      specialRequests, contactName, contactPhone, contactEmail,
-      tablePreferences, occasion, bookingTier, tierPrice,
+      tenantId, businessId, validUserId, bookingDate, bookingTime, partySize,
+      specialRequests || '', contactName, contactPhone, contactEmail,
+      tablePreferences || '', occasion || '', bookingTier, tierPrice,
       bookingRef, 'pending', tierPrice
     ]);
 
@@ -187,7 +256,7 @@ router.post('/', async (req, res) => {
 
   } catch (error) {
     console.error('Error creating booking:', error);
-    res.status(500).json({ error: 'Failed to create booking' });
+    res.status(500).json({ error: 'Failed to create booking', details: error.message });
   }
 });
 

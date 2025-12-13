@@ -1,10 +1,21 @@
 const OpenAI = require('openai');
 const pool = require('../config/database');
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+// Initialize OpenAI client lazily to avoid crashing if API key is missing
+let openai = null;
+
+function getOpenAIClient() {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn('⚠️ OPENAI_API_KEY not set - AI features will be disabled');
+      return null;
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+  }
+  return openai;
+}
 
 class AnalyticsAIService {
   /**
@@ -73,7 +84,13 @@ Return ONLY valid JSON (no markdown, no code blocks):
   ]
 }`;
 
-      const response = await openai.chat.completions.create({
+      const client = getOpenAIClient();
+      if (!client) {
+        console.warn('OpenAI client not available - returning empty insights');
+        return { insights: [] };
+      }
+
+      const response = await client.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
@@ -133,7 +150,13 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "growth_rate": number (percentage, e.g., 15.5 for 15.5% growth)
 }`;
 
-      const response = await openai.chat.completions.create({
+      const client = getOpenAIClient();
+      if (!client) {
+        console.warn('OpenAI client not available - returning empty forecast');
+        return { forecast: [], trend: 'stable', growth_rate: 0 };
+      }
+
+      const response = await client.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.5,
@@ -200,7 +223,13 @@ Return ONLY valid JSON (no markdown, no code blocks):
   ]
 }`;
 
-      const response = await openai.chat.completions.create({
+      const client = getOpenAIClient();
+      if (!client) {
+        console.warn('OpenAI client not available - returning empty anomalies');
+        return { anomalies: [] };
+      }
+
+      const response = await client.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.3,

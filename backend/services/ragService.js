@@ -1,9 +1,21 @@
 const pool = require('../config/database');
 const OpenAI = require('openai');
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+// Initialize OpenAI client lazily to avoid crashing if API key is missing
+let openai = null;
+
+function getOpenAIClient() {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn('⚠️ OPENAI_API_KEY not set - RAG features will be disabled');
+      return null;
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+  }
+  return openai;
+}
 
 /**
  * RAG (Retrieval-Augmented Generation) Service
@@ -70,7 +82,13 @@ Respond ONLY with a valid JSON object (no markdown, no code blocks) containing:
 
 Only include resources that are directly relevant to answering the question.`;
 
-      const response = await openai.chat.completions.create({
+      const client = getOpenAIClient();
+      if (!client) {
+        console.warn('OpenAI client not available - using fallback analysis');
+        return this.fallbackAnalysis(userMessage);
+      }
+
+      const response = await client.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [{ role: 'user', content: analysisPrompt }],
         temperature: 0.3,
@@ -80,8 +98,7 @@ Only include resources that are directly relevant to answering the question.`;
       const content = response.choices[0].message.content.trim();
       // Remove markdown code blocks if present
       const jsonContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      const analysis = JSON.parse(jsonContent);
-      return analysis;
+      return JSON.parse(jsonContent);
     } catch (error) {
       console.error('Error analyzing question:', error.message);
       // Fallback to simple keyword matching

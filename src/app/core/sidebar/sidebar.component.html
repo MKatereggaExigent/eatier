@@ -50,6 +50,20 @@
         </a>
       </li>
 
+      <!-- Bookings -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="bookings"
+          routerLinkActive="active"
+          class="nav-link"
+          [attr.aria-label]="'Navigate to Bookings' + (isCollapsed() ? '' : ' - Manage customer reservations and bookings')">
+          <span class="nav-icon" aria-hidden="true">📅</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Bookings</span>
+          }
+        </a>
+      </li>
+
       <!-- Reviews -->
       <li class="nav-item" role="listitem">
         <a

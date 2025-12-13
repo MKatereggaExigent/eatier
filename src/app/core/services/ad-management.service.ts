@@ -1,28 +1,31 @@
-import { Injectable, signal, inject } from '@angular/core';
 import {
+  AdAnalyticsResponse,
   AdCampaign,
   AdCampaignResponse,
-  AdAnalyticsResponse,
-  PaymentMethod,
-  AdTransaction,
   AdCreationForm,
-  BookingStatus,
-  ContactInquiry,
-  AutoResponse,
-  CampaignStatus,
+  AdTransaction,
   AdType,
+  AutoResponse,
+  BookingStatus,
+  CTAType,
+  CampaignStatus,
+  ContactInquiry,
   Currency,
-  CTAType
+  PaymentMethod
 } from '../models/ad-management.models';
-import { ApiService } from './api.service';
+import { Injectable, inject, signal } from '@angular/core';
 import { Observable, from, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
+
+import { ApiService } from './api.service';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdManagementService {
   private apiService = inject(ApiService);
+  private authService = inject(AuthService);
 
   // All data now comes from the backend API
 
@@ -73,6 +76,13 @@ export class AdManagementService {
       description: c.description,
       type: c.type,
       status: c.status,
+      // Tier and Placement
+      tierId: c.tier_id,
+      placementId: c.placement_id,
+      tierName: c.tier_name || c.tier_display_name,
+      placementName: c.placement_name || c.placement_display_name,
+      category: c.category,
+      objectives: c.objectives || [],
       budget: {
         totalBudget: parseFloat(c.total_budget),
         dailyBudget: parseFloat(c.daily_budget),
@@ -84,20 +94,20 @@ export class AdManagementService {
       },
       targeting: {
         geographic: {
-          regions: [],
+          regions: c.target_regions || [],
           countries: c.target_locations || [],
-          cities: [],
-          radius: c.target_radius_km || 50
+          cities: c.target_cities || [],
+          radius: c.target_radius || c.target_radius_km || 50
         },
         demographic: {
           ageRange: { min: c.target_age_min || 18, max: c.target_age_max || 65 },
           gender: c.target_gender ? [c.target_gender] : ['all'],
-          languages: ['English'],
-          userTypes: []
+          languages: c.target_languages || ['English'],
+          userTypes: c.target_user_types || []
         },
         interests: c.target_interests || [],
-        keywords: [],
-        excludedKeywords: []
+        keywords: c.target_keywords || [],
+        excludedKeywords: c.excluded_keywords || []
       },
       content: {
         images: c.media_urls ? c.media_urls.map((url: string, idx: number) => ({
@@ -107,15 +117,25 @@ export class AdManagementService {
           size: 'large',
           isPrimary: idx === 0
         })) : [],
-        videos: [],
+        videos: c.video_urls ? c.video_urls.map((url: string, idx: number) => ({
+          id: `vid${idx}`,
+          url,
+          thumbnailUrl: '',
+          duration: 0,
+          size: 'desktop',
+          format: 'mp4'
+        })) : [],
         text: {
           headline: c.headline || c.title,
-          description: c.body_text || c.description
+          description: c.body_text || c.description,
+          subheading: c.subheading
         },
         callToAction: {
-          type: 'learn-more' as CTAType,
+          type: (c.cta_type || 'learn-more') as CTAType,
           text: c.call_to_action || 'Learn More',
-          url: c.destination_url || '/'
+          url: c.cta_url || c.destination_url || '/',
+          phoneNumber: c.cta_phone,
+          email: c.cta_email
         }
       },
       analytics: {
@@ -147,35 +167,117 @@ export class AdManagementService {
     };
   }
 
+  async getCampaignById(campaignId: string): Promise<AdCampaign | null> {
+    try {
+      const currentUser = this.authService.currentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      const response = await this.apiService.get<any>(`business-ads/my-ads/${campaignId}?userId=${currentUser.id}`).toPromise();
+      return this.transformCampaign(response.ad || response);
+    } catch (error) {
+      console.error('Error fetching campaign:', error);
+      return null;
+    }
+  }
+
+  async updateCampaign(campaignId: string, campaignData: AdCreationForm): Promise<AdCampaign> {
+    try {
+      const currentUser = this.authService.currentUser();
+      if (!currentUser) {
+        throw new Error('User not authenticated. Please log in to update an ad campaign.');
+      }
+
+      const payload = {
+        title: campaignData.basic.title,
+        description: campaignData.basic.description,
+        type: campaignData.basic.type,
+        // Tier and Placement
+        tierId: campaignData.tierPlacement?.tierId,
+        placementId: campaignData.tierPlacement?.placementId,
+        // Budget
+        totalBudget: campaignData.budget.totalBudget,
+        dailyBudget: campaignData.budget.dailyBudget,
+        currency: campaignData.budget.currency,
+        // Targeting
+        targetRegions: campaignData.targeting.geographic.regions,
+        targetLocations: campaignData.targeting.geographic.countries,
+        targetCities: campaignData.targeting.geographic.cities,
+        targetAgeMin: campaignData.targeting.demographic.ageRange.min,
+        targetAgeMax: campaignData.targeting.demographic.ageRange.max,
+        targetGender: campaignData.targeting.demographic.gender[0],
+        targetInterests: campaignData.targeting.interests,
+        // Content
+        headline: campaignData.content.text.headline,
+        bodyText: campaignData.content.text.description,
+        callToAction: campaignData.content.callToAction.text,
+        ctaType: campaignData.content.callToAction.type,
+        ctaUrl: campaignData.content.callToAction.url,
+        ctaPhone: campaignData.content.callToAction.phoneNumber,
+        mediaUrls: campaignData.content.images.map(img => img.url),
+        videoUrls: campaignData.content.videos?.map(vid => vid.url) || [],
+        // Schedule
+        startDate: campaignData.schedule.startDate,
+        endDate: campaignData.schedule.endDate
+      };
+
+      const response = await this.apiService.put<any>(`business-ads/my-ads/${campaignId}?userId=${currentUser.id}`, payload).toPromise();
+      return this.transformCampaign(response.ad || response);
+    } catch (error) {
+      console.error('Error updating campaign:', error);
+      throw error;
+    }
+  }
+
   async createCampaign(campaignData: AdCreationForm): Promise<AdCampaign> {
     try {
-      // Get current user ID from localStorage or auth service
-      const userId = localStorage.getItem('user_id') || 'temp-user';
+      // Get current user from AuthService
+      const currentUser = this.authService.currentUser();
+
+      if (!currentUser) {
+        throw new Error('User not authenticated. Please log in to create an ad campaign.');
+      }
+
+      const userId = currentUser.id;
+      // tenantId is now looked up on the backend from the user's database record
 
       const payload = {
         userId,
         title: campaignData.basic.title,
         description: campaignData.basic.description,
         type: campaignData.basic.type,
+        // Tier and Placement
+        tierId: campaignData.tierPlacement?.tierId,
+        placementId: campaignData.tierPlacement?.placementId,
+        // Budget
         totalBudget: campaignData.budget.totalBudget,
         dailyBudget: campaignData.budget.dailyBudget,
         currency: campaignData.budget.currency,
+        // Targeting
+        targetRegions: campaignData.targeting.geographic.regions,
         targetLocations: campaignData.targeting.geographic.countries,
+        targetCities: campaignData.targeting.geographic.cities,
         targetAgeMin: campaignData.targeting.demographic.ageRange.min,
         targetAgeMax: campaignData.targeting.demographic.ageRange.max,
         targetGender: campaignData.targeting.demographic.gender[0],
         targetInterests: campaignData.targeting.interests,
+        // Content
         headline: campaignData.content.text.headline,
         bodyText: campaignData.content.text.description,
         callToAction: campaignData.content.callToAction.text,
+        ctaType: campaignData.content.callToAction.type,
+        ctaUrl: campaignData.content.callToAction.url,
+        ctaPhone: campaignData.content.callToAction.phoneNumber,
         mediaUrls: campaignData.content.images.map(img => img.url),
-        destinationUrl: campaignData.content.callToAction.url,
+        videoUrls: campaignData.content.videos?.map(vid => vid.url) || [],
+        // Schedule
         startDate: campaignData.schedule.startDate,
         endDate: campaignData.schedule.endDate
       };
 
-      const response = await this.apiService.post<any>('ads/campaigns', payload).toPromise();
-      return this.transformCampaign(response);
+      const response = await this.apiService.post<any>('business-ads/my-ads', payload).toPromise();
+      return this.transformCampaign(response.ad || response);
     } catch (error) {
       console.error('Error creating campaign:', error);
       throw error;
@@ -588,4 +690,85 @@ export class AdManagementService {
       throw error;
     }
   }
+
+  // Ad Tiers and Placements
+  async getAdTiers(): Promise<AdTier[]> {
+    try {
+      const response = await this.apiService.get<{ tiers: any[] }>('ads/tiers').toPromise();
+      return (response?.tiers || []).map(tier => ({
+        id: tier.id,
+        name: tier.name,
+        displayName: tier.display_name,
+        description: tier.description,
+        basePriceDaily: parseFloat(tier.base_price_daily),
+        basePriceWeekly: parseFloat(tier.base_price_weekly),
+        basePriceMonthly: parseFloat(tier.base_price_monthly),
+        priorityWeight: tier.priority_weight,
+        rotationSpeedSeconds: tier.rotation_speed_seconds,
+        supportsVideo: tier.supports_video,
+        supportsAnimation: tier.supports_animation,
+        features: tier.features || []
+      }));
+    } catch (error) {
+      console.error('Error fetching ad tiers:', error);
+      return [];
+    }
+  }
+
+  async getAdPlacements(tierId?: string): Promise<AdPlacement[]> {
+    try {
+      const url = tierId ? `ads/placements?tierId=${tierId}` : 'ads/placements';
+      const response = await this.apiService.get<{ placements: any[] }>(url).toPromise();
+      return (response?.placements || []).map(placement => ({
+        id: placement.id,
+        name: placement.name,
+        displayName: placement.display_name,
+        description: placement.description,
+        pageLocation: placement.page_location,
+        position: placement.position,
+        width: placement.width,
+        height: placement.height,
+        tierId: placement.tier_id,
+        tierName: placement.tier_name,
+        priceDaily: parseFloat(placement.price_daily || 0),
+        priceWeekly: parseFloat(placement.price_weekly || 0),
+        priceMonthly: parseFloat(placement.price_monthly || 0)
+      }));
+    } catch (error) {
+      console.error('Error fetching ad placements:', error);
+      return [];
+    }
+  }
+}
+
+// Interfaces for tiers and placements
+export interface AdTier {
+  id: string;
+  name: string;
+  displayName: string;
+  description: string;
+  basePriceDaily: number;
+  basePriceWeekly: number;
+  basePriceMonthly: number;
+  priorityWeight: number;
+  rotationSpeedSeconds: number;
+  supportsVideo: boolean;
+  supportsAnimation: boolean;
+  features: string[];
+}
+
+export interface AdPlacement {
+  id: string;
+  name: string;
+  displayName: string;
+  description: string;
+  pageLocation: string;
+  position: string;
+  width: number;
+  height: number;
+  tierId: string;
+  tierName: string;
+  priceDaily: number;
+  priceWeekly: number;
+  priceMonthly: number;
 }

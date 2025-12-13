@@ -268,26 +268,168 @@
         <p>No bookings yet. Your bookings will appear here.</p>
       </div>
     } @else {
-      <div class="bookings-list" role="list">
-        @for (booking of recentBookings(); track booking.id) {
-          <article class="booking-card" role="listitem">
-            <div class="booking-header">
-              <div class="booking-info">
-                <h4>{{ booking.customer_name || 'Guest' }}</h4>
-                <p class="booking-details">
-                  {{ formatDate(booking.booking_date) }} at {{ formatTime(booking.booking_time) }}
-                </p>
-                <p class="party-size">Party of {{ booking.party_size }}</p>
-              </div>
-              <span class="booking-status" [class]="getStatusClass(booking.status)">
-                {{ booking.status }}
-              </span>
-            </div>
-            @if (booking.special_requests) {
-              <p class="special-requests">{{ booking.special_requests }}</p>
+      <!-- Search and Controls -->
+      <div class="table-controls">
+        <div class="search-box">
+          <input
+            type="text"
+            placeholder="Search by name, email, or reference..."
+            [value]="bookingsSearchQuery()"
+            (input)="onBookingsSearchChange($any($event.target).value)"
+            class="search-input"
+          />
+          <span class="search-icon">🔍</span>
+        </div>
+        <div class="page-size-selector">
+          <label for="pageSize">Show:</label>
+          <select
+            id="pageSize"
+            [value]="bookingsPageSize()"
+            (change)="onBookingsPageSizeChange(+$any($event.target).value)"
+            class="page-size-select">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bookings-table-container">
+        <table class="bookings-table" role="table">
+          <thead>
+            <tr>
+              <th
+                class="sortable"
+                (click)="onBookingsSortChange('booking_reference')">
+                Ref
+                @if (bookingsSortColumn() === 'booking_reference') {
+                  <span class="sort-indicator">{{ bookingsSortDirection() === 'asc' ? '↑' : '↓' }}</span>
+                }
+              </th>
+              <th
+                class="sortable"
+                (click)="onBookingsSortChange('customer_name')">
+                Customer
+                @if (bookingsSortColumn() === 'customer_name') {
+                  <span class="sort-indicator">{{ bookingsSortDirection() === 'asc' ? '↑' : '↓' }}</span>
+                }
+              </th>
+              <th
+                class="sortable"
+                (click)="onBookingsSortChange('booking_date')">
+                Date & Time
+                @if (bookingsSortColumn() === 'booking_date') {
+                  <span class="sort-indicator">{{ bookingsSortDirection() === 'asc' ? '↑' : '↓' }}</span>
+                }
+              </th>
+              <th
+                class="sortable"
+                (click)="onBookingsSortChange('party_size')">
+                Party
+                @if (bookingsSortColumn() === 'party_size') {
+                  <span class="sort-indicator">{{ bookingsSortDirection() === 'asc' ? '↑' : '↓' }}</span>
+                }
+              </th>
+              <th
+                class="sortable"
+                (click)="onBookingsSortChange('status')">
+                Status
+                @if (bookingsSortColumn() === 'status') {
+                  <span class="sort-indicator">{{ bookingsSortDirection() === 'asc' ? '↑' : '↓' }}</span>
+                }
+              </th>
+              <th>Special Requests</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (booking of filteredBookings(); track booking.id) {
+              <tr>
+                <td class="booking-ref">{{ booking.booking_reference }}</td>
+                <td class="customer-info">
+                  <div class="customer-name">{{ booking.customer_name || 'Guest' }}</div>
+                  <div class="customer-contact">{{ booking.customer_email }}</div>
+                </td>
+                <td class="datetime">
+                  <div class="date">{{ formatDate(booking.booking_date) }}</div>
+                  <div class="time">{{ formatTime(booking.booking_time) }}</div>
+                </td>
+                <td class="party-size">{{ booking.party_size }}</td>
+                <td>
+                  <span class="booking-status" [class]="getStatusClass(booking.status)">
+                    {{ booking.status }}
+                  </span>
+                </td>
+                <td class="special-requests">
+                  {{ booking.special_requests || '—' }}
+                </td>
+                <td class="actions">
+                  <div class="action-buttons">
+                    @if (booking.status === 'pending') {
+                      <button
+                        type="button"
+                        class="action-btn accept-btn"
+                        (click)="confirmBooking(booking)"
+                        title="Accept booking">
+                        ✓
+                      </button>
+                      <button
+                        type="button"
+                        class="action-btn deny-btn"
+                        (click)="cancelBooking(booking)"
+                        title="Deny booking">
+                        ✗
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="action-btn message-btn"
+                      (click)="sendMessage(booking)"
+                      title="Send message">
+                      ✉
+                    </button>
+                    <button
+                      type="button"
+                      class="action-btn delete-btn"
+                      (click)="deleteBooking(booking)"
+                      title="Delete booking">
+                      🗑
+                    </button>
+                  </div>
+                </td>
+              </tr>
             }
-          </article>
-        }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="pagination-controls">
+        <div class="pagination-info">
+          Showing {{ (bookingsPage() - 1) * bookingsPageSize() + 1 }}
+          to {{ Math.min(bookingsPage() * bookingsPageSize(), bookingsTotalCount()) }}
+          of {{ bookingsTotalCount() }} bookings
+        </div>
+        <div class="pagination-buttons">
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="!bookingsHasPrevPage()"
+            (click)="onBookingsPageChange(bookingsPage() - 1)">
+            ← Previous
+          </button>
+          <span class="page-indicator">
+            Page {{ bookingsPage() }} of {{ bookingsTotalPages() }}
+          </span>
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="!bookingsHasNextPage()"
+            (click)="onBookingsPageChange(bookingsPage() + 1)">
+            Next →
+          </button>
+        </div>
       </div>
     }
   </section>

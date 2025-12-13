@@ -59,7 +59,10 @@
         </div>
 
       <div class="action-buttons">
-        <button type="button" class="primary-btn" (click)="callRestaurant()">
+        <button type="button" class="primary-btn book-btn" (click)="openBookingModal()">
+          📅 Book a Table
+        </button>
+        <button type="button" class="secondary-btn" (click)="callRestaurant()">
           📞 Call
         </button>
         <button type="button" class="secondary-btn" (click)="getDirections()">
@@ -123,8 +126,8 @@
     </div>
   </div>
 
-  <!-- Popular Dishes -->
-  <div class="popular-dishes">
+  <!-- Popular Dishes / Menu Section -->
+  <div id="menu-section" class="popular-dishes">
     <h2>Popular Dishes</h2>
     @if (popularDishes().length > 0) {
       <div class="dishes-grid">
@@ -242,3 +245,210 @@
   </div>
   }
 </div>
+
+<!-- Booking Modal -->
+@if (showBookingModal()) {
+  <div class="modal-overlay" (click)="closeBookingModal()">
+    <div class="modal-container booking-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Book a Table at {{ restaurant().name }}</h2>
+        <button type="button" class="close-btn" (click)="closeBookingModal()">×</button>
+      </div>
+
+      @if (bookingSuccess()) {
+        <div class="booking-success">
+          <div class="success-icon">✅</div>
+          <h3>Booking Confirmed!</h3>
+          <p>Your table has been reserved.</p>
+          <div class="booking-ref">
+            <strong>Booking Reference:</strong> {{ bookingReference() }}
+          </div>
+          <p class="success-message">
+            We've sent a confirmation email to {{ bookingForm.value.contactEmail }}.
+            The restaurant will contact you shortly to confirm your reservation.
+          </p>
+          <button type="button" class="primary-btn" (click)="closeBookingModal()">
+            Close
+          </button>
+        </div>
+      } @else {
+        <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()" class="booking-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bookingDate">Date *</label>
+              <input
+                type="date"
+                id="bookingDate"
+                formControlName="bookingDate"
+                [min]="getMinDate()"
+                [max]="getMaxDate()"
+                class="form-control"
+                (change)="onDateChange($event)"
+              />
+              @if (bookingForm.get('bookingDate')?.invalid && bookingForm.get('bookingDate')?.touched) {
+                <span class="error-message">Date is required</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="bookingTime">Time *</label>
+
+              @if (isLoadingSlots()) {
+                <div class="loading-slots">Loading available times...</div>
+              } @else if (availableTimeSlots().length > 0) {
+                <div class="time-slots-grid">
+                  @for (slot of availableTimeSlots(); track slot.time) {
+                    <button
+                      type="button"
+                      class="time-slot-btn"
+                      [class.selected]="bookingForm.get('bookingTime')?.value === slot.time"
+                      [class.unavailable]="!slot.available"
+                      [disabled]="!slot.available"
+                      (click)="bookingForm.patchValue({ bookingTime: slot.time })"
+                    >
+                      <span class="time">{{ slot.time }}</span>
+                      @if (!slot.available) {
+                        <span class="status fully-booked">Fully Booked</span>
+                      } @else {
+                        <span class="status available">Available</span>
+                      }
+                    </button>
+                  }
+                </div>
+              } @else {
+                <input
+                  type="time"
+                  id="bookingTime"
+                  formControlName="bookingTime"
+                  class="form-control"
+                  placeholder="Select a date first"
+                />
+              }
+
+              @if (bookingForm.get('bookingTime')?.invalid && bookingForm.get('bookingTime')?.touched) {
+                <span class="error-message">Time is required</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="partySize">Party Size *</label>
+              <input
+                type="number"
+                id="partySize"
+                formControlName="partySize"
+                min="1"
+                max="20"
+                class="form-control"
+              />
+              @if (bookingForm.get('partySize')?.invalid && bookingForm.get('partySize')?.touched) {
+                <span class="error-message">Party size must be between 1 and 20</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contactName">Name *</label>
+              <input
+                type="text"
+                id="contactName"
+                formControlName="contactName"
+                placeholder="Your full name"
+                class="form-control"
+              />
+              @if (bookingForm.get('contactName')?.invalid && bookingForm.get('contactName')?.touched) {
+                <span class="error-message">Name is required</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contactPhone">Phone *</label>
+              <input
+                type="tel"
+                id="contactPhone"
+                formControlName="contactPhone"
+                placeholder="+1 (555) 123-4567"
+                class="form-control"
+              />
+              @if (bookingForm.get('contactPhone')?.invalid && bookingForm.get('contactPhone')?.touched) {
+                <span class="error-message">Phone is required</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="contactEmail">Email *</label>
+              <input
+                type="email"
+                id="contactEmail"
+                formControlName="contactEmail"
+                placeholder="your@email.com"
+                class="form-control"
+              />
+              @if (bookingForm.get('contactEmail')?.invalid && bookingForm.get('contactEmail')?.touched) {
+                <span class="error-message">Valid email is required</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="occasion">Occasion (Optional)</label>
+              <select id="occasion" formControlName="occasion" class="form-control">
+                <option value="">Select an occasion</option>
+                <option value="birthday">Birthday</option>
+                <option value="anniversary">Anniversary</option>
+                <option value="date">Date Night</option>
+                <option value="business">Business Meal</option>
+                <option value="celebration">Celebration</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="tablePreferences">Table Preference (Optional)</label>
+              <select id="tablePreferences" formControlName="tablePreferences" class="form-control">
+                <option value="">No preference</option>
+                <option value="window">Window seat</option>
+                <option value="quiet">Quiet area</option>
+                <option value="outdoor">Outdoor seating</option>
+                <option value="booth">Booth</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="specialRequests">Special Requests (Optional)</label>
+            <textarea
+              id="specialRequests"
+              formControlName="specialRequests"
+              rows="3"
+              placeholder="Any dietary restrictions, allergies, or special requests..."
+              class="form-control"
+            ></textarea>
+          </div>
+
+          @if (bookingError()) {
+            <div class="error-alert">
+              {{ bookingError() }}
+            </div>
+          }
+
+          <div class="modal-actions">
+            <button type="button" class="secondary-btn" (click)="closeBookingModal()" [disabled]="isSubmittingBooking()">
+              Cancel
+            </button>
+            <button type="submit" class="primary-btn" [disabled]="isSubmittingBooking()">
+              @if (isSubmittingBooking()) {
+                <span>Booking...</span>
+              } @else {
+                <span>Confirm Booking</span>
+              }
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  </div>
+}

@@ -636,7 +636,7 @@ export class AuthService {
 
   private createMockBusinessOwner(): AuthResponse {
     const user: BusinessOwner = {
-      id: '1',
+      id: '11111111-1111-1111-1111-111111111111', // Valid UUID for business owner
       email: 'business@example.com',
       firstName: 'John',
       lastName: 'Doe',
@@ -690,7 +690,7 @@ export class AuthService {
 
   private createMockNormalUser(): AuthResponse {
     const user: NormalUser = {
-      id: '2',
+      id: '22222222-2222-2222-2222-222222222222', // Valid UUID for normal user
       email: 'normaluser@example.com',
       firstName: 'Jane',
       lastName: 'Smith',
@@ -740,7 +740,7 @@ export class AuthService {
 
   private createMockSpecialist(): AuthResponse {
     const user: Specialist = {
-      id: '3',
+      id: '33333333-3333-3333-3333-333333333333', // Valid UUID for specialist
       email: 'chef@example.com',
       firstName: 'Mario',
       lastName: 'Rossi',
@@ -816,7 +816,7 @@ export class AuthService {
 
   private createMockAdmin(): AuthResponse {
     const user: ItiyumAdmin = {
-      id: '4',
+      id: '44444444-4444-4444-4444-444444444444', // Valid UUID for admin
       email: 'admin@example.com',
       firstName: 'Admin',
       lastName: 'User',
@@ -854,7 +854,7 @@ export class AuthService {
 
   private createMockFoodEnthusiast(): AuthResponse {
     const user: FoodEnthusiast = {
-      id: '5',
+      id: '55555555-5555-5555-5555-555555555555', // Valid UUID for food enthusiast
       email: 'user@example.com',
       firstName: 'Sarah',
       lastName: 'Johnson',

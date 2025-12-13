@@ -32,6 +32,8 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
   showAdvancedOptions = signal<boolean>(false);
   currentAccessList = signal<MenuAccessPermission[]>([]);
   editingAccess = signal<MenuAccessPermission | null>(null);
+  selectedImageFile = signal<File | null>(null);
+  imagePreviewUrl = signal<string | null>(null);
 
   // Forms
   menuForm: FormGroup;
@@ -39,12 +41,58 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
 
   // Constants
   readonly menuTypes = [
+    // Meal Times
     { value: 'breakfast', label: 'Breakfast', icon: '🌅' },
+    { value: 'brunch', label: 'Brunch', icon: '🥐' },
     { value: 'lunch', label: 'Lunch', icon: '🌞' },
     { value: 'dinner', label: 'Dinner', icon: '🌙' },
+
+    // Course Types
+    { value: 'appetizers', label: 'Appetizers', icon: '🥟' },
+    { value: 'starters', label: 'Starters', icon: '🍤' },
+    { value: 'soups', label: 'Soups', icon: '🍲' },
+    { value: 'salads', label: 'Salads', icon: '🥗' },
+    { value: 'main-courses', label: 'Main Courses', icon: '🍽️' },
+    { value: 'sides', label: 'Sides', icon: '🥔' },
+    { value: 'desserts', label: 'Desserts', icon: '🍰' },
+
+    // Protein Types
+    { value: 'seafood', label: 'Seafood', icon: '🦞' },
+    { value: 'chicken', label: 'Chicken', icon: '🍗' },
+    { value: 'beef', label: 'Beef', icon: '🥩' },
+    { value: 'pork', label: 'Pork', icon: '🥓' },
+    { value: 'lamb', label: 'Lamb', icon: '🍖' },
+
+    // Dietary Preferences
+    { value: 'vegetarian', label: 'Vegetarian', icon: '🥬' },
+    { value: 'vegan', label: 'Vegan', icon: '🌱' },
+    { value: 'gluten-free', label: 'Gluten-Free', icon: '🌾' },
+    { value: 'healthy', label: 'Healthy Options', icon: '💚' },
+
+    // Beverages
     { value: 'beverages', label: 'Beverages', icon: '🥤' },
-    { value: 'dessert', label: 'Dessert', icon: '🍰' },
-    { value: 'special', label: 'Special', icon: '⭐' }
+    { value: 'coffee-tea', label: 'Coffee & Tea', icon: '☕' },
+    { value: 'cocktails', label: 'Cocktails', icon: '🍸' },
+    { value: 'wine', label: 'Wine', icon: '🍷' },
+    { value: 'beer', label: 'Beer', icon: '🍺' },
+    { value: 'smoothies', label: 'Smoothies & Juices', icon: '🥤' },
+
+    // Cuisine Types
+    { value: 'italian', label: 'Italian', icon: '🍝' },
+    { value: 'asian', label: 'Asian', icon: '🍜' },
+    { value: 'mexican', label: 'Mexican', icon: '🌮' },
+    { value: 'american', label: 'American', icon: '🍔' },
+    { value: 'mediterranean', label: 'Mediterranean', icon: '🫒' },
+    { value: 'indian', label: 'Indian', icon: '🍛' },
+
+    // Special Categories
+    { value: 'kids-menu', label: 'Kids Menu', icon: '👶' },
+    { value: 'specials', label: 'Chef Specials', icon: '⭐' },
+    { value: 'seasonal', label: 'Seasonal', icon: '🍂' },
+    { value: 'combo-meals', label: 'Combo Meals', icon: '🍱' },
+    { value: 'snacks', label: 'Snacks', icon: '🍿' },
+    { value: 'bakery', label: 'Bakery', icon: '🥖' },
+    { value: 'other', label: 'Other', icon: '📋' }
   ];
 
   readonly permissionLevels = [
@@ -80,7 +128,7 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
   ];
 
   // Character limits as specified
-  readonly DESCRIPTION_MAX_LENGTH = 15;
+  readonly DESCRIPTION_MAX_LENGTH = 500;
 
   constructor() {
     this.menuForm = this.fb.group({
@@ -150,14 +198,84 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
 
   editMenu(menuItem: MenuItem): void {
     this.isEditingMenu.set(true);
-    this.isCreatingMenu.set(false);
+    this.showCreateMenuModal.set(true);
     this.selectedMenuItem.set(menuItem);
     this.menuForm.patchValue({
       name: menuItem.title,
       description: menuItem.description,
       type: menuItem.category,
+      price: menuItem.price,
+      backgroundImage: menuItem.background_image,
       isActive: menuItem.is_active
     });
+  }
+
+  openCreateMenuModal(): void {
+    this.showCreateMenuModal.set(true);
+    this.isEditingMenu.set(false);
+    this.selectedMenuItem.set(null);
+    this.selectedImageFile.set(null);
+    this.imagePreviewUrl.set(null);
+    this.menuForm.reset({
+      name: '',
+      description: '',
+      type: '',
+      price: null,
+      backgroundImage: '',
+      isPublic: true,
+      isActive: true
+    });
+  }
+
+  closeCreateMenuModal(): void {
+    this.showCreateMenuModal.set(false);
+    this.isEditingMenu.set(false);
+    this.selectedMenuItem.set(null);
+    this.selectedImageFile.set(null);
+    this.imagePreviewUrl.set(null);
+    this.menuForm.reset();
+  }
+
+  onImageFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        this.errorMessage.set('Please select a valid image file');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.errorMessage.set('Image size must be less than 5MB');
+        return;
+      }
+
+      this.selectedImageFile.set(file);
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        this.imagePreviewUrl.set(result);
+        // Update the form control with the base64 data
+        this.menuForm.patchValue({ backgroundImage: result });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeSelectedImage(): void {
+    this.selectedImageFile.set(null);
+    this.imagePreviewUrl.set(null);
+    this.menuForm.patchValue({ backgroundImage: '' });
+  }
+
+  getCategoryLabel(category: string): string {
+    const type = this.menuTypes.find(t => t.value === category);
+    return type ? `${type.icon} ${type.label}` : category;
   }
 
   onSubmitMenu(): void {
@@ -207,10 +325,15 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
   }
 
   cancelMenuEdit(): void {
-    this.isCreatingMenu.set(false);
+    this.showCreateMenuModal.set(false);
     this.isEditingMenu.set(false);
     this.selectedMenuItem.set(null);
     this.menuForm.reset();
+  }
+
+  openManageAccessModal(): void {
+    this.showManageAccessModal.set(true);
+    this.accessForm.reset();
   }
 
   deleteMenu(menuItem: MenuItem): void {
@@ -261,6 +384,22 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
           this.loadMenus();
         }
       });
+  }
+
+  // ============================================
+  // UTILITY METHODS
+  // ============================================
+
+  formatPrice(price: any): string {
+    // Convert to number if it's a string
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+
+    // Return 0.00 if invalid
+    if (isNaN(numPrice) || numPrice === null || numPrice === undefined) {
+      return '0.00';
+    }
+
+    return numPrice.toFixed(2);
   }
 
   // ============================================
@@ -364,21 +503,6 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-  openCreateMenuModal(): void {
-    this.showCreateMenuModal.set(true);
-    this.menuForm.reset();
-  }
-
-  closeCreateMenuModal(): void {
-    this.showCreateMenuModal.set(false);
-    this.menuForm.reset();
-  }
-
-  openManageAccessModal(): void {
-    this.showManageAccessModal.set(true);
-    this.accessForm.reset();
-  }
-
   closeManageAccessModal(): void {
     this.showManageAccessModal.set(false);
     this.accessForm.reset();
@@ -395,6 +519,10 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
       };
       reader.readAsDataURL(file);
     }
+  }
+
+  removeBackgroundImage(): void {
+    this.menuForm.patchValue({ backgroundImage: '' });
   }
 
   onGrantAccess(): void {

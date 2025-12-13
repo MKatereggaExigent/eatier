@@ -14,6 +14,13 @@ export interface AdCampaign {
   startDate: Date;
   endDate?: Date;
   isActive: boolean;
+  // Tier and Placement
+  tierId?: string;
+  placementId?: string;
+  tierName?: string;
+  placementName?: string;
+  category?: string;
+  objectives?: string[];
 }
 
 export interface AdBudget {
@@ -271,10 +278,18 @@ export type InquiryPriority = 'low' | 'medium' | 'high' | 'urgent';
 // Form Models
 export interface AdCreationForm {
   basic: AdBasicInfo;
+  tierPlacement?: AdTierPlacement;
   targeting: AdTargeting;
   content: AdContent;
   budget: AdBudget;
   schedule: AdSchedule;
+}
+
+export interface AdTierPlacement {
+  tierId: string;
+  placementId: string;
+  tierName?: string;
+  placementName?: string;
 }
 
 export interface AdBasicInfo {

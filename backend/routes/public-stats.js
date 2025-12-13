@@ -13,11 +13,11 @@ router.get('/stats', async (req, res) => {
     // Note: reviews table doesn't exist yet, so we'll return 0 for now
     const stats = await pool.query(`
       SELECT
-        (SELECT COUNT(*) FROM users) as total_users,
-        (SELECT COUNT(*) FROM businesses) as total_businesses,
-        (SELECT COUNT(*) FROM users u
-         JOIN user_roles ur ON u.id = ur.user_id
-         JOIN roles r ON ur.role_id = r.id
+        (SELECT COUNT(*) FROM public.users) as total_users,
+        (SELECT COUNT(*) FROM public.businesses) as total_businesses,
+        (SELECT COUNT(*) FROM public.users u
+         JOIN public.user_roles ur ON u.id = ur.user_id
+         JOIN public.roles r ON ur.role_id = r.id
          WHERE r.name = 'Specialist') as total_specialists
     `);
 
@@ -30,9 +30,12 @@ router.get('/stats', async (req, res) => {
       specialists: parseInt(row.total_specialists) || 0
     });
   } catch (error) {
-    console.error('Error fetching public statistics:', error);
+    console.error('Error fetching public statistics:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('DATABASE_URL exists:', !!process.env.DATABASE_URL);
     res.status(500).json({
       error: 'Failed to fetch statistics',
+      details: error.message,
       // Return zeros as fallback
       activeUsers: 0,
       restaurants: 0,

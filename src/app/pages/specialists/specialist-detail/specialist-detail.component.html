@@ -1,0 +1,233 @@
+<div class="specialist-detail-container">
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading specialist...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error() }}</p>
+      <a routerLink="/specialists" class="back-btn">Back to Specialists</a>
+    </div>
+  } @else if (specialist()) {
+    <!-- Hero Section -->
+    <div class="hero-section">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <a routerLink="/specialists" class="back-link">← Back to Specialists</a>
+        <div class="specialist-header">
+          <div class="specialist-avatar">
+            <img
+              [src]="specialist()!.profilePhoto || getDefaultAvatar(specialist()!.fullName)"
+              [alt]="specialist()!.fullName"
+            />
+          </div>
+          <div class="specialist-intro">
+            <h1>{{ specialist()!.fullName }}</h1>
+            <div class="rating-info">
+              <span class="stars">{{ getStarRating(specialist()!.averageRating) }}</span>
+              <span class="rating">{{ specialist()!.averageRating.toFixed(1) }}</span>
+              <span class="reviews">({{ specialist()!.reviewCount }} reviews)</span>
+            </div>
+            <p class="bio">{{ specialist()!.bio || 'Professional culinary specialist ready to create amazing experiences.' }}</p>
+            <div class="quick-stats">
+              <div class="stat">
+                <span class="value">{{ specialist()!.completedBookings }}</span>
+                <span class="label">Bookings</span>
+              </div>
+              <div class="stat">
+                <span class="value">{{ specialist()!.services.length }}</span>
+                <span class="label">Services</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <!-- Services Section -->
+      <section class="services-section">
+        <h2>🍽️ Services Offered</h2>
+        @if (specialist()!.services.length === 0) {
+          <div class="empty-message">No services listed yet.</div>
+        } @else {
+          <div class="services-grid">
+            @for (service of specialist()!.services; track service.id) {
+              <div class="service-card glass-morphic">
+                <div class="service-header">
+                  <h3>{{ service.name }}</h3>
+                  <span class="category-badge">{{ service.category }}</span>
+                </div>
+                <p class="service-description">{{ service.description }}</p>
+                <div class="service-details">
+                  <div class="detail">
+                    <span class="icon">👥</span>
+                    <span>{{ service.minGuests }}-{{ service.maxGuests }} guests</span>
+                  </div>
+                  <div class="detail">
+                    <span class="icon">⏱️</span>
+                    <span>{{ service.durationHours }}h</span>
+                  </div>
+                </div>
+                <div class="service-pricing">
+                  <div class="price">
+                    <span class="amount">${{ service.basePrice }}</span>
+                    <span class="per">base</span>
+                    @if (service.pricePerPerson > 0) {
+                      <span class="plus">+ ${{ service.pricePerPerson }}/person</span>
+                    }
+                  </div>
+                  <button class="book-btn" (click)="selectService(service)">Book Now</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Reviews Section -->
+      <section class="reviews-section">
+        <h2>⭐ Reviews</h2>
+        @if (specialist()!.reviews.length === 0) {
+          <div class="empty-message">No reviews yet.</div>
+        } @else {
+          <div class="reviews-list">
+            @for (review of specialist()!.reviews; track review.id) {
+              <div class="review-card glass-morphic">
+                <div class="review-header">
+                  <div class="reviewer-info">
+                    <span class="reviewer-name">{{ review.clientName }}</span>
+                    <span class="event-type">{{ review.eventType }}</span>
+                  </div>
+                  <div class="review-rating">
+                    <span class="stars">{{ getStarRating(review.rating) }}</span>
+                  </div>
+                </div>
+                <p class="review-comment">{{ review.comment }}</p>
+                <span class="review-date">{{ review.createdAt | date:'mediumDate' }}</span>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Contact CTA -->
+      <section class="cta-section glass-morphic">
+        <h2>Ready to book {{ specialist()!.firstName }}?</h2>
+        <p>Get in touch to discuss your event and create an unforgettable culinary experience.</p>
+        <button class="cta-btn" (click)="openBookingForm()">Request Booking</button>
+      </section>
+    </div>
+
+    <!-- Booking Modal -->
+    @if (showBookingForm()) {
+      <div class="modal-overlay" (click)="closeBookingForm()">
+        <div class="booking-modal glass-morphic" (click)="$event.stopPropagation()">
+          <button class="close-btn" (click)="closeBookingForm()">✕</button>
+
+          @if (bookingSuccess()) {
+            <div class="success-state">
+              <span class="success-icon">✅</span>
+              <h3>Booking Request Sent!</h3>
+              <p>{{ specialist()!.firstName }} will review your request and get back to you soon.</p>
+              <button class="done-btn" (click)="closeBookingForm()">Done</button>
+            </div>
+          } @else {
+            <h3>Book {{ specialist()!.fullName }}</h3>
+            @if (selectedService()) {
+              <div class="selected-service">
+                <strong>{{ selectedService()!.name }}</strong>
+                <span class="price">Est. ${{ calculatePrice() }}</span>
+              </div>
+            }
+
+            <form (ngSubmit)="submitBooking()" class="booking-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Event Date *</label>
+                  <input type="date" [value]="bookingForm().bookingDate"
+                         (input)="updateBookingField('bookingDate', $any($event.target).value)" required />
+                </div>
+                <div class="form-group">
+                  <label>Guests *</label>
+                  <input type="number" [value]="bookingForm().guestCount" min="1" max="100"
+                         (input)="updateBookingField('guestCount', +$any($event.target).value)" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="eventType">Event Type *</label>
+                <select id="eventType" title="Event Type" [value]="bookingForm().eventType"
+                        (change)="updateBookingField('eventType', $any($event.target).value)">
+                  @for (type of eventTypes; track type) {
+                    <option [value]="type">{{ type }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="eventCity">City *</label>
+                  <input id="eventCity" type="text" [value]="bookingForm().eventCity"
+                         (input)="updateBookingField('eventCity', $any($event.target).value)"
+                         placeholder="e.g., Manhattan, NY" required />
+                </div>
+                <div class="form-group">
+                  <label for="eventAddress">Address</label>
+                  <input id="eventAddress" type="text" [value]="bookingForm().eventAddress"
+                         (input)="updateBookingField('eventAddress', $any($event.target).value)"
+                         placeholder="Event address (optional)" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="contactName">Your Name *</label>
+                  <input id="contactName" type="text" [value]="bookingForm().contactName"
+                         (input)="updateBookingField('contactName', $any($event.target).value)"
+                         placeholder="Your full name" required />
+                </div>
+                <div class="form-group">
+                  <label for="contactPhone">Phone *</label>
+                  <input id="contactPhone" type="tel" [value]="bookingForm().contactPhone"
+                         (input)="updateBookingField('contactPhone', $any($event.target).value)"
+                         placeholder="Your phone number" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="contactEmail">Email *</label>
+                <input id="contactEmail" type="email" [value]="bookingForm().contactEmail"
+                       (input)="updateBookingField('contactEmail', $any($event.target).value)"
+                       placeholder="Your email address" required />
+              </div>
+
+              <div class="form-group">
+                <label>Special Requests</label>
+                <textarea [value]="bookingForm().specialRequests"
+                          (input)="updateBookingField('specialRequests', $any($event.target).value)"
+                          placeholder="Any dietary requirements, preferences, or special notes..."
+                          rows="3"></textarea>
+              </div>
+
+              @if (bookingError()) {
+                <div class="error-message">{{ bookingError() }}</div>
+              }
+
+              <button type="submit" class="submit-btn" [disabled]="bookingLoading()">
+                @if (bookingLoading()) {
+                  <span class="spinner-small"></span> Submitting...
+                } @else {
+                  Submit Booking Request
+                }
+              </button>
+            </form>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>
+

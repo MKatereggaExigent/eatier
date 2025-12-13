@@ -71,53 +71,83 @@ router.get('/countries/region/:regionId', async (req, res) => {
 });
 
 // =====================================================
-// 2. ADS MANAGEMENT ENDPOINTS
+// 2. ADS MANAGEMENT ENDPOINTS (Using ad_campaigns table)
 // =====================================================
 
-// Get all ads for current user
+// Get all ads for current user/business
 router.get('/my-ads', async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { userId, businessId } = req.query;
     const { status, page = 1, limit = 10 } = req.query;
 
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID is required' });
+    if (!userId && !businessId) {
+      return res.status(400).json({ error: 'User ID or Business ID is required' });
     }
 
     const offset = (page - 1) * limit;
 
     let query = `
       SELECT
-        ba.*,
-        (SELECT json_agg(json_build_object('id', r.id, 'name', r.name, 'code', r.code))
-         FROM regions r
-         WHERE r.id = ANY(ba.target_regions)) as target_regions_data,
-        (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'code', c.code, 'currency_code', c.currency_code))
-         FROM countries c
-         WHERE c.id = ANY(ba.target_countries)) as target_countries_data
-      FROM business_ads ba
-      WHERE ba.advertiser_id = $1
+        ac.*,
+        t.name as tier_name,
+        t.display_name as tier_display_name,
+        t.base_price_daily as tier_price_daily,
+        t.priority_weight as tier_priority,
+        p.name as placement_name,
+        p.display_name as placement_display_name,
+        p.page_location,
+        p.position,
+        b.business_name
+      FROM ad_campaigns ac
+      LEFT JOIN ad_space_tiers t ON ac.tier_id = t.id
+      LEFT JOIN ad_placements p ON ac.placement_id = p.id
+      LEFT JOIN businesses b ON ac.business_id = b.id
+      WHERE 1=1
     `;
 
-    const params = [userId];
+    const params = [];
 
-    if (status) {
-      query += ` AND ba.status = $${params.length + 1}`;
-      params.push(status);
+    if (userId) {
+      params.push(userId);
+      query += ` AND ac.user_id = $${params.length}`;
     }
 
-    query += ` ORDER BY ba.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-    params.push(limit, offset);
+    if (businessId) {
+      params.push(businessId);
+      query += ` AND ac.business_id = $${params.length}`;
+    }
+
+    if (status) {
+      params.push(status);
+      query += ` AND ac.status = $${params.length}`;
+    }
+
+    query += ` ORDER BY ac.created_at DESC`;
+    params.push(parseInt(limit));
+    query += ` LIMIT $${params.length}`;
+    params.push(offset);
+    query += ` OFFSET $${params.length}`;
 
     const result = await pool.query(query, params);
 
     // Get total count
-    const countResult = await pool.query(`
-      SELECT COUNT(*) as total
-      FROM business_ads
-      WHERE advertiser_id = $1
-      ${status ? 'AND status = $2' : ''}
-    `, status ? [userId, status] : [userId]);
+    let countQuery = `SELECT COUNT(*) as total FROM ad_campaigns ac WHERE 1=1`;
+    const countParams = [];
+
+    if (userId) {
+      countParams.push(userId);
+      countQuery += ` AND ac.user_id = $${countParams.length}`;
+    }
+    if (businessId) {
+      countParams.push(businessId);
+      countQuery += ` AND ac.business_id = $${countParams.length}`;
+    }
+    if (status) {
+      countParams.push(status);
+      countQuery += ` AND ac.status = $${countParams.length}`;
+    }
+
+    const countResult = await pool.query(countQuery, countParams);
 
     res.json({
       ads: result.rows,
@@ -146,15 +176,25 @@ router.get('/my-ads/:adId', async (req, res) => {
 
     const result = await pool.query(`
       SELECT
-        ba.*,
-        (SELECT json_agg(json_build_object('id', r.id, 'name', r.name, 'code', r.code))
-         FROM regions r
-         WHERE r.id = ANY(ba.target_regions)) as target_regions_data,
-        (SELECT json_agg(json_build_object('id', c.id, 'name', c.name, 'code', c.code))
-         FROM countries c
-         WHERE c.id = ANY(ba.target_countries)) as target_countries_data
-      FROM business_ads ba
-      WHERE ba.id = $1 AND ba.advertiser_id = $2
+        ac.*,
+        t.name as tier_name,
+        t.display_name as tier_display_name,
+        t.base_price_daily as tier_price_daily,
+        t.priority_weight as tier_priority,
+        t.supports_video,
+        t.supports_animation,
+        p.name as placement_name,
+        p.display_name as placement_display_name,
+        p.page_location,
+        p.position,
+        p.width as placement_width,
+        p.height as placement_height,
+        b.business_name
+      FROM ad_campaigns ac
+      LEFT JOIN ad_space_tiers t ON ac.tier_id = t.id
+      LEFT JOIN ad_placements p ON ac.placement_id = p.id
+      LEFT JOIN businesses b ON ac.business_id = b.id
+      WHERE ac.id = $1 AND ac.user_id = $2
     `, [adId, userId]);
 
     if (result.rows.length === 0) {
@@ -169,24 +209,33 @@ router.get('/my-ads/:adId', async (req, res) => {
   }
 });
 
-// Create new ad
+/**
+ * Create new ad campaign
+ * RBAC: Only business owners and specialists can create ads
+ * Multi-tenancy: Uses user's tenant_id from database
+ */
 router.post('/my-ads', async (req, res) => {
   try {
     const {
       userId,
-      userRole,
-      tenantId,
+      tenantId: providedTenantId,
+      businessId: providedBusinessId,
+      tierId,
+      placementId,
       title,
       description,
-      imageUrl,
-      videoUrl,
-      ctaText,
+      headline,
+      bodyText,
+      callToAction,
+      ctaType,
       ctaUrl,
-      adType,
-      placement,
+      ctaPhone,
+      mediaUrls,
+      videoUrls,
       targetRegions,
-      targetCountries,
-      currencyCode,
+      targetLocations,
+      targetCities,
+      currency,
       totalBudget,
       dailyBudget,
       startDate,
@@ -194,68 +243,100 @@ router.post('/my-ads', async (req, res) => {
     } = req.body;
 
     // Validation
-    if (!userId || !tenantId) {
-      return res.status(400).json({ error: 'User ID and Tenant ID are required' });
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
     }
 
-    if (!title || !description) {
-      return res.status(400).json({ error: 'Title and description are required' });
+    if (!title) {
+      return res.status(400).json({ error: 'Title is required' });
+    }
+
+    if (!tierId || !placementId) {
+      return res.status(400).json({ error: 'Tier ID and Placement ID are required' });
     }
 
     if (!totalBudget || totalBudget < 5) {
       return res.status(400).json({
-        error: 'Minimum budget is $5 / €5 / £5',
+        error: 'Minimum budget is $5',
         minimumBudget: 5
       });
     }
 
-    if (!startDate || !endDate) {
-      return res.status(400).json({ error: 'Start date and end date are required' });
+    // Look up user's tenant_id and business_id from database
+    const userQuery = await pool.query(`
+      SELECT u.tenant_id, b.id as business_id
+      FROM users u
+      LEFT JOIN businesses b ON b.owner_id = u.id
+      WHERE u.id = $1
+    `, [userId]);
+
+    if (userQuery.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    if (new Date(endDate) <= new Date(startDate)) {
-      return res.status(400).json({ error: 'End date must be after start date' });
+    // Use provided values or fall back to database values
+    const tenantId = providedTenantId || userQuery.rows[0].tenant_id;
+    const businessId = providedBusinessId || userQuery.rows[0].business_id;
+
+    if (!tenantId) {
+      return res.status(400).json({ error: 'User is not associated with a tenant' });
     }
 
-    // Check user role (must be business_owner or specialist)
-    const allowedRoles = ['business_owner', 'specialist'];
-    if (!allowedRoles.includes(userRole)) {
-      return res.status(403).json({
-        error: 'Only business owners and specialists can create ads',
-        allowedRoles
+    // Verify the tier and placement exist and match
+    const tierCheck = await pool.query(`
+      SELECT t.id, t.priority_weight, p.id as placement_id, p.tier_id
+      FROM ad_space_tiers t
+      JOIN ad_placements p ON p.tier_id = t.id
+      WHERE t.id = $1 AND p.id = $2 AND t.is_active = true AND p.is_active = true
+    `, [tierId, placementId]);
+
+    if (tierCheck.rows.length === 0) {
+      return res.status(400).json({
+        error: 'Invalid tier or placement selection',
+        details: 'The selected placement does not match the tier'
       });
     }
 
+    // Calculate priority score based on tier and budget
+    const tierPriority = tierCheck.rows[0].priority_weight;
+    const priorityScore = Math.floor(tierPriority + (parseFloat(dailyBudget || 0) / 10));
+
     const result = await pool.query(`
-      INSERT INTO business_ads (
-        tenant_id, advertiser_id, advertiser_type,
-        title, description, image_url, video_url, cta_text, cta_url,
-        ad_type, placement,
-        target_regions, target_countries,
-        currency_code, total_budget, daily_budget,
+      INSERT INTO ad_campaigns (
+        tenant_id, user_id, business_id,
+        tier_id, placement_id,
+        title, description, headline, body_text,
+        call_to_action, cta_type, cta_url, cta_phone,
+        media_urls, video_urls,
+        target_regions, target_locations, target_cities,
+        currency, total_budget, daily_budget, remaining_amount,
         start_date, end_date,
-        status
+        priority_score, payment_required,
+        status, is_active
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $20, $22, $23, $24, true, 'draft', false)
       RETURNING *
     `, [
-      tenantId, userId, userRole,
-      title, description, imageUrl, videoUrl, ctaText || 'Learn More', ctaUrl,
-      adType || 'promoted', placement || 'homepage_banner',
-      targetRegions || [], targetCountries || [],
-      currencyCode || 'USD', totalBudget, dailyBudget,
-      startDate, endDate,
-      'draft' // New ads start as draft until payment
+      tenantId, userId, businessId || null,
+      tierId, placementId,
+      title, description || null, headline || null, bodyText || null,
+      callToAction || 'Learn More', ctaType || 'learn_more', ctaUrl || null, ctaPhone || null,
+      mediaUrls || [], videoUrls || [],
+      targetRegions || [], targetLocations || [], targetCities || [],
+      currency || 'USD', totalBudget, dailyBudget || totalBudget,
+      startDate || new Date(), endDate || null,
+      priorityScore
     ]);
 
     res.status(201).json({
-      message: 'Ad created successfully',
-      ad: result.rows[0]
+      message: 'Ad campaign created successfully. Payment required to activate.',
+      ad: result.rows[0],
+      paymentRequired: true
     });
 
   } catch (error) {
     console.error('Error creating ad:', error);
-    res.status(500).json({ error: 'Failed to create ad' });
+    res.status(500).json({ error: 'Failed to create ad', details: error.message });
   }
 });
 
@@ -280,11 +361,26 @@ router.put('/my-ads/:adId', async (req, res) => {
       placement,
       targetRegions,
       targetCountries,
+      targetCities,
+      targetLocations,
+      targetAgeMin,
+      targetAgeMax,
+      targetGender,
+      targetInterests,
       totalBudget,
       dailyBudget,
       startDate,
       endDate,
-      status
+      status,
+      headline,
+      bodyText,
+      callToAction,
+      ctaType,
+      ctaPhone,
+      mediaUrls,
+      videoUrls,
+      tierId,
+      placementId
     } = req.body;
 
     // Build dynamic update query
@@ -355,15 +451,75 @@ router.put('/my-ads/:adId', async (req, res) => {
       updates.push(`status = $${++paramCount}`);
       params.push(status);
     }
+    if (headline !== undefined) {
+      updates.push(`headline = $${++paramCount}`);
+      params.push(headline);
+    }
+    if (bodyText !== undefined) {
+      updates.push(`body_text = $${++paramCount}`);
+      params.push(bodyText);
+    }
+    if (callToAction !== undefined) {
+      updates.push(`call_to_action = $${++paramCount}`);
+      params.push(callToAction);
+    }
+    if (ctaType !== undefined) {
+      updates.push(`cta_type = $${++paramCount}`);
+      params.push(ctaType);
+    }
+    if (ctaPhone !== undefined) {
+      updates.push(`cta_phone = $${++paramCount}`);
+      params.push(ctaPhone);
+    }
+    if (mediaUrls !== undefined) {
+      updates.push(`media_urls = $${++paramCount}`);
+      params.push(mediaUrls);
+    }
+    if (videoUrls !== undefined) {
+      updates.push(`video_urls = $${++paramCount}`);
+      params.push(videoUrls);
+    }
+    if (tierId !== undefined) {
+      updates.push(`tier_id = $${++paramCount}`);
+      params.push(tierId);
+    }
+    if (placementId !== undefined) {
+      updates.push(`placement_id = $${++paramCount}`);
+      params.push(placementId);
+    }
+    if (targetCities !== undefined) {
+      updates.push(`target_cities = $${++paramCount}`);
+      params.push(targetCities);
+    }
+    if (targetLocations !== undefined) {
+      updates.push(`target_locations = $${++paramCount}`);
+      params.push(targetLocations);
+    }
+    if (targetAgeMin !== undefined) {
+      updates.push(`target_age_min = $${++paramCount}`);
+      params.push(targetAgeMin);
+    }
+    if (targetAgeMax !== undefined) {
+      updates.push(`target_age_max = $${++paramCount}`);
+      params.push(targetAgeMax);
+    }
+    if (targetGender !== undefined) {
+      updates.push(`target_gender = $${++paramCount}`);
+      params.push(targetGender);
+    }
+    if (targetInterests !== undefined) {
+      updates.push(`target_interests = $${++paramCount}`);
+      params.push(targetInterests);
+    }
 
     if (updates.length === 0) {
       return res.status(400).json({ error: 'No fields to update' });
     }
 
     const query = `
-      UPDATE business_ads
+      UPDATE ad_campaigns
       SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $1 AND advertiser_id = $2
+      WHERE id = $1 AND user_id = $2
       RETURNING *
     `;
 
@@ -395,8 +551,8 @@ router.delete('/my-ads/:adId', async (req, res) => {
     }
 
     const result = await pool.query(`
-      DELETE FROM business_ads
-      WHERE id = $1 AND advertiser_id = $2
+      DELETE FROM ad_campaigns
+      WHERE id = $1 AND user_id = $2
       RETURNING id, title
     `, [adId, userId]);
 
@@ -422,10 +578,23 @@ router.delete('/my-ads/:adId', async (req, res) => {
 // Get ad statistics for current user
 router.get('/stats', async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { userId, businessId } = req.query;
 
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID is required' });
+    if (!userId && !businessId) {
+      return res.status(400).json({ error: 'User ID or Business ID is required' });
+    }
+
+    let whereClause = '';
+    const params = [];
+
+    if (userId) {
+      params.push(userId);
+      whereClause = `user_id = $${params.length}`;
+    }
+    if (businessId) {
+      if (whereClause) whereClause += ' OR ';
+      params.push(businessId);
+      whereClause += `business_id = $${params.length}`;
     }
 
     const result = await pool.query(`
@@ -436,7 +605,7 @@ router.get('/stats', async (req, res) => {
         COUNT(*) FILTER (WHERE status = 'paused') as paused_ads,
         COUNT(*) FILTER (WHERE status = 'completed') as completed_ads,
         COALESCE(SUM(total_budget), 0) as total_budget,
-        COALESCE(SUM(spent_amount), 0) as total_spent,
+        COALESCE(SUM(total_budget - remaining_amount), 0) as total_spent,
         COALESCE(SUM(impressions), 0) as total_impressions,
         COALESCE(SUM(clicks), 0) as total_clicks,
         COALESCE(SUM(conversions), 0) as total_conversions,
@@ -450,9 +619,9 @@ router.get('/stats', async (req, res) => {
           THEN ROUND((SUM(conversions)::numeric / SUM(clicks)::numeric * 100), 2)
           ELSE 0
         END as conversion_rate
-      FROM business_ads
-      WHERE advertiser_id = $1
-    `, [userId]);
+      FROM ad_campaigns
+      WHERE ${whereClause}
+    `, params);
 
     res.json(result.rows[0]);
 
@@ -466,24 +635,29 @@ router.get('/stats', async (req, res) => {
 // 4. PAYMENT PROCESSING
 // =====================================================
 
-// Process ad payment
+/**
+ * Process ad payment
+ * Creates a payment record and activates the ad
+ */
 router.post('/my-ads/:adId/payment', async (req, res) => {
   try {
     const { adId } = req.params;
-    const { userId, paymentId, paymentMethod, amount } = req.body;
+    const { userId, tenantId, paymentMethod, amount, transactionId } = req.body;
 
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });
     }
 
-    if (!paymentId || !amount) {
-      return res.status(400).json({ error: 'Payment ID and amount are required' });
+    if (!amount) {
+      return res.status(400).json({ error: 'Payment amount is required' });
     }
 
-    // Get the ad
+    // Get the ad with tier info
     const adResult = await pool.query(`
-      SELECT * FROM business_ads
-      WHERE id = $1 AND advertiser_id = $2
+      SELECT ac.*, t.base_price_daily, t.display_name as tier_name
+      FROM ad_campaigns ac
+      LEFT JOIN ad_space_tiers t ON ac.tier_id = t.id
+      WHERE ac.id = $1 AND ac.user_id = $2
     `, [adId, userId]);
 
     if (adResult.rows.length === 0) {
@@ -501,18 +675,30 @@ router.post('/my-ads/:adId/payment', async (req, res) => {
       });
     }
 
-    // Update ad with payment information
+    // Create payment record
+    await pool.query(`
+      INSERT INTO ad_payments (
+        tenant_id, campaign_id, user_id,
+        amount, currency, payment_method, transaction_id,
+        status
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'completed')
+    `, [
+      tenantId || ad.tenant_id, adId, userId,
+      amount, ad.currency || 'USD', paymentMethod || 'card', transactionId || null
+    ]);
+
+    // Update ad with payment information and activate
     const result = await pool.query(`
-      UPDATE business_ads
+      UPDATE ad_campaigns
       SET
-        payment_status = 'paid',
-        payment_id = $1,
-        payment_date = CURRENT_TIMESTAMP,
+        payment_required = false,
+        payment_completed_at = CURRENT_TIMESTAMP,
         status = 'active',
+        is_active = true,
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = $2 AND advertiser_id = $3
+      WHERE id = $1 AND user_id = $2
       RETURNING *
-    `, [paymentId, adId, userId]);
+    `, [adId, userId]);
 
     res.json({
       message: 'Payment processed successfully. Your ad is now active!',
@@ -540,9 +726,9 @@ router.post('/my-ads/:adId/pause', async (req, res) => {
     }
 
     const result = await pool.query(`
-      UPDATE business_ads
-      SET status = 'paused', updated_at = CURRENT_TIMESTAMP
-      WHERE id = $1 AND advertiser_id = $2 AND status = 'active'
+      UPDATE ad_campaigns
+      SET status = 'paused', is_active = false, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1 AND user_id = $2 AND status = 'active'
       RETURNING *
     `, [adId, userId]);
 
@@ -572,9 +758,9 @@ router.post('/my-ads/:adId/resume', async (req, res) => {
     }
 
     const result = await pool.query(`
-      UPDATE business_ads
-      SET status = 'active', updated_at = CURRENT_TIMESTAMP
-      WHERE id = $1 AND advertiser_id = $2 AND status = 'paused'
+      UPDATE ad_campaigns
+      SET status = 'active', is_active = true, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1 AND user_id = $2 AND status = 'paused'
       RETURNING *
     `, [adId, userId]);
 
@@ -603,7 +789,7 @@ router.post('/track/impression/:adId', async (req, res) => {
     const { adId } = req.params;
 
     await pool.query(`
-      UPDATE business_ads
+      UPDATE ad_campaigns
       SET impressions = impressions + 1
       WHERE id = $1 AND status = 'active'
     `, [adId]);
@@ -622,7 +808,7 @@ router.post('/track/click/:adId', async (req, res) => {
     const { adId } = req.params;
 
     await pool.query(`
-      UPDATE business_ads
+      UPDATE ad_campaigns
       SET clicks = clicks + 1
       WHERE id = $1 AND status = 'active'
     `, [adId]);
@@ -641,7 +827,7 @@ router.post('/track/conversion/:adId', async (req, res) => {
     const { adId } = req.params;
 
     await pool.query(`
-      UPDATE business_ads
+      UPDATE ad_campaigns
       SET conversions = conversions + 1
       WHERE id = $1 AND status = 'active'
     `, [adId]);
@@ -651,6 +837,95 @@ router.post('/track/conversion/:adId', async (req, res) => {
   } catch (error) {
     console.error('Error tracking conversion:', error);
     res.status(500).json({ error: 'Failed to track conversion' });
+  }
+});
+
+// =====================================================
+// 7. AD TIERS & PLACEMENTS (for business dashboard)
+// =====================================================
+
+// Get available tiers for ad creation
+router.get('/tiers', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        t.id,
+        t.name,
+        t.display_name,
+        t.description,
+        t.base_price_daily,
+        t.base_price_weekly,
+        t.base_price_monthly,
+        t.currency,
+        t.max_width,
+        t.max_height,
+        t.supports_video,
+        t.supports_animation,
+        t.rotation_speed_seconds,
+        t.priority_weight,
+        t.features,
+        json_agg(json_build_object(
+          'id', p.id,
+          'name', p.name,
+          'display_name', p.display_name,
+          'page_location', p.page_location,
+          'position', p.position,
+          'width', p.width,
+          'height', p.height
+        )) FILTER (WHERE p.id IS NOT NULL) as placements
+      FROM ad_space_tiers t
+      LEFT JOIN ad_placements p ON t.id = p.tier_id AND p.is_active = true
+      WHERE t.is_active = true
+      GROUP BY t.id
+      ORDER BY t.sort_order
+    `);
+
+    res.json({
+      tiers: result.rows,
+      count: result.rows.length
+    });
+
+  } catch (error) {
+    console.error('Error fetching ad tiers:', error);
+    res.status(500).json({ error: 'Failed to fetch tiers' });
+  }
+});
+
+// Get placements for a specific tier
+router.get('/placements/:tierId', async (req, res) => {
+  try {
+    const { tierId } = req.params;
+
+    const result = await pool.query(`
+      SELECT
+        p.id,
+        p.name,
+        p.display_name,
+        p.description,
+        p.page_location,
+        p.position,
+        p.width,
+        p.height,
+        p.aspect_ratio,
+        p.max_concurrent_ads,
+        p.rotation_interval_ms,
+        COALESCE(p.custom_price_daily, t.base_price_daily) as price_daily,
+        COALESCE(p.custom_price_weekly, t.base_price_weekly) as price_weekly,
+        COALESCE(p.custom_price_monthly, t.base_price_monthly) as price_monthly
+      FROM ad_placements p
+      JOIN ad_space_tiers t ON p.tier_id = t.id
+      WHERE p.tier_id = $1 AND p.is_active = true
+      ORDER BY p.sort_order
+    `, [tierId]);
+
+    res.json({
+      placements: result.rows,
+      count: result.rows.length
+    });
+
+  } catch (error) {
+    console.error('Error fetching placements:', error);
+    res.status(500).json({ error: 'Failed to fetch placements' });
   }
 });
 

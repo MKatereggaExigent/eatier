@@ -1,7 +1,8 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AccountFreezeRequest, UserAccountActivity, UserNotificationSettings } from '../../../shared/models/user-profile.model';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-user-accounts-center',
@@ -41,8 +42,8 @@ export class UserAccountsCenterComponent implements OnInit {
     { value: 'indefinite', label: 'Indefinitely', description: 'Account will remain frozen until manually reactivated' }
   ];
 
-  // Mock data
-  mockNotificationSettings: UserNotificationSettings = {
+  // Default notification settings for new accounts
+  readonly defaultNotificationSettings: UserNotificationSettings = {
     customerUpdates: true,
     systemUpdates: true,
     marketingEmails: false,
@@ -53,59 +54,6 @@ export class UserAccountsCenterComponent implements OnInit {
     pushNotifications: true,
     smsNotifications: false
   };
-
-  mockAccountActivity: UserAccountActivity[] = [
-    {
-      id: '1',
-      userId: 'user-1',
-      action: 'Profile Updated',
-      details: { field: 'specialty_dishes', added: 'Pasta Carbonara' },
-      timestamp: new Date('2024-01-20T14:30:00'),
-      ipAddress: '192.168.1.1',
-      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)',
-      location: 'New York, NY'
-    },
-    {
-      id: '2',
-      userId: 'user-1',
-      action: 'Business Card Generated',
-      details: { format: 'QR Code', customization: 'professional_layout' },
-      timestamp: new Date('2024-01-19T16:45:00'),
-      ipAddress: '192.168.1.1',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      location: 'New York, NY'
-    },
-    {
-      id: '3',
-      userId: 'user-1',
-      action: 'Login',
-      details: { method: 'email', success: true },
-      timestamp: new Date('2024-01-19T08:00:00'),
-      ipAddress: '192.168.1.1',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      location: 'New York, NY'
-    },
-    {
-      id: '4',
-      userId: 'user-1',
-      action: 'Portfolio Updated',
-      details: { images_added: 2, images_removed: 1 },
-      timestamp: new Date('2024-01-18T12:15:00'),
-      ipAddress: '192.168.1.1',
-      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)',
-      location: 'New York, NY'
-    },
-    {
-      id: '5',
-      userId: 'user-1',
-      action: 'Legacy Access Granted',
-      details: { delegate_email: 'assistant@example.com', access_level: 'manage_profile' },
-      timestamp: new Date('2024-01-15T10:30:00'),
-      ipAddress: '192.168.1.1',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      location: 'New York, NY'
-    }
-  ];
 
   constructor() {
     this.notificationForm = this.fb.group({
@@ -144,16 +92,18 @@ export class UserAccountsCenterComponent implements OnInit {
   loadAccountData(): void {
     this.isLoading.set(true);
 
-    // Mock API calls
+    // TODO: Replace with actual API calls when endpoints are available
     setTimeout(() => {
-      this.notificationSettings.set(this.mockNotificationSettings);
-      this.accountActivity.set(this.mockAccountActivity);
+      // Use default notification settings until API is available
+      this.notificationSettings.set(this.defaultNotificationSettings);
+      // Account activity will be empty until API is available
+      this.accountActivity.set([]);
 
-      // Populate notification form
-      this.notificationForm.patchValue(this.mockNotificationSettings);
+      // Populate notification form with defaults
+      this.notificationForm.patchValue(this.defaultNotificationSettings);
 
       this.isLoading.set(false);
-    }, 1000);
+    }, 500);
   }
 
   setActiveSection(section: string): void {

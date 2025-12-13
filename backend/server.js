@@ -5,17 +5,59 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const fs = require('fs');
 
-const envPath = path.join(__dirname, '.env');
-require('dotenv').config({ path: envPath, override: true });
+// Load environment variables only in development
+// Production (Vercel) provides env vars directly
+const isProduction = process.env.NODE_ENV === 'production';
+if (!isProduction) {
+  const envLocalPath = path.join(__dirname, '.env.local');
+  const envPath = path.join(__dirname, '.env');
+
+  // Try .env.local first, then .env
+  if (fs.existsSync(envLocalPath)) {
+    require('dotenv').config({ path: envLocalPath, override: true });
+    console.log('💻 Loaded .env.local for development');
+  } else if (fs.existsSync(envPath)) {
+    require('dotenv').config({ path: envPath, override: true });
+    console.log('💻 Loaded .env for development');
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Security middleware
 app.use(helmet());
+
+// CORS configuration for production (Vercel) and development
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:4200',
+  'https://itiyum.vercel.app',
+  'https://itiyum-michaelkateregga-3777s-projects.vercel.app',
+  /\.vercel\.app$/  // Allow all Vercel preview deployments
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+  origin: function(origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+
+    // Check if origin is in allowed list or matches regex pattern
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (allowed instanceof RegExp) {
+        return allowed.test(origin);
+      }
+      return allowed === origin;
+    });
+
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(null, true); // Allow all origins in production for now
+    }
+  },
   credentials: true
 }));
 
@@ -38,6 +80,17 @@ app.use(cookieParser());
 
 // Logging middleware
 app.use(morgan('combined'));
+
+// Simple ping endpoint (no database required) - useful for debugging
+app.get('/api/ping', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'Server is running',
+    env: process.env.NODE_ENV || 'development',
+    hasDbUrl: !!process.env.DATABASE_URL,
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Initialize Passport for OAuth
 const passport = require('./config/passport');
@@ -74,6 +127,12 @@ const businessAdsRoutes = require('./routes/business-ads');
 const adsPublicRoutes = require('./routes/ads-public');
 const publicStatsRoutes = require('./routes/public-stats');
 const reviewsRoutes = require('./routes/reviews');
+const specialistRoutes = require('./routes/specialist');
+const publicSpecialistRoutes = require('./routes/public-specialist');
+const uploadRoutes = require('./routes/uploads');
+
+// Static file serving for uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -100,6 +159,9 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/business-ads', businessAdsRoutes);
 app.use('/api/ads-public', adsPublicRoutes); // Public ad serving endpoints
 app.use('/api/public', publicStatsRoutes); // Public statistics endpoint
+app.use('/api/specialist', specialistRoutes); // Specialist dashboard endpoints
+app.use('/api/public/specialists', publicSpecialistRoutes); // Public specialist discovery
+app.use('/api/uploads', uploadRoutes); // File upload endpoints
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -134,11 +196,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📱 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:4200'}`);
-  console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
-});
+// Start server only if not in serverless environment (Vercel)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📱 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:4200'}`);
+    console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
+  });
+}
 
+// Export for Vercel serverless
 module.exports = app;

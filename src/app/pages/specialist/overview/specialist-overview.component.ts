@@ -1,7 +1,9 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { SpecialistBooking, SpecialistEarning, SpecialistReview, SpecialistService } from '../../../core/services/specialist.service';
+
+import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
 import { Specialist } from '../../../shared/models/user.model';
 
 interface BookingRequest {
@@ -44,165 +46,177 @@ interface Review {
   templateUrl: './specialist-overview.component.html',
   styleUrls: ['./specialist-overview.component.scss']
 })
-export class SpecialistOverviewComponent {
+export class SpecialistOverviewComponent implements OnInit {
   private authService = inject(AuthService);
+  private specialistService = inject(SpecialistService);
 
   currentUser = this.authService.currentUser;
   specialist = computed(() => this.currentUser() as Specialist);
 
   // Loading states
-  loading = signal(false);
-  
-  // Business metrics
+  loading = signal(true);
+  loadingBookings = signal(true);
+  loadingReviews = signal(true);
+  loadingEarnings = signal(true);
+
+  // Error states
+  error = signal<string | null>(null);
+
+  // Business metrics - initialized with zeros, will be populated from API
   businessMetrics = signal({
-    totalBookings: 156,
-    completedBookings: 142,
-    totalEarnings: 28750,
-    monthlyEarnings: 4200,
-    averageRating: 4.8,
-    totalReviews: 89,
-    responseRate: 95,
-    repeatClientRate: 78,
-    upcomingBookings: 8,
-    pendingRequests: 5
+    totalBookings: 0,
+    completedBookings: 0,
+    totalEarnings: 0,
+    monthlyEarnings: 0,
+    averageRating: 0,
+    totalReviews: 0,
+    responseRate: 0,
+    repeatClientRate: 0,
+    upcomingBookings: 0,
+    pendingRequests: 0
   });
 
-  // Recent booking requests
-  recentRequests = signal<BookingRequest[]>([
-    {
-      id: '1',
-      clientName: 'Sarah Johnson',
-      clientAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face',
-      eventType: 'Private Dinner Party',
-      eventDate: new Date('2024-02-15'),
-      location: 'Manhattan, NY',
-      guests: 8,
-      budget: 1200,
-      status: 'pending',
-      message: 'Looking for an Italian chef for a romantic anniversary dinner for 8 people. Would love authentic regional dishes.',
-      requestDate: new Date('2024-01-20')
-    },
-    {
-      id: '2',
-      clientName: 'Michael Chen',
-      clientAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face',
-      eventType: 'Corporate Event',
-      eventDate: new Date('2024-02-22'),
-      location: 'Brooklyn, NY',
-      guests: 25,
-      budget: 3500,
-      status: 'pending',
-      message: 'Need catering for a corporate lunch meeting. Mediterranean cuisine preferred.',
-      requestDate: new Date('2024-01-19')
-    },
-    {
-      id: '3',
-      clientName: 'Emily Davis',
-      eventType: 'Wedding Reception',
-      eventDate: new Date('2024-03-10'),
-      location: 'Queens, NY',
-      guests: 50,
-      budget: 8000,
-      status: 'accepted',
-      message: 'Wedding reception catering needed. Mix of Italian and American cuisine.',
-      requestDate: new Date('2024-01-18')
-    }
-  ]);
+  // Recent booking requests from database
+  recentRequests = signal<BookingRequest[]>([]);
 
-  // Upcoming bookings
-  upcomingBookings = signal([
-    {
-      id: '1',
-      clientName: 'Robert Wilson',
-      eventType: 'Birthday Party',
-      eventDate: new Date('2024-01-25'),
-      location: 'Manhattan, NY',
-      guests: 12,
-      amount: 1500,
-      status: 'confirmed'
-    },
-    {
-      id: '2',
-      clientName: 'Lisa Rodriguez',
-      eventType: 'Private Dinner',
-      eventDate: new Date('2024-01-28'),
-      location: 'Brooklyn, NY',
-      guests: 6,
-      amount: 800,
-      status: 'confirmed'
-    },
-    {
-      id: '3',
-      clientName: 'David Kim',
-      eventType: 'Cooking Class',
-      eventDate: new Date('2024-02-02'),
-      location: 'Manhattan, NY',
-      guests: 4,
-      amount: 600,
-      status: 'confirmed'
-    }
-  ]);
+  // Upcoming bookings from database
+  upcomingBookings = signal<any[]>([]);
 
-  // Recent earnings
-  recentEarnings = signal<Earning[]>([
-    {
-      id: '1',
-      clientName: 'Jennifer Brown',
-      eventType: 'Private Dinner',
-      amount: 950,
-      date: new Date('2024-01-15'),
-      status: 'paid'
-    },
-    {
-      id: '2',
-      clientName: 'Thomas Anderson',
-      eventType: 'Corporate Lunch',
-      amount: 2200,
-      date: new Date('2024-01-12'),
-      status: 'paid'
-    },
-    {
-      id: '3',
-      clientName: 'Maria Garcia',
-      eventType: 'Cooking Class',
-      amount: 400,
-      date: new Date('2024-01-10'),
-      status: 'processing'
-    }
-  ]);
+  // Recent earnings from database
+  recentEarnings = signal<Earning[]>([]);
 
-  // Recent reviews
-  recentReviews = signal<Review[]>([
-    {
-      id: '1',
-      clientName: 'Amanda Taylor',
-      clientAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face',
-      rating: 5,
-      comment: 'Absolutely incredible! Mario created the most amazing Italian feast for our anniversary. Every dish was perfect and the presentation was restaurant-quality.',
-      eventType: 'Private Dinner',
-      date: new Date('2024-01-16')
-    },
-    {
-      id: '2',
-      clientName: 'James Wilson',
-      rating: 5,
-      comment: 'Professional, punctual, and the food was outstanding. Our corporate event was a huge success thanks to Mario\'s excellent catering.',
-      eventType: 'Corporate Event',
-      date: new Date('2024-01-14')
-    },
-    {
-      id: '3',
-      clientName: 'Sophie Martin',
-      clientAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&h=60&fit=crop&crop=face',
-      rating: 4,
-      comment: 'Great cooking class! Learned so much about authentic Italian techniques. Mario is a patient and knowledgeable teacher.',
-      eventType: 'Cooking Class',
-      date: new Date('2024-01-12')
-    }
-  ]);
+  // Recent reviews from database
+  recentReviews = signal<Review[]>([]);
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  loadData(): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    // Load overview statistics
+    this.specialistService.getOverview().subscribe({
+      next: (data) => {
+        this.businessMetrics.set({
+          totalBookings: data.totalBookings,
+          completedBookings: data.completedBookings,
+          totalEarnings: data.totalEarnings,
+          monthlyEarnings: data.monthlyEarnings,
+          averageRating: data.averageRating,
+          totalReviews: data.totalReviews,
+          responseRate: data.responseRate,
+          repeatClientRate: data.repeatClientRate,
+          upcomingBookings: data.upcomingBookings,
+          pendingRequests: data.pendingRequests
+        });
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading overview:', err);
+        this.error.set('Failed to load overview data');
+        this.loading.set(false);
+      }
+    });
+
+    // Load bookings
+    this.loadingBookings.set(true);
+    this.specialistService.getBookings(undefined, 10).subscribe({
+      next: (data) => {
+        // Transform bookings to match existing format
+        const bookings = data.bookings.map(b => ({
+          id: b.id,
+          clientName: b.client_name,
+          eventType: b.event_type || 'Private Event',
+          eventDate: new Date(b.booking_date),
+          location: b.event_city || 'Unknown',
+          guests: b.guest_count,
+          budget: b.total_price,
+          status: this.mapBookingStatus(b.status),
+          message: b.special_requests || '',
+          requestDate: new Date(b.created_at)
+        }));
+        this.recentRequests.set(bookings as BookingRequest[]);
+
+        // Set upcoming bookings (confirmed future bookings)
+        const upcoming = data.bookings
+          .filter(b => b.status === 'confirmed' && new Date(b.booking_date) >= new Date())
+          .map(b => ({
+            id: b.id,
+            clientName: b.client_name,
+            eventType: b.event_type || 'Private Event',
+            eventDate: new Date(b.booking_date),
+            location: b.event_city || 'Unknown',
+            guests: b.guest_count,
+            amount: b.total_price,
+            status: 'confirmed'
+          }));
+        this.upcomingBookings.set(upcoming);
+        this.loadingBookings.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading bookings:', err);
+        this.loadingBookings.set(false);
+      }
+    });
+
+    // Load reviews
+    this.loadingReviews.set(true);
+    this.specialistService.getReviews(5).subscribe({
+      next: (data) => {
+        const reviews = data.reviews.map(r => ({
+          id: r.id,
+          clientName: r.client_name,
+          rating: r.rating,
+          comment: r.comment || '',
+          eventType: r.event_type || 'Private Event',
+          date: new Date(r.created_at)
+        }));
+        this.recentReviews.set(reviews as Review[]);
+        this.loadingReviews.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading reviews:', err);
+        this.loadingReviews.set(false);
+      }
+    });
+
+    // Load earnings
+    this.loadingEarnings.set(true);
+    this.specialistService.getEarnings(5).subscribe({
+      next: (data) => {
+        const earnings = data.earnings.map(e => ({
+          id: e.id,
+          clientName: e.client_name || 'Client',
+          eventType: e.event_type || 'Service',
+          amount: e.amount,
+          date: new Date(e.created_at),
+          status: e.status as 'pending' | 'paid' | 'processing'
+        }));
+        this.recentEarnings.set(earnings);
+        this.loadingEarnings.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading earnings:', err);
+        this.loadingEarnings.set(false);
+      }
+    });
+  }
+
+  private mapBookingStatus(status: string): 'pending' | 'accepted' | 'declined' | 'completed' {
+    const statusMap: Record<string, 'pending' | 'accepted' | 'declined' | 'completed'> = {
+      'pending': 'pending',
+      'confirmed': 'accepted',
+      'completed': 'completed',
+      'cancelled': 'declined',
+      'declined': 'declined'
+    };
+    return statusMap[status] || 'pending';
+  }
 
   // Computed properties
-  pendingRequests = computed(() => 
+  pendingRequests = computed(() =>
     this.recentRequests().filter(req => req.status === 'pending')
   );
 
@@ -273,7 +287,7 @@ export class SpecialistOverviewComponent {
   // Action methods
   acceptRequest(requestId: string): void {
     const requests = this.recentRequests();
-    const updatedRequests = requests.map(req => 
+    const updatedRequests = requests.map(req =>
       req.id === requestId ? { ...req, status: 'accepted' as const } : req
     );
     this.recentRequests.set(updatedRequests);
@@ -281,7 +295,7 @@ export class SpecialistOverviewComponent {
 
   declineRequest(requestId: string): void {
     const requests = this.recentRequests();
-    const updatedRequests = requests.map(req => 
+    const updatedRequests = requests.map(req =>
       req.id === requestId ? { ...req, status: 'declined' as const } : req
     );
     this.recentRequests.set(updatedRequests);

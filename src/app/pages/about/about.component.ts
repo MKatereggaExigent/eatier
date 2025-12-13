@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit, signal, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 
+import { BannerAdComponent } from '../../shared/components/ads/banner-ad/banner-ad.component';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { PublicStatsService } from '../../core/services/public-stats.service';
+import { RouterModule } from '@angular/router';
 
 interface UserGroup {
   id: string;
@@ -23,7 +24,7 @@ interface CarouselSlide {
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, BannerAdComponent],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss'
 })

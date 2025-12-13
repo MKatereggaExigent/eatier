@@ -168,39 +168,50 @@
     </div>
 
     <div class="bookings-content">
-      <div class="booking-states">
-        <div class="state-card available">
-          <div class="state-icon">✅</div>
-          <h3 class="state-title">When Available</h3>
-          <div class="state-buttons">
-            <button type="button" class="btn-primary">Book Now</button>
-            <button type="button" class="btn-secondary">See Calendar</button>
-          </div>
-          <div class="state-secondary">
-            <button type="button" class="btn-link">Enquire Now</button>
-            <button type="button" class="btn-link">Get a Quote</button>
-          </div>
+      <div class="booking-features">
+        <div class="feature-card">
+          <div class="feature-icon">📅</div>
+          <h3 class="feature-title">Smart Calendar</h3>
+          <p class="feature-description">Set your availability and let customers book directly. Automatically sync with your schedule.</p>
         </div>
 
-        <div class="state-card fully-booked">
-          <div class="state-icon">📅</div>
-          <h3 class="state-title">When Fully Booked</h3>
-          <div class="state-buttons">
-            <button type="button" class="btn-disabled" disabled>Fully Booked</button>
-            <button type="button" class="btn-secondary">See Calendar</button>
-          </div>
-          <div class="state-secondary">
-            <button type="button" class="btn-link">Enquire Now</button>
-            <button type="button" class="btn-link">Get a Quote</button>
-          </div>
+        <div class="feature-card">
+          <div class="feature-icon">💬</div>
+          <h3 class="feature-title">Instant Enquiries</h3>
+          <p class="feature-description">Receive enquiries and quote requests directly. Auto-acknowledgement keeps customers informed.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔔</div>
+          <h3 class="feature-title">Real-time Notifications</h3>
+          <p class="feature-description">Get notified instantly when customers book or enquire. Never miss an opportunity.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">Booking Analytics</h3>
+          <p class="feature-description">Track your booking performance, peak times, and customer preferences.</p>
         </div>
       </div>
 
-      <div class="booking-note">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-        </svg>
-        <p>"Book Now" only shows if there is an open slot within the next 90 days. "Fully Booked" shows if no bookable slots exist in that window.</p>
+      <div class="booking-cta">
+        @if (isAuthenticated() && canAdvertise()) {
+          <p class="booking-cta-text">Set up your availability in your dashboard to start accepting bookings.</p>
+          <button type="button" class="btn-primary" (click)="navigateToDashboard()">
+            Go to Dashboard
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        } @else {
+          <p class="booking-cta-text">Register as a Business or Specialist to enable bookings and start accepting customers.</p>
+          <a routerLink="/register" class="btn-primary">
+            Get Started
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </a>
+        }
       </div>
     </div>
   </section>

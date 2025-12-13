@@ -1,7 +1,8 @@
+import { BehaviorSubject, Observable, interval } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
+import { catchError, map, tap } from 'rxjs/operators';
+
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, interval } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface Ad {
@@ -12,6 +13,7 @@ export interface Ad {
   video_url?: string;
   cta_text: string;
   cta_url: string;
+  cta_type: 'book_now' | 'visit_website' | 'call_now' | 'learn_more' | 'get_deal' | 'view_menu' | 'order_now';
   ad_type: string;
   placement: string;
   impressions: number;
@@ -20,14 +22,46 @@ export interface Ad {
   advertiser_type: string;
   advertiser_name: string;
   business_name?: string;
+  business_id?: string;
+  headline?: string;
+  body_text?: string;
+  phone?: string;
+  website?: string;
+  tier_name?: string;
+  tier_priority?: number;
+  rotation_speed_seconds?: number;
 }
 
 export interface AdPlacement {
   id: string;
   name: string;
+  display_name: string;
   description: string;
-  dimensions: string;
+  page_location: string;
   position: string;
+  width: number;
+  height: number;
+  tier_id: string;
+  tier_name: string;
+  price_daily: number;
+  price_weekly: number;
+  price_monthly: number;
+}
+
+export interface AdTier {
+  id: string;
+  name: string;
+  display_name: string;
+  description: string;
+  base_price_daily: number;
+  base_price_weekly: number;
+  base_price_monthly: number;
+  priority_weight: number;
+  rotation_speed_seconds: number;
+  supports_video: boolean;
+  supports_animation: boolean;
+  features: string[];
+  placements?: AdPlacement[];
 }
 
 @Injectable({
@@ -35,11 +69,11 @@ export interface AdPlacement {
 })
 export class AdServingService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/ads-public`;
+  private apiUrl = `${environment.apiUrl}/ads`;
 
   // Cache for ads by placement
   private adsCache = new Map<string, BehaviorSubject<Ad[]>>();
-  
+
   // Track which ads have been shown (for impression tracking)
   private shownAds = new Set<string>();
 
@@ -59,13 +93,29 @@ export class AdServingService {
   }
 
   /**
-   * Fetch ads from the backend
+   * Fetch ads from the backend with placement filter
    */
   private fetchAds(placement: string, limit: number): void {
-    this.http.get<{ placement: string; ads: Ad[]; count: number }>(
-      `${this.apiUrl}/placements/${placement}?limit=${limit}`
+    // Map frontend placement names to backend placement names
+    const placementMap: Record<string, string> = {
+      'sidebar_ad': 'sidebar_left',
+      'sidebar_left': 'sidebar_left',
+      'sidebar_right': 'sidebar_right',
+      'homepage_banner': 'homepage_hero_banner',
+      'header_banner': 'header_banner',
+      'footer_banner': 'footer_banner',
+      'inline_content': 'inline_content',
+      'community_feed': 'community_feed',
+      'restaurant_list_banner': 'restaurant_list_banner',
+      'specialist_list_banner': 'specialist_list_banner'
+    };
+
+    const backendPlacement = placementMap[placement] || placement;
+
+    this.http.get<{ ads: any[]; count: number }>(
+      `${this.apiUrl}/public?placement=${backendPlacement}&limit=${limit}`
     ).pipe(
-      map(response => response.ads),
+      map(response => this.transformAds(response.ads || [], placement)),
       catchError(error => {
         console.error(`Error fetching ads for placement ${placement}:`, error);
         return [];
@@ -73,6 +123,38 @@ export class AdServingService {
     ).subscribe(ads => {
       this.adsCache.get(placement)?.next(ads);
     });
+  }
+
+  /**
+   * Transform backend ad data to frontend Ad interface
+   */
+  private transformAds(ads: any[], placement: string): Ad[] {
+    return ads.map(ad => ({
+      id: ad.id,
+      title: ad.title,
+      description: ad.description || ad.body_text || '',
+      image_url: ad.image_url || ad.media_urls?.[0] || '',
+      video_url: ad.video_url || ad.video_urls?.[0] || undefined,
+      cta_text: ad.call_to_action || 'Learn More',
+      cta_url: ad.cta_url || '',
+      cta_type: ad.cta_type || 'learn_more',
+      ad_type: ad.type || 'promoted',
+      placement: ad.placement_name || placement,
+      impressions: ad.impressions || 0,
+      clicks: ad.clicks || 0,
+      advertiser_id: ad.user_id || '',
+      advertiser_type: 'business',
+      advertiser_name: ad.business_name || '',
+      business_name: ad.business_name,
+      business_id: ad.business_id,
+      headline: ad.headline,
+      body_text: ad.body_text,
+      phone: ad.phone || ad.cta_phone,
+      website: ad.website,
+      tier_name: ad.tier_name,
+      tier_priority: ad.tier_priority,
+      rotation_speed_seconds: ad.rotation_speed_seconds
+    }));
   }
 
   /**
@@ -95,14 +177,8 @@ export class AdServingService {
 
     this.shownAds.add(adId);
 
-    this.http.post(`${this.apiUrl}/impressions/${adId}`, {})
-      .pipe(
-        catchError(error => {
-          console.error('Error tracking impression:', error);
-          return [];
-        })
-      )
-      .subscribe();
+    // Impressions are tracked automatically when fetching public ads
+    // No separate endpoint needed
   }
 
   /**
@@ -110,7 +186,7 @@ export class AdServingService {
    * Called when a user clicks on an ad
    */
   trackClick(adId: string): void {
-    this.http.post(`${this.apiUrl}/clicks/${adId}`, {})
+    this.http.post(`${this.apiUrl}/click/${adId}`, {})
       .pipe(
         catchError(error => {
           console.error('Error tracking click:', error);
@@ -129,6 +205,20 @@ export class AdServingService {
         map(response => response.placements),
         catchError(error => {
           console.error('Error fetching placements:', error);
+          return [];
+        })
+      );
+  }
+
+  /**
+   * Get all ad tiers with pricing
+   */
+  getAdTiers(): Observable<AdTier[]> {
+    return this.http.get<{ tiers: AdTier[] }>(`${this.apiUrl}/tiers`)
+      .pipe(
+        map(response => response.tiers),
+        catchError(error => {
+          console.error('Error fetching ad tiers:', error);
           return [];
         })
       );

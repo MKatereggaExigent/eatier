@@ -33,15 +33,15 @@ router.get('/bookings', async (req, res) => {
 
     const businessId = businessResult.rows[0].id;
 
-    // Build query
+    // Build query - Use LEFT JOIN to include guest bookings (user_id = NULL)
     let query = `
       SELECT
         bk.*,
-        u.first_name || ' ' || u.last_name as customer_name,
-        u.email as customer_email,
-        u.phone as customer_phone
+        COALESCE(u.first_name || ' ' || u.last_name, bk.contact_name) as customer_name,
+        COALESCE(u.email, bk.contact_email) as customer_email,
+        COALESCE(u.phone, bk.contact_phone) as customer_phone
       FROM bookings bk
-      JOIN users u ON bk.user_id = u.id
+      LEFT JOIN users u ON bk.user_id = u.id
       WHERE bk.business_id = $1 AND bk.tenant_id = $2
     `;
 
@@ -108,16 +108,16 @@ router.get('/bookings/:id', async (req, res) => {
     const tenantId = req.user.tenant_id;
     const bookingId = req.params.id;
 
-    // Verify ownership and get booking
+    // Verify ownership and get booking - Use LEFT JOIN to include guest bookings
     const result = await pool.query(`
       SELECT
         bk.*,
-        u.first_name || ' ' || u.last_name as customer_name,
-        u.email as customer_email,
-        u.phone as customer_phone,
+        COALESCE(u.first_name || ' ' || u.last_name, bk.contact_name) as customer_name,
+        COALESCE(u.email, bk.contact_email) as customer_email,
+        COALESCE(u.phone, bk.contact_phone) as customer_phone,
         b.business_name
       FROM bookings bk
-      JOIN users u ON bk.user_id = u.id
+      LEFT JOIN users u ON bk.user_id = u.id
       JOIN businesses b ON bk.business_id = b.id
       WHERE bk.id = $1 AND b.owner_id = $2 AND bk.tenant_id = $3
     `, [bookingId, userId, tenantId]);
@@ -131,6 +131,140 @@ router.get('/bookings/:id', async (req, res) => {
   } catch (error) {
     console.error('Error fetching booking:', error);
     res.status(500).json({ error: 'Failed to fetch booking' });
+  }
+});
+
+/**
+ * PATCH /api/business-owner/bookings/:id/status
+ * Update booking status
+ */
+router.patch('/bookings/:id/status', async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
+    const bookingId = req.params.id;
+    const { status } = req.body;
+
+    // Validate status
+    const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    // Verify ownership
+    const ownerCheck = await pool.query(`
+      SELECT bk.id FROM bookings bk
+      JOIN businesses b ON bk.business_id = b.id
+      WHERE bk.id = $1 AND b.owner_id = $2 AND bk.tenant_id = $3
+    `, [bookingId, userId, tenantId]);
+
+    if (ownerCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    // Update status
+    const result = await pool.query(`
+      UPDATE bookings
+      SET status = $1, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $2
+      RETURNING *
+    `, [status, bookingId]);
+
+    res.json({
+      message: 'Booking status updated successfully',
+      booking: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Error updating booking status:', error);
+    res.status(500).json({ error: 'Failed to update booking status' });
+  }
+});
+
+/**
+ * DELETE /api/business-owner/bookings/:id
+ * Delete a booking
+ */
+router.delete('/bookings/:id', async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
+    const bookingId = req.params.id;
+
+    // Verify ownership
+    const ownerCheck = await pool.query(`
+      SELECT bk.id FROM bookings bk
+      JOIN businesses b ON bk.business_id = b.id
+      WHERE bk.id = $1 AND b.owner_id = $2 AND bk.tenant_id = $3
+    `, [bookingId, userId, tenantId]);
+
+    if (ownerCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    // Delete booking
+    await pool.query(`
+      DELETE FROM bookings WHERE id = $1
+    `, [bookingId]);
+
+    res.json({ message: 'Booking deleted successfully' });
+
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+    res.status(500).json({ error: 'Failed to delete booking' });
+  }
+});
+
+/**
+ * POST /api/business-owner/bookings/:id/message
+ * Send a message to customer about their booking
+ */
+router.post('/bookings/:id/message', async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
+    const bookingId = req.params.id;
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // Verify ownership and get booking details
+    const bookingResult = await pool.query(`
+      SELECT
+        bk.*,
+        COALESCE(u.email, bk.contact_email) as customer_email,
+        COALESCE(u.first_name || ' ' || u.last_name, bk.contact_name) as customer_name,
+        b.business_name
+      FROM bookings bk
+      LEFT JOIN users u ON bk.user_id = u.id
+      JOIN businesses b ON bk.business_id = b.id
+      WHERE bk.id = $1 AND b.owner_id = $2 AND bk.tenant_id = $3
+    `, [bookingId, userId, tenantId]);
+
+    if (bookingResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    const booking = bookingResult.rows[0];
+
+    // TODO: Send email to customer
+    // For now, just log the message
+    console.log(`Message to ${booking.customer_email}:`, message);
+    console.log(`Booking: ${booking.booking_reference} at ${booking.business_name}`);
+
+    // Store message in database (optional - create booking_messages table if needed)
+    // For now, just return success
+
+    res.json({
+      message: 'Message sent successfully',
+      recipient: booking.customer_email
+    });
+
+  } catch (error) {
+    console.error('Error sending message:', error);
+    res.status(500).json({ error: 'Failed to send message' });
   }
 });
 

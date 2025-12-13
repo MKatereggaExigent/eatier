@@ -1,9 +1,11 @@
 import { CommonModule, TitleCasePipe } from '@angular/common';
-import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Subject, catchError, of, takeUntil } from 'rxjs';
 
 import { AuthService } from '../services/auth.service';
 import { BusinessOwner } from '../../shared/models/user.model';
+import { BusinessOwnerService } from '../services/business-owner.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,9 +14,11 @@ import { BusinessOwner } from '../../shared/models/user.model';
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private businessOwnerService = inject(BusinessOwnerService);
+  private destroy$ = new Subject<void>();
 
   // State management
   isCollapsed = signal(false);
@@ -27,7 +31,7 @@ export class SidebarComponent implements OnInit {
   businessType = signal('Restaurant');
   subscriptionStatus = signal<'trial' | 'active' | 'expired' | 'inactive'>('trial');
   trialDaysLeft = signal(14);
-  unreadReviews = signal(3);
+  unreadReviews = signal(0);
 
   // Computed properties
   businessOwner = computed(() => {
@@ -44,10 +48,16 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadBusinessInfo();
+    this.loadUnreadReviewsCount();
     // Auto-collapse on mobile
     if (window.innerWidth < 1024) {
       this.isCollapsed.set(true);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private loadBusinessInfo(): void {
@@ -58,11 +68,31 @@ export class SidebarComponent implements OnInit {
       this.businessType.set('Restaurant'); // Default type
       this.subscriptionStatus.set(owner.subscriptionStatus || 'trial');
 
-      // Calculate trial days left (mock calculation)
+      // TODO: Calculate trial days left from subscription start date when API is available
       if (owner.subscriptionStatus === 'trial') {
-        this.trialDaysLeft.set(14); // Mock value
+        this.trialDaysLeft.set(14); // Default trial period
       }
     }
+  }
+
+  private loadUnreadReviewsCount(): void {
+    // Fetch all reviews and count those without responses (pending reviews)
+    this.businessOwnerService.getReviews({ page: 1, limit: 100 })
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading reviews count:', error);
+          this.unreadReviews.set(0);
+          return of({ reviews: [], total: 0, pagination: { page: 1, limit: 100, hasMore: false } });
+        })
+      )
+      .subscribe(response => {
+        if (response && response.reviews) {
+          // Count reviews that don't have a response from owner (pending reviews)
+          const pendingCount = response.reviews.filter(review => !review.response_from_owner).length;
+          this.unreadReviews.set(pendingCount);
+        }
+      });
   }
 
   // UI Methods
@@ -101,12 +131,6 @@ export class SidebarComponent implements OnInit {
       default:
         return '📋';
     }
-  }
-
-  // Mock method to simulate unread reviews count
-  private updateUnreadReviews(): void {
-    // In a real app, this would come from a service
-    this.unreadReviews.set(Math.floor(Math.random() * 10));
   }
 
   // Logout method

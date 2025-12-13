@@ -12,7 +12,7 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-BACKEND_PORT="3000"
+BACKEND_PORT="3001"
 FRONTEND_PORT="4200"
 
 echo -e "${CYAN}🍽️  ITIYUM PLATFORM - QUICK START${NC}"
@@ -46,19 +46,46 @@ fi
 # Start backend
 echo -e "${YELLOW}🚀 Starting backend...${NC}"
 cd backend
-npm run dev > ../backend.log 2>&1 &
+node server.js > ../backend.log 2>&1 &
 BACKEND_PID=$!
 cd ..
-echo -e "${GREEN}✓ Backend started on port $BACKEND_PORT${NC}"
+echo -e "${GREEN}✓ Backend started on port $BACKEND_PORT (PID: $BACKEND_PID)${NC}"
+
+# Wait for backend to be ready
+echo -e "${YELLOW}⏳ Waiting for backend to be ready...${NC}"
+for i in {1..15}; do
+    if curl -s http://localhost:$BACKEND_PORT/api/auth/status >/dev/null 2>&1; then
+        echo -e "${GREEN}✓ Backend is responding${NC}"
+        break
+    fi
+    sleep 1
+    if [ $i -eq 15 ]; then
+        echo -e "${YELLOW}⚠️  Backend may not be ready yet, check backend.log if issues occur${NC}"
+    fi
+done
 
 # Start frontend
 echo -e "${YELLOW}🌐 Starting frontend...${NC}"
 ng serve --port $FRONTEND_PORT --host 0.0.0.0 > frontend.log 2>&1 &
 FRONTEND_PID=$!
-echo -e "${GREEN}✓ Frontend started on port $FRONTEND_PORT${NC}"
+echo -e "${GREEN}✓ Frontend started on port $FRONTEND_PORT (PID: $FRONTEND_PID)${NC}"
 
-# Wait a moment then open browser
-sleep 5
+# Wait for frontend to be ready
+echo -e "${YELLOW}⏳ Waiting for frontend to compile (this may take 30-60 seconds)...${NC}"
+for i in {1..120}; do
+    if curl -s http://localhost:$FRONTEND_PORT >/dev/null 2>&1; then
+        echo -e "${GREEN}✓ Frontend is ready${NC}"
+        break
+    fi
+    # Show progress every 10 seconds
+    if [ $((i % 10)) -eq 0 ]; then
+        echo -e "${BLUE}   Still compiling... ($i seconds)${NC}"
+    fi
+    sleep 1
+    if [ $i -eq 120 ]; then
+        echo -e "${YELLOW}⚠️  Frontend may not be ready yet, check frontend.log if issues occur${NC}"
+    fi
+done
 
 if command -v open >/dev/null 2>&1; then
     open http://localhost:$FRONTEND_PORT

@@ -13,8 +13,8 @@ router.get('/', async (req, res) => {
         b.*,
         u.first_name || ' ' || u.last_name as owner_name,
         u.email as owner_email
-      FROM businesses b
-      JOIN users u ON b.owner_id = u.id
+      FROM public.businesses b
+      JOIN public.users u ON b.owner_id = u.id
       WHERE b.account_status != 'deleted'
     `;
 
@@ -55,6 +55,7 @@ router.get('/', async (req, res) => {
       profilePhotos: business.profile_photos || [],
       backgroundImage: business.background_image,
       accountStatus: business.account_status,
+      priceRange: business.price_range, // Auto-calculated based on menu prices
       createdAt: business.created_at,
       updatedAt: business.updated_at
     }));
@@ -116,6 +117,7 @@ router.get('/:businessId', async (req, res) => {
         profilePhotos: business.profile_photos || [],
         backgroundImage: business.background_image,
         accountStatus: business.account_status,
+        priceRange: business.price_range, // Auto-calculated based on menu prices
         freezeUntil: business.freeze_until,
         freezeDuration: business.freeze_duration,
         createdAt: business.created_at,

@@ -374,12 +374,25 @@
 }
 
 .activity-list .activity-item .activity-content .activity-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
   font-size: 0.875rem;
   color: var(--clr-grey-700);
 }
 
+.activity-list .activity-item .activity-content .activity-details .activity-description {
+  color: var(--clr-grey-800);
+  font-weight: 500;
+}
+
 .activity-list .activity-item .activity-content .activity-details .activity-location {
-  margin-left: 1rem;
+  color: var(--clr-grey-600);
+  font-size: 0.8125rem;
+  padding: 0.25rem 0.5rem;
+  background: #e2e8f0;
+  border-radius: 4px;
 }
 
 .security-options {

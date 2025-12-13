@@ -1,0 +1,207 @@
+<div class="specialist-list-container">
+  <!-- Hero Header -->
+  <div class="hero-header">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="page-title">Find Your Perfect Specialist</h1>
+      <p class="page-subtitle">Discover talented chefs, caterers, and culinary experts for your next event</p>
+
+      <!-- Search Bar -->
+      <div class="search-bar-wrapper">
+        <div class="search-bar glass-morphic">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="Search by name, specialty, or service..."
+            [value]="searchQuery()"
+            (input)="onSearchChange($any($event.target).value)"
+            class="search-input"
+          />
+          @if (searchQuery()) {
+            <button type="button" class="clear-search" (click)="onSearchChange('')">✕</button>
+          }
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="quick-stats glass-morphic">
+        <div class="stat-item">
+          <span class="stat-number">{{ stats().totalSpecialists }}</span>
+          <span class="stat-label">Specialists</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number">{{ stats().totalReviews }}</span>
+          <span class="stat-label">Reviews</span>
+        </div>
+        @if (stats().avgRating > 0) {
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">{{ stats().avgRating.toFixed(1) }}★</span>
+            <span class="stat-label">Avg Rating</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <!-- Row 1: Main filters -->
+      <div class="filters-row">
+        <div class="filter-group">
+          <label class="filter-label">👨‍🍳 Specialty</label>
+          <select
+            [value]="selectedSpecialty()"
+            (change)="onSpecialtyChange($any($event.target).value)"
+            class="filter-select glass-morphic"
+          >
+            @for (specialty of specialtyTypes; track specialty) {
+              <option [value]="specialty === 'All Specialties' ? '' : specialty">
+                {{ specialty }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">🍽️ Cuisine</label>
+          <select
+            [value]="selectedCuisine()"
+            (change)="onCuisineChange($any($event.target).value)"
+            class="filter-select glass-morphic"
+          >
+            @for (cuisine of cuisineTypes; track cuisine.value) {
+              <option [value]="cuisine.value">{{ cuisine.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">⭐ Rating</label>
+          <select
+            [value]="selectedRating()"
+            (change)="onRatingChange($any($event.target).value)"
+            class="filter-select glass-morphic"
+          >
+            @for (rating of ratingFilters; track rating.value) {
+              <option [value]="rating.value">{{ rating.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 2: Additional filters -->
+      <div class="filters-row">
+        <div class="filter-group">
+          <label class="filter-label">💰 Price Range</label>
+          <select
+            [value]="selectedPriceRange()"
+            (change)="onPriceRangeChange($any($event.target).value)"
+            class="filter-select glass-morphic"
+          >
+            @for (price of priceRanges; track price.value) {
+              <option [value]="price.value">{{ price.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">📍 Country</label>
+          <input
+            type="text"
+            placeholder="Country..."
+            [value]="selectedCountry()"
+            (input)="onCountryChange($any($event.target).value)"
+            class="filter-input glass-morphic"
+          />
+        </div>
+
+        @if (hasActiveFilters()) {
+          <div class="filter-group filter-actions">
+            <label class="filter-label">&nbsp;</label>
+            <button type="button" class="clear-filters-btn" (click)="clearFilters()">
+              ✕ Clear Filters
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <div class="results-section">
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading specialists...</p>
+      </div>
+    } @else if (error()) {
+      <div class="error-state">
+        <span class="error-icon">⚠️</span>
+        <p>{{ error() }}</p>
+        <button type="button" class="retry-btn" (click)="loadSpecialists()">Try Again</button>
+      </div>
+    } @else if (specialists().length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon">👨‍🍳</span>
+        <h3>No specialists found</h3>
+        <p>Try adjusting your search or filters</p>
+      </div>
+    } @else {
+      <div class="specialists-grid">
+        @for (specialist of specialists(); track specialist.id) {
+          <a [routerLink]="['/specialists', specialist.id]" class="specialist-card glass-morphic">
+            <div class="specialist-image">
+              <img
+                [src]="specialist.profilePhoto || getDefaultAvatar(specialist.fullName)"
+                [alt]="specialist.fullName"
+                (error)="$any($event.target).src = getDefaultAvatar(specialist.fullName)"
+              />
+              @if (specialist.averageRating >= 4.5) {
+                <div class="top-rated-badge">⭐ Top Rated</div>
+              }
+            </div>
+            <div class="specialist-info">
+              <h3 class="specialist-name">{{ specialist.fullName }}</h3>
+              <div class="specialist-rating">
+                <span class="stars">{{ getStarRating(specialist.averageRating) }}</span>
+                <span class="rating-text">{{ specialist.averageRating.toFixed(1) }}</span>
+                <span class="review-count">({{ specialist.reviewCount }} reviews)</span>
+              </div>
+              <div class="specialist-specialties">
+                @for (specialty of specialist.specialties.slice(0, 3); track specialty) {
+                  <span class="specialty-tag">{{ specialty }}</span>
+                }
+              </div>
+              @if (specialist.minPrice > 0) {
+                <div class="specialist-pricing">
+                  <span class="price-label">💰 From</span>
+                  <span class="price-value">${{ specialist.minPrice }}</span>
+                  @if (specialist.maxPrice > specialist.minPrice) {
+                    <span class="price-range">- ${{ specialist.maxPrice }}</span>
+                  }
+                </div>
+              }
+              @if (specialist.location && specialist.location.country) {
+                <div class="specialist-location">
+                  <span class="location-icon">📍</span>
+                  <span class="location-text">{{ specialist.location.country }}</span>
+                </div>
+              }
+              @if (specialist.bio) {
+                <p class="specialist-bio">{{ specialist.bio | slice:0:80 }}{{ specialist.bio.length > 80 ? '...' : '' }}</p>
+              }
+              <div class="specialist-stats">
+                <span class="stat">✅ {{ specialist.completedBookings }} bookings</span>
+                <span class="stat">🍴 {{ specialist.services.length }} services</span>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    }
+  </div>
+</div>
+

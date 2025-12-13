@@ -261,7 +261,7 @@
         <div class="specialty-section">
           <h3>Specialty Dishes</h3>
           <div class="specialty-list">
-            @for (dish of currentProfile.specialtyDishes; track dish; let i = $index) {
+            @for (dish of currentProfile()?.specialtyDishes ?? []; track dish; let i = $index) {
               <div class="specialty-item">
                 <span class="dish-name">{{ dish }}</span>
                 <button type="button" class="remove-btn" (click)="removeSpecialtyDish(i)">✕</button>
@@ -289,7 +289,7 @@
         <div class="certification-section">
           <h3>Certifications</h3>
           <div class="certification-list">
-            @for (cert of currentProfile.certifications; track cert; let i = $index) {
+            @for (cert of currentProfile()?.certifications ?? []; track cert; let i = $index) {
               <div class="certification-item">
                 <span class="cert-name">{{ cert }}</span>
                 <button type="button" class="remove-btn" (click)="removeCertification(i)">✕</button>

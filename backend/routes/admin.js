@@ -595,8 +595,8 @@ router.get('/analytics', requireAdmin, async (req, res) => {
       SELECT
         -- User metrics
         (SELECT COUNT(*) FROM users) as total_users,
-        (SELECT COUNT(*) FROM users WHERE role = 'business_owner') as business_owners,
-        (SELECT COUNT(*) FROM users WHERE role = 'food_enthusiast') as food_enthusiasts,
+        (SELECT COUNT(DISTINCT ur.user_id) FROM user_roles ur JOIN roles r ON ur.role_id = r.id WHERE r.slug = 'business_owner') as business_owners,
+        (SELECT COUNT(DISTINCT ur.user_id) FROM user_roles ur JOIN roles r ON ur.role_id = r.id WHERE r.slug = 'food_enthusiast') as food_enthusiasts,
         (SELECT COUNT(*) FROM users WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_users_30d,
         (SELECT COUNT(*) FROM users WHERE created_at >= CURRENT_DATE - INTERVAL '7 days') as new_users_7d,
 
@@ -638,15 +638,17 @@ router.get('/analytics', requireAdmin, async (req, res) => {
     // Get user growth (last 12 months)
     const userGrowth = await pool.query(`
       SELECT
-        TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') as month,
-        TO_CHAR(DATE_TRUNC('month', created_at), 'Mon YYYY') as month_label,
-        COUNT(*) as users,
-        COUNT(*) FILTER (WHERE role = 'business_owner') as business_owners,
-        COUNT(*) FILTER (WHERE role = 'food_enthusiast') as food_enthusiasts
-      FROM users
-      WHERE created_at >= CURRENT_DATE - INTERVAL '12 months'
-      GROUP BY DATE_TRUNC('month', created_at)
-      ORDER BY DATE_TRUNC('month', created_at) ASC
+        TO_CHAR(DATE_TRUNC('month', u.created_at), 'YYYY-MM') as month,
+        TO_CHAR(DATE_TRUNC('month', u.created_at), 'Mon YYYY') as month_label,
+        COUNT(DISTINCT u.id) as users,
+        COUNT(DISTINCT u.id) FILTER (WHERE r.slug = 'business_owner') as business_owners,
+        COUNT(DISTINCT u.id) FILTER (WHERE r.slug = 'food_enthusiast') as food_enthusiasts
+      FROM users u
+      LEFT JOIN user_roles ur ON u.id = ur.user_id
+      LEFT JOIN roles r ON ur.role_id = r.id
+      WHERE u.created_at >= CURRENT_DATE - INTERVAL '12 months'
+      GROUP BY DATE_TRUNC('month', u.created_at)
+      ORDER BY DATE_TRUNC('month', u.created_at) ASC
     `);
 
     // Get revenue trends (last 12 months) - breakdown by source

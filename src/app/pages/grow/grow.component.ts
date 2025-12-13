@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
-import { PublicStatsService } from '../../core/services/public-stats.service';
 import { CommonModule } from '@angular/common';
+import { PublicStatsService } from '../../core/services/public-stats.service';
 
 interface AdType {
   id: string;
@@ -210,6 +210,23 @@ export class GrowComponent implements OnInit, OnDestroy {
       this.router.navigate(['/business-owner/ads/create']);
     } else if (user.role === 'specialist') {
       this.router.navigate(['/dashboard/specialist/ads/create']);
+    }
+  }
+
+  navigateToDashboard(): void {
+    const user = this.currentUser();
+    if (!user) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    // Navigate to dashboard based on role
+    if (user.role === 'business_owner') {
+      this.router.navigate(['/business-owner']);
+    } else if (user.role === 'specialist') {
+      this.router.navigate(['/dashboard/specialist']);
+    } else {
+      this.router.navigate(['/dashboard/user']);
     }
   }
 }

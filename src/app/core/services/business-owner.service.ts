@@ -61,6 +61,7 @@ export interface MenuItem {
 
 export interface Booking {
   id: string;
+  booking_reference?: string;
   tenant_id: string;
   user_id: string;
   business_id: string;
@@ -243,6 +244,21 @@ export class BusinessOwnerService {
     return this.http.patch<{ message: string; booking: Booking }>(
       `${this.apiUrl}/bookings/${bookingId}/status`,
       { status },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  deleteBooking(bookingId: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(
+      `${this.apiUrl}/bookings/${bookingId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  sendBookingMessage(bookingId: string, message: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.apiUrl}/bookings/${bookingId}/message`,
+      { message },
       { headers: this.getHeaders() }
     );
   }

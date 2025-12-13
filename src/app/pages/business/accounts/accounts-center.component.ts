@@ -1,9 +1,10 @@
-import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AccountActivity, AccountFreezeOptions, NotificationSettings } from '../../../shared/models/business-profile.model';
+import { Business, BusinessOwnerService } from '../../../core/services/business-owner.service';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
-import { AccountFreezeOptions, AccountActivity, NotificationSettings } from '../../../shared/models/business-profile.model';
-import { BusinessOwnerService, Business } from '../../../core/services/business-owner.service';
+
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-accounts-center',
@@ -43,8 +44,8 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
     { value: 'indefinite', label: 'Indefinitely', description: 'Account will remain frozen until manually reactivated' }
   ];
 
-  // Mock data
-  mockNotificationSettings: NotificationSettings = {
+  // Default notification settings for new accounts
+  readonly defaultNotificationSettings: NotificationSettings = {
     messages: true,
     updates: true,
     customerAlerts: true,
@@ -52,54 +53,6 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
     systemNotifications: true,
     emailFrequency: 'daily'
   };
-
-  mockAccountActivity: AccountActivity[] = [
-    {
-      id: '1',
-      userId: 'user-1',
-      action: 'Profile Updated',
-      details: { field: 'business_hours', oldValue: '9-5', newValue: '11-10' },
-      timestamp: new Date('2024-01-20T14:30:00'),
-      ipAddress: '192.168.1.1',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    {
-      id: '2',
-      userId: 'user-1',
-      action: 'Menu Created',
-      details: { menuName: 'Breakfast Menu', menuType: 'breakfast' },
-      timestamp: new Date('2024-01-19T09:15:00'),
-      ipAddress: '192.168.1.1',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    {
-      id: '3',
-      userId: 'user-1',
-      action: 'Login',
-      details: { method: 'email', success: true },
-      timestamp: new Date('2024-01-19T08:00:00'),
-      ipAddress: '192.168.1.1',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    {
-      id: '4',
-      userId: 'user-1',
-      action: 'Password Changed',
-      details: { method: 'security_settings' },
-      timestamp: new Date('2024-01-18T16:45:00'),
-      ipAddress: '192.168.1.1',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    {
-      id: '5',
-      userId: 'user-1',
-      action: 'Menu Access Granted',
-      details: { email: 'chef@restaurant.com', permission: 'edit_view' },
-      timestamp: new Date('2024-01-17T11:20:00'),
-      ipAddress: '192.168.1.1',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    }
-  ];
 
   constructor() {
     this.notificationForm = this.fb.group({
@@ -152,12 +105,12 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
         if (response && response.business) {
           this.business.set(response.business);
 
-          // Load notification settings (using defaults for now)
-          this.notificationSettings.set(this.mockNotificationSettings);
-          this.notificationForm.patchValue(this.mockNotificationSettings);
+          // Load notification settings (using defaults until API is available)
+          this.notificationSettings.set(this.defaultNotificationSettings);
+          this.notificationForm.patchValue(this.defaultNotificationSettings);
 
-          // Load account activity (using mock for now)
-          this.accountActivity.set(this.mockAccountActivity);
+          // Account activity will be empty until API is available
+          this.accountActivity.set([]);
         }
       });
   }
@@ -298,6 +251,24 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
       'Settings Updated': '⚙️'
     };
     return icons[action] || '📄';
+  }
+
+  formatActivityDetails(details: any): string {
+    if (!details) return '';
+
+    const entries = Object.entries(details);
+    if (entries.length === 0) return '';
+
+    return entries.map(([key, value]) => {
+      // Format the key to be more readable
+      const formattedKey = key
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/_/g, ' ')
+        .toLowerCase()
+        .replace(/^\w/, c => c.toUpperCase());
+
+      return `${formattedKey}: ${value}`;
+    }).join(' • ');
   }
 
   getFieldError(form: FormGroup, fieldName: string): string | null {
