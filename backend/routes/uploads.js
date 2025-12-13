@@ -10,14 +10,18 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
-// Ensure upload directories exist
+// Ensure upload directories exist (skip on Vercel serverless - read-only filesystem)
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
 const uploadDirs = ['ads', 'profiles', 'businesses', 'menus', 'temp'];
-uploadDirs.forEach(dir => {
-  const dirPath = path.join(__dirname, '..', 'uploads', dir);
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-});
+
+if (!isVercel) {
+  uploadDirs.forEach(dir => {
+    const dirPath = path.join(__dirname, '..', 'uploads', dir);
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+  });
+}
 
 // Allowed file types
 const ALLOWED_MIME_TYPES = {
@@ -79,7 +83,7 @@ router.post('/:category', upload.array('files', 10), async (req, res) => {
   try {
     const { category } = req.params;
     const validCategories = ['ads', 'profiles', 'businesses', 'menus'];
-    
+
     if (!validCategories.includes(category)) {
       return res.status(400).json({
         error: 'Invalid category',
@@ -93,7 +97,7 @@ router.post('/:category', upload.array('files', 10), async (req, res) => {
 
     // Build response with file URLs
     const baseUrl = process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 3001}`;
-    
+
     const uploadedFiles = req.files.map(file => ({
       id: path.basename(file.filename, path.extname(file.filename)),
       filename: file.filename,
@@ -124,7 +128,7 @@ router.post('/:category/single', upload.single('file'), async (req, res) => {
   try {
     const { category } = req.params;
     const validCategories = ['ads', 'profiles', 'businesses', 'menus'];
-    
+
     if (!validCategories.includes(category)) {
       return res.status(400).json({ error: 'Invalid category', validCategories });
     }
@@ -164,7 +168,7 @@ router.delete('/:category/:filename', async (req, res) => {
   try {
     const { category, filename } = req.params;
     const validCategories = ['ads', 'profiles', 'businesses', 'menus', 'temp'];
-    
+
     if (!validCategories.includes(category)) {
       return res.status(400).json({ error: 'Invalid category' });
     }
@@ -178,7 +182,7 @@ router.delete('/:category/:filename', async (req, res) => {
     }
 
     fs.unlinkSync(filePath);
-    
+
     res.json({ message: 'File deleted successfully', filename: sanitizedFilename });
 
   } catch (error) {
@@ -195,7 +199,7 @@ router.get('/:category', async (req, res) => {
   try {
     const { category } = req.params;
     const validCategories = ['ads', 'profiles', 'businesses', 'menus', 'temp'];
-    
+
     if (!validCategories.includes(category)) {
       return res.status(400).json({ error: 'Invalid category' });
     }
