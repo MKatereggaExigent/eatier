@@ -255,18 +255,27 @@ CREATE TABLE chef_follows (
 );
 
 -- ============================================
--- MENUS TABLE
+-- MENUS TABLE (menu items with prices)
 -- ============================================
 CREATE TABLE menus (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(255),
+    title VARCHAR(255) NOT NULL,
     description TEXT,
+    category VARCHAR(100) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    background_image TEXT,
     menu_type VARCHAR(50) DEFAULT 'regular',
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_menus_tenant_id ON menus(tenant_id);
+CREATE INDEX idx_menus_business_id ON menus(business_id);
+CREATE INDEX idx_menus_category ON menus(category);
 
 -- ============================================
 -- MENU_CATEGORIES TABLE
