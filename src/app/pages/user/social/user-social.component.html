@@ -1,0 +1,157 @@
+<div class="social-container">
+  <div class="page-header">
+    <h1>👥 Social</h1>
+    <p>Connect with fellow food lovers and discover new favorites</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button type="button" class="tab" [class.active]="activeTab() === 'feed'" (click)="setActiveTab('feed')">
+      📰 Activity Feed
+    </button>
+    <button type="button" class="tab" [class.active]="activeTab() === 'discover'" (click)="setActiveTab('discover')">
+      🔍 Discover
+    </button>
+    <button type="button" class="tab" [class.active]="activeTab() === 'following'" (click)="setActiveTab('following')">
+      👤 Following
+    </button>
+    <button type="button" class="tab" [class.active]="activeTab() === 'followers'" (click)="setActiveTab('followers')">
+      👥 Followers
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+  } @else {
+    <!-- Activity Feed -->
+    @if (activeTab() === 'feed') {
+      @if (activityFeed().length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">📰</span>
+          <h2>No activity yet</h2>
+          <p>Follow some food lovers to see their activity here!</p>
+          <button type="button" class="action-btn" (click)="setActiveTab('discover')">Discover People</button>
+        </div>
+      } @else {
+        <div class="activity-list">
+          @for (activity of activityFeed(); track activity.id) {
+            <div class="activity-card">
+              <div class="activity-icon">{{ getActivityIcon(activity.activityType) }}</div>
+              <div class="activity-content">
+                <div class="activity-header">
+                  <span class="actor-name">{{ activity.actorName }}</span>
+                  <span class="activity-text">{{ getActivityText(activity) }}</span>
+                </div>
+                @if (activity.contentPreview) {
+                  <p class="activity-preview">"{{ activity.contentPreview }}"</p>
+                }
+                <span class="activity-time">{{ formatDate(activity.createdAt) }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- Discover Users -->
+    @if (activeTab() === 'discover') {
+      @if (discoverUsers().length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">🔍</span>
+          <h2>No suggestions</h2>
+          <p>Check back later for new food lovers to follow!</p>
+        </div>
+      } @else {
+        <div class="users-grid">
+          @for (user of discoverUsers(); track user.id) {
+            <div class="user-card">
+              <div class="user-avatar">{{ user.firstName?.charAt(0) || 'U' }}</div>
+              <div class="user-info">
+                <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+                <div class="user-stats">
+                  <span>⭐ {{ user.reviewCount }} reviews</span>
+                  <span>👥 {{ user.followerCount }} followers</span>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                class="follow-btn" 
+                [class.following]="user.isFollowing"
+                [disabled]="isFollowInProgress(user.id)"
+                (click)="toggleFollow(user.id, user.isFollowing)">
+                @if (isFollowInProgress(user.id)) {
+                  ...
+                } @else if (user.isFollowing) {
+                  Following
+                } @else {
+                  Follow
+                }
+              </button>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- Following -->
+    @if (activeTab() === 'following') {
+      @if (following().length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">👤</span>
+          <h2>Not following anyone</h2>
+          <p>Discover and follow food lovers to see their activity!</p>
+          <button type="button" class="action-btn" (click)="setActiveTab('discover')">Discover People</button>
+        </div>
+      } @else {
+        <div class="users-grid">
+          @for (user of following(); track user.id) {
+            <div class="user-card">
+              <div class="user-avatar">{{ user.firstName?.charAt(0) || 'U' }}</div>
+              <div class="user-info">
+                <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+                <div class="user-stats">
+                  <span>⭐ {{ user.reviewCount }} reviews</span>
+                </div>
+              </div>
+              <button type="button" class="follow-btn following" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, true)">
+                @if (isFollowInProgress(user.id)) { ... } @else { Unfollow }
+              </button>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- Followers -->
+    @if (activeTab() === 'followers') {
+      @if (followers().length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">👥</span>
+          <h2>No followers yet</h2>
+          <p>Share your reviews and favorites to attract followers!</p>
+        </div>
+      } @else {
+        <div class="users-grid">
+          @for (user of followers(); track user.id) {
+            <div class="user-card">
+              <div class="user-avatar">{{ user.firstName?.charAt(0) || 'U' }}</div>
+              <div class="user-info">
+                <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+                <div class="user-stats">
+                  <span>⭐ {{ user.reviewCount }} reviews</span>
+                </div>
+              </div>
+              <button type="button" class="follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">
+                @if (isFollowInProgress(user.id)) { ... } @else if (user.isFollowing) { Following } @else { Follow Back }
+              </button>
+            </div>
+          }
+        </div>
+      }
+    }
+  }
+</div>
+

@@ -1,0 +1,150 @@
+<div class="orders-container">
+  <div class="page-header">
+    <h1>📦 Order History</h1>
+    <p>View your past orders and quickly reorder your favorites</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading your orders...</p>
+    </div>
+  } @else if (orders().length === 0) {
+    <div class="empty-state">
+      <span class="empty-icon">🛒</span>
+      <h2>No orders yet</h2>
+      <p>Your order history will appear here once you place your first order.</p>
+      <a href="/restaurants" class="browse-btn">Browse Restaurants</a>
+    </div>
+  } @else {
+    <div class="orders-list">
+      @for (order of orders(); track order.id) {
+        <div class="order-card">
+          <div class="order-header">
+            <div class="business-info">
+              <div class="business-logo">
+                @if (order.businessLogo) {
+                  <img [src]="order.businessLogo" [alt]="order.businessName">
+                } @else {
+                  <span>🍽️</span>
+                }
+              </div>
+              <div class="business-details">
+                <h3>{{ order.businessName || 'Restaurant' }}</h3>
+                <span class="order-number">#{{ order.orderNumber }}</span>
+              </div>
+            </div>
+            <div class="order-status" [class]="getStatusClass(order.status)">
+              <span class="status-icon">{{ getStatusIcon(order.status) }}</span>
+              <span class="status-text">{{ order.status | titlecase }}</span>
+            </div>
+          </div>
+
+          <div class="order-summary">
+            <div class="order-date">
+              <span class="label">📅</span>
+              <span>{{ formatDate(order.createdAt) }}</span>
+            </div>
+            <div class="order-type">
+              <span class="label">{{ order.orderType === 'delivery' ? '🚗' : '🏃' }}</span>
+              <span>{{ order.orderType | titlecase }}</span>
+            </div>
+            <div class="order-total">
+              <span class="label">💰</span>
+              <span class="amount">${{ order.totalAmount.toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <div class="order-items-preview">
+            @for (item of order.items.slice(0, 3); track item.id) {
+              <span class="item-tag">{{ item.quantity }}x {{ item.name }}</span>
+            }
+            @if (order.items.length > 3) {
+              <span class="more-items">+{{ order.items.length - 3 }} more</span>
+            }
+          </div>
+
+          <div class="order-actions">
+            <button type="button" class="view-btn" (click)="viewOrderDetails(order)">
+              View Details
+            </button>
+            <button 
+              type="button" 
+              class="reorder-btn" 
+              (click)="reorder(order.id)"
+              [disabled]="reordering() === order.id">
+              @if (reordering() === order.id) {
+                <span class="spinner-small"></span> Reordering...
+              } @else {
+                🔄 Reorder
+              }
+            </button>
+          </div>
+
+          @if (order.status === 'completed' || order.status === 'delivered') {
+            <div class="order-rating">
+              <span class="rating-label">Rate this order:</span>
+              <div class="stars">
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                  <button 
+                    type="button"
+                    class="star-btn" 
+                    [class.filled]="order.rating && star <= order.rating"
+                    (click)="rateOrder(order.id, star)">
+                    {{ order.rating && star <= order.rating ? '★' : '☆' }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Order Details Modal -->
+  @if (selectedOrder()) {
+    <div class="modal-overlay" (click)="closeOrderDetails()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <button type="button" class="close-btn" (click)="closeOrderDetails()">×</button>
+        <h2>Order #{{ selectedOrder()!.orderNumber }}</h2>
+        
+        <div class="modal-section">
+          <h3>Items</h3>
+          <div class="items-list">
+            @for (item of selectedOrder()!.items; track item.id) {
+              <div class="item-row">
+                <span class="item-name">{{ item.quantity }}x {{ item.name }}</span>
+                <span class="item-price">${{ item.totalPrice.toFixed(2) }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="modal-section totals">
+          <div class="total-row">
+            <span>Subtotal</span>
+            <span>${{ selectedOrder()!.subtotal.toFixed(2) }}</span>
+          </div>
+          @if (selectedOrder()!.discount > 0) {
+            <div class="total-row discount">
+              <span>Discount</span>
+              <span>-${{ selectedOrder()!.discount.toFixed(2) }}</span>
+            </div>
+          }
+          @if (selectedOrder()!.deliveryFee > 0) {
+            <div class="total-row">
+              <span>Delivery Fee</span>
+              <span>${{ selectedOrder()!.deliveryFee.toFixed(2) }}</span>
+            </div>
+          }
+          <div class="total-row grand-total">
+            <span>Total</span>
+            <span>${{ selectedOrder()!.totalAmount.toFixed(2) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

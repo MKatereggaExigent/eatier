@@ -1,16 +1,20 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
-import { Subject, catchError, finalize, forkJoin, of, takeUntil } from 'rxjs';
+import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService, UserStats, UserActivity, Favorite } from '../../../core/services/user.service';
+import { environment } from '../../../../environments/environment';
 
 interface LoadingState {
   stats: boolean;
   activity: boolean;
   favorites: boolean;
   recommendations: boolean;
+  wallet: boolean;
+  promotions: boolean;
 }
 
 interface ErrorState {
@@ -18,6 +22,22 @@ interface ErrorState {
   activity: string | null;
   favorites: string | null;
   recommendations: string | null;
+  wallet: string | null;
+  promotions: string | null;
+}
+
+interface WalletData {
+  cashbackBalance: number;
+  loyaltyPoints: number;
+}
+
+interface Promotion {
+  id: string;
+  code: string;
+  title: string;
+  discountType: string;
+  discountValue: number;
+  validUntil: Date;
 }
 
 @Component({
@@ -30,6 +50,7 @@ interface ErrorState {
 export class UserOverviewComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private userService = inject(UserService);
+  private http = inject(HttpClient);
   private destroy$ = new Subject<void>();
 
   currentUser = this.authService.currentUser;
@@ -39,7 +60,9 @@ export class UserOverviewComponent implements OnInit, OnDestroy {
     stats: true,
     activity: true,
     favorites: true,
-    recommendations: true
+    recommendations: true,
+    wallet: true,
+    promotions: true
   });
 
   // Error states
@@ -47,7 +70,9 @@ export class UserOverviewComponent implements OnInit, OnDestroy {
     stats: null,
     activity: null,
     favorites: null,
-    recommendations: null
+    recommendations: null,
+    wallet: null,
+    promotions: null
   });
 
   // Data signals
@@ -61,6 +86,8 @@ export class UserOverviewComponent implements OnInit, OnDestroy {
   recentActivity = signal<UserActivity[]>([]);
   favoriteRestaurants = signal<Favorite[]>([]);
   recommendedRestaurants = signal<any[]>([]);
+  wallet = signal<WalletData | null>(null);
+  promotions = signal<Promotion[]>([]);
 
   // Computed properties
   isLoading = computed(() =>
@@ -97,6 +124,8 @@ export class UserOverviewComponent implements OnInit, OnDestroy {
     this.loadRecentActivity(userId);
     this.loadFavorites(userId);
     this.loadRecommendations(userId);
+    this.loadWallet();
+    this.loadPromotions();
   }
 
   private loadUserStats(userId: string): void {
@@ -193,6 +222,59 @@ export class UserOverviewComponent implements OnInit, OnDestroy {
       .subscribe(response => {
         this.recommendedRestaurants.set(response.businesses);
       });
+  }
+
+  private loadWallet(): void {
+    this.loading.update(state => ({ ...state, wallet: true }));
+    this.errors.update(state => ({ ...state, wallet: null }));
+
+    this.http.get<any>(`${environment.apiUrl}/wallet`)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading wallet:', error);
+          this.errors.update(state => ({ ...state, wallet: 'Failed to load wallet' }));
+          return of({ wallet: null });
+        }),
+        finalize(() => {
+          this.loading.update(state => ({ ...state, wallet: false }));
+        })
+      )
+      .subscribe(response => {
+        this.wallet.set(response.wallet);
+      });
+  }
+
+  private loadPromotions(): void {
+    this.loading.update(state => ({ ...state, promotions: true }));
+    this.errors.update(state => ({ ...state, promotions: null }));
+
+    this.http.get<any>(`${environment.apiUrl}/member-promotions`)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading promotions:', error);
+          this.errors.update(state => ({ ...state, promotions: 'Failed to load promotions' }));
+          return of({ promotions: [] });
+        }),
+        finalize(() => {
+          this.loading.update(state => ({ ...state, promotions: false }));
+        })
+      )
+      .subscribe(response => {
+        this.promotions.set((response.promotions || []).slice(0, 3));
+      });
+  }
+
+  getDiscountDisplay(promo: Promotion): string {
+    if (promo.discountType === 'percentage') {
+      return `${promo.discountValue}% OFF`;
+    }
+    return `$${promo.discountValue} OFF`;
+  }
+
+  copyPromoCode(code: string): void {
+    navigator.clipboard.writeText(code);
   }
 
   // Helper methods

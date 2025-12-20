@@ -1,22 +1,47 @@
-<div class="user-dashboard">
-  <nav class="user-nav">
+<div class="user-dashboard" [class.menu-open]="mobileMenuOpen()">
+  <!-- Mobile Header -->
+  <header class="mobile-header">
+    <button type="button" class="menu-toggle" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+      <span class="hamburger" [class.open]="mobileMenuOpen()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </button>
+    <h2 class="mobile-title">{{ dashboardTitle() }}</h2>
+    <div class="mobile-user-avatar">
+      {{ getUserDisplayName().charAt(0).toUpperCase() }}
+    </div>
+  </header>
+
+  <!-- Overlay for mobile -->
+  @if (mobileMenuOpen()) {
+    <div class="nav-overlay" (click)="closeMobileMenu()"></div>
+  }
+
+  <nav class="user-nav" [class.open]="mobileMenuOpen()">
     <div class="nav-brand">
       <h2>{{ dashboardTitle() }}</h2>
       @if (currentUser()) {
         <div class="user-info">
-          <span class="user-name">{{ currentUser()?.firstName }} {{ currentUser()?.lastName }}</span>
+          <div class="user-avatar">
+            {{ getUserDisplayName().charAt(0).toUpperCase() }}
+          </div>
+          <span class="user-name">{{ getUserDisplayName() }}</span>
           <span class="user-role">{{ userRole() | titlecase }}</span>
         </div>
       }
     </div>
-    <ul class="nav-links">@for (item of navigationItems(); track item.path) {
+    <ul class="nav-links">
+      @for (item of navigationItems(); track item.path) {
         <li>
-          <a [routerLink]="item.path" routerLinkActive="active" class="nav-link">
+          <a [routerLink]="item.path" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
             <span class="nav-icon">{{ item.icon }}</span>
             <span class="nav-label">{{ item.label }}</span>
           </a>
         </li>
-      }</ul>
+      }
+    </ul>
 
     <div class="nav-footer">
       <button type="button" class="logout-btn" (click)="logout()">

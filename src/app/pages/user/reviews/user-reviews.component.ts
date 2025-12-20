@@ -1,31 +1,27 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Subject, of } from 'rxjs';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 interface Review {
   id: string;
-  restaurantId: string;
-  restaurantName: string;
-  restaurantImage?: string;
+  businessId: string;
+  businessName: string;
+  businessType?: string;
   rating: number;
   title: string;
-  content: string;
-  photos: string[];
-  visitDate: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  isPublic: boolean;
-  helpfulVotes: number;
-  totalVotes: number;
-  tags: string[];
-  dishesOrdered: string[];
-  priceRange: 'budget' | 'moderate' | 'expensive' | 'fine_dining';
-  serviceRating: number;
-  foodRating: number;
-  ambianceRating: number;
-  valueRating: number;
+  comment: string;
+  images: string[];
+  visitDate: string;
+  createdAt: string;
+  updatedAt: string;
+  helpfulCount: number;
+  notHelpfulCount: number;
   wouldRecommend: boolean;
   status: 'draft' | 'published' | 'flagged' | 'archived';
 }
@@ -34,11 +30,6 @@ interface ReviewStats {
   totalReviews: number;
   averageRating: number;
   helpfulVotes: number;
-  totalVotes: number;
-  reviewsThisMonth: number;
-  reviewsThisYear: number;
-  topCuisines: { name: string; count: number }[];
-  reviewStreak: number;
 }
 
 interface FilterOptions {
@@ -56,17 +47,21 @@ interface FilterOptions {
   templateUrl: './user-reviews.component.html',
   styleUrls: ['./user-reviews.component.scss']
 })
-export class UserReviewsComponent {
+export class UserReviewsComponent implements OnInit, OnDestroy {
+  private http = inject(HttpClient);
   private authService = inject(AuthService);
+  private destroy$ = new Subject<void>();
 
   currentUser = this.authService.currentUser;
 
   // State management
   isLoading = signal(false);
+  error = signal<string | null>(null);
   selectedReview = signal<Review | null>(null);
   showNewReviewModal = signal(false);
   showEditModal = signal(false);
   showDeleteConfirm = signal(false);
+  deleting = signal(false);
 
   // Filter and search
   searchQuery = signal('');
@@ -78,148 +73,61 @@ export class UserReviewsComponent {
     sortBy: 'newest'
   });
 
-  // Mock data - in real app, this would come from a service
-  reviews = signal<Review[]>([
-    {
-      id: '1',
-      restaurantId: 'rest1',
-      restaurantName: 'The Golden Spoon',
-      restaurantImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&h=200&fit=crop',
-      rating: 5,
-      title: 'Exceptional dining experience!',
-      content: 'Had an absolutely wonderful evening at The Golden Spoon. The service was impeccable, and every dish was a masterpiece. The chef\'s tasting menu exceeded all expectations. The ambiance was perfect for a special occasion.',
-      photos: [
-        'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop'
-      ],
-      visitDate: new Date('2024-01-15'),
-      createdAt: new Date('2024-01-16'),
-      updatedAt: new Date('2024-01-16'),
-      isPublic: true,
-      helpfulVotes: 23,
-      totalVotes: 25,
-      tags: ['fine_dining', 'romantic', 'special_occasion', 'excellent_service'],
-      dishesOrdered: ['Chef\'s Tasting Menu', 'Wine Pairing'],
-      priceRange: 'fine_dining',
-      serviceRating: 5,
-      foodRating: 5,
-      ambianceRating: 5,
-      valueRating: 4,
-      wouldRecommend: true,
-      status: 'published'
-    },
-    {
-      id: '2',
-      restaurantId: 'rest2',
-      restaurantName: 'Mama\'s Kitchen',
-      restaurantImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=200&fit=crop',
-      rating: 4,
-      title: 'Comfort food at its finest',
-      content: 'Great homestyle cooking with generous portions. The lasagna was incredible and the tiramisu was the perfect ending. Service was friendly though a bit slow during peak hours.',
-      photos: [
-        'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=400&h=300&fit=crop'
-      ],
-      visitDate: new Date('2024-01-10'),
-      createdAt: new Date('2024-01-11'),
-      updatedAt: new Date('2024-01-11'),
-      isPublic: true,
-      helpfulVotes: 15,
-      totalVotes: 18,
-      tags: ['italian', 'comfort_food', 'family_friendly', 'good_value'],
-      dishesOrdered: ['Lasagna', 'Caesar Salad', 'Tiramisu'],
-      priceRange: 'moderate',
-      serviceRating: 3,
-      foodRating: 5,
-      ambianceRating: 4,
-      valueRating: 5,
-      wouldRecommend: true,
-      status: 'published'
-    },
-    {
-      id: '3',
-      restaurantId: 'rest3',
-      restaurantName: 'Sakura Sushi',
-      restaurantImage: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=300&h=200&fit=crop',
-      rating: 4,
-      title: 'Fresh sushi, great atmosphere',
-      content: 'The fish was incredibly fresh and the presentation was beautiful. The omakase was worth every penny. Only downside was the wait time, but the quality made up for it.',
-      photos: [],
-      visitDate: new Date('2024-01-05'),
-      createdAt: new Date('2024-01-06'),
-      updatedAt: new Date('2024-01-06'),
-      isPublic: false,
-      helpfulVotes: 8,
-      totalVotes: 10,
-      tags: ['japanese', 'sushi', 'fresh', 'omakase'],
-      dishesOrdered: ['Omakase', 'Miso Soup', 'Green Tea Ice Cream'],
-      priceRange: 'expensive',
-      serviceRating: 4,
-      foodRating: 5,
-      ambianceRating: 4,
-      valueRating: 3,
-      wouldRecommend: true,
-      status: 'published'
-    },
-    {
-      id: '4',
-      restaurantId: 'rest4',
-      restaurantName: 'Street Tacos Express',
-      rating: 3,
-      title: 'Quick bite, decent food',
-      content: 'Good for a quick lunch. The carnitas tacos were flavorful but the al pastor was a bit dry. Prices are reasonable and service is fast.',
-      photos: [],
-      visitDate: new Date('2023-12-28'),
-      createdAt: new Date('2023-12-29'),
-      updatedAt: new Date('2023-12-29'),
-      isPublic: true,
-      helpfulVotes: 5,
-      totalVotes: 7,
-      tags: ['mexican', 'quick_bite', 'casual', 'affordable'],
-      dishesOrdered: ['Carnitas Tacos', 'Al Pastor Tacos', 'Horchata'],
-      priceRange: 'budget',
-      serviceRating: 4,
-      foodRating: 3,
-      ambianceRating: 2,
-      valueRating: 4,
-      wouldRecommend: true,
-      status: 'draft'
-    }
-  ]);
-
+  // Data from API
+  reviews = signal<Review[]>([]);
   reviewStats = signal<ReviewStats>({
-    totalReviews: 4,
-    averageRating: 4.0,
-    helpfulVotes: 51,
-    totalVotes: 60,
-    reviewsThisMonth: 3,
-    reviewsThisYear: 4,
-    topCuisines: [
-      { name: 'Italian', count: 2 },
-      { name: 'Japanese', count: 1 },
-      { name: 'Mexican', count: 1 }
-    ],
-    reviewStreak: 3
+    totalReviews: 0,
+    averageRating: 0,
+    helpfulVotes: 0
   });
+
+  ngOnInit(): void {
+    this.loadReviews();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadReviews(): void {
+    const userId = this.currentUser()?.id || localStorage.getItem('user_id') || 'temp-user';
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    const status = this.filters().status !== 'all' ? this.filters().status : undefined;
+
+    this.http.get<any>(`${environment.apiUrl}/reviews/user/${userId}`, {
+      params: status ? { status } : {}
+    })
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(err => {
+          console.error('Error loading reviews:', err);
+          this.error.set('Failed to load reviews');
+          return of({ reviews: [], stats: { totalReviews: 0, averageRating: 0, helpfulVotes: 0 } });
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe(response => {
+        this.reviews.set(response.reviews || []);
+        this.reviewStats.set(response.stats || { totalReviews: 0, averageRating: 0, helpfulVotes: 0 });
+      });
+  }
 
   // Computed properties
   filteredReviews = computed(() => {
-    let filtered = this.reviews();
+    let filtered = [...this.reviews()];
     const query = this.searchQuery().toLowerCase();
     const currentFilters = this.filters();
 
     // Search filter
     if (query) {
-      filtered = filtered.filter(review => 
-        review.restaurantName.toLowerCase().includes(query) ||
+      filtered = filtered.filter(review =>
+        review.businessName.toLowerCase().includes(query) ||
         review.title.toLowerCase().includes(query) ||
-        review.content.toLowerCase().includes(query) ||
-        review.tags.some(tag => tag.toLowerCase().includes(query))
+        review.comment.toLowerCase().includes(query)
       );
-    }
-
-    // Status filter
-    if (currentFilters.status !== 'all') {
-      filtered = filtered.filter(review => review.status === currentFilters.status);
     }
 
     // Rating filter
@@ -232,7 +140,7 @@ export class UserReviewsComponent {
     if (currentFilters.timeRange !== 'all') {
       const now = new Date();
       const cutoffDate = new Date();
-      
+
       switch (currentFilters.timeRange) {
         case 'week':
           cutoffDate.setDate(now.getDate() - 7);
@@ -247,17 +155,17 @@ export class UserReviewsComponent {
           cutoffDate.setFullYear(now.getFullYear() - 1);
           break;
       }
-      
-      filtered = filtered.filter(review => review.createdAt >= cutoffDate);
+
+      filtered = filtered.filter(review => new Date(review.createdAt) >= cutoffDate);
     }
 
     // Sort
     switch (currentFilters.sortBy) {
       case 'newest':
-        filtered.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         break;
       case 'oldest':
-        filtered.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+        filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         break;
       case 'rating_high':
         filtered.sort((a, b) => b.rating - a.rating);
@@ -266,16 +174,11 @@ export class UserReviewsComponent {
         filtered.sort((a, b) => a.rating - b.rating);
         break;
       case 'helpful':
-        filtered.sort((a, b) => b.helpfulVotes - a.helpfulVotes);
+        filtered.sort((a, b) => b.helpfulCount - a.helpfulCount);
         break;
     }
 
     return filtered;
-  });
-
-  helpfulnessPercentage = computed(() => {
-    const stats = this.reviewStats();
-    return stats.totalVotes > 0 ? Math.round((stats.helpfulVotes / stats.totalVotes) * 100) : 0;
   });
 
   // Action methods
@@ -304,36 +207,35 @@ export class UserReviewsComponent {
 
   confirmDelete(): void {
     const reviewToDelete = this.selectedReview();
-    if (reviewToDelete) {
-      const updatedReviews = this.reviews().filter(r => r.id !== reviewToDelete.id);
-      this.reviews.set(updatedReviews);
-      
-      // Update stats
-      const stats = this.reviewStats();
-      this.reviewStats.set({
-        ...stats,
-        totalReviews: stats.totalReviews - 1,
-        helpfulVotes: stats.helpfulVotes - reviewToDelete.helpfulVotes,
-        totalVotes: stats.totalVotes - reviewToDelete.totalVotes
+    if (!reviewToDelete) return;
+
+    const userId = this.currentUser()?.id || localStorage.getItem('user_id');
+    this.deleting.set(true);
+
+    this.http.delete(`${environment.apiUrl}/reviews/${reviewToDelete.id}`, {
+      params: { userId: userId || '' }
+    })
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(err => {
+          console.error('Error deleting review:', err);
+          this.error.set('Failed to delete review');
+          return of(null);
+        }),
+        finalize(() => this.deleting.set(false))
+      )
+      .subscribe(response => {
+        if (response !== null) {
+          this.loadReviews();
+          this.showDeleteConfirm.set(false);
+          this.selectedReview.set(null);
+        }
       });
-    }
-    this.showDeleteConfirm.set(false);
-    this.selectedReview.set(null);
   }
 
   cancelDelete(): void {
     this.showDeleteConfirm.set(false);
     this.selectedReview.set(null);
-  }
-
-  toggleReviewVisibility(reviewId: string): void {
-    const reviews = this.reviews();
-    const updatedReviews = reviews.map(review => 
-      review.id === reviewId 
-        ? { ...review, isPublic: !review.isPublic }
-        : review
-    );
-    this.reviews.set(updatedReviews);
   }
 
   updateFilters(newFilters: Partial<FilterOptions>): void {
@@ -356,7 +258,8 @@ export class UserReviewsComponent {
     return Array(5).fill(false).map((_, i) => i < Math.floor(rating));
   }
 
-  formatDate(date: Date): string {
+  formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',

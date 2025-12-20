@@ -1,0 +1,159 @@
+<div class="bookings-page">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <h1><span class="icon">📅</span> My Bookings</h1>
+      <p>Manage your restaurant reservations</p>
+    </div>
+    <a routerLink="/restaurants" class="btn-primary">
+      <span>🔍</span> Find Restaurants
+    </a>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button
+      type="button"
+      class="tab"
+      [class.active]="activeTab() === 'upcoming'"
+      (click)="setActiveTab('upcoming')">
+      Upcoming ({{ upcomingBookings().length }})
+    </button>
+    <button
+      type="button"
+      class="tab"
+      [class.active]="activeTab() === 'past'"
+      (click)="setActiveTab('past')">
+      Past ({{ pastBookings().length }})
+    </button>
+    <button
+      type="button"
+      class="tab"
+      [class.active]="activeTab() === 'cancelled'"
+      (click)="setActiveTab('cancelled')">
+      Cancelled ({{ cancelledBookings().length }})
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="bookings-content">
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading bookings...</p>
+      </div>
+    } @else if (error()) {
+      <div class="error-state">
+        <span class="icon">⚠️</span>
+        <p>{{ error() }}</p>
+        <button type="button" class="btn-retry" (click)="loadBookings()">Try Again</button>
+      </div>
+    } @else if (currentBookings().length === 0) {
+      <div class="empty-state">
+        <span class="icon">📅</span>
+        <h3>No {{ activeTab() }} bookings</h3>
+        <p>@if (activeTab() === 'upcoming') {
+          You don't have any upcoming reservations.
+        } @else if (activeTab() === 'past') {
+          You haven't completed any reservations yet.
+        } @else {
+          You don't have any cancelled bookings.
+        }</p>
+        @if (activeTab() === 'upcoming') {
+          <a routerLink="/restaurants" class="btn-primary">Find a Restaurant</a>
+        }
+      </div>
+    } @else {
+      <div class="bookings-list">
+        @for (booking of currentBookings(); track booking.id) {
+          <div class="booking-card">
+            <div class="booking-header">
+              <div class="restaurant-info">
+                <span class="restaurant-icon">🍽️</span>
+                <div>
+                  <h3>{{ booking.business_name }}</h3>
+                  <span class="booking-ref">Ref: {{ booking.booking_reference }}</span>
+                </div>
+              </div>
+              <span class="status-badge" [class]="getStatusClass(booking.status)">
+                {{ getStatusLabel(booking.status) }}
+              </span>
+            </div>
+
+            <div class="booking-details">
+              <div class="detail-item">
+                <span class="label">📆 Date</span>
+                <span class="value">{{ formatDate(booking.booking_date) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">🕐 Time</span>
+                <span class="value">{{ formatTime(booking.booking_time) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">👥 Party Size</span>
+                <span class="value">{{ booking.party_size }} guests</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">🎫 Tier</span>
+                <span class="value tier-badge">{{ getTierLabel(booking.booking_tier) }}</span>
+              </div>
+            </div>
+
+            @if (booking.special_requests) {
+              <div class="special-requests">
+                <span class="label">📝 Special Requests:</span>
+                <p>{{ booking.special_requests }}</p>
+              </div>
+            }
+
+            @if (booking.occasion) {
+              <div class="occasion">
+                <span class="label">🎉 Occasion:</span>
+                <span>{{ booking.occasion }}</span>
+              </div>
+            }
+
+            <div class="booking-footer">
+              <div class="contact-info">
+                <span>📞 {{ booking.business_phone || 'N/A' }}</span>
+                <span>✉️ {{ booking.business_email || 'N/A' }}</span>
+              </div>
+              <div class="actions">
+                @if (canCancel(booking)) {
+                  <button type="button" class="btn-cancel" (click)="openCancelModal(booking)">
+                    Cancel Booking
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Cancel Modal -->
+  @if (showCancelModal()) {
+    <div class="modal-overlay" (click)="closeCancelModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Cancel Booking</h2>
+          <button type="button" class="close-btn" (click)="closeCancelModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to cancel your booking at <strong>{{ selectedBooking()?.business_name }}</strong>?</p>
+          <p class="booking-info">{{ formatDate(selectedBooking()?.booking_date || '') }} at {{ formatTime(selectedBooking()?.booking_time || '') }}</p>
+          <label for="reason">Reason for cancellation (optional):</label>
+          <textarea id="reason" [(ngModel)]="cancellationReason" placeholder="Enter reason..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeCancelModal()">Keep Booking</button>
+          <button type="button" class="btn-danger" (click)="confirmCancellation()" [disabled]="cancelling()">
+            {{ cancelling() ? 'Cancelling...' : 'Confirm Cancellation' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

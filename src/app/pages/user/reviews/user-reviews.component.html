@@ -28,17 +28,17 @@
         <div class="stat-content">
           <h3>{{ reviewStats().totalReviews }}</h3>
           <p>Total Reviews</p>
-          <div class="stat-change">{{ reviewStats().reviewsThisMonth }} this month</div>
+          <div class="stat-change">Share your experiences</div>
         </div>
       </div>
 
       <div class="stat-card average-rating">
         <div class="stat-icon">⭐</div>
         <div class="stat-content">
-          <h3>{{ reviewStats().averageRating.toFixed(1) }}</h3>
+          <h3>{{ reviewStats().averageRating?.toFixed(1) || '0.0' }}</h3>
           <p>Average Rating</p>
           <div class="rating-stars">
-            @for (star of getStarArray(reviewStats().averageRating); track $index) {
+            @for (star of getStarArray(reviewStats().averageRating || 0); track $index) {
               <span class="star" [class.filled]="star">⭐</span>
             }
           </div>
@@ -50,16 +50,7 @@
         <div class="stat-content">
           <h3>{{ reviewStats().helpfulVotes }}</h3>
           <p>Helpful Votes</p>
-          <div class="stat-change">{{ helpfulnessPercentage() }}% helpful</div>
-        </div>
-      </div>
-
-      <div class="stat-card review-streak">
-        <div class="stat-icon">🔥</div>
-        <div class="stat-content">
-          <h3>{{ reviewStats().reviewStreak }}</h3>
-          <p>Review Streak</p>
-          <div class="stat-change">Keep it up!</div>
+          <div class="stat-change">People found your reviews helpful</div>
         </div>
       </div>
     </div>
@@ -160,16 +151,16 @@
             <!-- Review Header -->
             <div class="review-header">
               <div class="restaurant-info">
-                @if (review.restaurantImage) {
-                  <img [src]="review.restaurantImage" [alt]="review.restaurantName" class="restaurant-image">
-                } @else {
-                  <div class="restaurant-placeholder">🏪</div>
-                }
+                <div class="restaurant-placeholder">🏪</div>
                 <div class="restaurant-details">
-                  <h3 class="restaurant-name">{{ review.restaurantName }}</h3>
+                  <h3 class="restaurant-name">{{ review.businessName }}</h3>
                   <div class="review-meta">
-                    <span class="visit-date">{{ formatDate(review.visitDate) }}</span>
-                    <span class="price-range">{{ getPriceRangeDisplay(review.priceRange) }}</span>
+                    @if (review.visitDate) {
+                      <span class="visit-date">{{ formatDate(review.visitDate) }}</span>
+                    }
+                    @if (review.businessType) {
+                      <span class="business-type">{{ review.businessType }}</span>
+                    }
                   </div>
                 </div>
               </div>
@@ -181,9 +172,6 @@
                 <div class="action-menu">
                   <button type="button" class="action-btn" (click)="editReview(review)">
                     ✏️
-                  </button>
-                  <button type="button" class="action-btn" (click)="toggleReviewVisibility(review.id)">
-                    {{ review.isPublic ? '👁️' : '🙈' }}
                   </button>
                   <button type="button" class="action-btn delete" (click)="deleteReview(review.id)">
                     🗑️
@@ -201,64 +189,15 @@
                   }
                   <span class="rating-value">{{ review.rating }}/5</span>
                 </div>
-                <div class="detailed-ratings">
-                  <div class="rating-item">
-                    <span class="rating-label">Food</span>
-                    <div class="rating-bar">
-                      <div class="rating-fill" [style.width.%]="(review.foodRating / 5) * 100"></div>
-                    </div>
-                    <span class="rating-number">{{ review.foodRating }}</span>
-                  </div>
-                  <div class="rating-item">
-                    <span class="rating-label">Service</span>
-                    <div class="rating-bar">
-                      <div class="rating-fill" [style.width.%]="(review.serviceRating / 5) * 100"></div>
-                    </div>
-                    <span class="rating-number">{{ review.serviceRating }}</span>
-                  </div>
-                  <div class="rating-item">
-                    <span class="rating-label">Ambiance</span>
-                    <div class="rating-bar">
-                      <div class="rating-fill" [style.width.%]="(review.ambianceRating / 5) * 100"></div>
-                    </div>
-                    <span class="rating-number">{{ review.ambianceRating }}</span>
-                  </div>
-                  <div class="rating-item">
-                    <span class="rating-label">Value</span>
-                    <div class="rating-bar">
-                      <div class="rating-fill" [style.width.%]="(review.valueRating / 5) * 100"></div>
-                    </div>
-                    <span class="rating-number">{{ review.valueRating }}</span>
-                  </div>
-                </div>
               </div>
 
               <h4 class="review-title">{{ review.title }}</h4>
-              <p class="review-text">{{ review.content }}</p>
+              <p class="review-text">{{ review.comment }}</p>
 
-              @if (review.dishesOrdered.length > 0) {
-                <div class="dishes-ordered">
-                  <h5>Dishes Ordered:</h5>
-                  <div class="dishes-list">
-                    @for (dish of review.dishesOrdered; track dish) {
-                      <span class="dish-tag">{{ dish }}</span>
-                    }
-                  </div>
-                </div>
-              }
-
-              @if (review.photos.length > 0) {
+              @if (review.images && review.images.length > 0) {
                 <div class="review-photos">
-                  @for (photo of review.photos; track photo) {
-                    <img [src]="photo" [alt]="'Photo from ' + review.restaurantName" class="review-photo">
-                  }
-                </div>
-              }
-
-              @if (review.tags.length > 0) {
-                <div class="review-tags">
-                  @for (tag of review.tags; track tag) {
-                    <span class="tag">{{ tag.replace('_', ' ') | titlecase }}</span>
+                  @for (photo of review.images; track photo) {
+                    <img [src]="photo" [alt]="'Photo from ' + review.businessName" class="review-photo">
                   }
                 </div>
               }
@@ -268,24 +207,16 @@
             <div class="review-footer">
               <div class="review-stats">
                 <span class="helpful-votes">
-                  👍 {{ review.helpfulVotes }} helpful
+                  👍 {{ review.helpfulCount }} helpful
                 </span>
-                <span class="total-votes">
-                  ({{ review.totalVotes }} votes)
-                </span>
-                <span class="visibility">
-                  {{ review.isPublic ? '🌍 Public' : '🔒 Private' }}
-                </span>
+                @if (review.wouldRecommend) {
+                  <span class="recommend">✅ Recommends</span>
+                }
               </div>
               <div class="review-dates">
                 <span class="created-date">
                   Created {{ formatDate(review.createdAt) }}
                 </span>
-                @if (review.updatedAt.getTime() !== review.createdAt.getTime()) {
-                  <span class="updated-date">
-                    Updated {{ formatDate(review.updatedAt) }}
-                  </span>
-                }
               </div>
             </div>
           </article>
@@ -304,12 +235,14 @@
         <button type="button" class="modal-close" (click)="cancelDelete()">×</button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to delete your review for <strong>{{ selectedReview()?.restaurantName }}</strong>?</p>
+        <p>Are you sure you want to delete your review for <strong>{{ selectedReview()?.businessName }}</strong>?</p>
         <p class="warning-text">This action cannot be undone.</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn-secondary" (click)="cancelDelete()">Cancel</button>
-        <button type="button" class="btn-danger" (click)="confirmDelete()">Delete Review</button>
+        <button type="button" class="btn-secondary" (click)="cancelDelete()" [disabled]="deleting()">Cancel</button>
+        <button type="button" class="btn-danger" (click)="confirmDelete()" [disabled]="deleting()">
+          {{ deleting() ? 'Deleting...' : 'Delete Review' }}
+        </button>
       </div>
     </div>
   </div>

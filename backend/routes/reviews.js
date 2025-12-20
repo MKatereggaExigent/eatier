@@ -158,5 +158,212 @@ router.post('/business/:businessId/vote', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/reviews/user/:userId
+ * Get all reviews by a specific user (for user dashboard)
+ */
+router.get('/user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { status, page = 1, limit = 20 } = req.query;
+    const offset = (page - 1) * limit;
+
+    // Handle guest users
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (userId === 'temp-user' || !uuidRegex.test(userId)) {
+      return res.json({
+        reviews: [],
+        stats: { totalReviews: 0, averageRating: 0, helpfulVotes: 0 },
+        pagination: { page: parseInt(page), limit: parseInt(limit), total: 0 }
+      });
+    }
+
+    let query = `
+      SELECT
+        r.*,
+        b.business_name,
+        b.business_type
+      FROM reviews r
+      JOIN businesses b ON r.business_id = b.id
+      WHERE r.user_id = $1
+    `;
+
+    const params = [userId];
+
+    if (status && status !== 'all') {
+      query += ` AND r.status = $${params.length + 1}`;
+      params.push(status);
+    }
+
+    query += ` ORDER BY r.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
+
+    const result = await pool.query(query, params);
+
+    // Get stats
+    const statsResult = await pool.query(`
+      SELECT
+        COUNT(*) as total_reviews,
+        AVG(rating)::DECIMAL(3,2) as average_rating,
+        SUM(helpful_count) as helpful_votes
+      FROM reviews
+      WHERE user_id = $1
+    `, [userId]);
+
+    const stats = statsResult.rows[0];
+
+    res.json({
+      reviews: result.rows.map(r => ({
+        id: r.id,
+        businessId: r.business_id,
+        businessName: r.business_name,
+        businessType: r.business_type,
+        rating: r.rating,
+        title: r.title,
+        comment: r.comment,
+        images: r.images || [],
+        visitDate: r.visit_date,
+        wouldRecommend: r.would_recommend,
+        helpfulCount: r.helpful_count || 0,
+        notHelpfulCount: r.not_helpful_count || 0,
+        status: r.status,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at
+      })),
+      stats: {
+        totalReviews: parseInt(stats.total_reviews) || 0,
+        averageRating: parseFloat(stats.average_rating) || 0,
+        helpfulVotes: parseInt(stats.helpful_votes) || 0
+      },
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: parseInt(stats.total_reviews) || 0
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching user reviews:', error);
+    res.status(500).json({ error: 'Failed to fetch user reviews' });
+  }
+});
+
+/**
+ * POST /api/reviews
+ * Create a new review
+ */
+router.post('/', async (req, res) => {
+  try {
+    const {
+      userId,
+      businessId,
+      rating,
+      title,
+      comment,
+      images,
+      visitDate,
+      wouldRecommend,
+      status = 'published'
+    } = req.body;
+
+    if (!userId || !businessId || !rating) {
+      return res.status(400).json({ error: 'User ID, business ID, and rating are required' });
+    }
+
+    // Get tenant_id from business
+    const businessResult = await pool.query('SELECT tenant_id FROM businesses WHERE id = $1', [businessId]);
+    if (businessResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+    const tenantId = businessResult.rows[0].tenant_id;
+
+    const result = await pool.query(`
+      INSERT INTO reviews (
+        tenant_id, business_id, user_id, rating, title, comment,
+        images, visit_date, would_recommend, status
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING *
+    `, [
+      tenantId, businessId, userId, rating, title || '', comment || '',
+      images || [], visitDate, wouldRecommend !== false, status
+    ]);
+
+    res.status(201).json(result.rows[0]);
+
+  } catch (error) {
+    console.error('Error creating review:', error);
+    res.status(500).json({ error: 'Failed to create review' });
+  }
+});
+
+/**
+ * PUT /api/reviews/:reviewId
+ * Update a review (only by the owner)
+ */
+router.put('/:reviewId', async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const { userId, rating, title, comment, images, visitDate, wouldRecommend, status } = req.body;
+
+    // Verify ownership
+    const ownerCheck = await pool.query('SELECT user_id FROM reviews WHERE id = $1', [reviewId]);
+    if (ownerCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+    if (ownerCheck.rows[0].user_id !== userId) {
+      return res.status(403).json({ error: 'Not authorized to edit this review' });
+    }
+
+    const result = await pool.query(`
+      UPDATE reviews SET
+        rating = COALESCE($1, rating),
+        title = COALESCE($2, title),
+        comment = COALESCE($3, comment),
+        images = COALESCE($4, images),
+        visit_date = COALESCE($5, visit_date),
+        would_recommend = COALESCE($6, would_recommend),
+        status = COALESCE($7, status),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $8
+      RETURNING *
+    `, [rating, title, comment, images, visitDate, wouldRecommend, status, reviewId]);
+
+    res.json(result.rows[0]);
+
+  } catch (error) {
+    console.error('Error updating review:', error);
+    res.status(500).json({ error: 'Failed to update review' });
+  }
+});
+
+/**
+ * DELETE /api/reviews/:reviewId
+ * Delete a review (only by the owner)
+ */
+router.delete('/:reviewId', async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const { userId } = req.query;
+
+    // Verify ownership
+    const ownerCheck = await pool.query('SELECT user_id FROM reviews WHERE id = $1', [reviewId]);
+    if (ownerCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+    if (ownerCheck.rows[0].user_id !== userId) {
+      return res.status(403).json({ error: 'Not authorized to delete this review' });
+    }
+
+    await pool.query('DELETE FROM reviews WHERE id = $1', [reviewId]);
+
+    res.json({ message: 'Review deleted successfully' });
+
+  } catch (error) {
+    console.error('Error deleting review:', error);
+    res.status(500).json({ error: 'Failed to delete review' });
+  }
+});
+
 module.exports = router;
 

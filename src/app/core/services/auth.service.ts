@@ -67,7 +67,10 @@ export class AuthService {
 
     if (token && userJson) {
       try {
-        const user = JSON.parse(userJson) as User;
+        const storedUser = JSON.parse(userJson);
+        // Transform stored user data to ensure proper typing
+        // This handles cases where user data was stored before proper transformation was in place
+        const user = this.transformBackendUserToFrontend(storedUser);
         this.setCurrentUser(user);
       } catch (error) {
         console.error('Error parsing stored user data:', error);
@@ -284,13 +287,221 @@ export class AuthService {
       localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
     }
 
+    // Transform backend response to proper frontend User type
+    const transformedUser = this.transformBackendUserToFrontend(response.user);
+
     // Store user information
-    localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
+    localStorage.setItem(this.USER_KEY, JSON.stringify(transformedUser));
 
     // Update current user state
-    this.setCurrentUser(response.user);
+    this.setCurrentUser(transformedUser);
 
     console.log('🔑 Token stored in localStorage:', localStorage.getItem(this.TOKEN_KEY)?.substring(0, 20) + '...');
+  }
+
+  /**
+   * Transform backend user response to proper frontend User type
+   * The backend returns a flat user object, we need to transform it to the proper typed structure
+   */
+  private transformBackendUserToFrontend(backendUser: any): User {
+    const baseUser = {
+      id: backendUser.id,
+      email: backendUser.email,
+      firstName: backendUser.firstName || backendUser.first_name || '',
+      lastName: backendUser.lastName || backendUser.last_name || '',
+      phone: backendUser.phone,
+      avatar: backendUser.profilePhoto || backendUser.avatar || backendUser.avatar_url,
+      status: this.mapAccountStatus(backendUser.accountStatus || backendUser.account_status),
+      createdAt: backendUser.createdAt ? new Date(backendUser.createdAt) : new Date(),
+      updatedAt: backendUser.updatedAt ? new Date(backendUser.updatedAt) : new Date(),
+      emailVerified: backendUser.emailVerified ?? true,
+      phoneVerified: backendUser.phoneVerified ?? false
+    };
+
+    // Normalize role string to UserRole enum
+    const role = this.normalizeRole(backendUser.role);
+
+    switch (role) {
+      case UserRole.EATIER:
+        return {
+          ...baseUser,
+          role: UserRole.EATIER,
+          permissions: backendUser.permissions || ['*'],
+          managedAccounts: backendUser.managedAccounts || {
+            totalBusinesses: 0,
+            totalUsers: 0,
+            totalSpecialists: 0,
+            pendingVerifications: 0
+          },
+          systemAccess: backendUser.systemAccess || {
+            canManageUsers: true,
+            canManageBusinesses: true,
+            canManageContent: true,
+            canViewAnalytics: true,
+            canManageSubscriptions: true
+          }
+        } as ItiyumAdmin;
+
+      case UserRole.BUSINESS:
+        return {
+          ...baseUser,
+          role: UserRole.BUSINESS,
+          businessId: backendUser.businessId,
+          businessName: backendUser.businessName || '',
+          businessType: backendUser.businessType || 'restaurant',
+          subscriptionStatus: backendUser.subscriptionStatus || 'trial',
+          businessVerified: backendUser.businessVerified || false,
+          businessProfile: backendUser.businessProfile || {
+            description: '',
+            address: '',
+            city: '',
+            country: '',
+            phone: '',
+            website: '',
+            openingHours: {}
+          },
+          businessMetrics: backendUser.businessMetrics || {
+            averageRating: 0,
+            totalReviews: 0,
+            monthlyViews: 0,
+            favoriteCount: 0
+          }
+        } as BusinessOwner;
+
+      case UserRole.FOOD_ENTHUSIAST:
+        return {
+          ...baseUser,
+          role: UserRole.FOOD_ENTHUSIAST,
+          enthusiastProfile: backendUser.enthusiastProfile || {
+            bio: '',
+            expertise: [],
+            yearsOfExperience: 0,
+            certifications: []
+          },
+          preferences: backendUser.preferences || {
+            cuisineTypes: [],
+            dietaryRestrictions: [],
+            priceRange: 'moderate',
+            adventurousness: 'moderate'
+          },
+          activity: backendUser.activity || {
+            favoriteRestaurants: [],
+            reviewCount: 0,
+            averageRating: 0,
+            photosShared: 0,
+            followersCount: 0,
+            followingCount: 0,
+            badgesEarned: []
+          },
+          reviewingStats: backendUser.reviewingStats || {
+            totalReviews: 0,
+            helpfulVotes: 0,
+            featuredReviews: 0,
+            reviewerRank: 'newcomer'
+          },
+          explorationGoals: backendUser.explorationGoals || {
+            cuisinesToTry: [],
+            restaurantsWishlist: [],
+            monthlyGoal: 5
+          }
+        } as FoodEnthusiast;
+
+      case UserRole.SPECIALIST:
+        return {
+          ...baseUser,
+          role: UserRole.SPECIALIST,
+          specialistType: backendUser.specialistType || 'chef',
+          professionalProfile: backendUser.professionalProfile || {
+            title: '',
+            bio: '',
+            specialties: [],
+            experience: 0,
+            certifications: [],
+            languages: ['English'],
+            availability: { days: [], hours: '' }
+          },
+          serviceOfferings: backendUser.serviceOfferings || [],
+          pricing: backendUser.pricing || { hourlyRate: 0, currency: 'USD' },
+          portfolio: backendUser.portfolio || { images: [], videos: [], description: '' },
+          businessMetrics: backendUser.businessMetrics || {
+            rating: 0,
+            reviewCount: 0,
+            bookingCount: 0,
+            repeatClientRate: 0,
+            responseTime: 24
+          },
+          verification: backendUser.verification || {
+            identityVerified: false,
+            backgroundCheckPassed: false,
+            insuranceVerified: false,
+            certificationVerified: false
+          }
+        } as Specialist;
+
+      case UserRole.NORMAL_USER:
+      default:
+        return {
+          ...baseUser,
+          role: UserRole.NORMAL_USER,
+          preferences: backendUser.preferences || {
+            cuisineTypes: [],
+            dietaryRestrictions: [],
+            priceRange: 'moderate',
+            maxDistance: 10
+          },
+          activity: backendUser.activity || {
+            favoriteRestaurants: [],
+            recentSearches: [],
+            reviewCount: 0,
+            ordersCount: 0
+          },
+          quickAccess: backendUser.quickAccess || {
+            frequentOrders: [],
+            savedAddresses: []
+          }
+        } as NormalUser;
+    }
+  }
+
+  /**
+   * Map backend account status to UserStatus enum
+   */
+  private mapAccountStatus(status: string): UserStatus {
+    switch (status?.toLowerCase()) {
+      case 'active': return UserStatus.ACTIVE;
+      case 'inactive': return UserStatus.INACTIVE;
+      case 'suspended': return UserStatus.SUSPENDED;
+      case 'pending_verification': return UserStatus.PENDING_VERIFICATION;
+      default: return UserStatus.ACTIVE;
+    }
+  }
+
+  /**
+   * Normalize role string from backend to UserRole enum
+   */
+  private normalizeRole(role: string): UserRole {
+    if (!role) return UserRole.NORMAL_USER;
+
+    const normalizedRole = role.toLowerCase().replace(/\s+/g, '_');
+
+    switch (normalizedRole) {
+      case 'itiyum_admin':
+      case 'eatier':
+      case 'admin':
+        return UserRole.EATIER;
+      case 'business_owner':
+      case 'business':
+        return UserRole.BUSINESS;
+      case 'food_enthusiast':
+        return UserRole.FOOD_ENTHUSIAST;
+      case 'specialist':
+      case 'chef':
+        return UserRole.SPECIALIST;
+      case 'normal_user':
+      case 'user':
+      default:
+        return UserRole.NORMAL_USER;
+    }
   }
 
   private clearAuthData(): void {

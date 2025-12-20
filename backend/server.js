@@ -131,6 +131,13 @@ const specialistRoutes = require('./routes/specialist');
 const publicSpecialistRoutes = require('./routes/public-specialist');
 const uploadRoutes = require('./routes/uploads');
 const favoritesRoutes = require('./routes/favorites');
+const userPreferencesRoutes = require('./routes/user-preferences');
+const ordersRoutes = require('./routes/orders');
+const memberPromotionsRoutes = require('./routes/member-promotions');
+const bookingIncentivesRoutes = require('./routes/booking-incentives');
+const userWalletRoutes = require('./routes/user-wallet');
+const socialRoutes = require('./routes/social');
+const recommendationsRoutes = require('./routes/recommendations');
 
 // Static file serving for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -164,6 +171,13 @@ app.use('/api/specialist', specialistRoutes); // Specialist dashboard endpoints
 app.use('/api/public/specialists', publicSpecialistRoutes); // Public specialist discovery
 app.use('/api/uploads', uploadRoutes); // File upload endpoints
 app.use('/api/favorites', favoritesRoutes); // User favorites endpoints
+app.use('/api/user-preferences', userPreferencesRoutes); // User preferences for personalization
+app.use('/api/orders', ordersRoutes); // Order history and management
+app.use('/api/member-promotions', memberPromotionsRoutes); // Member-only promotions
+app.use('/api/booking-incentives', bookingIncentivesRoutes); // Booking discounts/cashback
+app.use('/api/wallet', userWalletRoutes); // User wallet/cashback
+app.use('/api/social', socialRoutes); // Social features (follow, activity feed)
+app.use('/api/recommendations', recommendationsRoutes); // Personalized recommendations
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -20,6 +20,9 @@ interface NavigationItem {
 export class UserDashboardComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+
+  // Mobile menu state
+  mobileMenuOpen = signal(false);
 
   currentUser = this.authService.currentUser;
   userRole = this.authService.userRole;
@@ -66,11 +69,15 @@ export class UserDashboardComponent {
       default:
         return [
           { path: 'overview', label: 'Overview', icon: '📊' },
-          { path: 'profile', label: 'Profile', icon: '👤' },
           { path: 'favorites', label: 'Favorites', icon: '❤️' },
+          { path: 'orders', label: 'Order History', icon: '📦' },
+          { path: 'bookings', label: 'Bookings', icon: '📅' },
           { path: 'reviews', label: 'My Reviews', icon: '⭐' },
-          { path: 'ads', label: 'Manage My Ads', icon: '📢' },
-          { path: 'bookings', label: 'Bookings', icon: '📋' }
+          { path: 'promotions', label: 'Deals', icon: '🎉' },
+          { path: 'wallet', label: 'Wallet', icon: '💳' },
+          { path: 'social', label: 'Social', icon: '👥' },
+          { path: 'preferences', label: 'Preferences', icon: '🎯' },
+          { path: 'profile', label: 'Profile', icon: '👤' }
         ];
     }
   });
@@ -90,6 +97,30 @@ export class UserDashboardComponent {
         return 'My Itiyum';
     }
   });
+
+  getUserDisplayName(): string {
+    const user = this.currentUser();
+    if (!user) return 'User';
+
+    // Try firstName + lastName first
+    const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+    if (fullName) return fullName;
+
+    // Fallback to email (without domain) if no name
+    if (user.email) {
+      return user.email.split('@')[0];
+    }
+
+    return 'User';
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen.update(open => !open);
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
+  }
 
   logout(): void {
     this.authService.logout();

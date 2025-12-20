@@ -1,9 +1,24 @@
-<div class="user-overview">
-  <!-- Welcome Section -->
-  <div class="welcome-section">
-    <h1>Welcome back, {{ currentUser()?.firstName }}!</h1>
-    <p>Discover new restaurants and share your culinary experiences.</p>
-  </div>
+<div class="user-overview" role="main" aria-label="User Dashboard">
+  <!-- Header Section -->
+  <header class="overview-header">
+    <div class="header-content">
+      <div class="welcome-section">
+        <h1 class="page-title">
+          <span class="title-icon">👋</span>
+          Welcome back, {{ currentUser()?.firstName || 'User' }}!
+        </h1>
+        <p class="page-subtitle">
+          Discover new restaurants, manage your bookings, and share your culinary experiences.
+        </p>
+      </div>
+      <div class="header-actions">
+        <a routerLink="/restaurants" class="btn-primary">
+          <span class="btn-icon">🔍</span>
+          Explore Restaurants
+        </a>
+      </div>
+    </div>
+  </header>
 
   <!-- Error Banner -->
   @if (hasErrors()) {
@@ -14,227 +29,375 @@
         <p>Please check your connection and try again.</p>
       </div>
       <button type="button" class="retry-btn" (click)="refreshData()">
-        🔄 Retry
+        <span>🔄</span> Retry
       </button>
     </div>
   }
 
-  <!-- Stats Cards -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      @if (loading().stats) {
-        <div class="stat-skeleton">
-          <div class="skeleton-icon"></div>
-          <div class="skeleton-content">
-            <div class="skeleton-number"></div>
-            <div class="skeleton-label"></div>
+  <!-- Stats Section -->
+  <section class="stats-section" aria-label="Your Activity Stats">
+    <div class="stats-grid">
+      <div class="stat-card reviews">
+        @if (loading().stats) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+            </div>
           </div>
-        </div>
-      } @else {
-        <div class="stat-icon">📝</div>
-        <div class="stat-content">
-          <h3>{{ stats().totalReviews }}</h3>
-          <p>Reviews Written</p>
-        </div>
-      }
-    </div>
-
-    <div class="stat-card">
-      @if (loading().stats) {
-        <div class="stat-skeleton">
-          <div class="skeleton-icon"></div>
-          <div class="skeleton-content">
-            <div class="skeleton-number"></div>
-            <div class="skeleton-label"></div>
+        } @else {
+          <div class="stat-icon">📝</div>
+          <div class="stat-content">
+            <h3>{{ stats().totalReviews }}</h3>
+            <p>Reviews Written</p>
+            <span class="stat-description">Share your experiences</span>
           </div>
-        </div>
-      } @else {
-        <div class="stat-icon">❤️</div>
-        <div class="stat-content">
-          <h3>{{ stats().totalFavorites }}</h3>
-          <p>Favorite Places</p>
-        </div>
-      }
-    </div>
-
-    <div class="stat-card">
-      @if (loading().stats) {
-        <div class="stat-skeleton">
-          <div class="skeleton-icon"></div>
-          <div class="skeleton-content">
-            <div class="skeleton-number"></div>
-            <div class="skeleton-label"></div>
-          </div>
-        </div>
-      } @else {
-        <div class="stat-icon">📅</div>
-        <div class="stat-content">
-          <h3>{{ stats().totalBookings }}</h3>
-          <p>Bookings Made</p>
-        </div>
-      }
-    </div>
-
-    <div class="stat-card">
-      @if (loading().stats) {
-        <div class="stat-skeleton">
-          <div class="skeleton-icon"></div>
-          <div class="skeleton-content">
-            <div class="skeleton-number"></div>
-            <div class="skeleton-label"></div>
-          </div>
-        </div>
-      } @else {
-        <div class="stat-icon">📸</div>
-        <div class="stat-content">
-          <h3>{{ stats().totalPhotos }}</h3>
-          <p>Photos Shared</p>
-        </div>
-      }
-    </div>
-  </div>
-
-  <!-- Quick Actions -->
-  <div class="quick-actions">
-    <h2>Quick Actions</h2>
-    <div class="action-grid">
-      <a routerLink="/restaurants" class="action-card">
-        <div class="action-icon">🔍</div>
-        <h3>Find Restaurants</h3>
-        <p>Discover new places to eat</p>
-      </a>
-
-      <a routerLink="reviews" class="action-card">
-        <div class="action-icon">✍️</div>
-        <h3>Write a Review</h3>
-        <p>Share your dining experience</p>
-      </a>
-
-      <a routerLink="favorites" class="action-card">
-        <div class="action-icon">⭐</div>
-        <h3>My Favorites</h3>
-        <p>View your saved restaurants</p>
-      </a>
-
-      <a routerLink="profile" class="action-card">
-        <div class="action-icon">👤</div>
-        <h3>Update Profile</h3>
-        <p>Manage your preferences</p>
-      </a>
-    </div>
-  </div>
-
-  <!-- Recent Activity -->
-  <div class="recent-activity">
-    <div class="section-header">
-      <h2>Recent Activity</h2>
-      <a routerLink="reviews" class="view-all">View All</a>
-    </div>
-
-    @if (loading().activity) {
-      <div class="activity-loading">
-        <div class="loading-spinner"></div>
-        <p>Loading activity...</p>
+        }
       </div>
-    } @else if (errors().activity) {
-      <div class="activity-error" role="alert">
-        <span class="error-icon">⚠️</span>
-        <p>{{ errors().activity }}</p>
-        <button type="button" class="retry-btn" (click)="refreshData()">
-          🔄 Retry
-        </button>
+
+      <div class="stat-card favorites">
+        @if (loading().stats) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+            </div>
+          </div>
+        } @else {
+          <div class="stat-icon">❤️</div>
+          <div class="stat-content">
+            <h3>{{ stats().totalFavorites }}</h3>
+            <p>Favorite Places</p>
+            <span class="stat-description">Your saved restaurants</span>
+          </div>
+        }
       </div>
-    } @else if (recentActivity().length === 0) {
-      <div class="no-activity">
-        <p>No recent activity. Start exploring restaurants!</p>
+
+      <div class="stat-card bookings">
+        @if (loading().stats) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+            </div>
+          </div>
+        } @else {
+          <div class="stat-icon">📅</div>
+          <div class="stat-content">
+            <h3>{{ stats().totalBookings }}</h3>
+            <p>Bookings Made</p>
+            <span class="stat-description">Restaurant reservations</span>
+          </div>
+        }
       </div>
-    } @else {
-      <div class="activity-list">
-        @for (activity of recentActivity(); track activity.id) {
-          <div class="activity-item">
-            <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
-            <div class="activity-content">
-              <p><strong>{{ activity.action }}</strong>
-                @if (activity.business_name) {
-                  at {{ activity.business_name }}
-                }
-              </p>
-              @if (activity.rating) {
-                <div class="activity-rating">
-                  @for (star of getStarArray(activity.rating); track $index) {
-                    <span class="star" [class.filled]="star === 1">⭐</span>
+
+      <div class="stat-card photos">
+        @if (loading().stats) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+            </div>
+          </div>
+        } @else {
+          <div class="stat-icon">📸</div>
+          <div class="stat-content">
+            <h3>{{ stats().totalPhotos }}</h3>
+            <p>Photos Shared</p>
+            <span class="stat-description">Food moments captured</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Member Benefits Section -->
+  <section class="member-benefits-section" aria-label="Member Benefits">
+    <div class="benefits-grid">
+      <!-- Wallet Card -->
+      <div class="benefit-card wallet-card">
+        <div class="benefit-header">
+          <span class="benefit-icon">💳</span>
+          <h3>My Wallet</h3>
+          <a routerLink="wallet" class="view-link">View All →</a>
+        </div>
+        @if (loading().wallet) {
+          <div class="benefit-loading">
+            <div class="loading-spinner-small"></div>
+          </div>
+        } @else if (wallet()) {
+          <div class="wallet-balances">
+            <div class="balance-item">
+              <span class="balance-label">Cashback</span>
+              <span class="balance-value">${{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</span>
+            </div>
+            <div class="balance-item">
+              <span class="balance-label">Points</span>
+              <span class="balance-value">{{ wallet()?.loyaltyPoints || 0 }}</span>
+            </div>
+          </div>
+          <p class="benefit-hint">Earn rewards on every order!</p>
+        } @else {
+          <p class="benefit-empty">Start earning rewards today!</p>
+        }
+      </div>
+
+      <!-- Promotions Card -->
+      <div class="benefit-card promotions-card">
+        <div class="benefit-header">
+          <span class="benefit-icon">🎉</span>
+          <h3>Exclusive Deals</h3>
+          <a routerLink="promotions" class="view-link">View All →</a>
+        </div>
+        @if (loading().promotions) {
+          <div class="benefit-loading">
+            <div class="loading-spinner-small"></div>
+          </div>
+        } @else if (promotions().length > 0) {
+          <div class="promo-list">
+            @for (promo of promotions(); track promo.id) {
+              <div class="promo-item">
+                <span class="promo-discount">{{ getDiscountDisplay(promo) }}</span>
+                <span class="promo-title">{{ promo.title }}</span>
+                <button type="button" class="copy-code-btn" (click)="copyPromoCode(promo.code)" title="Copy code">
+                  {{ promo.code }}
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="benefit-empty">Check back for exclusive member deals!</p>
+        }
+      </div>
+
+      <!-- Social Card -->
+      <div class="benefit-card social-card">
+        <div class="benefit-header">
+          <span class="benefit-icon">👥</span>
+          <h3>Social</h3>
+          <a routerLink="social" class="view-link">Explore →</a>
+        </div>
+        <div class="social-actions">
+          <a routerLink="social" class="social-action-btn">
+            <span>📰</span> Activity Feed
+          </a>
+          <a routerLink="social" class="social-action-btn">
+            <span>🔍</span> Discover Foodies
+          </a>
+        </div>
+        <p class="benefit-hint">Connect with fellow food lovers!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Quick Actions Card -->
+    <section class="content-card quick-actions-card" aria-label="Quick Actions">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">⚡</span>
+          Quick Actions
+        </h2>
+      </div>
+      <div class="card-content">
+        <div class="action-grid">
+          <a routerLink="/restaurants" class="action-card">
+            <div class="action-icon">🔍</div>
+            <div class="action-info">
+              <h3>Find Restaurants</h3>
+              <p>Discover new places to eat</p>
+            </div>
+          </a>
+
+          <a routerLink="reviews" class="action-card">
+            <div class="action-icon">✍️</div>
+            <div class="action-info">
+              <h3>Write a Review</h3>
+              <p>Share your dining experience</p>
+            </div>
+          </a>
+
+          <a routerLink="favorites" class="action-card">
+            <div class="action-icon">⭐</div>
+            <div class="action-info">
+              <h3>My Favorites</h3>
+              <p>View saved restaurants</p>
+            </div>
+          </a>
+
+          <a routerLink="bookings" class="action-card">
+            <div class="action-icon">📅</div>
+            <div class="action-info">
+              <h3>My Bookings</h3>
+              <p>Manage reservations</p>
+            </div>
+          </a>
+
+          <a routerLink="profile" class="action-card">
+            <div class="action-icon">👤</div>
+            <div class="action-info">
+              <h3>Update Profile</h3>
+              <p>Manage your preferences</p>
+            </div>
+          </a>
+
+          <a routerLink="/community" class="action-card">
+            <div class="action-icon">💬</div>
+            <div class="action-info">
+              <h3>Community</h3>
+              <p>Join food discussions</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Activity Card -->
+    <section class="content-card activity-card" aria-label="Recent Activity">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">🕐</span>
+          Recent Activity
+        </h2>
+        <a routerLink="reviews" class="view-all-btn">View All</a>
+      </div>
+
+      <div class="card-content">
+        @if (loading().activity) {
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading activity...</p>
+          </div>
+        } @else if (errors().activity) {
+          <div class="error-state" role="alert">
+            <span class="error-icon">⚠️</span>
+            <p>{{ errors().activity }}</p>
+            <button type="button" class="retry-btn" (click)="refreshData()">
+              <span>🔄</span> Retry
+            </button>
+          </div>
+        } @else if (recentActivity().length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3>No recent activity</h3>
+            <p>Start exploring restaurants to see your activity here!</p>
+            <a routerLink="/restaurants" class="btn-primary">Explore Restaurants</a>
+          </div>
+        } @else {
+          <div class="activity-list">
+            @for (activity of recentActivity(); track activity.id) {
+              <div class="activity-item">
+                <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
+                <div class="activity-content">
+                  <p class="activity-action">
+                    <strong>{{ activity.action }}</strong>
+                    @if (activity.business_name) {
+                      <span class="activity-location">at {{ activity.business_name }}</span>
+                    }
+                  </p>
+                  @if (activity.rating) {
+                    <div class="activity-rating">
+                      @for (star of getStarArray(activity.rating); track $index) {
+                        <span class="star" [class.filled]="star === 1">⭐</span>
+                      }
+                    </div>
+                  }
+                  <span class="activity-date">{{ formatDate(activity.created_at) }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Favorite Restaurants Card -->
+    <section class="content-card favorites-card" aria-label="Your Favorites">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">❤️</span>
+          Your Favorites
+        </h2>
+        <a routerLink="favorites" class="view-all-btn">View All</a>
+      </div>
+
+      <div class="card-content">
+        @if (loading().favorites) {
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading favorites...</p>
+          </div>
+        } @else if (favoriteRestaurants().length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">❤️</div>
+            <h3>No favorites yet</h3>
+            <p>Start adding your favorite restaurants!</p>
+            <a routerLink="/restaurants" class="btn-primary">Find Restaurants</a>
+          </div>
+        } @else {
+          <div class="favorites-grid">
+            @for (favorite of favoriteRestaurants(); track favorite.id) {
+              <a [routerLink]="['/restaurants', favorite.business_id]" class="favorite-card">
+                <div class="favorite-icon">🏪</div>
+                <div class="favorite-info">
+                  <h4>{{ favorite.business_name }}</h4>
+                  @if (favorite.business_type) {
+                    <p class="cuisine">{{ favorite.business_type }}</p>
                   }
                 </div>
-              }
-              <span class="activity-date">{{ formatDate(activity.created_at) }}</span>
-            </div>
+                <span class="favorite-arrow">→</span>
+              </a>
+            }
           </div>
         }
       </div>
-    }
-  </div>
+    </section>
 
-  <!-- Favorite Restaurants -->
-  <div class="favorites">
-    <div class="section-header">
-      <h2>Your Favorite Places</h2>
-      <a routerLink="favorites" class="view-all">View All</a>
-    </div>
+    <!-- Recommended Restaurants Card -->
+    <section class="content-card recommendations-card" aria-label="Recommendations">
+      <div class="card-header">
+        <h2>
+          <span class="header-icon">🎯</span>
+          Recommended for You
+        </h2>
+        <a routerLink="/restaurants" class="view-all-btn">Explore More</a>
+      </div>
 
-    @if (loading().favorites) {
-      <div class="favorites-loading">
-        <div class="loading-spinner"></div>
-        <p>Loading favorites...</p>
-      </div>
-    } @else if (favoriteRestaurants().length === 0) {
-      <div class="no-favorites">
-        <p>No favorites yet. Start adding your favorite restaurants!</p>
-      </div>
-    } @else {
-      <div class="restaurant-grid">
-        @for (favorite of favoriteRestaurants(); track favorite.id) {
-          <a [routerLink]="['/restaurants', favorite.business_id]" class="restaurant-card">
-            <div class="restaurant-info">
-              <h4>{{ favorite.business_name }}</h4>
-              @if (favorite.business_type) {
-                <p class="cuisine">{{ favorite.business_type }}</p>
-              }
-            </div>
-          </a>
+      <div class="card-content">
+        @if (loading().recommendations) {
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading recommendations...</p>
+          </div>
+        } @else if (recommendedRestaurants().length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">🎯</div>
+            <h3>No recommendations yet</h3>
+            <p>Explore restaurants to get personalized suggestions!</p>
+            <a routerLink="/restaurants" class="btn-primary">Discover Restaurants</a>
+          </div>
+        } @else {
+          <div class="recommendations-grid">
+            @for (restaurant of recommendedRestaurants(); track restaurant.id) {
+              <a [routerLink]="['/restaurants', restaurant.id]" class="recommendation-card">
+                <div class="recommendation-icon">🍽️</div>
+                <div class="recommendation-info">
+                  <h4>{{ restaurant.business_name || restaurant.name }}</h4>
+                  @if (restaurant.business_type || restaurant.cuisine) {
+                    <p class="cuisine">{{ restaurant.business_type || restaurant.cuisine }}</p>
+                  }
+                </div>
+                <span class="recommendation-arrow">→</span>
+              </a>
+            }
+          </div>
         }
       </div>
-    }
-  </div>
-
-  <!-- Recommended Restaurants -->
-  <div class="recommendations">
-    <div class="section-header">
-      <h2>Recommended for You</h2>
-      <a routerLink="/restaurants" class="view-all">Explore More</a>
-    </div>
-
-    @if (loading().recommendations) {
-      <div class="recommendations-loading">
-        <div class="loading-spinner"></div>
-        <p>Loading recommendations...</p>
-      </div>
-    } @else if (recommendedRestaurants().length === 0) {
-      <div class="no-recommendations">
-        <p>No recommendations available. Explore restaurants to get personalized suggestions!</p>
-      </div>
-    } @else {
-      <div class="restaurant-grid">
-        @for (restaurant of recommendedRestaurants(); track restaurant.id) {
-          <a [routerLink]="['/restaurants', restaurant.id]" class="restaurant-card">
-            <div class="restaurant-info">
-              <h4>{{ restaurant.business_name || restaurant.name }}</h4>
-              @if (restaurant.business_type || restaurant.cuisine) {
-                <p class="cuisine">{{ restaurant.business_type || restaurant.cuisine }}</p>
-              }
-            </div>
-          </a>
-        }
-      </div>
-    }
+    </section>
   </div>
 </div>

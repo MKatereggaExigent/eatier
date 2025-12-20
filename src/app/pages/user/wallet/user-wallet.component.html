@@ -1,0 +1,116 @@
+<div class="wallet-container">
+  <div class="page-header">
+    <h1>💳 My Wallet</h1>
+    <p>Manage your cashback, loyalty points, and rewards</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading your wallet...</p>
+    </div>
+  } @else {
+    <!-- Balance Cards -->
+    <div class="balance-grid">
+      <div class="balance-card cashback">
+        <div class="card-icon">💰</div>
+        <div class="card-content">
+          <span class="label">Cashback Balance</span>
+          <span class="amount">${{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</span>
+        </div>
+        @if (wallet()?.cashbackBalance && wallet()!.cashbackBalance >= 5) {
+          <button 
+            type="button" 
+            class="redeem-btn" 
+            (click)="redeemCashback(wallet()!.cashbackBalance)"
+            [disabled]="redeeming()">
+            @if (redeeming()) {
+              Redeeming...
+            } @else {
+              Redeem All
+            }
+          </button>
+        }
+      </div>
+
+      <div class="balance-card loyalty">
+        <div class="card-icon">⭐</div>
+        <div class="card-content">
+          <span class="label">Loyalty Points</span>
+          <span class="amount">{{ wallet()?.loyaltyPoints || 0 }} pts</span>
+        </div>
+        <span class="conversion-hint">100 pts = $1.00</span>
+      </div>
+
+      <div class="balance-card earned">
+        <div class="card-icon">📈</div>
+        <div class="card-content">
+          <span class="label">Total Earned</span>
+          <span class="amount">${{ wallet()?.totalEarned?.toFixed(2) || '0.00' }}</span>
+        </div>
+      </div>
+
+      <div class="balance-card redeemed">
+        <div class="card-icon">🎁</div>
+        <div class="card-content">
+          <span class="label">Total Redeemed</span>
+          <span class="amount">${{ wallet()?.totalRedeemed?.toFixed(2) || '0.00' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to Earn Section -->
+    <div class="earn-section">
+      <h2>💡 How to Earn Rewards</h2>
+      <div class="earn-grid">
+        <div class="earn-card">
+          <span class="earn-icon">🍽️</span>
+          <h3>Order Food</h3>
+          <p>Earn 2% cashback on every order</p>
+        </div>
+        <div class="earn-card">
+          <span class="earn-icon">📅</span>
+          <h3>Make Bookings</h3>
+          <p>Get up to 5% cashback on reservations</p>
+        </div>
+        <div class="earn-card">
+          <span class="earn-icon">⭐</span>
+          <h3>Write Reviews</h3>
+          <p>Earn 10 loyalty points per review</p>
+        </div>
+        <div class="earn-card">
+          <span class="earn-icon">👥</span>
+          <h3>Refer Friends</h3>
+          <p>Get $5 for each friend who signs up</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="transactions-section">
+      <h2>📋 Transaction History</h2>
+      @if (transactions().length === 0) {
+        <div class="empty-transactions">
+          <span class="empty-icon">📭</span>
+          <p>No transactions yet. Start earning rewards!</p>
+        </div>
+      } @else {
+        <div class="transactions-list">
+          @for (transaction of transactions(); track transaction.id) {
+            <div class="transaction-row" [class]="getTransactionClass(transaction.type)">
+              <div class="transaction-icon">{{ getTransactionIcon(transaction.type) }}</div>
+              <div class="transaction-details">
+                <span class="transaction-desc">{{ transaction.description }}</span>
+                <span class="transaction-date">{{ formatDate(transaction.createdAt) }}</span>
+              </div>
+              <div class="transaction-amount" [class]="getTransactionClass(transaction.type)">
+                {{ formatAmount(transaction.amount, transaction.type) }}
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
+

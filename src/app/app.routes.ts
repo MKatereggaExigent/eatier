@@ -164,7 +164,12 @@ export const routes: Routes = [
             { path: 'digital-card', loadComponent: () => import('./pages/user/digital-card/user-digital-card.component').then(m => m.UserDigitalCardComponent) },
             { path: 'legacy-access', loadComponent: () => import('./pages/user/legacy-access/legacy-access.component').then(m => m.LegacyAccessComponent) },
             { path: 'accounts', loadComponent: () => import('./pages/user/accounts/user-accounts-center.component').then(m => m.UserAccountsCenterComponent) },
-            { path: 'bookings', loadComponent: () => import('./pages/user/bookings/bookings.component').then(m => m.BookingsComponent) }
+            { path: 'bookings', loadComponent: () => import('./pages/user/bookings/bookings.component').then(m => m.BookingsComponent) },
+            { path: 'preferences', loadComponent: () => import('./pages/user/preferences/user-preferences.component').then(m => m.UserPreferencesComponent) },
+            { path: 'orders', loadComponent: () => import('./pages/user/orders/user-orders.component').then(m => m.UserOrdersComponent) },
+            { path: 'wallet', loadComponent: () => import('./pages/user/wallet/user-wallet.component').then(m => m.UserWalletComponent) },
+            { path: 'promotions', loadComponent: () => import('./pages/user/promotions/user-promotions.component').then(m => m.UserPromotionsComponent) },
+            { path: 'social', loadComponent: () => import('./pages/user/social/user-social.component').then(m => m.UserSocialComponent) }
         ]
     },
 
