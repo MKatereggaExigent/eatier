@@ -83,6 +83,8 @@ CREATE TABLE users (
     country VARCHAR(100),
     date_of_birth DATE,
     gender VARCHAR(20),
+    role VARCHAR(50) DEFAULT 'normal_user',
+    is_chef BOOLEAN DEFAULT false,
     account_status VARCHAR(50) DEFAULT 'active',
     status VARCHAR(50) DEFAULT 'active',
     email_verified BOOLEAN DEFAULT false,
@@ -164,13 +166,21 @@ CREATE TABLE businesses (
     place_id VARCHAR(255),
     logo_url TEXT,
     cover_image_url TEXT,
+    background_image TEXT,
+    profile_photos JSONB DEFAULT '[]',
     cuisine_types TEXT[],
     price_range VARCHAR(10),
     average_rating DECIMAL(3, 2) DEFAULT 0,
     total_reviews INTEGER DEFAULT 0,
+    total_bookings INTEGER DEFAULT 0,
+    status VARCHAR(50) DEFAULT 'active',
     account_status VARCHAR(50) DEFAULT 'active',
     is_verified BOOLEAN DEFAULT false,
     is_featured BOOLEAN DEFAULT false,
+    sustainability_ethos TEXT,
+    opens_at TIME,
+    closes_at TIME,
+    facilities JSONB DEFAULT '[]',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -337,6 +347,7 @@ CREATE TABLE reviews (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
     rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
     food_rating INTEGER CHECK (food_rating BETWEEN 1 AND 5),
     service_rating INTEGER CHECK (service_rating BETWEEN 1 AND 5),
@@ -344,9 +355,16 @@ CREATE TABLE reviews (
     value_rating INTEGER CHECK (value_rating BETWEEN 1 AND 5),
     title VARCHAR(255),
     content TEXT,
+    comment TEXT,
+    images JSONB DEFAULT '[]',
     visit_date DATE,
     is_verified BOOLEAN DEFAULT false,
+    is_verified_visit BOOLEAN DEFAULT false,
+    would_recommend BOOLEAN DEFAULT true,
     helpful_count INTEGER DEFAULT 0,
+    not_helpful_count INTEGER DEFAULT 0,
+    response_from_owner TEXT,
+    response_date TIMESTAMP WITH TIME ZONE,
     external_id VARCHAR(255),
     source VARCHAR(50) DEFAULT 'platform',
     status VARCHAR(50) DEFAULT 'published',
@@ -371,11 +389,14 @@ CREATE TABLE review_photos (
 CREATE TABLE community_posts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    author_id UUID REFERENCES users(id) ON DELETE CASCADE,
     business_id UUID REFERENCES businesses(id) ON DELETE SET NULL,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
     title VARCHAR(255),
     content TEXT NOT NULL,
     post_type VARCHAR(50) DEFAULT 'general',
     image_urls TEXT[],
+    images JSONB DEFAULT '[]',
     video_url TEXT,
     tags TEXT[],
     likes_count INTEGER DEFAULT 0,
@@ -383,6 +404,7 @@ CREATE TABLE community_posts (
     shares_count INTEGER DEFAULT 0,
     is_pinned BOOLEAN DEFAULT false,
     is_featured BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
     status VARCHAR(50) DEFAULT 'published',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -513,6 +535,7 @@ CREATE TABLE ad_campaigns (
     description TEXT,
     headline VARCHAR(255),
     body_text TEXT,
+    type VARCHAR(50) DEFAULT 'banner',
     campaign_type VARCHAR(50) DEFAULT 'banner',
     placement VARCHAR(100),
     target_audience JSONB DEFAULT '{}',
@@ -607,6 +630,212 @@ CREATE TABLE notifications (
 );
 
 -- ============================================
+-- FAVORITES TABLE
+-- ============================================
+CREATE TABLE favorites (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
+    collection_id UUID,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, business_id)
+);
+
+-- ============================================
+-- FAVORITE_COLLECTIONS TABLE
+-- ============================================
+CREATE TABLE favorite_collections (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    is_public BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- CONTACT_INQUIRIES TABLE
+-- ============================================
+CREATE TABLE contact_inquiries (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(50),
+    subject VARCHAR(255),
+    message TEXT NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    response TEXT,
+    responded_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- AUTO_RESPONSE_TEMPLATES TABLE
+-- ============================================
+CREATE TABLE auto_response_templates (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    subject VARCHAR(255),
+    body TEXT NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    trigger_type VARCHAR(50) DEFAULT 'manual',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- CHAT_HISTORY TABLE
+-- ============================================
+CREATE TABLE chat_history (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    session_id VARCHAR(255),
+    role VARCHAR(50) NOT NULL,
+    content TEXT NOT NULL,
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- INTEGRATION_CONNECTIONS TABLE
+-- ============================================
+CREATE TABLE integration_connections (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    provider VARCHAR(100) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    credentials JSONB DEFAULT '{}',
+    settings JSONB DEFAULT '{}',
+    last_sync_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- SYNC_HISTORY TABLE
+-- ============================================
+CREATE TABLE sync_history (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    connection_id UUID REFERENCES integration_connections(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    sync_type VARCHAR(100),
+    status VARCHAR(50) DEFAULT 'pending',
+    records_synced INTEGER DEFAULT 0,
+    errors JSONB DEFAULT '[]',
+    started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP WITH TIME ZONE
+);
+
+-- ============================================
+-- SPECIALIST_BOOKINGS TABLE
+-- ============================================
+CREATE TABLE specialist_bookings (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    specialist_id UUID REFERENCES specialist_profiles(id) ON DELETE CASCADE,
+    client_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    service_id UUID REFERENCES specialist_services(id) ON DELETE SET NULL,
+    booking_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    notes TEXT,
+    total_amount DECIMAL(10, 2) DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- SPECIALIST_EARNINGS TABLE
+-- ============================================
+CREATE TABLE specialist_earnings (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    specialist_id UUID REFERENCES specialist_profiles(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    booking_id UUID REFERENCES specialist_bookings(id) ON DELETE SET NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    platform_fee DECIMAL(10, 2) DEFAULT 0,
+    net_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    paid_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- SPECIALIST_REVIEWS TABLE
+-- ============================================
+CREATE TABLE specialist_reviews (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    specialist_id UUID REFERENCES specialist_profiles(id) ON DELETE CASCADE,
+    client_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    booking_id UUID REFERENCES specialist_bookings(id) ON DELETE SET NULL,
+    rating INTEGER CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- BUSINESS_ANALYTICS TABLE
+-- ============================================
+CREATE TABLE business_analytics (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    date DATE NOT NULL,
+    period_type VARCHAR(20) DEFAULT 'daily',
+    total_views INTEGER DEFAULT 0,
+    unique_visitors INTEGER DEFAULT 0,
+    menu_views INTEGER DEFAULT 0,
+    profile_views INTEGER DEFAULT 0,
+    contact_clicks INTEGER DEFAULT 0,
+    qr_scans INTEGER DEFAULT 0,
+    share_count INTEGER DEFAULT 0,
+    average_session_duration INTEGER DEFAULT 0,
+    bounce_rate DECIMAL(5, 2) DEFAULT 0,
+    return_visitor_rate DECIMAL(5, 2) DEFAULT 0,
+    popular_menu_items JSONB DEFAULT '[]',
+    peak_hours JSONB DEFAULT '[]',
+    top_countries JSONB DEFAULT '[]',
+    device_types JSONB DEFAULT '{}',
+    referral_sources JSONB DEFAULT '[]',
+    views_growth DECIMAL(5, 2) DEFAULT 0,
+    engagement_growth DECIMAL(5, 2) DEFAULT 0,
+    customer_growth DECIMAL(5, 2) DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(business_id, date, period_type)
+);
+
+-- ============================================
+-- BUSINESS_SUBSCRIPTIONS TABLE
+-- ============================================
+CREATE TABLE business_subscriptions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    plan VARCHAR(50) DEFAULT 'free',
+    status VARCHAR(50) DEFAULT 'active',
+    monthly_price DECIMAL(10, 2) DEFAULT 0,
+    billing_cycle VARCHAR(20) DEFAULT 'monthly',
+    start_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    end_date TIMESTAMP WITH TIME ZONE,
+    cancelled_at TIMESTAMP WITH TIME ZONE,
+    features JSONB DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
 -- ADMIN_STATISTICS MATERIALIZED VIEW
 -- ============================================
 CREATE MATERIALIZED VIEW admin_statistics AS
@@ -638,3 +867,23 @@ CREATE INDEX idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX idx_user_roles_user_id ON user_roles(user_id);
 CREATE INDEX idx_user_roles_role_id ON user_roles(role_id);
 
+-- New table indexes
+CREATE INDEX idx_favorites_user_id ON favorites(user_id);
+CREATE INDEX idx_favorites_business_id ON favorites(business_id);
+CREATE INDEX idx_favorites_tenant_id ON favorites(tenant_id);
+CREATE INDEX idx_favorite_collections_user_id ON favorite_collections(user_id);
+CREATE INDEX idx_favorite_collections_tenant_id ON favorite_collections(tenant_id);
+CREATE INDEX idx_contact_inquiries_business_id ON contact_inquiries(business_id);
+CREATE INDEX idx_contact_inquiries_status ON contact_inquiries(status);
+CREATE INDEX idx_chat_history_user_id ON chat_history(user_id);
+CREATE INDEX idx_chat_history_session_id ON chat_history(session_id);
+CREATE INDEX idx_integration_connections_business_id ON integration_connections(business_id);
+CREATE INDEX idx_sync_history_connection_id ON sync_history(connection_id);
+CREATE INDEX idx_specialist_bookings_specialist_id ON specialist_bookings(specialist_id);
+CREATE INDEX idx_specialist_bookings_client_id ON specialist_bookings(client_id);
+CREATE INDEX idx_specialist_earnings_specialist_id ON specialist_earnings(specialist_id);
+CREATE INDEX idx_specialist_reviews_specialist_id ON specialist_reviews(specialist_id);
+CREATE INDEX idx_business_analytics_business_id ON business_analytics(business_id);
+CREATE INDEX idx_business_analytics_date ON business_analytics(date);
+CREATE INDEX idx_business_subscriptions_business_id ON business_subscriptions(business_id);
+CREATE INDEX idx_business_subscriptions_status ON business_subscriptions(status);

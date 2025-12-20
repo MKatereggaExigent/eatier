@@ -130,6 +130,7 @@ const reviewsRoutes = require('./routes/reviews');
 const specialistRoutes = require('./routes/specialist');
 const publicSpecialistRoutes = require('./routes/public-specialist');
 const uploadRoutes = require('./routes/uploads');
+const favoritesRoutes = require('./routes/favorites');
 
 // Static file serving for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -162,6 +163,7 @@ app.use('/api/public', publicStatsRoutes); // Public statistics endpoint
 app.use('/api/specialist', specialistRoutes); // Specialist dashboard endpoints
 app.use('/api/public/specialists', publicSpecialistRoutes); // Public specialist discovery
 app.use('/api/uploads', uploadRoutes); // File upload endpoints
+app.use('/api/favorites', favoritesRoutes); // User favorites endpoints
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
