@@ -41,3 +41,21 @@ testem.log
 .DS_Store
 Thumbs.db
 .vercel
+
+# Environment files (NEVER commit with real values)
+.env
+.env.local
+.env.development
+.env.staging
+.env.production
+backend/.env
+backend/.env.local
+backend/.env.development
+backend/.env.staging
+backend/.env.production
+
+# Keep template files (safe to commit)
+!.env.*.template
+
+# Azure
+.azure/

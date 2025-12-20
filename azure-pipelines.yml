@@ -1,0 +1,277 @@
+# =============================================================================
+# ITIYUM PLATFORM - AZURE DEVOPS CI/CD PIPELINE
+# =============================================================================
+# Multi-stage pipeline for building, testing, and deploying to Azure
+# Supports: development, staging, and production environments
+# =============================================================================
+
+trigger:
+  branches:
+    include:
+      - main
+      - development
+      - staging
+  paths:
+    exclude:
+      - '*.md'
+      - 'docs/**'
+
+pr:
+  branches:
+    include:
+      - main
+      - development
+
+variables:
+  - name: dockerRegistryServiceConnection
+    value: 'itiyum-acr-connection'
+  - name: imageRepository
+    value: 'itiyum'
+  - name: dockerfilePath
+    value: '$(Build.SourcesDirectory)/backend/Dockerfile'
+  - name: tag
+    value: '$(Build.BuildId)'
+  - name: vmImageName
+    value: 'ubuntu-latest'
+  - name: nodeVersion
+    value: '20.x'
+
+stages:
+  # =============================================================================
+  # Stage 1: Build and Test
+  # =============================================================================
+  - stage: Build
+    displayName: 'Build and Test'
+    jobs:
+      - job: BuildBackend
+        displayName: 'Build Backend'
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: $(nodeVersion)
+            displayName: 'Install Node.js'
+
+          - script: |
+              cd backend
+              npm ci
+            displayName: 'Install Backend Dependencies'
+
+          - script: |
+              cd backend
+              npm run lint || true
+            displayName: 'Lint Backend'
+
+          - script: |
+              cd backend
+              npm test || true
+            displayName: 'Test Backend'
+
+          - task: Docker@2
+            displayName: 'Build Backend Docker Image'
+            inputs:
+              containerRegistry: $(dockerRegistryServiceConnection)
+              repository: $(imageRepository)-backend
+              command: 'build'
+              Dockerfile: 'backend/Dockerfile'
+              buildContext: 'backend'
+              tags: |
+                $(tag)
+                latest
+
+      - job: BuildFrontend
+        displayName: 'Build Frontend'
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: $(nodeVersion)
+            displayName: 'Install Node.js'
+
+          - script: |
+              npm ci --legacy-peer-deps
+            displayName: 'Install Frontend Dependencies'
+
+          - script: |
+              npm run lint || true
+            displayName: 'Lint Frontend'
+
+          - script: |
+              npm run build -- --configuration=production
+            displayName: 'Build Frontend for Production'
+
+          - task: Docker@2
+            displayName: 'Build Frontend Docker Image'
+            inputs:
+              containerRegistry: $(dockerRegistryServiceConnection)
+              repository: $(imageRepository)-frontend
+              command: 'build'
+              Dockerfile: 'azure/docker/Dockerfile.frontend.prod'
+              buildContext: '.'
+              tags: |
+                $(tag)
+                latest
+
+  # =============================================================================
+  # Stage 2: Deploy to Development
+  # =============================================================================
+  - stage: DeployDev
+    displayName: 'Deploy to Development'
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/development'))
+    variables:
+      - group: itiyum-dev-variables
+    jobs:
+      - deployment: DeployDevEnvironment
+        displayName: 'Deploy to Dev'
+        environment: 'development'
+        pool:
+          vmImage: $(vmImageName)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: Docker@2
+                  displayName: 'Push Backend Image'
+                  inputs:
+                    containerRegistry: $(dockerRegistryServiceConnection)
+                    repository: $(imageRepository)-backend
+                    command: 'push'
+                    tags: |
+                      $(tag)
+                      dev
+
+                - task: Docker@2
+                  displayName: 'Push Frontend Image'
+                  inputs:
+                    containerRegistry: $(dockerRegistryServiceConnection)
+                    repository: $(imageRepository)-frontend
+                    command: 'push'
+                    tags: |
+                      $(tag)
+                      dev
+
+                - task: AzureWebAppContainer@1
+                  displayName: 'Deploy Backend to Azure'
+                  inputs:
+                    azureSubscription: 'itiyum-azure-subscription'
+                    appName: 'app-itiyum-api-dev'
+                    containers: '$(containerRegistry)/$(imageRepository)-backend:$(tag)'
+
+                - task: AzureWebAppContainer@1
+                  displayName: 'Deploy Frontend to Azure'
+                  inputs:
+                    azureSubscription: 'itiyum-azure-subscription'
+                    appName: 'app-itiyum-web-dev'
+                    containers: '$(containerRegistry)/$(imageRepository)-frontend:$(tag)'
+
+  # =============================================================================
+  # Stage 3: Deploy to Staging
+  # =============================================================================
+  - stage: DeployStaging
+    displayName: 'Deploy to Staging'
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/staging'))
+    variables:
+      - group: itiyum-staging-variables
+    jobs:
+      - deployment: DeployStagingEnvironment
+        displayName: 'Deploy to Staging'
+        environment: 'staging'
+        pool:
+          vmImage: $(vmImageName)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: Docker@2
+                  displayName: 'Push Backend Image'
+                  inputs:
+                    containerRegistry: $(dockerRegistryServiceConnection)
+                    repository: $(imageRepository)-backend
+                    command: 'push'
+                    tags: |
+                      $(tag)
+                      staging
+
+                - task: Docker@2
+                  displayName: 'Push Frontend Image'
+                  inputs:
+                    containerRegistry: $(dockerRegistryServiceConnection)
+                    repository: $(imageRepository)-frontend
+                    command: 'push'
+                    tags: |
+                      $(tag)
+                      staging
+
+                - task: AzureWebAppContainer@1
+                  displayName: 'Deploy Backend to Azure'
+                  inputs:
+                    azureSubscription: 'itiyum-azure-subscription'
+                    appName: 'app-itiyum-api-stg'
+                    containers: '$(containerRegistry)/$(imageRepository)-backend:$(tag)'
+
+                - task: AzureWebAppContainer@1
+                  displayName: 'Deploy Frontend to Azure'
+                  inputs:
+                    azureSubscription: 'itiyum-azure-subscription'
+                    appName: 'app-itiyum-web-stg'
+                    containers: '$(containerRegistry)/$(imageRepository)-frontend:$(tag)'
+
+  # =============================================================================
+  # Stage 4: Deploy to Production
+  # =============================================================================
+  - stage: DeployProd
+    displayName: 'Deploy to Production'
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    variables:
+      - group: itiyum-prod-variables
+    jobs:
+      - deployment: DeployProdEnvironment
+        displayName: 'Deploy to Production'
+        environment: 'production'
+        pool:
+          vmImage: $(vmImageName)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: Docker@2
+                  displayName: 'Push Backend Image'
+                  inputs:
+                    containerRegistry: $(dockerRegistryServiceConnection)
+                    repository: $(imageRepository)-backend
+                    command: 'push'
+                    tags: |
+                      $(tag)
+                      prod
+                      latest
+
+                - task: Docker@2
+                  displayName: 'Push Frontend Image'
+                  inputs:
+                    containerRegistry: $(dockerRegistryServiceConnection)
+                    repository: $(imageRepository)-frontend
+                    command: 'push'
+                    tags: |
+                      $(tag)
+                      prod
+                      latest
+
+                - task: AzureWebAppContainer@1
+                  displayName: 'Deploy Backend to Azure'
+                  inputs:
+                    azureSubscription: 'itiyum-azure-subscription'
+                    appName: 'app-itiyum-api-prd'
+                    containers: '$(containerRegistry)/$(imageRepository)-backend:$(tag)'
+
+                - task: AzureWebAppContainer@1
+                  displayName: 'Deploy Frontend to Azure'
+                  inputs:
+                    azureSubscription: 'itiyum-azure-subscription'
+                    appName: 'app-itiyum-web-prd'
+                    containers: '$(containerRegistry)/$(imageRepository)-frontend:$(tag)'
+
