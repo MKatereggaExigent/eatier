@@ -459,10 +459,11 @@ router.get('/public', async (req, res) => {
 
     const params = [];
 
-    // Filter by placement
+    // Filter by placement - use LIKE to match placement prefix
+    // (e.g., 'header_banner' matches 'header_banner_premium', 'header_banner_basic', etc.)
     if (placement) {
-      params.push(placement);
-      query += ` AND p.name = $${params.length}`;
+      params.push(placement + '%');
+      query += ` AND p.name LIKE $${params.length}`;
     }
 
     // Filter by tier
