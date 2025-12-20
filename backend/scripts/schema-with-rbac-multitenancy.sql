@@ -508,16 +508,44 @@ CREATE TABLE ad_placements (
 );
 
 -- Insert default placements for each tier
+-- Header banner placements (all tiers)
 INSERT INTO ad_placements (tier_id, name, display_name, description, page_location, position, width, height, sort_order)
 SELECT id, 'header_banner_' || name, 'Header Banner (' || display_name || ')', 'Top of page banner', 'homepage', 'header', 728, 90, 1
 FROM ad_space_tiers;
 
+-- Sidebar placements (all tiers)
 INSERT INTO ad_placements (tier_id, name, display_name, description, page_location, position, width, height, sort_order)
 SELECT id, 'sidebar_' || name, 'Sidebar (' || display_name || ')', 'Sidebar advertisement', 'all_pages', 'sidebar', 300, 250, 2
 FROM ad_space_tiers;
 
+-- Restaurant list placements (all tiers)
 INSERT INTO ad_placements (tier_id, name, display_name, description, page_location, position, width, height, sort_order)
 SELECT id, 'restaurant_list_' || name, 'Restaurant List (' || display_name || ')', 'In restaurant listings', 'restaurant_list', 'inline', 468, 60, 3
+FROM ad_space_tiers;
+
+-- Homepage banner placements (all tiers)
+INSERT INTO ad_placements (tier_id, name, display_name, description, page_location, position, width, height, sort_order)
+SELECT id, 'homepage_banner_' || name, 'Homepage Banner (' || display_name || ')', 'Homepage hero banner', 'homepage', 'hero', 1200, 400, 4
+FROM ad_space_tiers;
+
+-- Footer banner placements (all tiers)
+INSERT INTO ad_placements (tier_id, name, display_name, description, page_location, position, width, height, sort_order)
+SELECT id, 'footer_banner_' || name, 'Footer Banner (' || display_name || ')', 'Footer advertisement', 'all_pages', 'footer', 728, 90, 5
+FROM ad_space_tiers;
+
+-- Inline content placements (all tiers)
+INSERT INTO ad_placements (tier_id, name, display_name, description, page_location, position, width, height, sort_order)
+SELECT id, 'inline_content_' || name, 'Inline Content (' || display_name || ')', 'In-content advertisement', 'all_pages', 'inline', 600, 200, 6
+FROM ad_space_tiers;
+
+-- Community feed placements (all tiers)
+INSERT INTO ad_placements (tier_id, name, display_name, description, page_location, position, width, height, sort_order)
+SELECT id, 'community_feed_' || name, 'Community Feed (' || display_name || ')', 'Community feed advertisement', 'community', 'feed', 500, 300, 7
+FROM ad_space_tiers;
+
+-- Specialist list placements (all tiers)
+INSERT INTO ad_placements (tier_id, name, display_name, description, page_location, position, width, height, sort_order)
+SELECT id, 'specialist_list_' || name, 'Specialist List (' || display_name || ')', 'Specialist listings advertisement', 'specialists', 'inline', 468, 60, 8
 FROM ad_space_tiers;
 
 -- ============================================

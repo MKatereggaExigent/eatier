@@ -158,7 +158,190 @@ FROM tenants t WHERE t.slug = 'itiyum';
 
 -- Assign admin role to admin user
 INSERT INTO user_roles (user_id, role_id)
-SELECT u.id, r.id 
-FROM users u, roles r 
+SELECT u.id, r.id
+FROM users u, roles r
 WHERE u.email = 'admin@itiyum.com' AND r.name = 'Itiyum Admin';
+
+-- ============================================
+-- CREATE DEMO BUSINESS FOR ADS
+-- ============================================
+INSERT INTO businesses (
+    name,
+    description,
+    address,
+    city,
+    country,
+    phone,
+    email,
+    website,
+    category,
+    cuisine_type,
+    price_range,
+    rating,
+    status,
+    is_verified,
+    tenant_id
+)
+SELECT
+    'Demo Restaurant',
+    'A demo restaurant for testing ad campaigns',
+    '123 Demo Street',
+    'Demo City',
+    'Demo Country',
+    '+1234567890',
+    'demo@restaurant.com',
+    'https://demo-restaurant.com',
+    'restaurant',
+    ARRAY['Italian', 'Mediterranean'],
+    '$$',
+    4.5,
+    'active',
+    true,
+    t.id
+FROM tenants t WHERE t.slug = 'itiyum'
+ON CONFLICT DO NOTHING;
+
+-- ============================================
+-- CREATE DEMO AD CAMPAIGNS
+-- ============================================
+-- Demo Header Banner Ad (Premium tier)
+INSERT INTO ad_campaigns (
+    business_id,
+    tenant_id,
+    tier_id,
+    placement_id,
+    name,
+    title,
+    description,
+    headline,
+    body_text,
+    type,
+    status,
+    is_active,
+    is_approved,
+    total_budget,
+    daily_budget,
+    remaining_amount,
+    start_date,
+    priority_score
+)
+SELECT
+    b.id,
+    t.id,
+    tier.id,
+    p.id,
+    'Demo Header Banner Campaign',
+    'Welcome to Demo Restaurant',
+    'Experience the finest Italian cuisine in town',
+    'Authentic Italian Dining',
+    'Visit us for an unforgettable culinary experience. Fresh ingredients, traditional recipes.',
+    'banner',
+    'active',
+    true,
+    true,
+    500.00,
+    25.00,
+    500.00,
+    CURRENT_DATE,
+    75
+FROM businesses b, tenants t, ad_space_tiers tier, ad_placements p
+WHERE b.name = 'Demo Restaurant'
+    AND t.slug = 'itiyum'
+    AND tier.name = 'premium'
+    AND p.name = 'header_banner_premium'
+ON CONFLICT DO NOTHING;
+
+-- Demo Sidebar Ad (Standard tier)
+INSERT INTO ad_campaigns (
+    business_id,
+    tenant_id,
+    tier_id,
+    placement_id,
+    name,
+    title,
+    description,
+    headline,
+    body_text,
+    type,
+    status,
+    is_active,
+    is_approved,
+    total_budget,
+    daily_budget,
+    remaining_amount,
+    start_date,
+    priority_score
+)
+SELECT
+    b.id,
+    t.id,
+    tier.id,
+    p.id,
+    'Demo Sidebar Campaign',
+    'Special Lunch Menu',
+    'Check out our daily lunch specials',
+    'Lunch Specials',
+    'Fresh daily specials from $12.99. Dine in or takeaway.',
+    'banner',
+    'active',
+    true,
+    true,
+    200.00,
+    15.00,
+    200.00,
+    CURRENT_DATE,
+    50
+FROM businesses b, tenants t, ad_space_tiers tier, ad_placements p
+WHERE b.name = 'Demo Restaurant'
+    AND t.slug = 'itiyum'
+    AND tier.name = 'standard'
+    AND p.name = 'sidebar_standard'
+ON CONFLICT DO NOTHING;
+
+-- Demo Restaurant List Ad (Basic tier)
+INSERT INTO ad_campaigns (
+    business_id,
+    tenant_id,
+    tier_id,
+    placement_id,
+    name,
+    title,
+    description,
+    headline,
+    body_text,
+    type,
+    status,
+    is_active,
+    is_approved,
+    total_budget,
+    daily_budget,
+    remaining_amount,
+    start_date,
+    priority_score
+)
+SELECT
+    b.id,
+    t.id,
+    tier.id,
+    p.id,
+    'Demo Restaurant List Campaign',
+    'Find Us in the List',
+    'Look for our special offers',
+    'New Location Open!',
+    'We have opened a new location near you. Visit today!',
+    'banner',
+    'active',
+    true,
+    true,
+    100.00,
+    10.00,
+    100.00,
+    CURRENT_DATE,
+    25
+FROM businesses b, tenants t, ad_space_tiers tier, ad_placements p
+WHERE b.name = 'Demo Restaurant'
+    AND t.slug = 'itiyum'
+    AND tier.name = 'basic'
+    AND p.name = 'restaurant_list_basic'
+ON CONFLICT DO NOTHING;
 
