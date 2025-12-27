@@ -1,0 +1,189 @@
+<div class="user-detail-container">
+  <!-- Header -->
+  <div class="detail-header">
+    <button type="button" class="back-btn" (click)="goBack()">
+      ← Back to Users
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading user details...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error() && !loading()) {
+    <div class="error-state">
+      <p>{{ error() }}</p>
+      <button type="button" class="retry-btn" (click)="loadUser(user()?.id || '')">
+        Try Again
+      </button>
+    </div>
+  }
+
+  <!-- User Content -->
+  @if (user() && !loading() && !error()) {
+    <!-- User Header Card -->
+    <div class="user-header-card">
+      <div class="user-avatar">
+        @if (user()!.avatar) {
+          <img [src]="user()!.avatar" [alt]="user()!.firstName" class="avatar-image">
+        } @else {
+          <div class="avatar-placeholder">
+            {{ user()!.firstName.charAt(0) }}{{ user()!.lastName.charAt(0) }}
+          </div>
+        }
+      </div>
+
+      <div class="user-info">
+        <h1 class="user-name">{{ user()!.firstName }} {{ user()!.lastName }}</h1>
+        <p class="user-email">{{ user()!.email }}</p>
+        <div class="user-badges">
+          <span class="role-badge" [class]="'role-' + user()!.role">
+            {{ getRoleIcon(user()!.role) }} {{ getRoleLabel(user()!.role) }}
+          </span>
+          <span class="status-badge" [class]="'status-' + user()!.status">
+            {{ user()!.status | titlecase }}
+          </span>
+          @if (user()!.emailVerified) {
+            <span class="verified-badge">✓ Verified</span>
+          }
+        </div>
+      </div>
+
+      <div class="user-actions">
+        @if (user()!.status === 'active') {
+          <button
+            type="button"
+            class="action-btn suspend-btn"
+            (click)="suspendUser()"
+            [disabled]="actionLoading()">
+            {{ actionLoading() ? 'Processing...' : '⏸️ Suspend User' }}
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="action-btn activate-btn"
+            (click)="activateUser()"
+            [disabled]="actionLoading()">
+            {{ actionLoading() ? 'Processing...' : '▶️ Activate User' }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-value">{{ user()!.totalBookings }}</div>
+        <div class="stat-label">Bookings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-value">{{ user()!.totalReviews }}</div>
+        <div class="stat-label">Reviews</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">❤️</div>
+        <div class="stat-value">{{ user()!.totalFavorites }}</div>
+        <div class="stat-label">Favorites</div>
+      </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="details-grid">
+      <!-- Account Information -->
+      <div class="detail-card">
+        <h3 class="card-title">Account Information</h3>
+        <div class="detail-row">
+          <span class="label">Email</span>
+          <span class="value">{{ user()!.email }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Phone</span>
+          <span class="value">{{ user()!.phone || 'Not provided' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Role</span>
+          <span class="value">{{ getRoleLabel(user()!.role) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Status</span>
+          <span class="value">{{ user()!.status | titlecase }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Email Verified</span>
+          <span class="value">{{ user()!.emailVerified ? 'Yes' : 'No' }}</span>
+        </div>
+      </div>
+
+      <!-- Activity Information -->
+      <div class="detail-card">
+        <h3 class="card-title">Activity</h3>
+        <div class="detail-row">
+          <span class="label">Joined</span>
+          <span class="value">{{ formatDate(user()!.createdAt) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Last Login</span>
+          <span class="value">
+            @if (user()!.lastLoginAt) {
+              {{ formatDateTime(user()!.lastLoginAt!) }}
+            } @else {
+              Never
+            }
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Last Updated</span>
+          <span class="value">{{ formatDate(user()!.updatedAt) }}</span>
+        </div>
+      </div>
+
+      <!-- Business Information (if applicable) -->
+      @if (user()!.businessId) {
+        <div class="detail-card">
+          <h3 class="card-title">Business</h3>
+          <div class="detail-row">
+            <span class="label">Business Name</span>
+            <span class="value">{{ user()!.businessName }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Business Type</span>
+            <span class="value">{{ user()!.businessType | titlecase }}</span>
+          </div>
+          <button
+            type="button"
+            class="view-business-btn"
+            (click)="viewBusiness(user()!.businessId!)">
+            View Business Details →
+          </button>
+        </div>
+      }
+
+      <!-- Tenant Information -->
+      @if (user()!.tenantName) {
+        <div class="detail-card">
+          <h3 class="card-title">Organization</h3>
+          <div class="detail-row">
+            <span class="label">Tenant</span>
+            <span class="value">{{ user()!.tenantName }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Toast -->
+@if (toast()) {
+  <div class="toast" [class]="'toast-' + toast()!.type" (click)="toast.set(null)">
+    <span>{{ toast()!.message }}</span>
+    <button type="button" class="toast-close">×</button>
+  </div>
+}
+

@@ -193,6 +193,15 @@ export class AdminService {
   }
 
   /**
+   * Get single user by ID
+   */
+  getUser(userId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/users/${userId}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
    * Get businesses list
    */
   getBusinesses(page: number = 1, limit: number = 100, search?: string, status?: string, businessType?: string, verified?: string): Observable<any> {

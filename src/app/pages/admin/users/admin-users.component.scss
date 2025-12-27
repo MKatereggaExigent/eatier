@@ -1,215 +1,123 @@
-// Admin Users Component Styles - NYT Theme
-// Import NYT fonts
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+// ===================================
+// ADMIN USERS - NYT EDITORIAL DESIGN
+// Clean, Typographic, Professional
+// ===================================
 
-// NYT-themed CSS Variables (matching global design system)
-:host {
-  // Primary Colors - NYT Style
-  --clr-primary-50: #f0f9ff;
-  --clr-primary-100: #e0f2fe;
-  --clr-primary-200: #bae6fd;
-  --clr-primary-300: #7dd3fc;
-  --clr-primary-400: #38bdf8;
-  --clr-primary-500: #0ea5e9;
-  --clr-primary-600: #0284c7;
-  --clr-primary-700: #0369a1;
-  --clr-primary-800: #075985;
-  --clr-primary-900: #0c4a6e;
+// Design Variables - Same as admin-overview
+$color-black: #121212;
+$color-dark-gray: #333333;
+$color-medium-gray: #666666;
+$color-light-gray: #999999;
+$color-border: #e0e0e0;
+$color-border-dark: #cccccc;
+$color-bg-light: #f7f7f7;
+$color-white: #ffffff;
 
-  // Secondary Colors - NYT Black
-  --clr-secondary-50: #fafafa;
-  --clr-secondary-100: #f5f5f5;
-  --clr-secondary-200: #e5e5e5;
-  --clr-secondary-300: #d4d4d4;
-  --clr-secondary-400: #a3a3a3;
-  --clr-secondary-500: #737373;
-  --clr-secondary-600: #525252;
-  --clr-secondary-700: #404040;
-  --clr-secondary-800: #262626;
-  --clr-secondary-900: #000000;
+$font-serif: 'Noto Serif', Georgia, 'Times New Roman', serif;
+$font-sans: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  // Background Colors - NYT White
-  --bg-gradient-primary: #ffffff;
-  --bg-gradient-card: #ffffff;
+$border-thin: 1px solid $color-border;
+$border-medium: 2px solid $color-black;
+$border-thick: 3px solid $color-black;
 
-  // Semantic Colors - NYT Style
-  --clr-success: #16a34a;
-  --clr-warning: #d97706;
-  --clr-error: #dc2626;
-  --clr-info: #0284c7;
+// Minimal animations
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-  // Spacing Scale
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --space-24: 6rem;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-  // Typography Scale
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-  --text-5xl: 3rem;
-  --text-6xl: 3.75rem;
-
-  // Font Weights
-  --font-light: 300;
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-  --font-extrabold: 800;
-
-  // Border Radius
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
-  --radius-full: 9999px;
-
-  // Transitions
-  --transition-fast: 150ms ease-in-out;
-  --transition-normal: 250ms ease-in-out;
-  --transition-slow: 350ms ease-in-out;
-
-  // Component-specific variables
-  --primary-color: #0284c7;
-  --primary-hover: #0369a1;
-  --secondary-color: #000000;
-  --success-color: #16a34a;
-  --warning-color: #d97706;
-  --error-color: #dc2626;
-  --info-color: #0284c7;
-
-  // Glass effect variables - NYT style (solid colors)
-  --glass-white: #ffffff;
-  --glass-white-strong: #ffffff;
-
-  // Shadow variables - NYT minimal shadows
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-xl: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 // Main Container
 .admin-users {
   min-height: 100vh;
-  background: #ffffff; // NYT white background
-  color: #000000; // NYT black text
-  padding: var(--space-6);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: $color-white;
+  color: $color-black;
+  padding: 2rem clamp(1rem, 3vw, 3rem);
 }
 
 // Header Section
 .users-header {
-  margin-bottom: var(--space-8);
+  margin-bottom: 2rem;
+  border-bottom: $border-thick;
+  padding-bottom: 1.5rem;
 
   .header-content {
-    margin-bottom: var(--space-6);
+    margin-bottom: 1.5rem;
 
     .title-section {
       .page-title {
-        font-family: 'Noto Serif', Georgia, 'Times New Roman', serif; // NYT serif font
-        font-size: var(--text-3xl);
-        font-weight: var(--font-bold);
-        color: #000000; // NYT black text
-        margin: 0 0 var(--space-2) 0;
+        font-family: $font-serif;
+        font-size: clamp(1.75rem, 3vw, 2.5rem);
+        font-weight: 700;
+        color: $color-black;
+        margin: 0 0 0.5rem 0;
         display: flex;
         align-items: center;
-        gap: var(--space-3);
+        gap: 0.75rem;
+        letter-spacing: -0.02em;
 
         .title-icon {
-          font-size: var(--text-2xl);
-          color: #0284c7; // NYT blue accent
+          font-size: 1.5rem;
+          color: $color-black;
         }
       }
 
       .page-subtitle {
-        font-size: var(--text-lg);
-        color: #737373; // NYT gray text
+        font-family: $font-sans;
+        font-size: 1rem;
+        color: $color-medium-gray;
         margin: 0;
-        font-weight: var(--font-normal);
-        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-weight: 400;
       }
     }
   }
 
-  // Stats Grid
+  // Stats Grid - NYT Editorial Style
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-4);
-    margin-bottom: var(--space-6);
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: $color-black;
+    border: 1px solid $color-black;
 
     .stat-card {
-      background: #ffffff;
-      border: 1px solid #e5e5e5;
-      border-radius: 4px;
-      padding: var(--space-5);
+      background: $color-white;
+      padding: 1.25rem;
       display: flex;
       align-items: center;
-      gap: var(--space-4);
-      transition: all 0.3s ease;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-      position: relative;
-      overflow: hidden;
-
-      // Top accent border
-      &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: #000000;
-        transition: all 0.3s ease;
-      }
+      gap: 1rem;
+      transition: background-color 0.2s ease;
 
       &:hover {
-        background: #fafafa;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        border-color: #d4d4d4;
-
-        &::before {
-          height: 4px;
-          background: #0284c7;
-        }
-
-        .stat-icon {
-          transform: scale(1.1);
-          background: #0284c7;
-          color: #ffffff;
-        }
+        background: $color-bg-light;
       }
 
       .stat-icon {
-        font-size: var(--text-2xl);
-        width: 48px;
-        height: 48px;
+        font-size: 1.25rem;
+        width: 40px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #f0f9ff;
-        color: #0284c7;
-        border-radius: 4px;
+        background: $color-bg-light;
+        color: $color-black;
+        border: 1px solid $color-border;
         flex-shrink: 0;
-        transition: all 0.3s ease;
       }
 
       .stat-content {
@@ -217,46 +125,44 @@
         min-width: 0;
 
         .stat-number {
-          font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
-          font-size: var(--text-2xl);
-          font-weight: var(--font-bold);
-          color: #000000;
+          font-family: $font-serif;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: $color-black;
           line-height: 1.2;
-          margin-bottom: var(--space-1);
         }
 
         .stat-label {
-          font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          font-size: var(--text-sm);
-          color: #737373;
-          font-weight: var(--font-medium);
-          line-height: 1.4;
+          font-family: $font-sans;
+          font-size: 0.75rem;
+          color: $color-medium-gray;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
       }
     }
   }
 }
 
-// Controls Section
+// Controls Section - NYT Editorial
 .controls-section {
-  background: #ffffff;
-  border: 1px solid #e5e5e5; // Light gray border
-  border-radius: 4px;
-  padding: var(--space-6);
-  margin-bottom: var(--space-6);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  background: $color-white;
+  border: 1px solid $color-border;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
 
   .controls-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--space-4);
-    margin-bottom: var(--space-4);
+    gap: 1rem;
+    flex-wrap: wrap;
 
     .search-controls {
       display: flex;
       align-items: center;
-      gap: var(--space-4);
+      gap: 1rem;
       flex: 1;
 
       .search-input-wrapper {
@@ -266,31 +172,30 @@
 
         .search-input {
           width: 100%;
-          padding: var(--space-3) var(--space-4) var(--space-3) var(--space-12);
-          border: 1px solid #d4d4d4; // Gray border
-          border-radius: 4px;
-          background: #ffffff; // White background
-          color: #000000; // Black text
-          font-size: var(--text-base);
+          padding: 0.75rem 1rem 0.75rem 2.75rem;
+          border: 1px solid $color-border;
+          background: $color-white;
+          color: $color-black;
+          font-family: $font-sans;
+          font-size: 0.9375rem;
+
           &::placeholder {
-            color: #a3a3a3; // Gray placeholder
+            color: $color-light-gray;
           }
 
           &:focus {
             outline: none;
-            border-color: #0284c7; // NYT blue focus
-            background: #ffffff;
-            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.1); // Blue focus ring
+            border-color: $color-black;
           }
         }
 
         .search-icon {
           position: absolute;
-          left: var(--space-4);
+          left: 1rem;
           top: 50%;
           transform: translateY(-50%);
-          color: #737373; // Gray icon
-          font-size: var(--text-lg);
+          color: $color-medium-gray;
+          font-size: 1rem;
         }
       }
     }
@@ -298,42 +203,40 @@
     .filter-controls {
       display: flex;
       align-items: center;
-      gap: var(--space-3);
+      gap: 0.75rem;
+      flex-wrap: wrap;
 
       .view-toggle {
         display: flex;
-        gap: 0.375rem;
-        padding: 0.25rem;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        backdrop-filter: blur(10px);
+        border: 1px solid $color-black;
 
         .toggle-btn {
-          padding: 0.625rem;
-          background: transparent;
+          padding: 0.5rem 0.75rem;
+          background: $color-white;
           border: none;
-          border-radius: 8px;
           cursor: pointer;
-          color: rgba(0, 0, 0, 0.5);
-          transition: all 0.3s ease;
+          color: $color-medium-gray;
+          transition: all 0.2s ease;
           display: flex;
           align-items: center;
           justify-content: center;
+
+          &:not(:last-child) {
+            border-right: 1px solid $color-black;
+          }
 
           svg {
             display: block;
           }
 
           &:hover {
-            background: rgba(255, 255, 255, 0.5);
-            color: rgba(0, 0, 0, 0.8);
+            background: $color-bg-light;
+            color: $color-black;
           }
 
           &.active {
-            background: linear-gradient(135deg, #0284c7, #0369a1);
-            color: white;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            background: $color-black;
+            color: $color-white;
           }
         }
       }
@@ -341,77 +244,71 @@
       .add-user-btn {
         display: flex;
         align-items: center;
-        gap: var(--space-2);
-        background: linear-gradient(135deg, #0284c7, #0369a1);
+        gap: 0.5rem;
+        background: $color-black;
         border: none;
-        color: #ffffff;
-        padding: var(--space-3) var(--space-5);
-        border-radius: 8px;
-        font-size: 0.9375rem;
+        color: $color-white;
+        padding: 0.75rem 1.25rem;
+        font-family: $font-sans;
+        font-size: 0.875rem;
         font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.2);
+        transition: background-color 0.2s ease;
 
         svg {
-          width: 20px;
-          height: 20px;
+          width: 16px;
+          height: 16px;
         }
 
         &:hover {
-          background: linear-gradient(135deg, #0369a1, #075985);
-          box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-          transform: translateY(-1px);
-        }
-
-        &:active {
-          transform: translateY(0);
+          background: $color-dark-gray;
         }
       }
 
       .filter-toggle-btn {
-        background: #ffffff; // White background
-        border: 1px solid #d4d4d4; // Gray border
-        color: #000000; // Black text
-        padding: var(--space-3) var(--space-4);
-        border-radius: 4px;
+        background: $color-white;
+        border: 1px solid $color-border;
+        color: $color-black;
+        padding: 0.75rem 1rem;
+        font-family: $font-sans;
+        font-size: 0.875rem;
+        font-weight: 500;
         display: flex;
         align-items: center;
-        gap: var(--space-2);
-        font-weight: var(--font-medium);
-        transition: all 0.3s ease;
-        position: relative;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
 
         &:hover, &.active {
-          background: #f8f9fa; // Light gray background
-          border-color: #0284c7; // NYT blue border
-          color: #0284c7; // NYT blue text
+          background: $color-bg-light;
+          border-color: $color-black;
         }
 
         .filter-badge {
-          background: var(--primary-color);
-          color: white;
-          font-size: var(--text-xs);
-          padding: var(--space-1) var(--space-2);
-          border-radius: 4px;
-          font-weight: var(--font-semibold);
-          margin-left: var(--space-1);
+          background: $color-black;
+          color: $color-white;
+          font-size: 0.75rem;
+          padding: 0.125rem 0.5rem;
+          font-weight: 600;
         }
       }
 
       .clear-filters-btn {
         background: transparent;
-        border: 1px solid #d4d4d4; // Gray border
-        color: #737373; // Gray text
-        padding: var(--space-2) var(--space-3);
-        border-radius: 4px;
-        font-size: var(--text-sm);
-        transition: all 0.3s ease;
+        border: 1px solid $color-border;
+        color: $color-medium-gray;
+        padding: 0.5rem 0.75rem;
+        font-family: $font-sans;
+        font-size: 0.8125rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
 
         &:hover {
-          background: #f8f9fa; // Light gray background
-          color: #000000; // Black text
-          border-color: #a3a3a3; // Darker gray border
+          background: $color-bg-light;
+          color: $color-black;
+          border-color: $color-black;
         }
       }
     }
@@ -419,41 +316,44 @@
 
   // Filter Panel
   .filter-panel {
-    border-top: 1px solid #e5e5e5; // Light gray border
-    padding-top: var(--space-4);
+    border-top: 1px solid $color-border;
+    padding-top: 1rem;
+    margin-top: 1rem;
 
     .filter-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--space-4);
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
 
       .filter-group {
         .filter-label {
           display: block;
-          color: #000000; // Black text
-          font-size: var(--text-sm);
-          font-weight: var(--font-medium);
-          margin-bottom: var(--space-2);
+          color: $color-black;
+          font-family: $font-sans;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin-bottom: 0.5rem;
         }
 
         .filter-select {
           width: 100%;
-          padding: var(--space-2) var(--space-3);
-          border: 1px solid #d4d4d4; // Gray border
-          border-radius: 4px;
-          background: #ffffff; // White background
-          color: #000000; // Black text
-          font-size: var(--text-sm);
+          padding: 0.5rem 0.75rem;
+          border: 1px solid $color-border;
+          background: $color-white;
+          color: $color-black;
+          font-family: $font-sans;
+          font-size: 0.875rem;
+
           &:focus {
             outline: none;
-            border-color: #0284c7; // NYT blue focus
-            background: #ffffff;
-            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.1); // Blue focus ring
+            border-color: $color-black;
           }
 
           option {
-            background: #ffffff; // White option background
-            color: #000000; // Black option text
+            background: $color-white;
+            color: $color-black;
           }
         }
       }
@@ -461,108 +361,113 @@
   }
 }
 
-// Users Section
+// Users Section - NYT Editorial
 .users-section {
   .loading-state {
     text-align: center;
-    padding: var(--space-12);
-    color: #000000; // Black text
+    padding: 4rem 2rem;
+    color: $color-black;
 
     .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #e5e5e5; // Light gray border
-      border-top: 3px solid #0284c7; // NYT blue top
+      width: 32px;
+      height: 32px;
+      border: 2px solid $color-border;
+      border-top: 2px solid $color-black;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto var(--space-4);
+      margin: 0 auto 1rem;
     }
 
     p {
-      font-size: var(--text-lg);
+      font-family: $font-sans;
+      font-size: 0.9375rem;
       margin: 0;
+      color: $color-medium-gray;
     }
   }
 
   .empty-state {
     text-align: center;
-    padding: var(--space-12);
-    background: #ffffff;
-    border: 1px solid #e5e5e5; // Light gray border
-    border-radius: 4px;
-    color: #000000; // Black text
+    padding: 4rem 2rem;
+    background: $color-white;
+    border: 1px solid $color-border;
+    color: $color-black;
 
     .empty-icon {
-      font-size: 4rem;
-      color: #737373; // Gray icon
-      margin-bottom: var(--space-4);
+      font-size: 3rem;
+      color: $color-light-gray;
+      margin-bottom: 1rem;
     }
 
     h3 {
-      font-size: var(--text-xl);
-      font-weight: var(--font-semibold);
-      margin: 0 0 var(--space-2) 0;
+      font-family: $font-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
     }
 
     p {
-      color: #737373; // Gray text
-      margin: 0 0 var(--space-6) 0;
+      font-family: $font-sans;
+      color: $color-medium-gray;
+      margin: 0 0 1.5rem 0;
     }
 
     .btn-secondary {
-      background: #ffffff; // White background
-      color: #000000; // Black text
-      border: 1px solid #d4d4d4; // Gray border
-      padding: var(--space-3) var(--space-6);
-      border-radius: 4px;
-      font-weight: var(--font-semibold);
-      transition: all 0.3s ease;
+      background: $color-white;
+      color: $color-black;
+      border: 1px solid $color-black;
+      padding: 0.75rem 1.5rem;
+      font-family: $font-sans;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s ease;
 
       &:hover {
-        background: #f8f9fa; // Light gray background
-        border-color: #0284c7; // NYT blue border
-        color: #0284c7; // NYT blue text
+        background: $color-black;
+        color: $color-white;
       }
     }
   }
 
-  // Users Table
+  // Users Table - NYT Editorial
   .users-table-container {
-    background: #ffffff;
-    border: 1px solid #e5e5e5; // Light gray border
-    border-radius: 4px;
-    overflow-x: auto; // Enable horizontal scrolling on all screen sizes
+    background: $color-white;
+    border: 1px solid $color-black;
+    overflow-x: auto;
     overflow-y: visible;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
+    -webkit-overflow-scrolling: touch;
 
     .users-table {
       width: 100%;
-      min-width: 1000px; // Ensure table doesn't get too cramped
+      min-width: 1000px;
       border-collapse: collapse;
 
       thead {
-        background: #f8f9fa; // Light gray background
+        background: $color-bg-light;
+        border-bottom: $border-medium;
 
         th {
-          padding: var(--space-4);
+          padding: 0.875rem 1rem;
           text-align: left;
-          font-weight: var(--font-semibold);
-          color: #000000; // Black text
-          font-size: var(--text-sm);
+          font-family: $font-sans;
+          font-weight: 700;
+          color: $color-black;
+          font-size: 0.6875rem;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
-          border-bottom: 1px solid #e5e5e5; // Light gray border
+          letter-spacing: 0.1em;
         }
       }
 
       tbody {
         .user-row {
-          transition: all 0.3s ease;
-          border-bottom: 1px solid #f5f5f5; // Very light gray border
+          transition: background-color 0.2s ease;
+          border-bottom: 1px solid $color-border;
 
           &:hover {
-            background: #f8f9fa; // Light gray background
+            background: $color-bg-light;
           }
 
           &:last-child {
@@ -570,165 +475,171 @@
           }
 
           td {
-            padding: var(--space-4);
+            padding: 1rem;
             vertical-align: middle;
-            color: #000000; // Black text
+            color: $color-black;
+            font-family: $font-sans;
+            font-size: 0.875rem;
           }
 
           .user-info {
             display: flex;
             align-items: center;
-            gap: var(--space-3);
+            gap: 0.75rem;
 
             .user-avatar {
               .avatar-image {
-                width: 40px;
-                height: 40px;
+                width: 36px;
+                height: 36px;
                 border-radius: 50%;
                 object-fit: cover;
+                border: 1px solid $color-border;
               }
 
               .avatar-placeholder {
-                width: 40px;
-                height: 40px;
+                width: 36px;
+                height: 36px;
                 border-radius: 50%;
-                background: #f0f9ff; // Light blue background
+                background: $color-bg-light;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-weight: var(--font-semibold);
-                font-size: var(--text-sm);
-                color: #0284c7; // NYT blue text
+                font-family: $font-sans;
+                font-weight: 600;
+                font-size: 0.75rem;
+                color: $color-dark-gray;
+                border: 1px solid $color-border;
               }
             }
 
             .user-details {
               .user-name {
-                font-weight: var(--font-semibold);
-                margin-bottom: var(--space-1);
+                font-weight: 600;
+                margin-bottom: 0.125rem;
               }
 
               .user-email {
-                font-size: var(--text-sm);
-                color: #737373; // Gray text
-                margin-bottom: var(--space-1);
+                font-size: 0.8125rem;
+                color: $color-medium-gray;
               }
             }
           }
 
           .tenant-info {
             .tenant-name {
-              font-size: var(--text-sm);
-              color: #0284c7;
-              font-weight: var(--font-medium);
+              font-size: 0.8125rem;
+              color: $color-dark-gray;
+              font-weight: 500;
             }
           }
 
           .business-info {
             .business-name {
-              font-size: var(--text-sm);
-              color: #000000;
-              font-weight: var(--font-medium);
-              margin-bottom: var(--space-1);
+              font-size: 0.8125rem;
+              color: $color-black;
+              font-weight: 500;
+              margin-bottom: 0.25rem;
             }
 
             .business-status {
-              font-size: var(--text-xs);
-              padding: 2px 8px;
-              border-radius: 4px;
+              font-size: 0.6875rem;
+              padding: 0.125rem 0.5rem;
               display: inline-block;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              font-weight: 600;
 
               &.status-active {
-                background: rgba(34, 197, 94, 0.2);
-                color: #22c55e;
+                background: $color-bg-light;
+                color: #16a34a;
+                border: 1px solid #16a34a;
               }
 
               &.status-pending {
-                background: rgba(251, 191, 36, 0.2);
-                color: #f59e0b;
+                background: $color-bg-light;
+                color: #d97706;
+                border: 1px solid #d97706;
               }
 
               &.status-suspended {
-                background: rgba(239, 68, 68, 0.2);
-                color: #ef4444;
+                background: $color-bg-light;
+                color: #dc2626;
+                border: 1px solid #dc2626;
               }
             }
 
             .text-muted {
-              color: #a3a3a3;
+              color: $color-light-gray;
             }
           }
 
+          // Role badges - NYT minimal style
           .role-badge {
             display: inline-flex;
             align-items: center;
-            gap: var(--space-2);
-            padding: var(--space-2) var(--space-3);
-            border-radius: 4px;
-            font-size: var(--text-sm);
-            font-weight: var(--font-medium);
+            gap: 0.375rem;
+            padding: 0.25rem 0.625rem;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: $color-bg-light;
+            color: $color-dark-gray;
+            border: 1px solid $color-border;
 
             &.role-itiyum {
-              background: rgba(147, 51, 234, 0.2);
-              color: #a855f7;
-              border: 1px solid rgba(147, 51, 234, 0.3);
+              border-color: $color-black;
+              color: $color-black;
             }
 
             &.role-business {
-              background: rgba(59, 130, 246, 0.2);
-              color: #3b82f6;
-              border: 1px solid rgba(59, 130, 246, 0.3);
+              border-color: $color-dark-gray;
             }
 
             &.role-food_enthusiast {
-              background: rgba(34, 197, 94, 0.2);
-              color: #22c55e;
-              border: 1px solid rgba(34, 197, 94, 0.3);
+              border-color: $color-medium-gray;
             }
 
             &.role-normal_user {
-              background: rgba(100, 116, 139, 0.2);
-              color: #94a3b8;
-              border: 1px solid rgba(100, 116, 139, 0.3);
+              border-color: $color-light-gray;
+              color: $color-medium-gray;
             }
 
             &.role-specialist {
-              background: rgba(245, 158, 11, 0.2);
-              color: #f59e0b;
-              border: 1px solid rgba(245, 158, 11, 0.3);
+              border-color: $color-dark-gray;
             }
           }
 
+          // Status badges - NYT minimal style
           .status-badge {
-            padding: var(--space-1) var(--space-3);
-            border-radius: 4px;
-            font-size: var(--text-xs);
-            font-weight: var(--font-semibold);
+            padding: 0.25rem 0.625rem;
+            font-size: 0.6875rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
 
             &.status-active {
-              background: rgba(5, 150, 105, 0.2);
-              color: #10b981;
-              border: 1px solid rgba(5, 150, 105, 0.3);
+              background: $color-white;
+              color: #16a34a;
+              border: 1px solid #16a34a;
             }
 
             &.status-inactive {
-              background: rgba(100, 116, 139, 0.2);
-              color: #94a3b8;
-              border: 1px solid rgba(100, 116, 139, 0.3);
+              background: $color-bg-light;
+              color: $color-medium-gray;
+              border: 1px solid $color-border;
             }
 
             &.status-suspended {
-              background: rgba(220, 38, 38, 0.2);
-              color: #ef4444;
-              border: 1px solid rgba(220, 38, 38, 0.3);
+              background: $color-white;
+              color: #dc2626;
+              border: 1px solid #dc2626;
             }
 
             &.status-pending {
-              background: rgba(217, 119, 6, 0.2);
-              color: #f59e0b;
-              border: 1px solid rgba(217, 119, 6, 0.3);
+              background: $color-white;
+              color: #d97706;
+              border: 1px solid #d97706;
             }
           }
 
@@ -736,13 +647,13 @@
             .verification-item {
               display: flex;
               align-items: center;
-              gap: var(--space-1);
-              margin-bottom: var(--space-1);
-              font-size: var(--text-xs);
-              color: #a3a3a3; // Light gray text
+              gap: 0.25rem;
+              margin-bottom: 0.25rem;
+              font-size: 0.75rem;
+              color: $color-light-gray;
 
               &.verified {
-                color: #16a34a; // Green for verified
+                color: #16a34a;
               }
 
               &:last-child {
@@ -752,69 +663,55 @@
           }
 
           .never-logged-in {
-            color: #a3a3a3; // Light gray text
+            color: $color-light-gray;
             font-style: italic;
+            font-size: 0.8125rem;
           }
 
+          // Action buttons - NYT minimal
           .action-buttons {
             display: flex;
-            gap: var(--space-2);
+            gap: 0.375rem;
 
             .btn-action {
-              width: 32px;
-              height: 32px;
-              border-radius: 4px;
-              border: none;
+              width: 28px;
+              height: 28px;
+              border: 1px solid $color-border;
+              background: $color-white;
               display: flex;
               align-items: center;
               justify-content: center;
-              font-size: var(--text-sm);
+              font-size: 0.75rem;
               cursor: pointer;
-              transition: all 0.3s ease;
+              transition: all 0.2s ease;
+              color: $color-medium-gray;
 
-              &.view-btn {
-                background: rgba(59, 130, 246, 0.2);
-                color: #3b82f6;
-
-                &:hover {
-                  background: rgba(59, 130, 246, 0.3);
-                }
+              &:hover {
+                border-color: $color-black;
+                color: $color-black;
               }
 
-              &.role-btn {
-                background: rgba(139, 92, 246, 0.2);
-                color: #8b5cf6;
-
-                &:hover {
-                  background: rgba(139, 92, 246, 0.3);
-                }
+              &.view-btn:hover {
+                background: $color-bg-light;
               }
 
-              &.suspend-btn {
-                background: rgba(245, 158, 11, 0.2);
-                color: #f59e0b;
-
-                &:hover {
-                  background: rgba(245, 158, 11, 0.3);
-                }
+              &.role-btn:hover {
+                background: $color-bg-light;
               }
 
-              &.activate-btn {
-                background: rgba(34, 197, 94, 0.2);
-                color: #22c55e;
-
-                &:hover {
-                  background: rgba(34, 197, 94, 0.3);
-                }
+              &.suspend-btn:hover {
+                border-color: #d97706;
+                color: #d97706;
               }
 
-              &.delete-btn {
-                background: rgba(220, 38, 38, 0.2);
-                color: #ef4444;
+              &.activate-btn:hover {
+                border-color: #16a34a;
+                color: #16a34a;
+              }
 
-                &:hover {
-                  background: rgba(220, 38, 38, 0.3);
-                }
+              &.delete-btn:hover {
+                border-color: #dc2626;
+                color: #dc2626;
               }
             }
           }
@@ -823,81 +720,89 @@
     }
   }
 
-  // Users Grid (Card View)
+  // Users Grid (Card View) - NYT Editorial
   .users-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: var(--space-6);
-    padding: var(--space-4) 0;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1px;
+    background: $color-black;
+    border: 1px solid $color-black;
+    margin-top: 1.5rem;
 
     .user-card {
-      background: #ffffff;
-      border: 1px solid #e5e5e5;
-      border-radius: 8px;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      background: $color-white;
+      transition: background-color 0.2s ease;
 
       &:hover {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        transform: translateY(-2px);
+        background: $color-bg-light;
       }
 
       .card-header {
-        padding: var(--space-5);
-        border-bottom: 1px solid #f5f5f5;
+        padding: 1.25rem;
+        border-bottom: 1px solid $color-border;
         display: flex;
         align-items: center;
-        gap: var(--space-4);
+        gap: 1rem;
 
         .user-avatar {
           .avatar-image {
-            width: 60px;
-            height: 60px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             object-fit: cover;
+            border: 1px solid $color-border;
           }
 
           .avatar-placeholder {
-            width: 60px;
-            height: 60px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            background: #f0f9ff;
+            background: $color-bg-light;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: var(--font-bold);
-            font-size: var(--text-lg);
-            color: #0284c7;
+            font-family: $font-sans;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: $color-dark-gray;
+            border: 1px solid $color-border;
           }
         }
 
         .user-info {
           flex: 1;
+          min-width: 0;
 
           .user-name {
-            font-size: var(--text-lg);
-            font-weight: var(--font-semibold);
-            color: #000000;
-            margin: 0 0 var(--space-1) 0;
+            font-family: $font-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: $color-black;
+            margin: 0 0 0.25rem 0;
           }
 
           .user-email {
-            font-size: var(--text-sm);
-            color: #737373;
-            margin: 0 0 var(--space-1) 0;
+            font-family: $font-sans;
+            font-size: 0.8125rem;
+            color: $color-medium-gray;
+            margin: 0 0 0.25rem 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
 
           .tenant-name {
-            font-size: var(--text-xs);
-            color: #0284c7;
-            font-weight: var(--font-medium);
-            margin: 0 0 var(--space-1) 0;
+            font-family: $font-sans;
+            font-size: 0.75rem;
+            color: $color-dark-gray;
+            font-weight: 500;
+            margin: 0 0 0.125rem 0;
           }
 
           .business-name {
-            font-size: var(--text-xs);
-            color: #a3a3a3;
+            font-family: $font-sans;
+            font-size: 0.75rem;
+            color: $color-light-gray;
             font-style: italic;
             margin: 0;
           }
@@ -905,10 +810,10 @@
       }
 
       .card-body {
-        padding: var(--space-5);
+        padding: 1.25rem;
         display: flex;
         flex-direction: column;
-        gap: var(--space-4);
+        gap: 0.75rem;
 
         .card-detail {
           display: flex;
@@ -916,134 +821,108 @@
           align-items: center;
 
           .detail-label {
-            font-size: var(--text-sm);
-            color: #737373;
-            font-weight: var(--font-medium);
+            font-family: $font-sans;
+            font-size: 0.75rem;
+            color: $color-medium-gray;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
           }
 
           .detail-value {
-            font-size: var(--text-sm);
-            color: #000000;
+            font-family: $font-sans;
+            font-size: 0.8125rem;
+            color: $color-black;
           }
 
+          // Role badges in cards
           .role-badge {
             display: inline-flex;
             align-items: center;
-            gap: var(--space-2);
-            padding: var(--space-2) var(--space-3);
-            border-radius: 4px;
-            font-size: var(--text-sm);
-            font-weight: var(--font-medium);
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: $color-bg-light;
+            color: $color-dark-gray;
+            border: 1px solid $color-border;
 
-            &.role-itiyum {
-              background: rgba(147, 51, 234, 0.2);
-              color: #a855f7;
-              border: 1px solid rgba(147, 51, 234, 0.3);
-            }
-
-            &.role-business {
-              background: rgba(59, 130, 246, 0.2);
-              color: #3b82f6;
-              border: 1px solid rgba(59, 130, 246, 0.3);
-            }
-
-            &.role-food_enthusiast {
-              background: rgba(34, 197, 94, 0.2);
-              color: #22c55e;
-              border: 1px solid rgba(34, 197, 94, 0.3);
-            }
-
-            &.role-normal_user {
-              background: rgba(100, 116, 139, 0.2);
-              color: #94a3b8;
-              border: 1px solid rgba(100, 116, 139, 0.3);
-            }
-
-            &.role-specialist {
-              background: rgba(245, 158, 11, 0.2);
-              color: #f59e0b;
-              border: 1px solid rgba(245, 158, 11, 0.3);
-            }
+            &.role-itiyum { border-color: $color-black; color: $color-black; }
+            &.role-business { border-color: $color-dark-gray; }
+            &.role-food_enthusiast { border-color: $color-medium-gray; }
+            &.role-normal_user { border-color: $color-light-gray; color: $color-medium-gray; }
+            &.role-specialist { border-color: $color-dark-gray; }
           }
 
+          // Status badges in cards
           .status-badge {
-            padding: var(--space-1) var(--space-3);
-            border-radius: 4px;
-            font-size: var(--text-xs);
-            font-weight: var(--font-semibold);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.6875rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
 
-            &.status-active {
-              background: rgba(5, 150, 105, 0.2);
-              color: #10b981;
-              border: 1px solid rgba(5, 150, 105, 0.3);
-            }
-
-            &.status-frozen, &.status-pending_deletion {
-              background: rgba(220, 38, 38, 0.2);
-              color: #ef4444;
-              border: 1px solid rgba(220, 38, 38, 0.3);
-            }
-
-            &.status-pending {
-              background: rgba(217, 119, 6, 0.2);
-              color: #f59e0b;
-              border: 1px solid rgba(217, 119, 6, 0.3);
-            }
+            &.status-active { background: $color-white; color: #16a34a; border: 1px solid #16a34a; }
+            &.status-frozen, &.status-pending_deletion { background: $color-white; color: #dc2626; border: 1px solid #dc2626; }
+            &.status-pending { background: $color-white; color: #d97706; border: 1px solid #d97706; }
           }
 
           .verification-badges {
             display: flex;
-            gap: var(--space-2);
+            gap: 0.375rem;
 
             .verification-badge {
-              font-size: var(--text-xs);
-              padding: var(--space-1) var(--space-2);
-              border-radius: 4px;
-              background: rgba(100, 116, 139, 0.2);
-              color: #94a3b8;
-              border: 1px solid rgba(100, 116, 139, 0.3);
+              font-size: 0.6875rem;
+              padding: 0.125rem 0.375rem;
+              background: $color-bg-light;
+              color: $color-medium-gray;
+              border: 1px solid $color-border;
+              font-weight: 500;
 
               &.verified {
-                background: rgba(5, 150, 105, 0.2);
-                color: #10b981;
-                border: 1px solid rgba(5, 150, 105, 0.3);
+                color: #16a34a;
+                border-color: #16a34a;
               }
             }
           }
 
           .never-logged-in {
-            color: #a3a3a3;
+            color: $color-light-gray;
             font-style: italic;
+            font-size: 0.8125rem;
           }
         }
 
         .card-stats {
           display: flex;
-          gap: var(--space-4);
-          padding-top: var(--space-3);
-          border-top: 1px solid #f5f5f5;
+          gap: 1rem;
+          padding-top: 0.75rem;
+          border-top: 1px solid $color-border;
 
           .stat-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: var(--space-1);
+            gap: 0.125rem;
 
             .stat-icon {
-              font-size: var(--text-lg);
+              font-size: 1rem;
+              color: $color-medium-gray;
             }
 
             .stat-value {
-              font-size: var(--text-xl);
-              font-weight: var(--font-bold);
-              color: #000000;
+              font-family: $font-serif;
+              font-size: 1.125rem;
+              font-weight: 700;
+              color: $color-black;
             }
 
             .stat-label {
-              font-size: var(--text-xs);
-              color: #737373;
+              font-family: $font-sans;
+              font-size: 0.625rem;
+              color: $color-medium-gray;
               text-transform: uppercase;
               letter-spacing: 0.05em;
             }
@@ -1052,186 +931,159 @@
       }
 
       .card-footer {
-        padding: var(--space-4);
-        border-top: 1px solid #f5f5f5;
+        padding: 0.75rem 1.25rem;
+        border-top: 1px solid $color-border;
         display: flex;
-        gap: var(--space-2);
-        background: #f8f9fa;
+        gap: 0.5rem;
+        background: $color-bg-light;
 
         .btn-card {
           flex: 1;
-          padding: var(--space-2) var(--space-3);
-          border-radius: 4px;
-          border: none;
-          font-size: var(--text-sm);
-          font-weight: var(--font-medium);
+          padding: 0.5rem 0.75rem;
+          border: 1px solid $color-border;
+          background: $color-white;
+          font-family: $font-sans;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.2s ease;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: var(--space-1);
+          gap: 0.25rem;
+          color: $color-medium-gray;
 
-          &.view-btn {
-            background: rgba(59, 130, 246, 0.2);
-            color: #3b82f6;
-
-            &:hover {
-              background: rgba(59, 130, 246, 0.3);
-            }
+          &:hover {
+            border-color: $color-black;
+            color: $color-black;
           }
 
-          &.role-btn {
-            background: rgba(139, 92, 246, 0.2);
-            color: #8b5cf6;
-
-            &:hover {
-              background: rgba(139, 92, 246, 0.3);
-            }
-          }
-
-          &.suspend-btn {
-            background: rgba(245, 158, 11, 0.2);
-            color: #f59e0b;
-
-            &:hover {
-              background: rgba(245, 158, 11, 0.3);
-            }
-          }
-
-          &.activate-btn {
-            background: rgba(34, 197, 94, 0.2);
-            color: #22c55e;
-
-            &:hover {
-              background: rgba(34, 197, 94, 0.3);
-            }
-          }
-
-          &.delete-btn {
-            background: rgba(220, 38, 38, 0.2);
-            color: #ef4444;
-
-            &:hover {
-              background: rgba(220, 38, 38, 0.3);
-            }
-          }
+          &.view-btn:hover { background: $color-bg-light; }
+          &.role-btn:hover { background: $color-bg-light; }
+          &.suspend-btn:hover { border-color: #d97706; color: #d97706; }
+          &.activate-btn:hover { border-color: #16a34a; color: #16a34a; }
+          &.delete-btn:hover { border-color: #dc2626; color: #dc2626; }
         }
       }
     }
   }
 }
 
-// Modal Styles
+// Modal Styles - NYT Editorial
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: var(--space-4);
-  animation: fadeIn 0.3s ease;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
 }
 
 .modal-content {
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 4px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: $color-white;
+  border: 2px solid $color-black;
   max-width: 90vw;
   max-height: 90vh;
   overflow-y: auto;
-  animation: slideInUp 0.3s ease;
+  animation: slideInUp 0.2s ease;
 
   &.user-modal {
     width: 100%;
-    max-width: 600px;
+    max-width: 560px;
   }
 
   &.delete-modal {
     width: 100%;
-    max-width: 500px;
+    max-width: 480px;
   }
 
   .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-6);
-    border-bottom: 1px solid #e5e5e5;
+    padding: 1.25rem 1.5rem;
+    border-bottom: $border-medium;
 
     h3 {
-      font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
-      font-size: var(--text-xl);
-      font-weight: var(--font-semibold);
-      color: #000000;
+      font-family: $font-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: $color-black;
       margin: 0;
     }
 
     .modal-close {
       background: none;
       border: none;
-      color: #525252;
-      font-size: var(--text-xl);
+      color: $color-medium-gray;
+      font-size: 1.25rem;
       cursor: pointer;
-      padding: var(--space-2);
-      border-radius: 4px;
-      transition: all 0.3s ease;
+      padding: 0.25rem;
+      transition: color 0.2s ease;
 
       &:hover {
-        background: #f5f5f5;
-        color: #000000;
+        color: $color-black;
       }
     }
   }
 
   .modal-body {
-    padding: var(--space-6);
-    color: #404040;
+    padding: 1.5rem;
+    color: $color-dark-gray;
+    font-family: $font-sans;
+    font-size: 0.9375rem;
+    line-height: 1.6;
   }
 
   .modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: var(--space-3);
-    padding: var(--space-6);
-    border-top: 1px solid #e5e5e5;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid $color-border;
+    background: $color-bg-light;
 
     button {
-      padding: var(--space-3) var(--space-6);
-      border-radius: 4px;
-      font-weight: var(--font-semibold);
-      transition: all 0.3s ease;
+      padding: 0.75rem 1.5rem;
+      font-family: $font-sans;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.2s ease;
       cursor: pointer;
 
       &.btn-primary {
-        background: #000000;
-        color: white;
+        background: $color-black;
+        color: $color-white;
         border: none;
 
         &:hover {
-          background: #262626;
+          background: $color-dark-gray;
         }
       }
 
       &.btn-secondary {
-        background: #ffffff;
-        color: #000000;
-        border: 1px solid #e5e5e5;
+        background: $color-white;
+        color: $color-black;
+        border: 1px solid $color-black;
 
         &:hover {
-          background: #f5f5f5;
+          background: $color-bg-light;
         }
       }
 
       &.btn-danger {
         background: #dc2626;
-        color: white;
+        color: $color-white;
         border: none;
 
         &:hover {
@@ -1242,159 +1094,162 @@
       &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-
-        &:hover {
-          background: inherit;
-        }
       }
     }
   }
 
-  // Close button
   .close-btn {
     background: none;
     border: none;
-    color: #525252;
-    font-size: 2rem;
+    color: $color-medium-gray;
+    font-size: 1.5rem;
     line-height: 1;
     cursor: pointer;
     padding: 0;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
-    transition: all 0.3s ease;
+    transition: color 0.2s ease;
 
     &:hover {
-      background: #f5f5f5;
-      color: #000000;
+      color: $color-black;
     }
   }
 }
 
-// Form Styles
+// Form Styles - NYT Editorial
 .add-user-form,
 .edit-role-form {
   .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-4);
-    margin-bottom: var(--space-4);
+    gap: 1rem;
+    margin-bottom: 1rem;
   }
 
   .form-group {
-    margin-bottom: var(--space-4);
+    margin-bottom: 1rem;
 
     label {
       display: block;
-      font-size: var(--text-sm);
-      font-weight: var(--font-medium);
-      color: #000000;
-      margin-bottom: var(--space-2);
+      font-family: $font-sans;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: $color-black;
+      margin-bottom: 0.5rem;
     }
 
     .form-control {
       width: 100%;
-      padding: var(--space-3);
-      border: 1px solid #d4d4d4;
-      border-radius: 4px;
-      font-size: var(--text-base);
-      color: #000000;
-      background: #ffffff;
-      transition: all 0.3s ease;
+      padding: 0.75rem;
+      border: 1px solid $color-border;
+      font-family: $font-sans;
+      font-size: 0.9375rem;
+      color: $color-black;
+      background: $color-white;
+      transition: border-color 0.2s ease;
 
       &:focus {
         outline: none;
-        border-color: #0284c7;
-        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        border-color: $color-black;
       }
 
       &::placeholder {
-        color: #a3a3a3;
+        color: $color-light-gray;
       }
     }
 
     .error-message {
       display: block;
       color: #dc2626;
-      font-size: var(--text-sm);
-      margin-top: var(--space-1);
+      font-size: 0.8125rem;
+      margin-top: 0.25rem;
     }
   }
 }
 
 .user-info-section {
-  background: #f8f9fa;
-  padding: var(--space-4);
-  border-radius: 4px;
-  margin-bottom: var(--space-4);
+  background: $color-bg-light;
+  padding: 1rem;
+  border: 1px solid $color-border;
+  margin-bottom: 1rem;
 
   p {
-    margin: var(--space-2) 0;
-    color: #404040;
+    font-family: $font-sans;
+    margin: 0.5rem 0;
+    color: $color-dark-gray;
+    font-size: 0.9375rem;
 
     strong {
-      color: #000000;
-      font-weight: var(--font-semibold);
+      color: $color-black;
+      font-weight: 600;
     }
   }
 }
 
 .role-category {
-  color: #737373;
-  font-size: var(--text-sm);
-  margin-left: var(--space-1);
+  color: $color-medium-gray;
+  font-size: 0.8125rem;
+  margin-left: 0.25rem;
 }
 
-// User Profile Styles
+// User Profile Styles - NYT Editorial
 .user-profile {
   .profile-header {
     display: flex;
     align-items: center;
-    gap: var(--space-4);
-    margin-bottom: var(--space-6);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid $color-border;
 
     .profile-avatar {
       .avatar-image {
-        width: 80px;
-        height: 80px;
+        width: 64px;
+        height: 64px;
         border-radius: 50%;
         object-fit: cover;
-        border: 2px solid #e5e5e5;
+        border: 2px solid $color-black;
       }
 
       .avatar-placeholder {
-        width: 80px;
-        height: 80px;
+        width: 64px;
+        height: 64px;
         border-radius: 50%;
-        background: #f5f5f5;
+        background: $color-bg-light;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: var(--font-bold);
-        font-size: var(--text-xl);
-        color: #525252;
-        border: 2px solid #e5e5e5;
+        font-family: $font-sans;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: $color-dark-gray;
+        border: 2px solid $color-black;
       }
     }
 
     .profile-info {
       h4 {
-        font-size: var(--text-xl);
-        font-weight: var(--font-semibold);
-        margin: 0 0 var(--space-1) 0;
-        color: #000000;
+        font-family: $font-serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0 0 0.25rem 0;
+        color: $color-black;
       }
 
       p {
-        color: #525252;
-        margin: 0 0 var(--space-1) 0;
+        font-family: $font-sans;
+        color: $color-medium-gray;
+        margin: 0 0 0.25rem 0;
+        font-size: 0.9375rem;
 
         &.business-name {
           font-style: italic;
-          color: #737373;
+          color: $color-light-gray;
         }
       }
     }
@@ -1404,98 +1259,85 @@
     .detail-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-4);
+      gap: 1rem;
 
       .detail-item {
         label {
           display: block;
-          font-size: var(--text-sm);
-          color: #737373;
-          font-weight: var(--font-medium);
-          margin-bottom: var(--space-1);
+          font-family: $font-sans;
+          font-size: 0.6875rem;
+          color: $color-medium-gray;
+          font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.05em;
+          margin-bottom: 0.25rem;
         }
 
         span {
           display: block;
-          color: #000000;
-          font-weight: var(--font-medium);
+          font-family: $font-sans;
+          color: $color-black;
+          font-weight: 500;
+          font-size: 0.9375rem;
         }
       }
     }
   }
 }
 
-// Delete Warning Styles
+// Delete Warning Styles - NYT Editorial
 .delete-warning {
   display: flex;
-  gap: var(--space-4);
+  gap: 1rem;
 
   .warning-icon {
-    font-size: var(--text-2xl);
+    font-size: 1.5rem;
     flex-shrink: 0;
-    color: #f59e0b;
+    color: #d97706;
   }
 
   .warning-content {
     h4 {
-      font-size: var(--text-lg);
-      font-weight: var(--font-semibold);
-      color: #000000;
-      margin: 0 0 var(--space-3) 0;
+      font-family: $font-serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: $color-black;
+      margin: 0 0 0.75rem 0;
     }
 
     p {
-      color: #404040;
-      margin: 0 0 var(--space-2) 0;
-      line-height: 1.5;
+      font-family: $font-sans;
+      color: $color-dark-gray;
+      margin: 0 0 0.5rem 0;
+      line-height: 1.6;
+      font-size: 0.9375rem;
 
       strong {
-        color: #000000;
-        font-weight: var(--font-semibold);
+        color: $color-black;
+        font-weight: 600;
       }
     }
 
     ul {
-      margin: var(--space-3) 0 0 var(--space-4);
+      margin: 0.75rem 0 0 1rem;
+      padding-left: 0.5rem;
 
       li {
-        color: #525252;
-        margin-bottom: var(--space-1);
+        font-family: $font-sans;
+        color: $color-medium-gray;
+        margin-bottom: 0.25rem;
         line-height: 1.5;
+        font-size: 0.875rem;
       }
     }
   }
 }
 
-// Animations
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-// Responsive Styles
+// Responsive Styles - NYT Editorial
 // Large screens (desktops)
 @media (max-width: 1366px) {
   .admin-users {
-    padding: var(--space-5);
+    padding: 1.5rem 1rem;
   }
 
   .users-header {
@@ -1506,7 +1348,7 @@
 
   .users-section {
     .users-grid {
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
   }
 }
@@ -1514,44 +1356,43 @@
 // Medium screens (tablets)
 @media (max-width: 1024px) {
   .admin-users {
-    padding: var(--space-4);
+    padding: 1rem;
   }
 
   .users-header {
-    margin-bottom: var(--space-6);
+    margin-bottom: 1.5rem;
 
     .header-content {
       .title-section {
         .page-title {
-          font-size: var(--text-2xl);
+          font-size: 1.5rem;
         }
 
         .page-subtitle {
-          font-size: var(--text-base);
+          font-size: 0.9375rem;
         }
       }
     }
 
     .stats-grid {
       grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-3);
 
       .stat-card {
-        padding: var(--space-4);
+        padding: 1rem;
 
         .stat-icon {
-          width: 40px;
-          height: 40px;
-          font-size: var(--text-xl);
+          width: 36px;
+          height: 36px;
+          font-size: 1rem;
         }
 
         .stat-content {
           .stat-number {
-            font-size: var(--text-xl);
+            font-size: 1.25rem;
           }
 
           .stat-label {
-            font-size: var(--text-xs);
+            font-size: 0.6875rem;
           }
         }
       }
@@ -1559,12 +1400,9 @@
   }
 
   .controls-section {
-    padding: var(--space-4);
+    padding: 1rem;
 
     .controls-content {
-      flex-wrap: wrap;
-      gap: var(--space-3);
-
       .search-controls {
         flex: 1 1 100%;
         order: 1;
@@ -1577,27 +1415,7 @@
       .filter-controls {
         flex: 1 1 100%;
         order: 2;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: var(--space-2);
-
-        .view-toggle {
-          order: 1;
-        }
-
-        .add-user-btn {
-          order: 3;
-          flex: 1;
-          justify-content: center;
-        }
-
-        .filter-toggle-btn {
-          order: 2;
-        }
-
-        .clear-filters-btn {
-          order: 4;
-        }
+        justify-content: flex-start;
       }
     }
 
@@ -1610,8 +1428,7 @@
 
   .users-section {
     .users-grid {
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: var(--space-4);
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     }
 
     .users-table-container {
@@ -1625,23 +1442,23 @@
     max-width: 90vw;
 
     &.user-modal {
-      max-width: 550px;
+      max-width: 520px;
     }
 
     .modal-header {
-      padding: var(--space-4);
+      padding: 1rem 1.25rem;
 
       h3 {
-        font-size: var(--text-lg);
+        font-size: 1.125rem;
       }
     }
 
     .modal-body {
-      padding: var(--space-4);
+      padding: 1.25rem;
     }
 
     .modal-footer {
-      padding: var(--space-4);
+      padding: 1rem 1.25rem;
     }
   }
 }
@@ -1649,53 +1466,52 @@
 // Small screens (mobile landscape and small tablets)
 @media (max-width: 768px) {
   .admin-users {
-    padding: var(--space-3);
+    padding: 0.75rem;
   }
 
   .users-header {
-    margin-bottom: var(--space-4);
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
 
     .header-content {
-      margin-bottom: var(--space-4);
+      margin-bottom: 1rem;
 
       .title-section {
         .page-title {
-          font-size: var(--text-xl);
-          gap: var(--space-2);
+          font-size: 1.25rem;
+          gap: 0.5rem;
 
           .title-icon {
-            font-size: var(--text-lg);
+            font-size: 1rem;
           }
         }
 
         .page-subtitle {
-          font-size: var(--text-sm);
+          font-size: 0.8125rem;
         }
       }
     }
 
     .stats-grid {
       grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-2);
-      margin-bottom: var(--space-4);
 
       .stat-card {
-        padding: var(--space-3);
-        gap: var(--space-2);
+        padding: 0.75rem;
+        gap: 0.5rem;
 
         .stat-icon {
-          width: 36px;
-          height: 36px;
-          font-size: var(--text-lg);
+          width: 32px;
+          height: 32px;
+          font-size: 0.875rem;
         }
 
         .stat-content {
           .stat-number {
-            font-size: var(--text-lg);
+            font-size: 1.125rem;
           }
 
           .stat-label {
-            font-size: 0.6875rem;
+            font-size: 0.625rem;
           }
         }
       }
@@ -1703,13 +1519,13 @@
   }
 
   .controls-section {
-    padding: var(--space-3);
-    margin-bottom: var(--space-4);
+    padding: 0.75rem;
+    margin-bottom: 1rem;
 
     .controls-content {
       flex-direction: column;
       align-items: stretch;
-      gap: var(--space-3);
+      gap: 0.75rem;
 
       .search-controls {
         width: 100%;
@@ -1718,13 +1534,13 @@
           max-width: none;
 
           .search-input {
-            padding: var(--space-2) var(--space-3) var(--space-2) var(--space-10);
-            font-size: var(--text-sm);
+            padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+            font-size: 0.875rem;
           }
 
           .search-icon {
-            left: var(--space-3);
-            font-size: var(--text-base);
+            left: 0.75rem;
+            font-size: 0.875rem;
           }
         }
       }
@@ -1732,7 +1548,7 @@
       .filter-controls {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: var(--space-2);
+        gap: 0.5rem;
 
         .view-toggle {
           grid-column: span 2;
@@ -1742,45 +1558,45 @@
         .add-user-btn {
           grid-column: span 2;
           justify-content: center;
-          padding: var(--space-3);
-          font-size: var(--text-sm);
+          padding: 0.625rem;
+          font-size: 0.75rem;
         }
 
         .filter-toggle-btn {
-          padding: var(--space-2) var(--space-3);
-          font-size: var(--text-sm);
+          padding: 0.5rem 0.75rem;
+          font-size: 0.75rem;
           justify-content: center;
         }
 
         .clear-filters-btn {
-          padding: var(--space-2) var(--space-3);
-          font-size: var(--text-xs);
+          padding: 0.5rem 0.75rem;
+          font-size: 0.6875rem;
         }
 
         .column-manager-btn {
           grid-column: span 2;
           justify-content: center;
-          padding: var(--space-2) var(--space-3);
-          font-size: var(--text-sm);
+          padding: 0.5rem 0.75rem;
+          font-size: 0.75rem;
         }
       }
     }
 
     .filter-panel {
-      padding-top: var(--space-3);
+      padding-top: 0.75rem;
 
       .filter-grid {
         grid-template-columns: 1fr;
-        gap: var(--space-3);
+        gap: 0.75rem;
 
         .filter-group {
           .filter-label {
-            font-size: var(--text-xs);
+            font-size: 0.6875rem;
           }
 
           .filter-select {
-            padding: var(--space-2);
-            font-size: var(--text-sm);
+            padding: 0.5rem;
+            font-size: 0.8125rem;
           }
         }
       }
@@ -1789,8 +1605,7 @@
 
   .users-section {
     .users-table-container {
-      border-radius: 0;
-      margin: 0 calc(var(--space-3) * -1);
+      margin: 0 -0.75rem;
       border-left: none;
       border-right: none;
 
@@ -1798,52 +1613,52 @@
         min-width: 700px;
 
         thead th {
-          padding: var(--space-3);
-          font-size: var(--text-xs);
+          padding: 0.625rem 0.75rem;
+          font-size: 0.625rem;
         }
 
         tbody .user-row td {
-          padding: var(--space-3);
-          font-size: var(--text-sm);
+          padding: 0.75rem;
+          font-size: 0.8125rem;
 
           .user-info {
-            gap: var(--space-2);
+            gap: 0.5rem;
 
             .user-avatar {
               .avatar-image,
               .avatar-placeholder {
-                width: 32px;
-                height: 32px;
-                font-size: var(--text-xs);
+                width: 28px;
+                height: 28px;
+                font-size: 0.625rem;
               }
             }
 
             .user-details {
               .user-name {
-                font-size: var(--text-sm);
+                font-size: 0.8125rem;
               }
 
               .user-email {
-                font-size: var(--text-xs);
+                font-size: 0.6875rem;
               }
             }
           }
 
           .role-badge {
-            padding: var(--space-1) var(--space-2);
-            font-size: var(--text-xs);
+            padding: 0.125rem 0.375rem;
+            font-size: 0.5625rem;
           }
 
           .status-badge {
-            padding: 2px var(--space-2);
-            font-size: 0.625rem;
+            padding: 0.125rem 0.375rem;
+            font-size: 0.5625rem;
           }
 
           .action-buttons {
             .btn-action {
-              width: 28px;
-              height: 28px;
-              font-size: var(--text-xs);
+              width: 24px;
+              height: 24px;
+              font-size: 0.625rem;
             }
           }
         }
@@ -1852,58 +1667,57 @@
 
     .users-grid {
       grid-template-columns: 1fr;
-      gap: var(--space-3);
-      padding: 0;
+      margin-top: 1rem;
 
       .user-card {
         .card-header {
-          padding: var(--space-4);
-          gap: var(--space-3);
+          padding: 1rem;
+          gap: 0.75rem;
 
           .user-avatar {
             .avatar-image,
             .avatar-placeholder {
-              width: 50px;
-              height: 50px;
-              font-size: var(--text-base);
+              width: 40px;
+              height: 40px;
+              font-size: 0.75rem;
             }
           }
 
           .user-info {
             .user-name {
-              font-size: var(--text-base);
+              font-size: 0.9375rem;
             }
 
             .user-email {
-              font-size: var(--text-xs);
+              font-size: 0.75rem;
             }
           }
         }
 
         .card-body {
-          padding: var(--space-4);
-          gap: var(--space-3);
+          padding: 1rem;
+          gap: 0.625rem;
 
           .card-stats {
             flex-wrap: wrap;
-            gap: var(--space-3);
+            gap: 0.75rem;
 
             .stat-item {
-              flex: 1 1 calc(33% - var(--space-2));
-              min-width: 60px;
+              flex: 1 1 calc(33% - 0.5rem);
+              min-width: 50px;
             }
           }
         }
 
         .card-footer {
-          padding: var(--space-3);
+          padding: 0.625rem 1rem;
           flex-wrap: wrap;
 
           .btn-card {
-            flex: 1 1 calc(50% - var(--space-1));
-            min-width: 80px;
-            padding: var(--space-2);
-            font-size: var(--text-xs);
+            flex: 1 1 calc(50% - 0.25rem);
+            min-width: 70px;
+            padding: 0.375rem 0.5rem;
+            font-size: 0.625rem;
           }
         }
       }
@@ -1911,7 +1725,7 @@
   }
 
   .modal-overlay {
-    padding: var(--space-2);
+    padding: 0.5rem;
     align-items: flex-end;
   }
 
@@ -1919,8 +1733,8 @@
     margin: 0;
     max-width: 100%;
     max-height: 95vh;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     width: 100%;
+    border-width: 2px 2px 0 2px;
 
     &.user-modal,
     &.delete-modal {
@@ -1928,38 +1742,38 @@
     }
 
     .modal-header {
-      padding: var(--space-4);
+      padding: 1rem;
       position: sticky;
       top: 0;
-      background: #ffffff;
+      background: $color-white;
       z-index: 10;
 
       h3 {
-        font-size: var(--text-base);
+        font-size: 1rem;
       }
 
       .modal-close {
-        padding: var(--space-1);
-        font-size: var(--text-lg);
+        padding: 0.25rem;
+        font-size: 1rem;
       }
     }
 
     .modal-body {
-      padding: var(--space-4);
+      padding: 1rem;
     }
 
     .modal-footer {
-      padding: var(--space-4);
+      padding: 1rem;
       flex-direction: column;
-      gap: var(--space-2);
+      gap: 0.5rem;
       position: sticky;
       bottom: 0;
-      background: #ffffff;
+      background: $color-bg-light;
 
       button {
         width: 100%;
         justify-content: center;
-        padding: var(--space-3);
+        padding: 0.75rem;
       }
     }
 
@@ -1972,8 +1786,8 @@
         .profile-avatar {
           .avatar-image,
           .avatar-placeholder {
-            width: 70px;
-            height: 70px;
+            width: 56px;
+            height: 56px;
           }
         }
       }
@@ -1981,7 +1795,7 @@
       .profile-details {
         .detail-grid {
           grid-template-columns: 1fr;
-          gap: var(--space-3);
+          gap: 0.75rem;
         }
       }
     }
@@ -1991,15 +1805,15 @@
   .edit-role-form {
     .form-row {
       grid-template-columns: 1fr;
-      gap: var(--space-3);
+      gap: 0.75rem;
     }
 
     .form-group {
-      margin-bottom: var(--space-3);
+      margin-bottom: 0.75rem;
 
       .form-control {
-        padding: var(--space-2) var(--space-3);
-        font-size: var(--text-sm);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
       }
     }
   }
@@ -2008,7 +1822,7 @@
 // Extra small screens (mobile portrait)
 @media (max-width: 480px) {
   .admin-users {
-    padding: var(--space-2);
+    padding: 0.5rem;
   }
 
   .users-header {
@@ -2016,22 +1830,22 @@
       grid-template-columns: 1fr 1fr;
 
       .stat-card {
-        padding: var(--space-2);
-        gap: var(--space-2);
+        padding: 0.5rem;
+        gap: 0.375rem;
 
         .stat-icon {
-          width: 32px;
-          height: 32px;
-          font-size: var(--text-base);
+          width: 28px;
+          height: 28px;
+          font-size: 0.75rem;
         }
 
         .stat-content {
           .stat-number {
-            font-size: var(--text-base);
+            font-size: 1rem;
           }
 
           .stat-label {
-            font-size: 0.625rem;
+            font-size: 0.5625rem;
           }
         }
       }
@@ -2039,7 +1853,7 @@
   }
 
   .controls-section {
-    padding: var(--space-2);
+    padding: 0.5rem;
 
     .controls-content {
       .filter-controls {
@@ -2071,52 +1885,49 @@
         min-width: 600px;
 
         thead th {
-          padding: var(--space-2);
-          font-size: 0.625rem;
+          padding: 0.5rem;
+          font-size: 0.5625rem;
         }
 
         tbody .user-row td {
-          padding: var(--space-2);
+          padding: 0.5rem;
         }
       }
     }
   }
 
-  // Hide less important columns on very small screens via scroll hint
+  // Scroll hint for table
   .users-table-container {
     position: relative;
 
     &::after {
       content: '→';
       position: absolute;
-      right: var(--space-2);
+      right: 0.5rem;
       top: 50%;
       transform: translateY(-50%);
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: var(--space-2) var(--space-3);
-      border-radius: var(--radius-full);
-      font-size: var(--text-sm);
+      background: $color-black;
+      color: $color-white;
+      padding: 0.375rem 0.625rem;
+      font-size: 0.75rem;
       pointer-events: none;
       opacity: 0.8;
       animation: pulse-hint 2s ease-in-out infinite;
     }
 
     &::-webkit-scrollbar {
-      height: 6px;
+      height: 4px;
     }
 
     &::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 3px;
+      background: $color-bg-light;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
-      border-radius: 3px;
+      background: $color-border-dark;
 
       &:hover {
-        background: #a1a1a1;
+        background: $color-medium-gray;
       }
     }
   }
@@ -2129,129 +1940,129 @@
   }
   50% {
     opacity: 1;
-    transform: translateY(-50%) translateX(5px);
+    transform: translateY(-50%) translateX(3px);
   }
 }
 
-// Column Manager Button
+// Column Manager Button - NYT Editorial
 .column-manager-btn {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  color: #8b5cf6;
-  padding: var(--space-3) var(--space-5);
-  border-radius: 8px;
-  font-size: 0.9375rem;
+  gap: 0.5rem;
+  background: $color-white;
+  border: 1px solid $color-border;
+  color: $color-dark-gray;
+  padding: 0.75rem 1rem;
+  font-family: $font-sans;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 
   svg {
     flex-shrink: 0;
   }
 
   &:hover {
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.5);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
+    background: $color-bg-light;
+    border-color: $color-black;
+    color: $color-black;
   }
 }
 
-// Column Manager Modal
+// Column Manager Modal - NYT Editorial
 .column-manager-modal {
-  max-width: 700px;
+  max-width: 640px;
   max-height: 80vh;
   overflow-y: auto;
 
   .column-manager-description {
-    color: var(--clr-secondary-600);
-    font-size: var(--text-sm);
-    margin-bottom: var(--space-6);
+    font-family: $font-sans;
+    color: $color-medium-gray;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
     line-height: 1.6;
   }
 
   .column-categories {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
+    gap: 1.5rem;
   }
 
   .column-category {
     .category-title {
-      font-size: var(--text-base);
-      font-weight: var(--font-semibold);
-      color: var(--clr-secondary-900);
-      margin-bottom: var(--space-3);
-      padding-bottom: var(--space-2);
-      border-bottom: 2px solid var(--clr-primary-600);
+      font-family: $font-sans;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: $color-black;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: $border-medium;
     }
 
     .column-checkboxes {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: var(--space-3);
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.5rem;
     }
 
     .column-checkbox-label {
       display: flex;
       align-items: flex-start;
-      gap: var(--space-2);
+      gap: 0.5rem;
       cursor: pointer;
-      padding: var(--space-2);
-      border-radius: 4px;
+      padding: 0.5rem;
       transition: background-color 0.2s ease;
 
       &:hover {
-        background-color: var(--clr-secondary-50);
+        background-color: $color-bg-light;
       }
 
       .column-checkbox {
         margin-top: 2px;
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         cursor: pointer;
-        accent-color: var(--clr-primary-600);
+        accent-color: $color-black;
       }
 
       .column-label-text {
-        font-size: var(--text-sm);
-        color: var(--clr-secondary-900);
+        font-family: $font-sans;
+        font-size: 0.875rem;
+        color: $color-black;
         line-height: 1.5;
 
         .column-description {
-          color: var(--clr-secondary-500);
-          font-size: 0.8125rem;
+          color: $color-medium-gray;
+          font-size: 0.75rem;
         }
       }
     }
   }
 }
 
-// Pagination Styles
+// Pagination Styles - NYT Editorial
 .pagination-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
-  background: #fff;
-  border-top: 1px solid #e5e5e5;
-  margin-top: 2rem;
+  padding: 1.25rem 1.5rem;
+  background: $color-white;
+  border-top: $border-medium;
+  margin-top: 1.5rem;
 
   .pagination-info {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.25rem;
 
     .pagination-text {
-      font-size: 0.875rem;
-      color: #525252;
-      font-family: 'Roboto', sans-serif;
+      font-family: $font-sans;
+      font-size: 0.8125rem;
+      color: $color-medium-gray;
     }
 
     .page-size-selector {
@@ -2260,29 +2071,30 @@
       gap: 0.5rem;
 
       label {
-        font-size: 0.875rem;
-        color: #525252;
-        font-family: 'Roboto', sans-serif;
+        font-family: $font-sans;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: $color-dark-gray;
       }
 
       .page-size-select {
-        padding: 0.375rem 0.75rem;
-        border: 1px solid #d4d4d4;
-        border-radius: 4px;
-        font-size: 0.875rem;
-        font-family: 'Roboto', sans-serif;
-        background: #fff;
+        padding: 0.375rem 0.625rem;
+        border: 1px solid $color-border;
+        font-family: $font-sans;
+        font-size: 0.8125rem;
+        background: $color-white;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: border-color 0.2s ease;
 
         &:hover {
-          border-color: #0284c7;
+          border-color: $color-black;
         }
 
         &:focus {
           outline: none;
-          border-color: #0284c7;
-          box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+          border-color: $color-black;
         }
       }
     }
@@ -2291,32 +2103,37 @@
   .pagination-controls {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0;
 
     .pagination-btn {
-      min-width: 2.25rem;
-      height: 2.25rem;
-      padding: 0.375rem 0.75rem;
-      border: 1px solid #d4d4d4;
-      background: #fff;
-      color: #262626;
-      font-size: 0.875rem;
-      font-family: 'Roboto', sans-serif;
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0.375rem 0.625rem;
+      border: 1px solid $color-border;
+      background: $color-white;
+      color: $color-dark-gray;
+      font-family: $font-sans;
+      font-size: 0.8125rem;
       font-weight: 500;
-      border-radius: 4px;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-left: -1px;
+
+      &:first-child {
+        margin-left: 0;
+      }
 
       &:hover:not(:disabled) {
-        background: #fafafa;
-        border-color: #0284c7;
-        color: #0284c7;
+        background: $color-bg-light;
+        border-color: $color-black;
+        color: $color-black;
+        z-index: 1;
 
         svg {
-          stroke: #0284c7;
+          stroke: $color-black;
         }
       }
 
@@ -2326,29 +2143,30 @@
       }
 
       &.active {
-        background: #0284c7;
-        border-color: #0284c7;
-        color: #fff;
+        background: $color-black;
+        border-color: $color-black;
+        color: $color-white;
         font-weight: 600;
+        z-index: 2;
       }
 
       svg {
-        stroke: #525252;
+        stroke: $color-medium-gray;
         transition: stroke 0.2s ease;
       }
     }
 
     .pagination-ellipsis {
-      padding: 0 0.5rem;
-      color: #737373;
-      font-size: 0.875rem;
-      font-family: 'Roboto', sans-serif;
+      padding: 0 0.375rem;
+      color: $color-medium-gray;
+      font-family: $font-sans;
+      font-size: 0.8125rem;
     }
   }
 
   // Tablet responsive
   @media (max-width: 1024px) {
-    padding: 1.25rem 1.5rem;
+    padding: 1rem 1.25rem;
     gap: 1rem;
   }
 
@@ -2361,12 +2179,12 @@
 
     .pagination-info {
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.625rem;
       width: 100%;
       text-align: center;
 
       .pagination-text {
-        font-size: 0.8125rem;
+        font-size: 0.75rem;
       }
 
       .page-size-selector {
@@ -2374,7 +2192,7 @@
         width: 100%;
 
         label {
-          font-size: 0.8125rem;
+          font-size: 0.6875rem;
         }
       }
     }
@@ -2382,18 +2200,18 @@
     .pagination-controls {
       flex-wrap: wrap;
       justify-content: center;
-      gap: 0.375rem;
+      gap: 0;
 
       .pagination-btn {
-        min-width: 2rem;
-        height: 2rem;
+        min-width: 1.75rem;
+        height: 1.75rem;
         padding: 0.25rem 0.5rem;
-        font-size: 0.8125rem;
+        font-size: 0.75rem;
       }
 
       .pagination-ellipsis {
         padding: 0 0.25rem;
-        font-size: 0.8125rem;
+        font-size: 0.75rem;
       }
     }
   }
@@ -2404,28 +2222,27 @@
 
     .pagination-info {
       .pagination-text {
-        font-size: 0.75rem;
+        font-size: 0.6875rem;
       }
 
       .page-size-selector {
         label {
-          font-size: 0.75rem;
+          font-size: 0.625rem;
         }
 
         .page-size-select {
           padding: 0.25rem 0.5rem;
-          font-size: 0.75rem;
+          font-size: 0.6875rem;
         }
       }
     }
 
     .pagination-controls {
       .pagination-btn {
-        min-width: 1.75rem;
-        height: 1.75rem;
+        min-width: 1.5rem;
+        height: 1.5rem;
         padding: 0.125rem 0.375rem;
-        font-size: 0.75rem;
-        border-radius: 3px;
+        font-size: 0.6875rem;
       }
 
       // Hide some page numbers on very small screens

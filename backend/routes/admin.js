@@ -443,6 +443,74 @@ router.post('/users', requireAdmin, async (req, res) => {
   }
 });
 
+// Get single user by ID
+router.get('/users/:id', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const query = `
+      SELECT
+        u.id,
+        u.email,
+        u.first_name,
+        u.last_name,
+        u.phone,
+        u.role,
+        u.tenant_id,
+        t.name as tenant_name,
+        u.status as account_status,
+        u.email_verified,
+        u.avatar_url,
+        u.created_at,
+        u.updated_at,
+        u.last_login_at,
+        (SELECT COUNT(*) FROM bookings WHERE user_id = u.id) as total_bookings,
+        (SELECT COUNT(*) FROM reviews WHERE user_id = u.id) as total_reviews,
+        (SELECT COUNT(*) FROM favorites WHERE user_id = u.id) as total_favorites,
+        (SELECT b.id FROM businesses b WHERE b.owner_id = u.id LIMIT 1) as business_id,
+        (SELECT b.business_name FROM businesses b WHERE b.owner_id = u.id LIMIT 1) as business_name,
+        (SELECT b.business_type FROM businesses b WHERE b.owner_id = u.id LIMIT 1) as business_type
+      FROM users u
+      LEFT JOIN tenants t ON u.tenant_id = t.id
+      WHERE u.id = $1
+    `;
+
+    const result = await pool.query(query, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = result.rows[0];
+
+    res.json({
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      phone: user.phone,
+      role: user.role,
+      tenantId: user.tenant_id,
+      tenantName: user.tenant_name,
+      status: user.account_status,
+      emailVerified: user.email_verified,
+      avatar: user.avatar_url,
+      createdAt: user.created_at,
+      updatedAt: user.updated_at,
+      lastLoginAt: user.last_login_at,
+      totalBookings: parseInt(user.total_bookings) || 0,
+      totalReviews: parseInt(user.total_reviews) || 0,
+      totalFavorites: parseInt(user.total_favorites) || 0,
+      businessId: user.business_id,
+      businessName: user.business_name,
+      businessType: user.business_type
+    });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Failed to fetch user', details: error.message });
+  }
+});
+
 // ===================================
 // BUSINESSES
 // ===================================

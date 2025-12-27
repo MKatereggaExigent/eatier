@@ -1,28 +1,49 @@
+// NYT Editorial Design Variables
+$font-serif: 'Noto Serif', Georgia, serif;
+$font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+$color-black: #000;
+$color-white: #fff;
+$color-dark-gray: #333;
+$color-medium-gray: #666;
+$color-light-gray: #999;
+$color-border: #e0e0e0;
+$color-bg-light: #f7f7f7;
+$color-success: #2e7d32;
+$color-warning: #f57c00;
+$color-danger: #c62828;
+$border-thin: 1px solid $color-border;
+$border-medium: 2px solid $color-black;
+
 .business-detail-container {
-  padding: 24px;
-  max-width: 1400px;
+  padding: 2rem;
+  max-width: 1200px;
   margin: 0 auto;
+  background: $color-white;
 }
 
 .detail-header {
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: $border-thin;
 }
 
 .back-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: var(--surface-color, #f5f5f5);
-  border: 1px solid var(--border-color, #e0e0e0);
-  border-radius: 8px;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: $color-white;
+  border: 1px solid $color-border;
   cursor: pointer;
-  font-size: 14px;
-  color: var(--text-primary, #333);
-  transition: all 0.2s;
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: $color-dark-gray;
+  transition: all 0.15s ease;
 
   &:hover {
-    background: var(--surface-hover, #ebebeb);
+    background: $color-bg-light;
+    border-color: $color-black;
   }
 }
 
@@ -32,19 +53,20 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 20px;
+  padding: 4rem 1.5rem;
   text-align: center;
-  color: var(--text-secondary, #666);
+  color: $color-medium-gray;
+  font-family: $font-sans;
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--border-color, #e0e0e0);
-  border-top-color: var(--primary-color, #4CAF50);
+  width: 36px;
+  height: 36px;
+  border: 3px solid $color-border;
+  border-top-color: $color-black;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 @keyframes spin {
@@ -52,45 +74,52 @@
 }
 
 .retry-btn {
-  margin-top: 16px;
-  padding: 10px 24px;
-  background: var(--primary-color, #4CAF50);
-  color: white;
+  margin-top: 1rem;
+  padding: 0.625rem 1.5rem;
+  background: $color-black;
+  color: $color-white;
   border: none;
-  border-radius: 8px;
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
 }
 
-// Business Header Card
+// Business Header Card - NYT Editorial
 .business-header-card {
   display: flex;
   align-items: flex-start;
-  gap: 24px;
-  padding: 24px;
-  background: var(--card-bg, white);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  margin-bottom: 24px;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: $color-white;
+  border: $border-medium;
+  margin-bottom: 1.5rem;
 }
 
 .business-logo {
   flex-shrink: 0;
-  
+
   img, .logo-placeholder {
-    width: 100px;
-    height: 100px;
-    border-radius: 12px;
+    width: 80px;
+    height: 80px;
     object-fit: cover;
+    border: $border-thin;
   }
 
   .logo-placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #4CAF50, #2196F3);
-    color: white;
-    font-size: 40px;
-    font-weight: 600;
+    background: $color-bg-light;
+    color: $color-dark-gray;
+    font-family: $font-serif;
+    font-size: 2rem;
+    font-weight: 700;
   }
 }
 
@@ -98,160 +127,274 @@
   flex: 1;
 
   .business-name {
-    margin: 0 0 4px;
-    font-size: 28px;
+    margin: 0 0 0.25rem;
+    font-family: $font-serif;
+    font-size: 1.75rem;
     font-weight: 700;
-    color: var(--text-primary, #333);
+    color: $color-black;
+    line-height: 1.2;
   }
 
   .business-type {
-    margin: 0 0 12px;
-    font-size: 16px;
-    color: var(--text-secondary, #666);
+    margin: 0 0 0.75rem;
+    font-family: $font-sans;
+    font-size: 0.875rem;
+    color: $color-medium-gray;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 }
 
 .business-badges {
   display: flex;
-  gap: 8px;
+  gap: 0.375rem;
   flex-wrap: wrap;
 }
 
 .status-badge {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  font-family: $font-sans;
+  font-size: 0.625rem;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid;
 }
 
-.status-active { background: #e8f5e9; color: #2e7d32; }
-.status-suspended { background: #ffebee; color: #c62828; }
-.status-pending { background: #fff3e0; color: #ef6c00; }
-.status-inactive { background: #f5f5f5; color: #757575; }
+.status-active {
+  background: rgba($color-success, 0.08);
+  color: $color-success;
+  border-color: rgba($color-success, 0.3);
+}
+.status-suspended {
+  background: rgba($color-danger, 0.08);
+  color: $color-danger;
+  border-color: rgba($color-danger, 0.3);
+}
+.status-pending {
+  background: rgba($color-warning, 0.08);
+  color: darken($color-warning, 10%);
+  border-color: rgba($color-warning, 0.3);
+}
+.status-inactive {
+  background: $color-bg-light;
+  color: $color-medium-gray;
+  border-color: $color-border;
+}
 
 .verified-badge {
-  padding: 4px 12px;
-  background: #e3f2fd;
-  color: #1565c0;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  background: $color-bg-light;
+  color: $color-dark-gray;
+  font-family: $font-sans;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid $color-border;
 }
 
 .featured-badge {
-  padding: 4px 12px;
-  background: #fff8e1;
-  color: #f57c00;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  background: $color-black;
+  color: $color-white;
+  font-family: $font-sans;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid $color-black;
 }
 
 .business-actions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.375rem;
 }
 
 .action-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid $color-border;
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s ease;
   white-space: nowrap;
+  background: $color-white;
+  color: $color-dark-gray;
+
+  &:hover:not(:disabled) {
+    background: $color-bg-light;
+    border-color: $color-black;
+  }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 }
 
-.verify-btn { background: #1565c0; color: white; &:hover:not(:disabled) { background: #0d47a1; } }
-.activate-btn { background: #2e7d32; color: white; &:hover:not(:disabled) { background: #1b5e20; } }
-.suspend-btn { background: #f57c00; color: white; &:hover:not(:disabled) { background: #e65100; } }
-.delete-btn { background: #c62828; color: white; &:hover:not(:disabled) { background: #b71c1c; } }
+.verify-btn {
+  background: $color-black;
+  border-color: $color-black;
+  color: $color-white;
+  &:hover:not(:disabled) { opacity: 0.85; background: $color-black; }
+}
+.activate-btn {
+  border-color: $color-success;
+  color: $color-success;
+  &:hover:not(:disabled) { background: rgba($color-success, 0.08); }
+}
+.suspend-btn {
+  border-color: $color-warning;
+  color: darken($color-warning, 10%);
+  &:hover:not(:disabled) { background: rgba($color-warning, 0.08); }
+}
+.delete-btn {
+  border-color: $color-danger;
+  color: $color-danger;
+  &:hover:not(:disabled) { background: rgba($color-danger, 0.08); }
+}
 
-// Stats Row
+// Stats Row - NYT Editorial
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0;
+  margin-bottom: 1.5rem;
+  border: $border-thin;
 }
 
 .stat-card {
-  padding: 20px;
-  background: var(--card-bg, white);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 1.25rem;
+  background: $color-white;
   text-align: center;
+  border-right: $border-thin;
 
-  .stat-icon { font-size: 28px; margin-bottom: 8px; }
-  .stat-value { font-size: 28px; font-weight: 700; color: var(--text-primary, #333); }
-  .stat-label { font-size: 14px; color: var(--text-secondary, #666); margin-top: 4px; }
+  &:last-child {
+    border-right: none;
+  }
+
+  .stat-icon {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.6;
+  }
+
+  .stat-value {
+    font-family: $font-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $color-black;
+  }
+
+  .stat-label {
+    font-family: $font-sans;
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: $color-medium-gray;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.25rem;
+  }
 }
 
-// Details Grid
+// Details Grid - NYT Editorial
 .details-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
 }
 
 .detail-card {
-  padding: 20px;
-  background: var(--card-bg, white);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 1.25rem;
+  background: $color-white;
+  border: $border-thin;
 
-  &.full-width { grid-column: 1 / -1; }
+  &.full-width {
+    grid-column: 1 / -1;
+  }
 
   .card-title {
-    margin: 0 0 16px;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-primary, #333);
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    margin: 0 0 1rem;
+    font-family: $font-sans;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: $color-dark-gray;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding-bottom: 0.75rem;
+    border-bottom: $border-medium;
   }
 }
 
 .detail-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border-light, #f0f0f0);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba($color-border, 0.5);
+  font-family: $font-sans;
+  font-size: 0.8125rem;
 
-  &:last-of-type { border-bottom: none; }
+  &:last-of-type {
+    border-bottom: none;
+  }
 
-  .label { font-weight: 500; color: var(--text-secondary, #666); }
-  .value { color: var(--text-primary, #333); text-align: right; }
-  .link { color: var(--primary-color, #4CAF50); text-decoration: none; &:hover { text-decoration: underline; } }
+  .label {
+    font-weight: 500;
+    color: $color-medium-gray;
+    font-size: 0.75rem;
+  }
+
+  .value {
+    color: $color-black;
+    text-align: right;
+  }
+
+  .link {
+    color: $color-black;
+    text-decoration: underline;
+    &:hover {
+      text-decoration: none;
+    }
+  }
 }
 
-.description-text { margin: 0; line-height: 1.6; color: var(--text-primary, #333); }
+.description-text {
+  margin: 0;
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: $color-dark-gray;
+}
 
 .view-owner-btn {
-  margin-top: 16px;
-  padding: 10px 16px;
-  background: var(--surface-color, #f5f5f5);
-  border: 1px solid var(--border-color, #e0e0e0);
-  border-radius: 8px;
+  margin-top: 1rem;
+  padding: 0.625rem 1rem;
+  background: $color-white;
+  border: 1px solid $color-border;
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
   width: 100%;
-  &:hover { background: var(--surface-hover, #ebebeb); }
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: $color-bg-light;
+    border-color: $color-black;
+  }
 }
 
-// Modal
+// Modal - NYT Editorial
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba($color-black, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -259,75 +402,169 @@
 }
 
 .modal-content {
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  max-width: 450px;
+  background: $color-white;
+  padding: 1.5rem;
+  border: $border-medium;
+  max-width: 420px;
   width: 90%;
 
-  .modal-title { margin: 0 0 12px; font-size: 20px; color: #c62828; }
-  .modal-message { margin: 0 0 24px; color: var(--text-secondary, #666); line-height: 1.5; }
+  .modal-title {
+    margin: 0 0 0.75rem;
+    font-family: $font-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $color-danger;
+  }
+
+  .modal-message {
+    margin: 0 0 1.5rem;
+    font-family: $font-sans;
+    font-size: 0.875rem;
+    color: $color-medium-gray;
+    line-height: 1.5;
+  }
 }
 
 .modal-actions {
   display: flex;
-  gap: 12px;
+  gap: 0.5rem;
   justify-content: flex-end;
 
   .cancel-btn {
-    padding: 10px 20px;
-    background: var(--surface-color, #f5f5f5);
-    border: 1px solid var(--border-color, #e0e0e0);
-    border-radius: 8px;
+    padding: 0.625rem 1.25rem;
+    background: $color-white;
+    border: 1px solid $color-border;
+    font-family: $font-sans;
+    font-size: 0.8125rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: $color-bg-light;
+      border-color: $color-black;
+    }
   }
 
   .confirm-delete-btn {
-    padding: 10px 20px;
-    background: #c62828;
-    color: white;
-    border: none;
-    border-radius: 8px;
+    padding: 0.625rem 1.25rem;
+    background: $color-danger;
+    color: $color-white;
+    border: 1px solid $color-danger;
+    font-family: $font-sans;
+    font-size: 0.8125rem;
+    font-weight: 600;
     cursor: pointer;
-    &:disabled { opacity: 0.6; cursor: not-allowed; }
+    transition: opacity 0.15s ease;
+
+    &:hover:not(:disabled) {
+      opacity: 0.85;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
 }
 
-// Toast
+// Toast - NYT Editorial
 .toast {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  padding: 16px 24px;
-  border-radius: 8px;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 1rem 1.25rem;
   display: flex;
   align-items: center;
-  gap: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  gap: 0.75rem;
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
   z-index: 1001;
   animation: slideIn 0.3s ease;
+  border: $border-medium;
 
-  .toast-close { background: none; border: none; font-size: 20px; cursor: pointer; opacity: 0.7; }
+  .toast-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
 
-.toast-success { background: #2e7d32; color: white; }
-.toast-error { background: #c62828; color: white; }
-.toast-info { background: #1565c0; color: white; }
+.toast-success {
+  background: $color-white;
+  color: $color-success;
+  border-color: $color-success;
+}
+
+.toast-error {
+  background: $color-white;
+  color: $color-danger;
+  border-color: $color-danger;
+}
+
+.toast-info {
+  background: $color-white;
+  color: $color-black;
+  border-color: $color-black;
+}
 
 @keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
-// Responsive
+// Responsive - NYT Editorial
 @media (max-width: 768px) {
+  .business-detail-container {
+    padding: 1rem;
+  }
+
   .business-header-card {
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
-  .business-actions { width: 100%; }
-  .action-btn { width: 100%; }
-}
 
+  .business-actions {
+    width: 100%;
+  }
+
+  .action-btn {
+    width: 100%;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+
+    .stat-card {
+      border-bottom: $border-thin;
+
+      &:nth-child(odd) {
+        border-right: $border-thin;
+      }
+
+      &:nth-child(even) {
+        border-right: none;
+      }
+
+      &:nth-last-child(-n+2) {
+        border-bottom: none;
+      }
+    }
+  }
+}
