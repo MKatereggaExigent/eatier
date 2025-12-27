@@ -353,16 +353,29 @@ export class AuthService {
           businessVerified: backendUser.businessVerified || false,
           businessProfile: backendUser.businessProfile || {
             description: '',
-            address: '',
-            city: '',
-            country: '',
-            phone: '',
-            website: '',
-            openingHours: {}
+            cuisine: [],
+            priceRange: 'moderate',
+            location: {
+              address: '',
+              city: '',
+              state: '',
+              country: ''
+            },
+            operatingHours: {},
+            contact: {
+              phone: ''
+            },
+            amenities: [],
+            photos: []
           },
-          businessMetrics: backendUser.businessMetrics || {
-            averageRating: 0,
+          menuManagement: backendUser.menuManagement || {
+            hasDigitalMenu: false,
+            menuCategories: [],
+            totalItems: 0
+          },
+          analytics: backendUser.analytics || {
             totalReviews: 0,
+            averageRating: 0,
             monthlyViews: 0,
             favoriteCount: 0
           }
@@ -418,11 +431,38 @@ export class AuthService {
             experience: 0,
             certifications: [],
             languages: ['English'],
-            availability: { days: [], hours: '' }
+            skills: []
           },
-          serviceOfferings: backendUser.serviceOfferings || [],
-          pricing: backendUser.pricing || { hourlyRate: 0, currency: 'USD' },
-          portfolio: backendUser.portfolio || { images: [], videos: [], description: '' },
+          services: backendUser.services || {
+            privateChef: false,
+            eventCatering: false,
+            consultations: false,
+            classes: false,
+            substituteCoverage: false,
+            specialEvents: false
+          },
+          pricing: backendUser.pricing || {},
+          availability: backendUser.availability || {
+            days: [],
+            hours: { start: '09:00', end: '18:00' },
+            advanceNotice: 2,
+            maxBookingsPerWeek: 10
+          },
+          serviceArea: backendUser.serviceArea || {
+            radius: 25,
+            location: {
+              city: '',
+              state: '',
+              country: ''
+            },
+            willingToTravel: true
+          },
+          portfolio: backendUser.portfolio || {
+            images: [],
+            videos: [],
+            description: '',
+            testimonials: []
+          },
           businessMetrics: backendUser.businessMetrics || {
             rating: 0,
             reviewCount: 0,

@@ -209,6 +209,15 @@ export class AdminService {
   }
 
   /**
+   * Get single business by ID
+   */
+  getBusiness(businessId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/businesses/${businessId}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
    * Verify a business
    */
   verifyBusiness(businessId: string): Observable<any> {

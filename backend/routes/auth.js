@@ -306,11 +306,18 @@ router.post('/register', async (req, res) => {
 
 // Login user
 router.post('/login', async (req, res) => {
+  console.log('=== LOGIN REQUEST ===');
+  console.log('Body:', JSON.stringify(req.body));
+  console.log('Content-Type:', req.headers['content-type']);
+
   const client = await pool.connect();
   try {
     const { email, password } = req.body;
 
+    console.log('Email:', email, 'Password length:', password?.length);
+
     if (!email || !password) {
+      console.log('Missing email or password');
       return res.status(400).json({ error: 'Email and password are required' });
     }
 

@@ -70,6 +70,7 @@ export const routes: Routes = [
             { path: 'overview', loadComponent: () => import('./pages/admin/overview/admin-overview.component').then(m => m.AdminOverviewComponent) },
             { path: 'users', loadComponent: () => import('./pages/admin/users/admin-users.component').then(m => m.AdminUsersComponent) },
             { path: 'businesses', loadComponent: () => import('./pages/admin/businesses/admin-businesses.component').then(m => m.AdminBusinessesComponent) },
+            { path: 'businesses/:id', loadComponent: () => import('./pages/admin/businesses/business-detail/business-detail.component').then(m => m.BusinessDetailComponent) },
             { path: 'bookings', loadComponent: () => import('./pages/admin/bookings/admin-bookings.component').then(m => m.AdminBookingsComponent) },
             { path: 'ads', loadComponent: () => import('./pages/admin/ads/admin-ads.component').then(m => m.AdminAdsComponent) },
             { path: 'analytics', loadComponent: () => import('./pages/admin/analytics/admin-analytics.component').then(m => m.AdminAnalyticsComponent) },
@@ -132,6 +133,7 @@ export const routes: Routes = [
             { path: '', redirectTo: 'overview', pathMatch: 'full' },
             { path: 'overview', loadComponent: () => import('./pages/food-enthusiast/overview/food-enthusiast-overview.component').then(m => m.FoodEnthusiastOverviewComponent) },
             { path: 'bookings', loadComponent: () => import('./pages/food-enthusiast/bookings/food-enthusiast-bookings.component').then(m => m.FoodEnthusiastBookingsComponent) },
+            { path: 'specialist-bookings', loadComponent: () => import('./pages/user/specialist-bookings/user-specialist-bookings.component').then(m => m.UserSpecialistBookingsComponent) },
             { path: 'reviews', loadComponent: () => import('./pages/food-enthusiast/reviews/food-enthusiast-reviews.component').then(m => m.FoodEnthusiastReviewsComponent) },
             { path: 'profile', loadComponent: () => import('./pages/user/profile/user-profile.component').then(m => m.UserProfileComponent) },
             { path: 'favorites', loadComponent: () => import('./pages/user/favorites/user-favorites.component').then(m => m.UserFavoritesComponent) },
@@ -165,6 +167,7 @@ export const routes: Routes = [
             { path: 'legacy-access', loadComponent: () => import('./pages/user/legacy-access/legacy-access.component').then(m => m.LegacyAccessComponent) },
             { path: 'accounts', loadComponent: () => import('./pages/user/accounts/user-accounts-center.component').then(m => m.UserAccountsCenterComponent) },
             { path: 'bookings', loadComponent: () => import('./pages/user/bookings/bookings.component').then(m => m.BookingsComponent) },
+            { path: 'specialist-bookings', loadComponent: () => import('./pages/user/specialist-bookings/user-specialist-bookings.component').then(m => m.UserSpecialistBookingsComponent) },
             { path: 'preferences', loadComponent: () => import('./pages/user/preferences/user-preferences.component').then(m => m.UserPreferencesComponent) },
             { path: 'orders', loadComponent: () => import('./pages/user/orders/user-orders.component').then(m => m.UserOrdersComponent) },
             { path: 'wallet', loadComponent: () => import('./pages/user/wallet/user-wallet.component').then(m => m.UserWalletComponent) },
@@ -192,7 +195,8 @@ export const routes: Routes = [
             { path: 'digital-card', loadComponent: () => import('./pages/user/digital-card/user-digital-card.component').then(m => m.UserDigitalCardComponent) },
             { path: 'legacy-access', loadComponent: () => import('./pages/user/legacy-access/legacy-access.component').then(m => m.LegacyAccessComponent) },
             { path: 'accounts', loadComponent: () => import('./pages/user/accounts/user-accounts-center.component').then(m => m.UserAccountsCenterComponent) },
-            { path: 'bookings', loadComponent: () => import('./pages/user/bookings/bookings.component').then(m => m.BookingsComponent) }
+            { path: 'bookings', loadComponent: () => import('./pages/user/bookings/bookings.component').then(m => m.BookingsComponent) },
+            { path: 'wallet', loadComponent: () => import('./pages/user/wallet/user-wallet.component').then(m => m.UserWalletComponent) }
         ]
     },
 

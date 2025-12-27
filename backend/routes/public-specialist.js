@@ -350,5 +350,163 @@ router.post('/:id/book', authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * POST /api/public/specialists/:id/testimonial
+ * Submit a testimonial for a specialist after a completed booking
+ * Only clients who have completed bookings with the specialist can submit testimonials
+ */
+router.post('/:id/testimonial', authenticateToken, async (req, res) => {
+  try {
+    const specialistId = req.params.id;
+    const clientId = req.user.id;
+    const clientTenantId = req.user.tenant_id;
+
+    if (!clientTenantId) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'User is not associated with a valid tenant'
+      });
+    }
+
+    const { bookingId, rating, review, eventType, eventDate } = req.body;
+
+    // Validate required fields
+    if (!review || !rating) {
+      return res.status(400).json({
+        error: 'Validation Error',
+        message: 'Rating and review are required'
+      });
+    }
+
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({
+        error: 'Validation Error',
+        message: 'Rating must be between 1 and 5'
+      });
+    }
+
+    // Verify the client has a completed booking with this specialist
+    const bookingCheck = await pool.query(`
+      SELECT id, booking_date, event_type
+      FROM specialist_bookings
+      WHERE client_id = $1
+        AND specialist_id = $2
+        AND status = 'completed'
+        ${bookingId ? 'AND id = $4' : ''}
+      ORDER BY booking_date DESC
+      LIMIT 1
+    `, bookingId
+      ? [clientId, specialistId, 'completed', bookingId]
+      : [clientId, specialistId, 'completed']
+    );
+
+    if (bookingCheck.rows.length === 0) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'You can only leave a testimonial after a completed booking with this specialist'
+      });
+    }
+
+    const completedBooking = bookingCheck.rows[0];
+
+    // Check if client already submitted a testimonial for this booking
+    const existingTestimonial = await pool.query(`
+      SELECT id FROM specialist_testimonials
+      WHERE specialist_id = $1 AND booking_id = $2
+    `, [specialistId, completedBooking.id]);
+
+    if (existingTestimonial.rows.length > 0) {
+      return res.status(400).json({
+        error: 'Duplicate',
+        message: 'You have already submitted a testimonial for this booking'
+      });
+    }
+
+    // Get client's name for the testimonial
+    const clientInfo = await pool.query(`
+      SELECT first_name, last_name, email FROM users WHERE id = $1
+    `, [clientId]);
+
+    const clientName = clientInfo.rows.length > 0
+      ? `${clientInfo.rows[0].first_name} ${clientInfo.rows[0].last_name}`.trim()
+      : 'Anonymous';
+
+    // Get specialist's tenant_id for multi-tenancy
+    const specialistInfo = await pool.query(`
+      SELECT tenant_id FROM users WHERE id = $1
+    `, [specialistId]);
+
+    if (specialistInfo.rows.length === 0) {
+      return res.status(404).json({ error: 'Specialist not found' });
+    }
+
+    const specialistTenantId = specialistInfo.rows[0].tenant_id;
+
+    // Insert the testimonial
+    const result = await pool.query(`
+      INSERT INTO specialist_testimonials (
+        specialist_id, tenant_id, client_id, booking_id,
+        client_name, rating, review,
+        event_type, event_date, is_public, is_featured
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, true, false)
+      RETURNING *
+    `, [
+      specialistId,
+      specialistTenantId,
+      clientId,
+      completedBooking.id,
+      clientName,
+      rating,
+      review,
+      eventType || completedBooking.event_type,
+      eventDate || completedBooking.booking_date,
+    ]);
+
+    res.status(201).json({
+      message: 'Thank you for your testimonial!',
+      testimonial: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error submitting testimonial:', error);
+    res.status(500).json({ error: 'Failed to submit testimonial' });
+  }
+});
+
+/**
+ * GET /api/public/specialists/:id/can-review
+ * Check if the current user can leave a testimonial for this specialist
+ */
+router.get('/:id/can-review', authenticateToken, async (req, res) => {
+  try {
+    const specialistId = req.params.id;
+    const clientId = req.user.id;
+
+    // Check for completed bookings without testimonials
+    const result = await pool.query(`
+      SELECT sb.id, sb.booking_date, sb.event_type
+      FROM specialist_bookings sb
+      LEFT JOIN specialist_testimonials st ON st.booking_id = sb.id
+      WHERE sb.client_id = $1
+        AND sb.specialist_id = $2
+        AND sb.status = 'completed'
+        AND st.id IS NULL
+      ORDER BY sb.booking_date DESC
+    `, [clientId, specialistId]);
+
+    res.json({
+      canReview: result.rows.length > 0,
+      pendingBookings: result.rows.map(row => ({
+        id: row.id,
+        bookingDate: row.booking_date,
+        eventType: row.event_type
+      }))
+    });
+  } catch (error) {
+    console.error('Error checking review eligibility:', error);
+    res.status(500).json({ error: 'Failed to check review eligibility' });
+  }
+});
+
 module.exports = router;
 

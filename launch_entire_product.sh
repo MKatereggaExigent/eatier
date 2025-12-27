@@ -2,6 +2,7 @@
 
 # Itiyum Platform Launch Script
 # This script starts PostgreSQL, Backend, and Frontend servers
+# Supports both Docker mode (recommended) and local mode
 
 set -e  # Exit on error
 
@@ -42,11 +43,165 @@ kill_port() {
     sleep 1
 }
 
+# Function to check if Docker is available
+check_docker() {
+    if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; then
+        if docker info &> /dev/null; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
 echo ""
 echo "=========================================="
 echo "   🚀 ITIYUM PLATFORM LAUNCHER 🚀"
 echo "=========================================="
 echo ""
+
+# Parse command line arguments
+USE_DOCKER=false
+USE_LOCAL=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --docker|-d)
+            USE_DOCKER=true
+            shift
+            ;;
+        --local|-l)
+            USE_LOCAL=true
+            shift
+            ;;
+        --help|-h)
+            echo "Usage: $0 [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  --docker, -d    Force Docker mode (recommended)"
+            echo "  --local, -l     Force local mode (requires local PostgreSQL)"
+            echo "  --help, -h      Show this help message"
+            echo ""
+            echo "Without options, Docker mode is used if available, otherwise local mode."
+            exit 0
+            ;;
+        *)
+            print_error "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+    esac
+done
+
+# Determine which mode to use
+if [ "$USE_DOCKER" = true ]; then
+    if ! check_docker; then
+        print_error "Docker requested but not available or not running"
+        exit 1
+    fi
+    print_status "Using Docker mode (forced)"
+elif [ "$USE_LOCAL" = true ]; then
+    print_status "Using local mode (forced)"
+elif check_docker; then
+    USE_DOCKER=true
+    print_status "Docker detected - using Docker mode (recommended)"
+else
+    print_status "Docker not available - using local mode"
+fi
+
+# ========================================
+# DOCKER MODE
+# ========================================
+if [ "$USE_DOCKER" = true ]; then
+    print_status "Starting Itiyum Platform with Docker..."
+
+    # Stop any existing containers
+    print_status "Stopping any existing containers..."
+    docker-compose down 2>/dev/null || true
+
+    # Build and start containers
+    print_status "Building and starting Docker containers..."
+    print_warning "This may take a few minutes on first run..."
+
+    docker-compose up -d --build
+
+    # Wait for services to be ready
+    print_status "Waiting for services to start..."
+
+    # Wait for backend
+    print_status "Waiting for backend to be ready..."
+    for i in {1..60}; do
+        if curl -s http://localhost:3001/api/auth/status > /dev/null 2>&1; then
+            print_success "Backend is ready"
+            break
+        fi
+        if [ $i -eq 60 ]; then
+            print_error "Backend failed to start. Check logs with: docker logs itiyum-backend"
+            exit 1
+        fi
+        sleep 2
+    done
+
+    # Wait for frontend
+    print_status "Waiting for frontend to be ready..."
+    print_warning "Frontend may take 30-60 seconds to compile..."
+    for i in {1..90}; do
+        if curl -s http://localhost:4200 > /dev/null 2>&1; then
+            print_success "Frontend is ready"
+            break
+        fi
+        if [ $((i % 15)) -eq 0 ]; then
+            print_status "Still waiting for frontend... ($i seconds)"
+        fi
+        if [ $i -eq 90 ]; then
+            print_error "Frontend failed to start. Check logs with: docker logs itiyum-frontend"
+            exit 1
+        fi
+        sleep 1
+    done
+
+    # Summary
+    echo ""
+    echo "=========================================="
+    echo "   ✅ ALL SERVICES STARTED (DOCKER MODE)"
+    echo "=========================================="
+    echo ""
+    echo "📊 Service Status:"
+    echo "  • PostgreSQL:  ✅ Running (container: itiyum-postgres)"
+    echo "  • Backend:     ✅ Running (container: itiyum-backend)"
+    echo "  • Frontend:    ✅ Running (container: itiyum-frontend)"
+    echo ""
+    echo "🌐 Access URLs:"
+    echo "  • Frontend:    http://localhost:4200"
+    echo "  • Backend API: http://localhost:3001/api"
+    echo "  • Login Page:  http://localhost:4200/login"
+    echo ""
+    echo "📝 Logs:"
+    echo "  • Backend:     docker logs -f itiyum-backend"
+    echo "  • Frontend:    docker logs -f itiyum-frontend"
+    echo "  • Database:    docker logs -f itiyum-postgres"
+    echo ""
+    echo "🛑 To stop all services:"
+    echo "  • docker-compose down"
+    echo "  • Or use: ./stop_entire_product.sh"
+    echo ""
+    echo "🔐 Admin Login:"
+    echo "  • Email:    admin@itiyum.com"
+    echo "  • Password: Admin@123"
+    echo ""
+    echo "=========================================="
+    echo ""
+    print_success "Launch complete (Docker mode)! 🎉"
+
+    # Save mode to file for stop script
+    echo "MODE=docker" > .itiyum_pids
+
+    exit 0
+fi
+
+# ========================================
+# LOCAL MODE (Original behavior)
+# ========================================
+print_status "Starting Itiyum Platform in local mode..."
 
 # Step 1: Check and start PostgreSQL
 print_status "Checking PostgreSQL status..."

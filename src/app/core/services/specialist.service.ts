@@ -51,6 +51,58 @@ export interface SpecialistEarning {
   created_at: string;
 }
 
+// Portfolio interfaces
+export interface PortfolioImage {
+  id: string;
+  url: string;
+  title: string;
+  description?: string;
+  category?: string;
+  event_type?: string;
+  is_main: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PortfolioVideo {
+  id: string;
+  url: string;
+  thumbnail_url?: string;
+  title: string;
+  description?: string;
+  duration_seconds: number;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PortfolioTestimonial {
+  id: string;
+  client_name: string;
+  client_avatar_url?: string;
+  rating: number;
+  review: string;
+  event_type?: string;
+  event_date?: string;
+  is_public: boolean;
+  is_featured: boolean;
+  is_verified: boolean;
+  booking_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PortfolioSettings {
+  id?: string;
+  portfolio_title?: string;
+  portfolio_description?: string;
+  show_contact_info: boolean;
+  allow_downloads: boolean;
+  watermark_images: boolean;
+  theme: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -106,6 +158,128 @@ export class SpecialistService {
     return this.http.get<{ earnings: SpecialistEarning[] }>(`${this.apiUrl}/earnings`, {
       headers: this.getHeaders(),
       params: { limit: limit.toString() }
+    });
+  }
+
+  // ============================================
+  // PORTFOLIO METHODS
+  // ============================================
+
+  /**
+   * Get portfolio images
+   */
+  getPortfolioImages(): Observable<{ images: PortfolioImage[] }> {
+    return this.http.get<{ images: PortfolioImage[] }>(`${this.apiUrl}/portfolio/images`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Add portfolio image
+   */
+  addPortfolioImage(data: { url: string; title: string; description?: string; category?: string; eventType?: string; isMain?: boolean }): Observable<{ image: PortfolioImage }> {
+    return this.http.post<{ image: PortfolioImage }>(`${this.apiUrl}/portfolio/images`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Update portfolio image
+   */
+  updatePortfolioImage(id: string, data: { title?: string; description?: string; category?: string; eventType?: string; isMain?: boolean }): Observable<{ image: PortfolioImage }> {
+    return this.http.put<{ image: PortfolioImage }>(`${this.apiUrl}/portfolio/images/${id}`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Delete portfolio image
+   */
+  deletePortfolioImage(id: string): Observable<{ success: boolean; deletedId: string }> {
+    return this.http.delete<{ success: boolean; deletedId: string }>(`${this.apiUrl}/portfolio/images/${id}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get portfolio videos
+   */
+  getPortfolioVideos(): Observable<{ videos: PortfolioVideo[] }> {
+    return this.http.get<{ videos: PortfolioVideo[] }>(`${this.apiUrl}/portfolio/videos`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Add portfolio video
+   */
+  addPortfolioVideo(data: { url: string; title: string; description?: string; thumbnailUrl?: string; durationSeconds?: number }): Observable<{ video: PortfolioVideo }> {
+    return this.http.post<{ video: PortfolioVideo }>(`${this.apiUrl}/portfolio/videos`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Update portfolio video
+   */
+  updatePortfolioVideo(id: string, data: { title?: string; description?: string; thumbnailUrl?: string; durationSeconds?: number }): Observable<{ video: PortfolioVideo }> {
+    return this.http.put<{ video: PortfolioVideo }>(`${this.apiUrl}/portfolio/videos/${id}`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Delete portfolio video
+   */
+  deletePortfolioVideo(id: string): Observable<{ success: boolean; deletedId: string }> {
+    return this.http.delete<{ success: boolean; deletedId: string }>(`${this.apiUrl}/portfolio/videos/${id}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get testimonials
+   */
+  getTestimonials(): Observable<{ testimonials: PortfolioTestimonial[] }> {
+    return this.http.get<{ testimonials: PortfolioTestimonial[] }>(`${this.apiUrl}/portfolio/testimonials`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Update testimonial visibility (specialists can only moderate - not edit content)
+   * Testimonials are created by clients after completed bookings
+   */
+  updateTestimonial(id: string, data: { isPublic?: boolean; isFeatured?: boolean }): Observable<{ testimonial: PortfolioTestimonial }> {
+    return this.http.put<{ testimonial: PortfolioTestimonial }>(`${this.apiUrl}/portfolio/testimonials/${id}`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Delete testimonial
+   */
+  deleteTestimonial(id: string): Observable<{ success: boolean; deletedId: string }> {
+    return this.http.delete<{ success: boolean; deletedId: string }>(`${this.apiUrl}/portfolio/testimonials/${id}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get portfolio settings
+   */
+  getPortfolioSettings(): Observable<{ settings: PortfolioSettings }> {
+    return this.http.get<{ settings: PortfolioSettings }>(`${this.apiUrl}/portfolio/settings`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Update portfolio settings
+   */
+  updatePortfolioSettings(data: { portfolioTitle?: string; portfolioDescription?: string; showContactInfo?: boolean; allowDownloads?: boolean; watermarkImages?: boolean; theme?: string }): Observable<{ settings: PortfolioSettings }> {
+    return this.http.put<{ settings: PortfolioSettings }>(`${this.apiUrl}/portfolio/settings`, data, {
+      headers: this.getHeaders()
     });
   }
 }

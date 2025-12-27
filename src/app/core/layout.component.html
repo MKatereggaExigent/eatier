@@ -97,17 +97,17 @@
             }
 
             <!-- Show user options for authenticated users -->
-            @if (isLoggedIn()) {
+            @if (isLoggedIn() && currentUser()) {
               <div class="profile-menu-user">
                 <div class="user-info">
-                  <span class="user-name">👋 Welcome back!</span>
-                  <span class="user-email">user&#64;example.com</span>
+                  <span class="user-name">👋 Welcome back, {{ currentUser()?.firstName || 'User' }}!</span>
+                  <span class="user-email">{{ currentUser()?.email }}</span>
                 </div>
                 <hr class="profile-menu-divider">
-                <a routerLink="/dashboard/user" class="profile-menu-item">
+                <a [routerLink]="getDashboardRoute()" class="profile-menu-item">
                   👤 Dashboard
                 </a>
-                <a routerLink="/profile" class="profile-menu-item">
+                <a [routerLink]="getDashboardRoute() + '/profile'" class="profile-menu-item">
                   ⚙️ Settings
                 </a>
                 <hr class="profile-menu-divider">

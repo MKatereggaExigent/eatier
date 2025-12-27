@@ -49,9 +49,10 @@ export class UserDashboardComponent {
           { path: 'overview', label: 'Overview', icon: '📊' },
           { path: 'portfolio', label: 'Portfolio', icon: '📸' },
           { path: 'availability', label: 'Availability', icon: '📅' },
+          { path: 'bookings', label: 'Bookings', icon: '📋' },
+          { path: 'wallet', label: 'Earnings', icon: '💰' },
           { path: 'ads', label: 'Manage My Ads', icon: '📢' },
-          { path: 'profile', label: 'Profile', icon: '👤' },
-          { path: 'bookings', label: 'Bookings', icon: '📋' }
+          { path: 'profile', label: 'Profile', icon: '👤' }
         ];
 
       case 'food_enthusiast':
@@ -62,7 +63,8 @@ export class UserDashboardComponent {
           { path: 'reviews', label: 'My Reviews', icon: '⭐' },
           { path: 'ads', label: 'Manage My Ads', icon: '📢' },
           { path: 'insights', label: 'Insights', icon: '📈' },
-          { path: 'bookings', label: 'Bookings', icon: '📋' }
+          { path: 'bookings', label: 'Bookings', icon: '📋' },
+          { path: 'specialist-bookings', label: 'Chef Bookings', icon: '👨‍🍳' }
         ];
 
       case 'normal_user':
@@ -72,6 +74,7 @@ export class UserDashboardComponent {
           { path: 'favorites', label: 'Favorites', icon: '❤️' },
           { path: 'orders', label: 'Order History', icon: '📦' },
           { path: 'bookings', label: 'Bookings', icon: '📅' },
+          { path: 'specialist-bookings', label: 'Chef Bookings', icon: '👨‍🍳' },
           { path: 'reviews', label: 'My Reviews', icon: '⭐' },
           { path: 'promotions', label: 'Deals', icon: '🎉' },
           { path: 'wallet', label: 'Wallet', icon: '💳' },
@@ -95,6 +98,22 @@ export class UserDashboardComponent {
       case 'normal_user':
       default:
         return 'My Itiyum';
+    }
+  });
+
+  // Base path for navigation links (absolute path)
+  basePath = computed(() => {
+    const role = this.userRole();
+    switch (role) {
+      case 'itiyum_admin':
+        return '/admin';
+      case 'specialist':
+        return '/dashboard/specialist';
+      case 'food_enthusiast':
+        return '/dashboard/food-enthusiast';
+      case 'normal_user':
+      default:
+        return '/dashboard/user';
     }
   });
 

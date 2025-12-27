@@ -3,7 +3,7 @@
 .wallet-container { padding: 2rem; max-width: 1200px; margin: 0 auto; }
 
 .page-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   h1 { font-size: 2rem; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5rem; }
   p { color: #666; font-size: 1rem; }
 }
@@ -15,31 +15,111 @@
 
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-.balance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+// Tier Banner
+.tier-banner {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+  padding: 1.25rem 1.5rem; border-radius: 16px; margin-bottom: 1.5rem;
+
+  .tier-info { display: flex; align-items: center; gap: 1rem; }
+  .tier-icon { font-size: 2.5rem; }
+  .tier-details { display: flex; flex-direction: column; }
+  .tier-name { font-size: 1.25rem; font-weight: 700; color: #1a1a2e; }
+  .tier-benefit { font-size: 0.9rem; color: #666; }
+
+  .tier-progress-section { flex: 1; max-width: 300px; min-width: 200px; }
+  .progress-text { font-size: 0.85rem; color: #666; display: block; margin-bottom: 0.5rem; }
+  .progress-bar { height: 8px; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #ff6b35, #ff8c5a); border-radius: 4px; transition: width 0.3s; }
+}
+
+// Specialist Banner
+.specialist-banner {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;
+  padding: 1.5rem; background: linear-gradient(135deg, #1a1a2e, #2d2d44); border-radius: 16px; margin-bottom: 1.5rem;
+
+  .stat-card {
+    display: flex; align-items: center; gap: 0.75rem; padding: 1rem;
+    background: rgba(255, 255, 255, 0.1); border-radius: 12px;
+  }
+  .stat-icon { font-size: 2rem; }
+  .stat-content { display: flex; flex-direction: column; }
+  .stat-value { font-size: 1.5rem; font-weight: 700; color: #fff; }
+  .stat-label { font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); }
+}
+
+.payout-hint { font-size: 0.8rem; color: #999; font-style: italic; }
+
+// Tab Navigation
+.tab-nav {
+  display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+
+  button {
+    padding: 0.75rem 1.5rem; border: none; background: #f5f5f5; border-radius: 10px;
+    font-weight: 500; color: #666; cursor: pointer; transition: all 0.2s;
+
+    &:hover { background: #eee; }
+    &.active { background: linear-gradient(135deg, #ff6b35, #ff8c5a); color: white; }
+  }
+}
+
+.balance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
 
 .balance-card {
   background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   display: flex; flex-direction: column; gap: 0.75rem; position: relative; overflow: hidden;
-  
+
   &::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
   &.cashback::before { background: linear-gradient(90deg, #ff6b35, #ff8c5a); }
   &.loyalty::before { background: linear-gradient(90deg, #ffc107, #ffdb4d); }
   &.earned::before { background: linear-gradient(90deg, #28a745, #5cb85c); }
   &.redeemed::before { background: linear-gradient(90deg, #6c5ce7, #a29bfe); }
-  
+
   .card-icon { font-size: 2rem; }
   .card-content { display: flex; flex-direction: column; gap: 0.25rem; }
   .label { font-size: 0.9rem; color: #666; }
   .amount { font-size: 1.75rem; font-weight: 700; color: #1a1a2e; }
-  
+  .pending { font-size: 0.8rem; color: #ff9800; font-weight: 500; }
+
   .redeem-btn {
     margin-top: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #ff6b35, #ff8c5a);
-    color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+    color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: transform 0.2s;
     &:hover:not(:disabled) { transform: translateY(-2px); }
     &:disabled { opacity: 0.7; cursor: not-allowed; }
   }
-  
+
   .conversion-hint { font-size: 0.8rem; color: #999; }
+}
+
+// Points Conversion
+.conversion-section {
+  background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;
+
+  h3 { font-size: 1.1rem; font-weight: 600; color: #1a1a2e; margin-bottom: 1rem; }
+
+  .conversion-form {
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+
+    .input-group {
+      display: flex; flex-direction: column; gap: 0.25rem;
+      label { font-size: 0.85rem; color: #666; }
+      input { padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; width: 120px; font-size: 1rem; }
+    }
+
+    .conversion-arrow { font-size: 1.5rem; color: #999; }
+
+    .conversion-result {
+      display: flex; flex-direction: column; gap: 0.25rem;
+      .result-label { font-size: 0.85rem; color: #666; }
+      .result-amount { font-size: 1.5rem; font-weight: 700; color: #28a745; }
+    }
+
+    .convert-btn {
+      padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #ffc107, #ffdb4d);
+      color: #1a1a2e; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+      &:hover:not(:disabled) { transform: translateY(-2px); }
+      &:disabled { opacity: 0.7; cursor: not-allowed; }
+    }
+  }
 }
 
 .earn-section {
@@ -47,19 +127,32 @@
   h2 { font-size: 1.25rem; font-weight: 600; color: #1a1a2e; margin-bottom: 1rem; }
 }
 
-.earn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.earn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
 
 .earn-card {
   background: linear-gradient(135deg, #fff5f0, #fff); border-radius: 12px; padding: 1.25rem;
   text-align: center; border: 1px solid #ffe0d0;
-  
+
   .earn-icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
   h3 { font-size: 1rem; font-weight: 600; color: #1a1a2e; margin-bottom: 0.25rem; }
   p { font-size: 0.85rem; color: #666; margin: 0; }
 }
 
+// Transactions
 .transactions-section {
   h2 { font-size: 1.25rem; font-weight: 600; color: #1a1a2e; margin-bottom: 1rem; }
+}
+
+.filter-bar {
+  display: flex; gap: 0.5rem; margin-bottom: 1rem;
+
+  button {
+    padding: 0.5rem 1rem; border: 1px solid #ddd; background: white; border-radius: 20px;
+    font-size: 0.9rem; color: #666; cursor: pointer; transition: all 0.2s;
+
+    &:hover { border-color: #ff6b35; color: #ff6b35; }
+    &.active { background: #ff6b35; border-color: #ff6b35; color: white; }
+  }
 }
 
 .empty-transactions {
@@ -75,21 +168,156 @@
 .transaction-row {
   display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
   border-bottom: 1px solid #f0f0f0;
-  
+
   &:last-child { border-bottom: none; }
-  
+
   .transaction-icon { font-size: 1.5rem; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 10px; }
-  
+
   .transaction-details {
     flex: 1; display: flex; flex-direction: column; gap: 0.25rem;
     .transaction-desc { font-weight: 500; color: #1a1a2e; }
     .transaction-date { font-size: 0.85rem; color: #999; }
   }
-  
+
   .transaction-amount {
     font-weight: 700; font-size: 1.1rem;
     &.transaction-credit { color: #28a745; }
     &.transaction-debit { color: #dc3545; }
   }
+}
+
+
+// Referrals Section
+.referrals-section {
+  .referral-card {
+    background: linear-gradient(135deg, #fff5f0, #fff); border-radius: 16px; padding: 2rem;
+    border: 1px solid #ffe0d0; margin-bottom: 1.5rem;
+
+    h3 { font-size: 1.25rem; font-weight: 600; color: #1a1a2e; margin-bottom: 0.5rem; }
+    > p { color: #666; margin-bottom: 1.5rem; }
+  }
+
+  .referral-code-box, .referral-link-box {
+    margin-bottom: 1.25rem;
+
+    .code-label, .link-label { font-size: 0.85rem; color: #666; display: block; margin-bottom: 0.5rem; }
+
+    .code-display, .link-display {
+      display: flex; gap: 0.5rem; align-items: center;
+    }
+
+    .code {
+      font-size: 1.5rem; font-weight: 700; color: #ff6b35; letter-spacing: 2px;
+      background: white; padding: 0.75rem 1.25rem; border-radius: 8px; border: 2px dashed #ff6b35;
+    }
+
+    input {
+      flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem;
+      background: white; color: #666;
+    }
+
+    .copy-btn {
+      padding: 0.75rem 1rem; background: #ff6b35; color: white; border: none; border-radius: 8px;
+      font-weight: 500; cursor: pointer; white-space: nowrap;
+      &:hover { background: #e55a2b; }
+    }
+  }
+
+  .referral-stats {
+    display: flex; gap: 2rem; margin-top: 1.5rem;
+
+    .stat {
+      display: flex; flex-direction: column; gap: 0.25rem;
+      .stat-value { font-size: 1.75rem; font-weight: 700; color: #1a1a2e; }
+      .stat-label { font-size: 0.9rem; color: #666; }
+    }
+  }
+
+  .referral-history {
+    background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    h3 { font-size: 1.1rem; font-weight: 600; color: #1a1a2e; margin-bottom: 1rem; }
+  }
+
+  .referral-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .referral-row {
+    display: flex; justify-content: space-between; align-items: center; padding: 0.75rem;
+    background: #f8f9fa; border-radius: 8px;
+
+    .referral-info { display: flex; flex-direction: column; gap: 0.25rem; }
+    .referral-name { font-weight: 500; color: #1a1a2e; }
+    .referral-date { font-size: 0.85rem; color: #999; }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500;
+      &.completed { background: #d4edda; color: #28a745; }
+      &.pending { background: #fff3cd; color: #856404; }
+    }
+  }
+}
+
+// Tiers Section
+.tiers-section {
+  .current-tier-card {
+    background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    text-align: center; margin-bottom: 2rem;
+
+    .tier-badge {
+      display: inline-block; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 1.1rem;
+      font-weight: 600; color: #1a1a2e; margin-bottom: 0.5rem;
+    }
+
+    p { color: #666; margin: 0; }
+  }
+
+  .tiers-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;
+  }
+
+  .tier-card {
+    background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 2px solid transparent; transition: all 0.2s;
+
+    &.current { border-color: #ff6b35; }
+
+    .tier-header {
+      display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+
+      .tier-icon { font-size: 1.75rem; }
+      .tier-name { font-size: 1.25rem; font-weight: 700; }
+
+      &.bronze .tier-name { color: #CD7F32; }
+      &.silver .tier-name { color: #6c757d; }
+      &.gold .tier-name { color: #d4a017; }
+      &.platinum .tier-name { color: #6c5ce7; }
+    }
+
+    .tier-benefits {
+      list-style: none; padding: 0; margin: 0 0 1rem 0;
+
+      li {
+        padding: 0.5rem 0; font-size: 0.9rem; color: #444;
+        &::before { content: '✓ '; color: #28a745; font-weight: bold; }
+      }
+    }
+
+    .tier-requirement {
+      display: block; font-size: 0.85rem; color: #999; font-weight: 500;
+      padding-top: 0.75rem; border-top: 1px solid #f0f0f0;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .wallet-container { padding: 1rem; }
+  .tier-banner { flex-direction: column; align-items: flex-start; }
+  .tier-progress-section { max-width: 100%; }
+  .balance-grid { grid-template-columns: 1fr 1fr; }
+  .conversion-form { flex-direction: column; align-items: stretch; }
+  .conversion-arrow { display: none; }
+  .referral-stats { flex-direction: column; gap: 1rem; }
 }
 

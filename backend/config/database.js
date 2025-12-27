@@ -6,7 +6,9 @@ const isProduction = process.env.NODE_ENV === 'production';
 // Load environment variables:
 // - Production (Vercel): Uses Vercel's environment variables directly (no dotenv needed)
 // - Development (Local): Load from .env.local file
-if (!isProduction) {
+// - Docker: Uses container environment variables (DB_HOST='postgres')
+const isDocker = process.env.DB_HOST === 'postgres';
+if (!isProduction && !isDocker) {
   try {
     require('dotenv').config({ path: path.join(__dirname, '..', '.env.local') });
     console.log('💻 Loaded .env.local for development');

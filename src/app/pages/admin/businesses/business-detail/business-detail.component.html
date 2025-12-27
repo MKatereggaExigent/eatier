@@ -1,0 +1,231 @@
+<div class="business-detail-container">
+  <!-- Header -->
+  <div class="detail-header">
+    <button class="back-btn" (click)="goBack()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Businesses
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading business details...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="error-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <p>{{ error() }}</p>
+      <button class="retry-btn" (click)="goBack()">Go Back</button>
+    </div>
+  }
+
+  <!-- Business Details -->
+  @if (business(); as b) {
+    <div class="business-content">
+      <!-- Business Header Card -->
+      <div class="business-header-card">
+        <div class="business-logo">
+          @if (b.logoUrl) {
+            <img [src]="b.logoUrl" [alt]="b.businessName" />
+          } @else {
+            <div class="logo-placeholder">{{ b.businessName.charAt(0) }}</div>
+          }
+        </div>
+        <div class="business-info">
+          <h1 class="business-name">{{ b.businessName }}</h1>
+          <p class="business-type">{{ b.businessType | titlecase }}</p>
+          <div class="business-badges">
+            <span class="status-badge" [class]="getStatusClass(b.status)">{{ b.status | titlecase }}</span>
+            @if (b.isVerified) {
+              <span class="verified-badge">✓ Verified</span>
+            }
+            @if (b.isFeatured) {
+              <span class="featured-badge">★ Featured</span>
+            }
+          </div>
+        </div>
+        <div class="business-actions">
+          @if (!b.isVerified) {
+            <button class="action-btn verify-btn" (click)="verifyBusiness()" [disabled]="isVerifying()">
+              {{ isVerifying() ? 'Verifying...' : 'Verify Business' }}
+            </button>
+          }
+          @if (b.status === 'suspended') {
+            <button class="action-btn activate-btn" (click)="activateBusiness()" [disabled]="isActivating()">
+              {{ isActivating() ? 'Activating...' : 'Activate Business' }}
+            </button>
+          } @else {
+            <button class="action-btn suspend-btn" (click)="suspendBusiness()" [disabled]="isSuspending()">
+              {{ isSuspending() ? 'Suspending...' : 'Suspend Business' }}
+            </button>
+          }
+          <button class="action-btn delete-btn" (click)="confirmDelete()">Delete Business</button>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value">{{ b.averageRating.toFixed(1) }}</div>
+          <div class="stat-label">Average Rating</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📝</div>
+          <div class="stat-value">{{ b.totalReviews }}</div>
+          <div class="stat-label">Total Reviews</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-value">{{ b.totalBookings }}</div>
+          <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-value">{{ b.priceRange || 'N/A' }}</div>
+          <div class="stat-label">Price Range</div>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="details-grid">
+        <!-- Contact Information -->
+        <div class="detail-card">
+          <h3 class="card-title">Contact Information</h3>
+          <div class="detail-row">
+            <span class="label">Email:</span>
+            <span class="value">{{ b.email || 'Not provided' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Phone:</span>
+            <span class="value">{{ b.phone || 'Not provided' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Website:</span>
+            @if (b.websiteUrl) {
+              <a [href]="b.websiteUrl" target="_blank" class="value link">{{ b.websiteUrl }}</a>
+            } @else {
+              <span class="value">Not provided</span>
+            }
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="detail-card">
+          <h3 class="card-title">Location</h3>
+          <div class="detail-row">
+            <span class="label">Address:</span>
+            <span class="value">{{ b.address || b.formattedAddress || 'Not provided' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">City:</span>
+            <span class="value">{{ b.city || 'Not provided' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Country:</span>
+            <span class="value">{{ b.country || 'Not provided' }}</span>
+          </div>
+        </div>
+
+        <!-- Owner Information -->
+        <div class="detail-card">
+          <h3 class="card-title">Owner Information</h3>
+          <div class="detail-row">
+            <span class="label">Name:</span>
+            <span class="value">{{ b.ownerName }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Email:</span>
+            <span class="value">{{ b.ownerEmail }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Phone:</span>
+            <span class="value">{{ b.ownerPhone || 'Not provided' }}</span>
+          </div>
+          <button class="view-owner-btn" (click)="viewOwner()">View Owner Profile →</button>
+        </div>
+
+        <!-- Business Hours -->
+        <div class="detail-card">
+          <h3 class="card-title">Business Hours</h3>
+          <div class="detail-row">
+            <span class="label">Opens:</span>
+            <span class="value">{{ b.opensAt || 'Not set' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Closes:</span>
+            <span class="value">{{ b.closesAt || 'Not set' }}</span>
+          </div>
+        </div>
+
+        <!-- Timestamps -->
+        <div class="detail-card">
+          <h3 class="card-title">Timestamps</h3>
+          <div class="detail-row">
+            <span class="label">Created:</span>
+            <span class="value">{{ formatDate(b.createdAt) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Last Updated:</span>
+            <span class="value">{{ formatDate(b.updatedAt) }}</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        @if (b.description) {
+          <div class="detail-card full-width">
+            <h3 class="card-title">Description</h3>
+            <p class="description-text">{{ b.description }}</p>
+          </div>
+        }
+
+        <!-- Sustainability -->
+        @if (b.sustainabilityEthos) {
+          <div class="detail-card full-width">
+            <h3 class="card-title">Sustainability Ethos</h3>
+            <p class="description-text">{{ b.sustainabilityEthos }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Delete Confirmation Modal -->
+  @if (showDeleteConfirm()) {
+    <div class="modal-overlay" (click)="cancelDelete()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Delete Business</h3>
+        <p class="modal-message">
+          Are you sure you want to delete <strong>{{ business()?.businessName }}</strong>?
+          This action cannot be undone and will also delete all associated bookings and data.
+        </p>
+        <div class="modal-actions">
+          <button class="cancel-btn" (click)="cancelDelete()">Cancel</button>
+          <button class="confirm-delete-btn" (click)="deleteBusiness()" [disabled]="isDeleting()">
+            {{ isDeleting() ? 'Deleting...' : 'Delete Business' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Toast Notification -->
+  @if (toastMessage()) {
+    <div class="toast" [class]="'toast-' + toastType()" (click)="hideToast()">
+      <span class="toast-message">{{ toastMessage() }}</span>
+      <button class="toast-close">×</button>
+    </div>
+  }
+</div>
+

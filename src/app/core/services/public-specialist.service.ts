@@ -141,5 +141,42 @@ export class PublicSpecialistService {
     });
     return this.http.post<BookingResponse>(`${this.apiUrl}/${specialistId}/book`, booking, { headers });
   }
+
+  /**
+   * Check if current user can leave a testimonial for a specialist
+   */
+  canReviewSpecialist(specialistId: string): Observable<{ canReview: boolean; pendingBookings: { id: string; bookingDate: string; eventType: string }[] }> {
+    const token = localStorage.getItem('auth_token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get<{ canReview: boolean; pendingBookings: { id: string; bookingDate: string; eventType: string }[] }>(
+      `${this.apiUrl}/${specialistId}/can-review`,
+      { headers }
+    );
+  }
+
+  /**
+   * Submit a testimonial for a specialist (requires completed booking)
+   */
+  submitTestimonial(specialistId: string, data: {
+    bookingId?: string;
+    rating: number;
+    review: string;
+    eventType?: string;
+    eventDate?: string;
+  }): Observable<{ message: string; testimonial: any }> {
+    const token = localStorage.getItem('auth_token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.post<{ message: string; testimonial: any }>(
+      `${this.apiUrl}/${specialistId}/testimonial`,
+      data,
+      { headers }
+    );
+  }
 }
 

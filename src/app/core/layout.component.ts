@@ -125,6 +125,26 @@ export class LayoutComponent {
     this.showMobileMenu.set(false);
   }
 
+  // Get dashboard route based on user role
+  getDashboardRoute(): string {
+    const user = this.currentUser();
+    if (!user) return '/dashboard/user';
+
+    switch (user.role) {
+      case 'itiyum_admin':
+        return '/admin';
+      case 'business_owner':
+        return '/dashboard/business';
+      case 'specialist':
+        return '/dashboard/specialist';
+      case 'food_enthusiast':
+        return '/dashboard/food-enthusiast';
+      case 'normal_user':
+      default:
+        return '/dashboard/user';
+    }
+  }
+
   // Logout functionality
   logout(): void {
     // Use AuthService for proper logout

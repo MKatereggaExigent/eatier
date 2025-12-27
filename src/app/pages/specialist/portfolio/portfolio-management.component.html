@@ -191,20 +191,14 @@
     <section class="tab-content testimonials-tab" role="tabpanel">
       <div class="content-header">
         <h2>Client Testimonials</h2>
-        <button type="button" class="add-btn primary" (click)="openTestimonialModal()">
-          <span class="btn-icon">➕</span>
-          Add Testimonial
-        </button>
+        <p class="header-note">Testimonials are submitted by clients after completed bookings</p>
       </div>
 
       @if (testimonials().length === 0) {
         <div class="empty-state">
           <div class="empty-icon">💬</div>
           <h3>No testimonials yet</h3>
-          <p>Add client reviews to build trust and credibility</p>
-          <button type="button" class="add-btn primary" (click)="openTestimonialModal()">
-            Add Your First Testimonial
-          </button>
+          <p>Testimonials will appear here when clients leave reviews after completing bookings with you</p>
         </div>
       } @else {
         <div class="testimonials-list">
@@ -229,19 +223,13 @@
                   </div>
                 </div>
                 <div class="testimonial-actions">
-                  <button type="button" class="action-btn" (click)="openTestimonialModal(testimonial)" title="Edit">
-                    ✏️
-                  </button>
-                  <button type="button" class="action-btn" (click)="toggleTestimonialFeatured(testimonial.id)" 
+                  <button type="button" class="action-btn" (click)="toggleTestimonialFeatured(testimonial.id)"
                           [title]="testimonial.isFeatured ? 'Remove from Featured' : 'Add to Featured'">
                     {{ testimonial.isFeatured ? '⭐' : '☆' }}
                   </button>
                   <button type="button" class="action-btn" (click)="toggleTestimonialPublic(testimonial.id)"
-                          [title]="testimonial.isPublic ? 'Make Private' : 'Make Public'">
+                          [title]="testimonial.isPublic ? 'Hide' : 'Show'">
                     {{ testimonial.isPublic ? '👁️' : '🔒' }}
-                  </button>
-                  <button type="button" class="action-btn delete" (click)="deleteTestimonial(testimonial.id)" title="Delete">
-                    🗑️
                   </button>
                 </div>
               </div>
@@ -254,7 +242,7 @@
                     <span class="featured-badge">Featured</span>
                   }
                   @if (!testimonial.isPublic) {
-                    <span class="private-badge">Private</span>
+                    <span class="private-badge">Hidden</span>
                   }
                 </div>
               </div>
@@ -318,8 +306,8 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="save-btn primary" [disabled]="settingsForm.invalid">
-            Save Settings
+          <button type="submit" class="save-btn primary" [disabled]="settingsForm.invalid || saving()">
+            {{ saving() ? 'Saving...' : 'Save Settings' }}
           </button>
         </div>
       </form>
@@ -370,15 +358,15 @@
         </div>
         @if (!selectedImage()) {
           <div class="form-group">
-            <label for="imageFile">Image File</label>
-            <input type="file" id="imageFile" (change)="onImageFileSelected($event)" 
-                   accept="image/*" class="form-file">
+            <label for="imageUrl">Image URL</label>
+            <input type="url" id="imageUrl" formControlName="url" class="form-input"
+                   placeholder="https://example.com/image.jpg">
           </div>
         }
         <div class="modal-actions">
           <button type="button" class="cancel-btn" (click)="closeImageModal()">Cancel</button>
-          <button type="submit" class="save-btn primary" [disabled]="imageForm.invalid">
-            {{ selectedImage() ? 'Update' : 'Add' }} Image
+          <button type="submit" class="save-btn primary" [disabled]="imageForm.invalid || saving()">
+            {{ saving() ? 'Saving...' : (selectedImage() ? 'Update' : 'Add') + ' Image' }}
           </button>
         </div>
       </form>
@@ -405,15 +393,20 @@
         </div>
         @if (!selectedVideo()) {
           <div class="form-group">
-            <label for="videoFile">Video File</label>
-            <input type="file" id="videoFile" (change)="onVideoFileSelected($event)" 
-                   accept="video/*" class="form-file">
+            <label for="videoUrl">Video URL</label>
+            <input type="url" id="videoUrl" formControlName="url" class="form-input"
+                   placeholder="https://example.com/video.mp4">
+          </div>
+          <div class="form-group">
+            <label for="thumbnailUrl">Thumbnail URL (optional)</label>
+            <input type="url" id="thumbnailUrl" formControlName="thumbnailUrl" class="form-input"
+                   placeholder="https://example.com/thumbnail.jpg">
           </div>
         }
         <div class="modal-actions">
           <button type="button" class="cancel-btn" (click)="closeVideoModal()">Cancel</button>
-          <button type="submit" class="save-btn primary" [disabled]="videoForm.invalid">
-            {{ selectedVideo() ? 'Update' : 'Add' }} Video
+          <button type="submit" class="save-btn primary" [disabled]="videoForm.invalid || saving()">
+            {{ saving() ? 'Saving...' : (selectedVideo() ? 'Update' : 'Add') + ' Video' }}
           </button>
         </div>
       </form>
@@ -421,73 +414,4 @@
   </div>
 }
 
-<!-- Testimonial Modal -->
-@if (showTestimonialModal()) {
-  <div class="modal-overlay" (click)="closeTestimonialModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>{{ selectedTestimonial() ? 'Edit Testimonial' : 'Add New Testimonial' }}</h3>
-        <button type="button" class="close-btn" (click)="closeTestimonialModal()">✕</button>
-      </div>
-      <form [formGroup]="testimonialForm" (ngSubmit)="saveTestimonial()" class="modal-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="clientName">Client Name</label>
-            <input type="text" id="clientName" formControlName="clientName" class="form-input">
-          </div>
-          <div class="form-group">
-            <label for="rating">Rating</label>
-            <select id="rating" formControlName="rating" class="form-select">
-              <option value="5">5 Stars</option>
-              <option value="4">4 Stars</option>
-              <option value="3">3 Stars</option>
-              <option value="2">2 Stars</option>
-              <option value="1">1 Star</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="review">Review</label>
-          <textarea id="review" formControlName="review" class="form-textarea" rows="4"></textarea>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="eventType">Event Type</label>
-            <select id="eventType" formControlName="eventType" class="form-select">
-              <option value="">Select Event Type</option>
-              <option value="Private Dinner">Private Dinner</option>
-              <option value="Corporate Event">Corporate Event</option>
-              <option value="Wedding">Wedding</option>
-              <option value="Cooking Class">Cooking Class</option>
-              <option value="Catering">Catering</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="eventDate">Event Date</label>
-            <input type="date" id="eventDate" formControlName="eventDate" class="form-input">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="isPublic" class="form-checkbox">
-              <span class="checkbox-text">Make public</span>
-            </label>
-          </div>
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="isFeatured" class="form-checkbox">
-              <span class="checkbox-text">Feature this testimonial</span>
-            </label>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="cancel-btn" (click)="closeTestimonialModal()">Cancel</button>
-          <button type="submit" class="save-btn primary" [disabled]="testimonialForm.invalid">
-            {{ selectedTestimonial() ? 'Update' : 'Add' }} Testimonial
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-}
+

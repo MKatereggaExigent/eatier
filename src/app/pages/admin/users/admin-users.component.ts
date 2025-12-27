@@ -313,7 +313,7 @@ export class AdminUsersComponent implements OnInit {
           email: user.email,
           firstName: user.first_name || 'Unknown',
           lastName: user.last_name || 'User',
-          role: this.mapBackendRole(user.role_name),
+          role: this.mapBackendRole(user.role || user.role_name),
           status: user.account_status || 'pending',
           createdAt: new Date(user.created_at),
           lastLoginAt: user.last_login_at ? new Date(user.last_login_at) : undefined,
@@ -321,6 +321,7 @@ export class AdminUsersComponent implements OnInit {
           phoneVerified: user.phone_verified || false,
           avatar: user.avatar_url,
           phone: user.phone,
+          tenantName: user.tenant_name,
           businessName: user.business_name,
           totalBookings: parseInt(user.total_bookings) || 0,
           totalReviews: user.total_reviews || 0

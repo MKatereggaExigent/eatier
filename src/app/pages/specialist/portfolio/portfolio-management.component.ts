@@ -1,11 +1,13 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { SpecialistService, PortfolioImage, PortfolioVideo, PortfolioTestimonial, PortfolioSettings } from '../../../core/services/specialist.service';
 import { Specialist } from '../../../shared/models/user.model';
 
-interface PortfolioImage {
+// Local interfaces for component display (mapped from API)
+interface DisplayImage {
   id: string;
   url: string;
   title: string;
@@ -16,7 +18,7 @@ interface PortfolioImage {
   isMain: boolean;
 }
 
-interface PortfolioVideo {
+interface DisplayVideo {
   id: string;
   url: string;
   thumbnail: string;
@@ -26,7 +28,7 @@ interface PortfolioVideo {
   uploadDate: Date;
 }
 
-interface Testimonial {
+interface DisplayTestimonial {
   id: string;
   clientName: string;
   clientAvatar?: string;
@@ -45,8 +47,9 @@ interface Testimonial {
   templateUrl: './portfolio-management.component.html',
   styleUrls: ['./portfolio-management.component.scss']
 })
-export class PortfolioManagementComponent {
+export class PortfolioManagementComponent implements OnInit {
   private authService = inject(AuthService);
+  private specialistService = inject(SpecialistService);
   private fb = inject(FormBuilder);
 
   currentUser = this.authService.currentUser;
@@ -54,118 +57,23 @@ export class PortfolioManagementComponent {
 
   // State management
   loading = signal(false);
+  saving = signal(false);
+  error = signal<string | null>(null);
   activeTab = signal<'images' | 'videos' | 'testimonials' | 'settings'>('images');
   showImageModal = signal(false);
   showVideoModal = signal(false);
-  showTestimonialModal = signal(false);
-  selectedImage = signal<PortfolioImage | null>(null);
-  selectedVideo = signal<PortfolioVideo | null>(null);
-  selectedTestimonial = signal<Testimonial | null>(null);
+  selectedImage = signal<DisplayImage | null>(null);
+  selectedVideo = signal<DisplayVideo | null>(null);
 
-  // Portfolio data
-  portfolioImages = signal<PortfolioImage[]>([
-    {
-      id: '1',
-      url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop',
-      title: 'Gourmet Pasta Creation',
-      description: 'Handmade pasta with truffle sauce for intimate dinner party',
-      category: 'Main Course',
-      eventType: 'Private Dinner',
-      uploadDate: new Date('2024-01-15'),
-      isMain: true
-    },
-    {
-      id: '2',
-      url: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop',
-      title: 'Elegant Appetizer Platter',
-      description: 'Artisanal appetizers for corporate event',
-      category: 'Appetizers',
-      eventType: 'Corporate Event',
-      uploadDate: new Date('2024-01-12'),
-      isMain: false
-    },
-    {
-      id: '3',
-      url: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop',
-      title: 'Signature Dessert',
-      description: 'Custom wedding cake with seasonal fruits',
-      category: 'Desserts',
-      eventType: 'Wedding',
-      uploadDate: new Date('2024-01-10'),
-      isMain: false
-    },
-    {
-      id: '4',
-      url: 'https://images.unsplash.com/photo-1551218808-94e220e084d2?w=400&h=300&fit=crop',
-      title: 'Cooking Class Setup',
-      description: 'Interactive cooking class preparation',
-      category: 'Teaching',
-      eventType: 'Cooking Class',
-      uploadDate: new Date('2024-01-08'),
-      isMain: false
-    }
-  ]);
-
-  portfolioVideos = signal<PortfolioVideo[]>([
-    {
-      id: '1',
-      url: 'https://example.com/video1.mp4',
-      thumbnail: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop',
-      title: 'Pasta Making Technique',
-      description: 'Demonstration of traditional Italian pasta making',
-      duration: 180,
-      uploadDate: new Date('2024-01-14')
-    },
-    {
-      id: '2',
-      url: 'https://example.com/video2.mp4',
-      thumbnail: 'https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?w=400&h=300&fit=crop',
-      title: 'Plating Presentation',
-      description: 'Professional plating techniques for fine dining',
-      duration: 120,
-      uploadDate: new Date('2024-01-11')
-    }
-  ]);
-
-  testimonials = signal<Testimonial[]>([
-    {
-      id: '1',
-      clientName: 'Sarah Johnson',
-      clientAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face',
-      rating: 5,
-      review: 'Mario created an absolutely incredible dining experience for our anniversary. Every dish was perfectly executed and beautifully presented. His attention to detail and passion for cooking really showed.',
-      eventType: 'Private Dinner',
-      eventDate: new Date('2024-01-16'),
-      isPublic: true,
-      isFeatured: true
-    },
-    {
-      id: '2',
-      clientName: 'Michael Chen',
-      rating: 5,
-      review: 'Outstanding catering for our corporate event. Professional, punctual, and the food was exceptional. Our clients were thoroughly impressed.',
-      eventType: 'Corporate Event',
-      eventDate: new Date('2024-01-14'),
-      isPublic: true,
-      isFeatured: false
-    },
-    {
-      id: '3',
-      clientName: 'Emily Davis',
-      clientAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face',
-      rating: 4,
-      review: 'Great cooking class experience! Mario is a patient teacher and really knows his craft. Learned so much about authentic Italian techniques.',
-      eventType: 'Cooking Class',
-      eventDate: new Date('2024-01-12'),
-      isPublic: true,
-      isFeatured: false
-    }
-  ]);
+  // Portfolio data - now loaded from API
+  portfolioImages = signal<DisplayImage[]>([]);
+  portfolioVideos = signal<DisplayVideo[]>([]);
+  testimonials = signal<DisplayTestimonial[]>([]);
+  portfolioSettings = signal<PortfolioSettings | null>(null);
 
   // Forms
   imageForm: FormGroup;
   videoForm: FormGroup;
-  testimonialForm: FormGroup;
   settingsForm: FormGroup;
 
   // Computed properties
@@ -189,35 +97,126 @@ export class PortfolioManagementComponent {
   constructor() {
     this.imageForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
-      description: ['', [Validators.required, Validators.minLength(10)]],
-      category: ['', Validators.required],
-      eventType: ['', Validators.required],
-      file: [null, Validators.required]
+      description: [''],
+      category: [''],
+      eventType: [''],
+      url: ['', Validators.required]
     });
 
     this.videoForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
-      description: ['', [Validators.required, Validators.minLength(10)]],
-      file: [null, Validators.required]
-    });
-
-    this.testimonialForm = this.fb.group({
-      clientName: ['', [Validators.required, Validators.minLength(2)]],
-      rating: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
-      review: ['', [Validators.required, Validators.minLength(20)]],
-      eventType: ['', Validators.required],
-      eventDate: ['', Validators.required],
-      isPublic: [true],
-      isFeatured: [false]
+      description: [''],
+      url: ['', Validators.required],
+      thumbnailUrl: ['']
     });
 
     this.settingsForm = this.fb.group({
-      portfolioTitle: [this.specialist()?.professionalProfile?.title || '', Validators.required],
-      portfolioDescription: [this.specialist()?.portfolio?.description || '', Validators.required],
+      portfolioTitle: [''],
+      portfolioDescription: [''],
       showContactInfo: [true],
       allowDownloads: [false],
-      watermarkImages: [true]
+      watermarkImages: [true],
+      theme: ['default']
     });
+  }
+
+  ngOnInit(): void {
+    this.loadPortfolioData();
+  }
+
+  /**
+   * Load all portfolio data from the API
+   */
+  loadPortfolioData(): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    // Load images
+    this.specialistService.getPortfolioImages().subscribe({
+      next: (response) => {
+        const images = response.images.map(img => this.mapApiImageToDisplay(img));
+        this.portfolioImages.set(images);
+      },
+      error: (err) => console.error('Error loading images:', err)
+    });
+
+    // Load videos
+    this.specialistService.getPortfolioVideos().subscribe({
+      next: (response) => {
+        const videos = response.videos.map(vid => this.mapApiVideoToDisplay(vid));
+        this.portfolioVideos.set(videos);
+      },
+      error: (err) => console.error('Error loading videos:', err)
+    });
+
+    // Load testimonials
+    this.specialistService.getTestimonials().subscribe({
+      next: (response) => {
+        const testimonials = response.testimonials.map(t => this.mapApiTestimonialToDisplay(t));
+        this.testimonials.set(testimonials);
+      },
+      error: (err) => console.error('Error loading testimonials:', err)
+    });
+
+    // Load settings
+    this.specialistService.getPortfolioSettings().subscribe({
+      next: (response) => {
+        this.portfolioSettings.set(response.settings);
+        this.settingsForm.patchValue({
+          portfolioTitle: response.settings.portfolio_title || '',
+          portfolioDescription: response.settings.portfolio_description || '',
+          showContactInfo: response.settings.show_contact_info,
+          allowDownloads: response.settings.allow_downloads,
+          watermarkImages: response.settings.watermark_images,
+          theme: response.settings.theme
+        });
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading settings:', err);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  // Mapping functions
+  private mapApiImageToDisplay(img: PortfolioImage): DisplayImage {
+    return {
+      id: img.id,
+      url: img.url,
+      title: img.title,
+      description: img.description || '',
+      category: img.category || '',
+      eventType: img.event_type || '',
+      uploadDate: new Date(img.created_at),
+      isMain: img.is_main
+    };
+  }
+
+  private mapApiVideoToDisplay(vid: PortfolioVideo): DisplayVideo {
+    return {
+      id: vid.id,
+      url: vid.url,
+      thumbnail: vid.thumbnail_url || '',
+      title: vid.title,
+      description: vid.description || '',
+      duration: vid.duration_seconds,
+      uploadDate: new Date(vid.created_at)
+    };
+  }
+
+  private mapApiTestimonialToDisplay(t: PortfolioTestimonial): DisplayTestimonial {
+    return {
+      id: t.id,
+      clientName: t.client_name,
+      clientAvatar: t.client_avatar_url,
+      rating: t.rating,
+      review: t.review,
+      eventType: t.event_type || '',
+      eventDate: t.event_date ? new Date(t.event_date) : new Date(),
+      isPublic: t.is_public,
+      isFeatured: t.is_featured
+    };
   }
 
   // Tab management
@@ -226,14 +225,15 @@ export class PortfolioManagementComponent {
   }
 
   // Image management
-  openImageModal(image?: PortfolioImage): void {
+  openImageModal(image?: DisplayImage): void {
     if (image) {
       this.selectedImage.set(image);
       this.imageForm.patchValue({
         title: image.title,
         description: image.description,
         category: image.category,
-        eventType: image.eventType
+        eventType: image.eventType,
+        url: image.url
       });
     } else {
       this.selectedImage.set(null);
@@ -248,68 +248,92 @@ export class PortfolioManagementComponent {
     this.imageForm.reset();
   }
 
-  onImageFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.imageForm.patchValue({ file });
-    }
-  }
-
   saveImage(): void {
     if (this.imageForm.valid) {
+      this.saving.set(true);
       const formData = this.imageForm.value;
       const selectedImage = this.selectedImage();
-      
+
       if (selectedImage) {
         // Update existing image
-        const images = this.portfolioImages();
-        const updatedImages = images.map(img => 
-          img.id === selectedImage.id 
-            ? { ...img, ...formData, uploadDate: new Date() }
-            : img
-        );
-        this.portfolioImages.set(updatedImages);
+        this.specialistService.updatePortfolioImage(selectedImage.id, {
+          title: formData.title,
+          description: formData.description,
+          category: formData.category,
+          eventType: formData.eventType
+        }).subscribe({
+          next: (response) => {
+            const images = this.portfolioImages().map(img =>
+              img.id === selectedImage.id ? this.mapApiImageToDisplay(response.image) : img
+            );
+            this.portfolioImages.set(images);
+            this.saving.set(false);
+            this.closeImageModal();
+          },
+          error: (err) => {
+            console.error('Error updating image:', err);
+            this.saving.set(false);
+          }
+        });
       } else {
         // Add new image
-        const newImage: PortfolioImage = {
-          id: Date.now().toString(),
-          url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop', // Placeholder
+        this.specialistService.addPortfolioImage({
+          url: formData.url,
           title: formData.title,
           description: formData.description,
           category: formData.category,
           eventType: formData.eventType,
-          uploadDate: new Date(),
           isMain: this.portfolioImages().length === 0
-        };
-        this.portfolioImages.set([...this.portfolioImages(), newImage]);
+        }).subscribe({
+          next: (response) => {
+            const newImage = this.mapApiImageToDisplay(response.image);
+            this.portfolioImages.set([...this.portfolioImages(), newImage]);
+            this.saving.set(false);
+            this.closeImageModal();
+          },
+          error: (err) => {
+            console.error('Error adding image:', err);
+            this.saving.set(false);
+          }
+        });
       }
-      
-      this.closeImageModal();
     }
   }
 
   deleteImage(imageId: string): void {
     if (confirm('Are you sure you want to delete this image?')) {
-      const images = this.portfolioImages().filter(img => img.id !== imageId);
-      this.portfolioImages.set(images);
+      this.specialistService.deletePortfolioImage(imageId).subscribe({
+        next: () => {
+          const images = this.portfolioImages().filter(img => img.id !== imageId);
+          this.portfolioImages.set(images);
+        },
+        error: (err) => console.error('Error deleting image:', err)
+      });
     }
   }
 
   setMainImage(imageId: string): void {
-    const images = this.portfolioImages().map(img => ({
-      ...img,
-      isMain: img.id === imageId
-    }));
-    this.portfolioImages.set(images);
+    this.specialistService.updatePortfolioImage(imageId, { isMain: true }).subscribe({
+      next: () => {
+        const images = this.portfolioImages().map(img => ({
+          ...img,
+          isMain: img.id === imageId
+        }));
+        this.portfolioImages.set(images);
+      },
+      error: (err) => console.error('Error setting main image:', err)
+    });
   }
 
   // Video management
-  openVideoModal(video?: PortfolioVideo): void {
+  openVideoModal(video?: DisplayVideo): void {
     if (video) {
       this.selectedVideo.set(video);
       this.videoForm.patchValue({
         title: video.title,
-        description: video.description
+        description: video.description,
+        url: video.url,
+        thumbnailUrl: video.thumbnail
       });
     } else {
       this.selectedVideo.set(null);
@@ -324,137 +348,122 @@ export class PortfolioManagementComponent {
     this.videoForm.reset();
   }
 
-  onVideoFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.videoForm.patchValue({ file });
-    }
-  }
-
   saveVideo(): void {
     if (this.videoForm.valid) {
+      this.saving.set(true);
       const formData = this.videoForm.value;
       const selectedVideo = this.selectedVideo();
-      
+
       if (selectedVideo) {
         // Update existing video
-        const videos = this.portfolioVideos();
-        const updatedVideos = videos.map(video => 
-          video.id === selectedVideo.id 
-            ? { ...video, ...formData, uploadDate: new Date() }
-            : video
-        );
-        this.portfolioVideos.set(updatedVideos);
-      } else {
-        // Add new video
-        const newVideo: PortfolioVideo = {
-          id: Date.now().toString(),
-          url: 'https://example.com/video.mp4', // Placeholder
-          thumbnail: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop',
+        this.specialistService.updatePortfolioVideo(selectedVideo.id, {
           title: formData.title,
           description: formData.description,
-          duration: 120, // Placeholder
-          uploadDate: new Date()
-        };
-        this.portfolioVideos.set([...this.portfolioVideos(), newVideo]);
+          thumbnailUrl: formData.thumbnailUrl
+        }).subscribe({
+          next: (response) => {
+            const videos = this.portfolioVideos().map(video =>
+              video.id === selectedVideo.id ? this.mapApiVideoToDisplay(response.video) : video
+            );
+            this.portfolioVideos.set(videos);
+            this.saving.set(false);
+            this.closeVideoModal();
+          },
+          error: (err) => {
+            console.error('Error updating video:', err);
+            this.saving.set(false);
+          }
+        });
+      } else {
+        // Add new video
+        this.specialistService.addPortfolioVideo({
+          url: formData.url,
+          title: formData.title,
+          description: formData.description,
+          thumbnailUrl: formData.thumbnailUrl
+        }).subscribe({
+          next: (response) => {
+            const newVideo = this.mapApiVideoToDisplay(response.video);
+            this.portfolioVideos.set([...this.portfolioVideos(), newVideo]);
+            this.saving.set(false);
+            this.closeVideoModal();
+          },
+          error: (err) => {
+            console.error('Error adding video:', err);
+            this.saving.set(false);
+          }
+        });
       }
-      
-      this.closeVideoModal();
     }
   }
 
   deleteVideo(videoId: string): void {
     if (confirm('Are you sure you want to delete this video?')) {
-      const videos = this.portfolioVideos().filter(video => video.id !== videoId);
-      this.portfolioVideos.set(videos);
-    }
-  }
-
-  // Testimonial management
-  openTestimonialModal(testimonial?: Testimonial): void {
-    if (testimonial) {
-      this.selectedTestimonial.set(testimonial);
-      this.testimonialForm.patchValue({
-        clientName: testimonial.clientName,
-        rating: testimonial.rating,
-        review: testimonial.review,
-        eventType: testimonial.eventType,
-        eventDate: testimonial.eventDate.toISOString().split('T')[0],
-        isPublic: testimonial.isPublic,
-        isFeatured: testimonial.isFeatured
+      this.specialistService.deletePortfolioVideo(videoId).subscribe({
+        next: () => {
+          const videos = this.portfolioVideos().filter(video => video.id !== videoId);
+          this.portfolioVideos.set(videos);
+        },
+        error: (err) => console.error('Error deleting video:', err)
       });
-    } else {
-      this.selectedTestimonial.set(null);
-      this.testimonialForm.reset({ rating: 5, isPublic: true, isFeatured: false });
-    }
-    this.showTestimonialModal.set(true);
-  }
-
-  closeTestimonialModal(): void {
-    this.showTestimonialModal.set(false);
-    this.selectedTestimonial.set(null);
-    this.testimonialForm.reset();
-  }
-
-  saveTestimonial(): void {
-    if (this.testimonialForm.valid) {
-      const formData = this.testimonialForm.value;
-      const selectedTestimonial = this.selectedTestimonial();
-      
-      if (selectedTestimonial) {
-        // Update existing testimonial
-        const testimonials = this.testimonials();
-        const updatedTestimonials = testimonials.map(testimonial => 
-          testimonial.id === selectedTestimonial.id 
-            ? { ...testimonial, ...formData, eventDate: new Date(formData.eventDate) }
-            : testimonial
-        );
-        this.testimonials.set(updatedTestimonials);
-      } else {
-        // Add new testimonial
-        const newTestimonial: Testimonial = {
-          id: Date.now().toString(),
-          clientName: formData.clientName,
-          rating: formData.rating,
-          review: formData.review,
-          eventType: formData.eventType,
-          eventDate: new Date(formData.eventDate),
-          isPublic: formData.isPublic,
-          isFeatured: formData.isFeatured
-        };
-        this.testimonials.set([...this.testimonials(), newTestimonial]);
-      }
-      
-      this.closeTestimonialModal();
     }
   }
 
-  deleteTestimonial(testimonialId: string): void {
-    if (confirm('Are you sure you want to delete this testimonial?')) {
-      const testimonials = this.testimonials().filter(t => t.id !== testimonialId);
-      this.testimonials.set(testimonials);
-    }
-  }
-
+  // Testimonial moderation (specialists can only toggle visibility, not create/edit content)
   toggleTestimonialFeatured(testimonialId: string): void {
-    const testimonials = this.testimonials().map(t => 
-      t.id === testimonialId ? { ...t, isFeatured: !t.isFeatured } : t
-    );
-    this.testimonials.set(testimonials);
+    const testimonial = this.testimonials().find(t => t.id === testimonialId);
+    if (testimonial) {
+      this.specialistService.updateTestimonial(testimonialId, { isFeatured: !testimonial.isFeatured }).subscribe({
+        next: () => {
+          const testimonials = this.testimonials().map(t =>
+            t.id === testimonialId ? { ...t, isFeatured: !t.isFeatured } : t
+          );
+          this.testimonials.set(testimonials);
+        },
+        error: (err) => console.error('Error toggling featured:', err)
+      });
+    }
   }
 
   toggleTestimonialPublic(testimonialId: string): void {
-    const testimonials = this.testimonials().map(t => 
-      t.id === testimonialId ? { ...t, isPublic: !t.isPublic } : t
-    );
-    this.testimonials.set(testimonials);
+    const testimonial = this.testimonials().find(t => t.id === testimonialId);
+    if (testimonial) {
+      this.specialistService.updateTestimonial(testimonialId, { isPublic: !testimonial.isPublic }).subscribe({
+        next: () => {
+          const testimonials = this.testimonials().map(t =>
+            t.id === testimonialId ? { ...t, isPublic: !t.isPublic } : t
+          );
+          this.testimonials.set(testimonials);
+        },
+        error: (err) => console.error('Error toggling public:', err)
+      });
+    }
   }
 
   // Settings management
   saveSettings(): void {
     if (this.settingsForm.valid) {
-      console.log('Saving portfolio settings:', this.settingsForm.value);
-      // TODO: Implement settings save
+      this.saving.set(true);
+      const formData = this.settingsForm.value;
+
+      this.specialistService.updatePortfolioSettings({
+        portfolioTitle: formData.portfolioTitle,
+        portfolioDescription: formData.portfolioDescription,
+        showContactInfo: formData.showContactInfo,
+        allowDownloads: formData.allowDownloads,
+        watermarkImages: formData.watermarkImages,
+        theme: formData.theme
+      }).subscribe({
+        next: (response) => {
+          this.portfolioSettings.set(response.settings);
+          this.saving.set(false);
+          alert('Settings saved successfully!');
+        },
+        error: (err) => {
+          console.error('Error saving settings:', err);
+          this.saving.set(false);
+        }
+      });
     }
   }
 

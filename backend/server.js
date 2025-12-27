@@ -9,19 +9,23 @@ const fs = require('fs');
 
 // Load environment variables only in development
 // Production (Vercel) provides env vars directly
+// Docker also provides env vars, so we don't override when running in Docker
 const isProduction = process.env.NODE_ENV === 'production';
-if (!isProduction) {
+const isDocker = process.env.DB_HOST === 'postgres';  // Docker uses 'postgres' as hostname
+if (!isProduction && !isDocker) {
   const envLocalPath = path.join(__dirname, '.env.local');
   const envPath = path.join(__dirname, '.env');
 
-  // Try .env.local first, then .env
+  // Try .env.local first, then .env (don't override existing env vars)
   if (fs.existsSync(envLocalPath)) {
-    require('dotenv').config({ path: envLocalPath, override: true });
+    require('dotenv').config({ path: envLocalPath });
     console.log('💻 Loaded .env.local for development');
   } else if (fs.existsSync(envPath)) {
-    require('dotenv').config({ path: envPath, override: true });
+    require('dotenv').config({ path: envPath });
     console.log('💻 Loaded .env for development');
   }
+} else if (isDocker) {
+  console.log('🐳 Running in Docker mode - using container environment variables');
 }
 
 const app = express();
@@ -128,6 +132,7 @@ const adsPublicRoutes = require('./routes/ads-public');
 const publicStatsRoutes = require('./routes/public-stats');
 const reviewsRoutes = require('./routes/reviews');
 const specialistRoutes = require('./routes/specialist');
+const specialistPortfolioRoutes = require('./routes/specialist-portfolio');
 const publicSpecialistRoutes = require('./routes/public-specialist');
 const uploadRoutes = require('./routes/uploads');
 const favoritesRoutes = require('./routes/favorites');
@@ -138,6 +143,7 @@ const bookingIncentivesRoutes = require('./routes/booking-incentives');
 const userWalletRoutes = require('./routes/user-wallet');
 const socialRoutes = require('./routes/social');
 const recommendationsRoutes = require('./routes/recommendations');
+const userSpecialistBookingsRoutes = require('./routes/user-specialist-bookings');
 
 // Static file serving for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -168,6 +174,7 @@ app.use('/api/business-ads', businessAdsRoutes);
 app.use('/api/ads-public', adsPublicRoutes); // Public ad serving endpoints
 app.use('/api/public', publicStatsRoutes); // Public statistics endpoint
 app.use('/api/specialist', specialistRoutes); // Specialist dashboard endpoints
+app.use('/api/specialist/portfolio', specialistPortfolioRoutes); // Specialist portfolio management
 app.use('/api/public/specialists', publicSpecialistRoutes); // Public specialist discovery
 app.use('/api/uploads', uploadRoutes); // File upload endpoints
 app.use('/api/favorites', favoritesRoutes); // User favorites endpoints
@@ -178,6 +185,7 @@ app.use('/api/booking-incentives', bookingIncentivesRoutes); // Booking discount
 app.use('/api/wallet', userWalletRoutes); // User wallet/cashback
 app.use('/api/social', socialRoutes); // Social features (follow, activity feed)
 app.use('/api/recommendations', recommendationsRoutes); // Personalized recommendations
+app.use('/api/user/specialist-bookings', userSpecialistBookingsRoutes); // User specialist booking history & testimonials
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

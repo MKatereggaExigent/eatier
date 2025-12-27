@@ -254,14 +254,17 @@ router.get('/users', requireAdmin, async (req, res) => {
         u.last_name,
         u.phone,
         u.role,
+        u.tenant_id,
+        t.name as tenant_name,
         u.status as account_status,
         u.email_verified,
         u.avatar_url,
         u.created_at,
         u.last_login_at,
         (SELECT COUNT(*) FROM bookings WHERE user_id = u.id) as total_bookings,
-        (SELECT b.name FROM businesses b WHERE b.owner_id = u.id LIMIT 1) as business_name
+        (SELECT b.business_name FROM businesses b WHERE b.owner_id = u.id LIMIT 1) as business_name
       FROM users u
+      LEFT JOIN tenants t ON u.tenant_id = t.id
       WHERE 1=1
     `;
 
@@ -320,6 +323,126 @@ router.get('/users', requireAdmin, async (req, res) => {
   }
 });
 
+// Create a new user (admin only)
+router.post('/users', requireAdmin, async (req, res) => {
+  console.log('=== CREATE USER REQUEST ===');
+  console.log('User making request:', req.user?.email, 'Role:', req.user?.role);
+  console.log('Request body:', JSON.stringify(req.body, null, 2));
+
+  const client = await pool.connect();
+  try {
+    const { email, password, firstName, lastName, phone, role = 'normal_user', status = 'active' } = req.body;
+
+    // Validate required fields
+    if (!email || !password || !firstName || !lastName) {
+      return res.status(400).json({
+        error: 'Email, password, first name, and last name are required'
+      });
+    }
+
+    // Validate password length
+    if (password.length < 8) {
+      return res.status(400).json({
+        error: 'Password must be at least 8 characters'
+      });
+    }
+
+    await client.query('BEGIN');
+
+    // Check if user already exists
+    const existingUser = await client.query(
+      'SELECT id FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (existingUser.rows.length > 0) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({
+        error: 'User with this email already exists'
+      });
+    }
+
+    // Get default tenant (Itiyum Platform)
+    const tenantResult = await client.query(
+      "SELECT id FROM tenants WHERE name = 'Itiyum Platform' LIMIT 1"
+    );
+    const tenantId = tenantResult.rows[0]?.id;
+
+    if (!tenantId) {
+      await client.query('ROLLBACK');
+      return res.status(500).json({
+        error: 'Default tenant not found'
+      });
+    }
+
+    // Hash password
+    const bcryptjs = require('bcryptjs');
+    const hashedPassword = await bcryptjs.hash(password, 10);
+
+    // Create user
+    const result = await client.query(`
+      INSERT INTO users (
+        email, password_hash, first_name, last_name, phone, tenant_id, account_status
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id, email, first_name, last_name, phone, tenant_id, account_status, created_at
+    `, [
+      email, hashedPassword, firstName, lastName, phone || null, tenantId, status
+    ]);
+
+    const user = result.rows[0];
+
+    // Map role slug to role name
+    const roleNameMap = {
+      'business_owner': 'Business Owner',
+      'food_enthusiast': 'Food Enthusiast',
+      'specialist': 'Specialist',
+      'itiyum_admin': 'Itiyum Admin',
+      'normal_user': 'Normal User'
+    };
+
+    const roleName = roleNameMap[role] || 'Normal User';
+
+    // Get role ID
+    const roleResult = await client.query(
+      "SELECT id FROM roles WHERE name = $1 LIMIT 1",
+      [roleName]
+    );
+
+    if (roleResult.rows.length > 0) {
+      // Assign role to user
+      await client.query(
+        `INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)`,
+        [user.id, roleResult.rows[0].id]
+      );
+    }
+
+    await client.query('COMMIT');
+
+    console.log(`Admin created user: ${email} with role: ${role}`);
+
+    res.status(201).json({
+      message: 'User created successfully',
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        phone: user.phone,
+        role: role,
+        status: user.account_status,
+        createdAt: user.created_at
+      }
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Failed to create user', details: error.message });
+  } finally {
+    client.release();
+  }
+});
+
 // ===================================
 // BUSINESSES
 // ===================================
@@ -331,26 +454,32 @@ router.get('/businesses', requireAdmin, async (req, res) => {
     let query = `
       SELECT
         b.id,
-        b.name,
-        b.slug,
+        b.business_name,
+        b.business_type,
         b.description,
         b.cuisine_types,
         b.price_range,
         b.phone,
         b.email,
-        b.website_url,
+        b.website AS website_url,
+        b.address,
+        b.city,
+        b.country,
+        b.logo_url,
         b.average_rating,
         b.total_reviews,
         b.total_bookings,
         b.status,
+        b.account_status,
         b.is_featured,
+        b.is_verified AS email_verified,
         b.created_at,
         b.updated_at,
-        u.first_name || ' ' || u.last_name as owner_name,
+        COALESCE(u.first_name || ' ' || u.last_name, 'No Owner') as owner_name,
         u.email as owner_email,
         u.id as owner_id
       FROM businesses b
-      JOIN users u ON b.owner_id = u.id
+      LEFT JOIN users u ON b.owner_id = u.id
       WHERE 1=1
     `;
 
@@ -359,7 +488,7 @@ router.get('/businesses', requireAdmin, async (req, res) => {
 
     if (search) {
       params.push(`%${search}%`);
-      query += ` AND (b.name ILIKE $${paramIndex} OR b.description ILIKE $${paramIndex})`;
+      query += ` AND (b.business_name ILIKE $${paramIndex} OR b.description ILIKE $${paramIndex})`;
       paramIndex++;
     }
 
@@ -381,7 +510,7 @@ router.get('/businesses', requireAdmin, async (req, res) => {
 
     if (search) {
       countParams.push(`%${search}%`);
-      countQuery += ` AND (b.name ILIKE $${countParamIndex} OR b.description ILIKE $${countParamIndex})`;
+      countQuery += ` AND (b.business_name ILIKE $${countParamIndex} OR b.description ILIKE $${countParamIndex})`;
       countParamIndex++;
     }
 
@@ -406,6 +535,214 @@ router.get('/businesses', requireAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error fetching businesses:', error);
     res.status(500).json({ error: 'Failed to fetch businesses', details: error.message });
+  }
+});
+
+// Get single business by ID
+router.get('/businesses/:id', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(`
+      SELECT
+        b.id,
+        b.business_name,
+        b.business_type,
+        b.description,
+        b.cuisine_types,
+        b.price_range,
+        b.phone,
+        b.email,
+        b.website AS website_url,
+        b.address,
+        b.formatted_address,
+        b.city,
+        b.state,
+        b.country,
+        b.postal_code,
+        b.latitude,
+        b.longitude,
+        b.logo_url,
+        b.cover_image_url,
+        b.average_rating,
+        b.total_reviews,
+        b.total_bookings,
+        b.status,
+        b.account_status,
+        b.is_featured,
+        b.is_verified,
+        b.sustainability_ethos,
+        b.opens_at,
+        b.closes_at,
+        b.facilities,
+        b.created_at,
+        b.updated_at,
+        COALESCE(u.first_name || ' ' || u.last_name, 'No Owner') as owner_name,
+        u.email as owner_email,
+        u.id as owner_id,
+        u.phone as owner_phone
+      FROM businesses b
+      LEFT JOIN users u ON b.owner_id = u.id
+      WHERE b.id = $1
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    res.json({ business: result.rows[0] });
+  } catch (error) {
+    console.error('Error fetching business:', error);
+    res.status(500).json({ error: 'Failed to fetch business', details: error.message });
+  }
+});
+
+// Verify a business
+router.patch('/businesses/:id/verify', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(`
+      UPDATE businesses
+      SET is_verified = true, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+      RETURNING id, business_name, is_verified
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    res.json({
+      message: 'Business verified successfully',
+      business: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error verifying business:', error);
+    res.status(500).json({ error: 'Failed to verify business', details: error.message });
+  }
+});
+
+// Suspend a business
+router.patch('/businesses/:id/suspend', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const result = await pool.query(`
+      UPDATE businesses
+      SET status = 'suspended', account_status = 'suspended', updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+      RETURNING id, business_name, status, account_status
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    // Optionally log the suspension reason
+    if (reason) {
+      console.log(`Business ${id} suspended. Reason: ${reason}`);
+    }
+
+    res.json({
+      message: 'Business suspended successfully',
+      business: result.rows[0],
+      reason: reason || null
+    });
+  } catch (error) {
+    console.error('Error suspending business:', error);
+    res.status(500).json({ error: 'Failed to suspend business', details: error.message });
+  }
+});
+
+// Activate a business
+router.patch('/businesses/:id/activate', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(`
+      UPDATE businesses
+      SET status = 'active', account_status = 'active', updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+      RETURNING id, business_name, status, account_status
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    res.json({
+      message: 'Business activated successfully',
+      business: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error activating business:', error);
+    res.status(500).json({ error: 'Failed to activate business', details: error.message });
+  }
+});
+
+// Feature/Unfeature a business
+router.patch('/businesses/:id/feature', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { featured } = req.body;
+
+    const result = await pool.query(`
+      UPDATE businesses
+      SET is_featured = $2, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+      RETURNING id, business_name, is_featured
+    `, [id, featured !== false]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    res.json({
+      message: result.rows[0].is_featured ? 'Business featured successfully' : 'Business unfeatured successfully',
+      business: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error featuring business:', error);
+    res.status(500).json({ error: 'Failed to update business feature status', details: error.message });
+  }
+});
+
+// Delete a business
+router.delete('/businesses/:id', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // First check if business exists
+    const checkResult = await pool.query('SELECT id, business_name FROM businesses WHERE id = $1', [id]);
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    const businessName = checkResult.rows[0].business_name;
+
+    // Delete related records first (cascade should handle most, but let's be explicit)
+    // Delete bookings associated with this business
+    await pool.query('DELETE FROM bookings WHERE business_id = $1', [id]);
+
+    // Delete business locations
+    await pool.query('DELETE FROM business_locations WHERE business_id = $1', [id]);
+
+    // Delete business subscriptions
+    await pool.query('DELETE FROM business_subscriptions WHERE business_id = $1', [id]);
+
+    // Delete the business
+    await pool.query('DELETE FROM businesses WHERE id = $1', [id]);
+
+    res.json({
+      message: 'Business deleted successfully',
+      deletedBusiness: { id, business_name: businessName }
+    });
+  } catch (error) {
+    console.error('Error deleting business:', error);
+    res.status(500).json({ error: 'Failed to delete business', details: error.message });
   }
 });
 
