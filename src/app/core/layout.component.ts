@@ -12,6 +12,14 @@ import { RightSidebarAdComponent } from '../shared/components/ads/right-sidebar-
 import { SearchService } from './services/search.service';
 import { User } from '../shared/models/user.model';
 
+// Navigation item interface
+interface NavItem {
+  label: string;
+  icon: string;
+  route: string;
+  exactMatch?: boolean;
+}
+
 @Component({
   selector: 'app-layout',
   standalone: true,
@@ -70,6 +78,81 @@ export class LayoutComponent {
     const user = this.currentUser();
     if (!user) return '?';
     return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+  });
+
+  // Navigation items based on login state and role
+  navigationItems = computed<NavItem[]>(() => {
+    const isAuthenticated = this.isLoggedIn();
+    const user = this.currentUser();
+
+    // Guest navigation (not logged in)
+    if (!isAuthenticated || !user) {
+      return [
+        { label: 'About', icon: '🏠', route: '/about' },
+        { label: 'Grow', icon: '📈', route: '/grow' },
+        { label: 'Restaurants', icon: '🍽️', route: '/restaurants' },
+        { label: 'Specialists', icon: '👨‍🍳', route: '/specialists' },
+        { label: 'Community', icon: '🌟', route: '/community' },
+        { label: 'FAQs', icon: '❓', route: '/faqs' },
+        { label: 'Help', icon: '💬', route: '/help' }
+      ];
+    }
+
+    // Role-based navigation for authenticated users
+    const role = user.role;
+
+    switch (role) {
+      case 'itiyum_admin':
+        return [
+          { label: 'Dashboard', icon: '📊', route: '/admin' },
+          { label: 'Users', icon: '👥', route: '/admin/users' },
+          { label: 'Businesses', icon: '🏢', route: '/admin/businesses' },
+          { label: 'Analytics', icon: '📈', route: '/admin/analytics' },
+          { label: 'Reports', icon: '📋', route: '/admin/reports' },
+          { label: 'Settings', icon: '⚙️', route: '/admin/settings' }
+        ];
+
+      case 'business_owner':
+        return [
+          { label: 'Dashboard', icon: '📊', route: '/dashboard/business' },
+          { label: 'Restaurants', icon: '🍽️', route: '/restaurants' },
+          { label: 'Bookings', icon: '📅', route: '/dashboard/business/bookings' },
+          { label: 'Menu', icon: '📜', route: '/dashboard/business/menu' },
+          { label: 'Reviews', icon: '⭐', route: '/dashboard/business/reviews' },
+          { label: 'Analytics', icon: '📈', route: '/dashboard/business/analytics' }
+        ];
+
+      case 'specialist':
+        return [
+          { label: 'Dashboard', icon: '📊', route: '/dashboard/specialist' },
+          { label: 'Restaurants', icon: '🍽️', route: '/restaurants' },
+          { label: 'My Bookings', icon: '📅', route: '/dashboard/specialist/bookings' },
+          { label: 'Portfolio', icon: '🎨', route: '/dashboard/specialist/portfolio' },
+          { label: 'Community', icon: '🌟', route: '/community' },
+          { label: 'Wallet', icon: '💰', route: '/dashboard/specialist/wallet' }
+        ];
+
+      case 'food_enthusiast':
+        return [
+          { label: 'Dashboard', icon: '📊', route: '/dashboard/food-enthusiast' },
+          { label: 'Restaurants', icon: '🍽️', route: '/restaurants' },
+          { label: 'Specialists', icon: '👨‍🍳', route: '/specialists' },
+          { label: 'My Bookings', icon: '📅', route: '/dashboard/food-enthusiast/bookings' },
+          { label: 'Community', icon: '🌟', route: '/community' },
+          { label: 'Favorites', icon: '❤️', route: '/dashboard/food-enthusiast/favorites' }
+        ];
+
+      case 'normal_user':
+      default:
+        return [
+          { label: 'Dashboard', icon: '📊', route: '/dashboard/user' },
+          { label: 'Restaurants', icon: '🍽️', route: '/restaurants' },
+          { label: 'Specialists', icon: '👨‍🍳', route: '/specialists' },
+          { label: 'My Bookings', icon: '📅', route: '/dashboard/user/bookings' },
+          { label: 'Favorites', icon: '❤️', route: '/dashboard/user/favorites' },
+          { label: 'Wallet', icon: '💰', route: '/dashboard/user/wallet' }
+        ];
+    }
   });
 
   constructor() {

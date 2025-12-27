@@ -288,7 +288,21 @@ export class ReviewsService {
 
   // Update review
   updateReview(reviewId: string, updates: Partial<Review>): Observable<boolean> {
-    return this.apiService.patch(`reviews/${reviewId}`, updates).pipe(
+    const userId = localStorage.getItem('user_id') || 'temp-user';
+    const payload = {
+      userId,
+      overallRating: updates.overallRating,
+      foodRating: updates.foodRating,
+      serviceRating: updates.serviceRating,
+      ambianceRating: updates.ambianceRating,
+      valueRating: updates.valueRating,
+      title: updates.title,
+      content: updates.content,
+      visitDate: updates.visitDate,
+      wouldRecommend: updates.wouldRecommend
+    };
+
+    return this.apiService.put(`reviews/${reviewId}`, payload).pipe(
       map(() => true),
       tap(() => {
         const currentReviews = this.reviewsSubject.value;
@@ -306,7 +320,8 @@ export class ReviewsService {
 
   // Delete review
   deleteReview(reviewId: string): Observable<boolean> {
-    return this.apiService.delete(`reviews/${reviewId}`).pipe(
+    const userId = localStorage.getItem('user_id') || 'temp-user';
+    return this.apiService.delete(`reviews/${reviewId}?userId=${userId}`).pipe(
       map(() => true),
       tap(() => {
         const currentReviews = this.reviewsSubject.value;

@@ -344,8 +344,23 @@
 
           .profile-menu-user {
             .user-info {
+              display: flex;
+              flex-direction: column;
+              gap: var(--space-1);
               padding: var(--space-3) var(--space-4);
               margin-bottom: var(--space-2);
+
+              // Direct children styling (for simple layout without avatar)
+              > .user-name {
+                font-size: var(--text-sm);
+                font-weight: var(--font-semibold);
+                color: #000000;
+              }
+
+              > .user-email {
+                font-size: var(--text-xs);
+                color: #525252;
+              }
 
               .user-avatar-section {
                 display: flex;

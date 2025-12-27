@@ -8,43 +8,15 @@
         <span class="brand-text itiyum-brand">Itiyum</span>
       </a>
 
-      <!-- Navigation Links -->
+      <!-- Navigation Links - Dynamic based on login state and role -->
       <ul class="navbar-nav" [class.mobile-open]="showMobileMenu()">
-        <li class="nav-item">
-          <a routerLink="/about" routerLinkActive="active" class="nav-link">
-            🏠 About
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/grow" routerLinkActive="active" class="nav-link">
-            📈 Grow
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/restaurants" routerLinkActive="active" class="nav-link">
-            🍽️ Restaurants
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/specialists" routerLinkActive="active" class="nav-link">
-            👨‍🍳 Specialists
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/community" routerLinkActive="active" class="nav-link">
-            🌟 Community
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/faqs" routerLinkActive="active" class="nav-link">
-            ❓ FAQs
-          </a>
-        </li>
-        <li class="nav-item">
-          <a routerLink="/help" routerLinkActive="active" class="nav-link">
-            💬 Help
-          </a>
-        </li>
+        @for (navItem of navigationItems(); track navItem.route) {
+          <li class="nav-item">
+            <a [routerLink]="navItem.route" routerLinkActive="active" class="nav-link">
+              {{ navItem.icon }} {{ navItem.label }}
+            </a>
+          </li>
+        }
       </ul>
 
       <!-- Action Buttons -->

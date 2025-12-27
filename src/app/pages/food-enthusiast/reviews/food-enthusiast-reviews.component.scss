@@ -1,36 +1,31 @@
-// Food Enthusiast Reviews Component Styles
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+// Food Enthusiast Reviews Component Styles - NYT Style
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Source+Sans+Pro:wght@300;400;600;700&display=swap');
 
-// CSS Variables
+// NYT-inspired CSS Variables - Black & White
 :host {
-  --primary-color: #2563eb;
-  --primary-hover: #1d4ed8;
-  --secondary-color: #64748b;
-  --success-color: #059669;
-  --warning-color: #d97706;
-  --error-color: #dc2626;
-  --info-color: #0891b2;
+  // Core colors - Black & White palette
+  --color-black: #121212;
+  --color-dark-gray: #333333;
+  --color-medium-gray: #666666;
+  --color-light-gray: #999999;
+  --color-border: #e0e0e0;
+  --color-bg-light: #f7f7f7;
+  --color-white: #ffffff;
 
-  --excellent-color: #059669;
-  --good-color: #65a30d;
-  --average-color: #d97706;
-  --poor-color: #dc2626;
-  --terrible-color: #991b1b;
+  // Accent (minimal use)
+  --color-accent: #121212;
+  --color-accent-hover: #333333;
 
-  --glass-white: rgba(255, 255, 255, 0.25);
-  --glass-white-strong: rgba(255, 255, 255, 0.35);
-  --glass-dark: rgba(0, 0, 0, 0.1);
+  // Status colors (muted)
+  --color-success: #333333;
+  --color-warning: #666666;
+  --color-error: #121212;
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  // Typography
+  --font-serif: 'Noto Serif', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-
+  // Spacing
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -38,151 +33,170 @@
   --space-5: 1.25rem;
   --space-6: 1.5rem;
   --space-8: 2rem;
+  --space-10: 2.5rem;
   --space-12: 3rem;
+  --space-16: 4rem;
 
+  // Font sizes
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
   --text-lg: 1.125rem;
   --text-xl: 1.25rem;
   --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
 
+  // Font weights
   --font-light: 300;
   --font-normal: 400;
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
+
+  // Borders
+  --border-thin: 1px solid var(--color-border);
+  --border-medium: 2px solid var(--color-black);
+  --border-thick: 3px solid var(--color-black);
 }
 
-// Main Container
+// Main Container - NYT Style
 .reviews-dashboard {
   min-height: 100vh;
-  padding: var(--space-6);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--color-white);
+  padding: var(--space-8) var(--space-6);
+  font-family: var(--font-sans);
+  color: var(--color-black);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-// Header Section
+// Header Section - NYT Editorial Style
 .dashboard-header {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-10);
+  border-bottom: var(--border-thick);
+  padding-bottom: var(--space-8);
 
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-8);
 
     .title-section {
       .page-title {
-        font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
-        font-size: var(--text-3xl);
+        font-family: var(--font-serif);
+        font-size: var(--text-4xl);
         font-weight: var(--font-bold);
-        color: white;
-        margin: 0 0 var(--space-2) 0;
+        color: var(--color-black);
+        margin: 0 0 var(--space-3) 0;
         display: flex;
         align-items: center;
         gap: var(--space-3);
+        letter-spacing: -0.02em;
+        line-height: 1.1;
 
         .title-icon {
-          font-size: var(--text-2xl);
+          font-size: var(--text-3xl);
         }
       }
 
       .page-subtitle {
+        font-family: var(--font-serif);
         font-size: var(--text-lg);
-        color: rgba(255, 255, 255, 0.8);
+        color: var(--color-medium-gray);
         margin: 0;
         font-weight: var(--font-normal);
+        font-style: italic;
       }
     }
 
     .header-actions {
       .new-review-btn {
-        background: #ffffff;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
+        background: var(--color-black);
+        border: none;
+        color: var(--color-white);
         padding: var(--space-3) var(--space-6);
-        border-radius: 4px;
+        font-family: var(--font-sans);
+        font-size: var(--text-sm);
         font-weight: var(--font-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         display: flex;
         align-items: center;
         gap: var(--space-2);
-        transition: all 0.3s ease;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
 
         &:hover {
-          background: rgba(255, 255, 255, 0.4);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          background: var(--color-dark-gray);
         }
 
         .btn-icon {
-          font-size: var(--text-lg);
+          font-size: var(--text-base);
         }
       }
     }
   }
 
-  // Stats Grid
+  // Stats Grid - Minimalist
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-6);
 
     .stat-card {
-      background: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
+      background: var(--color-white);
+      border: var(--border-thin);
       padding: var(--space-5);
       display: flex;
       align-items: center;
       gap: var(--space-4);
-      transition: all 0.3s ease;
+      transition: border-color 0.2s ease;
 
       &:hover {
-        background: #ffffff;
-        transform: translateY(-2px);
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        border-color: var(--color-black);
       }
 
       .stat-icon {
-        font-size: var(--text-2xl);
-        width: 48px;
-        height: 48px;
+        font-size: var(--text-xl);
+        width: 40px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 4px;
+        background: var(--color-bg-light);
+        border: var(--border-thin);
       }
 
       .stat-content {
         .stat-number {
+          font-family: var(--font-serif);
           font-size: var(--text-2xl);
           font-weight: var(--font-bold);
-          color: white;
+          color: var(--color-black);
           line-height: 1;
           margin-bottom: var(--space-1);
         }
 
         .stat-label {
-          font-size: var(--text-sm);
-          color: rgba(255, 255, 255, 0.8);
-          font-weight: var(--font-medium);
+          font-size: var(--text-xs);
+          color: var(--color-medium-gray);
+          font-weight: var(--font-semibold);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
       }
     }
   }
 }
 
-// Controls Section (similar to bookings)
+// Controls Section - NYT Style
 .controls-section {
-  background: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  padding: var(--space-6);
-  margin-bottom: var(--space-6);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  background: var(--color-white);
+  border-bottom: var(--border-thin);
+  padding: var(--space-5) 0;
+  margin-bottom: var(--space-8);
 
   .controls-content {
     display: flex;
@@ -205,19 +219,19 @@
         .search-input {
           width: 100%;
           padding: var(--space-3) var(--space-4) var(--space-3) var(--space-12);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 4px;
-          background: rgba(255, 255, 255, 0.1);
-          color: white;
+          border: var(--border-thin);
+          background: var(--color-white);
+          color: var(--color-black);
+          font-family: var(--font-sans);
           font-size: var(--text-base);
+
           &::placeholder {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--color-light-gray);
           }
 
           &:focus {
             outline: none;
-            border-color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--color-black);
           }
         }
 
@@ -226,7 +240,7 @@
           left: var(--space-4);
           top: 50%;
           transform: translateY(-50%);
-          color: rgba(255, 255, 255, 0.6);
+          color: var(--color-light-gray);
           font-size: var(--text-lg);
         }
       }
@@ -238,28 +252,28 @@
       gap: var(--space-3);
 
       .filter-toggle-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
+        background: var(--color-white);
+        border: var(--border-thin);
+        color: var(--color-black);
         padding: var(--space-3) var(--space-4);
-        border-radius: 4px;
+        font-family: var(--font-sans);
+        font-size: var(--text-sm);
         display: flex;
         align-items: center;
         gap: var(--space-2);
         font-weight: var(--font-medium);
-        transition: all 0.3s ease;
-        position: relative;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
 
         &:hover, &.active {
-          background: rgba(255, 255, 255, 0.2);
+          border-color: var(--color-black);
         }
 
         .filter-badge {
-          background: var(--primary-color);
-          color: white;
+          background: var(--color-black);
+          color: var(--color-white);
           font-size: var(--text-xs);
-          padding: var(--space-1) var(--space-2);
-          border-radius: 4px;
+          padding: 2px var(--space-2);
           font-weight: var(--font-semibold);
           margin-left: var(--space-1);
         }
@@ -267,16 +281,17 @@
 
       .clear-filters-btn {
         background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: rgba(255, 255, 255, 0.8);
+        border: none;
+        color: var(--color-medium-gray);
         padding: var(--space-2) var(--space-3);
-        border-radius: 4px;
+        font-family: var(--font-sans);
         font-size: var(--text-sm);
-        transition: all 0.3s ease;
+        text-decoration: underline;
+        cursor: pointer;
+        transition: color 0.2s ease;
 
         &:hover {
-          background: rgba(255, 255, 255, 0.1);
-          color: white;
+          color: var(--color-black);
         }
       }
     }
@@ -284,8 +299,8 @@
 
   // Filter Panel
   .filter-panel {
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    padding-top: var(--space-4);
+    border-top: var(--border-thin);
+    padding-top: var(--space-5);
 
     .filter-grid {
       display: grid;
@@ -295,29 +310,32 @@
       .filter-group {
         .filter-label {
           display: block;
-          color: white;
-          font-size: var(--text-sm);
-          font-weight: var(--font-medium);
+          color: var(--color-dark-gray);
+          font-size: var(--text-xs);
+          font-weight: var(--font-semibold);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
           margin-bottom: var(--space-2);
         }
 
         .filter-select {
           width: 100%;
           padding: var(--space-2) var(--space-3);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 4px;
-          background: rgba(255, 255, 255, 0.1);
-          color: white;
+          border: var(--border-thin);
+          background: var(--color-white);
+          color: var(--color-black);
+          font-family: var(--font-sans);
           font-size: var(--text-sm);
+          cursor: pointer;
+
           &:focus {
             outline: none;
-            border-color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--color-black);
           }
 
           option {
-            background: #1f2937;
-            color: white;
+            background: var(--color-white);
+            color: var(--color-black);
           }
         }
       }
@@ -325,114 +343,131 @@
   }
 }
 
-// Reviews Section
+// Reviews Section - NYT Style
 .reviews-section {
   .loading-state {
     text-align: center;
-    padding: var(--space-12);
-    color: white;
+    padding: var(--space-16);
+    color: var(--color-medium-gray);
 
     .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-top: 3px solid white;
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--color-border);
+      border-top: 2px solid var(--color-black);
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin: 0 auto var(--space-4);
     }
 
     p {
-      font-size: var(--text-lg);
+      font-family: var(--font-serif);
+      font-size: var(--text-base);
+      font-style: italic;
       margin: 0;
     }
   }
 
   .empty-state {
     text-align: center;
-    padding: var(--space-12);
-    background: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    color: white;
+    padding: var(--space-16);
+    background: var(--color-bg-light);
+    border: var(--border-thin);
+    color: var(--color-black);
 
     .empty-icon {
-      font-size: 4rem;
+      font-size: 3rem;
       margin-bottom: var(--space-4);
+      opacity: 0.5;
     }
 
     h3 {
+      font-family: var(--font-serif);
       font-size: var(--text-xl);
-      font-weight: var(--font-semibold);
+      font-weight: var(--font-bold);
       margin: 0 0 var(--space-2) 0;
+      color: var(--color-black);
     }
 
     p {
-      color: rgba(255, 255, 255, 0.8);
+      font-family: var(--font-serif);
+      color: var(--color-medium-gray);
+      font-style: italic;
       margin: 0 0 var(--space-6) 0;
     }
 
     .btn-primary, .btn-secondary {
       padding: var(--space-3) var(--space-6);
-      border-radius: 4px;
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
       font-weight: var(--font-semibold);
-      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
 
     .btn-primary {
-      background: var(--primary-color);
-      color: white;
+      background: var(--color-black);
+      color: var(--color-white);
       border: none;
 
       &:hover {
-        background: var(--primary-hover);
-        transform: translateY(-2px);
+        background: var(--color-dark-gray);
       }
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: var(--color-white);
+      color: var(--color-black);
+      border: var(--border-thin);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.2);
+        border-color: var(--color-black);
       }
     }
   }
 
-  // Reviews Grid
+  // Reviews Grid - NYT Article Cards
   .reviews-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
-    gap: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 
     .review-card {
-      background: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
-      padding: var(--space-6);
-      transition: all 0.3s ease;
+      background: var(--color-white);
+      border-bottom: var(--border-thin);
+      padding: var(--space-8) 0;
+      transition: none;
       position: relative;
-      overflow: hidden;
 
-      &:hover {
-        background: #ffffff;
-        transform: translateY(-4px);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      &:first-child {
+        padding-top: 0;
       }
 
-      // Status-based styling
+      &:hover {
+        background: var(--color-white);
+      }
+
+      // Status-based styling - subtle left border
       &.status-published {
-        border-left: 4px solid var(--success-color);
+        &::before {
+          content: '';
+          position: absolute;
+          left: -var(--space-6);
+          top: var(--space-8);
+          bottom: var(--space-8);
+          width: 3px;
+          background: var(--color-black);
+        }
       }
 
       &.status-draft {
-        border-left: 4px solid var(--warning-color);
+        opacity: 0.7;
       }
 
       &.status-archived {
-        border-left: 4px solid var(--secondary-color);
+        opacity: 0.5;
       }
 
       .review-header {
@@ -443,37 +478,46 @@
 
         .restaurant-info {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           gap: var(--space-4);
           flex: 1;
 
           .restaurant-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 4px;
+            width: 80px;
+            height: 80px;
             object-fit: cover;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            filter: grayscale(100%);
+            transition: filter 0.3s ease;
+          }
+
+          &:hover .restaurant-image {
+            filter: grayscale(0%);
           }
 
           .restaurant-details {
             .restaurant-name {
-              font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
-              font-size: var(--text-lg);
-              font-weight: var(--font-semibold);
-              color: white;
+              font-family: var(--font-serif);
+              font-size: var(--text-xl);
+              font-weight: var(--font-bold);
+              color: var(--color-black);
               margin: 0 0 var(--space-1) 0;
+              line-height: 1.2;
             }
 
             .restaurant-cuisine {
-              font-size: var(--text-sm);
-              color: rgba(255, 255, 255, 0.8);
+              font-family: var(--font-sans);
+              font-size: var(--text-xs);
+              color: var(--color-medium-gray);
               margin: 0 0 var(--space-1) 0;
-              font-weight: var(--font-medium);
+              font-weight: var(--font-semibold);
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
             }
 
             .restaurant-location {
-              font-size: var(--text-xs);
-              color: rgba(255, 255, 255, 0.6);
+              font-family: var(--font-sans);
+              font-size: var(--text-sm);
+              color: var(--color-light-gray);
               margin: 0;
             }
           }
@@ -485,47 +529,30 @@
             flex-direction: column;
             align-items: center;
             gap: var(--space-1);
-            padding: var(--space-2);
-            border-radius: 4px;
+            padding: var(--space-3);
+            border: var(--border-medium);
+            min-width: 60px;
 
-            &.excellent {
-              background: rgba(5, 150, 105, 0.2);
-              border: 1px solid rgba(5, 150, 105, 0.3);
-            }
-
-            &.good {
-              background: rgba(101, 163, 13, 0.2);
-              border: 1px solid rgba(101, 163, 13, 0.3);
-            }
-
-            &.average {
-              background: rgba(217, 119, 6, 0.2);
-              border: 1px solid rgba(217, 119, 6, 0.3);
-            }
-
-            &.poor {
-              background: rgba(220, 38, 38, 0.2);
-              border: 1px solid rgba(220, 38, 38, 0.3);
-            }
-
-            &.terrible {
-              background: rgba(153, 27, 27, 0.2);
-              border: 1px solid rgba(153, 27, 27, 0.3);
+            // All ratings use black/white - no color coding
+            &.excellent, &.good, &.average, &.poor, &.terrible {
+              background: var(--color-white);
+              border-color: var(--color-black);
             }
 
             .rating-number {
-              font-size: var(--text-xl);
+              font-family: var(--font-serif);
+              font-size: var(--text-2xl);
               font-weight: var(--font-bold);
-              color: white;
+              color: var(--color-black);
             }
 
             .rating-stars {
               display: flex;
-              gap: 2px;
+              gap: 1px;
 
               .star {
-                font-size: var(--text-sm);
-                opacity: 0.3;
+                font-size: var(--text-xs);
+                opacity: 0.2;
 
                 &.filled {
                   opacity: 1;
@@ -540,38 +567,40 @@
         margin-bottom: var(--space-5);
 
         .review-title {
-          font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
-          font-size: var(--text-lg);
-          font-weight: var(--font-semibold);
-          color: white;
+          font-family: var(--font-serif);
+          font-size: var(--text-xl);
+          font-weight: var(--font-bold);
+          color: var(--color-black);
           margin: 0 0 var(--space-3) 0;
+          line-height: 1.3;
         }
 
         .review-text {
-          color: rgba(255, 255, 255, 0.9);
-          line-height: 1.6;
+          font-family: var(--font-serif);
+          color: var(--color-dark-gray);
+          line-height: 1.7;
           margin: 0 0 var(--space-4) 0;
           font-size: var(--text-base);
         }
 
         .detailed-ratings {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-          gap: var(--space-3);
+          display: flex;
+          flex-wrap: wrap;
+          gap: var(--space-4);
           margin-bottom: var(--space-4);
-          padding: var(--space-3);
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          padding: var(--space-4) 0;
+          border-top: var(--border-thin);
+          border-bottom: var(--border-thin);
 
           .rating-item {
-            text-align: center;
+            text-align: left;
 
             .rating-label {
               display: block;
+              font-family: var(--font-sans);
               font-size: var(--text-xs);
-              color: rgba(255, 255, 255, 0.7);
-              font-weight: var(--font-medium);
+              color: var(--color-medium-gray);
+              font-weight: var(--font-semibold);
               text-transform: uppercase;
               letter-spacing: 0.05em;
               margin-bottom: var(--space-1);
@@ -579,9 +608,10 @@
 
             .rating-value {
               display: block;
+              font-family: var(--font-serif);
               font-size: var(--text-sm);
-              color: white;
-              font-weight: var(--font-semibold);
+              color: var(--color-black);
+              font-weight: var(--font-bold);
             }
           }
         }
@@ -589,26 +619,25 @@
         .review-details {
           display: flex;
           flex-wrap: wrap;
-          gap: var(--space-3);
+          gap: var(--space-4);
           margin-bottom: var(--space-4);
 
           .detail-item {
             display: flex;
             align-items: center;
             gap: var(--space-2);
-            background: rgba(255, 255, 255, 0.1);
-            padding: var(--space-2) var(--space-3);
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            padding: 0;
 
             .detail-icon {
-              font-size: var(--text-base);
+              font-size: var(--text-sm);
+              opacity: 0.6;
             }
 
             .detail-text {
+              font-family: var(--font-sans);
               font-size: var(--text-sm);
-              color: rgba(255, 255, 255, 0.9);
-              font-weight: var(--font-medium);
+              color: var(--color-medium-gray);
             }
           }
         }
@@ -618,20 +647,21 @@
           align-items: center;
           gap: var(--space-2);
           padding: var(--space-2) var(--space-3);
-          border-radius: 4px;
-          font-size: var(--text-sm);
-          font-weight: var(--font-medium);
+          font-family: var(--font-sans);
+          font-size: var(--text-xs);
+          font-weight: var(--font-semibold);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
 
           &.positive {
-            background: rgba(5, 150, 105, 0.2);
-            color: #10b981;
-            border: 1px solid rgba(5, 150, 105, 0.3);
+            background: var(--color-black);
+            color: var(--color-white);
           }
 
           &.negative {
-            background: rgba(220, 38, 38, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(220, 38, 38, 0.3);
+            background: var(--color-white);
+            color: var(--color-black);
+            border: var(--border-thin);
           }
         }
       }
@@ -642,60 +672,63 @@
         align-items: center;
         margin-bottom: var(--space-4);
         padding-top: var(--space-4);
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: var(--border-thin);
 
         .review-meta {
           display: flex;
           align-items: center;
-          gap: var(--space-3);
+          gap: var(--space-4);
 
           .review-date {
-            font-size: var(--text-sm);
-            color: rgba(255, 255, 255, 0.7);
+            font-family: var(--font-sans);
+            font-size: var(--text-xs);
+            color: var(--color-light-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
           }
 
           .review-status {
             padding: var(--space-1) var(--space-2);
-            border-radius: 4px;
+            font-family: var(--font-sans);
             font-size: var(--text-xs);
             font-weight: var(--font-semibold);
             text-transform: uppercase;
             letter-spacing: 0.05em;
 
             &.status-published {
-              background: rgba(5, 150, 105, 0.2);
-              color: #10b981;
-              border: 1px solid rgba(5, 150, 105, 0.3);
+              background: var(--color-black);
+              color: var(--color-white);
             }
 
             &.status-draft {
-              background: rgba(217, 119, 6, 0.2);
-              color: #f59e0b;
-              border: 1px solid rgba(217, 119, 6, 0.3);
+              background: var(--color-bg-light);
+              color: var(--color-medium-gray);
+              border: var(--border-thin);
             }
 
             &.status-archived {
-              background: rgba(100, 116, 139, 0.2);
-              color: #94a3b8;
-              border: 1px solid rgba(100, 116, 139, 0.3);
+              background: transparent;
+              color: var(--color-light-gray);
+              border: var(--border-thin);
             }
           }
 
           .verified-badge {
-            background: rgba(37, 99, 235, 0.2);
-            color: #3b82f6;
-            border: 1px solid rgba(37, 99, 235, 0.3);
+            background: var(--color-white);
+            color: var(--color-black);
+            border: var(--border-medium);
             padding: var(--space-1) var(--space-2);
-            border-radius: 4px;
+            font-family: var(--font-sans);
             font-size: var(--text-xs);
-            font-weight: var(--font-semibold);
+            font-weight: var(--font-bold);
           }
         }
 
         .review-stats {
           .helpful-votes {
-            font-size: var(--text-sm);
-            color: rgba(255, 255, 255, 0.7);
+            font-family: var(--font-sans);
+            font-size: var(--text-xs);
+            color: var(--color-light-gray);
           }
         }
       }
@@ -707,40 +740,42 @@
 
         button {
           padding: var(--space-2) var(--space-4);
-          border-radius: 4px;
-          font-size: var(--text-sm);
-          font-weight: var(--font-medium);
-          transition: all 0.3s ease;
-          flex: 1;
-          min-width: 100px;
+          font-family: var(--font-sans);
+          font-size: var(--text-xs);
+          font-weight: var(--font-semibold);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          cursor: pointer;
+          transition: all 0.2s ease;
 
           &.btn-primary {
-            background: var(--primary-color);
-            color: white;
+            background: var(--color-black);
+            color: var(--color-white);
             border: none;
 
             &:hover {
-              background: var(--primary-hover);
+              background: var(--color-dark-gray);
             }
           }
 
           &.btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: var(--color-white);
+            color: var(--color-black);
+            border: var(--border-thin);
 
             &:hover {
-              background: rgba(255, 255, 255, 0.2);
+              border-color: var(--color-black);
             }
           }
 
           &.btn-danger {
-            background: rgba(220, 38, 38, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(220, 38, 38, 0.3);
+            background: var(--color-white);
+            color: var(--color-black);
+            border: var(--border-thin);
+            text-decoration: underline;
 
             &:hover {
-              background: rgba(220, 38, 38, 0.3);
+              border-color: var(--color-black);
             }
           }
         }
@@ -749,35 +784,34 @@
   }
 }
 
-// Modal Styles
+// Modal Styles - NYT Style
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: var(--space-4);
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.2s ease;
 }
 
 .modal-content {
-  background: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: var(--color-white);
+  border: none;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   max-width: 90vw;
   max-height: 90vh;
   overflow-y: auto;
-  animation: slideInUp 0.3s ease;
+  animation: slideInUp 0.2s ease;
 
   &.new-review-modal {
     width: 100%;
-    max-width: 900px;
+    max-width: 700px;
   }
 
   .modal-header {
@@ -785,29 +819,27 @@
     justify-content: space-between;
     align-items: center;
     padding: var(--space-6);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: var(--border-thick);
 
     h3 {
-      font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
-      font-size: var(--text-xl);
-      font-weight: var(--font-semibold);
-      color: white;
+      font-family: var(--font-serif);
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      color: var(--color-black);
       margin: 0;
     }
 
     .modal-close {
       background: none;
       border: none;
-      color: rgba(255, 255, 255, 0.7);
+      color: var(--color-medium-gray);
       font-size: var(--text-xl);
       cursor: pointer;
       padding: var(--space-2);
-      border-radius: 4px;
-      transition: all 0.3s ease;
+      transition: color 0.2s ease;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
+        color: var(--color-black);
       }
     }
   }
@@ -815,50 +847,54 @@
   .modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: var(--space-3);
+    gap: var(--space-4);
     padding: var(--space-6);
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: var(--border-thin);
 
     button {
       padding: var(--space-3) var(--space-6);
-      border-radius: 4px;
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
       font-weight: var(--font-semibold);
-      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       gap: var(--space-2);
 
       &.btn-primary {
-        background: var(--primary-color);
-        color: white;
+        background: var(--color-black);
+        color: var(--color-white);
         border: none;
 
         &:hover:not(:disabled) {
-          background: var(--primary-hover);
+          background: var(--color-dark-gray);
         }
 
         &:disabled {
-          opacity: 0.6;
+          opacity: 0.5;
           cursor: not-allowed;
         }
       }
 
       &.btn-secondary {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: var(--color-white);
+        color: var(--color-black);
+        border: var(--border-thin);
 
         &:hover {
-          background: rgba(255, 255, 255, 0.2);
+          border-color: var(--color-black);
         }
       }
 
       .loading-spinner {
         &.small {
-          width: 16px;
-          height: 16px;
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          border-top: 2px solid white;
+          width: 14px;
+          height: 14px;
+          border: 2px solid var(--color-border);
+          border-top: 2px solid var(--color-white);
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }
@@ -867,15 +903,15 @@
   }
 }
 
-// Review Form Styles
+// Review Form Styles - NYT Style
 .review-form {
   padding: var(--space-6);
-  color: white;
+  color: var(--color-black);
 
   .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-4);
+    gap: var(--space-5);
 
     .form-group {
       &.full-width {
@@ -884,42 +920,45 @@
 
       label {
         display: block;
-        color: white;
-        font-size: var(--text-sm);
-        font-weight: var(--font-medium);
+        font-family: var(--font-sans);
+        color: var(--color-dark-gray);
+        font-size: var(--text-xs);
+        font-weight: var(--font-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         margin-bottom: var(--space-2);
       }
 
       .form-control {
         width: 100%;
         padding: var(--space-3);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 4px;
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
+        border: var(--border-thin);
+        background: var(--color-white);
+        color: var(--color-black);
+        font-family: var(--font-sans);
         font-size: var(--text-base);
-        transition: all 0.3s ease;
+        transition: border-color 0.2s ease;
 
         &::placeholder {
-          color: rgba(255, 255, 255, 0.6);
+          color: var(--color-light-gray);
         }
 
         &:focus {
           outline: none;
-          border-color: rgba(255, 255, 255, 0.5);
-          background: rgba(255, 255, 255, 0.15);
-          box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+          border-color: var(--color-black);
         }
 
         option {
-          background: #1f2937;
-          color: white;
+          background: var(--color-white);
+          color: var(--color-black);
         }
       }
 
       textarea.form-control {
         resize: vertical;
-        min-height: 120px;
+        min-height: 150px;
+        font-family: var(--font-serif);
+        line-height: 1.6;
       }
 
       .checkbox-label {
@@ -931,14 +970,34 @@
         .checkbox-input {
           width: 18px;
           height: 18px;
-          accent-color: var(--primary-color);
+          accent-color: var(--color-black);
         }
 
         .checkbox-text {
+          font-family: var(--font-sans);
           font-size: var(--text-base);
-          color: white;
+          color: var(--color-black);
         }
       }
+    }
+  }
+}
+
+// Rating Stars Interactive - NYT Style
+.rating-input {
+  display: flex;
+  gap: var(--space-1);
+
+  .star-btn {
+    background: none;
+    border: none;
+    font-size: var(--text-xl);
+    cursor: pointer;
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+
+    &.filled, &:hover {
+      opacity: 1;
     }
   }
 }
@@ -957,11 +1016,11 @@
 @keyframes slideInUp {
   from {
     opacity: 0;
-    transform: translateY(30px) scale(0.95);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
@@ -972,10 +1031,18 @@
   }
 
   .dashboard-header {
+    padding-bottom: var(--space-6);
+
     .header-content {
       flex-direction: column;
       gap: var(--space-4);
       align-items: stretch;
+
+      .title-section {
+        .page-title {
+          font-size: var(--text-2xl);
+        }
+      }
 
       .header-actions {
         align-self: stretch;
@@ -1012,8 +1079,18 @@
     }
   }
 
-  .reviews-grid {
-    grid-template-columns: 1fr;
+  .reviews-section .reviews-grid .review-card {
+    .review-header {
+      flex-direction: column;
+      gap: var(--space-4);
+
+      .restaurant-info {
+        .restaurant-image {
+          width: 60px;
+          height: 60px;
+        }
+      }
+    }
   }
 }
 
@@ -1022,5 +1099,9 @@
     .stats-grid {
       grid-template-columns: 1fr;
     }
+  }
+
+  .review-form .form-grid {
+    grid-template-columns: 1fr;
   }
 }

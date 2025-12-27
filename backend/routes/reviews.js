@@ -215,20 +215,28 @@ router.get('/user/:userId', async (req, res) => {
     res.json({
       reviews: result.rows.map(r => ({
         id: r.id,
-        businessId: r.business_id,
-        businessName: r.business_name,
-        businessType: r.business_type,
-        rating: r.rating,
+        business_id: r.business_id,
+        business_name: r.business_name,
+        business_type: r.business_type,
+        user_id: r.user_id,
+        overall_rating: r.rating,
+        food_rating: r.food_rating,
+        service_rating: r.service_rating,
+        ambiance_rating: r.ambiance_rating,
+        value_rating: r.value_rating,
         title: r.title,
-        comment: r.comment,
+        content: r.content || r.comment,
         images: r.images || [],
-        visitDate: r.visit_date,
-        wouldRecommend: r.would_recommend,
-        helpfulCount: r.helpful_count || 0,
-        notHelpfulCount: r.not_helpful_count || 0,
+        photos: r.images || [],
+        visit_date: r.visit_date,
+        would_recommend: r.would_recommend,
+        helpful_votes: r.helpful_count || 0,
+        total_votes: (r.helpful_count || 0) + (r.not_helpful_count || 0),
         status: r.status,
-        createdAt: r.created_at,
-        updatedAt: r.updated_at
+        is_verified_visit: r.is_verified_visit || false,
+        is_featured: r.is_featured || false,
+        created_at: r.created_at,
+        updated_at: r.updated_at
       })),
       stats: {
         totalReviews: parseInt(stats.total_reviews) || 0,
@@ -257,39 +265,82 @@ router.post('/', async (req, res) => {
     const {
       userId,
       businessId,
-      rating,
+      overallRating,
+      foodRating,
+      serviceRating,
+      ambianceRating,
+      valueRating,
       title,
+      content,
       comment,
       images,
       visitDate,
+      dishesOrdered,
+      pricePaid,
+      partySize,
+      occasion,
       wouldRecommend,
       status = 'published'
     } = req.body;
+
+    // Support both overallRating and rating for backward compatibility
+    const rating = overallRating || req.body.rating;
 
     if (!userId || !businessId || !rating) {
       return res.status(400).json({ error: 'User ID, business ID, and rating are required' });
     }
 
     // Get tenant_id from business
-    const businessResult = await pool.query('SELECT tenant_id FROM businesses WHERE id = $1', [businessId]);
+    const businessResult = await pool.query('SELECT tenant_id, business_name FROM businesses WHERE id = $1', [businessId]);
     if (businessResult.rows.length === 0) {
       return res.status(404).json({ error: 'Business not found' });
     }
     const tenantId = businessResult.rows[0].tenant_id;
+    const businessName = businessResult.rows[0].business_name;
 
     const result = await pool.query(`
       INSERT INTO reviews (
-        tenant_id, business_id, user_id, rating, title, comment,
+        tenant_id, business_id, user_id, rating, food_rating, service_rating,
+        ambiance_rating, value_rating, title, content, comment,
         images, visit_date, would_recommend, status
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       RETURNING *
     `, [
-      tenantId, businessId, userId, rating, title || '', comment || '',
-      images || [], visitDate, wouldRecommend !== false, status
+      tenantId, businessId, userId, rating,
+      foodRating || null, serviceRating || null,
+      ambianceRating || null, valueRating || null,
+      title || '', content || comment || '', content || comment || '',
+      images || [], visitDate || null, wouldRecommend !== false, status
     ]);
 
-    res.status(201).json(result.rows[0]);
+    const r = result.rows[0];
+
+    // Return in the format expected by the frontend
+    res.status(201).json({
+      id: r.id,
+      business_id: r.business_id,
+      business_name: businessName,
+      user_id: r.user_id,
+      overall_rating: r.rating,
+      food_rating: r.food_rating,
+      service_rating: r.service_rating,
+      ambiance_rating: r.ambiance_rating,
+      value_rating: r.value_rating,
+      title: r.title,
+      content: r.content || r.comment,
+      images: r.images || [],
+      photos: r.images || [],
+      visit_date: r.visit_date,
+      would_recommend: r.would_recommend,
+      helpful_votes: 0,
+      total_votes: 0,
+      status: r.status,
+      is_verified_visit: false,
+      is_featured: false,
+      created_at: r.created_at,
+      updated_at: r.updated_at
+    });
 
   } catch (error) {
     console.error('Error creating review:', error);
@@ -304,32 +355,91 @@ router.post('/', async (req, res) => {
 router.put('/:reviewId', async (req, res) => {
   try {
     const { reviewId } = req.params;
-    const { userId, rating, title, comment, images, visitDate, wouldRecommend, status } = req.body;
+    const {
+      userId,
+      overallRating,
+      foodRating,
+      serviceRating,
+      ambianceRating,
+      valueRating,
+      title,
+      content,
+      comment,
+      images,
+      visitDate,
+      wouldRecommend,
+      status
+    } = req.body;
+
+    // Support both overallRating and rating for backward compatibility
+    const rating = overallRating || req.body.rating;
 
     // Verify ownership
-    const ownerCheck = await pool.query('SELECT user_id FROM reviews WHERE id = $1', [reviewId]);
+    const ownerCheck = await pool.query(`
+      SELECT r.user_id, b.business_name
+      FROM reviews r
+      JOIN businesses b ON r.business_id = b.id
+      WHERE r.id = $1
+    `, [reviewId]);
+
     if (ownerCheck.rows.length === 0) {
       return res.status(404).json({ error: 'Review not found' });
     }
     if (ownerCheck.rows[0].user_id !== userId) {
       return res.status(403).json({ error: 'Not authorized to edit this review' });
     }
+    const businessName = ownerCheck.rows[0].business_name;
 
     const result = await pool.query(`
       UPDATE reviews SET
         rating = COALESCE($1, rating),
-        title = COALESCE($2, title),
-        comment = COALESCE($3, comment),
-        images = COALESCE($4, images),
-        visit_date = COALESCE($5, visit_date),
-        would_recommend = COALESCE($6, would_recommend),
-        status = COALESCE($7, status),
+        food_rating = COALESCE($2, food_rating),
+        service_rating = COALESCE($3, service_rating),
+        ambiance_rating = COALESCE($4, ambiance_rating),
+        value_rating = COALESCE($5, value_rating),
+        title = COALESCE($6, title),
+        content = COALESCE($7, content),
+        comment = COALESCE($8, comment),
+        images = COALESCE($9, images),
+        visit_date = COALESCE($10, visit_date),
+        would_recommend = COALESCE($11, would_recommend),
+        status = COALESCE($12, status),
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = $8
+      WHERE id = $13
       RETURNING *
-    `, [rating, title, comment, images, visitDate, wouldRecommend, status, reviewId]);
+    `, [
+      rating, foodRating, serviceRating, ambianceRating, valueRating,
+      title, content || comment, content || comment, images,
+      visitDate, wouldRecommend, status, reviewId
+    ]);
 
-    res.json(result.rows[0]);
+    const r = result.rows[0];
+
+    // Return in the format expected by the frontend
+    res.json({
+      id: r.id,
+      business_id: r.business_id,
+      business_name: businessName,
+      user_id: r.user_id,
+      overall_rating: r.rating,
+      food_rating: r.food_rating,
+      service_rating: r.service_rating,
+      ambiance_rating: r.ambiance_rating,
+      value_rating: r.value_rating,
+      title: r.title,
+      content: r.content || r.comment,
+      images: r.images || [],
+      photos: r.images || [],
+      visit_date: r.visit_date,
+      would_recommend: r.would_recommend,
+      helpful_votes: r.helpful_count || 0,
+      total_votes: (r.helpful_count || 0) + (r.not_helpful_count || 0),
+      status: r.status,
+      is_verified_visit: r.is_verified_visit || false,
+      is_featured: r.is_featured || false,
+      created_at: r.created_at,
+      updated_at: r.updated_at
+    });
 
   } catch (error) {
     console.error('Error updating review:', error);
