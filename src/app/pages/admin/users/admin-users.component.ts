@@ -5,7 +5,7 @@ import { AdminService } from '../../../core/services/admin.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 
 export interface AdminUser {
@@ -80,6 +80,7 @@ export class AdminUsersComponent implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
+  private router = inject(Router);
 
   currentUser = this.authService.currentUser;
 
@@ -518,6 +519,11 @@ export class AdminUsersComponent implements OnInit {
   closeUserModal(): void {
     this.selectedUser.set(null);
     this.showUserModal.set(false);
+  }
+
+  viewFullProfile(user: AdminUser): void {
+    this.closeUserModal();
+    this.router.navigate(['/admin/users', user.id]);
   }
 
   suspendUser(user: AdminUser): void {

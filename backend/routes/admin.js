@@ -1370,4 +1370,887 @@ router.get('/analytics/ai-insights', requireAdmin, async (req, res) => {
   }
 });
 
+// ===================================
+// REPORTS - COMPREHENSIVE DATA EXPORT
+// Multi-tenant, RBAC-protected endpoints
+// ===================================
+
+/**
+ * Helper function to convert data to CSV format
+ * @param {Array} data - Array of objects to convert
+ * @param {Array} columns - Column definitions [{key, label}]
+ * @returns {string} CSV formatted string
+ */
+function convertToCSV(data, columns) {
+  if (!data || data.length === 0) {
+    return columns.map(c => c.label).join(',') + '\n';
+  }
+
+  // Header row
+  const header = columns.map(c => `"${c.label}"`).join(',');
+
+  // Data rows
+  const rows = data.map(row => {
+    return columns.map(col => {
+      let value = row[col.key];
+      if (value === null || value === undefined) {
+        value = '';
+      } else if (typeof value === 'object') {
+        value = JSON.stringify(value);
+      } else {
+        value = String(value);
+      }
+      // Escape quotes and wrap in quotes
+      return `"${value.replace(/"/g, '""')}"`;
+    }).join(',');
+  });
+
+  return [header, ...rows].join('\n');
+}
+
+/**
+ * Helper to get tenant context for multi-tenancy
+ * For admin, we query across all tenants or filter by specific tenant
+ */
+async function getTenantContext(req) {
+  const tenantSlug = req.query.tenant || req.body.tenant;
+  if (tenantSlug) {
+    const result = await pool.query('SELECT id, name, slug FROM tenants WHERE slug = $1', [tenantSlug]);
+    return result.rows[0] || null;
+  }
+  return null; // null means all tenants (admin view)
+}
+
+/**
+ * Log report generation for audit trail
+ * Note: This attempts to log to activity_log table; silently fails if table doesn't exist
+ */
+async function logReportGeneration(userId, reportType, format, filters) {
+  try {
+    // Check if activity_log table exists and has the right columns
+    const tableCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_name = 'activity_log'
+      )
+    `);
+
+    if (tableCheck.rows[0].exists) {
+      // Try with action column (documented schema)
+      await pool.query(`
+        INSERT INTO activity_log (user_id, action, entity_type, details, status)
+        VALUES ($1, 'export_report', 'report', $2, 'success')
+      `, [userId, JSON.stringify({ reportType, format, filters: filters || {} })]);
+    }
+  } catch (error) {
+    // Silently fail - logging should not break report generation
+    console.error('Error logging report generation (non-critical):', error.message);
+  }
+}
+
+// GET /reports/stats - Report statistics
+router.get('/reports/stats', async (req, res) => {
+  try {
+    const tenant = await getTenantContext(req);
+    const tenantFilter = tenant ? 'AND tenant_id = $1' : '';
+    const params = tenant ? [tenant.id] : [];
+
+    // Get report generation stats from activity log
+    const generatedThisMonth = await pool.query(`
+      SELECT COUNT(*) as count
+      FROM activity_log
+      WHERE action = 'export'
+        AND entity_type = 'report'
+        AND created_at >= DATE_TRUNC('month', CURRENT_DATE)
+        ${tenant ? 'AND tenant_id = $1' : ''}
+    `, params);
+
+    // Calculate approximate data size
+    const dataSizeQuery = await pool.query(`
+      SELECT
+        (SELECT COUNT(*) FROM users ${tenant ? 'WHERE tenant_id = $1' : ''}) as user_count,
+        (SELECT COUNT(*) FROM businesses ${tenant ? 'WHERE tenant_id = $1' : ''}) as business_count,
+        (SELECT COUNT(*) FROM bookings ${tenant ? 'WHERE tenant_id = $1' : ''}) as booking_count
+    `, params);
+
+    const counts = dataSizeQuery.rows[0];
+    const estimatedRecords = parseInt(counts.user_count) + parseInt(counts.business_count) + parseInt(counts.booking_count);
+    const estimatedSizeMB = (estimatedRecords * 0.5 / 1024).toFixed(2); // ~0.5KB per record estimate
+
+    res.json({
+      availableReports: 6,
+      scheduledReports: 0, // Future feature
+      generatedThisMonth: parseInt(generatedThisMonth.rows[0].count) || 0,
+      dataExported: `${estimatedSizeMB} MB`,
+      tenant: tenant ? { id: tenant.id, name: tenant.name, slug: tenant.slug } : null
+    });
+
+  } catch (error) {
+    console.error('Error fetching report stats:', error);
+    res.status(500).json({ error: 'Failed to fetch report stats', details: error.message });
+  }
+});
+
+// POST /reports/users - Generate users report
+router.post('/reports/users', async (req, res) => {
+  try {
+    const { format = 'json', dateFrom, dateTo } = req.body;
+    const tenant = await getTenantContext(req);
+    const userId = req.user?.id;
+
+    // Build query with filters
+    let query = `
+      SELECT
+        u.id,
+        u.email,
+        u.first_name,
+        u.last_name,
+        u.phone,
+        u.role,
+        u.status as account_status,
+        u.email_verified,
+        u.created_at,
+        u.last_login_at,
+        t.name as tenant_name,
+        t.slug as tenant_slug,
+        (SELECT COUNT(*) FROM bookings WHERE user_id = u.id) as total_bookings,
+        (SELECT COUNT(*) FROM reviews WHERE user_id = u.id) as total_reviews,
+        (SELECT b.business_name FROM businesses b WHERE b.owner_id = u.id LIMIT 1) as business_name
+      FROM users u
+      LEFT JOIN tenants t ON u.tenant_id = t.id
+      WHERE 1=1
+    `;
+
+    const params = [];
+    let paramIndex = 1;
+
+    // Multi-tenancy filter
+    if (tenant) {
+      query += ` AND u.tenant_id = $${paramIndex}`;
+      params.push(tenant.id);
+      paramIndex++;
+    }
+
+    // Date range filter
+    if (dateFrom) {
+      query += ` AND u.created_at >= $${paramIndex}`;
+      params.push(dateFrom);
+      paramIndex++;
+    }
+    if (dateTo) {
+      query += ` AND u.created_at <= $${paramIndex}::date + INTERVAL '1 day'`;
+      params.push(dateTo);
+      paramIndex++;
+    }
+
+    query += ' ORDER BY u.created_at DESC';
+
+    const result = await pool.query(query, params);
+
+    // Log report generation
+    await logReportGeneration(userId, 'users', format, { dateFrom, dateTo, tenant: tenant?.slug });
+
+    if (format === 'csv') {
+      const columns = [
+        { key: 'id', label: 'User ID' },
+        { key: 'email', label: 'Email' },
+        { key: 'first_name', label: 'First Name' },
+        { key: 'last_name', label: 'Last Name' },
+        { key: 'phone', label: 'Phone' },
+        { key: 'role', label: 'Role' },
+        { key: 'account_status', label: 'Status' },
+        { key: 'email_verified', label: 'Email Verified' },
+        { key: 'tenant_name', label: 'Tenant' },
+        { key: 'total_bookings', label: 'Total Bookings' },
+        { key: 'total_reviews', label: 'Total Reviews' },
+        { key: 'business_name', label: 'Business Name' },
+        { key: 'created_at', label: 'Created At' },
+        { key: 'last_login_at', label: 'Last Login' }
+      ];
+
+      const csv = convertToCSV(result.rows, columns);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="users-report-${new Date().toISOString().split('T')[0]}.csv"`);
+      return res.send(csv);
+    }
+
+    res.json({
+      report: 'users',
+      generatedAt: new Date().toISOString(),
+      totalRecords: result.rows.length,
+      filters: { dateFrom, dateTo, tenant: tenant?.slug },
+      data: result.rows
+    });
+
+  } catch (error) {
+    console.error('Error generating users report:', error);
+    res.status(500).json({ error: 'Failed to generate users report', details: error.message });
+  }
+});
+
+// POST /reports/businesses - Generate businesses report
+router.post('/reports/businesses', async (req, res) => {
+  try {
+    const { format = 'json', dateFrom, dateTo } = req.body;
+    const tenant = await getTenantContext(req);
+    const userId = req.user?.id;
+
+    let query = `
+      SELECT
+        b.id,
+        b.business_name,
+        b.business_type,
+        b.email,
+        b.phone,
+        b.country,
+        b.city,
+        b.address,
+        b.account_status,
+        b.is_verified,
+        b.is_featured,
+        b.created_at,
+        b.updated_at,
+        t.name as tenant_name,
+        t.slug as tenant_slug,
+        u.first_name || ' ' || u.last_name as owner_name,
+        u.email as owner_email,
+        COALESCE(b.average_rating, 0) as average_rating,
+        COALESCE(b.total_reviews, 0) as total_reviews,
+        (SELECT COUNT(*) FROM bookings WHERE business_id = b.id) as total_bookings,
+        (SELECT COUNT(*) FROM bookings WHERE business_id = b.id AND status = 'completed') as completed_bookings,
+        (SELECT bs.plan FROM business_subscriptions bs WHERE bs.business_id = b.id AND bs.status = 'active' LIMIT 1) as subscription_plan
+      FROM businesses b
+      LEFT JOIN tenants t ON b.tenant_id = t.id
+      LEFT JOIN users u ON b.owner_id = u.id
+      WHERE 1=1
+    `;
+
+    const params = [];
+    let paramIndex = 1;
+
+    if (tenant) {
+      query += ` AND b.tenant_id = $${paramIndex}`;
+      params.push(tenant.id);
+      paramIndex++;
+    }
+
+    if (dateFrom) {
+      query += ` AND b.created_at >= $${paramIndex}`;
+      params.push(dateFrom);
+      paramIndex++;
+    }
+    if (dateTo) {
+      query += ` AND b.created_at <= $${paramIndex}::date + INTERVAL '1 day'`;
+      params.push(dateTo);
+      paramIndex++;
+    }
+
+    query += ' ORDER BY b.created_at DESC';
+
+    const result = await pool.query(query, params);
+
+    await logReportGeneration(userId, 'businesses', format, { dateFrom, dateTo, tenant: tenant?.slug });
+
+    if (format === 'csv') {
+      const columns = [
+        { key: 'id', label: 'Business ID' },
+        { key: 'business_name', label: 'Business Name' },
+        { key: 'business_type', label: 'Type' },
+        { key: 'email', label: 'Email' },
+        { key: 'phone', label: 'Phone' },
+        { key: 'country', label: 'Country' },
+        { key: 'city', label: 'City' },
+        { key: 'address', label: 'Address' },
+        { key: 'account_status', label: 'Status' },
+        { key: 'is_verified', label: 'Verified' },
+        { key: 'is_featured', label: 'Featured' },
+        { key: 'owner_name', label: 'Owner Name' },
+        { key: 'owner_email', label: 'Owner Email' },
+        { key: 'average_rating', label: 'Avg Rating' },
+        { key: 'total_reviews', label: 'Total Reviews' },
+        { key: 'total_bookings', label: 'Total Bookings' },
+        { key: 'completed_bookings', label: 'Completed Bookings' },
+        { key: 'subscription_plan', label: 'Subscription' },
+        { key: 'tenant_name', label: 'Tenant' },
+        { key: 'created_at', label: 'Created At' }
+      ];
+
+      const csv = convertToCSV(result.rows, columns);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="businesses-report-${new Date().toISOString().split('T')[0]}.csv"`);
+      return res.send(csv);
+    }
+
+    res.json({
+      report: 'businesses',
+      generatedAt: new Date().toISOString(),
+      totalRecords: result.rows.length,
+      filters: { dateFrom, dateTo, tenant: tenant?.slug },
+      data: result.rows
+    });
+
+  } catch (error) {
+    console.error('Error generating businesses report:', error);
+    res.status(500).json({ error: 'Failed to generate businesses report', details: error.message });
+  }
+});
+
+// POST /reports/bookings - Generate bookings report
+router.post('/reports/bookings', async (req, res) => {
+  try {
+    const { format = 'json', dateFrom, dateTo, status } = req.body;
+    const tenant = await getTenantContext(req);
+    const userId = req.user?.id;
+
+    let query = `
+      SELECT
+        bk.id,
+        bk.booking_date,
+        bk.booking_time,
+        bk.party_size,
+        bk.status,
+        bk.special_requests,
+        bk.total_amount,
+        CASE
+          WHEN bk.status = 'completed' THEN 'paid'
+          WHEN bk.status = 'cancelled' THEN 'refunded'
+          ELSE 'pending'
+        END as payment_status,
+        bk.created_at,
+        bk.updated_at,
+        b.id as business_id,
+        b.business_name,
+        b.business_type,
+        u.id as customer_id,
+        u.first_name || ' ' || u.last_name as customer_name,
+        u.email as customer_email,
+        u.phone as customer_phone,
+        t.name as tenant_name,
+        t.slug as tenant_slug
+      FROM bookings bk
+      LEFT JOIN businesses b ON bk.business_id = b.id
+      LEFT JOIN users u ON bk.user_id = u.id
+      LEFT JOIN tenants t ON bk.tenant_id = t.id
+      WHERE 1=1
+    `;
+
+    const params = [];
+    let paramIndex = 1;
+
+    if (tenant) {
+      query += ` AND bk.tenant_id = $${paramIndex}`;
+      params.push(tenant.id);
+      paramIndex++;
+    }
+
+    if (dateFrom) {
+      query += ` AND bk.booking_date >= $${paramIndex}`;
+      params.push(dateFrom);
+      paramIndex++;
+    }
+    if (dateTo) {
+      query += ` AND bk.booking_date <= $${paramIndex}`;
+      params.push(dateTo);
+      paramIndex++;
+    }
+
+    if (status && status !== 'all') {
+      query += ` AND bk.status = $${paramIndex}`;
+      params.push(status);
+      paramIndex++;
+    }
+
+    query += ' ORDER BY bk.booking_date DESC, bk.booking_time DESC';
+
+    const result = await pool.query(query, params);
+
+    await logReportGeneration(userId, 'bookings', format, { dateFrom, dateTo, status, tenant: tenant?.slug });
+
+    if (format === 'csv') {
+      const columns = [
+        { key: 'id', label: 'Booking ID' },
+        { key: 'booking_date', label: 'Date' },
+        { key: 'booking_time', label: 'Time' },
+        { key: 'party_size', label: 'Party Size' },
+        { key: 'status', label: 'Status' },
+        { key: 'business_name', label: 'Business' },
+        { key: 'business_type', label: 'Business Type' },
+        { key: 'customer_name', label: 'Customer Name' },
+        { key: 'customer_email', label: 'Customer Email' },
+        { key: 'customer_phone', label: 'Customer Phone' },
+        { key: 'total_amount', label: 'Amount' },
+        { key: 'payment_status', label: 'Payment Status' },
+        { key: 'special_requests', label: 'Special Requests' },
+        { key: 'tenant_name', label: 'Tenant' },
+        { key: 'created_at', label: 'Created At' }
+      ];
+
+      const csv = convertToCSV(result.rows, columns);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="bookings-report-${new Date().toISOString().split('T')[0]}.csv"`);
+      return res.send(csv);
+    }
+
+    res.json({
+      report: 'bookings',
+      generatedAt: new Date().toISOString(),
+      totalRecords: result.rows.length,
+      filters: { dateFrom, dateTo, status, tenant: tenant?.slug },
+      data: result.rows
+    });
+
+  } catch (error) {
+    console.error('Error generating bookings report:', error);
+    res.status(500).json({ error: 'Failed to generate bookings report', details: error.message });
+  }
+});
+
+// POST /reports/financial - Generate financial report
+router.post('/reports/financial', async (req, res) => {
+  try {
+    const { format = 'json', dateFrom, dateTo } = req.body;
+    const tenant = await getTenantContext(req);
+    const userId = req.user?.id;
+
+    // Build date filter conditions
+    let dateFilter = '';
+    const params = [];
+    let paramIndex = 1;
+
+    if (tenant) {
+      paramIndex++;
+    }
+
+    if (dateFrom) {
+      dateFilter += ` AND created_at >= $${tenant ? paramIndex : paramIndex}`;
+      paramIndex++;
+    }
+    if (dateTo) {
+      dateFilter += ` AND created_at <= $${paramIndex}::date + INTERVAL '1 day'`;
+      paramIndex++;
+    }
+
+    // Build params array
+    const filterParams = [];
+    if (tenant) filterParams.push(tenant.id);
+    if (dateFrom) filterParams.push(dateFrom);
+    if (dateTo) filterParams.push(dateTo);
+
+    // Revenue from subscriptions
+    const subscriptionRevenue = await pool.query(`
+      SELECT
+        bs.id,
+        bs.plan as plan_type,
+        bs.monthly_price,
+        bs.status,
+        bs.start_date,
+        bs.end_date,
+        bs.created_at,
+        b.business_name,
+        b.id as business_id,
+        t.name as tenant_name
+      FROM business_subscriptions bs
+      LEFT JOIN businesses b ON bs.business_id = b.id
+      LEFT JOIN tenants t ON b.tenant_id = t.id
+      WHERE 1=1
+      ${tenant ? 'AND b.tenant_id = $1' : ''}
+      ${dateFrom ? `AND bs.created_at >= $${tenant ? 2 : 1}` : ''}
+      ${dateTo ? `AND bs.created_at <= $${tenant ? (dateFrom ? 3 : 2) : (dateFrom ? 2 : 1)}::date + INTERVAL '1 day'` : ''}
+      ORDER BY bs.created_at DESC
+    `, filterParams);
+
+    // Revenue from bookings (commission)
+    const bookingRevenue = await pool.query(`
+      SELECT
+        bk.id,
+        bk.booking_date,
+        bk.total_amount,
+        bk.status,
+        'paid' as payment_status,
+        bk.created_at,
+        5.00 as commission_amount,
+        b.business_name,
+        u.first_name || ' ' || u.last_name as customer_name,
+        t.name as tenant_name
+      FROM bookings bk
+      LEFT JOIN businesses b ON bk.business_id = b.id
+      LEFT JOIN users u ON bk.user_id = u.id
+      LEFT JOIN tenants t ON bk.tenant_id = t.id
+      WHERE bk.status = 'completed'
+      ${tenant ? 'AND bk.tenant_id = $1' : ''}
+      ${dateFrom ? `AND bk.created_at >= $${tenant ? 2 : 1}` : ''}
+      ${dateTo ? `AND bk.created_at <= $${tenant ? (dateFrom ? 3 : 2) : (dateFrom ? 2 : 1)}::date + INTERVAL '1 day'` : ''}
+      ORDER BY bk.created_at DESC
+    `, filterParams);
+
+    // Calculate totals
+    const subscriptionTotal = subscriptionRevenue.rows
+      .filter(s => s.status === 'active')
+      .reduce((sum, s) => sum + parseFloat(s.monthly_price || 0), 0);
+
+    const commissionTotal = bookingRevenue.rows.length * 5.00;
+
+    const summary = {
+      totalRevenue: subscriptionTotal + commissionTotal,
+      subscriptionRevenue: subscriptionTotal,
+      commissionRevenue: commissionTotal,
+      activeSubscriptions: subscriptionRevenue.rows.filter(s => s.status === 'active').length,
+      completedBookings: bookingRevenue.rows.length
+    };
+
+    await logReportGeneration(userId, 'financial', format, { dateFrom, dateTo, tenant: tenant?.slug });
+
+    if (format === 'csv') {
+      // Combine subscription and booking data for CSV
+      const allTransactions = [
+        ...subscriptionRevenue.rows.map(s => ({
+          type: 'Subscription',
+          id: s.id,
+          date: s.created_at,
+          description: `${s.plan_type} subscription - ${s.business_name}`,
+          amount: s.monthly_price,
+          status: s.status,
+          tenant_name: s.tenant_name
+        })),
+        ...bookingRevenue.rows.map(b => ({
+          type: 'Commission',
+          id: b.id,
+          date: b.created_at,
+          description: `Booking commission - ${b.business_name}`,
+          amount: 5.00,
+          status: 'collected',
+          tenant_name: b.tenant_name
+        }))
+      ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      const columns = [
+        { key: 'type', label: 'Transaction Type' },
+        { key: 'id', label: 'Transaction ID' },
+        { key: 'date', label: 'Date' },
+        { key: 'description', label: 'Description' },
+        { key: 'amount', label: 'Amount (USD)' },
+        { key: 'status', label: 'Status' },
+        { key: 'tenant_name', label: 'Tenant' }
+      ];
+
+      const csv = convertToCSV(allTransactions, columns);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="financial-report-${new Date().toISOString().split('T')[0]}.csv"`);
+      return res.send(csv);
+    }
+
+    res.json({
+      report: 'financial',
+      generatedAt: new Date().toISOString(),
+      totalRecords: subscriptionRevenue.rows.length + bookingRevenue.rows.length,
+      filters: { dateFrom, dateTo, tenant: tenant?.slug },
+      summary,
+      data: {
+        subscriptions: subscriptionRevenue.rows,
+        bookingCommissions: bookingRevenue.rows
+      }
+    });
+
+  } catch (error) {
+    console.error('Error generating financial report:', error);
+    res.status(500).json({ error: 'Failed to generate financial report', details: error.message });
+  }
+});
+
+// POST /reports/analytics - Generate analytics report
+router.post('/reports/analytics', async (req, res) => {
+  try {
+    const { format = 'json', dateFrom, dateTo } = req.body;
+    const tenant = await getTenantContext(req);
+    const userId = req.user?.id;
+
+    // Build date conditions
+    const dateCondition = (table, column = 'created_at') => {
+      let conditions = [];
+      if (dateFrom) conditions.push(`${table}.${column} >= '${dateFrom}'`);
+      if (dateTo) conditions.push(`${table}.${column} <= '${dateTo}'::date + INTERVAL '1 day'`);
+      return conditions.length > 0 ? 'AND ' + conditions.join(' AND ') : '';
+    };
+
+    const tenantCondition = (table) => tenant ? `AND ${table}.tenant_id = '${tenant.id}'` : '';
+
+    // User metrics by month
+    const userMetrics = await pool.query(`
+      SELECT
+        TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') as month,
+        COUNT(*) as new_users,
+        COUNT(*) FILTER (WHERE role = 'business_owner') as new_business_owners,
+        COUNT(*) FILTER (WHERE role = 'food_enthusiast') as new_food_enthusiasts
+      FROM users
+      WHERE created_at >= COALESCE($1::date, CURRENT_DATE - INTERVAL '12 months')
+        AND created_at <= COALESCE($2::date, CURRENT_DATE) + INTERVAL '1 day'
+        ${tenant ? 'AND tenant_id = $3' : ''}
+      GROUP BY DATE_TRUNC('month', created_at)
+      ORDER BY month ASC
+    `, tenant ? [dateFrom, dateTo, tenant.id] : [dateFrom, dateTo]);
+
+    // Business metrics by month
+    const businessMetrics = await pool.query(`
+      SELECT
+        TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') as month,
+        COUNT(*) as new_businesses,
+        COUNT(*) FILTER (WHERE account_status = 'active') as active_businesses
+      FROM businesses
+      WHERE created_at >= COALESCE($1::date, CURRENT_DATE - INTERVAL '12 months')
+        AND created_at <= COALESCE($2::date, CURRENT_DATE) + INTERVAL '1 day'
+        ${tenant ? 'AND tenant_id = $3' : ''}
+      GROUP BY DATE_TRUNC('month', created_at)
+      ORDER BY month ASC
+    `, tenant ? [dateFrom, dateTo, tenant.id] : [dateFrom, dateTo]);
+
+    // Booking metrics by month
+    const bookingMetrics = await pool.query(`
+      SELECT
+        TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') as month,
+        COUNT(*) as total_bookings,
+        COUNT(*) FILTER (WHERE status = 'completed') as completed_bookings,
+        COUNT(*) FILTER (WHERE status = 'cancelled') as cancelled_bookings,
+        COALESCE(SUM(total_amount), 0) as total_revenue
+      FROM bookings
+      WHERE created_at >= COALESCE($1::date, CURRENT_DATE - INTERVAL '12 months')
+        AND created_at <= COALESCE($2::date, CURRENT_DATE) + INTERVAL '1 day'
+        ${tenant ? 'AND tenant_id = $3' : ''}
+      GROUP BY DATE_TRUNC('month', created_at)
+      ORDER BY month ASC
+    `, tenant ? [dateFrom, dateTo, tenant.id] : [dateFrom, dateTo]);
+
+    // Platform totals
+    const totals = await pool.query(`
+      SELECT
+        (SELECT COUNT(*) FROM users ${tenant ? 'WHERE tenant_id = $1' : ''}) as total_users,
+        (SELECT COUNT(*) FROM businesses ${tenant ? 'WHERE tenant_id = $1' : ''}) as total_businesses,
+        (SELECT COUNT(*) FROM bookings ${tenant ? 'WHERE tenant_id = $1' : ''}) as total_bookings,
+        (SELECT COUNT(*) FROM reviews) as total_reviews
+    `, tenant ? [tenant.id] : []);
+
+    await logReportGeneration(userId, 'analytics', format, { dateFrom, dateTo, tenant: tenant?.slug });
+
+    if (format === 'csv') {
+      // Merge all metrics by month
+      const months = [...new Set([
+        ...userMetrics.rows.map(r => r.month),
+        ...businessMetrics.rows.map(r => r.month),
+        ...bookingMetrics.rows.map(r => r.month)
+      ])].sort();
+
+      const mergedData = months.map(month => {
+        const user = userMetrics.rows.find(r => r.month === month) || {};
+        const business = businessMetrics.rows.find(r => r.month === month) || {};
+        const booking = bookingMetrics.rows.find(r => r.month === month) || {};
+        return {
+          month,
+          new_users: user.new_users || 0,
+          new_business_owners: user.new_business_owners || 0,
+          new_food_enthusiasts: user.new_food_enthusiasts || 0,
+          new_businesses: business.new_businesses || 0,
+          active_businesses: business.active_businesses || 0,
+          total_bookings: booking.total_bookings || 0,
+          completed_bookings: booking.completed_bookings || 0,
+          cancelled_bookings: booking.cancelled_bookings || 0,
+          revenue: booking.total_revenue || 0
+        };
+      });
+
+      const columns = [
+        { key: 'month', label: 'Month' },
+        { key: 'new_users', label: 'New Users' },
+        { key: 'new_business_owners', label: 'New Business Owners' },
+        { key: 'new_food_enthusiasts', label: 'New Food Enthusiasts' },
+        { key: 'new_businesses', label: 'New Businesses' },
+        { key: 'active_businesses', label: 'Active Businesses' },
+        { key: 'total_bookings', label: 'Total Bookings' },
+        { key: 'completed_bookings', label: 'Completed Bookings' },
+        { key: 'cancelled_bookings', label: 'Cancelled Bookings' },
+        { key: 'revenue', label: 'Revenue (USD)' }
+      ];
+
+      const csv = convertToCSV(mergedData, columns);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="analytics-report-${new Date().toISOString().split('T')[0]}.csv"`);
+      return res.send(csv);
+    }
+
+    res.json({
+      report: 'analytics',
+      generatedAt: new Date().toISOString(),
+      totalRecords: userMetrics.rows.length + businessMetrics.rows.length + bookingMetrics.rows.length,
+      filters: { dateFrom, dateTo, tenant: tenant?.slug },
+      summary: totals.rows[0],
+      data: {
+        userMetrics: userMetrics.rows,
+        businessMetrics: businessMetrics.rows,
+        bookingMetrics: bookingMetrics.rows
+      }
+    });
+
+  } catch (error) {
+    console.error('Error generating analytics report:', error);
+    res.status(500).json({ error: 'Failed to generate analytics report', details: error.message });
+  }
+});
+
+// POST /reports/activity - Generate activity log report
+router.post('/reports/activity', async (req, res) => {
+  try {
+    const { format = 'json', dateFrom, dateTo, actionType } = req.body;
+    const tenant = await getTenantContext(req);
+    const userId = req.user?.id;
+
+    // Check if activity_log table exists
+    const tableCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_name = 'activity_log'
+      )
+    `);
+
+    if (!tableCheck.rows[0].exists) {
+      // Return empty report if table doesn't exist
+      await logReportGeneration(userId, 'activity', format, { dateFrom, dateTo, actionType, tenant: tenant?.slug });
+
+      if (format === 'csv') {
+        const columns = [
+          { key: 'id', label: 'Activity ID' },
+          { key: 'created_at', label: 'Timestamp' },
+          { key: 'action', label: 'Action' },
+          { key: 'entity_type', label: 'Entity Type' },
+          { key: 'entity_id', label: 'Entity ID' },
+          { key: 'user_name', label: 'User Name' },
+          { key: 'user_email', label: 'User Email' },
+          { key: 'status', label: 'Status' },
+          { key: 'ip_address', label: 'IP Address' },
+          { key: 'tenant_name', label: 'Tenant' }
+        ];
+        const csv = convertToCSV([], columns);
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="activity-report-${new Date().toISOString().split('T')[0]}.csv"`);
+        return res.send(csv);
+      }
+
+      return res.json({
+        report: 'activity',
+        generatedAt: new Date().toISOString(),
+        totalRecords: 0,
+        filters: { dateFrom, dateTo, actionType, tenant: tenant?.slug },
+        message: 'Activity log table not yet created. No data available.',
+        summary: { actionTypes: [] },
+        data: []
+      });
+    }
+
+    // Use documented schema column names: action, entity_type, entity_id, details
+    let query = `
+      SELECT
+        al.id,
+        al.action,
+        al.entity_type,
+        al.entity_id,
+        al.details,
+        al.ip_address,
+        al.user_agent,
+        al.status,
+        al.created_at,
+        u.id as user_id,
+        u.email as user_email,
+        u.first_name || ' ' || u.last_name as user_name,
+        u.role as user_role,
+        t.name as tenant_name,
+        t.slug as tenant_slug
+      FROM activity_log al
+      LEFT JOIN users u ON al.user_id = u.id
+      LEFT JOIN tenants t ON al.tenant_id = t.id
+      WHERE 1=1
+    `;
+
+    const params = [];
+    let paramIndex = 1;
+
+    // Multi-tenancy filter
+    if (tenant) {
+      query += ` AND al.tenant_id = $${paramIndex}`;
+      params.push(tenant.id);
+      paramIndex++;
+    }
+
+    // Date range filter
+    if (dateFrom) {
+      query += ` AND al.created_at >= $${paramIndex}`;
+      params.push(dateFrom);
+      paramIndex++;
+    }
+    if (dateTo) {
+      query += ` AND al.created_at <= $${paramIndex}::date + INTERVAL '1 day'`;
+      params.push(dateTo);
+      paramIndex++;
+    }
+
+    // Action type filter
+    if (actionType && actionType !== 'all') {
+      query += ` AND al.action = $${paramIndex}`;
+      params.push(actionType);
+      paramIndex++;
+    }
+
+    query += ' ORDER BY al.created_at DESC LIMIT 10000'; // Limit for safety
+
+    const result = await pool.query(query, params);
+
+    // Get action type summary (using correct column name: action)
+    const actionSummary = await pool.query(`
+      SELECT action, COUNT(*) as count
+      FROM activity_log al
+      WHERE 1=1
+      ${tenant ? 'AND al.tenant_id = $1' : ''}
+      ${dateFrom ? `AND al.created_at >= $${tenant ? 2 : 1}` : ''}
+      ${dateTo ? `AND al.created_at <= $${tenant ? (dateFrom ? 3 : 2) : (dateFrom ? 2 : 1)}::date + INTERVAL '1 day'` : ''}
+      GROUP BY action
+      ORDER BY count DESC
+    `, tenant ? [tenant.id, ...(dateFrom ? [dateFrom] : []), ...(dateTo ? [dateTo] : [])]
+              : [...(dateFrom ? [dateFrom] : []), ...(dateTo ? [dateTo] : [])]);
+
+    await logReportGeneration(userId, 'activity', format, { dateFrom, dateTo, actionType, tenant: tenant?.slug });
+
+    if (format === 'csv') {
+      const columns = [
+        { key: 'id', label: 'Activity ID' },
+        { key: 'created_at', label: 'Timestamp' },
+        { key: 'action', label: 'Action' },
+        { key: 'entity_type', label: 'Entity Type' },
+        { key: 'entity_id', label: 'Entity ID' },
+        { key: 'status', label: 'Status' },
+        { key: 'user_name', label: 'User Name' },
+        { key: 'user_email', label: 'User Email' },
+        { key: 'user_role', label: 'User Role' },
+        { key: 'ip_address', label: 'IP Address' },
+        { key: 'tenant_name', label: 'Tenant' }
+      ];
+
+      const csv = convertToCSV(result.rows, columns);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="activity-report-${new Date().toISOString().split('T')[0]}.csv"`);
+      return res.send(csv);
+    }
+
+    res.json({
+      report: 'activity',
+      generatedAt: new Date().toISOString(),
+      totalRecords: result.rows.length,
+      filters: { dateFrom, dateTo, actionType, tenant: tenant?.slug },
+      summary: {
+        actionTypes: actionSummary.rows
+      },
+      data: result.rows
+    });
+
+  } catch (error) {
+    console.error('Error generating activity report:', error);
+    res.status(500).json({ error: 'Failed to generate activity report', details: error.message });
+  }
+});
+
 module.exports = router;

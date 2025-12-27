@@ -1,128 +1,100 @@
-// Admin Settings Component Styles - NYT Theme
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;600;700&family=Roboto:wght@300;400;500;600;700&display=swap');
+// ===================================
+// ADMIN SETTINGS - NYT EDITORIAL DESIGN
+// Minimalist, Typographic, Professional
+// ===================================
 
-// NYT-themed CSS Variables
-:host {
-  // Primary Colors
-  --clr-primary-600: #0284c7;
-  --clr-primary-700: #0369a1;
+// Design Variables
+$color-black: #121212;
+$color-dark-gray: #333333;
+$color-medium-gray: #666666;
+$color-light-gray: #999999;
+$color-border: #e0e0e0;
+$color-bg-light: #f7f7f7;
+$color-white: #ffffff;
 
-  // Secondary Colors
-  --clr-secondary-50: #fafafa;
-  --clr-secondary-200: #e5e5e5;
-  --clr-secondary-300: #d4d4d4;
-  --clr-secondary-500: #737373;
-  --clr-secondary-600: #525252;
-  --clr-secondary-900: #000000;
+$font-serif: 'Noto Serif', Georgia, 'Times New Roman', serif;
+$font-sans: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  // Semantic Colors
-  --clr-success: #16a34a;
-  --clr-warning: #d97706;
-  --clr-error: #dc2626;
-
-  // Spacing
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-
-  // Typography
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-
-  // Font Weights
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-
-  // Border Radius
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-
-  // Transitions
-  --transition-normal: 250ms ease-in-out;
-}
+$border-thin: 1px solid $color-border;
+$border-medium: 2px solid $color-black;
 
 .admin-settings {
   min-height: 100vh;
-  background-color: var(--clr-secondary-50);
-  padding: var(--space-8) var(--space-6);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: $color-white;
+  padding: 1.5rem clamp(1rem, 3vw, 2rem);
+  font-family: $font-sans;
 }
 
 // Header Section
 .settings-header {
-  margin-bottom: var(--space-8);
+  margin-bottom: 1.5rem;
+  border-bottom: $border-medium;
+  padding-bottom: 1rem;
 }
 
 .header-content {
-  margin-bottom: var(--space-6);
+  margin-bottom: 1rem;
 }
 
 .title-section {
   .page-title {
-    font-family: 'Noto Serif', Georgia, serif;
-    font-size: var(--text-3xl);
-    font-weight: var(--font-bold);
-    color: var(--clr-secondary-900);
-    margin: 0 0 var(--space-2) 0;
-    letter-spacing: -0.025em;
+    font-family: $font-serif;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    color: $color-black;
+    margin: 0 0 0.375rem 0;
+    letter-spacing: -0.02em;
   }
 
   .page-subtitle {
-    font-size: var(--text-base);
-    color: var(--clr-secondary-500);
+    font-size: 0.875rem;
+    color: $color-medium-gray;
     margin: 0;
-    font-weight: var(--font-normal);
+    font-weight: 400;
   }
 }
 
 // Tab Navigation
 .tab-navigation {
   display: flex;
-  gap: var(--space-2);
-  margin-bottom: var(--space-6);
-  border-bottom: 2px solid var(--clr-secondary-200);
+  gap: 0;
+  margin-bottom: 1.5rem;
+  border-bottom: $border-thin;
   overflow-x: auto;
   padding-bottom: 0;
 
   .tab-button {
     background: none;
     border: none;
-    padding: var(--space-4) var(--space-5);
-    font-family: 'Roboto', sans-serif;
-    font-size: var(--text-base);
-    font-weight: var(--font-medium);
-    color: var(--clr-secondary-600);
+    border-bottom: 2px solid transparent;
+    padding: 0.75rem 1rem;
+    font-family: $font-sans;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: $color-medium-gray;
     cursor: pointer;
-    transition: all var(--transition-normal);
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
+    transition: all 0.15s ease;
+    margin-bottom: -1px;
     white-space: nowrap;
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: 0.375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
 
     .tab-icon {
-      font-size: 1.125rem;
+      font-size: 1rem;
     }
 
     &:hover {
-      color: var(--clr-secondary-900);
-      background-color: rgba(0, 0, 0, 0.02);
+      color: $color-black;
+      background-color: $color-bg-light;
     }
 
     &.active {
-      color: var(--clr-primary-600);
-      border-bottom-color: var(--clr-primary-600);
-      font-weight: var(--font-semibold);
+      color: $color-black;
+      border-bottom-color: $color-black;
+      font-weight: 700;
     }
   }
 }
@@ -131,24 +103,23 @@
 .settings-content {
   .loading-state {
     text-align: center;
-    padding: var(--space-8);
-    background: #ffffff;
-    border: 1px solid var(--clr-secondary-200);
-    border-radius: var(--radius-lg);
+    padding: 2rem;
+    background: $color-white;
+    border: $border-thin;
 
     .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--clr-secondary-200);
-      border-top-color: var(--clr-primary-600);
+      width: 32px;
+      height: 32px;
+      border: 2px solid $color-border;
+      border-top-color: $color-black;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-      margin: 0 auto var(--space-4);
+      margin: 0 auto 0.75rem;
     }
 
     p {
-      color: var(--clr-secondary-500);
-      font-size: var(--text-base);
+      color: $color-medium-gray;
+      font-size: 0.875rem;
     }
   }
 }
@@ -159,138 +130,143 @@
 
 // Settings Panel
 .settings-panel {
-  background: #ffffff;
-  border: 1px solid var(--clr-secondary-200);
-  border-top: 3px solid var(--clr-secondary-900);
-  border-radius: var(--radius-lg);
-  padding: var(--space-8);
+  background: $color-white;
+  border: $border-thin;
+  border-top: $border-medium;
+  padding: 1.5rem;
 }
 
 .panel-header {
-  margin-bottom: var(--space-6);
-  padding-bottom: var(--space-5);
-  border-bottom: 1px solid var(--clr-secondary-200);
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: $border-thin;
 
   .panel-title {
-    font-family: 'Noto Serif', Georgia, serif;
-    font-size: var(--text-2xl);
-    font-weight: var(--font-bold);
-    color: var(--clr-secondary-900);
-    margin: 0 0 var(--space-2) 0;
+    font-family: $font-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $color-black;
+    margin: 0 0 0.375rem 0;
   }
 
   .panel-description {
-    font-size: var(--text-base);
-    color: var(--clr-secondary-500);
+    font-size: 0.875rem;
+    color: $color-medium-gray;
     margin: 0;
   }
 }
 
 // Form Sections
 .form-section {
-  margin-bottom: var(--space-8);
+  margin-bottom: 1.5rem;
 
   &:last-child {
     margin-bottom: 0;
   }
 
   .section-title {
-    font-family: 'Noto Serif', Georgia, serif;
-    font-size: var(--text-lg);
-    font-weight: var(--font-semibold);
-    color: var(--clr-secondary-900);
-    margin: 0 0 var(--space-4) 0;
+    font-family: $font-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $color-black;
+    margin: 0 0 0.75rem 0;
   }
 
   .section-description {
-    font-size: var(--text-sm);
-    color: var(--clr-secondary-500);
-    margin: 0 0 var(--space-4) 0;
+    font-size: 0.8125rem;
+    color: $color-medium-gray;
+    margin: 0 0 0.75rem 0;
   }
 }
 
 // Form Groups
 .form-group {
-  margin-bottom: var(--space-5);
+  margin-bottom: 1rem;
 
   .form-label {
     display: block;
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-    color: var(--clr-secondary-900);
-    margin-bottom: var(--space-2);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $color-dark-gray;
+    margin-bottom: 0.375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
   }
 
   .form-input,
   .form-select {
     width: 100%;
     padding: 0.625rem 0.75rem;
-    border: 1px solid var(--clr-secondary-300);
-    border-radius: var(--radius-md);
-    font-family: 'Roboto', sans-serif;
-    font-size: var(--text-base);
-    color: var(--clr-secondary-900);
-    background-color: #ffffff;
-    transition: all var(--transition-normal);
+    border: $border-thin;
+    font-family: $font-sans;
+    font-size: 0.875rem;
+    color: $color-dark-gray;
+    background-color: $color-white;
+    transition: border-color 0.15s ease;
 
     &:focus {
       outline: none;
-      border-color: var(--clr-primary-600);
-      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+      border-color: $color-black;
     }
 
     &:disabled {
-      background-color: var(--clr-secondary-50);
-      color: var(--clr-secondary-500);
+      background-color: $color-bg-light;
+      color: $color-medium-gray;
       cursor: not-allowed;
     }
 
     &::placeholder {
-      color: var(--clr-secondary-500);
+      color: $color-light-gray;
     }
   }
 
   .form-help {
-    font-size: var(--text-sm);
-    color: var(--clr-secondary-500);
-    margin: var(--space-2) 0 0 0;
+    font-size: 0.75rem;
+    color: $color-medium-gray;
+    margin: 0.375rem 0 0 0;
   }
 }
 
 // Info Grid
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 0.25rem;
 
   .info-label {
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-    color: var(--clr-secondary-500);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: $color-medium-gray;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .info-value {
-    font-size: var(--text-base);
-    font-weight: var(--font-semibold);
-    color: var(--clr-secondary-900);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $color-dark-gray;
 
     &.status-badge {
       display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: var(--text-sm);
-      background-color: var(--clr-secondary-200);
-      color: var(--clr-secondary-600);
+      padding: 0.25rem 0.5rem;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background-color: $color-bg-light;
+      color: $color-medium-gray;
+      border: $border-thin;
 
       &.active {
-        background-color: rgba(22, 163, 74, 0.1);
-        color: var(--clr-success);
+        background-color: $color-black;
+        color: $color-white;
+        border-color: $color-black;
       }
     }
   }
@@ -300,40 +276,39 @@
 .toggle-group {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 0.75rem;
 }
 
 .toggle-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4);
-  border: 1px solid var(--clr-secondary-200);
-  border-radius: var(--radius-md);
-  background-color: #ffffff;
-  transition: all var(--transition-normal);
+  padding: 0.75rem;
+  border: $border-thin;
+  background-color: $color-white;
+  transition: all 0.15s ease;
 
   &:hover {
-    border-color: var(--clr-secondary-300);
-    background-color: var(--clr-secondary-50);
+    border-color: $color-dark-gray;
+    background-color: $color-bg-light;
   }
 
   .toggle-info {
     flex: 1;
-    margin-right: var(--space-4);
+    margin-right: 0.75rem;
 
     .toggle-label {
       display: block;
-      font-size: var(--text-base);
-      font-weight: var(--font-medium);
-      color: var(--clr-secondary-900);
-      margin-bottom: var(--space-2);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: $color-dark-gray;
+      margin-bottom: 0.25rem;
       cursor: pointer;
     }
 
     .toggle-description {
-      font-size: var(--text-sm);
-      color: var(--clr-secondary-500);
+      font-size: 0.75rem;
+      color: $color-medium-gray;
       margin: 0;
     }
   }
@@ -343,8 +318,8 @@
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 48px;
-  height: 24px;
+  width: 40px;
+  height: 20px;
   flex-shrink: 0;
 
   input {
@@ -353,15 +328,15 @@
     height: 0;
 
     &:checked + .toggle-slider {
-      background-color: var(--clr-primary-600);
+      background-color: $color-black;
 
       &:before {
-        transform: translateX(24px);
+        transform: translateX(20px);
       }
     }
 
     &:focus + .toggle-slider {
-      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
     }
   }
 
@@ -372,19 +347,19 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--clr-secondary-300);
-    transition: var(--transition-normal);
-    border-radius: 24px;
+    background-color: $color-border;
+    transition: 0.15s ease;
+    border-radius: 20px;
 
     &:before {
       position: absolute;
       content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: var(--transition-normal);
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: $color-white;
+      transition: 0.15s ease;
       border-radius: 50%;
     }
   }
@@ -394,102 +369,99 @@
 .templates-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 0.5rem;
 }
 
 .template-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4);
-  border: 1px solid var(--clr-secondary-200);
-  border-radius: var(--radius-md);
-  background-color: #ffffff;
+  padding: 0.75rem;
+  border: $border-thin;
+  background-color: $color-white;
 
   .template-info {
     flex: 1;
 
     .template-name {
       display: block;
-      font-size: var(--text-base);
-      font-weight: var(--font-medium);
-      color: var(--clr-secondary-900);
-      margin-bottom: var(--space-2);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: $color-dark-gray;
+      margin-bottom: 0.25rem;
     }
 
     .template-meta {
-      font-size: var(--text-sm);
-      color: var(--clr-secondary-500);
+      font-size: 0.75rem;
+      color: $color-medium-gray;
     }
   }
 
   .template-status {
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-    background-color: var(--clr-secondary-200);
-    color: var(--clr-secondary-600);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: $color-bg-light;
+    color: $color-medium-gray;
+    border: $border-thin;
 
     &.active {
-      background-color: rgba(22, 163, 74, 0.1);
-      color: var(--clr-success);
+      background-color: $color-black;
+      color: $color-white;
+      border-color: $color-black;
     }
   }
 }
 
 .empty-state {
   text-align: center;
-  padding: var(--space-6);
-  color: var(--clr-secondary-500);
-  font-size: var(--text-base);
+  padding: 1.5rem;
+  color: $color-medium-gray;
+  font-size: 0.875rem;
 }
 
 // Form Actions
 .form-actions {
-  margin-top: var(--space-6);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--clr-secondary-200);
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: $border-thin;
   display: flex;
-  gap: var(--space-4);
+  gap: 0.75rem;
 }
 
 // Buttons
 .btn-primary {
-  padding: 0.75rem 1.5rem;
-  background-color: var(--clr-primary-600);
-  color: #ffffff;
+  padding: 0.625rem 1.25rem;
+  background-color: $color-black;
+  color: $color-white;
   border: none;
-  border-radius: var(--radius-md);
-  font-family: 'Roboto', sans-serif;
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all var(--transition-normal);
+  transition: background-color 0.15s ease;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 0.375rem;
 
   &:hover:not(:disabled) {
-    background-color: var(--clr-primary-700);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
+    background-color: $color-dark-gray;
   }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
   .btn-spinner {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #ffffff;
+    border-top-color: $color-white;
     border-radius: 50%;
     animation: spin 0.6s linear infinite;
   }
@@ -498,23 +470,21 @@
 // Success Toast
 .success-toast {
   position: fixed;
-  bottom: var(--space-6);
-  right: var(--space-6);
-  background-color: var(--clr-success);
-  color: #ffffff;
-  padding: var(--space-4) var(--space-6);
-  border-radius: var(--radius-md);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background-color: $color-black;
+  color: $color-white;
+  padding: 0.75rem 1.25rem;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
   z-index: 1000;
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.2s ease-out;
 
   .toast-icon {
-    font-size: 1.25rem;
+    font-size: 1rem;
   }
 }
 
@@ -532,25 +502,25 @@
 // Responsive Design
 @media (max-width: 1024px) {
   .admin-settings {
-    padding: var(--space-6) var(--space-4);
+    padding: 1.25rem 1rem;
   }
 
   .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 
   .settings-panel {
-    padding: var(--space-6);
+    padding: 1.25rem;
   }
 }
 
 @media (max-width: 768px) {
   .admin-settings {
-    padding: var(--space-4);
+    padding: 1rem;
   }
 
   .title-section .page-title {
-    font-size: var(--text-2xl);
+    font-size: 1.5rem;
   }
 
   .stats-grid {
@@ -559,13 +529,13 @@
 
   .tab-navigation {
     .tab-button {
-      padding: var(--space-3) var(--space-4);
-      font-size: var(--text-sm);
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
     }
   }
 
   .settings-panel {
-    padding: var(--space-4);
+    padding: 1rem;
   }
 
   .form-actions {
@@ -578,9 +548,8 @@
   }
 
   .success-toast {
-    bottom: var(--space-4);
-    right: var(--space-4);
-    left: var(--space-4);
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
   }
 }
-

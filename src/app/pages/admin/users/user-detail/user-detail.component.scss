@@ -1,0 +1,448 @@
+// NYT Editorial Design Variables
+$font-serif: 'Noto Serif', Georgia, serif;
+$font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+$color-black: #000;
+$color-white: #fff;
+$color-dark-gray: #333;
+$color-medium-gray: #666;
+$color-light-gray: #999;
+$color-border: #e0e0e0;
+$color-bg-light: #f7f7f7;
+$color-success: #2e7d32;
+$color-warning: #f57c00;
+$color-danger: #c62828;
+$border-thin: 1px solid $color-border;
+$border-medium: 2px solid $color-black;
+
+.user-detail-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: $color-white;
+}
+
+.detail-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: $border-thin;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: $color-white;
+  border: 1px solid $color-border;
+  cursor: pointer;
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: $color-dark-gray;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: $color-bg-light;
+    border-color: $color-black;
+  }
+}
+
+// Loading & Error States
+.loading-state, .error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+  text-align: center;
+  color: $color-medium-gray;
+  font-family: $font-sans;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid $color-border;
+  border-top-color: $color-black;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.retry-btn {
+  margin-top: 1rem;
+  padding: 0.625rem 1.5rem;
+  background: $color-black;
+  color: $color-white;
+  border: none;
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+// User Header Card - NYT Editorial
+.user-header-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: $color-white;
+  border: $border-medium;
+  margin-bottom: 1.5rem;
+}
+
+.user-avatar {
+  flex-shrink: 0;
+
+  .avatar-image, .avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: $border-thin;
+  }
+
+  .avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $color-bg-light;
+    color: $color-dark-gray;
+    font-family: $font-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+}
+
+.user-info {
+  flex: 1;
+
+  .user-name {
+    margin: 0 0 0.25rem;
+    font-family: $font-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $color-black;
+    line-height: 1.2;
+  }
+
+  .user-email {
+    margin: 0 0 0.75rem;
+    font-family: $font-sans;
+    font-size: 0.875rem;
+    color: $color-medium-gray;
+  }
+}
+
+.user-badges {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.role-badge, .status-badge, .verified-badge {
+  padding: 0.125rem 0.5rem;
+  font-family: $font-sans;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid;
+}
+
+.role-badge {
+  background: $color-black;
+  color: $color-white;
+  border-color: $color-black;
+}
+
+.status-badge {
+  &.status-active {
+    background: lighten($color-success, 50%);
+    color: $color-success;
+    border-color: $color-success;
+  }
+  &.status-frozen {
+    background: lighten($color-warning, 40%);
+    color: darken($color-warning, 10%);
+    border-color: $color-warning;
+  }
+  &.status-pending_deletion {
+    background: lighten($color-danger, 40%);
+    color: $color-danger;
+    border-color: $color-danger;
+  }
+}
+
+.verified-badge {
+  background: lighten($color-success, 50%);
+  color: $color-success;
+  border-color: $color-success;
+}
+
+// User Actions
+.user-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  padding: 0.625rem 1rem;
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.15s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.suspend-btn {
+    background: $color-white;
+    color: $color-warning;
+    border-color: $color-warning;
+
+    &:hover:not(:disabled) {
+      background: $color-warning;
+      color: $color-white;
+    }
+  }
+
+  &.activate-btn {
+    background: $color-black;
+    color: $color-white;
+    border-color: $color-black;
+
+    &:hover:not(:disabled) {
+      opacity: 0.85;
+    }
+  }
+}
+
+// Stats Row - NYT Editorial Grid
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: $border-thin;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  padding: 1.25rem;
+  text-align: center;
+  border-right: $border-thin;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  .stat-icon {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-value {
+    font-family: $font-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $color-black;
+    line-height: 1.2;
+  }
+
+  .stat-label {
+    font-family: $font-sans;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: $color-light-gray;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 0.25rem;
+  }
+}
+
+// Details Grid
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.detail-card {
+  background: $color-white;
+  border: $border-thin;
+
+  .card-title {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    background: $color-bg-light;
+    font-family: $font-sans;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: $color-dark-gray;
+    border-bottom: $border-medium;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: $border-thin;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-family: $font-sans;
+      font-size: 0.8125rem;
+      color: $color-light-gray;
+    }
+
+    .value {
+      font-family: $font-sans;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: $color-dark-gray;
+    }
+  }
+}
+
+.view-business-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: $color-white;
+  border: none;
+  border-top: $border-thin;
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: $color-black;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: $color-bg-light;
+  }
+}
+
+// Toast - NYT Editorial
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1.25rem;
+  background: $color-white;
+  border: 1px solid;
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 1000;
+  animation: slideIn 0.2s ease;
+
+  &.toast-success {
+    border-color: $color-success;
+    color: $color-success;
+  }
+
+  &.toast-error {
+    border-color: $color-danger;
+    color: $color-danger;
+  }
+
+  &.toast-info {
+    border-color: $color-black;
+    color: $color-dark-gray;
+  }
+
+  .toast-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: inherit;
+    line-height: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .user-detail-container {
+    padding: 1rem;
+  }
+
+  .user-header-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .user-info {
+    .user-name {
+      font-size: 1.5rem;
+    }
+  }
+
+  .user-badges {
+    justify-content: center;
+  }
+
+  .user-actions {
+    width: 100%;
+    flex-direction: column;
+
+    .action-btn {
+      width: 100%;
+    }
+  }
+
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    border-right: none;
+    border-bottom: $border-thin;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

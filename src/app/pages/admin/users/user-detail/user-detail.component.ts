@@ -128,13 +128,13 @@ export class UserDetailComponent implements OnInit {
     if (!user) return;
 
     this.actionLoading.set(true);
-    this.adminService.updateUserStatus(user.id, 'frozen').subscribe({
+    this.adminService.suspendUser(user.id).subscribe({
       next: () => {
         this.showToast('User suspended successfully', 'success');
         this.loadUser(user.id);
         this.actionLoading.set(false);
       },
-      error: (err) => {
+      error: (err: { error?: { error?: string } }) => {
         this.showToast(err.error?.error || 'Failed to suspend user', 'error');
         this.actionLoading.set(false);
       }
@@ -146,13 +146,13 @@ export class UserDetailComponent implements OnInit {
     if (!user) return;
 
     this.actionLoading.set(true);
-    this.adminService.updateUserStatus(user.id, 'active').subscribe({
+    this.adminService.activateUser(user.id).subscribe({
       next: () => {
         this.showToast('User activated successfully', 'success');
         this.loadUser(user.id);
         this.actionLoading.set(false);
       },
-      error: (err) => {
+      error: (err: { error?: { error?: string } }) => {
         this.showToast(err.error?.error || 'Failed to activate user', 'error');
         this.actionLoading.set(false);
       }
