@@ -1,113 +1,350 @@
-@import '../shared-user-styles.scss';
+// ===================================
+// USER PROMOTIONS - NYT EDITORIAL STYLE
+// ===================================
 
-.promotions-container { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+.promotions-container {
+  padding: 48px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #ffffff;
+}
+
+// ===================================
+// HEADER
+// ===================================
 
 .page-header {
-  margin-bottom: 2rem;
-  h1 { font-size: 2rem; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5rem; }
-  p { color: #666; font-size: 1rem; }
+  margin-bottom: 48px;
+  border-bottom: 3px solid #000000;
+  padding-bottom: 24px;
+
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  p {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: #666666;
+    margin: 0;
+  }
 }
 
-.loading-state, .empty-state {
-  display: flex; flex-direction: column; align-items: center; padding: 4rem; text-align: center;
-  .spinner { width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #ff6b35; border-radius: 50%; animation: spin 1s linear infinite; }
-  .empty-icon { font-size: 4rem; margin-bottom: 1rem; }
-  h2 { color: #1a1a2e; margin-bottom: 0.5rem; }
-  p { color: #666; }
+// ===================================
+// LOADING & EMPTY STATES
+// ===================================
+
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 24px;
+  text-align: center;
+  border: 1px solid #e5e5e5;
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #e5e5e5;
+    border-left: 2px solid #000000;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 12px 0;
+  }
+
+  p {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 15px;
+    color: #666666;
+    margin: 0;
+  }
 }
 
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-.promotions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+// ===================================
+// PROMOTIONS GRID
+// ===================================
+
+.promotions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+// ===================================
+// PROMO CARD
+// ===================================
 
 .promo-card {
-  background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  position: relative; transition: transform 0.3s ease;
-  
-  &:hover { transform: translateY(-4px); }
-  
-  .promo-badge {
-    position: absolute; top: 1rem; right: 1rem; padding: 0.25rem 0.75rem;
-    background: rgba(255, 107, 53, 0.1); color: #ff6b35; border-radius: 20px;
-    font-size: 0.8rem; font-weight: 500;
+  border: 1px solid #000000;
+  background: #ffffff;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 4px 4px 0 #000000;
   }
-  
-  .promo-discount {
-    background: linear-gradient(135deg, #ff6b35, #ff8c5a); padding: 2rem; text-align: center;
-    .discount-value { font-size: 2.5rem; font-weight: 800; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-  }
-  
-  .promo-content {
-    padding: 1.5rem;
-    h3 { font-size: 1.25rem; font-weight: 600; color: #1a1a2e; margin-bottom: 0.5rem; }
-    .promo-description { color: #666; font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.5; }
-    
-    .promo-details {
-      display: flex; flex-wrap: wrap; gap: 0.75rem;
-      .detail-item {
-        display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem; color: #888;
-        background: #f5f5f5; padding: 0.25rem 0.75rem; border-radius: 15px;
-      }
+
+  .promo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e5e5;
+
+    .promo-badge {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #000000;
     }
-  }
-  
-  .promo-footer {
-    padding: 1rem 1.5rem; background: #f8f9fa; border-top: 1px solid #eee;
-    
-    .promo-code-section {
-      margin-bottom: 0.75rem;
-      .code-label { font-size: 0.8rem; color: #666; display: block; margin-bottom: 0.25rem; }
-      .code-box {
-        display: flex; align-items: center; gap: 0.5rem;
-        .code {
-          flex: 1; padding: 0.75rem 1rem; background: white; border: 2px dashed #ff6b35;
-          border-radius: 8px; font-family: monospace; font-size: 1.1rem; font-weight: 700;
-          color: #ff6b35; letter-spacing: 2px;
-        }
-        .copy-btn {
-          padding: 0.75rem 1rem; background: #1a1a2e; color: white; border: none;
-          border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;
-          &:hover { background: #2a2a4e; }
-          &.copied { background: #28a745; }
-        }
-      }
-    }
-    
+
     .promo-expiry {
-      display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem;
-      &.normal { color: #666; }
-      &.urgent { color: #dc3545; font-weight: 600; }
-      &.expired { color: #999; text-decoration: line-through; }
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+
+      &.normal {
+        color: #666666;
+      }
+
+      &.urgent {
+        color: #dc2626;
+        font-weight: 600;
+      }
+
+      &.expired {
+        color: #999999;
+        text-decoration: line-through;
+      }
+    }
+  }
+
+  .promo-discount {
+    padding: 32px 20px;
+    text-align: center;
+    background: #000000;
+
+    .discount-value {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 48px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .promo-content {
+    padding: 24px 20px;
+
+    h3 {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #000000;
+      margin: 0 0 12px 0;
+      line-height: 1.3;
+    }
+
+    .promo-description {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 15px;
+      color: #333333;
+      line-height: 1.7;
+      margin: 0 0 16px 0;
+    }
+
+    .promo-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+
+      .detail-item {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 12px;
+        color: #666666;
+        padding: 6px 12px;
+        border: 1px solid #e5e5e5;
+      }
+    }
+  }
+
+  .promo-footer {
+    padding: 20px;
+    border-top: 1px solid #000000;
+    background: #f5f5f5;
+
+    .promo-code-section {
+      .code-label {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #666666;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .code-box {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+
+        .code {
+          flex: 1;
+          padding: 14px 16px;
+          background: #ffffff;
+          border: 1px solid #000000;
+          border-right: none;
+          font-family: 'Courier New', monospace;
+          font-size: 16px;
+          font-weight: 700;
+          color: #000000;
+          letter-spacing: 2px;
+        }
+
+        .copy-btn {
+          padding: 14px 20px;
+          background: #000000;
+          color: #ffffff;
+          border: 1px solid #000000;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: #333333;
+          }
+
+          &.copied {
+            background: #15803d;
+            border-color: #15803d;
+          }
+        }
+      }
     }
   }
 }
 
+// ===================================
+// HOW IT WORKS
+// ===================================
+
 .how-it-works {
-  background: linear-gradient(135deg, #fff5f0, #fff); border-radius: 16px; padding: 2rem;
-  border: 1px solid #ffe0d0;
-  
-  h2 { font-size: 1.25rem; font-weight: 600; color: #1a1a2e; margin-bottom: 1.5rem; text-align: center; }
-  
+  border: 1px solid #000000;
+  padding: 32px;
+
+  h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 32px 0;
+    text-align: center;
+  }
+
   .steps {
-    display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1rem;
-    
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+
     .step {
-      display: flex; align-items: center; gap: 0.75rem; background: white;
-      padding: 1rem 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 20px;
+      border: 1px solid #e5e5e5;
+
       .step-number {
-        width: 30px; height: 30px; background: linear-gradient(135deg, #ff6b35, #ff8c5a);
-        color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: #000000;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 16px;
         font-weight: 700;
+        flex-shrink: 0;
       }
-      .step-text { font-size: 0.95rem; color: #333; }
+
+      .step-text {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 14px;
+        color: #333333;
+        line-height: 1.5;
+      }
     }
-    
-    .step-arrow { font-size: 1.5rem; color: #ff6b35; }
+  }
+}
+
+// ===================================
+// RESPONSIVE
+// ===================================
+
+@media (max-width: 1024px) {
+  .promotions-container {
+    padding: 32px 16px;
+  }
+
+  .how-it-works .steps {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .how-it-works .steps { flex-direction: column; .step-arrow { transform: rotate(90deg); } }
+  .promotions-container {
+    padding: 24px 16px;
+  }
+
+  .page-header h1 {
+    font-size: 32px;
+  }
+
+  .promotions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .promo-card .promo-discount .discount-value {
+    font-size: 36px;
+  }
+
+  .how-it-works {
+    padding: 24px;
+
+    .steps {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
 }
 

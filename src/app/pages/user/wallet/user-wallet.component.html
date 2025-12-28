@@ -1,8 +1,8 @@
 <div class="wallet-container">
-  <div class="page-header">
+  <header class="page-header">
     <h1>{{ pageTitle() }}</h1>
     <p>{{ pageSubtitle() }}</p>
-  </div>
+  </header>
 
   @if (loading()) {
     <div class="loading-state">
@@ -12,9 +12,9 @@
   } @else {
     <!-- Tier Badge (only for normal users) -->
     @if (!isSpecialist() && wallet()?.tier) {
-      <div class="tier-banner" [style.background]="'linear-gradient(135deg, ' + getTierColor(wallet()!.tier) + '22, ' + getTierColor(wallet()!.tier) + '44)'">
+      <div class="tier-banner">
         <div class="tier-info">
-          <span class="tier-icon">{{ getTierIcon(wallet()!.tier) }}</span>
+          <span class="tier-badge" [class]="'tier-' + wallet()!.tier">{{ wallet()!.tier | titlecase }}</span>
           <div class="tier-details">
             <span class="tier-name">{{ wallet()!.tier | titlecase }} Member</span>
             <span class="tier-benefit">{{ wallet()?.tierInfo?.cashbackRate || 2 }}% cashback on orders</span>
@@ -35,38 +35,29 @@
     @if (isSpecialist()) {
       <div class="specialist-banner">
         <div class="stat-card">
-          <span class="stat-icon">📊</span>
-          <div class="stat-content">
-            <span class="stat-value">${{ wallet()?.totalCashbackEarned?.toFixed(2) || '0.00' }}</span>
-            <span class="stat-label">Total Earnings</span>
-          </div>
+          <div class="stat-value">${{ wallet()?.totalCashbackEarned?.toFixed(2) || '0.00' }}</div>
+          <div class="stat-label">Total Earnings</div>
         </div>
         <div class="stat-card">
-          <span class="stat-icon">💵</span>
-          <div class="stat-content">
-            <span class="stat-value">${{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</span>
-            <span class="stat-label">Available for Payout</span>
-          </div>
+          <div class="stat-value">${{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</div>
+          <div class="stat-label">Available for Payout</div>
         </div>
         <div class="stat-card">
-          <span class="stat-icon">⏳</span>
-          <div class="stat-content">
-            <span class="stat-value">${{ wallet()?.pendingCashback?.toFixed(2) || '0.00' }}</span>
-            <span class="stat-label">Pending</span>
-          </div>
+          <div class="stat-value">${{ wallet()?.pendingCashback?.toFixed(2) || '0.00' }}</div>
+          <div class="stat-label">Pending</div>
         </div>
       </div>
     }
 
     <!-- Tab Navigation -->
-    <div class="tab-nav">
+    <nav class="tab-nav">
       <button type="button" [class.active]="activeTab() === 'overview'" (click)="setTab('overview')">Overview</button>
       <button type="button" [class.active]="activeTab() === 'transactions'" (click)="setTab('transactions')">{{ isSpecialist() ? 'Earnings History' : 'Transactions' }}</button>
       <button type="button" [class.active]="activeTab() === 'referrals'" (click)="setTab('referrals')">Referrals</button>
       @if (!isSpecialist()) {
         <button type="button" [class.active]="activeTab() === 'tiers'" (click)="setTab('tiers')">Tiers & Benefits</button>
       }
-    </div>
+    </nav>
 
     <!-- Overview Tab -->
     @if (activeTab() === 'overview') {
@@ -74,14 +65,11 @@
       @if (isSpecialist()) {
         <div class="balance-grid">
           <div class="balance-card cashback">
-            <div class="card-icon">💵</div>
-            <div class="card-content">
-              <span class="label">Available Balance</span>
-              <span class="amount">${{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</span>
-              @if (wallet()?.pendingCashback && wallet()!.pendingCashback > 0) {
-                <span class="pending">+${{ wallet()!.pendingCashback.toFixed(2) }} pending</span>
-              }
-            </div>
+            <span class="card-label">Available Balance</span>
+            <span class="card-amount">${{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</span>
+            @if (wallet()?.pendingCashback && wallet()!.pendingCashback > 0) {
+              <span class="pending">+${{ wallet()!.pendingCashback.toFixed(2) }} pending</span>
+            }
             @if (wallet()?.cashbackBalance && wallet()!.cashbackBalance >= 50) {
               <button type="button" class="redeem-btn" (click)="redeemCashback(wallet()!.cashbackBalance)" [disabled]="redeeming()">
                 {{ redeeming() ? 'Processing...' : 'Request Payout' }}
@@ -93,115 +81,89 @@
           </div>
 
           <div class="balance-card loyalty">
-            <div class="card-icon">⭐</div>
-            <div class="card-content">
-              <span class="label">Tip Points</span>
-              <span class="amount">{{ wallet()?.loyaltyPoints || 0 }} pts</span>
-            </div>
+            <span class="card-label">Tip Points</span>
+            <span class="card-amount">{{ wallet()?.loyaltyPoints || 0 }} pts</span>
             <span class="conversion-hint">From customer tips & bonuses</span>
           </div>
 
           <div class="balance-card earned">
-            <div class="card-icon">📈</div>
-            <div class="card-content">
-              <span class="label">This Month</span>
-              <span class="amount">${{ wallet()?.totalEarned?.toFixed(2) || '0.00' }}</span>
-            </div>
+            <span class="card-label">This Month</span>
+            <span class="card-amount">${{ wallet()?.totalEarned?.toFixed(2) || '0.00' }}</span>
           </div>
 
           <div class="balance-card redeemed">
-            <div class="card-icon">🏦</div>
-            <div class="card-content">
-              <span class="label">Total Payouts</span>
-              <span class="amount">${{ wallet()?.totalRedeemed?.toFixed(2) || '0.00' }}</span>
-            </div>
+            <span class="card-label">Total Payouts</span>
+            <span class="card-amount">${{ wallet()?.totalRedeemed?.toFixed(2) || '0.00' }}</span>
           </div>
         </div>
 
         <!-- Specialist Earnings Sources -->
-        <div class="earn-section">
-          <h2>💡 Your Earnings Sources</h2>
+        <section class="earn-section">
+          <h2>Earnings Sources</h2>
           <div class="earn-grid">
             <div class="earn-card">
-              <span class="earn-icon">🍳</span>
               <h3>Service Bookings</h3>
               <p>Earn from completed bookings</p>
             </div>
             <div class="earn-card">
-              <span class="earn-icon">💝</span>
               <h3>Customer Tips</h3>
               <p>Tips from satisfied customers</p>
             </div>
             <div class="earn-card">
-              <span class="earn-icon">⭐</span>
               <h3>Rating Bonuses</h3>
               <p>Bonuses for 5-star ratings</p>
             </div>
             <div class="earn-card">
-              <span class="earn-icon">👥</span>
               <h3>Referrals</h3>
               <p>Earn $10 per specialist referral</p>
             </div>
           </div>
-        </div>
+        </section>
       } @else {
         <!-- Normal User Overview -->
         <div class="balance-grid">
           <div class="balance-card cashback">
-            <div class="card-icon">💰</div>
-            <div class="card-content">
-              <span class="label">Cashback Balance</span>
-              <span class="amount">${{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</span>
-              @if (wallet()?.pendingCashback && wallet()!.pendingCashback > 0) {
+            <span class="card-label">Cashback Balance</span>
+            <span class="card-amount">${{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</span>
+            @if (wallet()?.pendingCashback && wallet()!.pendingCashback > 0) {
               <span class="pending">+${{ wallet()!.pendingCashback.toFixed(2) }} pending</span>
             }
+            @if (wallet()?.cashbackBalance && wallet()!.cashbackBalance >= 5) {
+              <button type="button" class="redeem-btn" (click)="redeemCashback(wallet()!.cashbackBalance)" [disabled]="redeeming()">
+                {{ redeeming() ? 'Redeeming...' : 'Redeem All' }}
+              </button>
+            }
           </div>
-          @if (wallet()?.cashbackBalance && wallet()!.cashbackBalance >= 5) {
-            <button type="button" class="redeem-btn" (click)="redeemCashback(wallet()!.cashbackBalance)" [disabled]="redeeming()">
-              {{ redeeming() ? 'Redeeming...' : 'Redeem All' }}
-            </button>
-          }
-        </div>
 
-        <div class="balance-card loyalty">
-          <div class="card-icon">⭐</div>
-          <div class="card-content">
-            <span class="label">Loyalty Points</span>
-            <span class="amount">{{ wallet()?.loyaltyPoints || 0 }} pts</span>
+          <div class="balance-card loyalty">
+            <span class="card-label">Loyalty Points</span>
+            <span class="card-amount">{{ wallet()?.loyaltyPoints || 0 }} pts</span>
             @if (wallet()?.pendingPoints && wallet()!.pendingPoints > 0) {
               <span class="pending">+{{ wallet()!.pendingPoints }} pending</span>
             }
+            <span class="conversion-hint">100 pts = $1.00</span>
           </div>
-          <span class="conversion-hint">100 pts = $1.00</span>
-        </div>
 
-        <div class="balance-card earned">
-          <div class="card-icon">📈</div>
-          <div class="card-content">
-            <span class="label">Total Earned</span>
-            <span class="amount">${{ wallet()?.totalEarned?.toFixed(2) || '0.00' }}</span>
+          <div class="balance-card earned">
+            <span class="card-label">Total Earned</span>
+            <span class="card-amount">${{ wallet()?.totalEarned?.toFixed(2) || '0.00' }}</span>
           </div>
-        </div>
 
-        <div class="balance-card redeemed">
-          <div class="card-icon">🎁</div>
-          <div class="card-content">
-            <span class="label">Total Redeemed</span>
-            <span class="amount">${{ wallet()?.totalRedeemed?.toFixed(2) || '0.00' }}</span>
+          <div class="balance-card redeemed">
+            <span class="card-label">Total Redeemed</span>
+            <span class="card-amount">${{ wallet()?.totalRedeemed?.toFixed(2) || '0.00' }}</span>
           </div>
-        </div>
         </div>
 
         <!-- Points Conversion -->
         @if (wallet()?.loyaltyPoints && wallet()!.loyaltyPoints >= 100) {
           <div class="conversion-section">
-            <h3>🔄 Convert Points to Cashback</h3>
+            <h3>Convert Points to Cashback</h3>
             <div class="conversion-form">
               <div class="input-group">
                 <label>Points to convert</label>
                 <input type="number" [ngModel]="pointsToConvert()" (ngModelChange)="pointsToConvert.set($event)" min="100" [max]="wallet()!.loyaltyPoints" step="100">
               </div>
-              <div class="conversion-arrow">→</div>
               <div class="conversion-result">
                 <span class="result-label">You'll receive</span>
                 <span class="result-amount">${{ cashbackValue() }}</span>
@@ -214,37 +176,33 @@
         }
 
         <!-- How to Earn Section -->
-        <div class="earn-section">
-          <h2>💡 How to Earn Rewards</h2>
+        <section class="earn-section">
+          <h2>How to Earn Rewards</h2>
           <div class="earn-grid">
             <div class="earn-card">
-              <span class="earn-icon">🍽️</span>
               <h3>Order Food</h3>
               <p>Earn {{ wallet()?.tierInfo?.cashbackRate || 2 }}% cashback on every order</p>
             </div>
             <div class="earn-card">
-              <span class="earn-icon">📅</span>
               <h3>Make Bookings</h3>
               <p>Get up to 5% cashback on reservations</p>
             </div>
             <div class="earn-card">
-              <span class="earn-icon">⭐</span>
               <h3>Write Reviews</h3>
               <p>Earn 10 loyalty points per review</p>
             </div>
             <div class="earn-card">
-              <span class="earn-icon">👥</span>
               <h3>Refer Friends</h3>
               <p>Get $5 for each friend who signs up</p>
             </div>
           </div>
-        </div>
+        </section>
       }
     }
 
     <!-- Transactions Tab -->
     @if (activeTab() === 'transactions') {
-      <div class="transactions-section">
+      <section class="transactions-section">
         <div class="filter-bar">
           <button type="button" [class.active]="transactionFilter() === 'all'" (click)="setFilter('all')">All</button>
           <button type="button" [class.active]="transactionFilter() === 'credit'" (click)="setFilter('credit')">Earned</button>
@@ -253,14 +211,12 @@
 
         @if (filteredTransactions().length === 0) {
           <div class="empty-transactions">
-            <span class="empty-icon">📭</span>
             <p>No transactions yet. Start earning rewards!</p>
           </div>
         } @else {
           <div class="transactions-list">
             @for (transaction of filteredTransactions(); track transaction.id) {
               <div class="transaction-row">
-                <div class="transaction-icon">{{ getTransactionIcon(transaction.type, transaction.amountType) }}</div>
                 <div class="transaction-details">
                   <span class="transaction-desc">{{ transaction.description || 'Transaction' }}</span>
                   <span class="transaction-date">{{ formatDate(transaction.createdAt) }}</span>
@@ -272,22 +228,22 @@
             }
           </div>
         }
-      </div>
+      </section>
     }
 
     <!-- Referrals Tab -->
     @if (activeTab() === 'referrals') {
-      <div class="referrals-section">
+      <section class="referrals-section">
         <div class="referral-card">
-          <h3>🎁 Share & Earn</h3>
-          <p>Invite friends and earn $5 for each friend who places their first order!</p>
+          <h3>Share & Earn</h3>
+          <p>Invite friends and earn $5 for each friend who places their first order.</p>
 
           <div class="referral-code-box">
             <span class="code-label">Your Referral Code</span>
             <div class="code-display">
               <span class="code">{{ referralInfo()?.referralCode || wallet()?.referralCode }}</span>
               <button type="button" class="copy-btn" (click)="copyReferralCode()">
-                {{ copyingCode() ? '✓ Copied!' : '📋 Copy' }}
+                {{ copyingCode() ? 'Copied' : 'Copy' }}
               </button>
             </div>
           </div>
@@ -297,7 +253,7 @@
             <div class="link-display">
               <input type="text" [value]="referralInfo()?.referralLink" readonly>
               <button type="button" class="copy-btn" (click)="copyReferralLink()">
-                {{ copyingCode() ? '✓' : '📋' }}
+                {{ copyingCode() ? '✓' : 'Copy' }}
               </button>
             </div>
           </div>
@@ -336,23 +292,20 @@
             </div>
           </div>
         }
-      </div>
+      </section>
     }
 
     <!-- Tiers Tab -->
     @if (activeTab() === 'tiers') {
-      <div class="tiers-section">
+      <section class="tiers-section">
         <div class="current-tier-card">
-          <span class="tier-badge" [style.background]="getTierColor(wallet()!.tier)">
-            {{ getTierIcon(wallet()!.tier) }} {{ wallet()!.tier | titlecase }}
-          </span>
+          <span class="current-tier-badge" [class]="'tier-' + wallet()!.tier">{{ wallet()!.tier | titlecase }}</span>
           <p>Your current membership tier based on ${{ wallet()?.lifetimeSpend?.toFixed(0) || 0 }} lifetime spend</p>
         </div>
 
         <div class="tiers-grid">
           <div class="tier-card" [class.current]="wallet()?.tier === 'bronze'">
-            <div class="tier-header bronze">
-              <span class="tier-icon">🥉</span>
+            <div class="tier-header">
               <span class="tier-name">Bronze</span>
             </div>
             <ul class="tier-benefits">
@@ -360,12 +313,11 @@
               <li>1x points multiplier</li>
               <li>Standard support</li>
             </ul>
-            <span class="tier-requirement">$0 - $499 spend</span>
+            <span class="tier-requirement">$0 – $499 spend</span>
           </div>
 
           <div class="tier-card" [class.current]="wallet()?.tier === 'silver'">
-            <div class="tier-header silver">
-              <span class="tier-icon">🥈</span>
+            <div class="tier-header">
               <span class="tier-name">Silver</span>
             </div>
             <ul class="tier-benefits">
@@ -377,8 +329,7 @@
           </div>
 
           <div class="tier-card" [class.current]="wallet()?.tier === 'gold'">
-            <div class="tier-header gold">
-              <span class="tier-icon">🥇</span>
+            <div class="tier-header">
               <span class="tier-name">Gold</span>
             </div>
             <ul class="tier-benefits">
@@ -391,8 +342,7 @@
           </div>
 
           <div class="tier-card" [class.current]="wallet()?.tier === 'platinum'">
-            <div class="tier-header platinum">
-              <span class="tier-icon">💎</span>
+            <div class="tier-header">
               <span class="tier-name">Platinum</span>
             </div>
             <ul class="tier-benefits">
@@ -405,7 +355,7 @@
             <span class="tier-requirement">$5,000+ spend</span>
           </div>
         </div>
-      </div>
+      </section>
     }
   }
 </div>

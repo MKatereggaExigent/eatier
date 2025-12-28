@@ -3,19 +3,11 @@
   <header class="reviews-header">
     <div class="header-content">
       <div class="title-section">
-        <h1 class="page-title">
-          <span class="title-icon">⭐</span>
-          My Reviews
-        </h1>
-        <p class="page-subtitle">
-          Manage your restaurant reviews and share your dining experiences
-        </p>
+        <h1 class="page-title">My Reviews</h1>
+        <p class="page-subtitle">Manage your restaurant reviews and share your dining experiences</p>
       </div>
       <div class="header-actions">
-        <button type="button" class="btn-primary" (click)="openNewReviewModal()">
-          <span class="btn-icon">✍️</span>
-          Write Review
-        </button>
+        <button type="button" class="btn-primary" (click)="openNewReviewModal()">Write Review</button>
       </div>
     </div>
   </header>
@@ -23,35 +15,22 @@
   <!-- Stats Overview -->
   <section class="stats-overview" aria-label="Review Statistics">
     <div class="stats-grid">
-      <div class="stat-card total-reviews">
-        <div class="stat-icon">📝</div>
-        <div class="stat-content">
-          <h3>{{ reviewStats().totalReviews }}</h3>
-          <p>Total Reviews</p>
-          <div class="stat-change">Share your experiences</div>
+      <div class="stat-card">
+        <div class="stat-value">{{ reviewStats().totalReviews }}</div>
+        <div class="stat-label">Total Reviews</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ reviewStats().averageRating?.toFixed(1) || '0.0' }}</div>
+        <div class="stat-label">Average Rating</div>
+        <div class="rating-stars">
+          @for (star of getStarArray(reviewStats().averageRating || 0); track $index) {
+            <span class="star" [class.filled]="star">★</span>
+          }
         </div>
       </div>
-
-      <div class="stat-card average-rating">
-        <div class="stat-icon">⭐</div>
-        <div class="stat-content">
-          <h3>{{ reviewStats().averageRating?.toFixed(1) || '0.0' }}</h3>
-          <p>Average Rating</p>
-          <div class="rating-stars">
-            @for (star of getStarArray(reviewStats().averageRating || 0); track $index) {
-              <span class="star" [class.filled]="star">⭐</span>
-            }
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card helpful-votes">
-        <div class="stat-icon">👍</div>
-        <div class="stat-content">
-          <h3>{{ reviewStats().helpfulVotes }}</h3>
-          <p>Helpful Votes</p>
-          <div class="stat-change">People found your reviews helpful</div>
-        </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ reviewStats().helpfulVotes }}</div>
+        <div class="stat-label">Helpful Votes</div>
       </div>
     </div>
   </section>
@@ -66,11 +45,10 @@
           [(ngModel)]="searchQuery"
           (ngModelChange)="searchQuery.set($event)"
           class="search-input">
-        <span class="search-icon">🔍</span>
       </div>
 
       <div class="filter-controls">
-        <select 
+        <select
           [value]="filters().status"
           (change)="updateFilters({ status: $any($event.target).value })"
           class="filter-select">
@@ -80,7 +58,7 @@
           <option value="archived">Archived</option>
         </select>
 
-        <select 
+        <select
           [value]="filters().rating"
           (change)="updateFilters({ rating: $any($event.target).value })"
           class="filter-select">
@@ -92,7 +70,7 @@
           <option value="1">1 Star</option>
         </select>
 
-        <select 
+        <select
           [value]="filters().timeRange"
           (change)="updateFilters({ timeRange: $any($event.target).value })"
           class="filter-select">
@@ -103,7 +81,7 @@
           <option value="year">This Year</option>
         </select>
 
-        <select 
+        <select
           [value]="filters().sortBy"
           (change)="updateFilters({ sortBy: $any($event.target).value })"
           class="filter-select">
@@ -114,9 +92,7 @@
           <option value="helpful">Most Helpful</option>
         </select>
 
-        <button type="button" class="btn-secondary" (click)="clearFilters()">
-          Clear Filters
-        </button>
+        <button type="button" class="btn-clear" (click)="clearFilters()">Clear</button>
       </div>
     </div>
   </section>
@@ -130,18 +106,13 @@
       </div>
     } @else if (filteredReviews().length === 0) {
       <div class="empty-state">
-        <div class="empty-icon">📝</div>
         <h3>No reviews found</h3>
         @if (searchQuery() || filters().status !== 'all' || filters().rating !== 'all') {
           <p>Try adjusting your filters or search terms</p>
-          <button type="button" class="btn-secondary" (click)="clearFilters()">
-            Clear Filters
-          </button>
+          <button type="button" class="btn-secondary" (click)="clearFilters()">Clear Filters</button>
         } @else {
           <p>Start sharing your dining experiences by writing your first review</p>
-          <button type="button" class="btn-primary" (click)="openNewReviewModal()">
-            Write Your First Review
-          </button>
+          <button type="button" class="btn-primary" (click)="openNewReviewModal()">Write Your First Review</button>
         }
       </div>
     } @else {
@@ -151,7 +122,7 @@
             <!-- Review Header -->
             <div class="review-header">
               <div class="restaurant-info">
-                <div class="restaurant-placeholder">🏪</div>
+                <div class="restaurant-avatar">{{ (review.businessName || 'R').charAt(0) }}</div>
                 <div class="restaurant-details">
                   <h3 class="restaurant-name">{{ review.businessName }}</h3>
                   <div class="review-meta">
@@ -165,17 +136,10 @@
                 </div>
               </div>
               <div class="review-actions">
-                <div class="status-badge" [class]="getStatusColor(review.status)">
-                  <span class="status-icon">{{ getStatusIcon(review.status) }}</span>
-                  <span class="status-text">{{ review.status | titlecase }}</span>
-                </div>
+                <span class="status-badge" [class]="getStatusColor(review.status)">{{ review.status | titlecase }}</span>
                 <div class="action-menu">
-                  <button type="button" class="action-btn" (click)="editReview(review)">
-                    ✏️
-                  </button>
-                  <button type="button" class="action-btn delete" (click)="deleteReview(review.id)">
-                    🗑️
-                  </button>
+                  <button type="button" class="action-btn" (click)="editReview(review)">Edit</button>
+                  <button type="button" class="action-btn delete" (click)="deleteReview(review.id)">Delete</button>
                 </div>
               </div>
             </div>
@@ -185,7 +149,7 @@
               <div class="review-rating">
                 <div class="overall-rating">
                   @for (star of getStarArray(review.rating); track $index) {
-                    <span class="star" [class.filled]="star">⭐</span>
+                    <span class="star" [class.filled]="star">★</span>
                   }
                   <span class="rating-value">{{ review.rating }}/5</span>
                 </div>
@@ -206,17 +170,13 @@
             <!-- Review Footer -->
             <div class="review-footer">
               <div class="review-stats">
-                <span class="helpful-votes">
-                  👍 {{ review.helpfulCount }} helpful
-                </span>
+                <span class="helpful-votes">{{ review.helpfulCount }} helpful</span>
                 @if (review.wouldRecommend) {
-                  <span class="recommend">✅ Recommends</span>
+                  <span class="recommend">Recommends</span>
                 }
               </div>
               <div class="review-dates">
-                <span class="created-date">
-                  Created {{ formatDate(review.createdAt) }}
-                </span>
+                <span class="created-date">{{ formatDate(review.createdAt) }}</span>
               </div>
             </div>
           </article>
@@ -241,14 +201,14 @@
       <div class="modal-footer">
         <button type="button" class="btn-secondary" (click)="cancelDelete()" [disabled]="deleting()">Cancel</button>
         <button type="button" class="btn-danger" (click)="confirmDelete()" [disabled]="deleting()">
-          {{ deleting() ? 'Deleting...' : 'Delete Review' }}
+          {{ deleting() ? 'Deleting...' : 'Delete' }}
         </button>
       </div>
     </div>
   </div>
 }
 
-<!-- New Review Modal Placeholder -->
+<!-- New Review Modal -->
 @if (showNewReviewModal()) {
   <div class="modal-overlay" (click)="closeNewReviewModal()">
     <div class="modal-content large" (click)="$event.stopPropagation()">
@@ -268,7 +228,7 @@
   </div>
 }
 
-<!-- Edit Review Modal Placeholder -->
+<!-- Edit Review Modal -->
 @if (showEditModal()) {
   <div class="modal-overlay" (click)="closeEditModal()">
     <div class="modal-content large" (click)="$event.stopPropagation()">

@@ -1,22 +1,22 @@
 <div class="social-container">
   <div class="page-header">
-    <h1>👥 Social</h1>
+    <h1>Social</h1>
     <p>Connect with fellow food lovers and discover new favorites</p>
   </div>
 
   <!-- Tabs -->
   <div class="tabs">
     <button type="button" class="tab" [class.active]="activeTab() === 'feed'" (click)="setActiveTab('feed')">
-      📰 Activity Feed
+      Activity Feed
     </button>
     <button type="button" class="tab" [class.active]="activeTab() === 'discover'" (click)="setActiveTab('discover')">
-      🔍 Discover
+      Discover
     </button>
     <button type="button" class="tab" [class.active]="activeTab() === 'following'" (click)="setActiveTab('following')">
-      👤 Following
+      Following
     </button>
     <button type="button" class="tab" [class.active]="activeTab() === 'followers'" (click)="setActiveTab('followers')">
-      👥 Followers
+      Followers
     </button>
   </div>
 

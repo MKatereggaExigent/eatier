@@ -2,12 +2,10 @@
   <!-- Header -->
   <header class="page-header">
     <div class="header-content">
-      <h1><span class="icon">📅</span> My Bookings</h1>
+      <h1>My Bookings</h1>
       <p>Manage your restaurant reservations</p>
     </div>
-    <a routerLink="/restaurants" class="btn-primary">
-      <span>🔍</span> Find Restaurants
-    </a>
+    <a routerLink="/restaurants" class="btn-header">Find Restaurants</a>
   </header>
 
   <!-- Tabs -->
@@ -44,13 +42,11 @@
       </div>
     } @else if (error()) {
       <div class="error-state">
-        <span class="icon">⚠️</span>
         <p>{{ error() }}</p>
         <button type="button" class="btn-retry" (click)="loadBookings()">Try Again</button>
       </div>
     } @else if (currentBookings().length === 0) {
       <div class="empty-state">
-        <span class="icon">📅</span>
         <h3>No {{ activeTab() }} bookings</h3>
         <p>@if (activeTab() === 'upcoming') {
           You don't have any upcoming reservations.
@@ -69,8 +65,8 @@
           <div class="booking-card">
             <div class="booking-header">
               <div class="restaurant-info">
-                <span class="restaurant-icon">🍽️</span>
-                <div>
+                <div class="restaurant-avatar">{{ (booking.business_name || 'R').charAt(0) }}</div>
+                <div class="restaurant-details">
                   <h3>{{ booking.business_name }}</h3>
                   <span class="booking-ref">Ref: {{ booking.booking_reference }}</span>
                 </div>
@@ -82,41 +78,47 @@
 
             <div class="booking-details">
               <div class="detail-item">
-                <span class="label">📆 Date</span>
+                <span class="label">Date</span>
                 <span class="value">{{ formatDate(booking.booking_date) }}</span>
               </div>
               <div class="detail-item">
-                <span class="label">🕐 Time</span>
+                <span class="label">Time</span>
                 <span class="value">{{ formatTime(booking.booking_time) }}</span>
               </div>
               <div class="detail-item">
-                <span class="label">👥 Party Size</span>
+                <span class="label">Party Size</span>
                 <span class="value">{{ booking.party_size }} guests</span>
               </div>
               <div class="detail-item">
-                <span class="label">🎫 Tier</span>
+                <span class="label">Tier</span>
                 <span class="value tier-badge">{{ getTierLabel(booking.booking_tier) }}</span>
               </div>
             </div>
 
             @if (booking.special_requests) {
               <div class="special-requests">
-                <span class="label">📝 Special Requests:</span>
+                <span class="label">Special Requests</span>
                 <p>{{ booking.special_requests }}</p>
               </div>
             }
 
             @if (booking.occasion) {
               <div class="occasion">
-                <span class="label">🎉 Occasion:</span>
-                <span>{{ booking.occasion }}</span>
+                <span class="label">Occasion</span>
+                <span class="value">{{ booking.occasion }}</span>
               </div>
             }
 
             <div class="booking-footer">
               <div class="contact-info">
-                <span>📞 {{ booking.business_phone || 'N/A' }}</span>
-                <span>✉️ {{ booking.business_email || 'N/A' }}</span>
+                <span class="contact-item">
+                  <span class="contact-label">Phone</span>
+                  {{ booking.business_phone || 'N/A' }}
+                </span>
+                <span class="contact-item">
+                  <span class="contact-label">Email</span>
+                  {{ booking.business_email || 'N/A' }}
+                </span>
               </div>
               <div class="actions">
                 @if (canCancel(booking)) {
@@ -143,7 +145,7 @@
         <div class="modal-body">
           <p>Are you sure you want to cancel your booking at <strong>{{ selectedBooking()?.business_name }}</strong>?</p>
           <p class="booking-info">{{ formatDate(selectedBooking()?.booking_date || '') }} at {{ formatTime(selectedBooking()?.booking_time || '') }}</p>
-          <label for="reason">Reason for cancellation (optional):</label>
+          <label for="reason">Reason for cancellation (optional)</label>
           <textarea id="reason" [(ngModel)]="cancellationReason" placeholder="Enter reason..."></textarea>
         </div>
         <div class="modal-footer">

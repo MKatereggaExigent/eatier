@@ -233,31 +233,6 @@ export class UserWalletComponent implements OnInit {
     this.transactionFilter.set(filter);
   }
 
-  getTierIcon(tier: string): string {
-    switch (tier?.toLowerCase()) {
-      case 'platinum': return '💎';
-      case 'gold': return '🥇';
-      case 'silver': return '🥈';
-      default: return '🥉';
-    }
-  }
-
-  getTierColor(tier: string): string {
-    switch (tier?.toLowerCase()) {
-      case 'platinum': return '#E5E4E2';
-      case 'gold': return '#FFD700';
-      case 'silver': return '#C0C0C0';
-      default: return '#CD7F32';
-    }
-  }
-
-  getTransactionIcon(type: string, amountType: string): string {
-    if (type === 'credit') {
-      return amountType === 'cashback' ? '💰' : '⭐';
-    }
-    return amountType === 'cashback' ? '🎁' : '🏆';
-  }
-
   getTransactionClass(type: string): string {
     return type === 'credit' ? 'transaction-credit' : 'transaction-debit';
   }

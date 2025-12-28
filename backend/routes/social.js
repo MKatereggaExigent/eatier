@@ -147,6 +147,51 @@ router.get('/following', authenticateToken, async (req, res) => {
 });
 
 // ============================================================================
+// GET /api/social/feed - Alias for activity-feed (for frontend compatibility)
+// ============================================================================
+router.get('/feed', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const tenantId = req.user.tenant_id;
+    const { limit = 20, offset = 0 } = req.query;
+
+    // Get activity from users the current user follows
+    const result = await pool.query(
+      `SELECT uaf.*, u.first_name, u.last_name, u.avatar_url
+       FROM user_activity_feed uaf
+       JOIN users u ON uaf.user_id = u.id
+       WHERE uaf.tenant_id = $1
+         AND uaf.is_public = true
+         AND (uaf.user_id IN (SELECT following_id FROM user_follows WHERE follower_id = $2) OR uaf.user_id = $2)
+       ORDER BY uaf.created_at DESC
+       LIMIT $3 OFFSET $4`,
+      [tenantId, userId, parseInt(limit), parseInt(offset)]
+    );
+
+    res.json({
+      activities: result.rows.map(a => ({
+        id: a.id,
+        actorName: `${a.first_name} ${a.last_name}`,
+        activityType: a.activity_type,
+        contentType: a.reference_type,
+        contentPreview: a.metadata?.preview || '',
+        businessName: a.metadata?.business_name || '',
+        createdAt: a.created_at,
+        user: {
+          id: a.user_id,
+          firstName: a.first_name,
+          lastName: a.last_name,
+          avatar: a.avatar_url
+        }
+      }))
+    });
+  } catch (error) {
+    console.error('Error fetching activity feed:', error);
+    res.status(500).json({ error: 'Failed to fetch activity feed' });
+  }
+});
+
+// ============================================================================
 // GET /api/social/activity-feed - Get activity feed from followed users
 // ============================================================================
 router.get('/activity-feed', authenticateToken, async (req, res) => {
