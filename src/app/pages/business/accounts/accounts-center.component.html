@@ -33,6 +33,14 @@
     <button
       type="button"
       class="tab-button"
+      [class.active]="activeSection() === 'billing'"
+      (click)="setActiveSection('billing')"
+    >
+      💳 Billing & Subscription
+    </button>
+    <button
+      type="button"
+      class="tab-button"
       [class.active]="activeSection() === 'notifications'"
       (click)="setActiveSection('notifications')"
     >
@@ -63,26 +71,32 @@
 
       <div class="overview-cards">
         <div class="overview-card">
-          <div class="card-icon">📊</div>
           <div class="card-content">
             <h3>Account Status</h3>
-            <p class="status active">Active</p>
+            <p class="status" [class.active]="business()?.account_status === 'active'">
+              {{ business()?.account_status | titlecase }}
+            </p>
           </div>
         </div>
 
         <div class="overview-card">
-          <div class="card-icon">📅</div>
           <div class="card-content">
             <h3>Member Since</h3>
-            <p>January 2024</p>
+            <p>{{ business()?.created_at | date:'MMMM yyyy' }}</p>
           </div>
         </div>
 
         <div class="overview-card">
-          <div class="card-icon">📈</div>
           <div class="card-content">
-            <h3>Profile Views</h3>
-            <p>2,456 this month</p>
+            <h3>Total Bookings</h3>
+            <p>{{ business()?.total_bookings ?? 0 | number }}</p>
+          </div>
+        </div>
+
+        <div class="overview-card">
+          <div class="card-content">
+            <h3>Menu Items</h3>
+            <p>{{ business()?.total_menu_items ?? 0 | number }}</p>
           </div>
         </div>
       </div>
@@ -100,6 +114,154 @@
             🗑️ Delete Account
           </button>
         </div>
+      </div>
+    </div>
+  }
+
+  <!-- Billing & Subscription Section -->
+  @if (activeSection() === 'billing') {
+    <div class="section-content billing-section">
+      <h2>Billing & Subscription</h2>
+
+      <!-- Current Subscription Status -->
+      <div class="current-subscription">
+        <div class="subscription-header">
+          <h3>Current Plan</h3>
+          <span class="subscription-badge" [class]="getSubscriptionStatusClass()">
+            {{ subscription()?.status ? (subscription()?.status | titlecase) : 'Free' }}
+          </span>
+        </div>
+
+        @if (subscription()?.status === 'trial') {
+          <div class="trial-notice">
+            <span class="trial-icon">⏰</span>
+            <div class="trial-info">
+              <strong>Trial Period</strong>
+              <p>{{ getTrialDaysRemaining() }} days remaining. Upgrade now to continue enjoying all features.</p>
+            </div>
+          </div>
+        }
+
+        <div class="current-plan-details">
+          <div class="plan-name">{{ subscription()?.plan ? (subscription()?.plan | titlecase) : 'Free' }} Plan</div>
+          @if (subscription()?.status === 'active' && subscription()?.price) {
+            <div class="plan-price">${{ subscription()?.price }}/{{ subscription()?.billingCycle }}</div>
+          }
+          @if (!subscription() || subscription()?.plan === 'free') {
+            <div class="plan-price free-price">$0/month</div>
+          }
+        </div>
+      </div>
+
+      <!-- Billing Cycle Toggle -->
+      <div class="billing-cycle-toggle">
+        <span class="cycle-label">Billing Cycle:</span>
+        <div class="toggle-buttons">
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="billingCycle() === 'monthly'"
+            (click)="setBillingCycle('monthly')">
+            Monthly
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="billingCycle() === 'yearly'"
+            (click)="setBillingCycle('yearly')">
+            Yearly <span class="save-badge">2 months free</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Subscription Plans -->
+      <div class="plans-grid">
+        @for (plan of subscriptionPlans; track plan.id) {
+          <div class="plan-card" [class.popular]="plan.isPopular" [class.current]="isCurrentPlan(plan.id)">
+            @if (plan.isPopular) {
+              <div class="popular-badge">Most Popular</div>
+            }
+            @if (isCurrentPlan(plan.id)) {
+              <div class="current-badge">Current Plan</div>
+            }
+
+            <h3 class="plan-name">{{ plan.name }}</h3>
+            <div class="plan-pricing">
+              <span class="price">${{ getPlanPrice(plan) }}</span>
+              <span class="period">/{{ billingCycle() === 'yearly' ? 'year' : 'month' }}</span>
+            </div>
+
+            <ul class="plan-features">
+              @for (feature of plan.features; track feature) {
+                <li>
+                  <span class="check-icon">✓</span>
+                  {{ feature }}
+                </li>
+              }
+            </ul>
+
+            <button
+              type="button"
+              class="plan-btn"
+              [class.current-btn]="isCurrentPlan(plan.id)"
+              [disabled]="isCurrentPlan(plan.id)"
+              (click)="selectPlan(plan)">
+              @if (isCurrentPlan(plan.id)) {
+                Current Plan
+              } @else if (subscription()?.status === 'trial') {
+                Upgrade Now
+              } @else {
+                Switch to {{ plan.name }}
+              }
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Payment Methods Section -->
+      <div class="payment-methods-section">
+        <div class="section-header">
+          <h3>Payment Methods</h3>
+          <button type="button" class="add-payment-btn" (click)="openPaymentModal()">
+            + Add Payment Method
+          </button>
+        </div>
+
+        @if (paymentMethods().length === 0) {
+          <div class="no-payment-methods">
+            <span class="empty-icon">💳</span>
+            <p>No payment methods added yet</p>
+            <button type="button" class="add-first-btn" (click)="openPaymentModal()">
+              Add Your First Payment Method
+            </button>
+          </div>
+        } @else {
+          <div class="payment-methods-list">
+            @for (method of paymentMethods(); track method.id) {
+              <div class="payment-method-card">
+                <div class="method-icon">
+                  @if (method.type === 'card') { 💳 } @else { 🏦 }
+                </div>
+                <div class="method-details">
+                  <div class="method-name">{{ method.holderName }}</div>
+                  <div class="method-number">
+                    @if (method.type === 'card') {
+                      •••• •••• •••• {{ method.lastFour }}
+                    } @else {
+                      Account ending in {{ method.lastFour }}
+                    }
+                  </div>
+                  @if (method.expiryDate) {
+                    <div class="method-expiry">Expires {{ method.expiryDate }}</div>
+                  }
+                </div>
+                @if (method.isDefault) {
+                  <span class="default-badge">Default</span>
+                }
+              </div>
+            }
+          </div>
+        }
       </div>
     </div>
   }
@@ -326,6 +488,141 @@
               Deleting...
             } @else {
               Delete Account Permanently
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Payment Modal -->
+@if (showPaymentModal()) {
+  <div class="modal-overlay" (click)="closePaymentModal()">
+    <div class="modal-content payment-modal" (click)="$event.stopPropagation()">
+      <button type="button" class="modal-close" (click)="closePaymentModal()">×</button>
+
+      <h2>
+        @if (selectedPlan()) {
+          Upgrade to {{ selectedPlan()?.name }}
+        } @else {
+          Add Payment Method
+        }
+      </h2>
+
+      @if (selectedPlan()) {
+        <div class="selected-plan-summary">
+          <div class="plan-summary-name">{{ selectedPlan()?.name }} Plan</div>
+          <div class="plan-summary-price">
+            ${{ getPlanPrice(selectedPlan()!) }}/{{ billingCycle() === 'yearly' ? 'year' : 'month' }}
+          </div>
+        </div>
+      }
+
+      <form [formGroup]="paymentForm" (ngSubmit)="onPaymentSubmit()" class="payment-form">
+        <!-- Payment Type Selection -->
+        <div class="payment-type-selector">
+          <label class="payment-type-option">
+            <input type="radio" formControlName="paymentType" value="card" (change)="onPaymentTypeChange()" />
+            <span class="type-icon">💳</span>
+            <span class="type-label">Credit/Debit Card</span>
+          </label>
+          <label class="payment-type-option">
+            <input type="radio" formControlName="paymentType" value="bank" (change)="onPaymentTypeChange()" />
+            <span class="type-icon">🏦</span>
+            <span class="type-label">Bank Account</span>
+          </label>
+        </div>
+
+        <!-- Card Payment Fields -->
+        @if (paymentForm.get('paymentType')?.value === 'card') {
+          <div class="card-fields">
+            <div class="form-group">
+              <label for="cardHolderName">Cardholder Name</label>
+              <input id="cardHolderName" type="text" formControlName="cardHolderName" placeholder="Name on card" />
+              @if (getFieldError(paymentForm, 'cardHolderName')) {
+                <span class="field-error">{{ getFieldError(paymentForm, 'cardHolderName') }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="cardNumber">Card Number</label>
+              <input
+                id="cardNumber"
+                type="text"
+                formControlName="cardNumber"
+                placeholder="1234 5678 9012 3456"
+                maxlength="16"
+                (input)="formatCardNumber($event)" />
+              @if (getFieldError(paymentForm, 'cardNumber')) {
+                <span class="field-error">{{ getFieldError(paymentForm, 'cardNumber') }}</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="expiryMonth">Expiry Month</label>
+                <input id="expiryMonth" type="text" formControlName="expiryMonth" placeholder="MM" maxlength="2" />
+              </div>
+              <div class="form-group half">
+                <label for="expiryYear">Expiry Year</label>
+                <input id="expiryYear" type="text" formControlName="expiryYear" placeholder="YY" maxlength="2" />
+              </div>
+              <div class="form-group half">
+                <label for="cvv">CVV</label>
+                <input id="cvv" type="text" formControlName="cvv" placeholder="123" maxlength="4" />
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Bank Payment Fields -->
+        @if (paymentForm.get('paymentType')?.value === 'bank') {
+          <div class="bank-fields">
+            <div class="form-group">
+              <label for="accountHolderName">Account Holder Name</label>
+              <input id="accountHolderName" type="text" formControlName="accountHolderName" placeholder="Name on account" />
+              @if (getFieldError(paymentForm, 'accountHolderName')) {
+                <span class="field-error">{{ getFieldError(paymentForm, 'accountHolderName') }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="bankName">Bank Name</label>
+              <input id="bankName" type="text" formControlName="bankName" placeholder="Your bank name" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="accountNumber">Account Number</label>
+                <input id="accountNumber" type="text" formControlName="accountNumber" placeholder="Account number" />
+              </div>
+              <div class="form-group half">
+                <label for="routingNumber">Routing Number</label>
+                <input id="routingNumber" type="text" formControlName="routingNumber" placeholder="Routing number" />
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Save Payment Method Checkbox -->
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="savePaymentMethod" />
+            <span>Save this payment method for future use</span>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" (click)="closePaymentModal()">Cancel</button>
+          <button type="submit" class="primary-btn" [disabled]="isProcessingPayment()">
+            @if (isProcessingPayment()) {
+              <span class="loading-spinner"></span>
+              Processing...
+            } @else if (selectedPlan()) {
+              Pay ${{ getPlanPrice(selectedPlan()!) }}
+            } @else {
+              Add Payment Method
             }
           </button>
         </div>

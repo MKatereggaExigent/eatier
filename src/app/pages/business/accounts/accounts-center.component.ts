@@ -1,10 +1,29 @@
 import { AccountActivity, AccountFreezeOptions, NotificationSettings } from '../../../shared/models/business-profile.model';
-import { Business, BusinessOwnerService } from '../../../core/services/business-owner.service';
+import { Business, BusinessOwnerService, BusinessSubscription } from '../../../core/services/business-owner.service';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
+
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  billingCycle: 'monthly' | 'yearly';
+  features: string[];
+  isPopular?: boolean;
+  isCurrent?: boolean;
+}
+
+export interface PaymentMethod {
+  id: string;
+  type: 'card' | 'bank';
+  lastFour: string;
+  expiryDate?: string;
+  holderName: string;
+  isDefault: boolean;
+}
 
 @Component({
   selector: 'app-accounts-center',
@@ -26,15 +45,69 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
   errorMessage = signal<string | null>(null);
   showFreezeModal = signal<boolean>(false);
   showDeleteModal = signal<boolean>(false);
+  showPaymentModal = signal<boolean>(false);
+  isProcessingPayment = signal<boolean>(false);
+
+  // Subscription & Billing
+  subscription = signal<BusinessSubscription | null>(null);
+  selectedPlan = signal<SubscriptionPlan | null>(null);
+  paymentMethods = signal<PaymentMethod[]>([]);
+  billingCycle = signal<'monthly' | 'yearly'>('monthly');
 
   // Forms
   notificationForm: FormGroup;
   freezeForm: FormGroup;
   deleteForm: FormGroup;
+  paymentForm: FormGroup;
 
   // Data
   accountActivity = signal<AccountActivity[]>([]);
   notificationSettings = signal<NotificationSettings | null>(null);
+
+  // Subscription Plans
+  readonly subscriptionPlans: SubscriptionPlan[] = [
+    {
+      id: 'basic',
+      name: 'Basic',
+      price: 29.99,
+      billingCycle: 'monthly',
+      features: [
+        'Up to 50 menu items',
+        'Basic analytics',
+        'Email support',
+        'Standard listing'
+      ]
+    },
+    {
+      id: 'professional',
+      name: 'Professional',
+      price: 79.99,
+      billingCycle: 'monthly',
+      features: [
+        'Unlimited menu items',
+        'Advanced analytics',
+        'Priority support',
+        'Featured listing',
+        'Customer insights',
+        'Booking management'
+      ],
+      isPopular: true
+    },
+    {
+      id: 'enterprise',
+      name: 'Enterprise',
+      price: 199.99,
+      billingCycle: 'monthly',
+      features: [
+        'Everything in Professional',
+        'Multi-location support',
+        'API access',
+        'Dedicated account manager',
+        'Custom integrations',
+        'White-label options'
+      ]
+    }
+  ];
 
   // Freeze duration options
   readonly freezeDurations = [
@@ -74,6 +147,30 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
       reason: [''],
       password: ['', Validators.required]
     });
+
+    // Payment form with card/bank details
+    this.paymentForm = this.fb.group({
+      paymentType: ['card', Validators.required],
+      // Card fields
+      cardHolderName: ['', Validators.required],
+      cardNumber: ['', [Validators.required, Validators.pattern(/^\d{16}$/)]],
+      expiryMonth: ['', [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])$/)]],
+      expiryYear: ['', [Validators.required, Validators.pattern(/^\d{2}$/)]],
+      cvv: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]],
+      // Bank fields (optional, used when paymentType is 'bank')
+      accountHolderName: [''],
+      accountNumber: [''],
+      routingNumber: [''],
+      bankName: [''],
+      // Billing address
+      billingAddress: [''],
+      billingCity: [''],
+      billingState: [''],
+      billingZip: [''],
+      billingCountry: ['South Africa'],
+      // Save for future
+      savePaymentMethod: [true]
+    });
   }
 
   ngOnInit(): void {
@@ -95,7 +192,7 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
         catchError(error => {
           console.error('Error loading business data:', error);
           this.errorMessage.set('Failed to load account data. Please try again.');
-          return of({ business: null });
+          return of({ business: null, subscription: null });
         }),
         finalize(() => {
           this.isLoading.set(false);
@@ -104,6 +201,11 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
       .subscribe(response => {
         if (response && response.business) {
           this.business.set(response.business);
+
+          // Load subscription data
+          if (response.subscription) {
+            this.subscription.set(response.subscription);
+          }
 
           // Load notification settings (using defaults until API is available)
           this.notificationSettings.set(this.defaultNotificationSettings);
@@ -290,8 +392,160 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
       reason: 'Reason',
       confirmText: 'Confirmation text',
       password: 'Password',
-      emailFrequency: 'Email frequency'
+      emailFrequency: 'Email frequency',
+      cardHolderName: 'Card holder name',
+      cardNumber: 'Card number',
+      expiryMonth: 'Expiry month',
+      expiryYear: 'Expiry year',
+      cvv: 'CVV',
+      accountHolderName: 'Account holder name',
+      accountNumber: 'Account number',
+      routingNumber: 'Routing number'
     };
     return labels[fieldName] || fieldName;
+  }
+
+  // ===================================
+  // BILLING & SUBSCRIPTION METHODS
+  // ===================================
+
+  setBillingCycle(cycle: 'monthly' | 'yearly'): void {
+    this.billingCycle.set(cycle);
+  }
+
+  getPlanPrice(plan: SubscriptionPlan): number {
+    if (this.billingCycle() === 'yearly') {
+      return Math.round(plan.price * 10); // 2 months free on yearly
+    }
+    return plan.price;
+  }
+
+  selectPlan(plan: SubscriptionPlan): void {
+    this.selectedPlan.set(plan);
+    this.showPaymentModal.set(true);
+  }
+
+  openPaymentModal(): void {
+    this.showPaymentModal.set(true);
+    this.paymentForm.reset({
+      paymentType: 'card',
+      billingCountry: 'South Africa',
+      savePaymentMethod: true
+    });
+  }
+
+  closePaymentModal(): void {
+    this.showPaymentModal.set(false);
+    this.selectedPlan.set(null);
+    this.paymentForm.reset();
+  }
+
+  onPaymentTypeChange(): void {
+    const paymentType = this.paymentForm.get('paymentType')?.value;
+
+    if (paymentType === 'card') {
+      // Make card fields required
+      this.paymentForm.get('cardHolderName')?.setValidators([Validators.required]);
+      this.paymentForm.get('cardNumber')?.setValidators([Validators.required, Validators.pattern(/^\d{16}$/)]);
+      this.paymentForm.get('expiryMonth')?.setValidators([Validators.required]);
+      this.paymentForm.get('expiryYear')?.setValidators([Validators.required]);
+      this.paymentForm.get('cvv')?.setValidators([Validators.required, Validators.pattern(/^\d{3,4}$/)]);
+      // Clear bank validators
+      this.paymentForm.get('accountHolderName')?.clearValidators();
+      this.paymentForm.get('accountNumber')?.clearValidators();
+      this.paymentForm.get('routingNumber')?.clearValidators();
+    } else {
+      // Make bank fields required
+      this.paymentForm.get('accountHolderName')?.setValidators([Validators.required]);
+      this.paymentForm.get('accountNumber')?.setValidators([Validators.required]);
+      this.paymentForm.get('routingNumber')?.setValidators([Validators.required]);
+      // Clear card validators
+      this.paymentForm.get('cardHolderName')?.clearValidators();
+      this.paymentForm.get('cardNumber')?.clearValidators();
+      this.paymentForm.get('expiryMonth')?.clearValidators();
+      this.paymentForm.get('expiryYear')?.clearValidators();
+      this.paymentForm.get('cvv')?.clearValidators();
+    }
+
+    // Update validity
+    Object.keys(this.paymentForm.controls).forEach(key => {
+      this.paymentForm.get(key)?.updateValueAndValidity();
+    });
+  }
+
+  formatCardNumber(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/\D/g, '');
+    if (value.length > 16) {
+      value = value.substring(0, 16);
+    }
+    input.value = value;
+    this.paymentForm.get('cardNumber')?.setValue(value);
+  }
+
+  onPaymentSubmit(): void {
+    if (this.paymentForm.valid && this.selectedPlan()) {
+      this.isProcessingPayment.set(true);
+
+      const paymentData = {
+        ...this.paymentForm.value,
+        planId: this.selectedPlan()?.id,
+        billingCycle: this.billingCycle(),
+        amount: this.getPlanPrice(this.selectedPlan()!)
+      };
+
+      // TODO: Replace with actual API call to process payment
+      // this.businessOwnerService.processSubscriptionPayment(paymentData)
+
+      // Mock API call for now
+      setTimeout(() => {
+        console.log('Processing payment:', paymentData);
+        this.isProcessingPayment.set(false);
+        this.closePaymentModal();
+
+        // Update subscription status
+        const newSubscription: BusinessSubscription = {
+          id: 'sub_' + Date.now(),
+          plan: this.selectedPlan()!.id as any,
+          status: 'active',
+          startDate: new Date().toISOString(),
+          price: this.getPlanPrice(this.selectedPlan()!),
+          billingCycle: this.billingCycle()
+        };
+        this.subscription.set(newSubscription);
+
+        this.successMessage.set(`Successfully upgraded to ${this.selectedPlan()?.name} plan!`);
+        setTimeout(() => this.successMessage.set(null), 5000);
+      }, 2000);
+    } else {
+      // Mark all fields as touched to show validation errors
+      Object.keys(this.paymentForm.controls).forEach(key => {
+        this.paymentForm.get(key)?.markAsTouched();
+      });
+    }
+  }
+
+  isCurrentPlan(planId: string): boolean {
+    const sub = this.subscription();
+    return sub?.plan === planId && sub?.status === 'active';
+  }
+
+  getSubscriptionStatusClass(): string {
+    const status = this.subscription()?.status;
+    switch (status) {
+      case 'active': return 'status-active';
+      case 'trial': return 'status-trial';
+      case 'expired': return 'status-expired';
+      case 'cancelled': return 'status-cancelled';
+      default: return 'status-inactive';
+    }
+  }
+
+  getTrialDaysRemaining(): number | null {
+    const sub = this.subscription();
+    if (sub?.status === 'trial' && sub?.trialDaysLeft !== undefined) {
+      return sub.trialDaysLeft;
+    }
+    return null;
   }
 }

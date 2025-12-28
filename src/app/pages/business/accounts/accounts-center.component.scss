@@ -1,176 +1,202 @@
 // ===================================
-// ACCOUNTS CENTER - NYT THEME
+// ACCOUNTS CENTER - NYT EDITORIAL DESIGN
 // ===================================
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+// NYT Typography
+$font-serif: Georgia, 'Times New Roman', serif;
+$font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', monospace;
 
-:host {
-  // NYT Color Palette
-  --clr-primary-600: #0284c7;
-  --clr-primary-700: #0369a1;
-  --clr-secondary-900: #000000;
-  --clr-secondary-600: #525252;
-  --clr-secondary-500: #737373;
-  --clr-secondary-400: #a3a3a3;
-  --clr-secondary-300: #d4d4d4;
-  --clr-secondary-200: #e5e5e5;
-  --clr-secondary-50: #fafafa;
-  --clr-success: #16a34a;
-  --clr-warning: #d97706;
-  --clr-error: #dc2626;
-  --clr-info: #0284c7;
-  --clr-black: #000000;
-  --clr-grey-700: #525252;
+// NYT Colors
+$color-black: #000;
+$color-white: #fff;
+$color-gray-100: #f7f7f7;
+$color-gray-200: #e5e5e5;
+$color-gray-400: #999;
+$color-gray-600: #666;
+$color-gray-800: #333;
+$color-success: #0a7c42;
+$color-error: #c41e3a;
+$color-warning: #b8860b;
+$color-info: #326891;
 
-  // Typography
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
+// Spacing
+$space-xs: 0.25rem;
+$space-sm: 0.5rem;
+$space-md: 1rem;
+$space-lg: 1.5rem;
+$space-xl: 2rem;
+$space-2xl: 3rem;
 
-  // Spacing
-  --space-2: 0.5rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-
-  // Transitions
-  --transition-normal: 0.2s ease;
-}
+// ===================================
+// MAIN CONTAINER
+// ===================================
 
 .accounts-center-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--space-8);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: $space-xl;
+  min-height: calc(100vh - 200px);
 }
 
+// ===================================
+// HEADER
+// ===================================
+
 .accounts-header {
-  text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: $space-2xl;
+  padding-bottom: $space-xl;
+  border-bottom: 1px solid $color-black;
 
   h1 {
-    font-size: 2rem;
+    font-family: $font-serif;
+    font-size: 2.5rem;
     font-weight: 700;
-    color: var(--clr-black);
-    margin-bottom: 0.5rem;
+    color: $color-black;
+    margin: 0 0 $space-sm;
+    line-height: 1.2;
   }
 
   p {
-    color: var(--clr-grey-700);
+    font-family: $font-sans;
     font-size: 1rem;
+    color: $color-gray-600;
+    margin: 0;
   }
 }
 
+// ===================================
+// MESSAGES
+// ===================================
+
 .success-message, .error-message {
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
+  font-family: $font-sans;
+  padding: $space-lg;
+  margin-bottom: $space-xl;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-weight: 500;
+  gap: $space-sm;
+  font-size: 0.875rem;
 }
 
 .success-message {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #166534;
+  background: $color-white;
+  border: 2px solid $color-success;
+  color: $color-success;
 }
 
 .error-message {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
+  background: $color-white;
+  border: 2px solid $color-error;
+  color: $color-error;
 }
+
+// ===================================
+// TABS - NYT STYLE
+// ===================================
 
 .accounts-tabs {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: $space-xl;
+  border-bottom: 1px solid $color-black;
 
   .tab-button {
-    padding: 0.75rem 1.5rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    background: white;
-    color: var(--clr-grey-700);
+    font-family: $font-sans;
+    padding: $space-md $space-lg;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: $color-gray-600;
+    font-size: 0.875rem;
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     cursor: pointer;
     transition: all 0.2s ease;
+    margin-bottom: -1px;
 
     &:hover {
-      background: #f3f4f6;
-      border-color: #d1d5db;
+      color: $color-black;
     }
 
     &.active {
-      background: var(--clr-primary-600);
-      border-color: var(--clr-primary-600);
-      color: white;
+      color: $color-black;
+      border-bottom-color: $color-black;
+      font-weight: 600;
     }
   }
 }
 
+// ===================================
+// SECTION CONTENT
+// ===================================
+
 .section-content {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  background: $color-white;
+  border: 1px solid $color-black;
+  padding: $space-xl;
 
   h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--clr-black);
-    margin-bottom: 2rem;
+    font-family: $font-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $color-black;
+    margin: 0 0 $space-xl;
+    padding-bottom: $space-md;
+    border-bottom: 1px solid $color-gray-200;
   }
 }
 
+// ===================================
+// OVERVIEW CARDS - NYT GRID STYLE
+// ===================================
+
 .overview-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border: 1px solid $color-black;
+  margin-bottom: $space-xl;
 
   .overview-card {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 1.5rem;
-    border: 1px solid #e2e8f0;
+    background: $color-white;
+    border-right: 1px solid $color-black;
+    padding: $space-lg;
     display: flex;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: column;
+    justify-content: center;
 
-    .card-icon {
-      font-size: 2rem;
+    &:last-child {
+      border-right: none;
     }
 
     .card-content {
       h3 {
-        font-size: 1rem;
+        font-family: $font-sans;
+        font-size: 0.75rem;
         font-weight: 600;
-        color: var(--clr-black);
-        margin-bottom: 0.25rem;
+        color: $color-gray-600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin: 0 0 $space-sm;
+        line-height: 1.3;
       }
 
       p {
-        color: var(--clr-grey-700);
-        font-size: 0.875rem;
+        font-family: $font-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        color: $color-black;
+        margin: 0;
+        line-height: 1;
 
         &.status {
-          font-weight: 600;
+          font-size: 1.5rem;
+          text-transform: capitalize;
 
           &.active {
-            color: #10b981;
+            color: $color-success;
           }
         }
       }
@@ -178,41 +204,51 @@
   }
 }
 
+// ===================================
+// QUICK ACTIONS
+// ===================================
+
 .quick-actions {
   h3 {
+    font-family: $font-serif;
     font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--clr-black);
-    margin-bottom: 1rem;
+    font-weight: 700;
+    color: $color-black;
+    margin: 0 0 $space-md;
   }
 
   .actions-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    gap: 0;
+    border: 1px solid $color-black;
 
     .action-btn {
-      padding: 1rem;
-      border-radius: 8px;
-      border: 2px solid #e5e7eb;
-      background: white;
-      color: var(--clr-black);
+      font-family: $font-sans;
+      padding: $space-md;
+      border: none;
+      border-right: 1px solid $color-black;
+      background: $color-white;
+      color: $color-black;
+      font-size: 0.875rem;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background-color 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: $space-sm;
+
+      &:last-child {
+        border-right: none;
+      }
 
       &:hover {
-        background: #f3f4f6;
-        border-color: #d1d5db;
+        background: $color-gray-100;
       }
 
       &.warning {
-        border-color: #f59e0b;
-        color: #f59e0b;
+        color: $color-warning;
 
         &:hover {
           background: #fef3c7;
@@ -220,19 +256,18 @@
       }
 
       &.danger {
-        border-color: #ef4444;
-        color: #ef4444;
+        color: $color-error;
 
         &:hover {
-          background: #fef2f2;
+          background: #fee2e2;
         }
       }
 
       .loading-spinner {
-        width: 16px;
-        height: 16px;
-        border: 2px solid rgba(0, 0, 0, 0.3);
-        border-top: 2px solid currentColor;
+        width: 14px;
+        height: 14px;
+        border: 2px solid $color-gray-200;
+        border-top-color: $color-black;
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
@@ -240,74 +275,91 @@
   }
 }
 
+// ===================================
+// NOTIFICATION FORM - NYT STYLE
+// ===================================
+
 .notification-form {
   .notification-group {
-    margin-bottom: 2rem;
+    margin-bottom: $space-xl;
+    border: 1px solid $color-black;
 
     h3 {
+      font-family: $font-serif;
       font-size: 1.125rem;
-      font-weight: 600;
-      color: var(--clr-black);
-      margin-bottom: 1rem;
+      font-weight: 700;
+      color: $color-black;
+      padding: $space-md;
+      margin: 0;
+      border-bottom: 1px solid $color-black;
+      background: $color-gray-100;
     }
 
     .notification-item {
       display: flex;
       align-items: flex-start;
-      gap: 1rem;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 0.5rem;
+      gap: $space-md;
+      padding: $space-md;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background-color 0.2s ease;
+      border-bottom: 1px solid $color-gray-200;
+
+      &:last-child {
+        border-bottom: none;
+      }
 
       &:hover {
-        background: #f8fafc;
+        background: $color-gray-100;
       }
 
       input[type="checkbox"] {
-        margin-top: 0.25rem;
+        margin-top: $space-xs;
+        accent-color: $color-black;
       }
 
       .notification-content {
         .notification-title {
+          font-family: $font-sans;
           display: block;
           font-weight: 500;
-          color: var(--clr-black);
-          margin-bottom: 0.25rem;
+          color: $color-black;
+          margin-bottom: $space-xs;
         }
 
         .notification-description {
+          font-family: $font-sans;
           font-size: 0.875rem;
-          color: var(--clr-grey-700);
+          color: $color-gray-600;
         }
       }
     }
   }
 
   .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: $space-lg;
 
     label {
+      font-family: $font-sans;
       display: block;
       font-weight: 600;
-      color: var(--clr-black);
-      margin-bottom: 0.5rem;
-      font-size: 0.875rem;
+      color: $color-black;
+      margin-bottom: $space-sm;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     select {
+      font-family: $font-sans;
       width: 100%;
-      padding: 0.75rem;
-      border: 2px solid #e1e5e9;
-      border-radius: 8px;
+      padding: $space-sm $space-md;
+      border: 1px solid $color-black;
       font-size: 0.875rem;
-      background: white;
+      background: $color-white;
 
       &:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: $color-gray-100;
       }
     }
   }
@@ -317,33 +369,33 @@
     justify-content: flex-end;
 
     .primary-btn {
-      background: var(--clr-primary-600);
-      color: white;
+      font-family: $font-sans;
+      background: $color-black;
+      color: $color-white;
       border: none;
-      padding: 0.875rem 2rem;
-      border-radius: 8px;
-      font-weight: 600;
+      padding: $space-sm $space-xl;
+      font-size: 0.875rem;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: $space-sm;
 
       &:hover:not(:disabled) {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        background: $color-gray-800;
       }
 
       &:disabled {
-        opacity: 0.6;
+        opacity: 0.5;
         cursor: not-allowed;
       }
 
       .loading-spinner {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
         border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top: 2px solid white;
+        border-top-color: $color-white;
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
@@ -351,23 +403,30 @@
   }
 }
 
+// ===================================
+// ACTIVITY LIST - NYT STYLE
+// ===================================
+
 .activity-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0;
+  border: 1px solid $color-black;
 
   .activity-item {
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
-    padding: 1rem;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    gap: $space-md;
+    padding: $space-md;
+    background: $color-white;
+    border-bottom: 1px solid $color-gray-200;
+
+    &:last-child {
+      border-bottom: none;
+    }
 
     .activity-icon {
-      font-size: 1.25rem;
-      margin-top: 0.25rem;
+      font-size: 1rem;
     }
 
     .activity-content {
@@ -377,108 +436,127 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 0.5rem;
+        margin-bottom: $space-xs;
 
         .activity-action {
+          font-family: $font-sans;
           font-weight: 500;
-          color: var(--clr-black);
+          color: $color-black;
         }
 
         .activity-time {
-          font-size: 0.875rem;
-          color: var(--clr-grey-700);
+          font-family: $font-sans;
+          font-size: 0.75rem;
+          color: $color-gray-400;
         }
       }
 
       .activity-details {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: $space-sm;
         align-items: center;
         font-size: 0.875rem;
-        color: var(--clr-grey-700);
+        color: $color-gray-600;
 
         .activity-description {
-          color: var(--clr-grey-800);
+          font-family: $font-sans;
+          color: $color-gray-600;
           font-weight: 500;
         }
 
         .activity-location {
-          color: var(--clr-grey-600);
-          font-size: 0.8125rem;
-          padding: 0.25rem 0.5rem;
-          background: #e2e8f0;
-          border-radius: 4px;
+          font-family: $font-mono;
+          color: $color-gray-600;
+          font-size: 0.75rem;
+          padding: $space-xs $space-sm;
+          background: $color-gray-100;
+          border: 1px solid $color-gray-200;
         }
       }
     }
   }
 }
 
+// ===================================
+// SECURITY OPTIONS - NYT STYLE
+// ===================================
+
 .security-options {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0;
+  border: 1px solid $color-black;
 
   .security-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem;
-    background: #f8fafc;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    padding: $space-lg;
+    background: $color-white;
+    border-bottom: 1px solid $color-gray-200;
+
+    &:last-child {
+      border-bottom: none;
+    }
 
     .security-content {
       h3 {
+        font-family: $font-sans;
         font-size: 1rem;
         font-weight: 600;
-        color: var(--clr-black);
-        margin-bottom: 0.25rem;
+        color: $color-black;
+        margin: 0 0 $space-xs;
       }
 
       p {
+        font-family: $font-sans;
         font-size: 0.875rem;
-        color: var(--clr-grey-700);
+        color: $color-gray-600;
+        margin: 0;
       }
     }
 
     .secondary-btn {
-      background: white;
-      color: var(--clr-grey-700);
-      border: 2px solid #e5e7eb;
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
+      font-family: $font-sans;
+      background: $color-white;
+      color: $color-black;
+      border: 1px solid $color-black;
+      padding: $space-sm $space-md;
+      font-size: 0.875rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
 
       &:hover {
-        background: #f3f4f6;
-        border-color: #d1d5db;
+        background: $color-black;
+        color: $color-white;
       }
     }
   }
 }
 
-// Modal styles
+// ===================================
+// MODAL STYLES - NYT STYLE
+// ===================================
+
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 2rem;
+  padding: $space-xl;
 }
 
 .modal-content {
-  background: white;
-  border-radius: 16px;
+  background: $color-white;
+  border: 1px solid $color-black;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
@@ -488,50 +566,62 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
+    padding: $space-lg;
+    border-bottom: 1px solid $color-black;
 
     h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--clr-black);
+      font-family: $font-serif;
+      font-weight: 700;
+      color: $color-black;
+      margin: 0;
     }
 
     .close-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
+      background: $color-white;
+      border: 1px solid $color-black;
+      font-size: 1rem;
       cursor: pointer;
-      color: var(--clr-grey-700);
-      padding: 0.5rem;
-      border-radius: 50%;
+      color: $color-black;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       &:hover {
-        background: #f3f4f6;
+        background: $color-black;
+        color: $color-white;
       }
     }
   }
 }
 
+// ===================================
+// FREEZE/DELETE FORMS - NYT STYLE
+// ===================================
+
 .freeze-form, .delete-form {
-  padding: 1.5rem;
+  padding: $space-lg;
 
   .duration-options {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0;
+    border: 1px solid $color-black;
 
     .duration-option {
       display: block;
       cursor: pointer;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 1rem;
+      padding: $space-md;
       transition: all 0.2s ease;
+      border-bottom: 1px solid $color-gray-200;
+
+      &:last-child {
+        border-bottom: none;
+      }
 
       &:hover {
-        border-color: #667eea;
-        background: rgba(102, 126, 234, 0.05);
+        background: $color-gray-100;
       }
 
       input[type="radio"] {
@@ -540,54 +630,58 @@
 
       input[type="radio"]:checked + .option-content {
         .option-title {
-          color: #667eea;
+          color: $color-black;
           font-weight: 600;
         }
       }
 
       .option-content {
         .option-title {
+          font-family: $font-sans;
           display: block;
           font-weight: 500;
-          color: var(--clr-black);
-          margin-bottom: 0.25rem;
+          color: $color-black;
+          margin-bottom: $space-xs;
         }
 
         .option-description {
+          font-family: $font-sans;
           font-size: 0.875rem;
-          color: var(--clr-grey-700);
+          color: $color-gray-600;
         }
       }
     }
   }
 
   .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: $space-lg;
 
     label {
+      font-family: $font-sans;
       display: block;
       font-weight: 600;
-      color: var(--clr-black);
-      margin-bottom: 0.5rem;
-      font-size: 0.875rem;
+      color: $color-black;
+      margin-bottom: $space-sm;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     input, textarea {
+      font-family: $font-sans;
       width: 100%;
-      padding: 0.75rem;
-      border: 2px solid #e1e5e9;
-      border-radius: 8px;
+      padding: $space-sm $space-md;
+      border: 1px solid $color-black;
       font-size: 0.875rem;
-      background: white;
+      background: $color-white;
 
       &:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: $color-gray-100;
       }
 
       &.error {
-        border-color: #ef4444;
+        border-color: $color-error;
       }
     }
 
@@ -597,95 +691,110 @@
     }
 
     .field-error {
+      font-family: $font-sans;
       display: block;
-      color: #ef4444;
+      color: $color-error;
       font-size: 0.75rem;
-      margin-top: 0.25rem;
+      margin-top: $space-xs;
     }
   }
 
   .modal-actions {
     display: flex;
-    gap: 1rem;
+    gap: 0;
     justify-content: flex-end;
-    margin-top: 2rem;
+    margin-top: $space-xl;
+    border-top: 1px solid $color-black;
+    margin-left: -$space-lg;
+    margin-right: -$space-lg;
+    margin-bottom: -$space-lg;
 
     .secondary-btn, .warning-btn, .danger-btn {
-      padding: 0.875rem 2rem;
-      border-radius: 8px;
-      font-weight: 600;
+      font-family: $font-sans;
+      padding: $space-md $space-xl;
+      font-size: 0.875rem;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: $space-sm;
+      border: none;
 
       &:disabled {
-        opacity: 0.6;
+        opacity: 0.5;
         cursor: not-allowed;
       }
     }
 
     .secondary-btn {
-      background: white;
-      color: var(--clr-grey-700);
-      border: 2px solid #e5e7eb;
+      background: $color-white;
+      color: $color-gray-600;
+      flex: 1;
+      border-right: 1px solid $color-black;
 
       &:hover {
-        background: #f3f4f6;
-        border-color: #d1d5db;
+        background: $color-gray-100;
+        color: $color-black;
       }
     }
 
     .warning-btn {
-      background: #f59e0b;
-      color: white;
-      border: none;
+      background: $color-warning;
+      color: $color-white;
+      flex: 1;
 
       &:hover:not(:disabled) {
-        background: #d97706;
+        background: darken($color-warning, 10%);
       }
     }
 
     .danger-btn {
-      background: #ef4444;
-      color: white;
-      border: none;
+      background: $color-error;
+      color: $color-white;
+      flex: 1;
 
       &:hover:not(:disabled) {
-        background: #dc2626;
+        background: darken($color-error, 10%);
       }
     }
 
     .loading-spinner {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top: 2px solid white;
+      border-top-color: $color-white;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
   }
 }
 
+// ===================================
+// WARNING MESSAGE
+// ===================================
+
 .warning-message {
-  background: #fef3c7;
-  border: 1px solid #f59e0b;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
+  background: $color-white;
+  border: 2px solid $color-warning;
+  padding: $space-lg;
+  margin-bottom: $space-xl;
 
   p {
-    margin-bottom: 0.5rem;
-    color: #92400e;
+    font-family: $font-sans;
+    margin-bottom: $space-sm;
+    color: $color-warning;
+    font-size: 0.875rem;
   }
 
   ul {
-    margin-left: 1rem;
-    color: #92400e;
+    font-family: $font-sans;
+    margin-left: $space-md;
+    color: $color-gray-600;
+    font-size: 0.875rem;
 
     li {
-      margin-bottom: 0.25rem;
+      margin-bottom: $space-xs;
     }
   }
 }
@@ -695,29 +804,885 @@
   100% { transform: rotate(360deg); }
 }
 
+// ===================================
+// BILLING & SUBSCRIPTION SECTION - NYT STYLE
+// ===================================
+
+.billing-section {
+
+  .current-subscription {
+    background: $color-white;
+    border: 1px solid $color-black;
+    padding: $space-xl;
+    margin-bottom: $space-xl;
+
+    .subscription-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $space-md;
+      padding-bottom: $space-md;
+      border-bottom: 1px solid $color-gray-200;
+
+      h3 {
+        font-family: $font-serif;
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $color-black;
+      }
+    }
+
+    .subscription-badge {
+      font-family: $font-sans;
+      padding: $space-xs $space-md;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border: 1px solid;
+
+      &.status-active {
+        background: $color-white;
+        border-color: $color-success;
+        color: $color-success;
+      }
+
+      &.status-trial {
+        background: $color-white;
+        border-color: $color-warning;
+        color: $color-warning;
+      }
+
+      &.status-expired,
+      &.status-cancelled {
+        background: $color-white;
+        border-color: $color-error;
+        color: $color-error;
+      }
+
+      &.status-inactive {
+        background: $color-white;
+        border-color: $color-gray-400;
+        color: $color-gray-600;
+      }
+    }
+
+    .trial-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: $space-md;
+      background: $color-white;
+      border: 2px solid $color-warning;
+      padding: $space-md;
+      margin-bottom: $space-md;
+
+      .trial-icon {
+        font-size: 1.25rem;
+      }
+
+      .trial-info {
+        strong {
+          font-family: $font-sans;
+          display: block;
+          color: $color-warning;
+          font-weight: 600;
+          margin-bottom: $space-xs;
+        }
+
+        p {
+          font-family: $font-sans;
+          margin: 0;
+          color: $color-gray-600;
+          font-size: 0.875rem;
+          line-height: 1.5;
+        }
+      }
+    }
+
+    .current-plan-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .plan-name {
+        font-family: $font-serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $color-black;
+      }
+
+      .plan-price {
+        font-family: $font-serif;
+        font-size: 1.25rem;
+        color: $color-black;
+        font-weight: 700;
+
+        &.free-price {
+          color: $color-success;
+        }
+      }
+    }
+  }
+
+  // ===================================
+  // BILLING CYCLE TOGGLE
+  // ===================================
+
+  .billing-cycle-toggle {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    margin-bottom: $space-xl;
+
+    .cycle-label {
+      font-family: $font-sans;
+      font-size: 0.875rem;
+      color: $color-gray-600;
+    }
+
+    .toggle-buttons {
+      display: flex;
+      border: 1px solid $color-black;
+
+      .toggle-btn {
+        font-family: $font-sans;
+        padding: $space-sm $space-lg;
+        border: none;
+        background: $color-white;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.875rem;
+        color: $color-gray-600;
+        transition: all 0.2s ease;
+        border-right: 1px solid $color-black;
+
+        &:last-child {
+          border-right: none;
+        }
+
+        &:hover:not(.active) {
+          background: $color-gray-100;
+        }
+
+        &.active {
+          background: $color-black;
+          color: $color-white;
+          font-weight: 600;
+        }
+
+        .save-badge {
+          font-family: $font-sans;
+          background: $color-white;
+          border: 1px solid $color-success;
+          color: $color-success;
+          font-size: 0.625rem;
+          padding: 0.125rem $space-sm;
+          margin-left: $space-sm;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+      }
+    }
+  }
+
+  // ===================================
+  // PLANS GRID - NYT STYLE
+  // ===================================
+
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid $color-black;
+    margin-bottom: $space-xl;
+  }
+
+  .plan-card {
+    position: relative;
+    background: $color-white;
+    border-right: 1px solid $color-black;
+    padding: $space-xl;
+    transition: background-color 0.2s ease;
+
+    &:last-child {
+      border-right: none;
+    }
+
+    &:hover {
+      background: $color-gray-100;
+    }
+
+    &.popular {
+      background: $color-gray-100;
+    }
+
+    &.current {
+      background: $color-gray-100;
+    }
+
+    .popular-badge,
+    .current-badge {
+      font-family: $font-sans;
+      position: absolute;
+      top: $space-md;
+      right: $space-md;
+      padding: $space-xs $space-sm;
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border: 1px solid;
+    }
+
+    .popular-badge {
+      background: $color-white;
+      border-color: $color-black;
+      color: $color-black;
+    }
+
+    .current-badge {
+      background: $color-white;
+      border-color: $color-success;
+      color: $color-success;
+    }
+
+    h3.plan-name {
+      font-family: $font-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 $space-sm 0;
+      color: $color-black;
+    }
+
+    .plan-pricing {
+      margin-bottom: $space-lg;
+      padding-bottom: $space-md;
+      border-bottom: 1px solid $color-gray-200;
+
+      .price {
+        font-family: $font-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: $color-black;
+        line-height: 1;
+      }
+
+      .period {
+        font-family: $font-sans;
+        font-size: 0.875rem;
+        color: $color-gray-600;
+      }
+    }
+
+    .plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 $space-lg 0;
+
+      li {
+        font-family: $font-sans;
+        display: flex;
+        align-items: flex-start;
+        gap: $space-sm;
+        padding: $space-xs 0;
+        color: $color-gray-600;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        border-bottom: 1px solid $color-gray-200;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .check-icon {
+          color: $color-success;
+          font-weight: 700;
+          flex-shrink: 0;
+        }
+      }
+    }
+
+    .plan-btn {
+      font-family: $font-sans;
+      width: 100%;
+      padding: $space-sm $space-md;
+      border: 1px solid $color-black;
+      background: $color-white;
+      color: $color-black;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background: $color-black;
+        color: $color-white;
+      }
+
+      &.current-btn {
+        background: $color-success;
+        border-color: $color-success;
+        color: $color-white;
+        cursor: default;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // ===================================
+  // PAYMENT METHODS SECTION
+  // ===================================
+
+  .payment-methods-section {
+    background: $color-white;
+    border: 1px solid $color-black;
+    padding: $space-xl;
+    margin-top: $space-xl;
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $space-lg;
+      padding-bottom: $space-md;
+      border-bottom: 1px solid $color-gray-200;
+
+      h3 {
+        font-family: $font-serif;
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $color-black;
+      }
+
+      .add-payment-btn {
+        font-family: $font-sans;
+        padding: $space-sm $space-md;
+        background: $color-white;
+        color: $color-black;
+        border: 1px solid $color-black;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: $color-black;
+          color: $color-white;
+        }
+      }
+    }
+
+    .no-payment-methods {
+      text-align: center;
+      padding: $space-xl $space-md;
+      color: $color-gray-600;
+
+      .empty-icon {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: $space-md;
+        opacity: 0.5;
+      }
+
+      p {
+        font-family: $font-sans;
+        margin-bottom: $space-md;
+        font-size: 0.875rem;
+      }
+
+      .add-first-btn {
+        font-family: $font-sans;
+        padding: $space-sm $space-md;
+        background: $color-white;
+        color: $color-black;
+        border: 1px solid $color-black;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: $color-black;
+          color: $color-white;
+        }
+      }
+    }
+
+    .payment-methods-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid $color-black;
+    }
+
+    .payment-method-card {
+      display: flex;
+      align-items: center;
+      gap: $space-md;
+      padding: $space-md;
+      background: $color-white;
+      border-bottom: 1px solid $color-gray-200;
+      transition: background-color 0.2s ease;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background: $color-gray-100;
+      }
+
+      .method-icon {
+        font-size: 1.25rem;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: $color-gray-100;
+        border: 1px solid $color-gray-200;
+      }
+
+      .method-details {
+        flex: 1;
+
+        .method-name {
+          font-family: $font-sans;
+          font-weight: 500;
+          color: $color-black;
+          font-size: 0.875rem;
+        }
+
+        .method-number {
+          font-family: $font-mono;
+          font-size: 0.875rem;
+          color: $color-gray-600;
+          margin-top: $space-xs;
+        }
+
+        .method-expiry {
+          font-family: $font-sans;
+          font-size: 0.75rem;
+          color: $color-gray-400;
+          margin-top: $space-xs;
+        }
+      }
+
+      .default-badge {
+        font-family: $font-sans;
+        padding: $space-xs $space-sm;
+        background: $color-white;
+        border: 1px solid $color-success;
+        color: $color-success;
+        font-size: 0.625rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+    }
+  }
+}
+
+// ===================================
+// PAYMENT MODAL - NYT STYLE
+// ===================================
+
+.payment-modal {
+  max-width: 480px;
+  padding: 0;
+  position: relative;
+  border: 1px solid $color-black;
+  background: $color-white;
+
+  // Modal Header
+  h2 {
+    font-family: $font-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $color-black;
+    margin: 0;
+    padding: $space-lg;
+    border-bottom: 1px solid $color-black;
+    background: $color-white;
+  }
+
+  // Close button
+  .modal-close {
+    position: absolute;
+    top: $space-md;
+    right: $space-md;
+    width: 28px;
+    height: 28px;
+    border: 1px solid $color-black;
+    background: $color-white;
+    font-size: 1rem;
+    line-height: 1;
+    color: $color-black;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: $color-black;
+      color: $color-white;
+    }
+  }
+
+  // Payment Form
+  .payment-form {
+    padding: $space-lg;
+  }
+
+  .selected-plan-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: $color-gray-100;
+    border: 1px solid $color-gray-200;
+    padding: $space-md;
+    margin-bottom: $space-lg;
+
+    .plan-summary-name {
+      font-family: $font-sans;
+      font-weight: 600;
+      font-size: 1rem;
+      color: $color-black;
+    }
+
+    .plan-summary-price {
+      font-family: $font-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: $color-black;
+    }
+  }
+
+  .payment-type-selector {
+    display: flex;
+    gap: 0;
+    margin-bottom: $space-lg;
+    border: 1px solid $color-black;
+
+    .payment-type-option {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: $space-sm;
+      padding: $space-md;
+      border-right: 1px solid $color-black;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: $color-white;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      &:hover {
+        background: $color-gray-100;
+      }
+
+      input[type="radio"] {
+        display: none;
+      }
+
+      &:has(input:checked) {
+        background: $color-black;
+        color: $color-white;
+
+        .type-label {
+          color: $color-white;
+        }
+      }
+
+      .type-icon {
+        font-size: 1.5rem;
+      }
+
+      .type-label {
+        font-family: $font-sans;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: $color-gray-600;
+      }
+    }
+  }
+
+  // Form fields styling
+  .card-fields,
+  .bank-fields {
+    .form-group {
+      margin-bottom: $space-md;
+
+      label {
+        font-family: $font-sans;
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: $color-black;
+        text-transform: uppercase;
+        margin-bottom: $space-xs;
+      }
+
+      input {
+        font-family: $font-sans;
+        width: 100%;
+        padding: $space-sm $space-md;
+        border: 1px solid $color-black;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background: $color-white;
+
+        &::placeholder {
+          color: $color-gray-400;
+        }
+
+        &:focus {
+          outline: none;
+          background: $color-gray-100;
+        }
+
+        &:hover:not(:focus) {
+          background: $color-gray-100;
+        }
+      }
+
+      .field-error {
+        font-family: $font-sans;
+        display: block;
+        margin-top: $space-xs;
+        font-size: 0.75rem;
+        color: $color-error;
+      }
+    }
+  }
+
+  .form-row {
+    display: flex;
+    gap: $space-md;
+
+    .form-group.half {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  .checkbox-group {
+    margin-top: $space-lg;
+    padding-top: $space-md;
+    border-top: 1px solid $color-gray-200;
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: $space-sm;
+      cursor: pointer;
+
+      input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: $color-black;
+        cursor: pointer;
+      }
+
+      span {
+        font-family: $font-sans;
+        font-size: 0.875rem;
+        color: $color-gray-600;
+      }
+    }
+  }
+
+  // Modal Actions
+  .modal-actions {
+    display: flex;
+    gap: 0;
+    margin-top: $space-lg;
+    border-top: 1px solid $color-black;
+
+    .secondary-btn {
+      font-family: $font-sans;
+      flex: 1;
+      padding: $space-md;
+      border: none;
+      border-right: 1px solid $color-black;
+      background: $color-white;
+      color: $color-gray-600;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: $color-gray-100;
+        color: $color-black;
+      }
+    }
+
+    .primary-btn {
+      font-family: $font-sans;
+      flex: 2;
+      padding: $space-md;
+      border: none;
+      background: $color-black;
+      color: $color-white;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $space-sm;
+
+      &:hover:not(:disabled) {
+        background: $color-gray-800;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .loading-spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: $color-white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+    }
+  }
+}
+
+// ===================================
+// RESPONSIVE STYLES
+// ===================================
+
 @media (max-width: 768px) {
   .accounts-center-container {
-    padding: 1rem;
+    padding: $space-md;
+  }
+
+  .accounts-header {
+    h1 {
+      font-size: 1.75rem;
+    }
   }
 
   .accounts-tabs {
-    justify-content: stretch;
+    flex-wrap: wrap;
 
     .tab-button {
-      flex: 1;
+      flex: 1 1 45%;
       text-align: center;
+      font-size: 0.75rem;
+      padding: $space-sm;
     }
   }
 
   .overview-cards {
     grid-template-columns: 1fr;
+
+    .overview-card {
+      border-right: none;
+      border-bottom: 1px solid $color-black;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
   }
 
-  .actions-grid {
+  .quick-actions .actions-grid {
     grid-template-columns: 1fr;
+
+    .action-btn {
+      border-right: none;
+      border-bottom: 1px solid $color-black;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
   }
 
   .modal-overlay {
-    padding: 1rem;
+    padding: $space-md;
+  }
+
+  .billing-section {
+    .billing-cycle-toggle {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .plans-grid {
+      grid-template-columns: 1fr;
+
+      .plan-card {
+        border-right: none;
+        border-bottom: 1px solid $color-black;
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+
+    .current-subscription .current-plan-details {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $space-sm;
+    }
+
+    .payment-methods-section .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $space-md;
+    }
+  }
+
+  .payment-modal {
+    .payment-type-selector {
+      flex-direction: column;
+
+      .payment-type-option {
+        border-right: none;
+        border-bottom: 1px solid $color-black;
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+
+      .form-group.half {
+        width: 100%;
+      }
+    }
+
+    .modal-actions {
+      flex-direction: column;
+
+      .secondary-btn {
+        border-right: none;
+        border-bottom: 1px solid $color-black;
+      }
+    }
   }
 }

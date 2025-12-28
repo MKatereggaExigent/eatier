@@ -2,10 +2,10 @@ import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NavigationEnd, Router } from '@angular/router';
 
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { CommonModule, DatePipe } from '@angular/common';
+import { Subscription, firstValueFrom } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 interface ChatMessage {
   text: string;
@@ -13,17 +13,33 @@ interface ChatMessage {
   timestamp: Date;
 }
 
+interface ChatResponse {
+  response: string;
+  context?: {
+    pageName?: string;
+    userRole?: string;
+  };
+}
+
+interface ChatHistoryResponse {
+  history: Array<{
+    message: string;
+    is_ai: boolean;
+    created_at: string;
+  }>;
+}
+
 @Component({
   selector: 'app-chatbot',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, DatePipe],
   templateUrl: './chatbot.component.html',
   styleUrls: ['./chatbot.component.scss']
 })
 export class ChatbotComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = 'http://localhost:3001/api/chat';
+  private apiUrl = `${environment.apiUrl}/chat`;
   private routerSubscription?: Subscription;
 
   // State signals
@@ -129,11 +145,22 @@ export class ChatbotComponent implements OnInit, OnDestroy {
     this.isOpen.set(!this.isOpen());
 
     if (this.isOpen() && this.messages().length === 0) {
-      // Add welcome message
-      this.addMessage(
-        `Hello! I'm your Itiyum AI assistant. I can help you with questions about this page and the platform. How can I assist you today?`,
-        true
-      );
+      // Check if user is logged in
+      const token = localStorage.getItem('itiyum_token');
+
+      if (token) {
+        // Logged-in user: Full access to personalized data
+        this.addMessage(
+          `Hello! I'm your Itiyum AI assistant. I have access to your account data and can help you with questions about your bookings, favorites, and more. How can I assist you today?`,
+          true
+        );
+      } else {
+        // Public user: Limited to general information
+        this.addMessage(
+          `Hello! I'm the Itiyum AI assistant. I can help you learn about our platform, discover restaurants, and answer general questions. Log in to access personalized assistance with your bookings and account!`,
+          true
+        );
+      }
     }
   }
 
@@ -160,29 +187,37 @@ export class ChatbotComponent implements OnInit, OnDestroy {
         pageData: this.getPageData()
       };
 
-      // Get authentication token
-      const token = localStorage.getItem('auth_token');
+      // Get authentication token (using same key as AuthService)
+      const token = localStorage.getItem('itiyum_token');
 
-      if (!token) {
-        this.addMessage(
-          'Please log in to use the chatbot.',
-          true
+      let response: ChatResponse;
+
+      if (token) {
+        // Authenticated user: Use main chat API with full database access (RBAC + multi-tenancy)
+        const headers = new HttpHeaders({
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        });
+
+        response = await firstValueFrom(
+          this.http.post<ChatResponse>(this.apiUrl, {
+            message,
+            pageContext
+          }, { headers })
         );
-        this.isTyping.set(false);
-        return;
+      } else {
+        // Public user: Use public chat API (no database access, only public content)
+        const headers = new HttpHeaders({
+          'Content-Type': 'application/json'
+        });
+
+        response = await firstValueFrom(
+          this.http.post<ChatResponse>(`${this.apiUrl}/public`, {
+            message,
+            pageContext
+          }, { headers })
+        );
       }
-
-      // Set headers with authentication token
-      const headers = new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      });
-
-      // Call chat API with authentication
-      const response = await this.http.post<any>(this.apiUrl, {
-        message,
-        pageContext
-      }, { headers }).toPromise();
 
       // Add AI response to chat
       this.addMessage(response.response, true);
@@ -245,7 +280,7 @@ export class ChatbotComponent implements OnInit, OnDestroy {
    */
   async loadChatHistory(): Promise<void> {
     try {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('itiyum_token');
 
       if (!token) {
         // User not logged in, skip loading history
@@ -256,10 +291,12 @@ export class ChatbotComponent implements OnInit, OnDestroy {
         'Authorization': `Bearer ${token}`
       });
 
-      const response = await this.http.get<any>(`${this.apiUrl}/history?limit=10`, { headers }).toPromise();
+      const response = await firstValueFrom(
+        this.http.get<ChatHistoryResponse>(`${this.apiUrl}/history?limit=10`, { headers })
+      );
 
       if (response.history && response.history.length > 0) {
-        const historyMessages: ChatMessage[] = response.history.map((msg: any) => ({
+        const historyMessages: ChatMessage[] = response.history.map((msg) => ({
           text: msg.message,
           isAI: msg.is_ai,
           timestamp: new Date(msg.created_at)
@@ -278,7 +315,7 @@ export class ChatbotComponent implements OnInit, OnDestroy {
   async clearHistory(): Promise<void> {
     if (confirm('Are you sure you want to clear your chat history?')) {
       try {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('itiyum_token');
 
         if (!token) {
           alert('Please log in to clear chat history.');
@@ -289,7 +326,9 @@ export class ChatbotComponent implements OnInit, OnDestroy {
           'Authorization': `Bearer ${token}`
         });
 
-        await this.http.delete(`${this.apiUrl}/history`, { headers }).toPromise();
+        await firstValueFrom(
+          this.http.delete(`${this.apiUrl}/history`, { headers })
+        );
         this.messages.set([]);
         this.addMessage(
           `Hello! I'm your Itiyum AI assistant. How can I help you today?`,
@@ -300,6 +339,14 @@ export class ChatbotComponent implements OnInit, OnDestroy {
         alert('Failed to clear chat history');
       }
     }
+  }
+
+  /**
+   * Handle input change
+   */
+  onInputChange(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    this.userInput.set(target.value);
   }
 
   /**

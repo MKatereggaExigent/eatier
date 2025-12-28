@@ -3,6 +3,18 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export interface BusinessSubscription {
+  id: string;
+  plan: 'trial' | 'free' | 'basic' | 'premium' | 'enterprise';
+  status: 'trial' | 'active' | 'expired' | 'cancelled' | 'inactive';
+  startDate: string;
+  endDate?: string;
+  price: number;
+  billingCycle: 'monthly' | 'quarterly' | 'yearly';
+  features?: Record<string, unknown>;
+  trialDaysLeft?: number;
+}
+
 export interface Business {
   id: string;
   owner_id: string;
@@ -116,8 +128,8 @@ export class BusinessOwnerService {
   // BUSINESS PROFILE MANAGEMENT
   // ===================================
 
-  getMyBusiness(): Observable<{ business: Business }> {
-    return this.http.get<{ business: Business }>(`${this.apiUrl}/my-business`, {
+  getMyBusiness(): Observable<{ business: Business; subscription: BusinessSubscription | null }> {
+    return this.http.get<{ business: Business; subscription: BusinessSubscription | null }>(`${this.apiUrl}/my-business`, {
       headers: this.getHeaders()
     });
   }

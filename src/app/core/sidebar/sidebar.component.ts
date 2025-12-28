@@ -5,7 +5,7 @@ import { Subject, catchError, of, takeUntil } from 'rxjs';
 
 import { AuthService } from '../services/auth.service';
 import { BusinessOwner } from '../../shared/models/user.model';
-import { BusinessOwnerService } from '../services/business-owner.service';
+import { BusinessOwnerService, BusinessSubscription } from '../services/business-owner.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -30,8 +30,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   businessName = signal('My Restaurant');
   businessType = signal('Restaurant');
   subscriptionStatus = signal<'trial' | 'active' | 'expired' | 'inactive'>('trial');
-  trialDaysLeft = signal(14);
+  trialDaysLeft = signal<number | null>(null);
   unreadReviews = signal(0);
+  subscription = signal<BusinessSubscription | null>(null);
 
   // Computed properties
   businessOwner = computed(() => {
@@ -63,15 +64,46 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private loadBusinessInfo(): void {
     const owner = this.businessOwner();
     if (owner) {
-      // Use firstName + lastName as business name since businessName doesn't exist in the model
-      this.businessName.set(`${owner.firstName} ${owner.lastName}'s Restaurant`);
-      this.businessType.set('Restaurant'); // Default type
-      this.subscriptionStatus.set(owner.subscriptionStatus || 'trial');
+      // Fetch business and subscription data from API
+      this.businessOwnerService.getMyBusiness()
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError(error => {
+            console.error('Error loading business info:', error);
+            // Fallback to user data if API fails
+            this.businessName.set(`${owner.firstName} ${owner.lastName}'s Restaurant`);
+            this.businessType.set('Restaurant');
+            this.subscriptionStatus.set(owner.subscriptionStatus || 'trial');
+            this.trialDaysLeft.set(owner.subscriptionStatus === 'trial' ? 14 : null);
+            return of(null);
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            const { business, subscription } = response;
 
-      // TODO: Calculate trial days left from subscription start date when API is available
-      if (owner.subscriptionStatus === 'trial') {
-        this.trialDaysLeft.set(14); // Default trial period
-      }
+            // Set business info
+            this.businessName.set(business.business_name || `${owner.firstName}'s Business`);
+            this.businessType.set(business.business_type || 'Restaurant');
+
+            // Set subscription info
+            if (subscription) {
+              this.subscription.set(subscription);
+              this.subscriptionStatus.set(subscription.status as 'trial' | 'active' | 'expired' | 'inactive');
+
+              // Set trial days left from API
+              if (subscription.status === 'trial' && subscription.trialDaysLeft !== undefined) {
+                this.trialDaysLeft.set(subscription.trialDaysLeft);
+              } else {
+                this.trialDaysLeft.set(null);
+              }
+            } else {
+              // No subscription record - default to trial
+              this.subscriptionStatus.set('trial');
+              this.trialDaysLeft.set(14);
+            }
+          }
+        });
     }
   }
 

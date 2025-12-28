@@ -8,6 +8,7 @@ const { authenticateToken } = require('../middleware/auth');
 const rateLimitMap = new Map();
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
 const MAX_REQUESTS_PER_WINDOW = 10;
+const MAX_PUBLIC_REQUESTS_PER_WINDOW = 5; // Stricter limit for public users
 
 /**
  * Simple rate limiting middleware
@@ -55,9 +56,58 @@ function sanitizeInput(input) {
 }
 
 /**
+ * POST /api/chat/public
+ * Send a message to the AI chatbot for PUBLIC (unauthenticated) users
+ * Only provides information from public pages content
+ */
+router.post('/public', rateLimiter, async (req, res) => {
+  try {
+    const { message, pageContext } = req.body;
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // Sanitize user input
+    const sanitizedMessage = sanitizeInput(message);
+
+    if (!sanitizedMessage) {
+      return res.status(400).json({ error: 'Invalid message' });
+    }
+
+    // Generate AI response with PUBLIC context only (no database access)
+    const aiResponse = await chatService.generatePublicResponse(
+      sanitizedMessage,
+      pageContext || {}
+    );
+
+    res.json({
+      response: aiResponse,
+      context: {
+        pageName: pageContext?.pageName,
+        isPublic: true
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in public chat endpoint:', error);
+
+    if (error.message.includes('OpenAI')) {
+      return res.status(503).json({
+        error: 'AI service is temporarily unavailable. Please try again later.'
+      });
+    }
+
+    res.status(500).json({
+      error: 'Failed to process your message. Please try again.'
+    });
+  }
+});
+
+/**
  * POST /api/chat
  * Send a message to the AI chatbot
- * REQUIRES AUTHENTICATION - Each user only sees their own chat history
+ * REQUIRES AUTHENTICATION - Each user only sees their own data based on RBAC and multi-tenancy
  */
 router.post('/', authenticateToken, rateLimiter, async (req, res) => {
   try {

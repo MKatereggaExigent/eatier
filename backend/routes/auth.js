@@ -253,6 +253,17 @@ router.post('/register', async (req, res) => {
       ]);
 
       businessId = businessResult.rows[0].id;
+
+      // Create trial subscription for new business (14 days trial period)
+      const trialEndDate = new Date();
+      trialEndDate.setDate(trialEndDate.getDate() + 14);
+
+      await client.query(`
+        INSERT INTO business_subscriptions (
+          business_id, tenant_id, plan, status, monthly_price, billing_cycle,
+          start_date, end_date, features
+        ) VALUES ($1, $2, 'trial', 'trial', 0, 'monthly', CURRENT_TIMESTAMP, $3, '{"trial": true, "trial_days": 14}')
+      `, [businessId, tenantId, trialEndDate]);
     }
 
     // Get security settings for session timeout

@@ -110,7 +110,8 @@
     <div class="chat-input">
       <textarea
         class="input-field"
-        [(ngModel)]="userInput"
+        [value]="userInput()"
+        (input)="onInputChange($event)"
         (keypress)="onKeyPress($event)"
         placeholder="Ask me anything about this page..."
         rows="1"

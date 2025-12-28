@@ -251,7 +251,7 @@ class ChatService {
       // Add recent conversation history (last 10 messages)
       conversationHistory.forEach(msg => {
         messages.push({
-          role: msg.is_ai ? 'assistant' : 'user',
+          role: msg.is_ai_response ? 'assistant' : 'user',
           content: msg.message
         });
       });
@@ -398,7 +398,7 @@ Answer the user's question based on the database context and conversation histor
   async saveChatMessage(userId, tenantId, message, isAI = false) {
     try {
       await pool.query(`
-        INSERT INTO chat_history (tenant_id, user_id, message, is_ai, created_at)
+        INSERT INTO chat_history (tenant_id, user_id, message, is_ai_response, created_at)
         VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
       `, [tenantId, userId, message, isAI]);
     } catch (error) {
@@ -412,7 +412,7 @@ Answer the user's question based on the database context and conversation histor
   async getChatHistory(userId, tenantId, limit = 20) {
     try {
       const result = await pool.query(`
-        SELECT message, is_ai, created_at
+        SELECT message, is_ai_response, created_at
         FROM chat_history
         WHERE user_id = $1 AND tenant_id = $2
         ORDER BY created_at DESC
@@ -423,6 +423,166 @@ Answer the user's question based on the database context and conversation histor
     } catch (error) {
       console.error('Error getting chat history:', error);
       return [];
+    }
+  }
+
+  /**
+   * Get publicly visible restaurant/business data
+   * This is the same data that would be shown on public search/browse pages
+   */
+  async getPublicBusinessData() {
+    try {
+      // Get aggregate stats - using correct column names: is_verified, cuisine_types (array)
+      const stats = await pool.query(`
+        SELECT
+          COUNT(*) as total_restaurants
+        FROM businesses
+        WHERE status = 'active' AND is_verified = true
+      `);
+
+      // Get cuisines available (cuisine_types is an array, so we need to unnest it)
+      const cuisines = await pool.query(`
+        SELECT cuisine, COUNT(*) as count
+        FROM businesses, unnest(cuisine_types) as cuisine
+        WHERE status = 'active' AND is_verified = true AND cuisine_types IS NOT NULL
+        GROUP BY cuisine
+        ORDER BY count DESC
+        LIMIT 15
+      `);
+
+      // Get sample featured restaurants (public info only)
+      const featuredRestaurants = await pool.query(`
+        SELECT
+          business_name,
+          cuisine_types[1] as primary_cuisine,
+          city,
+          country,
+          COALESCE(average_rating, 0) as rating
+        FROM businesses
+        WHERE status = 'active' AND is_verified = true
+        ORDER BY average_rating DESC NULLS LAST, created_at DESC
+        LIMIT 10
+      `);
+
+      // Get cities with restaurants
+      const cities = await pool.query(`
+        SELECT DISTINCT city, country, COUNT(*) as restaurant_count
+        FROM businesses
+        WHERE status = 'active' AND is_verified = true AND city IS NOT NULL
+        GROUP BY city, country
+        ORDER BY restaurant_count DESC
+        LIMIT 10
+      `);
+
+      return {
+        stats: stats.rows[0],
+        cuisines: cuisines.rows,
+        featuredRestaurants: featuredRestaurants.rows,
+        cities: cities.rows
+      };
+    } catch (error) {
+      console.error('Error getting public business data:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Generate AI response for PUBLIC (unauthenticated) users
+   * Provides information based on publicly visible restaurant data
+   */
+  async generatePublicResponse(userMessage, pageContext) {
+    try {
+      const { pageName, pageUrl } = pageContext;
+
+      // Get public restaurant data that would be visible on the website
+      const publicData = await this.getPublicBusinessData();
+
+      // Build public context with real restaurant data
+      let restaurantContext = '';
+      if (publicData) {
+        const cuisineCount = publicData.cuisines?.length || 0;
+        restaurantContext = `
+CURRENT RESTAURANT DATA ON ITIYUM:
+- Total Verified Restaurants: ${publicData.stats?.total_restaurants || 0}
+- Number of Cuisine Types: ${cuisineCount}
+
+`;
+
+        if (publicData.cuisines && publicData.cuisines.length > 0) {
+          restaurantContext += `Available Cuisines:\n`;
+          publicData.cuisines.forEach(c => {
+            restaurantContext += `- ${c.cuisine}: ${c.count} restaurants\n`;
+          });
+          restaurantContext += '\n';
+        }
+
+        if (publicData.featuredRestaurants && publicData.featuredRestaurants.length > 0) {
+          restaurantContext += `Featured Restaurants:\n`;
+          publicData.featuredRestaurants.forEach(r => {
+            const location = [r.city, r.country].filter(Boolean).join(', ');
+            restaurantContext += `- ${r.business_name} (${r.primary_cuisine || 'Various'}) - ${location}${r.rating > 0 ? ` - Rating: ${r.rating}/5` : ''}\n`;
+          });
+          restaurantContext += '\n';
+        }
+
+        if (publicData.cities && publicData.cities.length > 0) {
+          restaurantContext += `Cities with Restaurants:\n`;
+          publicData.cities.forEach(c => {
+            restaurantContext += `- ${c.city}, ${c.country}: ${c.restaurant_count} restaurants\n`;
+          });
+        }
+      }
+
+      const systemMessage = `You are a helpful AI assistant for Itiyum, a global food discovery and restaurant booking platform.
+
+You are chatting with a PUBLIC (non-logged-in) visitor. You have access to PUBLIC restaurant information that anyone can see on the website.
+
+Current Page Context:
+- Page: ${pageName || 'home'}
+- URL: ${pageUrl || '/'}
+
+${restaurantContext}
+
+About Itiyum:
+- Itiyum is a global platform connecting food lovers with restaurants, cafes, and culinary experiences
+- Users can discover restaurants, view menus, read reviews, and make reservations
+- Business owners can list their restaurants, manage menus, and handle bookings
+- The platform supports multiple countries and cuisines
+
+What you CAN help with:
+- Showing available restaurants, cuisines, and locations from the data above
+- General information about how Itiyum works
+- Explaining features like restaurant search, booking, reviews
+- Guiding visitors on how to sign up or log in
+- Answering questions about the current page they're viewing
+- Providing food and dining recommendations based on available restaurants
+
+What you CANNOT do:
+- Access any user data, bookings, or private information
+- Show business analytics or internal data
+- Make reservations (users need to log in for that)
+
+Be friendly and helpful! When users ask about restaurants, use the actual data provided above. Encourage them to create an account to make reservations and unlock full features!`;
+
+      const client = getOpenAIClient();
+      if (!client) {
+        throw new Error('AI chat is not available - OPENAI_API_KEY not configured');
+      }
+
+      const completion = await client.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+          { role: 'system', content: systemMessage },
+          { role: 'user', content: userMessage }
+        ],
+        temperature: 0.7,
+        max_tokens: 500
+      });
+
+      return completion.choices[0].message.content;
+    } catch (error) {
+      console.error('Error generating public response:', error);
+      throw new Error('Failed to generate AI response');
     }
   }
 }

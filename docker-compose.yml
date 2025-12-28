@@ -39,11 +39,11 @@ services:
       DB_PASSWORD: itiyum_secure_password_2024
       PORT: 3001
       NODE_ENV: development
-      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       JWT_EXPIRES_IN: 24h
       CORS_ORIGIN: http://localhost:4200
       FRONTEND_URL: http://localhost:4200
-      OPENAI_API_KEY: sk-placeholder-key-for-development
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
     ports:
       - "3001:3001"
     volumes:

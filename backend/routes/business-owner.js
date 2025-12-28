@@ -13,7 +13,7 @@ router.use(requireBusinessOwner);
 
 /**
  * GET /api/business-owner/my-business
- * Get current user's business profile
+ * Get current user's business profile with subscription data
  */
 router.get('/my-business', async (req, res) => {
   try {
@@ -29,9 +29,23 @@ router.get('/my-business', async (req, res) => {
         (SELECT COUNT(*) FROM bookings WHERE business_id = b.id) as total_bookings,
         (SELECT COUNT(*) FROM reviews WHERE business_id = b.id AND status = 'published') as total_reviews,
         (SELECT AVG(rating) FROM reviews WHERE business_id = b.id AND status = 'published') as average_rating,
-        (SELECT COUNT(*) FROM menus WHERE business_id = b.id) as total_menu_items
+        (SELECT COUNT(*) FROM menus WHERE business_id = b.id) as total_menu_items,
+        bs.id as subscription_id,
+        bs.plan as subscription_plan,
+        bs.status as subscription_status,
+        bs.start_date as subscription_start_date,
+        bs.end_date as subscription_end_date,
+        bs.monthly_price as subscription_price,
+        bs.billing_cycle as subscription_billing_cycle,
+        bs.features as subscription_features,
+        CASE
+          WHEN bs.status = 'trial' AND bs.end_date IS NOT NULL THEN
+            GREATEST(0, EXTRACT(DAY FROM (bs.end_date - CURRENT_TIMESTAMP)))::integer
+          ELSE NULL
+        END as trial_days_left
       FROM businesses b
       JOIN users u ON b.owner_id = u.id
+      LEFT JOIN business_subscriptions bs ON bs.business_id = b.id
       WHERE b.owner_id = $1 AND b.tenant_id = $2
       LIMIT 1
     `, [userId, tenantId]);
@@ -40,7 +54,33 @@ router.get('/my-business', async (req, res) => {
       return res.status(404).json({ error: 'Business not found' });
     }
 
-    res.json({ business: result.rows[0] });
+    const business = result.rows[0];
+
+    // Structure subscription data separately for cleaner response
+    const subscription = business.subscription_id ? {
+      id: business.subscription_id,
+      plan: business.subscription_plan,
+      status: business.subscription_status,
+      startDate: business.subscription_start_date,
+      endDate: business.subscription_end_date,
+      price: business.subscription_price,
+      billingCycle: business.subscription_billing_cycle,
+      features: business.subscription_features,
+      trialDaysLeft: business.trial_days_left
+    } : null;
+
+    // Remove subscription fields from business object
+    delete business.subscription_id;
+    delete business.subscription_plan;
+    delete business.subscription_status;
+    delete business.subscription_start_date;
+    delete business.subscription_end_date;
+    delete business.subscription_price;
+    delete business.subscription_billing_cycle;
+    delete business.subscription_features;
+    delete business.trial_days_left;
+
+    res.json({ business, subscription });
 
   } catch (error) {
     console.error('Error fetching business:', error);

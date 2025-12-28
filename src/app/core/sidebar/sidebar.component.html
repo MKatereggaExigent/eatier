@@ -200,7 +200,7 @@
           <span class="status-icon">{{ getSubscriptionIcon() }}</span>
           <div class="status-text">
             <p class="status-label">{{ subscriptionStatus() | titlecase }}</p>
-            @if (subscriptionStatus() === 'trial') {
+            @if (subscriptionStatus() === 'trial' && trialDaysLeft() !== null) {
               <p class="trial-days">{{ trialDaysLeft() }} days left</p>
             }
           </div>

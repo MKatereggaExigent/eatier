@@ -18,6 +18,25 @@ function getOpenAIClient() {
 }
 
 /**
+ * Helper function to check if a role name indicates admin privileges
+ * Handles different naming conventions (e.g., "Itiyum Admin", "itiyum_admin", "itiyum")
+ */
+function isAdminRole(roleName) {
+  if (!roleName) return false;
+  const normalized = roleName.toLowerCase().replace(/[_\s-]/g, '');
+  return normalized === 'itiyumadmin' || normalized === 'itiyum' || normalized === 'admin' || normalized === 'platformadmin';
+}
+
+/**
+ * Helper function to check if a role name indicates business owner privileges
+ */
+function isBusinessOwnerRole(roleName) {
+  if (!roleName) return false;
+  const normalized = roleName.toLowerCase().replace(/[_\s-]/g, '');
+  return normalized === 'businessowner' || normalized === 'business' || normalized === 'owner' || normalized === 'restaurantowner';
+}
+
+/**
  * RAG (Retrieval-Augmented Generation) Service
  * Intelligently retrieves relevant database data based on user questions
  * while respecting RBAC and multi-tenancy
@@ -28,7 +47,7 @@ class RAGService {
    */
   async getUserPermissions(userId, tenantId) {
     const result = await pool.query(`
-      SELECT DISTINCT p.resource, p.action, p.slug
+      SELECT DISTINCT p.name, p.category, r.name as role_name
       FROM users u
       JOIN user_roles ur ON u.id = ur.user_id
       JOIN roles r ON ur.role_id = r.id
@@ -40,17 +59,43 @@ class RAGService {
     const permissions = {
       resources: new Set(),
       actions: {},
-      slugs: new Set()
+      names: new Set(),
+      roleName: null
     };
 
     result.rows.forEach(row => {
-      permissions.resources.add(row.resource);
-      permissions.slugs.add(row.slug);
+      // Parse permission name to extract resource and action
+      // Handles both formats: "users:read" and "users.view"
+      const permName = row.name || '';
+      permissions.names.add(permName);
 
-      if (!permissions.actions[row.resource]) {
-        permissions.actions[row.resource] = new Set();
+      if (row.category) {
+        permissions.resources.add(row.category);
       }
-      permissions.actions[row.resource].add(row.action);
+
+      // Extract resource from permission name if it contains a separator (: or .)
+      const separator = permName.includes(':') ? ':' : (permName.includes('.') ? '.' : null);
+      if (separator) {
+        const [resource, action] = permName.split(separator);
+        permissions.resources.add(resource);
+        if (!permissions.actions[resource]) {
+          permissions.actions[resource] = new Set();
+        }
+        permissions.actions[resource].add(action);
+        // Also add normalized action names (view/read are equivalent)
+        if (action === 'view') {
+          permissions.actions[resource].add('read');
+        } else if (action === 'read') {
+          permissions.actions[resource].add('view');
+        }
+      } else {
+        // Use the permission name as a resource
+        permissions.resources.add(permName);
+      }
+
+      if (row.role_name && !permissions.roleName) {
+        permissions.roleName = row.role_name;
+      }
     });
 
     return permissions;
@@ -152,7 +197,7 @@ Only include resources that are directly relevant to answering the question.`;
     // Filter resources based on user permissions
     const allowedResources = analysis.resources.filter(resource =>
       permissions.resources.has(resource) &&
-      (permissions.actions[resource]?.has('view') || permissions.slugs.has(`${resource}.view`))
+      (permissions.actions[resource]?.has('view') || permissions.actions[resource]?.has('read') || permissions.names.has(`${resource}:view`) || permissions.names.has(`${resource}:read`))
     );
 
     for (const resource of allowedResources) {
@@ -208,13 +253,13 @@ Only include resources that are directly relevant to answering the question.`;
   async fetchUsers(userId, tenantId, filters, limit) {
     // Check if user is admin
     const roleCheck = await pool.query(`
-      SELECT r.slug FROM users u
+      SELECT r.name FROM users u
       JOIN user_roles ur ON u.id = ur.user_id
       JOIN roles r ON ur.role_id = r.id
       WHERE u.id = $1 AND u.tenant_id = $2
     `, [userId, tenantId]);
 
-    const isAdmin = roleCheck.rows.some(r => r.slug === 'itiyum_admin');
+    const isAdmin = roleCheck.rows.some(r => isAdminRole(r.name));
 
     let query = `
       SELECT u.id, u.first_name, u.last_name, u.email, u.account_status,
@@ -251,15 +296,15 @@ Only include resources that are directly relevant to answering the question.`;
    */
   async fetchBusinesses(userId, tenantId, filters, limit) {
     const roleCheck = await pool.query(`
-      SELECT r.slug FROM users u
+      SELECT r.name FROM users u
       JOIN user_roles ur ON u.id = ur.user_id
       JOIN roles r ON ur.role_id = r.id
       WHERE u.id = $1 AND u.tenant_id = $2
     `, [userId, tenantId]);
 
-    const userRole = roleCheck.rows[0]?.slug;
-    const isAdmin = userRole === 'itiyum_admin';
-    const isBusinessOwner = userRole === 'business_owner';
+    const userRole = roleCheck.rows[0]?.name;
+    const isAdmin = isAdminRole(userRole);
+    const isBusinessOwner = isBusinessOwnerRole(userRole);
 
     let query = `
       SELECT b.id, b.business_name, b.business_type, b.email, b.phone,
@@ -294,14 +339,14 @@ Only include resources that are directly relevant to answering the question.`;
    */
   async fetchBookings(userId, tenantId, filters, limit) {
     const roleCheck = await pool.query(`
-      SELECT r.slug FROM users u
+      SELECT r.name FROM users u
       JOIN user_roles ur ON u.id = ur.user_id
       JOIN roles r ON ur.role_id = r.id
       WHERE u.id = $1 AND u.tenant_id = $2
     `, [userId, tenantId]);
 
-    const userRole = roleCheck.rows[0]?.slug;
-    const isAdmin = userRole === 'itiyum_admin';
+    const userRole = roleCheck.rows[0]?.name;
+    const isAdmin = isAdminRole(userRole);
 
     let query = `
       SELECT bk.id, bk.user_id, bk.business_id, bk.booking_date, bk.booking_time,
@@ -339,14 +384,14 @@ Only include resources that are directly relevant to answering the question.`;
    */
   async fetchMenus(userId, tenantId, filters, limit) {
     const roleCheck = await pool.query(`
-      SELECT r.slug FROM users u
+      SELECT r.name FROM users u
       JOIN user_roles ur ON u.id = ur.user_id
       JOIN roles r ON ur.role_id = r.id
       WHERE u.id = $1 AND u.tenant_id = $2
     `, [userId, tenantId]);
 
-    const userRole = roleCheck.rows[0]?.slug;
-    const isAdmin = userRole === 'itiyum_admin';
+    const userRole = roleCheck.rows[0]?.name;
+    const isAdmin = isAdminRole(userRole);
 
     let query = `
       SELECT m.id, m.title, m.category, m.description, m.price, m.is_active,
@@ -376,14 +421,14 @@ Only include resources that are directly relevant to answering the question.`;
    */
   async fetchAds(userId, tenantId, filters, limit) {
     const roleCheck = await pool.query(`
-      SELECT r.slug FROM users u
+      SELECT r.name FROM users u
       JOIN user_roles ur ON u.id = ur.user_id
       JOIN roles r ON ur.role_id = r.id
       WHERE u.id = $1 AND u.tenant_id = $2
     `, [userId, tenantId]);
 
-    const userRole = roleCheck.rows[0]?.slug;
-    const isAdmin = userRole === 'itiyum_admin';
+    const userRole = roleCheck.rows[0]?.name;
+    const isAdmin = isAdminRole(userRole);
 
     let query = `
       SELECT a.id, a.title, a.placement, a.status, a.budget, a.spent,
@@ -442,15 +487,15 @@ Only include resources that are directly relevant to answering the question.`;
    */
   async fetchAnalytics(userId, tenantId, filters) {
     const roleCheck = await pool.query(`
-      SELECT r.slug FROM users u
+      SELECT r.name FROM users u
       JOIN user_roles ur ON u.id = ur.user_id
       JOIN roles r ON ur.role_id = r.id
       WHERE u.id = $1 AND u.tenant_id = $2
     `, [userId, tenantId]);
 
-    const userRole = roleCheck.rows[0]?.slug;
-    const isAdmin = userRole === 'itiyum_admin';
-    const isBusinessOwner = userRole === 'business_owner';
+    const userRole = roleCheck.rows[0]?.name;
+    const isAdmin = isAdminRole(userRole);
+    const isBusinessOwner = isBusinessOwnerRole(userRole);
 
     const analytics = {};
 
