@@ -1,7 +1,7 @@
 <div class="digital-card-container">
   <!-- Header -->
   <div class="card-header">
-    <h1>💳 Digital Business Card</h1>
+    <h1>Digital Business Card</h1>
     <p>Create and customize your digital business card with QR code</p>
   </div>
 
@@ -15,8 +15,8 @@
 
   <div class="card-layout">
     <!-- Customization Panel -->
-    <div class="customization-panel">
-      <h2>🎨 Customize Your Card</h2>
+    <div class="customization-panel" [formGroup]="customizationForm">
+      <h2>Customize Your Card</h2>
 
       <!-- Color Presets -->
       <div class="customization-section">
@@ -101,14 +101,14 @@
       <!-- Actions -->
       <div class="customization-actions">
         <button type="button" class="primary-btn" (click)="saveCustomization()">
-          💾 Save Customization
+          Save Customization
         </button>
         <button type="button" class="secondary-btn" (click)="generateQRCode()" [disabled]="isGenerating()">
           @if (isGenerating()) {
             <span class="loading-spinner"></span>
             Generating...
           } @else {
-            🔄 Regenerate QR
+            Regenerate QR
           }
         </button>
       </div>
@@ -116,7 +116,7 @@
 
     <!-- Card Preview -->
     <div class="card-preview">
-      <h2>📱 Preview</h2>
+      <h2>Preview</h2>
 
       @if (businessProfile()) {
         <div class="business-card" [ngStyle]="getPreviewStyle()">

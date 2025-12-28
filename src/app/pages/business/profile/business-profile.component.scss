@@ -1,264 +1,200 @@
-// Business Profile Component Styles - NYT Theme
-// Import NYT fonts
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+// ===================================
+// BUSINESS PROFILE - NYT EDITORIAL DESIGN
+// ===================================
 
-// NYT-themed CSS Variables (matching admin design system)
-:host {
-  // Primary Colors - NYT Style
-  --clr-primary-50: #f0f9ff;
-  --clr-primary-100: #e0f2fe;
-  --clr-primary-200: #bae6fd;
-  --clr-primary-300: #7dd3fc;
-  --clr-primary-400: #38bdf8;
-  --clr-primary-500: #0ea5e9;
-  --clr-primary-600: #0284c7;
-  --clr-primary-700: #0369a1;
-  --clr-primary-800: #075985;
-  --clr-primary-900: #0c4a6e;
+// Typography
+$font-serif: Georgia, 'Times New Roman', serif;
+$font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  // Secondary Colors - NYT Black
-  --clr-secondary-50: #fafafa;
-  --clr-secondary-100: #f5f5f5;
-  --clr-secondary-200: #e5e5e5;
-  --clr-secondary-300: #d4d4d4;
-  --clr-secondary-400: #a3a3a3;
-  --clr-secondary-500: #737373;
-  --clr-secondary-600: #525252;
-  --clr-secondary-700: #404040;
-  --clr-secondary-800: #262626;
-  --clr-secondary-900: #000000;
+// Colors
+$color-black: #000;
+$color-white: #fff;
+$color-gray-100: #f7f7f7;
+$color-gray-200: #e5e5e5;
+$color-gray-400: #999;
+$color-gray-600: #666;
+$color-gray-800: #333;
+$color-success: #0a7c42;
+$color-error: #c41e3a;
+$color-warning: #b8860b;
 
-  // Background Colors
-  --bg-gradient-primary: #ffffff;
-  --bg-gradient-card: #ffffff;
-
-  // Semantic Colors
-  --clr-success: #16a34a;
-  --clr-warning: #d97706;
-  --clr-error: #dc2626;
-  --clr-info: #0284c7;
-
-  // Spacing Scale
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-
-  // Typography Scale
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-
-  // Font Weights
-  --font-light: 300;
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-  --font-extrabold: 800;
-
-  // Border Radius
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-
-  // Transitions
-  --transition-fast: 150ms ease-in-out;
-  --transition-normal: 250ms ease-in-out;
-  --transition-slow: 350ms ease-in-out;
-
-  // Shadows
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
+// Spacing
+$space-xs: 0.25rem;
+$space-sm: 0.5rem;
+$space-md: 1rem;
+$space-lg: 1.5rem;
+$space-xl: 2rem;
+$space-2xl: 3rem;
 
 // Main Container
 .business-profile-container {
-  min-height: 100vh;
-  background: #ffffff;
-  color: #000000;
-  padding: var(--space-6);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   max-width: 1200px;
   margin: 0 auto;
+  padding: $space-xl;
+  min-height: 100vh;
 }
 
 // Header Section
 .profile-header {
-  margin-bottom: var(--space-8);
+  margin-bottom: $space-2xl;
+  padding-bottom: $space-xl;
+  border-bottom: 1px solid $color-black;
 
   h1 {
-    font-family: 'Roboto', sans-serif;
-    font-size: var(--text-3xl);
-    font-weight: var(--font-bold);
-    color: #000000;
-    margin: 0 0 var(--space-2) 0;
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
+    font-family: $font-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: $color-black;
+    margin: 0 0 $space-sm;
+    line-height: 1.2;
   }
 
   p {
-    font-size: var(--text-lg);
-    color: #737373;
+    font-family: $font-sans;
+    font-size: 1rem;
+    color: $color-gray-600;
     margin: 0;
-    font-weight: var(--font-normal);
-    font-family: 'Roboto', sans-serif;
   }
 }
 
-// Success/Error Messages - NYT Style
-.success-message, .error-message {
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  margin-bottom: var(--space-6);
+// Success/Error Messages
+.success-message,
+.error-message {
+  font-family: $font-sans;
+  padding: $space-md $space-lg;
+  margin-bottom: $space-lg;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  font-weight: var(--font-medium);
-  font-family: 'Roboto', sans-serif;
-  font-size: var(--text-sm);
-  border: 1px solid;
+  gap: $space-md;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border: 2px solid;
 }
 
 .success-message {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
-  color: #166534;
+  background: $color-white;
+  border-color: $color-success;
+  color: $color-success;
 
   .success-icon {
-    font-size: var(--text-xl);
+    font-size: 1rem;
   }
 }
 
 .error-message {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #dc2626;
+  background: $color-white;
+  border-color: $color-error;
+  color: $color-error;
 
   .error-icon {
-    font-size: var(--text-xl);
+    font-size: 1rem;
   }
 }
 
-// Tabs - NYT Style
+// Tabs
 .profile-tabs {
   display: flex;
-  gap: var(--space-2);
-  margin-bottom: var(--space-8);
-  overflow-x: auto;
-  padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--clr-secondary-200);
+  gap: 0;
+  margin-bottom: $space-xl;
+  border-bottom: 2px solid $color-black;
 
   .tab-button {
-    padding: var(--space-3) var(--space-6);
+    font-family: $font-sans;
+    padding: $space-md $space-lg;
     border: none;
     background: transparent;
     border-bottom: 2px solid transparent;
     cursor: pointer;
-    font-weight: var(--font-medium);
-    color: #737373;
-    transition: all var(--transition-normal);
+    font-weight: 500;
+    color: $color-gray-600;
+    transition: color 0.2s;
     white-space: nowrap;
-    font-family: 'Roboto', sans-serif;
-    font-size: var(--text-sm);
+    font-size: 0.875rem;
     position: relative;
-    bottom: -1px;
+    bottom: -2px;
 
     &:hover {
-      color: #000000;
-      border-bottom-color: #d4d4d4;
+      color: $color-black;
     }
 
     &.active {
-      color: #0284c7;
-      border-bottom-color: #0284c7;
-      font-weight: var(--font-semibold);
+      color: $color-black;
+      border-bottom-color: $color-black;
+      font-weight: 600;
     }
   }
 }
 
-// Form Sections - NYT Style
+// Form Sections
 .profile-form {
   .form-section {
-    background: #ffffff;
-    border-radius: var(--radius-lg);
-    padding: var(--space-8);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--clr-secondary-200);
-    margin-bottom: var(--space-6);
+    background: $color-white;
+    padding: $space-xl;
+    border: 1px solid $color-black;
+    margin-bottom: $space-lg;
 
     h2 {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-bold);
-      color: #000000;
-      margin-bottom: var(--space-6);
-      font-family: 'Roboto', sans-serif;
+      font-family: $font-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $color-black;
+      margin-bottom: $space-lg;
+      padding-bottom: $space-md;
+      border-bottom: 1px solid $color-gray-200;
     }
 
     .section-description {
-      color: #737373;
-      font-size: var(--text-sm);
-      margin-bottom: var(--space-6);
-      font-family: 'Roboto', sans-serif;
+      font-family: $font-sans;
+      color: $color-gray-600;
+      font-size: 0.875rem;
+      margin-bottom: $space-lg;
     }
   }
 
   .form-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--space-6);
-    margin-bottom: var(--space-6);
+    gap: $space-lg;
+    margin-bottom: $space-lg;
   }
 
   .form-group {
-    margin-bottom: var(--space-6);
+    margin-bottom: $space-lg;
 
     label {
+      font-family: $font-sans;
       display: block;
-      font-weight: var(--font-medium);
-      color: #000000;
-      margin-bottom: var(--space-2);
-      font-size: var(--text-sm);
-      font-family: 'Roboto', sans-serif;
+      font-weight: 600;
+      color: $color-black;
+      margin-bottom: $space-sm;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
+      font-family: $font-sans;
       width: 100%;
-      padding: var(--space-3);
-      border: 1px solid var(--clr-secondary-300);
-      border-radius: var(--radius-md);
-      font-size: var(--text-sm);
-      transition: all var(--transition-normal);
-      background: #ffffff;
-      font-family: 'Roboto', sans-serif;
-      color: #000000;
+      padding: $space-md;
+      border: 1px solid $color-black;
+      font-size: 0.875rem;
+      background: $color-white;
+      color: $color-black;
+      transition: border-color 0.2s;
 
       &:focus {
         outline: none;
-        border-color: #0284c7;
-        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        border-width: 2px;
       }
 
       &.error {
-        border-color: #dc2626;
+        border-color: $color-error;
       }
 
       &::placeholder {
-        color: #a3a3a3;
+        color: $color-gray-400;
       }
     }
 
@@ -269,105 +205,113 @@
   }
 
   .field-error {
+    font-family: $font-sans;
     display: block;
-    color: #dc2626;
-    font-size: var(--text-xs);
-    margin-top: var(--space-1);
-    font-family: 'Roboto', sans-serif;
+    color: $color-error;
+    font-size: 0.75rem;
+    margin-top: $space-xs;
   }
 
   .character-count {
-    font-size: var(--text-xs);
-    color: #737373;
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    color: $color-gray-600;
     text-align: right;
-    margin-top: var(--space-1);
-    font-family: 'Roboto', sans-serif;
+    margin-top: $space-xs;
 
     &.limit-warning {
-      color: #d97706;
-      font-weight: var(--font-medium);
+      color: $color-warning;
+      font-weight: 500;
     }
   }
 }
 
+// Facilities Grid
 .facilities-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  gap: $space-md;
 
   .facility-checkbox {
     display: block;
     cursor: pointer;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 1rem;
-    transition: all 0.2s ease;
+    border: 1px solid $color-black;
+    padding: $space-md;
+    transition: background-color 0.2s;
 
     &:hover {
-      border-color: #667eea;
-      background-color: rgba(102, 126, 234, 0.05);
+      background-color: $color-gray-100;
     }
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       display: none;
     }
 
-    input[type="checkbox"]:checked + .facility-content {
+    input[type='checkbox']:checked + .facility-content {
       .facility-icon {
-        background: #667eea;
-        color: white;
+        background: $color-black;
+        color: $color-white;
       }
     }
 
     .facility-content {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: $space-md;
 
       .facility-icon {
-        width: 3rem;
-        height: 3rem;
-        border-radius: 50%;
-        background: #f3f4f6;
+        width: 2.5rem;
+        height: 2.5rem;
+        background: $color-gray-100;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
-        transition: all 0.2s ease;
+        font-size: 1.25rem;
+        transition: all 0.2s;
       }
 
       .facility-label {
+        font-family: $font-sans;
         font-weight: 500;
-        color: var(--clr-black);
+        color: $color-black;
+        font-size: 0.875rem;
       }
     }
   }
 }
 
+// Hours Grid
 .hours-grid {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0;
+  border: 1px solid $color-black;
 
   .hours-row {
     display: grid;
     grid-template-columns: 150px 1fr;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    gap: $space-md;
+    padding: $space-md;
+    border-bottom: 1px solid $color-gray-200;
+
+    &:last-child {
+      border-bottom: none;
+    }
 
     .day-checkbox {
       label {
+        font-family: $font-sans;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: $space-sm;
         font-weight: 500;
         cursor: pointer;
+        font-size: 0.875rem;
 
-        input[type="checkbox"] {
+        input[type='checkbox'] {
           width: auto;
+          accent-color: $color-black;
         }
       }
     }
@@ -375,53 +319,63 @@
     .time-inputs {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: $space-md;
 
-      input[type="time"] {
+      input[type='time'] {
         width: auto;
         min-width: 120px;
+        padding: $space-sm;
+        border: 1px solid $color-black;
+        font-family: $font-sans;
       }
 
       .time-separator {
-        color: var(--clr-grey-700);
+        font-family: $font-sans;
+        color: $color-gray-600;
         font-weight: 500;
       }
     }
 
     .closed-indicator {
-      color: var(--clr-grey-700);
+      font-family: $font-sans;
+      color: $color-gray-600;
       font-style: italic;
+      font-size: 0.875rem;
     }
   }
 }
 
+// Media Group
 .media-group {
-  margin-bottom: 2rem;
+  margin-bottom: $space-xl;
 
   h3 {
+    font-family: $font-serif;
     font-size: 1.125rem;
     font-weight: 600;
-    color: var(--clr-black);
-    margin-bottom: 0.5rem;
+    color: $color-black;
+    margin-bottom: $space-sm;
   }
 
   .media-description {
-    color: var(--clr-grey-700);
+    font-family: $font-sans;
+    color: $color-gray-600;
     font-size: 0.875rem;
-    margin-bottom: 1rem;
+    margin-bottom: $space-md;
   }
 }
 
+// Photo Grid
 .photo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
+  gap: $space-md;
 
   .photo-item {
     position: relative;
     aspect-ratio: 1;
-    border-radius: 8px;
     overflow: hidden;
+    border: 1px solid $color-black;
 
     img {
       width: 100%;
@@ -431,59 +385,58 @@
 
     .remove-photo {
       position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      width: 2rem;
-      height: 2rem;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
+      top: $space-sm;
+      right: $space-sm;
+      width: 1.75rem;
+      height: 1.75rem;
+      background: $color-black;
+      color: $color-white;
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.875rem;
+      font-size: 0.75rem;
 
       &:hover {
-        background: rgba(239, 68, 68, 0.8);
+        background: $color-error;
       }
     }
   }
 
   .photo-upload {
     aspect-ratio: 1;
-    border: 2px dashed #d1d5db;
-    border-radius: 8px;
+    border: 2px dashed $color-black;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s;
 
     &:hover {
-      border-color: #667eea;
-      background: rgba(102, 126, 234, 0.05);
+      background: $color-gray-100;
     }
 
     .upload-placeholder {
       text-align: center;
-      color: var(--clr-grey-700);
+      color: $color-gray-600;
 
       .upload-icon {
         display: block;
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+        margin-bottom: $space-sm;
+        color: $color-black;
       }
     }
   }
 }
 
+// Background Preview
 .background-preview {
   position: relative;
-  border-radius: 8px;
   overflow: hidden;
   max-width: 400px;
+  border: 1px solid $color-black;
 
   img {
     width: 100%;
@@ -492,132 +445,146 @@
   }
 
   .remove-background {
+    font-family: $font-sans;
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
+    top: $space-md;
+    right: $space-md;
+    background: $color-black;
+    color: $color-white;
     border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
+    padding: $space-sm $space-md;
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 
     &:hover {
-      background: rgba(239, 68, 68, 0.8);
+      background: $color-error;
     }
   }
 }
 
+// Background Upload
 .background-upload {
   display: block;
-  border: 2px dashed #d1d5db;
-  border-radius: 8px;
-  padding: 2rem;
+  border: 2px dashed $color-black;
+  padding: $space-xl;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s;
   max-width: 400px;
 
   &:hover {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
+    background: $color-gray-100;
   }
 
   .upload-placeholder.large {
     .upload-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      font-size: 2rem;
+      margin-bottom: $space-md;
+      color: $color-black;
     }
   }
 }
 
-// Form Actions - NYT Style
+// Form Actions
 .form-actions {
   display: flex;
-  gap: var(--space-4);
+  gap: $space-md;
   justify-content: flex-end;
-  padding: var(--space-8);
-  background: #ffffff;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--clr-secondary-200);
-  margin-top: var(--space-6);
+  padding: $space-lg;
+  background: $color-white;
+  border: 1px solid $color-black;
+  margin-top: $space-lg;
 
-  .primary-button, .secondary-button {
-    padding: var(--space-3) var(--space-8);
-    border-radius: var(--radius-md);
-    font-weight: var(--font-medium);
+  .primary-button,
+  .secondary-button {
+    font-family: $font-sans;
+    padding: $space-md $space-xl;
+    font-weight: 500;
     cursor: pointer;
-    transition: all var(--transition-normal);
-    font-family: 'Roboto', sans-serif;
-    font-size: var(--text-sm);
+    transition: background-color 0.2s;
+    font-size: 0.875rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: $space-sm;
 
     &:disabled {
-      opacity: 0.6;
+      opacity: 0.5;
       cursor: not-allowed;
     }
   }
 
   .primary-button {
-    background: #0284c7;
-    color: #ffffff;
-    border: none;
+    background: $color-black;
+    color: $color-white;
+    border: 1px solid $color-black;
 
     &:hover:not(:disabled) {
-      background: #0369a1;
-      box-shadow: var(--shadow-md);
+      background: $color-gray-800;
     }
 
     .loading-spinner {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top: 2px solid #ffffff;
+      border-top: 2px solid $color-white;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
   }
 
   .secondary-button {
-    background: #ffffff;
-    color: #525252;
-    border: 1px solid var(--clr-secondary-300);
+    background: $color-white;
+    color: $color-black;
+    border: 1px solid $color-black;
 
     &:hover:not(:disabled) {
-      background: var(--clr-secondary-50);
-      border-color: var(--clr-secondary-400);
+      background: $color-gray-100;
     }
   }
 }
 
+// Animation
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
+// Responsive
 @media (max-width: 768px) {
   .business-profile-container {
-    padding: 1rem;
+    padding: $space-md;
+  }
+
+  .profile-header h1 {
+    font-size: 2rem;
   }
 
   .profile-tabs {
     flex-wrap: wrap;
   }
 
-  .form-row {
+  .profile-form .form-row {
     grid-template-columns: 1fr;
   }
 
-  .hours-row {
+  .hours-grid .hours-row {
     grid-template-columns: 1fr;
-    gap: 0.5rem;
+    gap: $space-sm;
   }
 
   .form-actions {
     flex-direction: column;
+
+    .primary-button,
+    .secondary-button {
+      width: 100%;
+      justify-content: center;
+    }
   }
 }

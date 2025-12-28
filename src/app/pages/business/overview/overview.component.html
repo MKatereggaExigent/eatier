@@ -2,7 +2,7 @@
   <!-- Welcome Section -->
   <header class="welcome-section">
     <h1 class="welcome-title">
-      Welcome back, {{ currentUser()?.firstName || 'Business Owner' }}!
+      Welcome back, {{ currentUser()?.firstName || 'Business Owner' }}
     </h1>
     <p class="welcome-subtitle">
       @if (business()) {
@@ -17,7 +17,6 @@
   @if (hasErrors()) {
     <div class="error-banner" role="alert" aria-live="polite">
       <div class="error-content">
-        <span class="error-icon">⚠️</span>
         <div class="error-text">
           <h3>Unable to load some data</h3>
           <p>Please check your connection and try again.</p>
@@ -27,7 +26,7 @@
           class="retry-btn"
           (click)="refreshData()"
           aria-label="Retry loading data">
-          🔄 Retry
+          Retry
         </button>
       </div>
     </div>
@@ -40,20 +39,14 @@
       <div class="stat-card" aria-label="Total Bookings">
         @if (loading().business) {
           <div class="stat-skeleton">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-content">
-              <div class="skeleton-number"></div>
-              <div class="skeleton-label"></div>
-            </div>
+            <div class="skeleton-number"></div>
+            <div class="skeleton-label"></div>
           </div>
         } @else {
-          <div class="stat-icon" aria-hidden="true">📅</div>
           <div class="stat-content">
-            <h3 class="stat-number">{{ stats().totalBookings }}</h3>
-            <p class="stat-label">Total Bookings</p>
-            <span class="stat-info">
-              {{ stats().pendingBookings }} pending
-            </span>
+            <span class="stat-number">{{ stats().totalBookings }}</span>
+            <span class="stat-label">Total Bookings</span>
+            <span class="stat-info">{{ stats().pendingBookings }} pending</span>
           </div>
         }
       </div>
@@ -62,20 +55,14 @@
       <div class="stat-card" aria-label="Average Rating">
         @if (loading().business) {
           <div class="stat-skeleton">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-content">
-              <div class="skeleton-number"></div>
-              <div class="skeleton-label"></div>
-            </div>
+            <div class="skeleton-number"></div>
+            <div class="skeleton-label"></div>
           </div>
         } @else {
-          <div class="stat-icon" aria-hidden="true">⭐</div>
           <div class="stat-content">
-            <h3 class="stat-number">{{ stats().averageRating.toFixed(1) }}</h3>
-            <p class="stat-label">Average Rating</p>
-            <span class="stat-info">
-              {{ stats().totalReviews }} reviews
-            </span>
+            <span class="stat-number">{{ stats().averageRating.toFixed(1) }}</span>
+            <span class="stat-label">Average Rating</span>
+            <span class="stat-info">{{ stats().totalReviews }} reviews</span>
           </div>
         }
       </div>
@@ -84,20 +71,14 @@
       <div class="stat-card" aria-label="Menu Items">
         @if (loading().business) {
           <div class="stat-skeleton">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-content">
-              <div class="skeleton-number"></div>
-              <div class="skeleton-label"></div>
-            </div>
+            <div class="skeleton-number"></div>
+            <div class="skeleton-label"></div>
           </div>
         } @else {
-          <div class="stat-icon" aria-hidden="true">🍽️</div>
           <div class="stat-content">
-            <h3 class="stat-number">{{ stats().totalMenuItems }}</h3>
-            <p class="stat-label">Menu Items</p>
-            <span class="stat-info">
-              Active items
-            </span>
+            <span class="stat-number">{{ stats().totalMenuItems }}</span>
+            <span class="stat-label">Menu Items</span>
+            <span class="stat-info">Active items</span>
           </div>
         }
       </div>
@@ -106,20 +87,14 @@
       <div class="stat-card" aria-label="Today's Bookings">
         @if (loading().bookings) {
           <div class="stat-skeleton">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-content">
-              <div class="skeleton-number"></div>
-              <div class="skeleton-label"></div>
-            </div>
+            <div class="skeleton-number"></div>
+            <div class="skeleton-label"></div>
           </div>
         } @else {
-          <div class="stat-icon" aria-hidden="true">📍</div>
           <div class="stat-content">
-            <h3 class="stat-number">{{ stats().todayBookings }}</h3>
-            <p class="stat-label">Today's Bookings</p>
-            <span class="stat-info">
-              {{ stats().confirmedBookings }} confirmed
-            </span>
+            <span class="stat-number">{{ stats().todayBookings }}</span>
+            <span class="stat-label">Today's Bookings</span>
+            <span class="stat-info">{{ stats().confirmedBookings }} confirmed</span>
           </div>
         }
       </div>
@@ -134,7 +109,6 @@
          class="action-card"
          role="listitem"
          aria-label="Manage Menu - Add, edit, or remove menu items">
-        <div class="action-icon" aria-hidden="true">🍽️</div>
         <h3>Manage Menu</h3>
         <p>Add, edit, or remove menu items</p>
       </a>
@@ -143,7 +117,6 @@
          class="action-card"
          role="listitem"
          aria-label="Update Profile - Edit restaurant information and photos">
-        <div class="action-icon" aria-hidden="true">🏪</div>
         <h3>Update Profile</h3>
         <p>Edit restaurant information and photos</p>
       </a>
@@ -152,7 +125,6 @@
          class="action-card"
          role="listitem"
          aria-label="Respond to Reviews - Engage with customer feedback">
-        <div class="action-icon" aria-hidden="true">💬</div>
         <h3>Respond to Reviews</h3>
         <p>Engage with customer feedback</p>
       </a>
@@ -161,7 +133,6 @@
          class="action-card"
          role="listitem"
          aria-label="View Analytics - Track performance and insights">
-        <div class="action-icon" aria-hidden="true">📊</div>
         <h3>View Analytics</h3>
         <p>Track performance and insights</p>
       </a>
@@ -182,19 +153,18 @@
       </div>
     } @else if (errors().reviews) {
       <div class="reviews-error" role="alert">
-        <span class="error-icon">⚠️</span>
         <p>{{ errors().reviews }}</p>
         <button
           type="button"
           class="retry-btn"
           (click)="refreshData()"
           aria-label="Retry loading reviews">
-          🔄 Retry
+          Retry
         </button>
       </div>
     } @else if (recentReviews().length === 0) {
       <div class="no-reviews">
-        <p>No reviews yet. Encourage your customers to leave reviews!</p>
+        <p>No reviews yet. Encourage your customers to leave reviews.</p>
       </div>
     } @else {
       <div class="reviews-list" role="list">
@@ -208,9 +178,7 @@
                 <div class="customer-details">
                   <h4>{{ review.customer_name || 'Anonymous' }}</h4>
                   <div class="rating" [attr.aria-label]="review.rating + ' out of 5 stars'">
-                    @for (star of getStarArray(review.rating); track $index) {
-                      <span class="star" [class.filled]="star === 1" aria-hidden="true">⭐</span>
-                    }
+                    <span class="rating-value">{{ review.rating }}/5</span>
                   </div>
                 </div>
               </div>
@@ -227,11 +195,9 @@
                 class="respond-btn"
                 [class.responded]="review.response_from_owner"
                 [attr.aria-label]="review.response_from_owner ? 'View response to ' + review.customer_name + ' review' : 'Respond to ' + review.customer_name + ' review'">
-                {{ review.response_from_owner ? '✓ Responded' : 'Respond' }}
+                {{ review.response_from_owner ? 'Responded' : 'Respond' }}
               </button>
-              <span class="helpful-count">
-                👍 {{ review.helpful_count }} helpful
-              </span>
+              <span class="helpful-count">{{ review.helpful_count }} helpful</span>
             </div>
           </article>
         }
@@ -253,14 +219,13 @@
       </div>
     } @else if (errors().bookings) {
       <div class="bookings-error" role="alert">
-        <span class="error-icon">⚠️</span>
         <p>{{ errors().bookings }}</p>
         <button
           type="button"
           class="retry-btn"
           (click)="refreshData()"
           aria-label="Retry loading bookings">
-          🔄 Retry
+          Retry
         </button>
       </div>
     } @else if (recentBookings().length === 0) {
@@ -278,7 +243,6 @@
             (input)="onBookingsSearchChange($any($event.target).value)"
             class="search-input"
           />
-          <span class="search-icon">🔍</span>
         </div>
         <div class="page-size-selector">
           <label for="pageSize">Show:</label>
@@ -372,14 +336,14 @@
                         class="action-btn accept-btn"
                         (click)="confirmBooking(booking)"
                         title="Accept booking">
-                        ✓
+                        Accept
                       </button>
                       <button
                         type="button"
                         class="action-btn deny-btn"
                         (click)="cancelBooking(booking)"
                         title="Deny booking">
-                        ✗
+                        Deny
                       </button>
                     }
                     <button
@@ -387,14 +351,14 @@
                       class="action-btn message-btn"
                       (click)="sendMessage(booking)"
                       title="Send message">
-                      ✉
+                      Message
                     </button>
                     <button
                       type="button"
                       class="action-btn delete-btn"
                       (click)="deleteBooking(booking)"
                       title="Delete booking">
-                      🗑
+                      Delete
                     </button>
                   </div>
                 </td>
@@ -439,25 +403,25 @@
     <h2 class="section-title">Tips to Grow Your Business</h2>
     <div class="tips-grid" role="list">
       <article class="tip-card" role="listitem">
-        <div class="tip-icon" aria-hidden="true">📸</div>
+        <span class="tip-number">1</span>
         <h4>Add High-Quality Photos</h4>
         <p>Restaurants with photos get 42% more views than those without.</p>
       </article>
 
       <article class="tip-card" role="listitem">
-        <div class="tip-icon" aria-hidden="true">💬</div>
+        <span class="tip-number">2</span>
         <h4>Respond to Reviews</h4>
         <p>Engaging with customers shows you care and can improve your rating.</p>
       </article>
 
       <article class="tip-card" role="listitem">
-        <div class="tip-icon" aria-hidden="true">🕒</div>
+        <span class="tip-number">3</span>
         <h4>Keep Hours Updated</h4>
         <p>Accurate hours help customers know when you're open.</p>
       </article>
 
       <article class="tip-card" role="listitem">
-        <div class="tip-icon" aria-hidden="true">🎯</div>
+        <span class="tip-number">4</span>
         <h4>Use Analytics</h4>
         <p>Track your performance to understand what works best.</p>
       </article>

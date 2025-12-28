@@ -70,19 +70,31 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
       businessType: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       contactNumber: ['', [Validators.required, Validators.pattern(/^\+?[\d\s\-\(\)]+$/)]],
+      country: ['', Validators.required],
+      sustainabilityEthos: ['', Validators.maxLength(200)],
 
       // Address
-      address: ['', Validators.required],
+      street: ['', Validators.required],
       city: ['', Validators.required],
       state: ['', Validators.required],
       zipCode: [''],
 
-      // Optional Information
+      // Details
+      bio: ['', [Validators.required, Validators.maxLength(500)]],
       description: ['', Validators.maxLength(500)],
-      website: ['']
-    });
+      website: [''],
 
-    this.hoursForm = this.fb.group({
+      // Facilities
+      parking: [false],
+      petFriendly: [false],
+      carWash: [false],
+      swimming: [false],
+      wifi: [false],
+      airConditioning: [false],
+      outdoorSeating: [false],
+      wheelchairAccessible: [false],
+
+      // Business Hours
       mondayOpen: [false],
       mondayOpenTime: [''],
       mondayCloseTime: [''],
@@ -105,6 +117,9 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
       sundayOpenTime: [''],
       sundayCloseTime: ['']
     });
+
+    // Keep hoursForm for backward compatibility if needed
+    this.hoursForm = this.fb.group({});
   }
 
   ngOnInit(): void {
@@ -146,11 +161,14 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
       businessType: business.business_type,
       email: business.email,
       contactNumber: business.phone,
-      address: business.address,
+      country: '', // Not available in Business model
+      sustainabilityEthos: business.sustainability_ethos || '',
+      street: business.address,
       city: '', // Not available in Business model
       state: '', // Not available in Business model
       zipCode: '', // Not available in Business model
-      description: business.sustainability_ethos || '',
+      bio: business.sustainability_ethos || '', // Using sustainability_ethos as placeholder
+      description: '',
       website: '' // Not available in Business model
     });
   }
@@ -179,11 +197,12 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
         business_type: formValue.businessType,
         email: formValue.email,
         contact_number: formValue.contactNumber,
-        address: formValue.address,
+        address: formValue.street, // Map street to address
         city: formValue.city,
         state: formValue.state,
         zip_code: formValue.zipCode,
-        description: formValue.description,
+        sustainability_ethos: formValue.sustainabilityEthos,
+        description: formValue.bio,
         website: formValue.website
       };
 
