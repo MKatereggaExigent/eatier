@@ -800,10 +800,29 @@
 }
 
 @media (max-width: 480px) {
+  .bookings-dashboard {
+    padding: var(--space-3);
+  }
+
   .dashboard-header {
     .stats-grid {
       grid-template-columns: 1fr;
     }
+  }
+
+  .booking-card {
+    .booking-actions {
+      button {
+        min-height: 44px;
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  // Ensure touch targets are at least 44px
+  button, a, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 
@@ -827,8 +846,9 @@
   background: var(--color-white);
   border: var(--border-medium);
   max-width: 90vw;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
   animation: slideInUp 0.3s ease;
 
   &.new-booking-modal {
@@ -850,8 +870,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-6) var(--space-10);
+    padding: var(--space-4) var(--space-8);
     border-bottom: var(--border-thick);
+    flex-shrink: 0;
+    background: var(--color-white);
 
     h3 {
       font-family: var(--font-serif);
@@ -878,17 +900,21 @@
   }
 
   .modal-body {
-    padding: var(--space-8) var(--space-10);
+    padding: var(--space-6) var(--space-8);
     color: var(--color-black);
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
   }
 
   .modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: var(--space-3);
-    padding: var(--space-5) var(--space-10);
+    padding: var(--space-4) var(--space-8);
     border-top: var(--border-thin);
     background: var(--color-bg-light);
+    flex-shrink: 0;
 
     button {
       padding: var(--space-3) var(--space-6);
@@ -961,12 +987,20 @@
 
 // Booking Form Styles - NYT Editorial
 .booking-form {
-  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 
   .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-6) var(--space-8);
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    padding: var(--space-4) var(--space-8);
 
     .form-group {
       &.full-width {
@@ -1021,6 +1055,11 @@
         min-height: 100px;
       }
     }
+  }
+
+  .modal-footer {
+    flex-shrink: 0;
+    margin-top: auto;
   }
 }
 

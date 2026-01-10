@@ -862,3 +862,27 @@
     gap: var(--space-2);
   }
 }
+
+// Small mobile breakpoint
+@media (max-width: 480px) {
+  .food-enthusiast-overview {
+    padding: var(--space-3);
+  }
+
+  .overview-header {
+    .header-content .welcome-section .page-title {
+      font-size: var(--text-xl);
+    }
+  }
+
+  .stats-section .stats-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  // Ensure touch targets are at least 44px
+  button, a, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

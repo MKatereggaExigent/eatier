@@ -1172,8 +1172,59 @@ $border-medium: 2px solid $color-black;
   }
 
   .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    // Scroll hint
+    &::before {
+      content: 'Swipe to see more →';
+      display: block;
+      padding: 0.5rem 1rem;
+      background: #f5f5f5;
+      border-bottom: 1px solid #e5e5e5;
+      font-size: 0.75rem;
+      color: #737373;
+      text-align: center;
+    }
+
     .bookings-table {
       min-width: 700px;
+
+      th, td {
+        padding: 0.75rem;
+        font-size: 0.8rem;
+      }
     }
+  }
+
+  .filters-section {
+    .filters-row {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+}
+
+// Extra small screens
+@media (max-width: 480px) {
+  .admin-bookings {
+    padding: 0.75rem;
+  }
+
+  .bookings-header {
+    .header-content h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  // Ensure touch targets are at least 44px
+  button, a, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  input, select {
+    min-height: 44px;
+    font-size: 16px; // Prevents iOS zoom
   }
 }

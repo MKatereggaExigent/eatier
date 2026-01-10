@@ -672,3 +672,82 @@ a {
   .xl\:flex { display: flex; }
   .xl\:grid { display: grid; }
 }
+
+// ===================================
+// MOBILE TOUCH TARGETS
+// ===================================
+
+// Ensure minimum 44px touch targets on mobile devices
+// This follows Apple's Human Interface Guidelines and WCAG 2.1 AAA
+@media (max-width: 768px) {
+  // Interactive elements should have minimum 44px touch targets
+  button:not(.no-touch-target),
+  [role="button"]:not(.no-touch-target),
+  a.btn:not(.no-touch-target),
+  .btn:not(.no-touch-target) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  // Form inputs should be at least 44px tall
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+  // Prevent iOS zoom on input focus by using 16px font size
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  // Checkbox and radio buttons need larger touch targets
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  // Labels for checkboxes/radios should have padding for touch
+  label:has(input[type="checkbox"]),
+  label:has(input[type="radio"]) {
+    padding: 0.5rem 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+// ===================================
+// MOBILE UTILITY CLASSES
+// ===================================
+
+// Hide on mobile
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+// Show only on mobile
+@media (min-width: 769px) {
+  .show-mobile-only {
+    display: none !important;
+  }
+}
+
+// Full width on mobile
+@media (max-width: 768px) {
+  .full-width-mobile {
+    width: 100% !important;
+  }
+}
+
+// Stack on mobile (flex column)
+@media (max-width: 768px) {
+  .stack-mobile {
+    flex-direction: column !important;
+  }
+}

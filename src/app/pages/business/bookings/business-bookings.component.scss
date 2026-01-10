@@ -626,7 +626,7 @@ $space-2xl: 3rem;
   }
 
   .page-header .header-content h1 {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
 
   .statistics-grid {
@@ -644,10 +644,33 @@ $space-2xl: 3rem;
 
   .filters-row {
     grid-template-columns: 1fr;
+    gap: $space-sm;
   }
 
   .bookings-table-container {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    // Scroll hint
+    &::before {
+      content: 'Swipe to see more →';
+      display: block;
+      padding: $space-sm $space-md;
+      background: $color-gray-100;
+      border-bottom: 1px solid $color-gray-200;
+      font-size: 0.75rem;
+      color: $color-gray-600;
+      text-align: center;
+    }
+  }
+
+  .bookings-table {
+    min-width: 600px;
+
+    th, td {
+      padding: $space-sm;
+      font-size: 0.8rem;
+    }
   }
 
   .modal-content {
@@ -665,6 +688,29 @@ $space-2xl: 3rem;
     .btn-status {
       width: 100%;
       justify-content: center;
+      min-height: 44px;
     }
+  }
+}
+
+// Small mobile breakpoint
+@media (max-width: 480px) {
+  .bookings-management-container {
+    padding: $space-sm;
+  }
+
+  .page-header .header-content h1 {
+    font-size: 1.5rem;
+  }
+
+  // Ensure touch targets are at least 44px
+  button, a, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  input, select {
+    min-height: 44px;
+    font-size: 16px; // Prevents iOS zoom
   }
 }

@@ -554,21 +554,33 @@
 }
 
 /* ========== Responsive Design ========== */
+
+// Tablet breakpoint
+@media (max-width: 1024px) {
+  .user-groups-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .resources-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+// Mobile breakpoint
 @media (max-width: 768px) {
   .hero-carousel {
-    height: 500px;
+    height: 450px;
 
     .carousel-control {
       width: 40px;
       height: 40px;
+      min-width: 44px;
+      min-height: 44px;
 
-      &.prev {
-        left: 1rem;
-      }
-
-      &.next {
-        right: 1rem;
-      }
+      &.prev { left: 0.75rem; }
+      &.next { right: 0.75rem; }
 
       svg {
         width: 20px;
@@ -591,7 +603,7 @@
     }
 
     .hero-content {
-      padding: 1rem;
+      padding: 1.5rem;
     }
 
     .hero-stats {
@@ -610,19 +622,55 @@
   .user-groups-grid {
     grid-template-columns: 1fr;
     padding: 0;
+    gap: 1.5rem;
   }
 
   .community-actions {
     flex-direction: column;
+    gap: 0.75rem;
 
     button {
       width: 100%;
       justify-content: center;
+      min-height: 44px;
     }
   }
 
   .resources-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+// Small mobile breakpoint
+@media (max-width: 480px) {
+  .hero-carousel {
+    height: 400px;
+
+    .hero-content {
+      padding: 1rem;
+    }
+
+    .hero-stats {
+      gap: 0.75rem;
+
+      .stat-number {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .mission-section,
+  .user-groups-section,
+  .community-section,
+  .resources-section {
+    padding: 2rem 1rem;
+  }
+
+  // Ensure touch targets are at least 44px
+  button, a, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 

@@ -709,21 +709,30 @@
 // RESPONSIVE DESIGN
 // =====================================================
 
+// Tablet breakpoint
+@media (max-width: 1024px) {
+  .geo-targeting-content {
+    gap: 2rem;
+  }
+
+  .pricing-grid {
+    gap: 1.5rem;
+  }
+}
+
+// Mobile breakpoint
 @media (max-width: 768px) {
   .hero-carousel {
-    height: 500px;
+    height: 450px;
 
     .carousel-control {
       width: 40px;
       height: 40px;
+      min-width: 44px;
+      min-height: 44px;
 
-      &.prev {
-        left: 1rem;
-      }
-
-      &.next {
-        right: 1rem;
-      }
+      &.prev { left: 0.75rem; }
+      &.next { right: 0.75rem; }
 
       svg {
         width: 20px;
@@ -736,8 +745,17 @@
     }
 
     .hero-content {
+      padding: 3rem 1.5rem;
+
       .hero-stats {
-        gap: 2rem;
+        gap: 1.5rem;
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hero-cta {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
       }
     }
   }
@@ -747,37 +765,89 @@
   .pricing-section,
   .benefits-section,
   .cta-section {
-    padding: 4rem 1.5rem;
+    padding: 3rem 1.5rem;
   }
 
   .section-header {
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
   }
 
   .ad-types-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .geo-targeting-content {
     grid-template-columns: 1fr;
-    gap: 3rem;
+    gap: 2rem;
   }
 
   .geo-visual .globe-icon {
-    font-size: 6rem;
+    font-size: 5rem;
   }
 
   .benefits-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .pricing-card {
-    padding: 2rem;
+    padding: 1.5rem;
   }
 
   .cta-buttons {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.75rem;
+  }
+}
+
+// Small mobile breakpoint
+@media (max-width: 480px) {
+  .hero-carousel {
+    height: 400px;
+
+    .hero-content {
+      padding: 2rem 1rem;
+
+      .hero-stats {
+        gap: 1rem;
+
+        .stat-number {
+          font-size: 1.5rem;
+        }
+      }
+    }
+  }
+
+  .ad-types-section,
+  .geo-targeting-section,
+  .pricing-section,
+  .benefits-section,
+  .cta-section {
+    padding: 2rem 1rem;
+  }
+
+  .section-header {
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .geo-visual .globe-icon {
+    font-size: 4rem;
+  }
+
+  .pricing-card {
+    padding: 1.25rem;
+  }
+
+  // Ensure touch targets are at least 44px
+  button, a, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 

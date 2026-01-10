@@ -629,6 +629,7 @@
 }
 
 // Responsive Design
+// Tablet breakpoint
 @media (max-width: 768px) {
   .register-container {
     padding: 1rem;
@@ -650,6 +651,7 @@
 
     .role-selection .role-option {
       padding: 0.875rem;
+      min-height: 44px;
 
       .role-content {
         gap: 0.75rem;
@@ -671,10 +673,25 @@
         }
       }
     }
+
+    // Ensure touch targets are at least 44px
+    input {
+      min-height: 44px;
+      font-size: 16px; // Prevents iOS zoom on focus
+    }
+
+    button {
+      min-height: 44px;
+    }
   }
 }
 
+// Small mobile breakpoint
 @media (max-width: 480px) {
+  .register-container {
+    padding: 0.5rem;
+  }
+
   .register-header {
     h1 {
       font-size: 1.35rem;
@@ -687,6 +704,13 @@
 
   .register-card {
     padding: 1.5rem 1rem;
+    margin: 0.5rem;
+  }
+
+  // Ensure all interactive elements have proper touch targets
+  button, a, .role-option {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 

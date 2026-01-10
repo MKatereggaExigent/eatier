@@ -1095,6 +1095,10 @@
 }
 
 @media (max-width: 480px) {
+  .reviews-dashboard {
+    padding: var(--space-3);
+  }
+
   .dashboard-header {
     .stats-grid {
       grid-template-columns: 1fr;
@@ -1103,5 +1107,20 @@
 
   .review-form .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .review-card {
+    .review-actions {
+      button {
+        min-height: 44px;
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  // Ensure touch targets are at least 44px
+  button, a, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
   }
 }

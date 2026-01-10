@@ -754,8 +754,9 @@
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
   max-width: 90vw;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
   animation: slideInUp 0.3s ease;
 }
 
@@ -778,8 +779,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-6);
+  padding: var(--space-4) var(--space-6);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+  background: var(--glass-white-strong);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
 .modal-content .modal-header h3 {
@@ -807,16 +811,20 @@
 }
 
 .modal-content .modal-body {
-  padding: var(--space-6);
+  padding: var(--space-4) var(--space-6);
   color: white;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .modal-content .modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: var(--space-3);
-  padding: var(--space-6);
+  padding: var(--space-4) var(--space-6);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
 }
 
 .modal-content .modal-footer button {
@@ -878,10 +886,24 @@
   animation: spin 1s linear infinite;
 }
 
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .booking-form .form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-4);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-4) var(--space-6);
+}
+
+.booking-form .modal-footer {
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 .booking-form .form-grid .form-group.full-width {
