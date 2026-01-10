@@ -1,5 +1,6 @@
 # Production Docker Compose for Eatier/Itiyum Backend
 # Run on server with: docker-compose -f docker-compose.prod.yml up -d
+# All resources are prefixed with 'itiyum_' for isolation
 
 services:
   # PostgreSQL Database
@@ -11,18 +12,18 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-itiyum_secure_password}
       POSTGRES_DB: ${DB_NAME:-itiyum}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - itiyum_postgres_data:/var/lib/postgresql/data
     ports:
-      - "5466:5432"  # Host port 5466 to avoid conflicts
+      - "5466:5432"  # Host port 5466 - unique for itiyum
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-itiyum} -d ${DB_NAME:-itiyum}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD-SHELL", "pg_isready -U itiyum -d itiyum"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
     restart: unless-stopped
     networks:
-      - itiyum-network
+      - itiyum_network
 
   # Node.js Backend API
   backend:
@@ -49,20 +50,24 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
     ports:
-      - "3002:3001"  # Host port 3002 to avoid conflicts with other apps
+      - "3002:3001"  # Host port 3002 - unique for itiyum
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
-      - ./backend/uploads:/app/uploads
+      - itiyum_uploads:/app/uploads
     restart: unless-stopped
     networks:
-      - itiyum-network
+      - itiyum_network
 
 volumes:
-  postgres_data:
+  itiyum_postgres_data:
+    name: itiyum_postgres_data
+  itiyum_uploads:
+    name: itiyum_uploads
 
 networks:
-  itiyum-network:
+  itiyum_network:
+    name: itiyum_network
     driver: bridge
 
