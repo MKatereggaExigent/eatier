@@ -14,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     ports:
-      - "5432:5432"
+      - "5466:5432"  # Host port 5466 to avoid conflicts
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-itiyum} -d ${DB_NAME:-itiyum}"]
       interval: 10s
@@ -49,7 +49,7 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
     ports:
-      - "3001:3001"
+      - "3002:3001"  # Host port 3002 to avoid conflicts with other apps
     depends_on:
       postgres:
         condition: service_healthy

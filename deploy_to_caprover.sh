@@ -10,7 +10,7 @@ set -e
 CAPROVER_NAME="aidoc-server"       # Your CapRover server name (from ~/.caprover/configs.json)
 CAPROVER_APP="itiyum"              # CapRover app name for frontend
 BACKEND_HOST="41.76.109.131"       # Server's public IP
-BACKEND_PORT="3001"                # Backend port
+BACKEND_PORT="3002"                # Backend host port (mapped to container 3001)
 APP_NAME="itiyum"
 
 echo ""

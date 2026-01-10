@@ -67,7 +67,7 @@ done
 # Check Backend
 echo "🔍 Checking Backend..."
 for i in {1..30}; do
-    if curl -s http://localhost:3001/api/auth/status > /dev/null 2>&1; then
+    if curl -s http://localhost:3002/api/auth/status > /dev/null 2>&1; then
         echo "✅ Backend is ready"
         break
     fi
@@ -88,8 +88,8 @@ echo "=========================================="
 echo "   ✅ BACKEND STARTED SUCCESSFULLY"
 echo "=========================================="
 echo ""
-echo "🌐 Backend API: http://41.76.109.131:3001/api"
-echo "🗄️  Database:   PostgreSQL on port 5432"
+echo "🌐 Backend API: http://41.76.109.131:3002/api"
+echo "🗄️  Database:   PostgreSQL on port 5466 (host) -> 5432 (container)"
 echo ""
 echo "📝 Useful commands:"
 echo "   Logs:    docker-compose -f docker-compose.prod.yml logs -f"

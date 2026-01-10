@@ -55,7 +55,7 @@ docker-compose -f docker-compose.prod.yml up -d --build
 # Wait for backend
 echo "⏳ Waiting for backend to be ready..."
 for i in {1..60}; do
-    if curl -s http://localhost:3001/api/auth/status > /dev/null 2>&1; then
+    if curl -s http://localhost:3002/api/auth/status > /dev/null 2>&1; then
         echo "✅ Backend is ready!"
         break
     fi
@@ -90,7 +90,7 @@ echo "=========================================="
 echo ""
 echo "🌐 Access URLs:"
 echo "   • Frontend:  https://itiyum.aidocumines.com"
-echo "   • Backend:   http://41.76.109.131:3001/api"
+echo "   • Backend:   http://41.76.109.131:3002/api"
 echo ""
 echo "🔐 Admin Login:"
 echo "   • Email:    admin@itiyum.com"
