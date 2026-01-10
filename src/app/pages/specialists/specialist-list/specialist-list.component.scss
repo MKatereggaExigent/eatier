@@ -1,125 +1,181 @@
+/* ========== NYT-Inspired Specialist List Page ========== */
+
+// Design System Variables
+$font-serif: 'Playfair Display', 'Georgia', serif;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+// NYT Color Palette
+$nyt-black: #121212;
+$nyt-dark-gray: #333333;
+$nyt-medium-gray: #666666;
+$nyt-light-gray: #f7f7f5;
+$nyt-warm-white: #faf9f6;
+$nyt-border: #e2e2e2;
+$itiyum-orange: #ff8c00;
+$itiyum-orange-dark: #e67e00;
+
 .specialist-list-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: $nyt-warm-white;
 }
 
+/* ========== Hero Header ========== */
 .hero-header {
   position: relative;
-  padding: 80px 20px 60px;
+  padding: 100px 20px 80px;
   background: url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1600') center/cover;
 
   .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(15, 52, 96, 0.9), rgba(26, 26, 46, 0.85));
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.7) 100%
+    );
   }
 
   .hero-content {
     position: relative;
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     text-align: center;
   }
 
   .page-title {
-    font-size: 2.5rem;
+    font-family: $font-serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight: 700;
-    color: #fff;
-    margin-bottom: 12px;
+    color: white;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   }
 
   .page-subtitle {
-    font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 32px;
+    font-family: $font-sans;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
   }
 }
 
-.glass-morphic {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-}
-
+/* ========== Search Bar ========== */
 .search-bar-wrapper {
-  max-width: 600px;
-  margin: 0 auto 24px;
+  max-width: 650px;
+  margin: 0 auto 32px;
 
   .search-bar {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
-    gap: 12px;
+    padding: 14px 24px;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: none;
+    backdrop-filter: none;
 
-    .search-icon { font-size: 1.2rem; }
+    .search-icon {
+      font-size: 1.1rem;
+      opacity: 0.6;
+    }
 
     .search-input {
       flex: 1;
       background: none;
       border: none;
-      color: #fff;
+      color: $nyt-black;
+      font-family: $font-sans;
       font-size: 1rem;
       outline: none;
 
-      &::placeholder { color: rgba(255, 255, 255, 0.6); }
+      &::placeholder {
+        color: $nyt-medium-gray;
+      }
     }
 
     .clear-search {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: #fff;
-      width: 24px;
-      height: 24px;
+      background: $nyt-light-gray;
+      border: 1px solid $nyt-border;
+      color: $nyt-medium-gray;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       cursor: pointer;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: $nyt-border;
+        color: $nyt-black;
+      }
     }
   }
 }
 
+/* ========== Quick Stats ========== */
 .quick-stats {
   display: inline-flex;
-  padding: 16px 32px;
-  gap: 24px;
+  padding: 20px 40px;
+  gap: 32px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
 
   .stat-item {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 4px;
 
     .stat-number {
-      font-size: 1.5rem;
+      font-family: $font-serif;
+      font-size: 1.75rem;
       font-weight: 700;
-      color: #4ecdc4;
+      color: $itiyum-orange;
     }
 
     .stat-label {
-      font-size: 0.85rem;
-      color: rgba(255, 255, 255, 0.7);
+      font-family: $font-sans;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.85);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
   }
 
   .stat-divider {
     width: 1px;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.25);
   }
 }
 
+/* ========== Filters Section ========== */
 .filters-section {
-  padding: 24px 20px;
-  background: rgba(0, 0, 0, 0.2);
+  padding: 28px 20px;
+  background: white;
+  border-bottom: 1px solid $nyt-border;
 
   .filters-container {
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
   }
 
   .filters-row {
     display: flex;
-    gap: 20px;
+    gap: 24px;
     flex-wrap: wrap;
     justify-content: center;
   }
@@ -127,32 +183,45 @@
   .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 
     .filter-label {
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 0.85rem;
+      font-family: $font-sans;
+      color: $nyt-medium-gray;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
     }
 
     .filter-select, .filter-input {
-      padding: 10px 16px;
-      color: #fff;
-      font-size: 0.95rem;
+      padding: 10px 14px;
+      font-family: $font-sans;
+      color: $nyt-black;
+      font-size: 0.9rem;
       min-width: 180px;
       cursor: pointer;
+      background: white;
+      border: 1px solid $nyt-border;
+      border-radius: 4px;
+      transition: all 0.2s ease;
 
-      option { background: #1a1a2e; color: #fff; }
+      option {
+        background: white;
+        color: $nyt-black;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $itiyum-orange;
+        box-shadow: 0 0 0 3px rgba($itiyum-orange, 0.1);
+      }
     }
 
     .filter-input {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 16px;
-      outline: none;
-
-      &::placeholder { color: rgba(255, 255, 255, 0.5); }
-      &:focus { border-color: #4ecdc4; }
+      &::placeholder {
+        color: $nyt-medium-gray;
+      }
     }
 
     &.filter-actions {
@@ -162,96 +231,157 @@
 
   .clear-filters-btn {
     padding: 10px 20px;
-    background: rgba(255, 107, 107, 0.2);
-    border: 1px solid rgba(255, 107, 107, 0.4);
-    color: #ff6b6b;
-    border-radius: 16px;
+    background: white;
+    border: 1px solid $nyt-border;
+    color: $nyt-medium-gray;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.3s;
+    font-family: $font-sans;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(255, 107, 107, 0.3);
-      border-color: #ff6b6b;
+      background: $nyt-light-gray;
+      border-color: $nyt-dark-gray;
+      color: $nyt-black;
     }
   }
 }
 
+/* ========== Results Section ========== */
 .results-section {
-  padding: 40px 20px;
-  max-width: 1400px;
+  padding: 48px 20px;
+  max-width: 1300px;
   margin: 0 auto;
 }
 
+/* ========== Loading/Error/Empty States ========== */
 .loading-state, .error-state, .empty-state {
   text-align: center;
-  padding: 60px 20px;
-  color: rgba(255, 255, 255, 0.8);
+  padding: 80px 20px;
+  color: $nyt-medium-gray;
 
   .spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid rgba(255, 255, 255, 0.2);
-    border-top-color: #4ecdc4;
+    width: 40px;
+    height: 40px;
+    border: 3px solid $nyt-border;
+    border-top-color: $itiyum-orange;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 16px;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
   }
 
-  .error-icon, .empty-icon { font-size: 3rem; display: block; margin-bottom: 16px; }
+  h3 {
+    font-family: $font-serif;
+    font-size: 1.5rem;
+    color: $nyt-black;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-family: $font-sans;
+    font-size: 1rem;
+    color: $nyt-medium-gray;
+  }
+
+  .error-icon, .empty-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 20px;
+  }
 
   .retry-btn {
-    margin-top: 16px;
-    padding: 10px 24px;
-    background: #4ecdc4;
-    color: #1a1a2e;
+    margin-top: 20px;
+    padding: 12px 28px;
+    background: $nyt-black;
+    color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
+    font-family: $font-sans;
+    font-size: 0.9rem;
     font-weight: 600;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $nyt-dark-gray;
+    }
   }
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.specialists-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
+/* ========== Specialists Grid ========== */
+.specialists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
+}
+
+/* ========== Specialist Card ========== */
 .specialist-card {
   display: block;
   text-decoration: none;
   overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
+  background: white;
+  border: 1px solid $nyt-border;
+  border-radius: 4px;
+  transition: all 0.25s ease;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 0;
+    background: $itiyum-orange;
+    transition: height 0.3s ease;
+    z-index: 1;
+  }
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+
+    &::before {
+      height: 100%;
+    }
+
+    .specialist-image img {
+      transform: scale(1.05);
+    }
   }
 
   .specialist-image {
     position: relative;
-    height: 200px;
+    height: 220px;
     overflow: hidden;
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 0.4s ease;
     }
 
     .top-rated-badge {
       position: absolute;
-      top: 12px;
-      right: 12px;
-      background: linear-gradient(135deg, #ffd700, #ffaa00);
-      color: #1a1a2e;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
+      top: 14px;
+      right: 14px;
+      background: $itiyum-orange;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 2px;
+      font-family: $font-sans;
+      font-size: 0.7rem;
       font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
   }
 
@@ -259,35 +389,56 @@
     padding: 20px;
 
     .specialist-name {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #fff;
-      margin-bottom: 8px;
+      font-family: $font-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: $nyt-black;
+      margin-bottom: 10px;
+      line-height: 1.3;
     }
 
     .specialist-rating {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
 
-      .stars { color: #ffd700; }
-      .rating-text { color: #fff; font-weight: 600; }
-      .review-count { color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; }
+      .stars {
+        color: $itiyum-orange;
+        font-size: 0.9rem;
+      }
+
+      .rating-text {
+        font-family: $font-sans;
+        color: $itiyum-orange;
+        font-weight: 700;
+        font-size: 0.95rem;
+      }
+
+      .review-count {
+        font-family: $font-sans;
+        color: $nyt-medium-gray;
+        font-size: 0.85rem;
+      }
     }
 
     .specialist-specialties {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 6px;
+      margin-bottom: 14px;
 
       .specialty-tag {
-        background: rgba(78, 205, 196, 0.2);
-        color: #4ecdc4;
+        background: $nyt-light-gray;
+        color: $nyt-dark-gray;
         padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 0.75rem;
+        border-radius: 2px;
+        font-family: $font-sans;
+        font-size: 0.72rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        border: 1px solid $nyt-border;
       }
     }
 
@@ -295,21 +446,26 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      padding-top: 10px;
+      border-top: 1px solid $nyt-border;
 
       .price-label {
-        color: rgba(255, 255, 255, 0.6);
+        font-family: $font-sans;
+        color: $nyt-medium-gray;
         font-size: 0.85rem;
       }
 
       .price-value {
-        color: #4ecdc4;
+        font-family: $font-sans;
+        color: $nyt-black;
         font-weight: 700;
-        font-size: 1rem;
+        font-size: 1.05rem;
       }
 
       .price-range {
-        color: #4ecdc4;
+        font-family: $font-sans;
+        color: $nyt-medium-gray;
         font-size: 0.9rem;
       }
     }
@@ -318,69 +474,76 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
 
       .location-icon {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
       }
 
       .location-text {
-        color: rgba(255, 255, 255, 0.7);
+        font-family: $font-sans;
+        color: $nyt-medium-gray;
         font-size: 0.85rem;
       }
     }
 
     .specialist-bio {
-      color: rgba(255, 255, 255, 0.7);
+      font-family: $font-sans;
+      color: $nyt-medium-gray;
       font-size: 0.9rem;
-      line-height: 1.5;
-      margin-bottom: 12px;
+      line-height: 1.6;
+      margin-bottom: 14px;
     }
 
     .specialist-stats {
       display: flex;
       gap: 16px;
+      padding-top: 12px;
+      border-top: 1px solid $nyt-light-gray;
 
       .stat {
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 0.85rem;
+        font-family: $font-sans;
+        color: $nyt-medium-gray;
+        font-size: 0.8rem;
       }
     }
   }
 }
 
-// Tablet breakpoint
+/* ========== Responsive Design ========== */
+
+// Large tablet breakpoint
 @media (max-width: 1024px) {
   .specialists-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    gap: 24px;
   }
 
-  .main-content {
-    padding: 2rem 1.5rem;
+  .results-section {
+    padding: 40px 20px;
   }
 }
 
-// Mobile breakpoint
+// Tablet/Mobile breakpoint
 @media (max-width: 768px) {
   .hero-header {
-    padding: 60px 1rem 40px;
+    padding: 80px 16px 60px;
 
     .page-title {
-      font-size: 1.8rem;
+      font-size: 2rem;
     }
 
     .page-subtitle {
       font-size: 1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 28px;
     }
   }
 
   .search-bar-wrapper {
-    margin: 0 auto 1rem;
+    margin: 0 auto 24px;
 
     .search-bar {
-      padding: 0.75rem 1rem;
+      padding: 12px 16px;
 
       .search-input {
         font-size: 16px; // Prevents iOS zoom
@@ -397,55 +560,87 @@
   }
 
   .quick-stats {
-    flex-direction: column;
-    gap: 0.75rem;
+    padding: 16px 24px;
+    gap: 20px;
+
+    .stat-divider {
+      display: none;
+    }
+
+    .stat-item {
+      .stat-number {
+        font-size: 1.5rem;
+      }
+    }
   }
 
-  .filters-container {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
+  .filters-section {
+    padding: 20px 16px;
+
+    .filters-row {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .filter-group {
+      width: 100%;
+
+      .filter-select, .filter-input {
+        width: 100%;
+        min-width: auto;
+      }
+    }
   }
 
   .specialists-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 20px;
   }
 
-  .main-content {
-    padding: 1.5rem 1rem;
+  .results-section {
+    padding: 32px 16px;
   }
 }
 
 // Small mobile breakpoint
 @media (max-width: 480px) {
   .hero-header {
-    padding: 40px 0.75rem 30px;
+    padding: 60px 12px 50px;
 
     .page-title {
-      font-size: 1.5rem;
+      font-size: 1.75rem;
+    }
+
+    .page-subtitle {
+      font-size: 0.95rem;
     }
   }
 
+  .quick-stats {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    padding: 14px 16px;
+  }
+
   .specialist-card {
-    .card-header {
-      padding: 1rem;
+    .specialist-info {
+      padding: 16px;
     }
 
-    .card-body {
-      padding: 1rem;
+    .specialist-name {
+      font-size: 1.2rem !important;
     }
 
     .specialist-stats {
       flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 10px;
     }
   }
 
   // Ensure touch targets are at least 44px
-  button, a, .filter-btn, .clear-search {
+  button, a, select, input {
     min-height: 44px;
-    min-width: 44px;
   }
 }
-

@@ -8,7 +8,7 @@
 
       <!-- Search Bar -->
       <div class="search-bar-wrapper">
-        <div class="search-bar glass-morphic">
+        <div class="search-bar">
           <span class="search-icon">🔍</span>
           <input
             type="text"
@@ -24,7 +24,7 @@
       </div>
 
       <!-- Quick Stats -->
-      <div class="quick-stats glass-morphic">
+      <div class="quick-stats">
         <div class="stat-item">
           <span class="stat-number">{{ stats().totalSpecialists }}</span>
           <span class="stat-label">Specialists</span>
@@ -51,11 +51,11 @@
       <!-- Row 1: Main filters -->
       <div class="filters-row">
         <div class="filter-group">
-          <label class="filter-label">👨‍🍳 Specialty</label>
+          <label class="filter-label">Specialty</label>
           <select
             [value]="selectedSpecialty()"
             (change)="onSpecialtyChange($any($event.target).value)"
-            class="filter-select glass-morphic"
+            class="filter-select"
           >
             @for (specialty of specialtyTypes; track specialty) {
               <option [value]="specialty === 'All Specialties' ? '' : specialty">
@@ -66,11 +66,11 @@
         </div>
 
         <div class="filter-group">
-          <label class="filter-label">🍽️ Cuisine</label>
+          <label class="filter-label">Cuisine</label>
           <select
             [value]="selectedCuisine()"
             (change)="onCuisineChange($any($event.target).value)"
-            class="filter-select glass-morphic"
+            class="filter-select"
           >
             @for (cuisine of cuisineTypes; track cuisine.value) {
               <option [value]="cuisine.value">{{ cuisine.label }}</option>
@@ -79,11 +79,11 @@
         </div>
 
         <div class="filter-group">
-          <label class="filter-label">⭐ Rating</label>
+          <label class="filter-label">Rating</label>
           <select
             [value]="selectedRating()"
             (change)="onRatingChange($any($event.target).value)"
-            class="filter-select glass-morphic"
+            class="filter-select"
           >
             @for (rating of ratingFilters; track rating.value) {
               <option [value]="rating.value">{{ rating.label }}</option>
@@ -95,11 +95,11 @@
       <!-- Row 2: Additional filters -->
       <div class="filters-row">
         <div class="filter-group">
-          <label class="filter-label">💰 Price Range</label>
+          <label class="filter-label">Price Range</label>
           <select
             [value]="selectedPriceRange()"
             (change)="onPriceRangeChange($any($event.target).value)"
-            class="filter-select glass-morphic"
+            class="filter-select"
           >
             @for (price of priceRanges; track price.value) {
               <option [value]="price.value">{{ price.label }}</option>
@@ -108,13 +108,13 @@
         </div>
 
         <div class="filter-group">
-          <label class="filter-label">📍 Country</label>
+          <label class="filter-label">Country</label>
           <input
             type="text"
-            placeholder="Country..."
+            placeholder="Enter country..."
             [value]="selectedCountry()"
             (input)="onCountryChange($any($event.target).value)"
-            class="filter-input glass-morphic"
+            class="filter-input"
           />
         </div>
 
@@ -122,7 +122,7 @@
           <div class="filter-group filter-actions">
             <label class="filter-label">&nbsp;</label>
             <button type="button" class="clear-filters-btn" (click)="clearFilters()">
-              ✕ Clear Filters
+              Clear All Filters
             </button>
           </div>
         }
@@ -135,7 +135,7 @@
     @if (loading()) {
       <div class="loading-state">
         <div class="spinner"></div>
-        <p>Loading specialists...</p>
+        <p>Finding specialists for you...</p>
       </div>
     } @else if (error()) {
       <div class="error-state">
@@ -152,7 +152,7 @@
     } @else {
       <div class="specialists-grid">
         @for (specialist of specialists(); track specialist.id) {
-          <a [routerLink]="['/specialists', specialist.id]" class="specialist-card glass-morphic">
+          <a [routerLink]="['/specialists', specialist.id]" class="specialist-card">
             <div class="specialist-image">
               <img
                 [src]="specialist.profilePhoto || getDefaultAvatar(specialist.fullName)"
@@ -160,7 +160,7 @@
                 (error)="$any($event.target).src = getDefaultAvatar(specialist.fullName)"
               />
               @if (specialist.averageRating >= 4.5) {
-                <div class="top-rated-badge">⭐ Top Rated</div>
+                <div class="top-rated-badge">Top Rated</div>
               }
             </div>
             <div class="specialist-info">
@@ -177,7 +177,7 @@
               </div>
               @if (specialist.minPrice > 0) {
                 <div class="specialist-pricing">
-                  <span class="price-label">💰 From</span>
+                  <span class="price-label">From</span>
                   <span class="price-value">${{ specialist.minPrice }}</span>
                   @if (specialist.maxPrice > specialist.minPrice) {
                     <span class="price-range">- ${{ specialist.maxPrice }}</span>
@@ -191,11 +191,11 @@
                 </div>
               }
               @if (specialist.bio) {
-                <p class="specialist-bio">{{ specialist.bio | slice:0:80 }}{{ specialist.bio.length > 80 ? '...' : '' }}</p>
+                <p class="specialist-bio">{{ specialist.bio | slice:0:100 }}{{ specialist.bio.length > 100 ? '...' : '' }}</p>
               }
               <div class="specialist-stats">
-                <span class="stat">✅ {{ specialist.completedBookings }} bookings</span>
-                <span class="stat">🍴 {{ specialist.services.length }} services</span>
+                <span class="stat">{{ specialist.completedBookings }} bookings completed</span>
+                <span class="stat">{{ specialist.services.length }} services</span>
               </div>
             </div>
           </a>
@@ -204,4 +204,3 @@
     }
   </div>
 </div>
-
