@@ -1,9 +1,23 @@
-/* Modern About Page - Inclusive Design for All User Groups */
+/* NYT-Inspired About Page - Modern Glassmorphic Design */
+
+// NYT Color Palette
+$nyt-black: #121212;
+$nyt-dark-gray: #333333;
+$nyt-medium-gray: #666666;
+$nyt-light-gray: #f7f7f5;
+$nyt-warm-white: #faf9f6;
+$nyt-accent: #567b95;
+$nyt-border: #e2e2e2;
+$itiyum-orange: #ff8c00;
+
+// Typography
+$font-serif: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
 .about-page {
   width: 100%;
   overflow-x: hidden;
-  background: linear-gradient(180deg, #fafbfc 0%, #ffffff 100%);
+  background: $nyt-warm-white;
   margin: 0;
   padding: 0;
 }
@@ -11,7 +25,9 @@
 /* ========== Hero Carousel Section ========== */
 .hero-carousel {
   position: relative;
-  height: 600px;
+  height: 85vh;
+  min-height: 600px;
+  max-height: 900px;
   overflow: hidden;
   width: 100vw;
   margin: 0;
@@ -37,7 +53,7 @@
     background-position: center;
     background-repeat: no-repeat;
     opacity: 0;
-    transition: opacity 1s ease-in-out;
+    transition: opacity 1.2s ease-in-out;
     z-index: 1;
 
     &.active {
@@ -52,9 +68,10 @@
       width: 100%;
       height: 100%;
       background: linear-gradient(
-        135deg,
-        rgba(0, 0, 0, 0.75) 0%,
-        rgba(40, 40, 40, 0.65) 100%
+        180deg,
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.5) 50%,
+        rgba(0, 0, 0, 0.7) 100%
       );
       z-index: 1;
     }
@@ -62,72 +79,79 @@
 
   .hero-content {
     position: absolute;
-    top: 50%;
+    bottom: 15%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     z-index: 10;
     text-align: center;
     color: white;
     width: 90%;
-    max-width: 900px;
-    padding: 2rem;
+    max-width: 1000px;
+    padding: 3rem;
+
+    // Glassmorphic card effect
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
 
   .hero-title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-family: $font-serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
     font-weight: 700;
-    margin: 0 0 1rem;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
+    margin: 0 0 1.5rem;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
     color: white;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     animation: fadeInUp 1s ease-out;
 
     .brand-gradient {
-      color: #ff8c00;
-      background: none;
-      -webkit-background-clip: unset;
-      -webkit-text-fill-color: unset;
-      background-clip: unset;
+      color: $itiyum-orange;
       display: inline-block;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      text-shadow: 0 4px 20px rgba(255, 140, 0, 0.4);
     }
   }
 
   .hero-subtitle {
-    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    font-family: $font-sans;
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
     margin: 0 auto 2.5rem;
     max-width: 700px;
-    color: white;
-    opacity: 1;
-    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.7;
     font-weight: 400;
-    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
     animation: fadeInUp 1s ease-out 0.2s backwards;
   }
 
   .hero-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
-    max-width: 700px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 2rem 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
     animation: fadeInUp 1s ease-out 0.4s backwards;
 
     .stat-item {
       .stat-value {
-        font-size: clamp(2rem, 4vw, 2.8rem);
+        font-family: $font-serif;
+        font-size: clamp(2rem, 4vw, 3rem);
         font-weight: 700;
-        margin-bottom: 0.3rem;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        margin-bottom: 0.5rem;
+        color: white;
       }
 
       .stat-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
+        font-family: $font-sans;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        opacity: 0.85;
         font-weight: 500;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
       }
     }
   }
@@ -138,24 +162,24 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 15;
-    background: rgba(255, 255, 255, 0.25);
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     color: white;
-    width: 50px;
-    height: 50px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.4);
-      border-color: rgba(255, 255, 255, 0.8);
-      transform: translateY(-50%) scale(1.1);
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-50%) scale(1.08);
     }
 
     &:active {
@@ -163,22 +187,18 @@
     }
 
     &.prev {
-      left: 2rem;
+      left: 2.5rem;
     }
 
     &.next {
-      right: 2rem;
-    }
-
-    svg {
-      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+      right: 2.5rem;
     }
   }
 
   /* Carousel Indicators */
   .carousel-indicators {
     position: absolute;
-    bottom: 2rem;
+    bottom: 2.5rem;
     left: 50%;
     transform: translateX(-50%);
     z-index: 15;
@@ -186,25 +206,23 @@
     gap: 0.75rem;
 
     .indicator {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      border: 2px solid white;
-      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      background: rgba(255, 255, 255, 0.4);
       cursor: pointer;
       transition: all 0.3s ease;
       padding: 0;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.6);
-        transform: scale(1.2);
+        background: rgba(255, 255, 255, 0.7);
       }
 
       &.active {
         background: white;
-        width: 32px;
-        border-radius: 6px;
+        width: 36px;
+        border-radius: 5px;
       }
     }
   }
@@ -222,10 +240,28 @@
   }
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
 /* ========== Mission Section ========== */
 .mission-section {
-  padding: 4rem 2rem;
+  padding: 6rem 2rem;
   background: white;
+  position: relative;
+
+  // NYT-style decorative line
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: $nyt-black;
+  }
 
   .mission-content {
     max-width: 800px;
@@ -234,40 +270,46 @@
   }
 
   .mission-text {
-    font-size: 1.15rem;
-    line-height: 1.8;
-    color: #4a5568;
-    margin: 1.5rem 0 0;
+    font-family: $font-serif;
+    font-size: 1.35rem;
+    line-height: 1.9;
+    color: $nyt-dark-gray;
+    margin: 2rem 0 0;
+    font-style: italic;
   }
 }
 
 /* ========== Section Titles ========== */
 .section-title {
-  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-family: $font-serif;
+  font-size: clamp(2.25rem, 5vw, 3rem);
   font-weight: 700;
   text-align: center;
-  margin: 0 0 1rem;
-  color: #1a202c;
+  margin: 0 0 1.25rem;
+  color: $nyt-black;
   letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .section-subtitle {
+  font-family: $font-sans;
   text-align: center;
   font-size: 1.1rem;
-  color: #718096;
-  margin: 0 auto 3rem;
-  max-width: 600px;
-  line-height: 1.6;
+  color: $nyt-medium-gray;
+  margin: 0 auto 3.5rem;
+  max-width: 650px;
+  line-height: 1.7;
 }
 
 /* ========== User Groups Section ========== */
 .user-groups-section {
-  padding: 4rem 2rem;
-  background: #f7fafc;
+  padding: 6rem 2rem;
+  background: $nyt-light-gray;
+  position: relative;
 
   .user-groups-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     gap: 2rem;
     max-width: 1400px;
     margin: 0 auto;
@@ -277,50 +319,41 @@
 
 .user-group-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 2px;
   overflow: hidden;
-  box-shadow:
-    0 4px 6px rgba(0, 0, 0, 0.05),
-    0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid $nyt-border;
 
   &:hover {
-    transform: translateY(-8px);
-    box-shadow:
-      0 20px 25px rgba(0, 0, 0, 0.1),
-      0 10px 10px rgba(0, 0, 0, 0.04);
+    transform: translateY(-12px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+
+    .card-header .icon-wrapper {
+      transform: scale(1.1);
+    }
   }
 
   .card-header {
-    padding: 2rem 2rem 1.5rem;
+    padding: 2.5rem 2rem 2rem;
     color: white;
     position: relative;
     overflow: hidden;
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
     .icon-wrapper {
-      font-size: 3rem;
-      margin-bottom: 0.8rem;
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
       display: inline-block;
-      animation: float 3s ease-in-out infinite;
+      transition: transform 0.3s ease;
     }
 
     .card-title {
-      font-size: 1.6rem;
+      font-family: $font-serif;
+      font-size: 1.75rem;
       font-weight: 700;
       margin: 0;
       position: relative;
+      letter-spacing: -0.01em;
     }
   }
 
@@ -328,21 +361,25 @@
     padding: 2rem;
 
     .card-description {
+      font-family: $font-sans;
       font-size: 1rem;
       line-height: 1.7;
-      color: #4a5568;
+      color: $nyt-medium-gray;
       margin: 0 0 1.5rem;
     }
 
     .features-section {
       margin-bottom: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid $nyt-border;
 
       .features-title {
-        font-size: 0.9rem;
-        font-weight: 700;
+        font-family: $font-sans;
+        font-size: 0.75rem;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #2d3748;
+        letter-spacing: 0.1em;
+        color: $nyt-medium-gray;
         margin: 0 0 1rem;
       }
 
@@ -355,22 +392,23 @@
           display: flex;
           align-items: flex-start;
           gap: 0.75rem;
-          margin-bottom: 0.75rem;
-          font-size: 0.95rem;
-          line-height: 1.6;
-          color: #4a5568;
+          margin-bottom: 0.65rem;
+          font-family: $font-sans;
+          font-size: 0.9rem;
+          line-height: 1.5;
+          color: $nyt-dark-gray;
 
           .feature-icon {
             flex-shrink: 0;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
-            background: #4a5568;
+            background: $nyt-black;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             font-weight: 700;
             margin-top: 2px;
           }
@@ -380,19 +418,21 @@
 
     .cta-button {
       width: 100%;
-      padding: 0.9rem 1.5rem;
+      padding: 1rem 1.5rem;
       border: none;
-      border-radius: 8px;
+      border-radius: 2px;
       color: white;
-      font-size: 1rem;
+      font-family: $font-sans;
+      font-size: 0.9rem;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
       &:hover {
+        opacity: 0.9;
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
       }
 
       &:active {
@@ -404,77 +444,90 @@
 
 /* ========== Community Section ========== */
 .community-section {
-  padding: 5rem 2rem;
-  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  padding: 7rem 2rem;
+  background: $nyt-black;
   color: white;
   text-align: center;
+  position: relative;
 
+  // Glassmorphic overlay card
   .community-content {
-    max-width: 700px;
+    max-width: 800px;
     margin: 0 auto;
+    padding: 4rem;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
   }
 
   .section-title {
+    font-family: $font-serif;
     color: white;
+    margin-bottom: 1.5rem;
   }
 
   .community-text {
-    font-size: 1.15rem;
+    font-family: $font-serif;
+    font-size: 1.25rem;
     line-height: 1.8;
-    margin: 1.5rem 0 2.5rem;
-    color: white;
-    opacity: 1;
+    margin: 0 0 2.5rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-style: italic;
   }
 
   .community-actions {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     justify-content: center;
     flex-wrap: wrap;
 
     button {
       padding: 1rem 2.5rem;
-      border-radius: 8px;
-      font-size: 1.05rem;
+      border-radius: 2px;
+      font-family: $font-sans;
+      font-size: 0.9rem;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       cursor: pointer;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.75rem;
       border: none;
 
       .arrow {
         transition: transform 0.3s ease;
+        font-size: 1.1rem;
       }
 
       &:hover .arrow {
-        transform: translateX(4px);
+        transform: translateX(6px);
       }
     }
 
     .primary-button {
-      background: white;
-      color: #1a202c;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background: $itiyum-orange;
+      color: white;
 
       &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-        background: #f5f5f5;
+        background: darken($itiyum-orange, 5%);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(255, 140, 0, 0.3);
       }
     }
 
     .secondary-button {
-      background: rgba(255, 255, 255, 0.15);
+      background: transparent;
       color: white;
       border: 2px solid white;
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.25);
-        transform: translateY(-2px);
+        background: white;
+        color: $nyt-black;
+        transform: translateY(-3px);
       }
     }
   }
@@ -482,8 +535,8 @@
 
 /* ========== Resources Section ========== */
 .resources-section {
-  padding: 5rem 2rem;
-  background: white;
+  padding: 6rem 2rem;
+  background: $nyt-light-gray;
 
   .resources-content {
     max-width: 1200px;
@@ -492,95 +545,118 @@
 
   .resources-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
     margin-top: 3rem;
   }
 
   .resource-card {
-    text-align: center;
-    padding: 2rem 1.5rem;
-    border-radius: 12px;
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s ease;
+    text-align: left;
+    padding: 2.5rem 2rem;
+    background: white;
+    border: 1px solid $nyt-border;
+    border-radius: 2px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+
+    // Top accent line
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: $nyt-black;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
 
     &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-      border-color: #cbd5e0;
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+
+      &::before {
+        transform: scaleX(1);
+      }
+
+      .resource-icon {
+        transform: scale(1.1);
+      }
     }
 
     .resource-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      font-size: 2.5rem;
+      margin-bottom: 1.25rem;
+      display: block;
+      transition: transform 0.3s ease;
     }
 
     h3 {
-      font-size: 1.3rem;
+      font-family: $font-serif;
+      font-size: 1.25rem;
       font-weight: 700;
       margin: 0 0 0.75rem;
-      color: #2d3748;
+      color: $nyt-black;
     }
 
     p {
-      font-size: 0.95rem;
+      font-family: $font-sans;
+      font-size: 0.9rem;
       line-height: 1.6;
-      color: #718096;
+      color: $nyt-medium-gray;
       margin: 0;
     }
   }
 }
 
-/* ========== Animations ========== */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* ========== Responsive Design ========== */
+
+// Large tablet breakpoint
+@media (max-width: 1200px) {
+  .resources-section .resources-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
 // Tablet breakpoint
 @media (max-width: 1024px) {
-  .user-groups-grid {
+  .hero-carousel {
+    height: 75vh;
+    min-height: 500px;
+
+    .hero-content {
+      padding: 2rem;
+    }
+
+    .hero-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  .user-groups-section .user-groups-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
 
-  .resources-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+  .community-section .community-content {
+    padding: 3rem 2rem;
   }
 }
 
 // Mobile breakpoint
 @media (max-width: 768px) {
   .hero-carousel {
-    height: 450px;
+    height: auto;
+    min-height: 600px;
 
     .carousel-control {
-      width: 40px;
-      height: 40px;
-      min-width: 44px;
-      min-height: 44px;
+      width: 44px;
+      height: 44px;
 
-      &.prev { left: 0.75rem; }
-      &.next { right: 0.75rem; }
+      &.prev { left: 1rem; }
+      &.next { right: 1rem; }
 
       svg {
         width: 20px;
@@ -589,95 +665,130 @@
     }
 
     .carousel-indicators {
-      bottom: 1rem;
-      gap: 0.5rem;
+      bottom: 1.5rem;
 
       .indicator {
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
 
         &.active {
-          width: 24px;
+          width: 28px;
         }
       }
     }
 
     .hero-content {
+      bottom: 10%;
       padding: 1.5rem;
+      border-radius: 16px;
     }
 
     .hero-stats {
       gap: 1rem;
-      grid-template-columns: repeat(2, 1fr);
+      padding-top: 1.5rem;
     }
   }
 
-  .mission-section,
-  .user-groups-section,
-  .community-section,
+  .mission-section {
+    padding: 4rem 1.5rem;
+
+    &::before {
+      width: 60px;
+    }
+
+    .mission-text {
+      font-size: 1.15rem;
+    }
+  }
+
+  .user-groups-section {
+    padding: 4rem 1.5rem;
+
+    .user-groups-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .community-section {
+    padding: 4rem 1.5rem;
+
+    .community-content {
+      padding: 2rem 1.5rem;
+    }
+
+    .community-actions {
+      flex-direction: column;
+      gap: 1rem;
+
+      button {
+        width: 100%;
+        justify-content: center;
+        min-height: 48px;
+      }
+    }
+  }
+
   .resources-section {
-    padding: 3rem 1.5rem;
-  }
+    padding: 4rem 1.5rem;
 
-  .user-groups-grid {
-    grid-template-columns: 1fr;
-    padding: 0;
-    gap: 1.5rem;
-  }
-
-  .community-actions {
-    flex-direction: column;
-    gap: 0.75rem;
-
-    button {
-      width: 100%;
-      justify-content: center;
-      min-height: 44px;
+    .resources-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
     }
-  }
 
-  .resources-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    .resource-card {
+      padding: 2rem 1.5rem;
+    }
   }
 }
 
 // Small mobile breakpoint
 @media (max-width: 480px) {
   .hero-carousel {
-    height: 400px;
+    min-height: 550px;
 
     .hero-content {
-      padding: 1rem;
+      padding: 1.25rem;
+      width: 95%;
+    }
+
+    .hero-title {
+      font-size: 1.75rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
     }
 
     .hero-stats {
-      gap: 0.75rem;
-
-      .stat-number {
-        font-size: 1.5rem;
+      .stat-item .stat-value {
+        font-size: 1.75rem;
       }
     }
+  }
+
+  .section-title {
+    font-size: 1.75rem;
   }
 
   .mission-section,
   .user-groups-section,
   .community-section,
   .resources-section {
-    padding: 2rem 1rem;
+    padding: 3rem 1rem;
   }
 
   // Ensure touch targets are at least 44px
-  button, a, .btn, [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
+  button, a.cta-button, .btn, [role="button"] {
+    min-height: 48px;
   }
 }
 
 /* ========== Ads Banner Section ========== */
 .ads-banner-section {
-  padding: 2rem 0;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 2.5rem 0;
+  background: $nyt-light-gray;
   margin: 0;
   width: 100vw;
   position: relative;
@@ -685,4 +796,6 @@
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
+  border-top: 1px solid $nyt-border;
+  border-bottom: 1px solid $nyt-border;
 }
