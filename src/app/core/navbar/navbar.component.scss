@@ -55,11 +55,7 @@ $touch-target-min: 44px;
   .logo {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
     text-decoration: none;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #ff6b00;
     transition: transform 0.3s ease;
     min-height: $touch-target-min;
 
@@ -67,22 +63,13 @@ $touch-target-min: 44px;
       transform: scale(1.05);
     }
 
-    .logo-icon {
-      font-size: 2rem;
+    .logo-image {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
 
       @media (max-width: $breakpoint-mobile) {
-        font-size: 1.5rem;
-      }
-    }
-
-    .logo-text {
-      background: linear-gradient(135deg, #ff6b00, #ff8c00);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-
-      @media (max-width: $breakpoint-mobile) {
-        font-size: 1.25rem;
+        height: 40px;
       }
     }
   }
