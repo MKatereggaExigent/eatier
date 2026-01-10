@@ -3,13 +3,16 @@
   <div class="hero-header">
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <h1 class="page-title">Discover Amazing Restaurants</h1>
-      <p class="page-subtitle">Explore the finest dining experiences in your city</p>
+      <h1 class="page-title">Discover Restaurants</h1>
+      <p class="page-subtitle">Find the finest dining experiences curated for you</p>
 
       <!-- Enhanced Search Bar -->
       <div class="search-bar-wrapper">
-        <div class="search-bar glass-morphic">
-          <span class="search-icon">🔍</span>
+        <div class="search-bar">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
           <input
             type="text"
             placeholder="Search restaurants, cuisines, or locations..."
@@ -18,31 +21,28 @@
             class="search-input"
           />
           @if (searchQuery()) {
-            <button type="button" class="clear-search" (click)="onSearchChange('')">✕</button>
+            <button type="button" class="clear-search" (click)="onSearchChange('')">×</button>
           }
         </div>
       </div>
 
       <!-- Quick Stats -->
-      <div class="quick-stats glass-morphic">
+      <div class="quick-stats">
         <div class="stat-item">
           <span class="stat-number">{{ stats().restaurants }}</span>
           <span class="stat-label">Restaurants</span>
         </div>
-        <div class="stat-divider"></div>
         <div class="stat-item">
           <span class="stat-number">{{ cuisineTypes.length - 1 }}</span>
           <span class="stat-label">Cuisines</span>
         </div>
-        <div class="stat-divider"></div>
         <div class="stat-item">
           <span class="stat-number">{{ stats().reviews }}</span>
           <span class="stat-label">Reviews</span>
         </div>
         @if (stats().reviews > 0) {
-          <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-number">{{ stats().avgRating.toFixed(1) }}★</span>
+            <span class="stat-number">{{ stats().avgRating.toFixed(1) }}</span>
             <span class="stat-label">Avg Rating</span>
           </div>
         }
@@ -54,11 +54,11 @@
   <div class="filters-section">
     <div class="filters-container">
       <div class="filter-group">
-        <label class="filter-label">🍽️ Cuisine</label>
+        <label class="filter-label">Cuisine</label>
         <select
           [value]="selectedCuisine()"
           (change)="onCuisineChange($any($event.target).value)"
-          class="filter-select glass-morphic"
+          class="filter-select"
         >
           @for (cuisine of cuisineTypes; track cuisine) {
             <option [value]="cuisine === 'All Cuisines' ? '' : cuisine">
@@ -69,11 +69,11 @@
       </div>
 
       <div class="filter-group">
-        <label class="filter-label">💰 Price Range</label>
+        <label class="filter-label">Price Range</label>
         <select
           [value]="selectedPriceRange()"
           (change)="onPriceRangeChange($any($event.target).value)"
-          class="filter-select glass-morphic"
+          class="filter-select"
         >
           @for (range of priceRanges; track range.value) {
             <option [value]="range.value">{{ range.label }}</option>
@@ -81,18 +81,12 @@
         </select>
       </div>
 
-      <button type="button" class="filter-button glass-morphic">
-        <span>⚙️</span>
-        <span>More Filters</span>
-      </button>
-
       @if (searchQuery() || selectedCuisine() || selectedPriceRange()) {
         <button
           type="button"
-          class="clear-all-btn glass-morphic"
+          class="clear-all-btn"
           (click)="clearAllFilters()">
-          <span>✕</span>
-          <span>Clear All</span>
+          Clear Filters
         </button>
       }
     </div>
@@ -113,7 +107,7 @@
   <!-- Restaurant Grid -->
   <div class="restaurant-grid">
     @for (restaurant of filteredRestaurants(); track restaurant.id) {
-      <article class="restaurant-card glass-morphic">
+      <article class="restaurant-card">
         <a [routerLink]="['/restaurants', restaurant.id]" class="restaurant-link">
           <div class="card-image-wrapper">
             <img [src]="restaurant.image" [alt]="restaurant.name" class="restaurant-image" />
@@ -127,17 +121,15 @@
 
             <!-- Distance Badge - Only show if available -->
             @if (restaurant.distance && restaurant.distance !== 'N/A') {
-              <div class="distance-badge glass-morphic">
-                <span class="distance-icon">📍</span>
+              <div class="distance-badge">
                 {{ restaurant.distance }}
               </div>
             }
 
             <!-- Rating Badge - Show "New" if no reviews -->
-            <div class="rating-badge glass-morphic">
+            <div class="rating-badge">
               @if (restaurant.reviewCount > 0) {
-                <span class="rating-star">⭐</span>
-                <span class="rating-value">{{ restaurant.rating.toFixed(1) }}</span>
+                <span class="rating-value">{{ restaurant.rating.toFixed(1) }} ★</span>
               } @else {
                 <span class="new-badge">New</span>
               }
@@ -163,40 +155,53 @@
 
             @if (restaurant.address && restaurant.address !== 'Address not provided') {
               <p class="restaurant-address">
-                <span class="address-icon">📍</span>
                 {{ restaurant.address }}
               </p>
             } @else {
               <p class="restaurant-address no-address">
-                <span class="address-icon">📍</span>
                 <span class="setup-required">Address setup required</span>
               </p>
             }
 
-            <div class="restaurant-features">
-              @for (feature of restaurant.features; track feature) {
-                <span class="feature-tag">{{ feature }}</span>
-              }
-            </div>
+            @if (restaurant.features && restaurant.features.length > 0) {
+              <div class="restaurant-features">
+                @for (feature of restaurant.features.slice(0, 3); track feature) {
+                  <span class="feature-tag">{{ feature }}</span>
+                }
+              </div>
+            }
           </div>
         </a>
 
         <!-- Action Buttons -->
         <div class="card-actions">
           <button type="button" class="action-btn favorite" title="Save to favorites">
-            <span class="action-icon">❤️</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
           </button>
           <button type="button" class="action-btn share" title="Share">
-            <span class="action-icon">📤</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
           </button>
           <button type="button" class="action-btn directions" title="Get directions">
-            <span class="action-icon">🗺️</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+            </svg>
           </button>
         </div>
       </article>
     } @empty {
-      <div class="no-results glass-morphic">
-        <div class="no-results-icon">🔍</div>
+      <div class="no-results">
+        <svg class="no-results-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
         <h3>No restaurants found</h3>
         <p>Try adjusting your search criteria or filters</p>
         <button type="button" class="clear-filters-btn" (click)="clearAllFilters()">
@@ -209,9 +214,11 @@
   <!-- Load More -->
   @if (filteredRestaurants().length > 0 && filteredRestaurants().length >= 5) {
     <div class="load-more-section">
-      <button type="button" class="load-more-btn glass-morphic">
-        <span>Load More Restaurants</span>
-        <span class="load-icon">↓</span>
+      <button type="button" class="load-more-btn">
+        <span>Load More</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"></path>
+        </svg>
       </button>
     </div>
   }
