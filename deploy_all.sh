@@ -3,6 +3,12 @@
 # Eatier/Itiyum Full Deployment Script
 # Run this ON THE SERVER after git pull
 # This starts backend AND deploys frontend to CapRover
+#
+# IMPORTANT: Run WITHOUT sudo for CapRover deployment to work:
+#   ./deploy_all.sh
+#
+# If you need sudo for Docker, add your user to docker group:
+#   sudo usermod -aG docker $USER
 
 set -e
 
@@ -13,6 +19,18 @@ echo "=========================================="
 echo "📍 Running on server: $(hostname)"
 echo "📅 $(date)"
 echo ""
+
+# Check if running as root/sudo - warn about CapRover issues
+if [ "$EUID" -eq 0 ]; then
+    echo "⚠️  WARNING: Running as root/sudo."
+    echo "   CapRover config is in user's home directory."
+    echo "   Frontend deployment may fail."
+    echo ""
+    echo "   Recommended: Run without sudo:"
+    echo "   ./deploy_all.sh"
+    echo ""
+    read -p "Press Enter to continue anyway, or Ctrl+C to cancel..."
+fi
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -77,8 +95,13 @@ echo "🎨 STEP 2: Building & Deploying Frontend"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-# Run frontend deployment script
-./deploy_to_caprover.sh
+# Run frontend deployment script (use user's home for CapRover config)
+if [ "$EUID" -eq 0 ] && [ -n "$SUDO_USER" ]; then
+    echo "📝 Running CapRover deployment as $SUDO_USER..."
+    sudo -u "$SUDO_USER" ./deploy_to_caprover.sh
+else
+    ./deploy_to_caprover.sh
+fi
 
 # ===========================================
 # STEP 3: Final Summary

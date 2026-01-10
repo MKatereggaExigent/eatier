@@ -121,21 +121,38 @@ server {
 }
 EOF
 
-# Step 8: Create deployment tarball
+# Step 8: Create deployment tarball (use home directory like cryptosqan)
+TARBALL_PATH=~/${APP_NAME}-frontend.tar.gz
 echo "📦 Packaging into ${APP_NAME}-frontend.tar.gz..."
-tar -czf /tmp/${APP_NAME}-frontend.tar.gz ./* || { echo "❌ Failed to create tar.gz"; exit 1; }
-echo "✅ Tarball created at: /tmp/${APP_NAME}-frontend.tar.gz"
+tar -czf "$TARBALL_PATH" ./* || { echo "❌ Failed to create tar.gz"; exit 1; }
+echo "✅ Tarball created at: $TARBALL_PATH"
 
-# Step 9: Deploy to CapRover
+# Step 9: Check CapRover config exists
+CAPROVER_CONFIG=~/.caprover/configs.json
+if [ ! -f "$CAPROVER_CONFIG" ]; then
+    echo ""
+    echo "❌ CapRover not configured. Please run:"
+    echo "   caprover login"
+    echo ""
+    echo "   When prompted:"
+    echo "   - URL: https://captain.aidocumines.com"
+    echo "   - Password: your CapRover admin password"
+    echo "   - Name: aidoc-server"
+    echo ""
+    exit 1
+fi
+
+# Step 10: Deploy to CapRover
 echo ""
 echo "🚀 Deploying to CapRover..."
+echo "   Using config: $CAPROVER_CONFIG"
 caprover deploy \
   --caproverName "$CAPROVER_NAME" \
   --caproverApp "$CAPROVER_APP" \
-  --tarFile /tmp/${APP_NAME}-frontend.tar.gz
+  --tarFile "$TARBALL_PATH"
 
 # Cleanup
-rm -f /tmp/${APP_NAME}-frontend.tar.gz
+rm -f "$TARBALL_PATH"
 
 echo ""
 echo "✅ Frontend deployment complete!"
