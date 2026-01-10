@@ -64,12 +64,12 @@ $touch-target-min: 44px;
     }
 
     .logo-image {
-      height: 48px;
+      height: 120px;
       width: auto;
       object-fit: contain;
 
       @media (max-width: $breakpoint-mobile) {
-        height: 40px;
+        height: 80px;
       }
     }
   }

@@ -180,12 +180,12 @@
       }
 
       .brand-logo-image {
-        height: 48px;
+        height: 120px;
         width: auto;
         object-fit: contain;
 
         @media (max-width: 768px) {
-          height: 40px;
+          height: 80px;
         }
       }
     }
@@ -554,7 +554,7 @@
       margin-bottom: var(--space-6);
 
       .footer-logo-image {
-        height: 56px;
+        height: 140px;
         width: auto;
         object-fit: contain;
         margin-bottom: var(--space-3);
