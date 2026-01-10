@@ -482,8 +482,6 @@ $itiyum-orange-dark: #e67e00;
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
-
-    }
   }
 
   &.small {
@@ -1797,6 +1795,8 @@ $itiyum-orange-dark: #e67e00;
 .spinner {
   display: inline-block;
   animation: spin 0.8s linear infinite;
+}
+
 /* ========== Pagination ========== */
 .pagination-container {
   margin-top: 40px;
