@@ -1,4 +1,4 @@
-/* ========== Minimal Floating Navbar ========== */
+/* ========== Compact Navbar - Same width as navbar-nav ========== */
 
 // Breakpoints
 $breakpoint-mobile: 480px;
@@ -13,30 +13,35 @@ $itiyum-orange-dark: #e67e00;
 $nyt-black: #121212;
 $nyt-dark-gray: #333333;
 
-/* Wrapper - Invisible, just for positioning */
+/* Navbar - Centered, same width as navbar-nav */
 .navbar {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
-  pointer-events: none;
+  width: fit-content;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Container - No extra width, just holds navbar-nav */
 .navbar-container {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 5px;
 }
 
-/* Brand / Logo - Separate fixed element */
+/* Logo - Completely separate fixed container */
 .navbar-brand {
   position: fixed;
-  top: 10px;
+  top: 12px;
   left: 16px;
   z-index: 1001;
-  pointer-events: auto;
 
   .logo {
     display: block;
@@ -58,19 +63,11 @@ $nyt-dark-gray: #333333;
   }
 }
 
-/* ========== NAVBAR-NAV - The main styled element ========== */
+/* NAVBAR-NAV - The content that determines width */
 .navbar-nav {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 22px;
-  padding: 4px 5px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  pointer-events: auto;
 
   .nav-link {
     padding: 6px 11px;
@@ -101,7 +98,7 @@ $nyt-dark-gray: #333333;
   }
 }
 
-/* Actions - Separate fixed element */
+/* Actions - Completely separate fixed container on right */
 .navbar-actions {
   position: fixed;
   top: 14px;
@@ -109,21 +106,12 @@ $nyt-dark-gray: #333333;
   z-index: 1001;
   display: flex;
   align-items: center;
-  gap: 5px;
-  pointer-events: auto;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 18px;
-  padding: 4px 5px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  gap: 4px;
 
   @media (max-width: $breakpoint-tablet) {
     right: 12px;
     top: 12px;
     gap: 3px;
-    padding: 3px 4px;
   }
 }
 
