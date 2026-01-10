@@ -744,69 +744,186 @@ $itiyum-orange-dark: #e67e00;
 }
 
 /* ========== Responsive Design ========== */
+
+// Large desktop
+@media (max-width: 1400px) {
+  .restaurant-grid {
+    max-width: 1100px;
+  }
+
+  .filters-section .filters-container {
+    max-width: 1000px;
+  }
+}
+
+// Large tablet / Small desktop
+@media (max-width: 1200px) {
+  .restaurant-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    max-width: 900px;
+  }
+
+  .hero-header {
+    min-height: 400px;
+    padding: 5rem 2rem 4rem;
+
+    .hero-content {
+      max-width: 700px;
+      padding: 2.5rem;
+    }
+  }
+}
+
+// iPad / Tablet breakpoint
 @media (max-width: 1024px) {
   .restaurant-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
+    padding: 2rem 1.5rem;
   }
 
   .quick-stats {
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0;
 
     .stat-item {
       padding: 0.75rem 1.5rem;
       border-right: 1px solid rgba(255, 255, 255, 0.15);
+      flex: 0 0 auto;
 
       &:nth-child(2n) {
         border-right: none;
+      }
+
+      &:last-of-type {
+        border-right: none;
+      }
+
+      .stat-number {
+        font-size: 1.75rem;
+      }
+
+      .stat-label {
+        font-size: 0.6rem;
       }
     }
   }
 
   .hero-header {
-    padding: 4rem 1.5rem;
+    padding: 4rem 1.5rem 3rem;
     min-height: 380px;
 
     .hero-content {
       padding: 2rem;
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-header {
-    padding: 3rem 1rem;
-    min-height: 350px;
-
-    .hero-content {
-      padding: 1.5rem;
+      width: 90%;
     }
 
     .page-title {
-      font-size: 1.8rem;
+      font-size: 2.25rem;
     }
 
     .page-subtitle {
       font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .search-bar-wrapper {
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+
+    .search-bar {
+      padding: 0.85rem 1.25rem;
+    }
+  }
+
+  .filters-section {
+    padding: 1.25rem 1.5rem;
+
+    .filters-container {
+      gap: 0.75rem;
+    }
+  }
+
+  .restaurant-card {
+    .card-image-wrapper {
+      height: 200px;
+    }
+
+    .card-content {
+      padding: 1.25rem;
+    }
+  }
+
+  .sponsored-banner {
+    padding: 1rem 1.5rem 0;
+  }
+}
+
+// Mobile breakpoint
+@media (max-width: 768px) {
+  .hero-header {
+    padding: 3rem 1rem 2.5rem;
+    min-height: 350px;
+
+    .hero-content {
+      padding: 1.5rem;
+      width: 92%;
+      border-radius: 4px;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      font-size: 0.95rem;
+      margin-bottom: 1.25rem;
     }
   }
 
   .search-bar-wrapper .search-bar {
     padding: 0.85rem 1rem;
+    gap: 0.75rem;
+
+    .search-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .search-input {
+      font-size: 0.95rem;
+    }
   }
 
   .quick-stats {
+    flex-wrap: wrap;
+    justify-content: center;
+
     .stat-item {
       padding: 0.6rem 1rem;
       flex: 0 0 50%;
+      text-align: center;
+      border-right: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+      &:nth-child(odd) {
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      &:nth-last-child(-n+2) {
+        border-bottom: none;
+      }
 
       .stat-number {
         font-size: 1.5rem;
       }
 
       .stat-label {
-        font-size: 0.65rem;
+        font-size: 0.55rem;
       }
     }
   }
@@ -817,13 +934,19 @@ $itiyum-orange-dark: #e67e00;
     .filters-container {
       flex-direction: column;
       align-items: stretch;
+      gap: 0.75rem;
 
       .filter-group {
         width: 100%;
 
+        .filter-label {
+          font-size: 0.65rem;
+        }
+
         .filter-select {
           width: 100%;
           min-width: unset;
+          padding: 0.75rem 1rem;
         }
       }
 
@@ -831,8 +954,21 @@ $itiyum-orange-dark: #e67e00;
       .clear-all-btn {
         width: 100%;
         justify-content: center;
+        min-height: 48px;
       }
     }
+
+    .results-info .results-text {
+      font-size: 0.85rem;
+
+      .results-count {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .sponsored-banner {
+    padding: 1rem;
   }
 
   .restaurant-grid {
@@ -844,19 +980,94 @@ $itiyum-orange-dark: #e67e00;
   .restaurant-card {
     .card-image-wrapper {
       height: 180px;
+
+      .status-badge {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.65rem;
+      }
+
+      .rating-badge {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+      }
+
+      .distance-badge {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.7rem;
+      }
     }
 
     .card-content {
       padding: 1rem;
 
-      .restaurant-name {
-        font-size: 1.1rem;
+      .card-header {
+        margin-bottom: 0.6rem;
+
+        .restaurant-name {
+          font-size: 1.1rem;
+        }
+
+        .review-count {
+          font-size: 0.75rem;
+        }
+      }
+
+      .restaurant-meta {
+        gap: 0.4rem;
+        margin-bottom: 0.6rem;
+
+        .cuisine-badge,
+        .price-badge {
+          padding: 0.25rem 0.6rem;
+          font-size: 0.65rem;
+        }
+      }
+
+      .restaurant-address {
+        font-size: 0.8rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .restaurant-features {
+        gap: 0.3rem;
+
+        .feature-tag {
+          padding: 0.2rem 0.5rem;
+          font-size: 0.65rem;
+        }
       }
     }
 
     .card-actions .action-btn {
       padding: 0.65rem;
       min-height: 48px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .no-results {
+    padding: 3rem 1.5rem;
+
+    .no-results-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+    }
+
+    .clear-filters-btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.8rem;
     }
   }
 
@@ -866,6 +1077,55 @@ $itiyum-orange-dark: #e67e00;
     .load-more-btn {
       width: 100%;
       justify-content: center;
+      padding: 0.9rem 2rem;
+    }
+  }
+}
+
+// Small mobile breakpoint
+@media (max-width: 480px) {
+  .hero-header {
+    padding: 2.5rem 0.75rem 2rem;
+    min-height: 320px;
+
+    .hero-content {
+      padding: 1.25rem 1rem;
+      width: 95%;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+    }
+
+    .page-subtitle {
+      font-size: 0.9rem;
+    }
+  }
+
+  .quick-stats .stat-item {
+    padding: 0.5rem 0.75rem;
+
+    .stat-number {
+      font-size: 1.35rem;
+    }
+  }
+
+  .filters-section {
+    padding: 0.75rem;
+  }
+
+  .restaurant-grid {
+    padding: 1rem 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .restaurant-card {
+    .card-image-wrapper {
+      height: 160px;
+    }
+
+    .card-content {
+      padding: 0.85rem;
     }
   }
 }

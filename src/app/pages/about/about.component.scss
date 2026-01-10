@@ -612,26 +612,76 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
 /* ========== Responsive Design ========== */
 
+// Large desktop breakpoint
+@media (max-width: 1400px) {
+  .hero-content {
+    max-width: 900px;
+  }
+
+  .hero-stats {
+    max-width: 700px;
+  }
+}
+
 // Large tablet breakpoint
 @media (max-width: 1200px) {
   .resources-section .resources-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .hero-carousel .hero-content {
+    width: 92%;
+    max-width: 800px;
+    padding: 2.5rem;
+  }
 }
 
-// Tablet breakpoint
+// iPad / Tablet breakpoint
 @media (max-width: 1024px) {
   .hero-carousel {
     height: 75vh;
     min-height: 500px;
+    max-height: 700px;
 
     .hero-content {
       padding: 2rem;
+      width: 90%;
+      bottom: 12%;
+      border-radius: 20px;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
     }
 
     .hero-stats {
       grid-template-columns: repeat(2, 1fr);
       gap: 1.5rem;
+      max-width: 100%;
+
+      .stat-item {
+        .stat-value {
+          font-size: 2rem;
+        }
+
+        .stat-label {
+          font-size: 0.75rem;
+        }
+      }
+    }
+
+    .carousel-control {
+      width: 48px;
+      height: 48px;
+
+      &.prev { left: 1.5rem; }
+      &.next { right: 1.5rem; }
     }
   }
 
@@ -643,78 +693,128 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   .community-section .community-content {
     padding: 3rem 2rem;
   }
+
+  .mission-section {
+    padding: 5rem 2rem;
+
+    .mission-text {
+      font-size: 1.2rem;
+      max-width: 100%;
+    }
+  }
 }
 
 // Mobile breakpoint
 @media (max-width: 768px) {
   .hero-carousel {
     height: auto;
-    min-height: 600px;
+    min-height: 550px;
+    max-height: none;
 
     .carousel-control {
       width: 44px;
       height: 44px;
 
-      &.prev { left: 1rem; }
-      &.next { right: 1rem; }
+      &.prev { left: 0.75rem; }
+      &.next { right: 0.75rem; }
 
       svg {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
       }
     }
 
     .carousel-indicators {
-      bottom: 1.5rem;
+      bottom: 1.25rem;
+      gap: 0.5rem;
 
       .indicator {
         width: 8px;
         height: 8px;
 
         &.active {
-          width: 28px;
+          width: 24px;
         }
       }
     }
 
     .hero-content {
-      bottom: 10%;
+      position: relative;
+      bottom: auto;
+      left: auto;
+      transform: none;
+      margin: 6rem auto 3rem;
+      width: 90%;
       padding: 1.5rem;
       border-radius: 16px;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
     }
 
     .hero-stats {
       gap: 1rem;
       padding-top: 1.5rem;
+
+      .stat-item {
+        .stat-value {
+          font-size: 1.75rem;
+        }
+
+        .stat-label {
+          font-size: 0.7rem;
+        }
+      }
     }
   }
 
   .mission-section {
-    padding: 4rem 1.5rem;
+    padding: 3.5rem 1.5rem;
 
     &::before {
-      width: 60px;
+      width: 50px;
     }
 
     .mission-text {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
+      line-height: 1.7;
     }
   }
 
   .user-groups-section {
-    padding: 4rem 1.5rem;
+    padding: 3.5rem 1.5rem;
 
     .user-groups-grid {
       grid-template-columns: 1fr;
-      gap: 1.5rem;
+      gap: 1.25rem;
+    }
+
+    .group-card {
+      padding: 1.5rem;
+
+      .group-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
+      }
     }
   }
 
   .community-section {
-    padding: 4rem 1.5rem;
+    padding: 3.5rem 1.5rem;
 
     .community-content {
       padding: 2rem 1.5rem;
+    }
+
+    .community-title {
+      font-size: 1.75rem;
     }
 
     .community-actions {
@@ -730,7 +830,11 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   .resources-section {
-    padding: 4rem 1.5rem;
+    padding: 3.5rem 1.5rem;
+
+    .section-title {
+      font-size: 1.75rem;
+    }
 
     .resources-grid {
       grid-template-columns: 1fr;
@@ -738,48 +842,81 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
     .resource-card {
-      padding: 2rem 1.5rem;
+      padding: 1.5rem;
     }
+  }
+
+  .ads-banner-section {
+    padding: 2rem 1rem;
   }
 }
 
 // Small mobile breakpoint
 @media (max-width: 480px) {
   .hero-carousel {
-    min-height: 550px;
+    min-height: 500px;
 
     .hero-content {
       padding: 1.25rem;
-      width: 95%;
+      width: 94%;
+      margin-top: 5rem;
     }
 
     .hero-title {
-      font-size: 1.75rem;
+      font-size: 1.6rem;
+      line-height: 1.2;
     }
 
     .hero-subtitle {
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
 
     .hero-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+
       .stat-item .stat-value {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
       }
+    }
+
+    .carousel-control {
+      width: 40px;
+      height: 40px;
+
+      &.prev { left: 0.5rem; }
+      &.next { right: 0.5rem; }
     }
   }
 
   .section-title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 
-  .mission-section,
+  .mission-section {
+    padding: 2.5rem 1rem;
+
+    .mission-text {
+      font-size: 1rem;
+    }
+  }
+
   .user-groups-section,
   .community-section,
   .resources-section {
-    padding: 3rem 1rem;
+    padding: 2.5rem 1rem;
   }
 
-  // Ensure touch targets are at least 44px
+  .group-card,
+  .resource-card {
+    padding: 1.25rem;
+  }
+
+  .community-section .community-content {
+    padding: 1.5rem 1rem;
+  }
+
+  // Ensure touch targets are at least 48px
   button, a.cta-button, .btn, [role="button"] {
     min-height: 48px;
   }

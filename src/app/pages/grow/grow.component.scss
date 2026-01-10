@@ -879,6 +879,18 @@ $accent-gold: #c9a227;
 // RESPONSIVE
 // =====================================================
 
+// Large desktop breakpoint
+@media (max-width: 1400px) {
+  .hero-carousel .hero-content {
+    max-width: 800px;
+  }
+
+  .geo-targeting-content,
+  .bookings-content {
+    max-width: 1100px;
+  }
+}
+
 // Large tablet breakpoint
 @media (max-width: 1200px) {
   .ad-types-grid {
@@ -888,22 +900,11 @@ $accent-gold: #c9a227;
   .bookings-content .booking-features {
     grid-template-columns: repeat(2, 1fr);
   }
-}
 
-// Tablet breakpoint
-@media (max-width: 1024px) {
-  .hero-carousel {
-    height: 80vh;
-    min-height: 550px;
-
-    .hero-content {
-      padding: 2.5rem 2rem;
-      width: 92%;
-
-      .hero-stats {
-        gap: 2.5rem;
-      }
-    }
+  .hero-carousel .hero-content {
+    width: 90%;
+    max-width: 700px;
+    padding: 2.5rem 2rem;
   }
 
   .geo-targeting-content {
@@ -911,44 +912,74 @@ $accent-gold: #c9a227;
   }
 }
 
-// Mobile breakpoint
-@media (max-width: 768px) {
+// iPad / Tablet breakpoint
+@media (max-width: 1024px) {
   .hero-carousel {
-    height: auto;
-    min-height: 650px;
+    height: 80vh;
+    min-height: 550px;
+    max-height: 750px;
 
     .hero-content {
-      position: relative;
-      bottom: auto;
-      left: auto;
-      transform: none;
-      margin: 8rem auto 4rem;
-      padding: 2rem 1.5rem;
-      width: 90%;
+      padding: 2rem 1.75rem;
+      width: 88%;
+      bottom: 10%;
+      border-radius: 4px;
+
+      .hero-title {
+        font-size: 2.25rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+      }
 
       .hero-stats {
         gap: 2rem;
-        flex-direction: column;
-        padding: 1.5rem 0;
+        padding: 1.25rem 0;
 
-        .stat-item .stat-value {
-          font-size: 2.25rem;
+        .stat-item {
+          .stat-value {
+            font-size: 2rem;
+          }
+
+          .stat-label {
+            font-size: 0.65rem;
+          }
         }
       }
 
       .hero-cta {
-        flex-direction: column;
-        gap: 1rem;
+        gap: 0.75rem;
 
         button, a {
-          width: 100%;
-          justify-content: center;
+          padding: 0.85rem 1.5rem;
+          font-size: 0.8rem;
         }
       }
     }
 
     .carousel-controls {
       bottom: 1.5rem;
+      gap: 0.5rem;
+
+      .carousel-indicator {
+        width: 35px;
+        height: 4px;
+      }
+    }
+  }
+
+  .section-header {
+    margin-bottom: 2.5rem;
+
+    .section-title {
+      font-size: 2rem;
+    }
+
+    .section-description {
+      font-size: 1rem;
     }
   }
 
@@ -957,7 +988,101 @@ $accent-gold: #c9a227;
   .bookings-section,
   .enquiries-section,
   .cta-section {
-    padding: 4rem 1.5rem;
+    padding: 4rem 2rem;
+  }
+
+  .geo-targeting-content {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .geo-visual {
+    order: -1;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+// Mobile breakpoint
+@media (max-width: 768px) {
+  .hero-carousel {
+    height: auto;
+    min-height: 580px;
+    max-height: none;
+
+    .hero-content {
+      position: relative;
+      bottom: auto;
+      left: auto;
+      transform: none;
+      margin: 6rem auto 3rem;
+      padding: 1.5rem 1.25rem;
+      width: 90%;
+
+      .hero-title {
+        font-size: 1.85rem;
+      }
+
+      .hero-subtitle {
+        font-size: 0.95rem;
+      }
+
+      .hero-stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.5rem;
+        padding: 1rem 0;
+
+        .stat-item {
+          flex: 0 0 auto;
+          min-width: 80px;
+
+          .stat-value {
+            font-size: 1.75rem;
+          }
+
+          .stat-label {
+            font-size: 0.6rem;
+          }
+        }
+      }
+
+      .hero-cta {
+        flex-direction: column;
+        gap: 0.75rem;
+
+        button, a {
+          width: 100%;
+          justify-content: center;
+          min-height: 48px;
+        }
+      }
+    }
+
+    .carousel-controls {
+      bottom: 1.25rem;
+    }
+  }
+
+  .section-header {
+    margin-bottom: 2rem;
+
+    .section-title {
+      font-size: 1.75rem;
+    }
+
+    .section-description {
+      font-size: 0.95rem;
+    }
+  }
+
+  .ad-types-section,
+  .geo-targeting-section,
+  .bookings-section,
+  .enquiries-section,
+  .cta-section {
+    padding: 3rem 1.5rem;
   }
 
   .ad-types-grid {
@@ -965,19 +1090,56 @@ $accent-gold: #c9a227;
     gap: 1rem;
   }
 
+  .ad-type-card {
+    padding: 1.5rem;
+
+    .ad-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+    }
+  }
+
   .geo-visual {
-    padding: 2rem;
+    padding: 1.5rem;
+    max-width: 100%;
 
     .globe-icon {
-      font-size: 5rem;
+      font-size: 4rem;
     }
 
     .targeting-stats {
-      gap: 2rem;
+      gap: 1.5rem;
 
       .stat .stat-number {
-        font-size: 2.5rem;
+        font-size: 2rem;
       }
+
+      .stat .stat-label {
+        font-size: 0.7rem;
+      }
+    }
+
+    .country-tags {
+      gap: 0.5rem;
+
+      .country-tag {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  .geo-info {
+    h3 {
+      font-size: 1.5rem;
+    }
+
+    p {
+      font-size: 0.95rem;
     }
   }
 
@@ -986,71 +1148,122 @@ $accent-gold: #c9a227;
     gap: 1rem;
   }
 
+  .booking-feature-card {
+    padding: 1.5rem;
+
+    .feature-icon {
+      font-size: 1.5rem;
+    }
+
+    h4 {
+      font-size: 1rem;
+    }
+  }
+
+  .enquiries-card {
+    padding: 2rem 1.5rem;
+
+    h3 {
+      font-size: 1.35rem;
+    }
+  }
+
   .cta-section .cta-content {
-    padding: 2.5rem 1.5rem;
+    padding: 2rem 1.5rem;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+    }
+
+    .cta-buttons {
+      flex-direction: column;
+      gap: 0.75rem;
+
+      button, a {
+        width: 100%;
+        justify-content: center;
+        min-height: 48px;
+      }
+    }
   }
 }
 
 // Small mobile breakpoint
 @media (max-width: 480px) {
   .hero-carousel {
-    min-height: 600px;
+    min-height: 520px;
 
     .hero-content {
-      margin-top: 6rem;
-      padding: 1.5rem 1rem;
+      margin-top: 5rem;
+      padding: 1.25rem 1rem;
       width: 94%;
 
       .hero-title {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
+        line-height: 1.2;
       }
 
       .hero-subtitle {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
       }
 
       .hero-stats {
-        gap: 1.5rem;
+        gap: 1rem;
 
-        .stat-item .stat-value {
-          font-size: 2rem;
+        .stat-item {
+          min-width: 70px;
+
+          .stat-value {
+            font-size: 1.5rem;
+          }
         }
       }
+    }
+
+    .carousel-controls .carousel-indicator {
+      width: 28px;
+      height: 3px;
     }
   }
 
   .section-header .section-title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+  }
+
+  .ad-types-section,
+  .geo-targeting-section,
+  .bookings-section,
+  .enquiries-section,
+  .cta-section {
+    padding: 2.5rem 1rem;
   }
 
   .geo-visual {
-    padding: 1.5rem;
+    padding: 1.25rem;
 
     .globe-icon {
-      font-size: 4rem;
+      font-size: 3rem;
     }
 
     .targeting-stats {
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1rem;
 
       .stat .stat-number {
-        font-size: 2rem;
+        font-size: 1.75rem;
       }
     }
   }
 
   .cta-section .cta-content {
-    padding: 2rem 1rem;
+    padding: 1.5rem 1rem;
 
-    .cta-buttons {
-      flex-direction: column;
-      gap: 1rem;
-
-      button, a {
-        width: 100%;
-        justify-content: center;
-      }
+    h2 {
+      font-size: 1.35rem;
     }
   }
 
