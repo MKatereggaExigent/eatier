@@ -1,27 +1,34 @@
-/* ========== Glassmorphic Restaurant Detail - Monochrome Design ========== */
+/* ========== NYT-Inspired Restaurant Detail with Glassmorphism ========== */
+
+// Design System Variables
+$font-serif: 'Playfair Display', 'Georgia', serif;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+// NYT Color Palette
+$nyt-black: #121212;
+$nyt-dark-gray: #333333;
+$nyt-medium-gray: #666666;
+$nyt-light-gray: #f7f7f5;
+$nyt-warm-white: #faf9f6;
+$nyt-border: #e2e2e2;
+$itiyum-orange: #ff8c00;
+$itiyum-orange-dark: #e67e00;
 
 .restaurant-detail {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 25%, #d4d4d4 50%, #c0c0c0 75%, #b8b8b8 100%);
-  background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
+  background: $nyt-warm-white;
   padding: 0;
   margin: 0;
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  overflow-x: hidden;
 }
 
 /* ========== Hero Section ========== */
 .restaurant-hero {
   position: relative;
-  height: 600px;
+  height: 550px;
   overflow: hidden;
-  margin-bottom: 3rem;
+  margin-bottom: 0;
 
   .hero-images {
     position: absolute;
@@ -38,6 +45,7 @@
       position: absolute;
       top: 0;
       left: 0;
+      filter: brightness(0.85);
     }
 
     &::after {
@@ -49,8 +57,8 @@
       height: 100%;
       background: linear-gradient(
         180deg,
-        rgba(0, 0, 0, 0.4) 0%,
-        rgba(0, 0, 0, 0.7) 100%
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.6) 100%
       );
       z-index: 2;
     }
@@ -61,37 +69,45 @@
       right: 2rem;
       display: flex;
       gap: 0.5rem;
-      z-index: 3;
+      z-index: 5;
 
       .gallery-image {
-        width: 100px;
-        height: 80px;
+        width: 90px;
+        height: 70px;
         object-fit: cover;
-        border-radius: 8px;
-        border: 2px solid rgba(255, 255, 255, 0.8);
+        border-radius: 4px;
+        border: 2px solid rgba(255, 255, 255, 0.9);
         cursor: pointer;
         transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
         &:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+          transform: translateY(-4px) scale(1.05);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
       }
 
       .more-images {
-        width: 100px;
-        height: 80px;
+        width: 90px;
+        height: 70px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.75);
         -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
         color: white;
-        border-radius: 8px;
-        border: 2px solid rgba(255, 255, 255, 0.8);
+        border-radius: 4px;
+        border: 2px solid rgba(255, 255, 255, 0.9);
         font-weight: 600;
+        font-family: $font-sans;
+        font-size: 0.9rem;
         cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.85);
+        }
       }
     }
   }
@@ -101,23 +117,27 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    padding: 3rem 2rem 2rem;
+    padding: 4rem 2rem 2.5rem;
     background: linear-gradient(
       180deg,
       transparent 0%,
-      rgba(0, 0, 0, 0.9) 50%
+      rgba(0, 0, 0, 0.85) 60%
     );
     z-index: 3;
     color: white;
+
     .restaurant-header {
-      margin-bottom: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto 1.25rem;
 
       h1 {
-        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-family: $font-serif;
+        font-size: clamp(2rem, 5vw, 3rem);
         font-weight: 700;
         color: white;
-        margin-bottom: 1rem;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.02em;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
       }
 
       .restaurant-meta {
@@ -126,10 +146,11 @@
           align-items: center;
           gap: 0.5rem;
           margin-bottom: 0.75rem;
+          font-family: $font-sans;
 
           .star {
-            color: #fbbf24;
-            font-size: 1.2rem;
+            color: $itiyum-orange;
+            font-size: 1.1rem;
 
             &.filled {
               opacity: 1;
@@ -137,13 +158,14 @@
           }
 
           .rating-value {
-            font-weight: 600;
-            color: white;
+            font-weight: 700;
+            color: $itiyum-orange;
             font-size: 1.1rem;
           }
 
           .review-count {
             color: rgba(255, 255, 255, 0.85);
+            font-size: 0.95rem;
           }
         }
 
@@ -151,25 +173,28 @@
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          font-size: 1.05rem;
+          font-size: 0.9rem;
+          font-family: $font-sans;
 
           .cuisine {
             color: white;
             font-weight: 600;
-            padding: 0.4rem 1rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            -webkit-backdrop-filter: blur(10px);
-            backdrop-filter: blur(10px);
+            padding: 0.35rem 0.9rem;
+            background: rgba(255, 140, 0, 0.9);
+            border-radius: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
           }
 
           .separator {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.5);
           }
 
           .price-range {
             color: white;
             font-weight: 600;
+            letter-spacing: 0.05em;
           }
         }
       }
@@ -178,23 +203,27 @@
     .restaurant-status {
       display: inline-flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1.5rem;
-      background: rgba(255, 255, 255, 0.15);
-      -webkit-backdrop-filter: blur(15px);
-      backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 30px;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
       font-weight: 600;
-      margin-bottom: 2rem;
+      font-family: $font-sans;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
 
       &.open {
         color: white;
 
         &::before {
-          content: '●';
-          color: #4ade80;
-          font-size: 1.2rem;
+          content: '';
+          width: 8px;
+          height: 8px;
+          background: #22c55e;
+          border-radius: 50%;
         }
       }
 
@@ -202,71 +231,78 @@
         color: rgba(255, 255, 255, 0.9);
 
         &::before {
-          content: '●';
-          color: #888888;
-          font-size: 1.2rem;
+          content: '';
+          width: 8px;
+          height: 8px;
+          background: #888888;
+          border-radius: 50%;
         }
       }
 
       .hours {
-        display: block;
+        display: inline;
         font-weight: 400;
-        margin-top: 0.25rem;
-        font-size: 0.875rem;
+        font-size: 0.85rem;
         color: rgba(255, 255, 255, 0.85);
+        margin-left: 0.25rem;
       }
     }
 
     .action-buttons {
       display: flex;
-      gap: 1rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
+      max-width: 1200px;
+      margin: 0 auto;
 
       button {
-        padding: 0.9rem 1.8rem;
-        border-radius: 12px;
-        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
         font-weight: 600;
+        font-family: $font-sans;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
         border: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
 
         &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+          transform: translateY(-1px);
         }
       }
 
       .primary-btn {
-        background: white;
-        color: #1a1a1a;
+        background: $nyt-black;
+        color: white;
 
         &:hover {
-          background: #f5f5f5;
+          background: $nyt-dark-gray;
         }
       }
 
       .book-btn {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        background: $itiyum-orange !important;
         color: white !important;
-        font-size: 1.1rem;
-        font-weight: 600;
+        font-weight: 700;
 
         &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4) !important;
+          background: $itiyum-orange-dark !important;
+          box-shadow: 0 4px 15px rgba(255, 140, 0, 0.35) !important;
         }
       }
 
       .secondary-btn {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.15);
         color: white;
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.3);
         -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
 
         &:hover {
-          background: rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.25);
+          border-color: rgba(255, 255, 255, 0.5);
         }
       }
     }
@@ -274,63 +310,72 @@
 }
 
 .restaurant-info {
-  max-width: 1400px;
-  margin: 0 auto 3rem;
-  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 2rem;
+  gap: 2.5rem;
 
   .info-section {
-    background: rgba(255, 255, 255, 0.3);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 20px;
+    background: white;
+    border: 1px solid $nyt-border;
+    border-radius: 4px;
     padding: 2.5rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 
     h2 {
-      font-size: 2rem;
+      font-family: $font-serif;
+      font-size: 1.75rem;
       font-weight: 700;
-      color: #1a1a1a;
-      margin-bottom: 1.5rem;
+      color: $nyt-black;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid $itiyum-orange;
+      display: inline-block;
     }
 
     p {
-      font-size: 1.05rem;
+      font-family: $font-sans;
+      font-size: 1rem;
       line-height: 1.8;
-      color: #2d2d2d;
+      color: $nyt-dark-gray;
       margin-bottom: 2rem;
     }
 
     .contact-info {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.85rem;
       margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: $nyt-light-gray;
+      border-radius: 4px;
 
       .contact-item {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        font-size: 1rem;
-        color: #2d2d2d;
+        gap: 0.75rem;
+        font-family: $font-sans;
+        font-size: 0.95rem;
+        color: $nyt-dark-gray;
 
         .icon {
-          font-size: 1.3rem;
-          width: 2rem;
+          font-size: 1.1rem;
+          width: 1.5rem;
           flex-shrink: 0;
+          text-align: center;
         }
 
         .website-link {
-          color: #1a1a1a;
-          text-decoration: underline;
+          color: $itiyum-orange;
+          text-decoration: none;
           cursor: pointer;
           font-weight: 500;
+          transition: color 0.2s ease;
 
           &:hover {
-            color: #404040;
+            color: $itiyum-orange-dark;
+            text-decoration: underline;
           }
         }
       }
@@ -338,59 +383,68 @@
 
     .features {
       h3 {
-        font-size: 1.3rem;
+        font-family: $font-sans;
+        font-size: 0.8rem;
         font-weight: 700;
-        color: #1a1a1a;
+        color: $nyt-medium-gray;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
         margin-bottom: 1rem;
       }
 
       .feature-tags {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.75rem;
+        gap: 0.5rem;
 
         .feature-tag {
-          padding: 0.6rem 1.2rem;
-          background: rgba(0, 0, 0, 0.05);
-          border: 1px solid rgba(0, 0, 0, 0.1);
-          border-radius: 20px;
-          font-size: 0.9rem;
-          color: #2d2d2d;
+          padding: 0.4rem 0.85rem;
+          background: white;
+          border: 1px solid $nyt-border;
+          border-radius: 2px;
+          font-family: $font-sans;
+          font-size: 0.8rem;
+          color: $nyt-dark-gray;
           font-weight: 500;
+          text-transform: capitalize;
         }
       }
     }
   }
 
   .hours-section {
-    background: rgba(255, 255, 255, 0.3);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 20px;
-    padding: 2.5rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    background: white;
+    border: 1px solid $nyt-border;
+    border-radius: 4px;
+    padding: 2rem;
     height: fit-content;
+    position: sticky;
+    top: 6rem;
 
     h3 {
-      font-size: 1.5rem;
+      font-family: $font-serif;
+      font-size: 1.35rem;
       font-weight: 700;
-      color: #1a1a1a;
-      margin-bottom: 1.5rem;
+      color: $nyt-black;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid $itiyum-orange;
+      display: inline-block;
     }
 
     .hours-list {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0;
 
       .hours-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        font-size: 0.95rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid $nyt-border;
+        font-family: $font-sans;
+        font-size: 0.9rem;
 
         &:last-child {
           border-bottom: none;
@@ -398,118 +452,142 @@
 
         .day {
           font-weight: 600;
-          color: #1a1a1a;
+          color: $nyt-black;
         }
 
         .hours {
-          color: #404040;
-          font-size: 0.875rem;
+          color: $nyt-medium-gray;
+          font-size: 0.85rem;
         }
       }
     }
   }
 }
 
+/* ========== Popular Dishes Section ========== */
 .popular-dishes {
-  max-width: 1400px;
-  margin: 0 auto 3rem;
-  padding: 0 2rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 3rem;
 
   h2 {
-    font-size: 2.2rem;
+    font-family: $font-serif;
+    font-size: 1.75rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: $nyt-black;
     margin-bottom: 2rem;
-    text-align: center;
+    text-align: left;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid $itiyum-orange;
+    display: inline-block;
   }
 
   .dishes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
 
     .dish-card {
-      background: rgba(255, 255, 255, 0.3);
-      -webkit-backdrop-filter: blur(20px);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      border-radius: 20px;
+      background: white;
+      border: 1px solid $nyt-border;
+      border-radius: 4px;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       cursor: pointer;
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 0;
+        background: $itiyum-orange;
+        transition: height 0.3s ease;
+      }
 
       &:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.6);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+
+        &::before {
+          height: 100%;
+        }
       }
 
       .dish-image {
         width: 100%;
-        height: 220px;
+        height: 180px;
         object-fit: cover;
       }
 
       .dish-info {
-        padding: 1.5rem;
+        padding: 1.25rem;
 
         .dish-header {
           display: flex;
           justify-content: space-between;
-          align-items: start;
-          margin-bottom: 0.75rem;
+          align-items: flex-start;
+          margin-bottom: 0.5rem;
+          gap: 0.75rem;
 
           h3 {
-            font-size: 1.3rem;
+            font-family: $font-serif;
+            font-size: 1.15rem;
             font-weight: 700;
-            color: #1a1a1a;
+            color: $nyt-black;
             margin: 0;
+            line-height: 1.3;
           }
 
           .dish-price {
-            font-size: 1.25rem;
+            font-family: $font-sans;
+            font-size: 1rem;
             font-weight: 700;
-            color: #1a1a1a;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 0.4rem 1rem;
-            border-radius: 12px;
+            color: $itiyum-orange;
             white-space: nowrap;
           }
         }
 
         p {
-          font-size: 0.95rem;
-          color: #2d2d2d;
+          font-family: $font-sans;
+          font-size: 0.9rem;
+          color: $nyt-medium-gray;
           line-height: 1.5;
-          margin-bottom: 1rem;
+          margin-bottom: 0.75rem;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
 
         .dish-meta {
           display: flex;
           gap: 1rem;
           align-items: center;
-          font-size: 0.9rem;
-          color: #404040;
+          font-family: $font-sans;
+          font-size: 0.8rem;
+          color: $nyt-medium-gray;
 
           .rating {
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.25rem;
 
             .icon {
-              color: #d4d4d4;
-              font-size: 1rem;
+              color: $itiyum-orange;
+              font-size: 0.9rem;
             }
           }
 
           .orders {
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.25rem;
 
             .icon {
-              font-size: 1rem;
+              font-size: 0.9rem;
             }
           }
         }
@@ -521,55 +599,62 @@
     display: block;
     width: fit-content;
     margin: 2rem auto 0;
-    padding: 1rem 3rem;
-    background: white;
-    color: #1a1a1a;
-    border: 2px solid #1a1a1a;
-    border-radius: 30px;
-    font-size: 1.1rem;
+    padding: 0.85rem 2.5rem;
+    background: transparent;
+    color: $nyt-black;
+    border: 2px solid $nyt-black;
+    border-radius: 4px;
+    font-family: $font-sans;
+    font-size: 0.9rem;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 
     &:hover {
-      background: #1a1a1a;
+      background: $nyt-black;
       color: white;
-      transform: scale(1.05);
     }
   }
 }
 
+/* ========== Reviews Section ========== */
 .reviews-section {
-  max-width: 1400px;
-  margin: 0 auto 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 0 2rem 3rem;
 
   .reviews-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 
     h2 {
-      font-size: 2.2rem;
+      font-family: $font-serif;
+      font-size: 1.75rem;
       font-weight: 700;
-      color: #1a1a1a;
+      color: $nyt-black;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid $itiyum-orange;
     }
 
     .write-review-btn {
-      background: white;
-      color: #1a1a1a;
-      border: 2px solid #1a1a1a;
-      padding: 0.9rem 2rem;
-      border-radius: 30px;
+      background: transparent;
+      color: $nyt-black;
+      border: 2px solid $nyt-black;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      font-family: $font-sans;
+      font-size: 0.85rem;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
 
       &:hover {
-        background: #1a1a1a;
+        background: $nyt-black;
         color: white;
-        transform: scale(1.05);
       }
     }
   }
@@ -577,24 +662,19 @@
   .reviews-list {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
     margin-bottom: 2rem;
   }
 
   .review-card {
-    background: rgba(255, 255, 255, 0.3);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    background: white;
+    border: 1px solid $nyt-border;
+    border-radius: 4px;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
 
     &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     }
 
     .review-header {
@@ -606,37 +686,39 @@
       .reviewer-info {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: 0.85rem;
 
         .reviewer-avatar {
-          width: 50px;
-          height: 50px;
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
-          background: rgba(0, 0, 0, 0.1);
-          border: 2px solid rgba(255, 255, 255, 0.5);
-          color: #1a1a1a;
+          background: $nyt-light-gray;
+          border: 2px solid $nyt-border;
+          color: $nyt-dark-gray;
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: 700;
-          font-size: 1.3rem;
+          font-family: $font-sans;
+          font-size: 1.1rem;
         }
 
         .reviewer-details {
           h4 {
-            font-size: 1.1rem;
+            font-family: $font-sans;
+            font-size: 1rem;
             font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 0.25rem;
+            color: $nyt-black;
+            margin-bottom: 0.2rem;
           }
 
           .review-rating {
             display: flex;
-            gap: 0.2rem;
+            gap: 0.15rem;
 
             .star {
-              color: #d4d4d4;
-              font-size: 1rem;
+              color: $itiyum-orange;
+              font-size: 0.9rem;
 
               &.filled {
                 opacity: 1;
@@ -647,55 +729,58 @@
       }
 
       .review-date {
-        color: #404040;
-        font-size: 0.85rem;
+        font-family: $font-sans;
+        color: $nyt-medium-gray;
+        font-size: 0.8rem;
         font-weight: 500;
       }
     }
 
     .review-comment {
-      color: #2d2d2d;
+      font-family: $font-sans;
+      color: $nyt-dark-gray;
       line-height: 1.7;
-      font-size: 1rem;
+      font-size: 0.95rem;
       margin-bottom: 1rem;
     }
 
     .review-actions {
       display: flex;
-      gap: 1rem;
+      gap: 0.75rem;
 
       .action-btn {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        background: rgba(255, 255, 255, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        border-radius: 12px;
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-        color: #2d2d2d;
+        gap: 0.4rem;
+        background: $nyt-light-gray;
+        border: 1px solid $nyt-border;
+        border-radius: 4px;
+        padding: 0.4rem 0.85rem;
+        font-family: $font-sans;
+        font-size: 0.8rem;
+        color: $nyt-medium-gray;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s ease;
 
         .icon {
-          font-size: 1rem;
+          font-size: 0.9rem;
         }
 
         &:hover {
-          background: rgba(255, 255, 255, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.7);
+          background: white;
+          border-color: $nyt-dark-gray;
+          color: $nyt-dark-gray;
         }
 
         &.marked {
-          background: rgba(0, 0, 0, 0.1);
-          border: 1px solid rgba(0, 0, 0, 0.2);
-          color: #1a1a1a;
+          background: rgba($itiyum-orange, 0.1);
+          border-color: $itiyum-orange;
+          color: $itiyum-orange;
           font-weight: 600;
 
           &:hover {
-            background: rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(0, 0, 0, 0.3);
+            background: rgba($itiyum-orange, 0.15);
           }
         }
       }
@@ -705,87 +790,106 @@
   .view-all-reviews-btn {
     display: block;
     margin: 0 auto;
-    background: white;
-    color: #1a1a1a;
-    border: 2px solid #1a1a1a;
-    padding: 1rem 2.5rem;
-    border-radius: 30px;
+    background: transparent;
+    color: $nyt-black;
+    border: 2px solid $nyt-black;
+    padding: 0.75rem 2rem;
+    border-radius: 4px;
+    font-family: $font-sans;
+    font-size: 0.85rem;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 
     &:hover {
-      background: #1a1a1a;
+      background: $nyt-black;
       color: white;
-      transform: scale(1.05);
     }
   }
 }
 
+/* ========== Map Section ========== */
 .map-section {
-  max-width: 1400px;
-  margin: 0 auto 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 0 2rem 3rem;
 
   h2 {
-    font-size: 2.2rem;
+    font-family: $font-serif;
+    font-size: 1.75rem;
     font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 2rem;
-    text-align: center;
+    color: $nyt-black;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid $itiyum-orange;
+    display: inline-block;
   }
 
   .map-placeholder {
-    background: rgba(255, 255, 255, 0.3);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 20px;
-    height: 400px;
+    background: white;
+    border: 1px solid $nyt-border;
+    border-radius: 4px;
+    height: 350px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 
     .map-content {
       text-align: center;
 
       .map-icon {
-        font-size: 4rem;
-        margin-bottom: 1.5rem;
-        color: #404040;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: $nyt-medium-gray;
       }
 
       p {
-        color: #2d2d2d;
-        margin-bottom: 0.75rem;
-        font-size: 1.1rem;
+        font-family: $font-sans;
+        color: $nyt-medium-gray;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
         font-weight: 500;
       }
 
       .address {
+        font-family: $font-sans;
         font-weight: 700;
-        color: #1a1a1a;
-        margin-bottom: 2rem;
-        font-size: 1.2rem;
+        color: $nyt-black;
+        margin-bottom: 1.5rem;
+        font-size: 1.05rem;
       }
 
       .directions-btn {
-        background: white;
-        color: #1a1a1a;
-        border: 2px solid #1a1a1a;
-        padding: 0.9rem 2rem;
-        border-radius: 30px;
+        background: $itiyum-orange;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.75rem;
+        border-radius: 4px;
+        font-family: $font-sans;
+        font-size: 0.9rem;
         font-weight: 700;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
 
         &:hover {
-          background: #1a1a1a;
-          color: white;
-          transform: scale(1.05);
+          background: $itiyum-orange-dark;
+          box-shadow: 0 4px 15px rgba(255, 140, 0, 0.35);
         }
       }
+    }
+  }
+}
+
+/* ========== Responsive Styles ========== */
+@media (max-width: 1024px) {
+  .restaurant-info {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+
+    .hours-section {
+      position: static;
     }
   }
 }
@@ -793,49 +897,50 @@
 @media (max-width: 768px) {
   .restaurant-detail {
     .restaurant-hero {
-      height: 500px;
+      height: 450px;
 
       .hero-images {
         .image-gallery {
           bottom: 1rem;
           right: 1rem;
-          max-width: 200px;
+          display: none; // Hide on mobile for cleaner look
 
-          .gallery-thumbnails {
-            gap: 0.5rem;
+          .gallery-image {
+            width: 60px;
+            height: 50px;
+          }
 
-            .thumbnail {
-              width: 50px;
-              height: 50px;
-            }
+          .more-images {
+            width: 60px;
+            height: 50px;
+            font-size: 0.75rem;
           }
         }
       }
 
       .hero-content {
-        padding: 1.5rem;
+        padding: 2rem 1.5rem 1.5rem;
 
         .restaurant-header {
           h1 {
-            font-size: 2rem;
+            font-size: 1.75rem;
           }
         }
 
         .action-buttons {
           flex-direction: column;
-          gap: 0.75rem;
+          gap: 0.5rem;
 
           button {
             width: 100%;
+            justify-content: center;
           }
         }
       }
     }
 
     .restaurant-info {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-      padding: 1.5rem;
+      padding: 2rem 1.5rem;
 
       .info-section, .hours-section {
         padding: 1.5rem;
@@ -843,10 +948,10 @@
     }
 
     .popular-dishes {
-      padding: 0 1.5rem 1.5rem;
+      padding: 0 1.5rem 2rem;
 
       h2 {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
       }
 
       .dishes-grid {
@@ -858,14 +963,14 @@
     .reviews-section {
       padding: 0 1.5rem 2rem;
 
-      h2 {
-        font-size: 1.8rem;
-      }
-
       .reviews-header {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
         gap: 1rem;
+
+        h2 {
+          font-size: 1.5rem;
+        }
 
         .write-review-btn {
           width: 100%;
@@ -873,7 +978,7 @@
       }
 
       .review-card {
-        padding: 1.5rem;
+        padding: 1.25rem;
       }
     }
 
@@ -881,11 +986,11 @@
       padding: 0 1.5rem 2rem;
 
       h2 {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
       }
 
       .map-placeholder {
-        height: 300px;
+        height: 280px;
       }
     }
   }
@@ -894,28 +999,40 @@
 @media (max-width: 480px) {
   .restaurant-detail {
     .restaurant-hero {
-      height: 400px;
+      height: 380px;
 
       .hero-content {
+        padding: 1.5rem 1rem 1.25rem;
+
         .restaurant-header {
           h1 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
           }
 
-          .rating-cuisines {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
+          .restaurant-meta {
+            .cuisine-price {
+              flex-wrap: wrap;
+            }
           }
         }
+      }
+    }
+
+    .restaurant-info {
+      padding: 1.5rem 1rem;
+
+      .info-section, .hours-section {
+        padding: 1.25rem;
       }
     }
 
     .popular-dishes,
     .reviews-section,
     .map-section {
+      padding: 0 1rem 1.5rem;
+
       h2 {
-        font-size: 1.5rem;
+        font-size: 1.35rem;
       }
     }
 
@@ -925,8 +1042,12 @@
         gap: 0.5rem;
 
         .review-date {
-          align-self: flex-end;
+          align-self: flex-start;
         }
+      }
+
+      .review-actions {
+        flex-wrap: wrap;
       }
     }
   }
@@ -940,20 +1061,22 @@
   justify-content: center;
   min-height: 60vh;
   padding: 2rem;
+  background: $nyt-warm-white;
 
   .loading-spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-top-color: #333;
+    width: 40px;
+    height: 40px;
+    border: 3px solid $nyt-border;
+    border-top-color: $itiyum-orange;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin 0.8s linear infinite;
     margin-bottom: 1rem;
   }
 
   p {
-    color: #666;
-    font-size: 1.1rem;
+    font-family: $font-sans;
+    color: $nyt-medium-gray;
+    font-size: 1rem;
   }
 }
 
@@ -969,41 +1092,47 @@
   min-height: 60vh;
   padding: 2rem;
   text-align: center;
+  background: $nyt-warm-white;
 
   .error-message {
-    color: #d32f2f;
-    font-size: 1.1rem;
+    font-family: $font-sans;
+    color: #c53030;
+    font-size: 1rem;
     margin-bottom: 1.5rem;
     padding: 1rem 2rem;
-    background: rgba(211, 47, 47, 0.1);
-    border-radius: 8px;
-    border: 1px solid rgba(211, 47, 47, 0.3);
+    background: rgba(197, 48, 48, 0.08);
+    border-radius: 4px;
+    border: 1px solid rgba(197, 48, 48, 0.2);
   }
 
   .retry-btn {
     padding: 0.75rem 2rem;
-    background: #333;
+    background: $nyt-black;
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: 4px;
+    font-family: $font-sans;
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 
     &:hover {
-      background: #555;
-      transform: translateY(-2px);
+      background: $nyt-dark-gray;
     }
   }
 }
 
 .new-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: $itiyum-orange;
   color: white;
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 2px;
+  font-family: $font-sans;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* ========== Booking Modal ========== */
@@ -1013,14 +1142,14 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10000;
   padding: 1rem;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.2s ease;
 }
 
 @keyframes fadeIn {
@@ -1033,21 +1162,20 @@
 }
 
 .modal-container {
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 600px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  max-width: 550px;
   width: 100%;
   max-height: calc(100vh - 2rem);
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.3s ease;
+  animation: slideUp 0.25s ease;
 }
 
 @keyframes slideUp {
   from {
-    transform: translateY(50px);
+    transform: translateY(30px);
     opacity: 0;
   }
   to {
@@ -1060,50 +1188,51 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 20px 20px 0 0;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid $nyt-border;
+  background: white;
+  border-radius: 4px 4px 0 0;
   flex-shrink: 0;
 
   h2 {
     margin: 0;
-    font-size: 1.5rem;
-    color: #333;
+    font-family: $font-serif;
+    font-size: 1.35rem;
+    color: $nyt-black;
   }
 
   .close-btn {
     background: none;
     border: none;
-    font-size: 2rem;
-    color: #666;
+    font-size: 1.5rem;
+    color: $nyt-medium-gray;
     cursor: pointer;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
+    border-radius: 4px;
+    transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(0, 0, 0, 0.1);
-      color: #333;
+      background: $nyt-light-gray;
+      color: $nyt-black;
     }
   }
 }
 
 .booking-form {
-  padding: 1.5rem 2rem 2rem;
+  padding: 1.5rem;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
 
   .form-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
   }
 
   .form-group {
@@ -1111,39 +1240,42 @@
     flex-direction: column;
 
     label {
+      font-family: $font-sans;
       font-weight: 600;
-      color: #333;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
+      color: $nyt-dark-gray;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
     }
 
     .form-control {
-      padding: 0.75rem;
-      border: 2px solid rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      background: rgba(255, 255, 255, 0.9);
+      padding: 0.7rem 0.85rem;
+      border: 1px solid $nyt-border;
+      border-radius: 4px;
+      font-family: $font-sans;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      background: white;
 
       &:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: $itiyum-orange;
+        box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
       }
 
       &.ng-invalid.ng-touched {
-        border-color: #e74c3c;
+        border-color: #c53030;
       }
     }
 
     textarea.form-control {
       resize: vertical;
-      min-height: 80px;
+      min-height: 70px;
     }
 
     .error-message {
-      color: #e74c3c;
-      font-size: 0.85rem;
+      font-family: $font-sans;
+      color: #c53030;
+      font-size: 0.8rem;
       margin-top: 0.25rem;
     }
   }
@@ -1151,83 +1283,85 @@
   .loading-slots {
     padding: 1rem;
     text-align: center;
-    color: #667eea;
+    font-family: $font-sans;
+    color: $itiyum-orange;
     font-weight: 500;
   }
 
   .time-slots-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 0.75rem;
-    max-height: 300px;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+    max-height: 280px;
     overflow-y: auto;
-    padding: 0.5rem;
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: 10px;
+    padding: 0.75rem;
+    background: $nyt-light-gray;
+    border-radius: 4px;
 
     .time-slot-btn {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0.75rem;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
+      padding: 0.6rem;
+      border: 1px solid $nyt-border;
+      border-radius: 4px;
       background: white;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
 
       &:hover:not(:disabled) {
-        border-color: #667eea;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        border-color: $itiyum-orange;
+        box-shadow: 0 2px 8px rgba(255, 140, 0, 0.15);
       }
 
       &.selected {
-        border-color: #667eea;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-color: $itiyum-orange;
+        background: rgba($itiyum-orange, 0.08);
 
         .time {
-          color: #667eea;
+          color: $itiyum-orange;
           font-weight: 700;
         }
       }
 
       &.unavailable {
-        background: #f5f5f5;
-        border-color: #e0e0e0;
+        background: $nyt-light-gray;
+        border-color: $nyt-border;
         cursor: not-allowed;
-        opacity: 0.6;
+        opacity: 0.5;
 
         .time {
-          color: #999;
+          color: $nyt-medium-gray;
         }
 
         .status {
-          color: #e74c3c;
+          color: #c53030;
         }
       }
 
       .time {
-        font-size: 1rem;
+        font-family: $font-sans;
+        font-size: 0.9rem;
         font-weight: 600;
-        color: #333;
-        margin-bottom: 0.25rem;
+        color: $nyt-dark-gray;
+        margin-bottom: 0.2rem;
       }
 
       .status {
-        font-size: 0.75rem;
+        font-family: $font-sans;
+        font-size: 0.7rem;
         font-weight: 500;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
+        padding: 0.15rem 0.4rem;
+        border-radius: 2px;
 
         &.available {
-          color: #27ae60;
-          background: rgba(39, 174, 96, 0.1);
+          color: #22c55e;
+          background: rgba(34, 197, 94, 0.1);
         }
 
         &.fully-booked {
-          color: #e74c3c;
-          background: rgba(231, 76, 60, 0.1);
+          color: #c53030;
+          background: rgba(197, 48, 48, 0.1);
         }
       }
     }
@@ -1236,50 +1370,51 @@
 
 .modal-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: flex-end;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid $nyt-border;
 
   button {
-    padding: 0.9rem 2rem;
-    border-radius: 10px;
-    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-family: $font-sans;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     border: none;
-    min-width: 140px;
+    min-width: 120px;
 
     &:disabled {
-      opacity: 0.6;
+      opacity: 0.5;
       cursor: not-allowed;
     }
 
     &:not(:disabled):hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-1px);
     }
   }
 
   .primary-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: $itiyum-orange;
     color: white;
 
     &:hover:not(:disabled) {
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      background: $itiyum-orange-dark;
+      box-shadow: 0 4px 15px rgba(255, 140, 0, 0.35);
     }
   }
 
   .secondary-btn {
-    background: #f5f5f5;
-    color: #333;
-    border: 2px solid #e0e0e0;
+    background: white;
+    color: $nyt-dark-gray;
+    border: 1px solid $nyt-border;
 
     &:hover:not(:disabled) {
-      background: #e8e8e8;
-      border-color: #d0d0d0;
+      background: $nyt-light-gray;
+      border-color: $nyt-dark-gray;
     }
   }
 }
@@ -1292,9 +1427,9 @@
   min-height: 0;
 
   .success-icon {
-    font-size: 4rem;
+    font-size: 3.5rem;
     margin-bottom: 1rem;
-    animation: scaleIn 0.5s ease;
+    animation: scaleIn 0.4s ease;
   }
 
   @keyframes scaleIn {
@@ -1307,45 +1442,108 @@
   }
 
   h3 {
-    color: #27ae60;
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
+    font-family: $font-serif;
+    color: #22c55e;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
   }
 
   p {
-    color: #666;
-    margin-bottom: 1rem;
+    font-family: $font-sans;
+    color: $nyt-medium-gray;
+    margin-bottom: 0.75rem;
     line-height: 1.6;
+    font-size: 0.95rem;
   }
 
   .booking-ref {
-    background: rgba(102, 126, 234, 0.1);
-    padding: 1rem;
-    border-radius: 10px;
-    margin: 1.5rem 0;
-    font-size: 1.1rem;
+    background: rgba($itiyum-orange, 0.08);
+    padding: 0.85rem;
+    border-radius: 4px;
+    margin: 1.25rem 0;
+    font-family: $font-sans;
+    font-size: 1rem;
 
     strong {
-      color: #667eea;
+      color: $itiyum-orange;
     }
   }
 
   .success-message {
-    font-size: 0.95rem;
-    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
   }
 
   .primary-btn {
-    margin-top: 1rem;
+    margin-top: 0.75rem;
   }
 }
 
 .error-alert {
-  background: rgba(231, 76, 60, 0.1);
-  border: 2px solid #e74c3c;
-  color: #c0392b;
-  padding: 1rem;
-  border-radius: 10px;
+  font-family: $font-sans;
+  background: rgba(197, 48, 48, 0.08);
+  border: 1px solid rgba(197, 48, 48, 0.3);
+  color: #c53030;
+  padding: 0.85rem;
+  border-radius: 4px;
   margin-bottom: 1rem;
   font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* ========== Modal Responsive Styles ========== */
+@media (max-width: 600px) {
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal-container {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 16px 16px 0 0;
+    animation: slideUpMobile 0.3s ease;
+  }
+
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .modal-header {
+    border-radius: 16px 16px 0 0;
+    padding: 1rem 1.25rem;
+
+    h2 {
+      font-size: 1.2rem;
+    }
+  }
+
+  .booking-form {
+    padding: 1.25rem;
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .time-slots-grid {
+      grid-template-columns: repeat(2, 1fr);
+      max-height: 200px;
+    }
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+
+    button {
+      width: 100%;
+      min-width: auto;
+    }
+  }
 }

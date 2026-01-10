@@ -75,7 +75,12 @@ export class RestaurantListComponent implements OnInit {
 
   filteredRestaurants = signal<Restaurant[]>([]);
 
+  // Track favorite restaurants (stored in localStorage)
+  favorites = signal<Set<string>>(new Set());
+
   ngOnInit(): void {
+    // Load favorites from localStorage
+    this.loadFavorites();
     this.loadRestaurants();
     this.loadStatistics();
   }
@@ -237,5 +242,98 @@ export class RestaurantListComponent implements OnInit {
     this.selectedCuisine.set('');
     this.selectedPriceRange.set('');
     this.updateFilters();
+  }
+
+  // ==================== FAVORITES FUNCTIONALITY ====================
+
+  private loadFavorites(): void {
+    try {
+      const stored = localStorage.getItem('itiyum_favorites');
+      if (stored) {
+        this.favorites.set(new Set(JSON.parse(stored)));
+      }
+    } catch {
+      this.favorites.set(new Set());
+    }
+  }
+
+  private saveFavorites(): void {
+    try {
+      localStorage.setItem('itiyum_favorites', JSON.stringify([...this.favorites()]));
+    } catch {
+      console.error('Failed to save favorites to localStorage');
+    }
+  }
+
+  isFavorite(restaurantId: string): boolean {
+    return this.favorites().has(restaurantId);
+  }
+
+  toggleFavorite(event: Event, restaurant: Restaurant): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const current = this.favorites();
+    const newFavorites = new Set(current);
+
+    if (newFavorites.has(restaurant.id)) {
+      newFavorites.delete(restaurant.id);
+    } else {
+      newFavorites.add(restaurant.id);
+    }
+
+    this.favorites.set(newFavorites);
+    this.saveFavorites();
+  }
+
+  // ==================== SHARE FUNCTIONALITY ====================
+
+  shareRestaurant(event: Event, restaurant: Restaurant): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const url = `${window.location.origin}/restaurants/${restaurant.id}`;
+    const text = `Check out ${restaurant.name} on iTiYum!`;
+
+    // Use native share if available
+    if (navigator.share) {
+      navigator.share({
+        title: restaurant.name,
+        text: text,
+        url: url
+      }).catch(err => {
+        // User cancelled or share failed, fallback to clipboard
+        this.copyToClipboard(url);
+      });
+    } else {
+      // Fallback: copy link to clipboard
+      this.copyToClipboard(url);
+    }
+  }
+
+  private copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text).then(() => {
+      // Show a brief notification (could be replaced with a toast)
+      alert('Link copied to clipboard!');
+    }).catch(() => {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Link copied to clipboard!');
+    });
+  }
+
+  // ==================== DIRECTIONS FUNCTIONALITY ====================
+
+  getDirections(event: Event, restaurant: Restaurant): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const address = encodeURIComponent(restaurant.address);
+    window.open(`https://maps.google.com?q=${address}`, '_blank');
   }
 }

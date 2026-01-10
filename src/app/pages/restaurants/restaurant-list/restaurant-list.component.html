@@ -175,12 +175,21 @@
 
         <!-- Action Buttons -->
         <div class="card-actions">
-          <button type="button" class="action-btn favorite" title="Save to favorites">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button
+            type="button"
+            class="action-btn favorite"
+            [class.saved]="isFavorite(restaurant.id)"
+            title="Save to favorites"
+            (click)="toggleFavorite($event, restaurant)">
+            <svg width="18" height="18" viewBox="0 0 24 24" [attr.fill]="isFavorite(restaurant.id) ? '#ff8c00' : 'none'" stroke="currentColor" stroke-width="2">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
           </button>
-          <button type="button" class="action-btn share" title="Share">
+          <button
+            type="button"
+            class="action-btn share"
+            title="Share"
+            (click)="shareRestaurant($event, restaurant)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="18" cy="5" r="3"></circle>
               <circle cx="6" cy="12" r="3"></circle>
@@ -189,7 +198,11 @@
               <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
             </svg>
           </button>
-          <button type="button" class="action-btn directions" title="Get directions">
+          <button
+            type="button"
+            class="action-btn directions"
+            title="Get directions"
+            (click)="getDirections($event, restaurant)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
             </svg>

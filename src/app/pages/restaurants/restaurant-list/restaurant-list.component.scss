@@ -626,6 +626,20 @@ $itiyum-orange-dark: #e67e00;
         transform: scale(0.95);
       }
 
+      // Saved favorite state
+      &.favorite.saved {
+        color: $itiyum-orange;
+        background: rgba($itiyum-orange, 0.08);
+
+        svg {
+          stroke: $itiyum-orange;
+        }
+
+        &:hover {
+          background: rgba($itiyum-orange, 0.15);
+        }
+      }
+
       &.favorite:hover .action-icon {
         animation: heartBeat 0.8s ease;
       }
