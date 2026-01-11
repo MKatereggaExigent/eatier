@@ -29,7 +29,6 @@ export interface PlaceResult {
   providedIn: 'root'
 })
 export class GoogleMapsService {
-  private autocompleteService: any | null = null;
   private geocoder: any | null = null;
   private isLoaded = false;
 
@@ -46,10 +45,21 @@ export class GoogleMapsService {
         return;
       }
 
+      // Check if script is already being loaded
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]');
+      if (existingScript) {
+        existingScript.addEventListener('load', () => {
+          this.isLoaded = true;
+          this.initializeServices();
+          resolve();
+        });
+        return;
+      }
+
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&libraries=places`;
+      // Use loading=async parameter for optimal performance (recommended by Google)
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&libraries=places&loading=async`;
       script.async = true;
-      script.defer = true;
       script.onload = () => {
         this.isLoaded = true;
         this.initializeServices();
@@ -62,38 +72,51 @@ export class GoogleMapsService {
 
   private initializeServices(): void {
     if (typeof google !== 'undefined' && google.maps) {
-      this.autocompleteService = new google.maps.places.AutocompleteService();
       this.geocoder = new google.maps.Geocoder();
     }
   }
 
+  /**
+   * Get place predictions using the new AutocompleteSuggestion API
+   * This replaces the deprecated AutocompleteService
+   */
   async getPlacePredictions(input: string): Promise<any[]> {
     if (!this.isLoaded) {
       await this.loadGoogleMapsScript();
     }
 
-    return new Promise((resolve, reject) => {
-      if (!this.autocompleteService) {
-        reject(new Error('Autocomplete service not initialized'));
-        return;
+    try {
+      const { AutocompleteSessionToken, AutocompleteSuggestion } = await google.maps.importLibrary('places');
+
+      // Create a session token for billing optimization
+      const sessionToken = new AutocompleteSessionToken();
+
+      // Use the new AutocompleteSuggestion.fetchAutocompleteSuggestions API
+      const request = {
+        input,
+        sessionToken,
+        includedPrimaryTypes: ['establishment', 'geocode']
+      };
+
+      const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+
+      if (!suggestions || suggestions.length === 0) {
+        return [];
       }
 
-      this.autocompleteService.getPlacePredictions(
-        {
-          input,
-          types: ['establishment', 'geocode']
-        },
-        (predictions: any, status: any) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-            resolve(predictions);
-          } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
-            resolve([]);
-          } else {
-            reject(new Error(`Places API error: ${status}`));
-          }
+      // Transform to match the old API format for backward compatibility
+      return suggestions.map((suggestion: any) => ({
+        place_id: suggestion.placePrediction?.placeId || '',
+        description: suggestion.placePrediction?.text?.text || '',
+        structured_formatting: {
+          main_text: suggestion.placePrediction?.mainText?.text || '',
+          secondary_text: suggestion.placePrediction?.secondaryText?.text || ''
         }
-      );
-    });
+      }));
+    } catch (error) {
+      console.error('Error fetching autocomplete suggestions:', error);
+      return [];
+    }
   }
 
   /**
