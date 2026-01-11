@@ -30,7 +30,6 @@ export interface PlaceResult {
 })
 export class GoogleMapsService {
   private autocompleteService: any | null = null;
-  private placesService: any | null = null;
   private geocoder: any | null = null;
   private isLoaded = false;
 
@@ -65,10 +64,6 @@ export class GoogleMapsService {
     if (typeof google !== 'undefined' && google.maps) {
       this.autocompleteService = new google.maps.places.AutocompleteService();
       this.geocoder = new google.maps.Geocoder();
-
-      // PlacesService requires a map or div element
-      const div = document.createElement('div');
-      this.placesService = new google.maps.places.PlacesService(div);
     }
   }
 
@@ -101,58 +96,69 @@ export class GoogleMapsService {
     });
   }
 
+  /**
+   * Get place details using the new google.maps.places.Place API
+   * This replaces the deprecated PlacesService.getDetails()
+   */
   async getPlaceDetails(placeId: string): Promise<PlaceResult> {
     if (!this.isLoaded) {
       await this.loadGoogleMapsScript();
     }
 
-    return new Promise((resolve, reject) => {
-      if (!this.placesService) {
-        reject(new Error('Places service not initialized'));
-        return;
-      }
+    try {
+      // Use the new Place class (recommended API)
+      const { Place } = await google.maps.importLibrary('places');
 
-      this.placesService.getDetails(
-        {
-          placeId,
-          fields: ['place_id', 'formatted_address', 'name', 'geometry', 'address_components']
-        },
-        (place: any, status: any) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-            const addressComponents: any = {};
+      const place = new Place({
+        id: placeId,
+      });
 
-            place.address_components?.forEach((component: any) => {
-              if (component.types.includes('street_number') || component.types.includes('route')) {
-                addressComponents.street = (addressComponents.street || '') + ' ' + component.long_name;
-              }
-              if (component.types.includes('locality')) {
-                addressComponents.city = component.long_name;
-              }
-              if (component.types.includes('administrative_area_level_1')) {
-                addressComponents.state = component.long_name;
-              }
-              if (component.types.includes('country')) {
-                addressComponents.country = component.long_name;
-              }
-              if (component.types.includes('postal_code')) {
-                addressComponents.postalCode = component.long_name;
-              }
-            });
+      // Fetch the required fields using the new API
+      await place.fetchFields({
+        fields: ['id', 'displayName', 'formattedAddress', 'location', 'addressComponents']
+      });
 
-            resolve({
-              placeId: place.place_id!,
-              formattedAddress: place.formatted_address!,
-              name: place.name!,
-              latitude: place.geometry!.location!.lat(),
-              longitude: place.geometry!.location!.lng(),
-              addressComponents
-            });
-          } else {
-            reject(new Error(`Place details error: ${status}`));
+      const addressComponents: any = {};
+
+      // Parse address components from the new API format
+      if (place.addressComponents) {
+        for (const component of place.addressComponents) {
+          const types = component.types || [];
+          if (types.includes('street_number') || types.includes('route')) {
+            addressComponents.street = (addressComponents.street || '') + ' ' + component.longText;
+          }
+          if (types.includes('locality')) {
+            addressComponents.city = component.longText;
+          }
+          if (types.includes('administrative_area_level_1')) {
+            addressComponents.state = component.longText;
+          }
+          if (types.includes('country')) {
+            addressComponents.country = component.longText;
+          }
+          if (types.includes('postal_code')) {
+            addressComponents.postalCode = component.longText;
           }
         }
-      );
-    });
+      }
+
+      // Trim street if it exists
+      if (addressComponents.street) {
+        addressComponents.street = addressComponents.street.trim();
+      }
+
+      return {
+        placeId: place.id,
+        formattedAddress: place.formattedAddress || '',
+        name: place.displayName || '',
+        latitude: place.location?.lat() || 0,
+        longitude: place.location?.lng() || 0,
+        addressComponents
+      };
+    } catch (error) {
+      console.error('Error fetching place details with new API:', error);
+      throw new Error(`Place details error: ${error}`);
+    }
   }
 }
 
