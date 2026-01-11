@@ -29,9 +29,10 @@
   min-height: 100vh;
   min-height: 100dvh; // Dynamic viewport height for mobile browsers
   display: flex;
-  align-items: center;
+  align-items: flex-start; // Changed from center to prevent keyboard issues
   justify-content: center;
   padding: 2rem 1rem;
+  padding-top: 3rem;
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
@@ -54,22 +55,22 @@
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
 
-  // Glassmorphic overlay pattern
+  // Glassmorphic overlay pattern - contained within viewport
   &::before {
     content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: radial-gradient(
       circle at 50% 50%,
       rgba(255, 255, 255, 0.1) 0%,
       rgba(255, 255, 255, 0.05) 25%,
       transparent 50%
     );
-    animation: float 20s ease-in-out infinite;
     pointer-events: none;
+    z-index: 0;
   }
 }
 
@@ -81,11 +82,10 @@
   padding: 2.5rem;
   width: 100%;
   max-width: 640px;
-  max-height: 85vh;
-  max-height: 85dvh;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: visible;
   box-sizing: border-box;
+  margin-bottom: 2rem;
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.1),
     0 2px 8px rgba(0, 0, 0, 0.05),
