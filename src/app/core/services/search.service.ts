@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, tap, of, debounceTime, Subject } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface SearchResult {
   id: string;
@@ -24,7 +25,7 @@ export interface SearchResponse {
 })
 export class SearchService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3001/api';
+  private apiUrl = environment.apiUrl;
 
   searchResults = signal<SearchResult[]>([]);
   isSearching = signal<boolean>(false);
