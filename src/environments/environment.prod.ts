@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://41.76.109.131:3002/api',
+  apiUrl: '/api',  // Use relative URL - nginx proxies to backend
   googleMapsApiKey: 'AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' // Replace with actual key
 };
