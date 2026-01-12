@@ -29,18 +29,22 @@ export interface PlaceResult {
   providedIn: 'root'
 })
 export class GoogleMapsService {
-  private geocoder: any | null = null;
   private isLoaded = false;
+  private loadingPromise: Promise<void> | null = null;
 
   constructor() {
     this.loadGoogleMapsScript();
   }
 
   private loadGoogleMapsScript(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    // Return existing promise if already loading
+    if (this.loadingPromise) {
+      return this.loadingPromise;
+    }
+
+    this.loadingPromise = new Promise((resolve, reject) => {
       if (typeof google !== 'undefined' && google.maps) {
         this.isLoaded = true;
-        this.initializeServices();
         resolve();
         return;
       }
@@ -50,7 +54,6 @@ export class GoogleMapsService {
       if (existingScript) {
         existingScript.addEventListener('load', () => {
           this.isLoaded = true;
-          this.initializeServices();
           resolve();
         });
         return;
@@ -62,18 +65,13 @@ export class GoogleMapsService {
       script.async = true;
       script.onload = () => {
         this.isLoaded = true;
-        this.initializeServices();
         resolve();
       };
       script.onerror = () => reject(new Error('Failed to load Google Maps script'));
       document.head.appendChild(script);
     });
-  }
 
-  private initializeServices(): void {
-    if (typeof google !== 'undefined' && google.maps) {
-      this.geocoder = new google.maps.Geocoder();
-    }
+    return this.loadingPromise;
   }
 
   /**
