@@ -381,9 +381,10 @@ router.post('/login', async (req, res) => {
       WHERE id = $1
     `, [user.id]);
 
-    // Get primary role for token
-    const primaryRole = user.roles && user.roles.length > 0 ?
-      user.roles[0].toLowerCase().replace(' ', '_') : 'normal_user';
+    // Get primary role for token (filter out null values from LEFT JOIN)
+    const userRoles = (user.roles || []).filter(r => r !== null);
+    const primaryRole = userRoles.length > 0 ?
+      userRoles[0].toLowerCase().replace(/ /g, '_') : 'normal_user';
 
     // Generate access and refresh tokens with dynamic session timeout
     const tokenPayload = {
