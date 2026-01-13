@@ -89,18 +89,37 @@ async function initializeDatabase() {
       
     } else {
       console.log('✅ Database already initialized');
-      
+
       // Ensure admin user exists with correct password
       const tenantResult = await client.query(\"SELECT id FROM tenants WHERE slug = 'itiyum' LIMIT 1\");
       if (tenantResult.rows.length > 0) {
         const tenantId = tenantResult.rows[0].id;
         const adminResult = await client.query('SELECT id FROM users WHERE email = \$1 AND tenant_id = \$2', ['admin@itiyum.com', tenantId]);
-        
+        const passwordHash = await bcrypt.hash('Admin@123', 10);
+
         if (adminResult.rows.length === 0) {
           console.log('⚠️ Admin user not found, creating...');
-          const passwordHash = await bcrypt.hash('Admin@123', 10);
-          await client.query('UPDATE users SET password_hash = \$1 WHERE email = \$2', [passwordHash, 'admin@itiyum.com']);
+
+          // INSERT the admin user
+          const insertResult = await client.query(
+            'INSERT INTO users (email, password_hash, first_name, last_name, account_status, email_verified, tenant_id) VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7) RETURNING id',
+            ['admin@itiyum.com', passwordHash, 'Platform', 'Admin', 'active', true, tenantId]
+          );
+
+          // Assign Itiyum Admin role
+          const roleResult = await client.query(\"SELECT id FROM roles WHERE name = 'Itiyum Admin' LIMIT 1\");
+          if (roleResult.rows.length > 0 && insertResult.rows.length > 0) {
+            await client.query('INSERT INTO user_roles (user_id, role_id) VALUES (\$1, \$2) ON CONFLICT DO NOTHING', [insertResult.rows[0].id, roleResult.rows[0].id]);
+          }
+
+          console.log('✅ Admin user created: admin@itiyum.com / Admin@123');
+        } else {
+          // Update existing admin password to ensure it's correct
+          await client.query('UPDATE users SET password_hash = \$1 WHERE email = \$2 AND tenant_id = \$3', [passwordHash, 'admin@itiyum.com', tenantId]);
+          console.log('✅ Admin password updated: admin@itiyum.com / Admin@123');
         }
+      } else {
+        console.log('⚠️ Itiyum tenant not found, cannot create admin user');
       }
     }
     
