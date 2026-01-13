@@ -291,5 +291,103 @@ router.delete('/:userId/favorites/:favoriteId', async (req, res) => {
   }
 });
 
+// ===================================
+// USER RECOMMENDATIONS
+// ===================================
+
+/**
+ * GET /api/users/:userId/recommendations
+ * Get personalized restaurant recommendations for user
+ */
+router.get('/:userId/recommendations', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { limit = 10 } = req.query;
+    const tenantId = req.user.tenant_id;
+
+    // Verify user can access this data
+    if (req.user.id !== userId && req.user.role !== 'itiyum_admin') {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // Get user preferences
+    const prefsResult = await pool.query(
+      `SELECT cuisine_preferences, dietary_restrictions, price_preference
+       FROM user_preferences WHERE user_id = $1 AND tenant_id = $2`,
+      [userId, tenantId]
+    );
+    const prefs = prefsResult.rows[0];
+
+    // Get businesses the user has already favorited or reviewed
+    const excludeResult = await pool.query(
+      `SELECT DISTINCT business_id FROM (
+        SELECT business_id FROM favorites WHERE user_id = $1 AND tenant_id = $2
+        UNION
+        SELECT business_id FROM reviews WHERE user_id = $1 AND tenant_id = $2
+      ) excluded`,
+      [userId, tenantId]
+    );
+    const excludeIds = excludeResult.rows.map(r => r.business_id);
+
+    // Build recommendation query
+    let query = `
+      SELECT
+        b.id,
+        b.business_name as name,
+        b.cuisine_types as cuisine,
+        b.featured_image as image,
+        b.address,
+        COALESCE(AVG(r.rating), 0) as rating,
+        COUNT(DISTINCT r.id) as review_count
+      FROM businesses b
+      LEFT JOIN reviews r ON b.id = r.business_id AND r.status = 'published'
+      WHERE b.account_status = 'active'
+        AND b.tenant_id = $1
+    `;
+
+    const params = [tenantId];
+    let paramIndex = 2;
+
+    // Exclude already interacted businesses
+    if (excludeIds.length > 0) {
+      query += ` AND b.id != ALL($${paramIndex}::uuid[])`;
+      params.push(excludeIds);
+      paramIndex++;
+    }
+
+    // Filter by cuisine preferences if available
+    if (prefs?.cuisine_preferences && prefs.cuisine_preferences.length > 0) {
+      query += ` AND b.cuisine_types && $${paramIndex}::text[]`;
+      params.push(prefs.cuisine_preferences);
+      paramIndex++;
+    }
+
+    query += `
+      GROUP BY b.id, b.business_name, b.cuisine_types, b.featured_image, b.address
+      ORDER BY rating DESC, review_count DESC
+      LIMIT $${paramIndex}
+    `;
+    params.push(parseInt(limit));
+
+    const result = await pool.query(query, params);
+
+    const businesses = result.rows.map(b => ({
+      id: b.id,
+      name: b.name,
+      cuisine: Array.isArray(b.cuisine) ? b.cuisine.join(', ') : b.cuisine,
+      rating: parseFloat(b.rating) || 0,
+      image: b.image,
+      address: b.address,
+      reviewCount: parseInt(b.review_count) || 0
+    }));
+
+    res.json({ businesses });
+
+  } catch (error) {
+    console.error('Error fetching recommendations:', error);
+    res.status(500).json({ error: 'Failed to fetch recommendations' });
+  }
+});
+
 module.exports = router;
 

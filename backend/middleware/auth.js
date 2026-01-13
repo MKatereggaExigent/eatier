@@ -69,6 +69,7 @@ async function authenticateToken(req, res, next) {
 
     req.user = {
       id: user.id,
+      userId: user.id,  // Alias for backward compatibility with routes using req.user.userId
       email: user.email,
       firstName: user.first_name,
       lastName: user.last_name,
@@ -154,6 +155,7 @@ async function optionalAuth(req, res, next) {
 
       req.user = {
         id: user.id,
+        userId: user.id,  // Alias for backward compatibility
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
