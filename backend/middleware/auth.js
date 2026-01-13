@@ -63,6 +63,10 @@ async function authenticateToken(req, res, next) {
     }
 
     // Attach user to request with RBAC data
+    // Filter out null values from roles/permissions (from LEFT JOIN with no matches)
+    const userRoles = (user.roles || []).filter(r => r !== null);
+    const userPermissions = (user.permissions || []).filter(p => p !== null);
+
     req.user = {
       id: user.id,
       email: user.email,
@@ -70,10 +74,10 @@ async function authenticateToken(req, res, next) {
       lastName: user.last_name,
       tenant_id: user.tenant_id,
       tenantSlug: user.tenant_slug,
-      roles: user.roles || ['Normal User'],
-      permissions: user.permissions || [],
+      roles: userRoles.length > 0 ? userRoles : ['Normal User'],
+      permissions: userPermissions,
       // For backward compatibility, set primary role
-      role: user.roles && user.roles.length > 0 ? user.roles[0].toLowerCase().replace(' ', '_') : 'normal_user'
+      role: userRoles.length > 0 ? userRoles[0].toLowerCase().replace(/ /g, '_') : 'normal_user'
     };
 
     next();
@@ -144,6 +148,10 @@ async function optionalAuth(req, res, next) {
 
     if (result.rows.length > 0) {
       const user = result.rows[0];
+      // Filter out null values from roles/permissions (from LEFT JOIN with no matches)
+      const userRoles = (user.roles || []).filter(r => r !== null);
+      const userPermissions = (user.permissions || []).filter(p => p !== null);
+
       req.user = {
         id: user.id,
         email: user.email,
@@ -151,9 +159,9 @@ async function optionalAuth(req, res, next) {
         lastName: user.last_name,
         tenant_id: user.tenant_id,
         tenantSlug: user.tenant_slug,
-        roles: user.roles || ['Normal User'],
-        permissions: user.permissions || [],
-        role: user.roles && user.roles.length > 0 ? user.roles[0].toLowerCase().replace(' ', '_') : 'normal_user'
+        roles: userRoles.length > 0 ? userRoles : ['Normal User'],
+        permissions: userPermissions,
+        role: userRoles.length > 0 ? userRoles[0].toLowerCase().replace(/ /g, '_') : 'normal_user'
       };
     }
 
