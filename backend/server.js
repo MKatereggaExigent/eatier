@@ -144,6 +144,8 @@ const userWalletRoutes = require('./routes/user-wallet');
 const socialRoutes = require('./routes/social');
 const recommendationsRoutes = require('./routes/recommendations');
 const userSpecialistBookingsRoutes = require('./routes/user-specialist-bookings');
+const blogRoutes = require('./routes/blog');
+const adminBlogRoutes = require('./routes/admin-blog');
 
 // Static file serving for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -186,6 +188,8 @@ app.use('/api/wallet', userWalletRoutes); // User wallet/cashback
 app.use('/api/social', socialRoutes); // Social features (follow, activity feed)
 app.use('/api/recommendations', recommendationsRoutes); // Personalized recommendations
 app.use('/api/user/specialist-bookings', userSpecialistBookingsRoutes); // User specialist booking history & testimonials
+app.use('/api/blog', blogRoutes); // Public blog endpoints
+app.use('/api/admin/blog', adminBlogRoutes); // Admin blog management
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

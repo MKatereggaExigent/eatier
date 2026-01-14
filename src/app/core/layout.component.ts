@@ -92,6 +92,7 @@ export class LayoutComponent {
         { label: 'Grow', icon: '📈', route: '/grow' },
         { label: 'Restaurants', icon: '🍽️', route: '/restaurants' },
         { label: 'Specialists', icon: '👨‍🍳', route: '/specialists' },
+        { label: 'Blog', icon: '📝', route: '/blog' },
         { label: 'Community', icon: '🌟', route: '/community' },
         { label: 'FAQs', icon: '❓', route: '/faqs' },
         { label: 'Help', icon: '💬', route: '/help' }

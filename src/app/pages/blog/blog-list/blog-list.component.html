@@ -1,0 +1,165 @@
+<div class="blog-page">
+  <!-- Hero Section -->
+  <section class="blog-hero">
+    <div class="hero-content">
+      <h1>Itiyum Blog</h1>
+      <p>Discover food trends, restaurant tips, and culinary inspiration</p>
+      
+      <!-- Search Bar -->
+      <div class="search-container">
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery"
+          (keyup.enter)="onSearch()"
+          placeholder="Search articles..."
+          class="search-input"
+        />
+        <button (click)="onSearch()" class="search-btn">
+          🔍 Search
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div class="blog-container">
+    <!-- Categories Sidebar -->
+    <aside class="categories-sidebar">
+      <h3>Categories</h3>
+      <ul class="category-list">
+        <li>
+          <button 
+            [class.active]="selectedCategory() === ''"
+            (click)="onCategoryChange('')"
+          >
+            📚 All Posts
+            <span class="count">{{ totalPosts() }}</span>
+          </button>
+        </li>
+        @for (category of categories(); track category.id) {
+          <li>
+            <button 
+              [class.active]="selectedCategory() === category.name"
+              (click)="onCategoryChange(category.name)"
+            >
+              {{ category.icon }} {{ category.name }}
+              <span class="count">{{ category.post_count }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="blog-content">
+      <!-- Featured Posts -->
+      @if (featuredPosts().length > 0 && !selectedCategory() && currentPage() === 1) {
+        <section class="featured-section">
+          <h2>✨ Featured Articles</h2>
+          <div class="featured-grid">
+            @for (post of featuredPosts(); track post.id) {
+              <a [routerLink]="['/blog', post.slug]" class="featured-card">
+                <div class="featured-image">
+                  <img [src]="post.featured_image || 'assets/images/blog-placeholder.jpg'" [alt]="post.title" />
+                  <span class="featured-badge">Featured</span>
+                </div>
+                <div class="featured-content">
+                  <span class="category-tag">{{ post.category }}</span>
+                  <h3>{{ post.title }}</h3>
+                  <p>{{ post.excerpt }}</p>
+                  <div class="meta">
+                    <span>{{ formatDate(post.published_at) }}</span>
+                    <span>{{ getReadingTime(post.excerpt) }} min read</span>
+                  </div>
+                </div>
+              </a>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- Loading State -->
+      @if (loading()) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading articles...</p>
+        </div>
+      }
+
+      <!-- Error State -->
+      @if (error()) {
+        <div class="error-state">
+          <p>{{ error() }}</p>
+          <button (click)="loadPosts()">Try Again</button>
+        </div>
+      }
+
+      <!-- Posts Grid -->
+      @if (!loading() && !error()) {
+        <section class="posts-section">
+          <h2>
+            @if (selectedCategory()) {
+              {{ selectedCategory() }}
+            } @else {
+              Latest Articles
+            }
+          </h2>
+          
+          @if (posts().length === 0) {
+            <div class="empty-state">
+              <p>No articles found. Check back later!</p>
+            </div>
+          } @else {
+            <div class="posts-grid">
+              @for (post of posts(); track post.id) {
+                <a [routerLink]="['/blog', post.slug]" class="post-card">
+                  <div class="post-image">
+                    <img [src]="post.featured_image || 'assets/images/blog-placeholder.jpg'" [alt]="post.title" />
+                  </div>
+                  <div class="post-content">
+                    <span class="category-tag">{{ post.category }}</span>
+                    <h3>{{ post.title }}</h3>
+                    <p>{{ post.excerpt }}</p>
+                    <div class="post-meta">
+                      <div class="author">
+                        <img [src]="post.author_avatar || 'assets/images/default-avatar.png'" [alt]="post.author_name" />
+                        <span>{{ post.author_name }}</span>
+                      </div>
+                      <span class="date">{{ formatDate(post.published_at) }}</span>
+                    </div>
+                    <div class="post-stats">
+                      <span>👁️ {{ post.view_count }}</span>
+                      <span>❤️ {{ post.like_count }}</span>
+                      <span>⏱️ {{ getReadingTime(post.excerpt) }} min</span>
+                    </div>
+                  </div>
+                </a>
+              }
+            </div>
+          }
+        </section>
+
+        <!-- Pagination -->
+        @if (totalPages() > 1) {
+          <div class="pagination">
+            <button 
+              [disabled]="currentPage() === 1"
+              (click)="onPageChange(currentPage() - 1)"
+            >
+              ← Previous
+            </button>
+            <span class="page-info">
+              Page {{ currentPage() }} of {{ totalPages() }}
+            </span>
+            <button 
+              [disabled]="currentPage() === totalPages()"
+              (click)="onPageChange(currentPage() + 1)"
+            >
+              Next →
+            </button>
+          </div>
+        }
+      }
+    </main>
+  </div>
+</div>
+

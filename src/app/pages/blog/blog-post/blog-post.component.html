@@ -1,0 +1,113 @@
+<div class="blog-post-page">
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading article...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="error-state">
+      <h2>😕 Oops!</h2>
+      <p>{{ error() }}</p>
+      <a routerLink="/blog" class="back-btn">← Back to Blog</a>
+    </div>
+  }
+
+  <!-- Post Content -->
+  @if (!loading() && !error() && post()) {
+    <!-- Hero Section -->
+    <header class="post-hero" [style.backgroundImage]="'url(' + (post()?.featured_image || 'assets/images/blog-placeholder.jpg') + ')'">
+      <div class="hero-overlay">
+        <div class="hero-content">
+          <a routerLink="/blog" class="back-link">← Back to Blog</a>
+          <span class="category-tag">{{ post()?.category }}</span>
+          <h1>{{ post()?.title }}</h1>
+          <div class="post-meta">
+            <div class="author">
+              <img [src]="post()?.author_avatar || 'assets/images/default-avatar.png'" [alt]="post()?.author_name" />
+              <span>{{ post()?.author_name }}</span>
+            </div>
+            <span class="divider">•</span>
+            <span>{{ formatDate(post()?.published_at || '') }}</span>
+            <span class="divider">•</span>
+            <span>{{ getReadingTime() }} min read</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="post-main">
+      <article class="post-content">
+        <div class="content-body" [innerHTML]="getSafeContent()"></div>
+
+        <!-- Tags -->
+        @if (post()?.tags && post()!.tags.length > 0) {
+          <div class="post-tags">
+            <span class="tags-label">Tags:</span>
+            @for (tag of post()?.tags; track tag) {
+              <a [routerLink]="['/blog']" [queryParams]="{tag: tag}" class="tag">
+                #{{ tag }}
+              </a>
+            }
+          </div>
+        }
+
+        <!-- Engagement Actions -->
+        <div class="post-actions">
+          <button (click)="toggleLike()" class="like-btn" [class.liked]="liked()">
+            {{ liked() ? '❤️' : '🤍' }} {{ likeCount() }} Likes
+          </button>
+          
+          <div class="share-buttons">
+            <span>Share:</span>
+            <button (click)="sharePost('twitter')" class="share-btn twitter">𝕏</button>
+            <button (click)="sharePost('facebook')" class="share-btn facebook">f</button>
+            <button (click)="sharePost('linkedin')" class="share-btn linkedin">in</button>
+            <button (click)="sharePost('copy')" class="share-btn copy">🔗</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Author Card -->
+      <aside class="author-card">
+        <div class="author-info">
+          <img [src]="post()?.author_avatar || 'assets/images/default-avatar.png'" [alt]="post()?.author_name" />
+          <div>
+            <h4>Written by</h4>
+            <h3>{{ post()?.author_name }}</h3>
+            @if (post()?.author_bio) {
+              <p>{{ post()?.author_bio }}</p>
+            }
+          </div>
+        </div>
+      </aside>
+
+      <!-- Related Posts -->
+      @if (relatedPosts().length > 0) {
+        <section class="related-posts">
+          <h2>Related Articles</h2>
+          <div class="related-grid">
+            @for (relatedPost of relatedPosts(); track relatedPost.id) {
+              <a [routerLink]="['/blog', relatedPost.slug]" class="related-card">
+                <div class="related-image">
+                  <img [src]="relatedPost.featured_image || 'assets/images/blog-placeholder.jpg'" [alt]="relatedPost.title" />
+                </div>
+                <div class="related-content">
+                  <span class="category-tag">{{ relatedPost.category }}</span>
+                  <h3>{{ relatedPost.title }}</h3>
+                  <p>{{ relatedPost.excerpt }}</p>
+                  <span class="date">{{ formatDate(relatedPost.published_at) }}</span>
+                </div>
+              </a>
+            }
+          </div>
+        </section>
+      }
+    </main>
+  }
+</div>
+

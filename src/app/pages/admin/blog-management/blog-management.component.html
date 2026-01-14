@@ -1,0 +1,202 @@
+<div class="blog-management">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>📝 Blog Management</h1>
+      <button (click)="openNewPostEditor()" class="btn-primary">
+        + New Post
+      </button>
+    </div>
+  </header>
+
+  <!-- Stats Cards -->
+  @if (stats()) {
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-number">{{ stats()?.total_posts || 0 }}</span>
+        <span class="stat-label">Total Posts</span>
+      </div>
+      <div class="stat-card published">
+        <span class="stat-number">{{ stats()?.published_posts || 0 }}</span>
+        <span class="stat-label">Published</span>
+      </div>
+      <div class="stat-card draft">
+        <span class="stat-number">{{ stats()?.draft_posts || 0 }}</span>
+        <span class="stat-label">Drafts</span>
+      </div>
+      <div class="stat-card views">
+        <span class="stat-number">{{ stats()?.total_views || 0 }}</span>
+        <span class="stat-label">Total Views</span>
+      </div>
+    </div>
+  }
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        placeholder="Search posts..."
+      />
+      <button (click)="onSearch()">🔍</button>
+    </div>
+    
+    <select [(ngModel)]="filterStatus" (change)="onFilterChange()">
+      <option value="">All Status</option>
+      <option value="published">Published</option>
+      <option value="draft">Draft</option>
+      <option value="archived">Archived</option>
+    </select>
+    
+    <select [(ngModel)]="filterCategory" (change)="onFilterChange()">
+      <option value="">All Categories</option>
+      @for (category of categories(); track category.id) {
+        <option [value]="category.name">{{ category.name }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Posts Table -->
+  <div class="posts-table-container">
+    @if (loading()) {
+      <div class="loading-state">Loading posts...</div>
+    } @else if (posts().length === 0) {
+      <div class="empty-state">
+        <p>No blog posts found</p>
+        <button (click)="openNewPostEditor()" class="btn-primary">Create your first post</button>
+      </div>
+    } @else {
+      <table class="posts-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Views</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (post of posts(); track post.id) {
+            <tr>
+              <td class="title-cell">
+                <div class="post-title">
+                  @if (post.is_featured) {
+                    <span class="featured-badge">⭐</span>
+                  }
+                  {{ post.title }}
+                </div>
+                <span class="post-slug">/blog/{{ post.slug }}</span>
+              </td>
+              <td>{{ post.category || '-' }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(post.status)">
+                  {{ post.status }}
+                </span>
+              </td>
+              <td>{{ post.view_count }}</td>
+              <td>{{ formatDate(post.created_at) }}</td>
+              <td class="actions-cell">
+                <button (click)="openEditPostEditor(post)" class="btn-icon" title="Edit">✏️</button>
+                <button (click)="togglePublish(post)" class="btn-icon" title="Toggle Publish">
+                  {{ post.status === 'published' ? '📤' : '📥' }}
+                </button>
+                <button (click)="deletePost(post)" class="btn-icon danger" title="Delete">🗑️</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <div class="pagination">
+      <button [disabled]="currentPage() === 1" (click)="onPageChange(currentPage() - 1)">← Prev</button>
+      <span>Page {{ currentPage() }} of {{ totalPages() }}</span>
+      <button [disabled]="currentPage() === totalPages()" (click)="onPageChange(currentPage() + 1)">Next →</button>
+    </div>
+  }
+
+  <!-- Post Editor Modal -->
+  @if (showEditor()) {
+    <div class="modal-overlay" (click)="closeEditor()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ isEditing() ? 'Edit Post' : 'New Post' }}</h2>
+          <button (click)="closeEditor()" class="close-btn">×</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Title *</label>
+            <input type="text" [(ngModel)]="formTitle" (blur)="generateSlug()" placeholder="Enter post title" />
+          </div>
+          
+          <div class="form-group">
+            <label>Slug</label>
+            <input type="text" [(ngModel)]="formSlug" placeholder="url-friendly-slug" />
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <select [(ngModel)]="formCategory">
+                <option value="">Select category</option>
+                @for (category of categories(); track category.id) {
+                  <option [value]="category.name">{{ category.name }}</option>
+                }
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Status</label>
+              <select [(ngModel)]="formStatus">
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Featured Image URL</label>
+            <input type="text" [(ngModel)]="formFeaturedImage" placeholder="https://example.com/image.jpg" />
+          </div>
+
+          <div class="form-group">
+            <label>Excerpt</label>
+            <textarea [(ngModel)]="formExcerpt" rows="2" placeholder="Brief summary of the post..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Content * (HTML supported)</label>
+            <textarea [(ngModel)]="formContent" rows="12" placeholder="Write your blog post content here..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Tags (comma separated)</label>
+            <input type="text" [(ngModel)]="formTags" placeholder="food, recipes, tips" />
+          </div>
+
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="formIsFeatured" />
+              Featured Post
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeEditor()" class="btn-secondary">Cancel</button>
+          <button (click)="savePost()" [disabled]="saving()" class="btn-primary">
+            {{ saving() ? 'Saving...' : (isEditing() ? 'Update Post' : 'Create Post') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

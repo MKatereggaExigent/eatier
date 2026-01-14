@@ -37,6 +37,16 @@ export const routes: Routes = [
                 path: 'specialists/:id',
                 loadComponent: () => import('./pages/specialists/specialist-detail/specialist-detail.component').then(m => m.SpecialistDetailComponent)
             },
+
+            // Public blog routes
+            {
+                path: 'blog',
+                loadComponent: () => import('./pages/blog/blog-list/blog-list.component').then(m => m.BlogListComponent)
+            },
+            {
+                path: 'blog/:slug',
+                loadComponent: () => import('./pages/blog/blog-post/blog-post.component').then(m => m.BlogPostComponent)
+            },
         ]
     },
 
@@ -78,7 +88,8 @@ export const routes: Routes = [
             { path: 'ads', loadComponent: () => import('./pages/admin/ads/admin-ads.component').then(m => m.AdminAdsComponent) },
             { path: 'analytics', loadComponent: () => import('./pages/admin/analytics/admin-analytics.component').then(m => m.AdminAnalyticsComponent) },
             { path: 'reports', loadComponent: () => import('./pages/admin/reports/admin-reports.component').then(m => m.AdminReportsComponent) },
-            { path: 'settings', loadComponent: () => import('./pages/admin/settings/admin-settings.component').then(m => m.AdminSettingsComponent) }
+            { path: 'settings', loadComponent: () => import('./pages/admin/settings/admin-settings.component').then(m => m.AdminSettingsComponent) },
+            { path: 'blog', loadComponent: () => import('./pages/admin/blog-management/blog-management.component').then(m => m.BlogManagementComponent) }
         ]
     },
 

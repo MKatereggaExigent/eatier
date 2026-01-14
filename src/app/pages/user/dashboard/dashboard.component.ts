@@ -38,6 +38,7 @@ export class UserDashboardComponent {
           { path: 'users', label: 'Users', icon: '👥' },
           { path: 'businesses', label: 'Businesses', icon: '🏪' },
           { path: 'bookings', label: 'Bookings', icon: '📅' },
+          { path: 'blog', label: 'Blog', icon: '📝' },
           { path: 'ads', label: 'Manage My Ads', icon: '📢' },
           { path: 'analytics', label: 'Analytics', icon: '📈' },
           { path: 'reports', label: 'Reports', icon: '📋' },
