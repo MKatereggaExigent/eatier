@@ -797,14 +797,26 @@
 // Responsive Design
 // Tablet breakpoint
 @media (max-width: 768px) {
+  .home-button-container {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0 0.5rem;
+  }
+
   .login-container {
-    padding: 1rem;
+    padding: 0;
+    flex-direction: column;
+    justify-content: flex-start;
   }
 
   .login-card {
     padding: 2rem;
     max-width: 95%;
-    margin: 1rem;
+    margin: 0.5rem 1rem 1rem;
   }
 
   .login-header h1 {
@@ -826,14 +838,23 @@
 
 // Small mobile breakpoint
 @media (max-width: 480px) {
+  .home-button-container {
+    padding: 0.75rem 0 0.25rem;
+  }
+
+  .home-button {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
   .login-container {
-    padding: 0.5rem;
+    padding: 0;
   }
 
   .login-card {
     padding: 1.5rem;
     border-radius: 20px;
-    margin: 0.5rem;
+    margin: 0.25rem 0.5rem 0.5rem;
   }
 
   .login-header h1 {
