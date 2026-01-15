@@ -1009,6 +1009,11 @@ $accent-gold: #c9a227;
     height: auto;
     min-height: 580px;
     max-height: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 0;
 
     .hero-content {
       position: relative;
@@ -1018,6 +1023,7 @@ $accent-gold: #c9a227;
       margin: 6rem auto 3rem;
       padding: 1.5rem 1.25rem;
       width: 90%;
+      max-width: 500px;
 
       .hero-title {
         font-size: 1.85rem;

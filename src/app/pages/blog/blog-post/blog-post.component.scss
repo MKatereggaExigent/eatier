@@ -1,9 +1,31 @@
+// =====================================================
+// BLOG POST PAGE - NYT DESIGN SYSTEM WITH GLASSMORPHISM
+// =====================================================
+
+// Design System Variables
+$font-serif: 'Playfair Display', 'Georgia', serif;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+// NYT-inspired color palette
+$nyt-black: #121212;
+$nyt-dark-gray: #333333;
+$nyt-medium-gray: #666666;
+$nyt-light-gray: #f7f7f5;
+$nyt-border: #e0e0e0;
+
+// Accent colors
+$itiyum-orange: #ff8c00;
+$itiyum-orange-dark: #e67e00;
+
 .blog-post-page {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: #ffffff;
 }
 
-// Loading & Error States
+// =====================================================
+// LOADING & ERROR STATES
+// =====================================================
+
 .loading-state, .error-state {
   display: flex;
   flex-direction: column;
@@ -16,25 +38,42 @@
   .spinner {
     width: 50px;
     height: 50px;
-    border: 4px solid #e9ecef;
-    border-top-color: #667eea;
+    border: 4px solid $nyt-border;
+    border-top-color: $itiyum-orange;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
   }
 
   h2 {
+    font-family: $font-serif;
     font-size: 2rem;
     margin-bottom: 0.5rem;
+    color: $nyt-black;
+  }
+
+  p {
+    font-family: $font-sans;
+    color: $nyt-medium-gray;
   }
 
   .back-btn {
-    margin-top: 1rem;
-    padding: 0.75rem 1.5rem;
-    background: #667eea;
+    margin-top: 1.5rem;
+    padding: 0.875rem 1.75rem;
+    background: $nyt-black;
     color: white;
     text-decoration: none;
-    border-radius: 8px;
+    border-radius: 2px;
+    font-family: $font-sans;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: $itiyum-orange;
+    }
   }
 }
 
@@ -42,10 +81,14 @@
   to { transform: rotate(360deg); }
 }
 
-// Hero Section
+// =====================================================
+// HERO SECTION
+// =====================================================
+
 .post-hero {
-  height: 60vh;
-  min-height: 400px;
+  height: 65vh;
+  min-height: 450px;
+  max-height: 650px;
   background-size: cover;
   background-position: center;
   position: relative;
@@ -53,102 +96,146 @@
   .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3));
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 100%);
     display: flex;
     align-items: flex-end;
-    padding: 3rem;
+    padding: 4rem;
   }
 
   .hero-content {
     max-width: 900px;
     color: white;
 
+    // Glassmorphic card effect
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    padding: 2.5rem;
+
     .back-link {
       color: rgba(255,255,255,0.8);
       text-decoration: none;
-      font-size: 0.9rem;
-      display: inline-block;
-      margin-bottom: 1rem;
+      font-family: $font-sans;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      transition: color 0.2s ease;
 
       &:hover {
-        color: white;
+        color: $itiyum-orange;
       }
     }
 
     .category-tag {
       display: inline-block;
-      background: #667eea;
+      background: $itiyum-orange;
+      color: white;
       padding: 0.4rem 1rem;
-      border-radius: 20px;
-      font-size: 0.85rem;
+      border-radius: 2px;
+      font-family: $font-sans;
+      font-size: 0.75rem;
       font-weight: 600;
-      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.25rem;
     }
 
     h1 {
-      font-size: 2.5rem;
-      line-height: 1.3;
+      font-family: $font-serif;
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 700;
+      line-height: 1.2;
       margin-bottom: 1.5rem;
-
-      @media (max-width: 768px) {
-        font-size: 1.75rem;
-      }
+      letter-spacing: -0.02em;
     }
 
     .post-meta {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.25rem;
       flex-wrap: wrap;
-      font-size: 0.95rem;
+      font-family: $font-sans;
+      font-size: 0.9rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
 
       .author {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
 
         img {
-          width: 40px;
-          height: 40px;
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
           object-fit: cover;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        span {
+          font-weight: 500;
         }
       }
 
       .divider {
-        opacity: 0.5;
+        opacity: 0.4;
       }
     }
   }
 }
 
-// Main Content Area
+// =====================================================
+// MAIN CONTENT AREA
+// =====================================================
+
 .post-main {
   max-width: 800px;
   margin: -3rem auto 0;
-  padding: 0 1.5rem 3rem;
+  padding: 0 2rem 4rem;
   position: relative;
   z-index: 10;
 }
 
 .post-content {
   background: white;
-  border-radius: 16px;
-  padding: 3rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-
-  @media (max-width: 768px) {
-    padding: 1.5rem;
-  }
+  border: 1px solid $nyt-border;
+  border-radius: 2px;
+  padding: 3.5rem;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
 
   .content-body {
+    font-family: $font-sans;
     font-size: 1.1rem;
-    line-height: 1.8;
-    color: #333;
+    line-height: 1.85;
+    color: $nyt-dark-gray;
 
-    h2, h3, h4 {
+    h2 {
+      font-family: $font-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 2.5rem 0 1.25rem;
+      color: $nyt-black;
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-family: $font-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
       margin: 2rem 0 1rem;
-      color: #222;
+      color: $nyt-black;
+    }
+
+    h4 {
+      font-family: $font-sans;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 1.75rem 0 0.75rem;
+      color: $nyt-black;
     }
 
     p {
@@ -157,114 +244,163 @@
 
     ul, ol {
       margin-bottom: 1.5rem;
-      padding-left: 1.5rem;
+      padding-left: 1.75rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
     }
 
     img {
       max-width: 100%;
-      border-radius: 8px;
-      margin: 1.5rem 0;
+      border-radius: 2px;
+      margin: 2rem 0;
+      border: 1px solid $nyt-border;
     }
 
     blockquote {
-      border-left: 4px solid #667eea;
-      padding-left: 1.5rem;
-      margin: 1.5rem 0;
+      border-left: 4px solid $itiyum-orange;
+      padding: 1rem 0 1rem 1.75rem;
+      margin: 2rem 0;
+      font-family: $font-serif;
       font-style: italic;
-      color: #555;
+      font-size: 1.2rem;
+      color: $nyt-medium-gray;
+      background: $nyt-light-gray;
     }
 
     a {
-      color: #667eea;
+      color: $itiyum-orange;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s ease;
+
+      &:hover {
+        border-bottom-color: $itiyum-orange;
+      }
+    }
+
+    // First paragraph styling (drop cap effect)
+    > p:first-of-type::first-letter {
+      font-family: $font-serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      float: left;
+      line-height: 1;
+      margin-right: 0.5rem;
+      margin-top: 0.1rem;
+      color: $nyt-black;
     }
   }
 }
 
-// Tags
+// =====================================================
+// TAGS
+// =====================================================
+
 .post-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.75rem;
   align-items: center;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
   padding-top: 2rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid $nyt-border;
 
   .tags-label {
+    font-family: $font-sans;
     font-weight: 600;
-    color: #555;
+    font-size: 0.85rem;
+    color: $nyt-dark-gray;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .tag {
-    background: #f0f0f0;
-    color: #666;
-    padding: 0.3rem 0.75rem;
-    border-radius: 20px;
+    background: $nyt-light-gray;
+    color: $nyt-medium-gray;
+    padding: 0.4rem 0.85rem;
+    border-radius: 2px;
     text-decoration: none;
-    font-size: 0.85rem;
+    font-family: $font-sans;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid $nyt-border;
+    transition: all 0.2s ease;
 
     &:hover {
-      background: #667eea;
+      background: $itiyum-orange;
       color: white;
+      border-color: $itiyum-orange;
     }
   }
 }
 
-// Post Actions
+// =====================================================
+// POST ACTIONS
+// =====================================================
+
 .post-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #eee;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid $nyt-border;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.25rem;
 
   .like-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    border-radius: 50px;
-    font-size: 1rem;
+    background: $nyt-light-gray;
+    border: 1px solid $nyt-border;
+    border-radius: 2px;
+    font-family: $font-sans;
+    font-size: 0.9rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 
     &:hover {
       border-color: #e74c3c;
+      background: #fff5f5;
     }
 
     &.liked {
       background: #ffe6e6;
       border-color: #e74c3c;
+      color: #e74c3c;
     }
   }
 
   .share-buttons {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
 
     span {
-      color: #666;
-      font-size: 0.9rem;
+      font-family: $font-sans;
+      color: $nyt-medium-gray;
+      font-size: 0.85rem;
+      font-weight: 500;
     }
 
     .share-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      border-radius: 2px;
       border: none;
       cursor: pointer;
       font-weight: bold;
       font-size: 0.85rem;
-      transition: transform 0.2s;
+      transition: all 0.2s ease;
 
       &:hover {
-        transform: scale(1.1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       &.twitter {
@@ -283,60 +419,80 @@
       }
 
       &.copy {
-        background: #e9ecef;
+        background: $nyt-light-gray;
+        border: 1px solid $nyt-border;
       }
     }
   }
 }
 
-// Author Card
+// =====================================================
+// AUTHOR CARD
+// =====================================================
+
 .author-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-top: 2rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  background: $nyt-light-gray;
+  border: 1px solid $nyt-border;
+  border-radius: 2px;
+  padding: 2rem;
+  margin-top: 2.5rem;
 
   .author-info {
     display: flex;
-    gap: 1.5rem;
+    gap: 1.75rem;
     align-items: center;
 
     img {
-      width: 80px;
-      height: 80px;
+      width: 85px;
+      height: 85px;
       border-radius: 50%;
       object-fit: cover;
+      border: 3px solid white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     h4 {
-      color: #888;
-      font-size: 0.85rem;
-      font-weight: 500;
-      margin-bottom: 0.25rem;
+      font-family: $font-sans;
+      color: $nyt-medium-gray;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
     }
 
     h3 {
-      font-size: 1.25rem;
+      font-family: $font-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: $nyt-black;
       margin-bottom: 0.5rem;
     }
 
     p {
-      color: #666;
+      font-family: $font-sans;
+      color: $nyt-medium-gray;
       font-size: 0.9rem;
-      line-height: 1.5;
+      line-height: 1.6;
     }
   }
 }
 
-// Related Posts
+// =====================================================
+// RELATED POSTS
+// =====================================================
+
 .related-posts {
-  margin-top: 3rem;
+  margin-top: 3.5rem;
 
   h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    color: #333;
+    font-family: $font-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: $nyt-black;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid $nyt-black;
   }
 
   .related-grid {
@@ -347,62 +503,195 @@
 
   .related-card {
     background: white;
-    border-radius: 12px;
+    border: 1px solid $nyt-border;
+    border-radius: 2px;
     overflow: hidden;
     text-decoration: none;
     color: inherit;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
 
     &:hover {
       transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      border-color: $itiyum-orange;
     }
 
     .related-image {
-      height: 150px;
+      height: 160px;
+      overflow: hidden;
 
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover img {
+        transform: scale(1.05);
       }
     }
 
     .related-content {
-      padding: 1rem;
+      padding: 1.25rem;
 
       .category-tag {
         display: inline-block;
-        background: #667eea20;
-        color: #667eea;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.7rem;
+        background: rgba($itiyum-orange, 0.1);
+        color: $itiyum-orange;
+        padding: 0.25rem 0.6rem;
+        border-radius: 2px;
+        font-family: $font-sans;
+        font-size: 0.65rem;
         font-weight: 600;
-        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
       }
 
       h3 {
-        font-size: 1rem;
-        line-height: 1.4;
+        font-family: $font-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        line-height: 1.35;
         margin-bottom: 0.5rem;
+        color: $nyt-black;
       }
 
       p {
+        font-family: $font-sans;
         font-size: 0.85rem;
-        color: #666;
+        color: $nyt-medium-gray;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
       }
 
       .date {
+        font-family: $font-sans;
         font-size: 0.75rem;
-        color: #999;
+        color: $nyt-medium-gray;
       }
     }
   }
 }
 
+// =====================================================
+// RESPONSIVE DESIGN
+// =====================================================
+
+@media (max-width: 1024px) {
+  .post-hero {
+    height: 55vh;
+    min-height: 400px;
+
+    .hero-overlay {
+      padding: 3rem;
+    }
+
+    .hero-content {
+      padding: 2rem;
+    }
+  }
+
+  .post-main {
+    padding: 0 1.5rem 3rem;
+  }
+
+  .post-content {
+    padding: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .post-hero {
+    height: auto;
+    min-height: 350px;
+
+    .hero-overlay {
+      padding: 2rem 1.5rem;
+    }
+
+    .hero-content {
+      position: relative;
+      padding: 1.5rem;
+      margin-top: 4rem;
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .post-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+
+        .divider {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .post-main {
+    margin-top: -2rem;
+    padding: 0 1rem 2rem;
+  }
+
+  .post-content {
+    padding: 1.75rem;
+
+    .content-body {
+      font-size: 1rem;
+
+      > p:first-of-type::first-letter {
+        font-size: 2.75rem;
+      }
+    }
+  }
+
+  .post-actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    .like-btn {
+      justify-content: center;
+    }
+
+    .share-buttons {
+      justify-content: center;
+    }
+  }
+
+  .author-card .author-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .related-posts .related-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-hero .hero-content {
+    padding: 1.25rem;
+    margin-top: 3rem;
+
+    h1 {
+      font-size: 1.35rem;
+    }
+  }
+
+  .post-content {
+    padding: 1.25rem;
+  }
+
+  .author-card {
+    padding: 1.5rem;
+  }
+}
