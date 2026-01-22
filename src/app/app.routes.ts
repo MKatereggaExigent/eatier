@@ -16,7 +16,9 @@ export const routes: Routes = [
             { path: 'feedback', loadComponent: () => import('./pages/feedback/feedback.component').then(m => m.FeedbackComponent) },
             { path: 'community', loadComponent: () => import('./pages/community/community.component').then(m => m.CommunityComponent) },
             { path: 'faqs', loadComponent: () => import('./pages/faqs/faqs.component').then(m => m.FaqsComponent) },
-            { path: 'legal', loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent) },
+            { path: 'legal/terms', loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent), data: { page: 'terms' } },
+            { path: 'legal/privacy', loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent), data: { page: 'privacy' } },
+            { path: 'legal', redirectTo: 'legal/terms', pathMatch: 'full' },
 
             // Public restaurant discovery
             {
