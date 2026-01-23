@@ -114,7 +114,9 @@
             @for (post of featuredPosts(); track post.id) {
               <a [routerLink]="['/blog', post.slug]" class="featured-card">
                 <div class="featured-image">
-                  <img [src]="post.featured_image || 'assets/images/blog-placeholder.jpg'" [alt]="post.title" />
+                  @if (post.featured_image) {
+                    <img [src]="post.featured_image" [alt]="post.title" (error)="onImageError($event)" />
+                  }
                   <span class="featured-badge">Featured</span>
                 </div>
                 <div class="featured-content">
@@ -168,7 +170,9 @@
               @for (post of posts(); track post.id) {
                 <a [routerLink]="['/blog', post.slug]" class="post-card">
                   <div class="post-image">
-                    <img [src]="post.featured_image || 'assets/images/blog-placeholder.jpg'" [alt]="post.title" />
+                    @if (post.featured_image) {
+                      <img [src]="post.featured_image" [alt]="post.title" (error)="onImageError($event)" />
+                    }
                   </div>
                   <div class="post-content">
                     <span class="category-tag">{{ post.category }}</span>
@@ -176,8 +180,14 @@
                     <p>{{ post.excerpt }}</p>
                     <div class="post-meta">
                       <div class="author">
-                        <img [src]="post.author_avatar || 'assets/images/default-avatar.png'" [alt]="post.author_name" />
-                        <span>{{ post.author_name }}</span>
+                        <div class="author-avatar">
+                          @if (post.author_avatar) {
+                            <img [src]="post.author_avatar" [alt]="post.author_name" (error)="onImageError($event)" />
+                          } @else {
+                            <span class="avatar-fallback">{{ (post.author_name || 'A').charAt(0).toUpperCase() }}</span>
+                          }
+                        </div>
+                        <span>{{ post.author_name || 'Itiyum Team' }}</span>
                       </div>
                       <span class="date">{{ formatDate(post.published_at) }}</span>
                     </div>

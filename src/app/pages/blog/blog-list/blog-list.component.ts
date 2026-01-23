@@ -248,5 +248,11 @@ export class BlogListComponent implements OnInit, OnDestroy {
     const words = (excerpt || '').split(/\s+/).length * 5; // Estimate full content
     return Math.max(1, Math.ceil(words / wordsPerMinute));
   }
+
+  onImageError(event: Event): void {
+    // Hide the broken image - the CSS gradient background will show instead
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+  }
 }
 
