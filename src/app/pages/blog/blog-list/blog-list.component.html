@@ -21,6 +21,61 @@
     </div>
   </section>
 
+  <!-- Real-Time Industry News Ticker -->
+  @if (newsItems().length > 0) {
+    <section class="news-ticker-section">
+      <div class="ticker-header">
+        <span class="ticker-label">📡 Industry News</span>
+        <span class="ticker-live">LIVE</span>
+      </div>
+      <div class="news-ticker">
+        <div class="ticker-content">
+          @for (news of newsItems(); track news.id; let i = $index) {
+            <div
+              class="ticker-item"
+              [class.active]="i === currentNewsIndex()"
+              [class.breaking]="news.is_breaking"
+              (click)="trackNewsClick(news.id, news.source_url)"
+            >
+              @if (news.is_breaking) {
+                <span class="breaking-badge">BREAKING</span>
+              }
+              <span class="news-category">{{ news.category }}</span>
+              <span class="news-title">{{ news.title }}</span>
+              <span class="news-time">{{ getTimeAgo(news.published_at) }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- Industry Trends Stats -->
+  @if (industryTrends().length > 0) {
+    <section class="trends-section">
+      <div class="trends-container">
+        <h3>📊 Industry Trends</h3>
+        <div class="trends-grid">
+          @for (trend of industryTrends(); track trend.id) {
+            <div class="trend-card" [class.positive]="trend.percentage_change > 0" [class.negative]="trend.percentage_change < 0">
+              <span class="trend-icon">{{ trend.icon }}</span>
+              <div class="trend-info">
+                <span class="trend-name">{{ trend.trend_name }}</span>
+                <span class="trend-value">{{ trend.current_value }}{{ trend.unit === 'percent' ? '%' : (trend.unit === 'USD' ? '' : ' ' + trend.unit) }}</span>
+              </div>
+              <div class="trend-change">
+                <span class="change-indicator">
+                  {{ trend.percentage_change > 0 ? '↑' : '↓' }}
+                  {{ trend.percentage_change > 0 ? '+' : '' }}{{ trend.percentage_change | number:'1.1-1' }}%
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
   <div class="blog-container">
     <!-- Categories Sidebar -->
     <aside class="categories-sidebar">

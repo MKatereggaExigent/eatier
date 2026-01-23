@@ -1,9 +1,10 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { interval, Subscription } from 'rxjs';
 
 interface BlogPost {
   id: string;
@@ -30,6 +31,31 @@ interface BlogCategory {
   post_count: number;
 }
 
+interface NewsItem {
+  id: string;
+  title: string;
+  summary: string;
+  source_name: string;
+  source_url: string;
+  category: string;
+  tags: string[];
+  is_breaking: boolean;
+  priority: number;
+  published_at: string;
+}
+
+interface IndustryTrend {
+  id: string;
+  trend_name: string;
+  trend_type: string;
+  description: string;
+  current_value: number;
+  previous_value: number;
+  percentage_change: number;
+  unit: string;
+  icon: string;
+}
+
 @Component({
   selector: 'app-blog-list',
   standalone: true,
@@ -37,21 +63,28 @@ interface BlogCategory {
   templateUrl: './blog-list.component.html',
   styleUrl: './blog-list.component.scss'
 })
-export class BlogListComponent implements OnInit {
+export class BlogListComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
-  
+  private refreshSubscription?: Subscription;
+
   posts = signal<BlogPost[]>([]);
   featuredPosts = signal<BlogPost[]>([]);
   categories = signal<BlogCategory[]>([]);
-  
+
+  // Real-time news feed
+  newsItems = signal<NewsItem[]>([]);
+  industryTrends = signal<IndustryTrend[]>([]);
+  newsLoading = signal(false);
+  currentNewsIndex = signal(0);
+
   loading = signal(true);
   error = signal<string | null>(null);
-  
+
   // Filters
   selectedCategory = signal<string>('');
   searchQuery = signal('');
-  
+
   // Pagination
   currentPage = signal(1);
   totalPages = signal(1);
@@ -65,9 +98,74 @@ export class BlogListComponent implements OnInit {
       }
       this.loadPosts();
     });
-    
+
     this.loadCategories();
     this.loadFeaturedPosts();
+
+    // Load real-time industry news feed
+    this.loadIndustryNews();
+    this.loadIndustryTrends();
+
+    // Auto-refresh news every 5 minutes
+    this.refreshSubscription = interval(300000).subscribe(() => {
+      this.loadIndustryNews();
+    });
+
+    // Rotate news ticker every 5 seconds
+    interval(5000).subscribe(() => {
+      if (this.newsItems().length > 0) {
+        this.currentNewsIndex.set((this.currentNewsIndex() + 1) % this.newsItems().length);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
+    }
+  }
+
+  loadIndustryNews(): void {
+    this.newsLoading.set(true);
+    this.http.get<any>(`${environment.apiUrl}/industry-news`, {
+      params: { limit: '10' }
+    }).subscribe({
+      next: (response) => {
+        this.newsItems.set(response.news || []);
+        this.newsLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading industry news:', err);
+        this.newsLoading.set(false);
+      }
+    });
+  }
+
+  loadIndustryTrends(): void {
+    this.http.get<any>(`${environment.apiUrl}/industry-news/trends`).subscribe({
+      next: (response) => {
+        this.industryTrends.set(response.trends || []);
+      },
+      error: (err) => {
+        console.error('Error loading industry trends:', err);
+      }
+    });
+  }
+
+  trackNewsClick(newsId: string, url: string): void {
+    this.http.post(`${environment.apiUrl}/industry-news/${newsId}/click`, {}).subscribe();
+    window.open(url, '_blank');
+  }
+
+  getTimeAgo(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
   }
   
   loadPosts(): void {

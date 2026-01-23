@@ -723,3 +723,287 @@ $itiyum-orange-dark: #e67e00;
     }
   }
 }
+
+// =====================================================
+// REAL-TIME NEWS TICKER
+// =====================================================
+
+.news-ticker-section {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 0;
+  overflow: hidden;
+
+  .ticker-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 2rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    .ticker-label {
+      font-family: $font-sans;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .ticker-live {
+      background: #e74c3c;
+      color: white;
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      animation: pulse-live 2s ease-in-out infinite;
+    }
+  }
+
+  .news-ticker {
+    position: relative;
+    height: 50px;
+    overflow: hidden;
+
+    .ticker-content {
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .ticker-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0 2rem;
+      height: 50px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+      cursor: pointer;
+
+      &.active {
+        opacity: 1;
+        transform: translateY(0);
+        position: absolute;
+        left: 0;
+        right: 0;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+        }
+      }
+
+      &.breaking {
+        background: rgba(231, 76, 60, 0.15);
+
+        .news-title {
+          color: #ff6b6b;
+        }
+      }
+
+      .breaking-badge {
+        background: #e74c3c;
+        color: white;
+        padding: 0.2rem 0.5rem;
+        border-radius: 2px;
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        animation: flash 1s ease-in-out infinite;
+      }
+
+      .news-category {
+        background: rgba($itiyum-orange, 0.2);
+        color: $itiyum-orange;
+        padding: 0.25rem 0.6rem;
+        border-radius: 2px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .news-title {
+        flex: 1;
+        font-family: $font-sans;
+        font-size: 0.95rem;
+        color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .news-time {
+        font-family: $font-sans;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+// =====================================================
+// INDUSTRY TRENDS SECTION
+// =====================================================
+
+.trends-section {
+  background: $nyt-light-gray;
+  padding: 2rem 0;
+  border-bottom: 1px solid $nyt-border;
+
+  .trends-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+
+    h3 {
+      font-family: $font-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: $nyt-black;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+  }
+
+  .trends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .trend-card {
+    background: white;
+    border: 1px solid $nyt-border;
+    border-radius: 4px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    &.positive .trend-change {
+      color: #27ae60;
+    }
+
+    &.negative .trend-change {
+      color: #e74c3c;
+    }
+
+    .trend-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .trend-info {
+      flex: 1;
+      min-width: 0;
+
+      .trend-name {
+        display: block;
+        font-family: $font-sans;
+        font-size: 0.75rem;
+        color: $nyt-medium-gray;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+      }
+
+      .trend-value {
+        display: block;
+        font-family: $font-serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $nyt-black;
+      }
+    }
+
+    .trend-change {
+      text-align: right;
+
+      .change-indicator {
+        font-family: $font-sans;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Responsive adjustments for news ticker and trends
+@media (max-width: 768px) {
+  .news-ticker-section {
+    .ticker-header {
+      padding: 0.5rem 1rem;
+    }
+
+    .news-ticker .ticker-item {
+      padding: 0 1rem;
+      gap: 0.5rem;
+
+      .news-category {
+        display: none;
+      }
+
+      .news-title {
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  .trends-section {
+    padding: 1.5rem 0;
+
+    .trends-container {
+      padding: 0 1rem;
+    }
+
+    .trends-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .trend-card {
+      padding: 1rem;
+      flex-direction: column;
+      text-align: center;
+
+      .trend-info {
+        order: 2;
+      }
+
+      .trend-change {
+        order: 3;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .trends-section .trends-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trend-card {
+    flex-direction: row !important;
+    text-align: left !important;
+  }
+}

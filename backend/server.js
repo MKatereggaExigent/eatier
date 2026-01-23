@@ -146,6 +146,7 @@ const recommendationsRoutes = require('./routes/recommendations');
 const userSpecialistBookingsRoutes = require('./routes/user-specialist-bookings');
 const blogRoutes = require('./routes/blog');
 const adminBlogRoutes = require('./routes/admin-blog');
+const industryNewsRoutes = require('./routes/industry-news');
 
 // Static file serving for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -190,6 +191,7 @@ app.use('/api/recommendations', recommendationsRoutes); // Personalized recommen
 app.use('/api/user/specialist-bookings', userSpecialistBookingsRoutes); // User specialist booking history & testimonials
 app.use('/api/blog', blogRoutes); // Public blog endpoints
 app.use('/api/admin/blog', adminBlogRoutes); // Admin blog management
+app.use('/api/industry-news', industryNewsRoutes); // Real-time industry news feed
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
