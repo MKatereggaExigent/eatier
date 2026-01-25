@@ -49,6 +49,12 @@ export const routes: Routes = [
                 path: 'blog/:slug',
                 loadComponent: () => import('./pages/blog/blog-post/blog-post.component').then(m => m.BlogPostComponent)
             },
+
+            // Pricing/Subscription page
+            {
+                path: 'pricing',
+                loadComponent: () => import('./pages/subscribe/subscribe.component').then(m => m.SubscribeComponent)
+            },
         ]
     },
 

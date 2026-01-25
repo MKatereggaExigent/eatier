@@ -1,1 +1,177 @@
-<p>subscribe works!</p>
+<div class="pricing-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Choose Your Perfect Plan</h1>
+      <p class="hero-subtitle">
+        Unlock the full potential of Itiyum with a plan tailored to your needs.
+        From casual diners to restaurant owners, we have something for everyone.
+      </p>
+
+      <!-- Billing Toggle -->
+      <div class="billing-toggle">
+        <span [class.active]="billingCycle() === 'monthly'">Monthly</span>
+        <button class="toggle-switch" (click)="toggleBillingCycle()" [class.yearly]="billingCycle() === 'yearly'">
+          <span class="toggle-knob"></span>
+        </button>
+        <span [class.active]="billingCycle() === 'yearly'">
+          Yearly
+          <span class="save-badge">Save up to 17%</span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- User Type Tabs -->
+  <section class="user-type-section">
+    <div class="user-type-tabs">
+      @for (type of userTypes; track type.id) {
+        <button
+          class="user-type-tab"
+          [class.active]="selectedUserType() === type.id"
+          (click)="selectUserType(type.id)">
+          <span class="tab-icon">{{ type.icon }}</span>
+          <span class="tab-name">{{ type.name }}</span>
+          <span class="tab-description">{{ type.description }}</span>
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="error-banner">
+      <span class="error-icon">⚠️</span>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <section class="loading-section">
+      <div class="loading-spinner"></div>
+      <p>Loading plans...</p>
+    </section>
+  }
+
+  <!-- Plans Grid -->
+  @if (!loading()) {
+    <section class="plans-section">
+      <div class="plans-grid">
+        @for (plan of filteredPlans; track plan.id) {
+          <div class="plan-card" [class.popular]="plan.is_popular" [class.free]="getPrice(plan) === 0">
+            @if (plan.is_popular) {
+              <div class="popular-badge">Most Popular</div>
+            }
+
+            <div class="plan-header">
+              <h3 class="plan-name">{{ plan.name }}</h3>
+              <p class="plan-description">{{ plan.description }}</p>
+            </div>
+
+            <div class="plan-pricing">
+              @if (getPrice(plan) === 0) {
+                <span class="price-amount">Free</span>
+                <span class="price-period">Forever</span>
+              } @else {
+                <span class="price-amount">{{ formatCurrency(getPrice(plan)) }}</span>
+                <span class="price-period">/{{ billingCycle() === 'yearly' ? 'year' : 'month' }}</span>
+                @if (billingCycle() === 'yearly' && getSavingsPercent(plan) > 0) {
+                  <div class="yearly-savings">
+                    <span class="monthly-equivalent">{{ formatCurrency(getMonthlyEquivalent(plan)) }}/mo</span>
+                    <span class="savings-badge">Save {{ getSavingsPercent(plan) }}%</span>
+                  </div>
+                }
+              }
+            </div>
+
+            <ul class="plan-features">
+              @for (feature of getFeaturesList(plan); track feature) {
+                <li class="feature-item">
+                  <span class="feature-check">✓</span>
+                  {{ feature }}
+                </li>
+              }
+            </ul>
+
+            <button
+              class="subscribe-btn"
+              [class.processing]="processingPlanId() === plan.id"
+              [disabled]="processingPlanId() !== null"
+              (click)="subscribeToPlan(plan)">
+              @if (processingPlanId() === plan.id) {
+                <span class="btn-spinner"></span>
+                Processing...
+              } @else if (getPrice(plan) === 0) {
+                Get Started Free
+              } @else {
+                Subscribe Now
+              }
+            </button>
+
+            @if (plan.trial_days > 0) {
+              <p class="trial-note">{{ plan.trial_days }}-day free trial included</p>
+            }
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Features Comparison -->
+  <section class="comparison-section">
+    <h2 class="section-title">Why Choose Itiyum?</h2>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <span class="benefit-icon">🔒</span>
+        <h3>Secure Payments</h3>
+        <p>All transactions are processed securely through Paystack</p>
+      </div>
+      <div class="benefit-card">
+        <span class="benefit-icon">📱</span>
+        <h3>Mobile Friendly</h3>
+        <p>Access your dashboard from any device, anywhere</p>
+      </div>
+      <div class="benefit-card">
+        <span class="benefit-icon">📊</span>
+        <h3>Real-time Analytics</h3>
+        <p>Track your performance with detailed insights</p>
+      </div>
+      <div class="benefit-card">
+        <span class="benefit-icon">🎯</span>
+        <h3>Targeted Marketing</h3>
+        <p>Reach the right customers with smart advertising</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h4>Can I change my plan later?</h4>
+        <p>Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
+      </div>
+      <div class="faq-item">
+        <h4>What payment methods do you accept?</h4>
+        <p>We accept all major credit/debit cards, bank transfers, and mobile money through Paystack.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Is there a contract or commitment?</h4>
+        <p>No long-term contracts. You can cancel your subscription at any time.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Do you offer refunds?</h4>
+        <p>We offer a 14-day money-back guarantee if you're not satisfied with your subscription.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <h2>Ready to Get Started?</h2>
+    <p>Join thousands of restaurants and food lovers on Itiyum today.</p>
+    <button class="cta-btn" (click)="selectUserType('business_owner')">View Business Plans</button>
+  </section>
+</div>
