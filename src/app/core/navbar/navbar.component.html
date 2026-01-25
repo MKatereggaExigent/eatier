@@ -202,107 +202,113 @@
         </div>
       }
 
-      <!-- User Menu (Authenticated) -->
-      @if (isAuthenticated()) {
-        <div class="user-menu-container">
-          <button
-            class="icon-btn user-menu-btn"
-            (click)="toggleUserMenu($event)"
-            type="button"
-            title="Account"
-            aria-label="User menu"
-          >
-            <span class="user-icon">👤</span>
-          </button>
+      <!-- Profile Menu (Works for both authenticated and guest users) -->
+      <div class="profile-menu-container">
+        <button
+          class="icon-btn profile-btn"
+          (click)="isAuthenticated() ? toggleUserMenu($event) : toggleGuestMenu($event)"
+          type="button"
+          [attr.title]="isAuthenticated() ? 'My Account' : 'Sign In'"
+          [attr.aria-label]="isAuthenticated() ? 'Open account menu' : 'Open sign in menu'"
+          [class.authenticated]="isAuthenticated()"
+        >
+          @if (isAuthenticated()) {
+            <div class="profile-avatar">
+              <span>{{ user()?.firstName?.charAt(0)?.toUpperCase() || 'U' }}</span>
+            </div>
+          } @else {
+            <svg class="profile-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          }
+        </button>
 
-          @if (showUserMenu()) {
-            <div class="user-dropdown" (click)="$event.stopPropagation()">
-              <div class="user-info">
-                <div class="user-avatar-large">
-                  <span>{{ user()?.firstName?.charAt(0)?.toUpperCase() || 'U' }}</span>
-                </div>
-                <div class="user-details">
-                  <div class="user-name">{{ user()?.firstName }} {{ user()?.lastName }}</div>
-                  <div class="user-role">{{ getUserRoleLabel() }}</div>
-                </div>
+        <!-- Authenticated User Dropdown -->
+        @if (isAuthenticated() && showUserMenu()) {
+          <div class="profile-dropdown" (click)="$event.stopPropagation()">
+            <div class="profile-header">
+              <div class="profile-avatar-large">
+                <span>{{ user()?.firstName?.charAt(0)?.toUpperCase() || 'U' }}</span>
               </div>
-
-              <div class="dropdown-divider"></div>
-
-              <a [routerLink]="getDashboardRoute()" class="dropdown-item" (click)="closeMenus()">
-                <span class="item-icon">📊</span>
-                <span>Dashboard</span>
-              </a>
-
-              <a routerLink="/profile" class="dropdown-item" (click)="closeMenus()">
-                <span class="item-icon">👤</span>
-                <span>Profile</span>
-              </a>
-
-              <a routerLink="/settings" class="dropdown-item" (click)="closeMenus()">
-                <span class="item-icon">⚙️</span>
-                <span>Settings</span>
-              </a>
-
-              <div class="dropdown-divider"></div>
-
-              <a routerLink="/feedback" class="dropdown-item" (click)="closeMenus()">
-                <span class="item-icon">💬</span>
-                <span>Feedback</span>
-              </a>
-
-              <a routerLink="/help" class="dropdown-item" (click)="closeMenus()">
-                <span class="item-icon">❓</span>
-                <span>Help & Support</span>
-              </a>
-
-              <div class="dropdown-divider"></div>
-
-              <button class="dropdown-item logout" (click)="logout()" type="button">
-                <span class="item-icon">🚪</span>
-                <span>Log Out</span>
-              </button>
+              <div class="profile-details">
+                <div class="profile-name">{{ user()?.firstName }} {{ user()?.lastName }}</div>
+                <div class="profile-role">{{ getUserRoleLabel() }}</div>
+              </div>
             </div>
-          }
-        </div>
-      }
 
-      <!-- Guest Menu (Non-Authenticated) -->
-      @if (!isAuthenticated()) {
-        <div class="guest-menu-container">
-          <button class="guest-menu-trigger" (click)="toggleGuestMenu($event)" type="button">
-            <span class="menu-icon">👤</span>
-            <span class="menu-text">Account</span>
-            <span class="chevron-icon">▼</span>
-          </button>
+            <div class="dropdown-divider"></div>
 
-          @if (showGuestMenu()) {
-            <div class="guest-dropdown" (click)="$event.stopPropagation()">
-              <a routerLink="/login" class="dropdown-item primary" (click)="closeMenus()">
-                <span class="item-icon">🔐</span>
-                <span>Sign In</span>
-              </a>
+            <a [routerLink]="getDashboardRoute()" class="dropdown-item" (click)="closeMenus()">
+              <span class="item-icon">📊</span>
+              <span>Dashboard</span>
+            </a>
 
-              <a routerLink="/register" class="dropdown-item primary" (click)="closeMenus()">
-                <span class="item-icon">✍️</span>
-                <span>Register</span>
-              </a>
+            <a routerLink="/profile" class="dropdown-item" (click)="closeMenus()">
+              <span class="item-icon">👤</span>
+              <span>Profile</span>
+            </a>
 
-              <div class="dropdown-divider"></div>
+            <a routerLink="/settings" class="dropdown-item" (click)="closeMenus()">
+              <span class="item-icon">⚙️</span>
+              <span>Settings</span>
+            </a>
 
-              <a routerLink="/feedback" class="dropdown-item" (click)="closeMenus()">
-                <span class="item-icon">💬</span>
-                <span>Feedback</span>
-              </a>
+            <div class="dropdown-divider"></div>
 
-              <a routerLink="/help" class="dropdown-item" (click)="closeMenus()">
-                <span class="item-icon">❓</span>
-                <span>Help & Support</span>
-              </a>
+            <a routerLink="/feedback" class="dropdown-item" (click)="closeMenus()">
+              <span class="item-icon">💬</span>
+              <span>Feedback</span>
+            </a>
+
+            <a routerLink="/help" class="dropdown-item" (click)="closeMenus()">
+              <span class="item-icon">❓</span>
+              <span>Help & Support</span>
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <button class="dropdown-item logout" (click)="logout()" type="button">
+              <span class="item-icon">🚪</span>
+              <span>Log Out</span>
+            </button>
+          </div>
+        }
+
+        <!-- Guest User Dropdown -->
+        @if (!isAuthenticated() && showGuestMenu()) {
+          <div class="profile-dropdown guest" (click)="$event.stopPropagation()">
+            <div class="guest-header">
+              <span class="guest-title">Welcome to Itiyum</span>
+              <span class="guest-subtitle">Sign in to access your account</span>
             </div>
-          }
-        </div>
-      }
+
+            <div class="dropdown-divider"></div>
+
+            <a routerLink="/login" class="dropdown-item primary" (click)="closeMenus()">
+              <span class="item-icon">🔐</span>
+              <span>Sign In</span>
+            </a>
+
+            <a routerLink="/register" class="dropdown-item accent" (click)="closeMenus()">
+              <span class="item-icon">✍️</span>
+              <span>Create Account</span>
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <a routerLink="/feedback" class="dropdown-item" (click)="closeMenus()">
+              <span class="item-icon">💬</span>
+              <span>Feedback</span>
+            </a>
+
+            <a routerLink="/help" class="dropdown-item" (click)="closeMenus()">
+              <span class="item-icon">❓</span>
+              <span>Help & Support</span>
+            </a>
+          </div>
+        }
+      </div>
 
   <!-- Mobile Menu Toggle -->
   <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" type="button">

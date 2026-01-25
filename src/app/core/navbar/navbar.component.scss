@@ -620,9 +620,9 @@ $nyt-dark-gray: #333333;
   }
 }
 
-/* ========== User Menu Styles ========== */
+/* ========== Profile Menu Styles (Unified for Auth & Guest) ========== */
 
-.user-menu-container {
+.profile-menu-container {
   position: relative;
   z-index: 100;
 
@@ -631,83 +631,123 @@ $nyt-dark-gray: #333333;
   }
 }
 
-.user-menu-btn {
+.profile-btn {
   pointer-events: auto !important;
-
-  .user-icon {
-    pointer-events: none;
-  }
-}
-
-.user-menu-trigger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  cursor: pointer !important;
+  position: relative;
+  z-index: 1000;
   background: rgba(0, 0, 0, 0.04);
-  border: none;
-  border-radius: 8px;
-  padding: 6px 10px 6px 6px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-
-  &:hover {
-    background: rgba(255, 140, 0, 0.1);
-  }
-}
-
-.user-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, $itiyum-orange, $itiyum-orange-dark);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-family: $font-sans;
-  font-weight: 700;
-  font-size: 0.75rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 140, 0, 0.12);
+    border-color: rgba(255, 140, 0, 0.3);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.authenticated {
+    background: transparent;
+    border: 2px solid $itiyum-orange;
+    padding: 0;
+
+    &:hover {
+      border-color: $itiyum-orange-dark;
+      box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.15);
+    }
+  }
+
+  .profile-icon {
+    width: 20px;
+    height: 20px;
+    color: $nyt-dark-gray;
+    pointer-events: none;
+  }
+
+  .profile-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $itiyum-orange, $itiyum-orange-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: $font-sans;
+    font-weight: 700;
+    font-size: 0.875rem;
+    pointer-events: none;
+  }
+
+  @media (max-width: $breakpoint-tablet) {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+
+    .profile-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .profile-avatar {
+      font-size: 0.75rem;
+    }
+  }
 }
 
-.chevron-icon {
-  font-size: 0.625rem;
-  color: #666;
-}
-
-.user-dropdown {
+.profile-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   right: 0;
-  width: 240px;
+  width: 260px;
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  animation: slideDown 0.15s ease;
-  padding: 6px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.2s ease;
+  padding: 8px;
   z-index: 1001;
   pointer-events: auto;
 
+  &.guest {
+    width: 240px;
+  }
+
   @media (max-width: $breakpoint-mobile) {
     width: calc(100vw - 32px);
-    right: -0.5rem;
+    right: -8px;
   }
 }
 
-.user-info {
+.profile-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px;
+  gap: 12px;
+  padding: 12px;
   margin-bottom: 4px;
+  background: rgba(255, 140, 0, 0.04);
+  border-radius: 8px;
 }
 
-.user-avatar-large {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+.profile-avatar-large {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   background: linear-gradient(135deg, $itiyum-orange, $itiyum-orange-dark);
   display: flex;
   align-items: center;
@@ -715,29 +755,55 @@ $nyt-dark-gray: #333333;
   color: white;
   font-family: $font-sans;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.125rem;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(255, 140, 0, 0.3);
 }
 
-.user-details {
+.profile-details {
   flex: 1;
   min-width: 0;
 }
 
-.user-name {
+.profile-name {
   font-family: $font-sans;
   font-weight: 600;
   color: $nyt-black;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.user-role {
+.profile-role {
   font-family: $font-sans;
   font-size: 0.75rem;
   color: #666;
+  margin-top: 2px;
+}
+
+.guest-header {
+  padding: 16px 12px;
+  text-align: center;
+  background: rgba(255, 140, 0, 0.04);
+  border-radius: 8px;
+  margin-bottom: 4px;
+
+  .guest-title {
+    display: block;
+    font-family: $font-sans;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: $nyt-black;
+    margin-bottom: 4px;
+  }
+
+  .guest-subtitle {
+    display: block;
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    color: #666;
+  }
 }
 
 .dropdown-divider {
@@ -751,7 +817,7 @@ $nyt-dark-gray: #333333;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   text-decoration: none;
   color: $nyt-dark-gray;
   font-family: $font-sans;
@@ -766,6 +832,7 @@ $nyt-dark-gray: #333333;
 
   .item-icon {
     font-size: 1rem;
+    flex-shrink: 0;
   }
 
   &:hover {
@@ -782,90 +849,25 @@ $nyt-dark-gray: #333333;
   }
 
   &.primary {
-    background: rgba(255, 140, 0, 0.08);
-    color: $itiyum-orange;
+    background: $itiyum-orange;
+    color: white;
     font-weight: 600;
 
     &:hover {
-      background: rgba(255, 140, 0, 0.15);
+      background: $itiyum-orange-dark;
     }
   }
-}
 
-/* ========== Guest Menu Styles ========== */
+  &.accent {
+    background: rgba(255, 140, 0, 0.1);
+    color: $itiyum-orange;
+    font-weight: 600;
+    border: 1px solid rgba(255, 140, 0, 0.2);
 
-.guest-menu-container {
-  position: relative;
-  z-index: 100;
-
-  @media (max-width: $breakpoint-desktop) {
-    display: none;
-  }
-}
-
-.guest-menu-trigger {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: $itiyum-orange;
-  border: none;
-  border-radius: 14px;
-  padding: 5px 10px;
-  cursor: pointer;
-  pointer-events: auto !important;
-  transition: all 0.15s ease;
-  font-family: $font-sans;
-  font-weight: 600;
-  font-size: 0.75rem;
-  color: white;
-  position: relative;
-  z-index: 1000;
-
-  &:hover {
-    background: $itiyum-orange-dark;
-  }
-
-  .menu-icon {
-    font-size: 0.875rem;
-    display: none;
-    pointer-events: none;
-  }
-
-  .menu-text {
-    pointer-events: none;
-  }
-
-  .chevron-icon {
-    font-size: 0.5rem;
-    opacity: 0.8;
-    pointer-events: none;
-  }
-
-  @media (max-width: $breakpoint-tablet) {
-    padding: 4px 8px;
-    font-size: 0.6875rem;
-  }
-}
-
-.guest-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  width: 180px;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  animation: slideDown 0.15s ease;
-  padding: 5px;
-  z-index: 1001;
-  pointer-events: auto;
-
-  @media (max-width: $breakpoint-mobile) {
-    width: calc(100vw - 32px);
-    right: -6px;
+    &:hover {
+      background: rgba(255, 140, 0, 0.18);
+      border-color: rgba(255, 140, 0, 0.3);
+    }
   }
 }
 
