@@ -1,12 +1,13 @@
+<!-- Layer 1: Logo - Fixed top-left, independent of navbar -->
+<div class="logo-layer">
+  <a routerLink="/" class="logo" (click)="closeMenus()">
+    <img src="assets/images/itiyum-logo.jpeg" alt="Itiyum" class="logo-image" />
+  </a>
+</div>
+
+<!-- Layer 2: Navigation Banner - Centered thin banner -->
 <nav class="navbar" [class.scrolled]="isScrolled()">
   <div class="navbar-container">
-    <!-- Logo/Brand -->
-    <div class="navbar-brand">
-      <a routerLink="/" class="logo" (click)="closeMenus()">
-        <img src="assets/images/itiyum-logo.jpeg" alt="Itiyum" class="logo-image" />
-      </a>
-    </div>
-
     <!-- Desktop Navigation -->
     <div class="navbar-nav">
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
@@ -37,9 +38,11 @@
         Help
       </a>
     </div>
+  </div>
+</nav>
 
-    <!-- Right Side Actions -->
-    <div class="navbar-actions">
+<!-- Layer 3: Actions - Fixed top-right, independent of navbar -->
+<div class="actions-layer">
       <!-- Search Icon Button -->
       <div class="search-icon-container">
         <button
@@ -301,96 +304,94 @@
         </div>
       }
 
-      <!-- Mobile Menu Toggle -->
-      <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" type="button">
-        <span class="hamburger-icon">☰</span>
-      </button>
-    </div>
-  </div>
+  <!-- Mobile Menu Toggle -->
+  <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" type="button">
+    <span class="hamburger-icon">☰</span>
+  </button>
+</div>
 
-  <!-- Mobile Menu -->
-  @if (showMobileMenu()) {
-    <div class="mobile-menu">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">🏠</span>
-        <span>Home</span>
-      </a>
-      <a routerLink="/about" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">ℹ️</span>
-        <span>About</span>
-      </a>
-      <a routerLink="/grow" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">📈</span>
-        <span>Grow</span>
-      </a>
-      <a routerLink="/restaurants" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">🍽️</span>
-        <span>Restaurants</span>
-      </a>
-      <a routerLink="/specialists" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">👨‍🍳</span>
-        <span>Specialists</span>
-      </a>
-      <a routerLink="/pricing" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">💳</span>
-        <span>Pricing</span>
-      </a>
-      <a routerLink="/community" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">👥</span>
-        <span>Community</span>
-      </a>
-      <a routerLink="/faqs" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">❓</span>
-        <span>FAQs</span>
-      </a>
-      <a routerLink="/help" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">🆘</span>
-        <span>Help</span>
-      </a>
+<!-- Layer 4: Mobile Menu - Fixed overlay, independent -->
+@if (showMobileMenu()) {
+  <div class="mobile-menu">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="mobile-nav-link" (click)="closeMenus()">
+      <span class="link-icon">🏠</span>
+      <span>Home</span>
+    </a>
+    <a routerLink="/about" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+      <span class="link-icon">ℹ️</span>
+      <span>About</span>
+    </a>
+    <a routerLink="/grow" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+      <span class="link-icon">📈</span>
+      <span>Grow</span>
+    </a>
+    <a routerLink="/restaurants" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+      <span class="link-icon">🍽️</span>
+      <span>Restaurants</span>
+    </a>
+    <a routerLink="/specialists" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+      <span class="link-icon">👨‍🍳</span>
+      <span>Specialists</span>
+    </a>
+    <a routerLink="/pricing" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+      <span class="link-icon">💳</span>
+      <span>Pricing</span>
+    </a>
+    <a routerLink="/community" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+      <span class="link-icon">👥</span>
+      <span>Community</span>
+    </a>
+    <a routerLink="/faqs" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+      <span class="link-icon">❓</span>
+      <span>FAQs</span>
+    </a>
+    <a routerLink="/help" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenus()">
+      <span class="link-icon">🆘</span>
+      <span>Help</span>
+    </a>
 
-      @if (isAuthenticated()) {
-        <div class="mobile-divider"></div>
-        <a [routerLink]="getDashboardRoute()" class="mobile-nav-link" (click)="closeMenus()">
-          <span class="link-icon">📊</span>
-          <span>Dashboard</span>
-        </a>
-        <a routerLink="/profile" class="mobile-nav-link" (click)="closeMenus()">
-          <span class="link-icon">👤</span>
-          <span>Profile</span>
-        </a>
-        <a routerLink="/settings" class="mobile-nav-link" (click)="closeMenus()">
-          <span class="link-icon">⚙️</span>
-          <span>Settings</span>
-        </a>
-      } @else {
-        <div class="mobile-divider"></div>
-        <a routerLink="/login" class="mobile-nav-link primary" (click)="closeMenus()">
-          <span class="link-icon">🔐</span>
-          <span>Sign In</span>
-        </a>
-        <a routerLink="/register" class="mobile-nav-link primary" (click)="closeMenus()">
-          <span class="link-icon">✍️</span>
-          <span>Register</span>
-        </a>
-      }
-
+    @if (isAuthenticated()) {
       <div class="mobile-divider"></div>
-      <a routerLink="/feedback" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">💬</span>
-        <span>Feedback</span>
+      <a [routerLink]="getDashboardRoute()" class="mobile-nav-link" (click)="closeMenus()">
+        <span class="link-icon">📊</span>
+        <span>Dashboard</span>
       </a>
-      <a routerLink="/help" class="mobile-nav-link" (click)="closeMenus()">
-        <span class="link-icon">❓</span>
-        <span>Help & Support</span>
+      <a routerLink="/profile" class="mobile-nav-link" (click)="closeMenus()">
+        <span class="link-icon">👤</span>
+        <span>Profile</span>
       </a>
+      <a routerLink="/settings" class="mobile-nav-link" (click)="closeMenus()">
+        <span class="link-icon">⚙️</span>
+        <span>Settings</span>
+      </a>
+    } @else {
+      <div class="mobile-divider"></div>
+      <a routerLink="/login" class="mobile-nav-link primary" (click)="closeMenus()">
+        <span class="link-icon">🔐</span>
+        <span>Sign In</span>
+      </a>
+      <a routerLink="/register" class="mobile-nav-link primary" (click)="closeMenus()">
+        <span class="link-icon">✍️</span>
+        <span>Register</span>
+      </a>
+    }
 
-      @if (isAuthenticated()) {
-        <div class="mobile-divider"></div>
-        <button class="mobile-nav-link logout" (click)="logout()" type="button">
-          <span class="link-icon">🚪</span>
-          <span>Log Out</span>
-        </button>
-      }
-    </div>
-  }
-</nav>
+    <div class="mobile-divider"></div>
+    <a routerLink="/feedback" class="mobile-nav-link" (click)="closeMenus()">
+      <span class="link-icon">💬</span>
+      <span>Feedback</span>
+    </a>
+    <a routerLink="/help" class="mobile-nav-link" (click)="closeMenus()">
+      <span class="link-icon">❓</span>
+      <span>Help & Support</span>
+    </a>
+
+    @if (isAuthenticated()) {
+      <div class="mobile-divider"></div>
+      <button class="mobile-nav-link logout" (click)="logout()" type="button">
+        <span class="link-icon">🚪</span>
+        <span>Log Out</span>
+      </button>
+    }
+  </div>
+}

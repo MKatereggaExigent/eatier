@@ -36,12 +36,13 @@ $nyt-dark-gray: #333333;
   padding: 4px 5px;
 }
 
-/* Logo - Completely separate fixed container */
-.navbar-brand {
+/* Logo Layer - Fixed top-left, independent of navbar */
+.logo-layer {
   position: fixed;
-  top: 12px;
+  top: 10px;
   left: 16px;
   z-index: 1001;
+  pointer-events: auto;
 
   .logo {
     display: block;
@@ -52,12 +53,18 @@ $nyt-dark-gray: #333333;
     }
 
     .logo-image {
-      height: 36px;
+      height: 48px;
       width: auto;
       transition: opacity 0.15s ease;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      @media (max-width: $breakpoint-tablet) {
+        height: 40px;
+      }
 
       @media (max-width: $breakpoint-mobile) {
-        height: 28px;
+        height: 36px;
       }
     }
   }
@@ -98,19 +105,26 @@ $nyt-dark-gray: #333333;
   }
 }
 
-/* Actions - Completely separate fixed container on right */
-.navbar-actions {
+/* Actions Layer - Fixed top-right, independent of navbar */
+.actions-layer {
   position: fixed;
   top: 14px;
   right: 16px;
   z-index: 1001;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  pointer-events: auto;
 
   @media (max-width: $breakpoint-tablet) {
     right: 12px;
     top: 12px;
+    gap: 4px;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    right: 10px;
+    top: 10px;
     gap: 3px;
   }
 }
