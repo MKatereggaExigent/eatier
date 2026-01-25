@@ -264,7 +264,7 @@
             <strong>Booking Reference:</strong> {{ bookingReference() }}
           </div>
           <p class="success-message">
-            We've sent a confirmation email to {{ bookingForm.value.contactEmail }}.
+            A confirmation email has been sent to <strong>{{ bookingConfirmedEmail() }}</strong>.
             The restaurant will contact you shortly to confirm your reservation.
           </p>
           <button type="button" class="primary-btn" (click)="closeBookingModal()">

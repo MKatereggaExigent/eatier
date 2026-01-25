@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('../config/database');
+const { sendBookingConfirmation } = require('../services/emailService');
 const router = express.Router();
 
 // Get all bookings for a user
@@ -252,7 +253,34 @@ router.post('/', async (req, res) => {
       bookingRef, 'pending', tierPrice
     ]);
 
-    res.status(201).json(result.rows[0]);
+    const booking = result.rows[0];
+
+    // Get business name for email
+    let businessName = 'the restaurant';
+    try {
+      const businessResult = await pool.query(
+        'SELECT business_name FROM businesses WHERE id = $1',
+        [businessId]
+      );
+      if (businessResult.rows.length > 0) {
+        businessName = businessResult.rows[0].business_name;
+      }
+    } catch (bizError) {
+      console.log('Could not fetch business name:', bizError.message);
+    }
+
+    // Send confirmation email (non-blocking)
+    sendBookingConfirmation(booking, businessName)
+      .then(emailResult => {
+        if (emailResult.success) {
+          console.log(`📧 Confirmation email sent for booking ${booking.booking_reference}`);
+        } else {
+          console.log(`⚠️ Failed to send confirmation email: ${emailResult.error}`);
+        }
+      })
+      .catch(err => console.error('Email sending error:', err));
+
+    res.status(201).json(booking);
 
   } catch (error) {
     console.error('Error creating booking:', error);

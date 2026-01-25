@@ -38,6 +38,7 @@ export class RestaurantDetailComponent implements OnInit {
   isSubmittingBooking = signal<boolean>(false);
   bookingSuccess = signal<boolean>(false);
   bookingReference = signal<string>('');
+  bookingConfirmedEmail = signal<string>('');
   bookingError = signal<string | null>(null);
   availableTimeSlots = signal<any[]>([]);
   isLoadingSlots = signal<boolean>(false);
@@ -428,6 +429,7 @@ export class RestaurantDetailComponent implements OnInit {
     this.bookingSuccess.set(false);
     this.bookingError.set(null);
     this.bookingReference.set('');
+    this.bookingConfirmedEmail.set('');
     this.availableTimeSlots.set([]);
   }
 
@@ -486,13 +488,16 @@ export class RestaurantDetailComponent implements OnInit {
         this.bookingSuccess.set(true);
         this.bookingReference.set(response.booking_reference || response.id);
 
+        // Store email before resetting form so success message can display it
+        this.bookingConfirmedEmail.set(formValue.contactEmail);
+
         // Reset form
         this.bookingForm.reset({ partySize: 2 });
 
-        // Auto-close modal after 5 seconds
+        // Auto-close modal after 8 seconds (increased for better UX)
         setTimeout(() => {
           this.closeBookingModal();
-        }, 5000);
+        }, 8000);
       },
       error: (error) => {
         this.isSubmittingBooking.set(false);
