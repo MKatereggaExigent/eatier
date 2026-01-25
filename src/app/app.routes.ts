@@ -64,6 +64,12 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/payment/payment-callback.component').then(m => m.PaymentCallbackComponent)
     },
 
+    // Booking confirmation page (public - no login required)
+    {
+        path: 'booking/:reference',
+        loadComponent: () => import('./pages/booking/booking-confirmation.component').then(m => m.BookingConfirmationComponent)
+    },
+
     // Direct authentication routes (no layout)
     { path: 'login', canActivate: [GuestGuard], loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent) },
     { path: 'register', canActivate: [GuestGuard], loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent) },

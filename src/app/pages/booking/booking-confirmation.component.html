@@ -1,0 +1,126 @@
+<div class="booking-confirmation-page">
+  <!-- Header -->
+  <header class="page-header">
+    <a routerLink="/" class="logo">
+      <span class="logo-text">Itiyum</span>
+    </a>
+  </header>
+
+  <main class="content">
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading booking details...</p>
+      </div>
+    } @else if (error()) {
+      <div class="error-state">
+        <div class="error-icon">❌</div>
+        <h2>Booking Not Found</h2>
+        <p>{{ error() }}</p>
+        <a routerLink="/restaurants" class="btn-primary">Browse Restaurants</a>
+      </div>
+    } @else if (booking()) {
+      <div class="confirmation-card">
+        <!-- Status Banner -->
+        <div class="status-banner" [class]="getStatusClass(booking()!.status)">
+          <span class="status-icon">
+            @if (booking()!.status === 'confirmed') { ✅ }
+            @else if (booking()!.status === 'pending') { ⏳ }
+            @else if (booking()!.status === 'cancelled') { ❌ }
+            @else if (booking()!.status === 'completed') { ✓ }
+            @else { 📋 }
+          </span>
+          <span class="status-text">{{ getStatusLabel(booking()!.status) }}</span>
+        </div>
+
+        <!-- Booking Reference -->
+        <div class="reference-section">
+          <span class="label">Booking Reference</span>
+          <span class="reference">{{ booking()!.booking_reference }}</span>
+        </div>
+
+        <!-- Restaurant Info -->
+        <div class="restaurant-section">
+          <h2>{{ booking()!.business_name }}</h2>
+          @if (booking()!.business_address) {
+            <p class="address">📍 {{ booking()!.business_address }}</p>
+          }
+          @if (booking()!.business_phone) {
+            <p class="phone">📞 {{ booking()!.business_phone }}</p>
+          }
+        </div>
+
+        <!-- Booking Details -->
+        <div class="details-section">
+          <h3>Reservation Details</h3>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="label">📅 Date</span>
+              <span class="value">{{ formatDate(booking()!.booking_date) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">🕐 Time</span>
+              <span class="value">{{ formatTime(booking()!.booking_time) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">👥 Party Size</span>
+              <span class="value">{{ booking()!.party_size }} {{ booking()!.party_size === 1 ? 'Guest' : 'Guests' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">👤 Name</span>
+              <span class="value">{{ booking()!.contact_name }}</span>
+            </div>
+          </div>
+
+          @if (booking()!.occasion) {
+            <div class="occasion">
+              <span class="label">🎉 Occasion</span>
+              <span class="value">{{ booking()!.occasion }}</span>
+            </div>
+          }
+
+          @if (booking()!.special_requests) {
+            <div class="special-requests">
+              <span class="label">📝 Special Requests</span>
+              <p>{{ booking()!.special_requests }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- Contact Info -->
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <p><strong>Email:</strong> {{ booking()!.contact_email }}</p>
+          <p><strong>Phone:</strong> {{ booking()!.contact_phone }}</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+          <a routerLink="/restaurants" class="btn-secondary">Browse More Restaurants</a>
+          <a routerLink="/" class="btn-primary">Back to Home</a>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="tips-card">
+        <h4>💡 Helpful Tips</h4>
+        <ul>
+          <li>Please arrive 5-10 minutes before your reservation time</li>
+          <li>The restaurant will hold your table for 15 minutes</li>
+          <li>Need to cancel? Please do so at least 2 hours in advance</li>
+        </ul>
+      </div>
+    }
+  </main>
+
+  <!-- Footer -->
+  <footer class="page-footer">
+    <p>&copy; {{ currentYear }} Itiyum (Pty) Ltd. All rights reserved.</p>
+    <div class="footer-links">
+      <a routerLink="/legal/terms">Terms</a>
+      <a routerLink="/legal/privacy">Privacy</a>
+      <a routerLink="/help">Help</a>
+    </div>
+  </footer>
+</div>
+

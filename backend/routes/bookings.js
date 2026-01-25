@@ -23,6 +23,18 @@ router.get('/user/:userId', async (req, res) => {
       });
     }
 
+    // First, get the user's email to also find guest bookings made with their email
+    let userEmail = null;
+    try {
+      const userResult = await pool.query('SELECT email FROM users WHERE id = $1', [userId]);
+      if (userResult.rows.length > 0) {
+        userEmail = userResult.rows[0].email;
+      }
+    } catch (err) {
+      console.log('Could not fetch user email:', err.message);
+    }
+
+    // Query bookings by user_id OR by email (for guest bookings)
     let query = `
       SELECT
         b.*,
@@ -31,10 +43,17 @@ router.get('/user/:userId', async (req, res) => {
         bus.email as business_email
       FROM bookings b
       JOIN businesses bus ON b.business_id = bus.id
-      WHERE b.user_id = $1
-    `;
+      WHERE (b.user_id = $1`;
 
     const params = [userId];
+
+    // Also include guest bookings made with the same email
+    if (userEmail) {
+      query += ` OR (b.user_id IS NULL AND LOWER(b.contact_email) = LOWER($${params.length + 1})))`;
+      params.push(userEmail);
+    } else {
+      query += `)`;
+    }
 
     if (status) {
       query += ` AND b.status = $${params.length + 1}`;
@@ -61,6 +80,68 @@ router.get('/user/:userId', async (req, res) => {
   }
 });
 
+// Get booking by reference (for email link)
+router.get('/reference/:reference', async (req, res) => {
+  try {
+    const { reference } = req.params;
+
+    const result = await pool.query(`
+      SELECT
+        b.*,
+        bus.business_name,
+        bus.phone as business_phone,
+        bus.email as business_email,
+        bus.address as business_address
+      FROM bookings b
+      JOIN businesses bus ON b.business_id = bus.id
+      WHERE b.booking_reference = $1
+    `, [reference]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    res.json({ booking: result.rows[0] });
+  } catch (error) {
+    console.error('Error fetching booking by reference:', error);
+    res.status(500).json({ error: 'Failed to fetch booking' });
+  }
+});
+
+// Get bookings by email (for guests without accounts)
+router.get('/email/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const result = await pool.query(`
+      SELECT
+        b.*,
+        bus.business_name,
+        bus.phone as business_phone,
+        bus.email as business_email
+      FROM bookings b
+      JOIN businesses bus ON b.business_id = bus.id
+      WHERE LOWER(b.contact_email) = LOWER($1)
+      ORDER BY b.booking_date DESC, b.booking_time DESC
+      LIMIT $2 OFFSET $3
+    `, [email, limit, offset]);
+
+    res.json({
+      bookings: result.rows,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: result.rows.length
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching bookings by email:', error);
+    res.status(500).json({ error: 'Failed to fetch bookings' });
+  }
+});
+
 // Get all bookings for a business
 router.get('/business/:businessId', async (req, res) => {
   try {
@@ -68,15 +149,17 @@ router.get('/business/:businessId', async (req, res) => {
     const { status, date, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
 
+    // Use LEFT JOIN to include guest bookings (where user_id is NULL)
+    // Use COALESCE to fall back to contact info for guest bookings
     let query = `
       SELECT
         b.*,
-        u.first_name,
-        u.last_name,
-        u.email as user_email,
-        u.phone as user_phone
+        COALESCE(u.first_name, b.contact_name) as first_name,
+        COALESCE(u.last_name, '') as last_name,
+        COALESCE(u.email, b.contact_email) as user_email,
+        COALESCE(u.phone, b.contact_phone) as user_phone
       FROM bookings b
-      JOIN users u ON b.user_id = u.id
+      LEFT JOIN users u ON b.user_id = u.id
       WHERE b.business_id = $1
     `;
 
@@ -255,6 +338,15 @@ router.post('/', async (req, res) => {
 
     const booking = result.rows[0];
 
+    // Debug: Log booking data for email
+    console.log('📋 Booking created:', {
+      booking_reference: booking.booking_reference,
+      contact_name: booking.contact_name,
+      contact_email: booking.contact_email,
+      user_id: booking.user_id,
+      party_size: booking.party_size
+    });
+
     // Get business name for email
     let businessName = 'the restaurant';
     try {
@@ -268,6 +360,13 @@ router.post('/', async (req, res) => {
     } catch (bizError) {
       console.log('Could not fetch business name:', bizError.message);
     }
+
+    // Debug: Log what we're sending to email service
+    console.log('📧 Sending email with:', {
+      to: booking.contact_email,
+      contact_name: booking.contact_name,
+      businessName: businessName
+    });
 
     // Send confirmation email (non-blocking)
     sendBookingConfirmation(booking, businessName)
