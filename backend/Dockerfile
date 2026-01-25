@@ -14,8 +14,9 @@ RUN npm install
 # Copy application files
 COPY . .
 
-# Make entrypoint script executable
+# Make scripts executable
 RUN chmod +x docker-entrypoint.sh
+RUN chmod +x scripts/setup-database.sh 2>/dev/null || true
 
 # Expose port
 EXPOSE 3001
