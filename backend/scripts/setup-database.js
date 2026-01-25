@@ -55,7 +55,8 @@ const options = {
   fresh: args.includes('--fresh'),
   migrate: args.includes('--migrate'),
   verify: args.includes('--verify'),
-  help: args.includes('--help')
+  help: args.includes('--help'),
+  reset: args.find(a => a.startsWith('--reset='))?.split('=')[1]
 };
 
 if (options.help) {
@@ -65,15 +66,17 @@ ${colors.bold}ITIYUM DATABASE SETUP SCRIPT${colors.reset}
 Usage: node scripts/setup-database.js [options]
 
 Options:
-  --fresh     Drop all tables and start fresh (DESTRUCTIVE!)
-  --migrate   Run only pending migrations
-  --verify    Only verify database status
-  --help      Show this help message
+  --fresh              Drop all tables and start fresh (DESTRUCTIVE!)
+  --migrate            Run only pending migrations
+  --verify             Only verify database status
+  --reset=<migration>  Reset a specific migration to re-run it
+  --help               Show this help message
 
 Examples:
-  node scripts/setup-database.js              # Full setup
-  node scripts/setup-database.js --migrate    # Run pending migrations only
-  node scripts/setup-database.js --verify     # Check database status
+  node scripts/setup-database.js                            # Full setup
+  node scripts/setup-database.js --migrate                  # Run pending migrations only
+  node scripts/setup-database.js --verify                   # Check database status
+  node scripts/setup-database.js --reset=003_create_indexes.sql  # Reset and re-run migration 003
 `);
   process.exit(0);
 }
@@ -244,6 +247,16 @@ ${colors.blue}╚═════════════════════
     if (options.verify) {
       await verifyDatabase(client);
       return;
+    }
+
+    // Reset specific migration (if requested)
+    if (options.reset) {
+      log.step(2, `Resetting migration: ${options.reset}`);
+      await client.query(
+        'DELETE FROM schema_migrations WHERE migration_name = $1',
+        [options.reset]
+      );
+      log.success(`Migration ${options.reset} has been reset and will be re-run`);
     }
 
     // Step 2: Fresh install (if requested)

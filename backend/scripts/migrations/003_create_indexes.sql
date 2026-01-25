@@ -14,7 +14,7 @@ CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
 CREATE INDEX IF NOT EXISTS idx_businesses_tenant_id ON businesses(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_businesses_owner_id ON businesses(owner_id);
 CREATE INDEX IF NOT EXISTS idx_businesses_status ON businesses(status);
-CREATE INDEX IF NOT EXISTS idx_businesses_category ON businesses(category);
+CREATE INDEX IF NOT EXISTS idx_businesses_business_type ON businesses(business_type);
 
 -- ============================================
 -- MENUS INDEXES
@@ -81,7 +81,7 @@ CREATE INDEX IF NOT EXISTS idx_sync_history_connection_id ON sync_history(connec
 -- SPECIALIST INDEXES
 -- ============================================
 CREATE INDEX IF NOT EXISTS idx_specialist_bookings_specialist_id ON specialist_bookings(specialist_id);
-CREATE INDEX IF NOT EXISTS idx_specialist_bookings_user_id ON specialist_bookings(user_id);
+CREATE INDEX IF NOT EXISTS idx_specialist_bookings_client_id ON specialist_bookings(client_id);
 CREATE INDEX IF NOT EXISTS idx_specialist_earnings_specialist_id ON specialist_earnings(specialist_id);
 CREATE INDEX IF NOT EXISTS idx_specialist_reviews_specialist_id ON specialist_reviews(specialist_id);
 
@@ -89,7 +89,7 @@ CREATE INDEX IF NOT EXISTS idx_specialist_reviews_specialist_id ON specialist_re
 -- ANALYTICS INDEXES
 -- ============================================
 CREATE INDEX IF NOT EXISTS idx_business_analytics_business_id ON business_analytics(business_id);
-CREATE INDEX IF NOT EXISTS idx_business_analytics_date ON business_analytics(metric_date);
+CREATE INDEX IF NOT EXISTS idx_business_analytics_date ON business_analytics(date);
 CREATE INDEX IF NOT EXISTS idx_business_subscriptions_business_id ON business_subscriptions(business_id);
 CREATE INDEX IF NOT EXISTS idx_business_subscriptions_status ON business_subscriptions(status);
 

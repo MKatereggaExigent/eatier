@@ -665,7 +665,7 @@ $nyt-dark-gray: #333333;
   top: calc(100% + 8px);
   right: 0;
   width: 240px;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 10px;
@@ -673,6 +673,8 @@ $nyt-dark-gray: #333333;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   animation: slideDown 0.15s ease;
   padding: 6px;
+  z-index: 1001;
+  pointer-events: auto;
 
   @media (max-width: $breakpoint-mobile) {
     width: calc(100vw - 32px);

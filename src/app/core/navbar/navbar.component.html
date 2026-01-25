@@ -141,7 +141,7 @@
 
           <!-- Notifications Dropdown -->
           @if (showNotifications()) {
-            <div class="notifications-dropdown">
+            <div class="notifications-dropdown" (click)="$event.stopPropagation()">
               <div class="notifications-header">
                 <h3>Notifications</h3>
                 @if (unreadCount() > 0) {
@@ -213,7 +213,7 @@
           </button>
 
           @if (showUserMenu()) {
-            <div class="user-dropdown">
+            <div class="user-dropdown" (click)="$event.stopPropagation()">
               <div class="user-info">
                 <div class="user-avatar-large">
                   <span>{{ user()?.firstName?.charAt(0)?.toUpperCase() || 'U' }}</span>
@@ -274,7 +274,7 @@
           </button>
 
           @if (showGuestMenu()) {
-            <div class="guest-dropdown">
+            <div class="guest-dropdown" (click)="$event.stopPropagation()">
               <a routerLink="/login" class="dropdown-item primary" (click)="closeMenus()">
                 <span class="item-icon">🔐</span>
                 <span>Sign In</span>
