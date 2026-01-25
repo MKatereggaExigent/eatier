@@ -148,6 +148,9 @@ const blogRoutes = require('./routes/blog');
 const adminBlogRoutes = require('./routes/admin-blog');
 const industryNewsRoutes = require('./routes/industry-news');
 const specialistReviewsRoutes = require('./routes/specialist-reviews');
+const paymentsRoutes = require('./routes/payments');
+const subscriptionsRoutes = require('./routes/subscriptions');
+const premiumListingsRoutes = require('./routes/premium-listings');
 
 // Static file serving for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -194,6 +197,9 @@ app.use('/api/blog', blogRoutes); // Public blog endpoints
 app.use('/api/admin/blog', adminBlogRoutes); // Admin blog management
 app.use('/api/industry-news', industryNewsRoutes); // Real-time industry news feed
 app.use('/api/specialist-reviews', specialistReviewsRoutes); // Specialist reviews endpoints
+app.use('/api/payments', paymentsRoutes); // Paystack payment gateway
+app.use('/api/subscriptions', subscriptionsRoutes); // Subscription plans and management
+app.use('/api/premium-listings', premiumListingsRoutes); // Premium listing purchases
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

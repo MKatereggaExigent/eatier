@@ -52,6 +52,12 @@ export const routes: Routes = [
         ]
     },
 
+    // Payment callback route (no layout - standalone page)
+    {
+        path: 'payment/callback',
+        loadComponent: () => import('./pages/payment/payment-callback.component').then(m => m.PaymentCallbackComponent)
+    },
+
     // Direct authentication routes (no layout)
     { path: 'login', canActivate: [GuestGuard], loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent) },
     { path: 'register', canActivate: [GuestGuard], loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent) },

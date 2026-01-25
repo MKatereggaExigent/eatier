@@ -1,0 +1,121 @@
+<div class="payment-callback-container">
+  <div class="payment-card">
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <h2>Verifying Payment</h2>
+        <p>Please wait while we confirm your payment...</p>
+      </div>
+    }
+
+    <!-- Success State -->
+    @if (!loading() && paymentStatus() === 'success') {
+      <div class="success-state">
+        <div class="status-icon success">
+          <span>✓</span>
+        </div>
+        <h1>Payment Successful!</h1>
+        <p class="subtitle">Your payment has been processed successfully.</p>
+
+        @if (paymentDetails()) {
+          <div class="payment-details">
+            <div class="detail-row">
+              <span class="label">Amount</span>
+              <span class="value amount">{{ formatAmount(paymentDetails()!.amount, paymentDetails()!.currency) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Reference</span>
+              <span class="value reference">{{ paymentDetails()!.reference }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Date</span>
+              <span class="value">{{ formatDate(paymentDetails()!.paid_at) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Payment Method</span>
+              <span class="value capitalize">{{ paymentDetails()!.channel }}</span>
+            </div>
+          </div>
+        }
+
+        <div class="actions">
+          <button class="btn-primary" (click)="goToDashboard()">Go to Dashboard</button>
+          <button class="btn-secondary" (click)="goHome()">Back to Home</button>
+        </div>
+      </div>
+    }
+
+    <!-- Failed State -->
+    @if (!loading() && paymentStatus() === 'failed') {
+      <div class="failed-state">
+        <div class="status-icon failed">
+          <span>✕</span>
+        </div>
+        <h1>Payment Failed</h1>
+        <p class="subtitle">Unfortunately, your payment could not be processed.</p>
+
+        @if (paymentDetails()) {
+          <div class="payment-details">
+            <div class="detail-row">
+              <span class="label">Reference</span>
+              <span class="value reference">{{ paymentDetails()!.reference }}</span>
+            </div>
+          </div>
+        }
+
+        <div class="actions">
+          <button class="btn-primary" (click)="retryPayment()">Try Again</button>
+          <button class="btn-secondary" (click)="goHome()">Back to Home</button>
+        </div>
+      </div>
+    }
+
+    <!-- Pending State -->
+    @if (!loading() && paymentStatus() === 'pending') {
+      <div class="pending-state">
+        <div class="status-icon pending">
+          <span>⏳</span>
+        </div>
+        <h1>Payment Pending</h1>
+        <p class="subtitle">Your payment is being processed. This may take a few moments.</p>
+
+        @if (paymentDetails()) {
+          <div class="payment-details">
+            <div class="detail-row">
+              <span class="label">Reference</span>
+              <span class="value reference">{{ paymentDetails()!.reference }}</span>
+            </div>
+          </div>
+        }
+
+        <div class="actions">
+          <button class="btn-primary" (click)="goToDashboard()">Go to Dashboard</button>
+          <button class="btn-secondary" (click)="goHome()">Back to Home</button>
+        </div>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (!loading() && paymentStatus() === 'error') {
+      <div class="error-state">
+        <div class="status-icon error">
+          <span>!</span>
+        </div>
+        <h1>Verification Error</h1>
+        <p class="subtitle">{{ errorMessage() || 'We could not verify your payment status.' }}</p>
+
+        <div class="actions">
+          <button class="btn-primary" (click)="goToDashboard()">Go to Dashboard</button>
+          <button class="btn-secondary" (click)="goHome()">Back to Home</button>
+        </div>
+      </div>
+    }
+
+    <!-- Footer -->
+    <div class="card-footer">
+      <p>Need help? <a href="/help">Contact Support</a></p>
+    </div>
+  </div>
+</div>
+

@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('../config/database');
+const paystackService = require('../services/paystackService');
 const router = express.Router();
 
 // =====================================================
@@ -328,11 +329,62 @@ router.post('/my-ads', async (req, res) => {
       priorityScore
     ]);
 
-    res.status(201).json({
-      message: 'Ad campaign created successfully. Payment required to activate.',
-      ad: result.rows[0],
-      paymentRequired: true
-    });
+    const adCampaign = result.rows[0];
+
+    // Initialize Paystack payment for the ad campaign
+    // Get user email for payment
+    const userResult = await pool.query(`SELECT email FROM users WHERE id = $1`, [userId]);
+    const userEmail = userResult.rows[0]?.email;
+
+    if (userEmail && totalBudget > 0) {
+      try {
+        const reference = `AD_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const paymentResult = await paystackService.initializeTransaction({
+          email: userEmail,
+          amount: totalBudget,
+          reference,
+          callback_url: process.env.PAYSTACK_CALLBACK_URL,
+          metadata: {
+            type: 'ad_campaign',
+            ad_campaign_id: adCampaign.id,
+            tier_id: tierId,
+            user_id: userId,
+            tenant_id: tenantId
+          }
+        });
+
+        // Store pending payment transaction
+        await pool.query(`
+          INSERT INTO payment_transactions (tenant_id, user_id, reference, email, amount, currency, status, ad_campaign_id, metadata)
+          VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8)
+        `, [tenantId, userId, reference, userEmail, totalBudget, currency || 'ZAR', adCampaign.id, { tier_id: tierId }]);
+
+        res.status(201).json({
+          message: 'Ad campaign created successfully. Complete payment to activate.',
+          ad: adCampaign,
+          paymentRequired: true,
+          payment: {
+            authorization_url: paymentResult.authorization_url,
+            reference: paymentResult.reference,
+            amount: totalBudget
+          }
+        });
+      } catch (paymentError) {
+        console.error('Payment initialization failed:', paymentError);
+        res.status(201).json({
+          message: 'Ad campaign created. Payment initialization failed - please try again from the ad management page.',
+          ad: adCampaign,
+          paymentRequired: true,
+          paymentError: paymentError.message
+        });
+      }
+    } else {
+      res.status(201).json({
+        message: 'Ad campaign created successfully. Payment required to activate.',
+        ad: adCampaign,
+        paymentRequired: true
+      });
+    }
 
   } catch (error) {
     console.error('Error creating ad:', error);
@@ -636,27 +688,24 @@ router.get('/stats', async (req, res) => {
 // =====================================================
 
 /**
- * Process ad payment
- * Creates a payment record and activates the ad
+ * Initialize Paystack payment for an existing ad campaign
+ * Returns payment authorization URL for redirect
  */
 router.post('/my-ads/:adId/payment', async (req, res) => {
   try {
     const { adId } = req.params;
-    const { userId, tenantId, paymentMethod, amount, transactionId } = req.body;
+    const { userId, email } = req.body;
 
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });
     }
 
-    if (!amount) {
-      return res.status(400).json({ error: 'Payment amount is required' });
-    }
-
     // Get the ad with tier info
     const adResult = await pool.query(`
-      SELECT ac.*, t.base_price_daily, t.display_name as tier_name
+      SELECT ac.*, t.base_price_daily, t.display_name as tier_name, u.email as user_email
       FROM ad_campaigns ac
       LEFT JOIN ad_space_tiers t ON ac.tier_id = t.id
+      LEFT JOIN users u ON ac.user_id = u.id
       WHERE ac.id = $1 AND ac.user_id = $2
     `, [adId, userId]);
 
@@ -665,29 +714,87 @@ router.post('/my-ads/:adId/payment', async (req, res) => {
     }
 
     const ad = adResult.rows[0];
+    const userEmail = email || ad.user_email;
 
-    // Verify payment amount matches total budget
-    if (parseFloat(amount) < parseFloat(ad.total_budget)) {
+    if (!userEmail) {
+      return res.status(400).json({ error: 'Email is required for payment' });
+    }
+
+    if (!ad.payment_required) {
+      return res.status(400).json({ error: 'This ad has already been paid for' });
+    }
+
+    // Initialize Paystack payment
+    const reference = `AD_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const paymentResult = await paystackService.initializeTransaction({
+      email: userEmail,
+      amount: parseFloat(ad.total_budget),
+      reference,
+      callback_url: process.env.PAYSTACK_CALLBACK_URL,
+      metadata: {
+        type: 'ad_campaign',
+        ad_campaign_id: adId,
+        tier_id: ad.tier_id,
+        user_id: userId,
+        tenant_id: ad.tenant_id
+      }
+    });
+
+    // Store pending payment transaction
+    await pool.query(`
+      INSERT INTO payment_transactions (tenant_id, user_id, reference, email, amount, currency, status, ad_campaign_id, metadata)
+      VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8)
+      ON CONFLICT (reference) DO NOTHING
+    `, [ad.tenant_id, userId, reference, userEmail, ad.total_budget, ad.currency || 'ZAR', adId, { tier_id: ad.tier_id }]);
+
+    res.json({
+      success: true,
+      message: 'Payment initialized. Redirect to complete payment.',
+      payment: {
+        authorization_url: paymentResult.authorization_url,
+        reference: paymentResult.reference,
+        amount: ad.total_budget
+      },
+      ad: { id: ad.id, title: ad.title, tier_name: ad.tier_name }
+    });
+
+  } catch (error) {
+    console.error('Error initializing payment:', error);
+    res.status(500).json({ error: 'Failed to initialize payment' });
+  }
+});
+
+/**
+ * Verify ad payment (called after Paystack redirect)
+ * Activates the ad campaign if payment is successful
+ */
+router.post('/my-ads/:adId/verify-payment', async (req, res) => {
+  try {
+    const { adId } = req.params;
+    const { reference, userId } = req.body;
+
+    if (!reference) {
+      return res.status(400).json({ error: 'Payment reference is required' });
+    }
+
+    // Verify payment with Paystack
+    const paymentResult = await paystackService.verifyTransaction(reference);
+
+    if (paymentResult.status !== 'success') {
       return res.status(400).json({
-        error: 'Payment amount is less than total budget',
-        required: ad.total_budget,
-        provided: amount
+        error: 'Payment not successful',
+        status: paymentResult.status
       });
     }
 
-    // Create payment record
+    // Update payment transaction
     await pool.query(`
-      INSERT INTO ad_payments (
-        tenant_id, campaign_id, user_id,
-        amount, currency, payment_method, transaction_id,
-        status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'completed')
-    `, [
-      tenantId || ad.tenant_id, adId, userId,
-      amount, ad.currency || 'USD', paymentMethod || 'card', transactionId || null
-    ]);
+      UPDATE payment_transactions
+      SET status = 'success', paid_at = NOW(), channel = $1
+      WHERE reference = $2
+    `, [paymentResult.channel, reference]);
 
-    // Update ad with payment information and activate
+    // Activate the ad campaign
     const result = await pool.query(`
       UPDATE ad_campaigns
       SET
@@ -696,18 +803,19 @@ router.post('/my-ads/:adId/payment', async (req, res) => {
         status = 'active',
         is_active = true,
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = $1 AND user_id = $2
+      WHERE id = $1
       RETURNING *
-    `, [adId, userId]);
+    `, [adId]);
 
     res.json({
-      message: 'Payment processed successfully. Your ad is now active!',
+      success: true,
+      message: 'Payment verified! Your ad is now active!',
       ad: result.rows[0]
     });
 
   } catch (error) {
-    console.error('Error processing payment:', error);
-    res.status(500).json({ error: 'Failed to process payment' });
+    console.error('Error verifying payment:', error);
+    res.status(500).json({ error: 'Failed to verify payment' });
   }
 });
 

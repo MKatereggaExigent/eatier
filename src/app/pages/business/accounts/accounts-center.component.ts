@@ -3,6 +3,8 @@ import { Business, BusinessOwnerService, BusinessSubscription } from '../../../c
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 import { CommonModule } from '@angular/common';
 
@@ -35,6 +37,7 @@ export interface PaymentMethod {
 export class AccountsCenterComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private businessOwnerService = inject(BusinessOwnerService);
+  private http = inject(HttpClient);
   private destroy$ = new Subject<void>();
 
   // State management
@@ -484,43 +487,53 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
   }
 
   onPaymentSubmit(): void {
-    if (this.paymentForm.valid && this.selectedPlan()) {
+    if (this.selectedPlan()) {
       this.isProcessingPayment.set(true);
 
-      const paymentData = {
-        ...this.paymentForm.value,
-        planId: this.selectedPlan()?.id,
-        billingCycle: this.billingCycle(),
-        amount: this.getPlanPrice(this.selectedPlan()!)
-      };
+      // Get user info from localStorage
+      const userId = localStorage.getItem('user_id');
+      const userEmail = localStorage.getItem('user_email') || this.business()?.email;
 
-      // TODO: Replace with actual API call to process payment
-      // this.businessOwnerService.processSubscriptionPayment(paymentData)
-
-      // Mock API call for now
-      setTimeout(() => {
-        console.log('Processing payment:', paymentData);
+      if (!userId || !userEmail) {
+        this.errorMessage.set('User information not found. Please log in again.');
         this.isProcessingPayment.set(false);
-        this.closePaymentModal();
+        return;
+      }
 
-        // Update subscription status
-        const newSubscription: BusinessSubscription = {
-          id: 'sub_' + Date.now(),
-          plan: this.selectedPlan()!.id as any,
-          status: 'active',
-          startDate: new Date().toISOString(),
-          price: this.getPlanPrice(this.selectedPlan()!),
-          billingCycle: this.billingCycle()
-        };
-        this.subscription.set(newSubscription);
+      // Initialize Paystack payment
+      this.http.post<any>(`${environment.apiUrl}/subscriptions/subscribe`, {
+        userId,
+        planId: this.selectedPlan()!.id,
+        billingCycle: this.billingCycle(),
+        email: userEmail
+      }).subscribe({
+        next: (response) => {
+          this.isProcessingPayment.set(false);
 
-        this.successMessage.set(`Successfully upgraded to ${this.selectedPlan()?.name} plan!`);
-        setTimeout(() => this.successMessage.set(null), 5000);
-      }, 2000);
-    } else {
-      // Mark all fields as touched to show validation errors
-      Object.keys(this.paymentForm.controls).forEach(key => {
-        this.paymentForm.get(key)?.markAsTouched();
+          if (response.success && response.authorization_url) {
+            // Redirect to Paystack payment page
+            window.location.href = response.authorization_url;
+          } else if (response.success && response.subscription) {
+            // Free plan activated immediately
+            this.closePaymentModal();
+            const newSubscription: BusinessSubscription = {
+              id: response.subscription.id || 'sub_' + Date.now(),
+              plan: this.selectedPlan()!.id as any,
+              status: 'active',
+              startDate: new Date().toISOString(),
+              price: 0,
+              billingCycle: this.billingCycle()
+            };
+            this.subscription.set(newSubscription);
+            this.successMessage.set(`Successfully activated ${this.selectedPlan()?.name} plan!`);
+            setTimeout(() => this.successMessage.set(null), 5000);
+          }
+        },
+        error: (error) => {
+          this.isProcessingPayment.set(false);
+          this.errorMessage.set(error.error?.error || 'Failed to initialize payment. Please try again.');
+          setTimeout(() => this.errorMessage.set(null), 5000);
+        }
       });
     }
   }
