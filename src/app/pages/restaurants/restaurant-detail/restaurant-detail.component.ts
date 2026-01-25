@@ -73,6 +73,9 @@ export class RestaurantDetailComponent implements OnInit {
 
   // Track if write review modal is open
   showWriteReviewModal = signal(false);
+  isSubmittingReview = signal(false);
+  reviewSuccess = signal(false);
+  reviewError = signal<string | null>(null);
 
   // Booking form
   bookingForm: FormGroup = this.fb.group({
@@ -86,6 +89,25 @@ export class RestaurantDetailComponent implements OnInit {
     tablePreferences: [''],
     occasion: ['']
   });
+
+  // Review form
+  reviewForm: FormGroup = this.fb.group({
+    overallRating: [0, [Validators.required, Validators.min(1), Validators.max(5)]],
+    foodRating: [0],
+    serviceRating: [0],
+    ambianceRating: [0],
+    valueRating: [0],
+    title: [''],
+    comment: ['', [Validators.required, Validators.minLength(20)]],
+    visitDate: [''],
+    wouldRecommend: [true]
+  });
+
+  // Star rating helper for template
+  ratingStars = [1, 2, 3, 4, 5];
+
+  // Today's date for max date on visit date input
+  today = new Date().toISOString().split('T')[0];
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -349,9 +371,96 @@ export class RestaurantDetailComponent implements OnInit {
 
   // Write a review - open review modal
   openWriteReview(): void {
+    // Check if user is logged in
+    const user = this.authService.currentUser();
+    if (!user) {
+      alert('Please log in to write a review');
+      return;
+    }
+
+    // Reset form and state
+    this.reviewForm.reset({
+      overallRating: 0,
+      foodRating: 0,
+      serviceRating: 0,
+      ambianceRating: 0,
+      valueRating: 0,
+      title: '',
+      comment: '',
+      visitDate: '',
+      wouldRecommend: true
+    });
+    this.reviewSuccess.set(false);
+    this.reviewError.set(null);
     this.showWriteReviewModal.set(true);
-    // In a real app, this would open a modal or navigate to review page
-    alert('Opening review form... This will display a modal where customers can write their review with rating, photos, and comments.');
+  }
+
+  // Close review modal
+  closeReviewModal(): void {
+    this.showWriteReviewModal.set(false);
+    this.reviewSuccess.set(false);
+    this.reviewError.set(null);
+  }
+
+  // Set rating for a specific field
+  setRating(field: string, rating: number): void {
+    this.reviewForm.get(field)?.setValue(rating);
+  }
+
+  // Get current rating value for display
+  getRating(field: string): number {
+    return this.reviewForm.get(field)?.value || 0;
+  }
+
+  // Submit review
+  submitReview(): void {
+    if (this.reviewForm.invalid) {
+      if (this.reviewForm.get('overallRating')?.value < 1) {
+        this.reviewError.set('Please select an overall rating');
+        return;
+      }
+      if (this.reviewForm.get('comment')?.invalid) {
+        this.reviewError.set('Please write a review with at least 20 characters');
+        return;
+      }
+      return;
+    }
+
+    const user = this.authService.currentUser();
+    if (!user) {
+      this.reviewError.set('Please log in to submit a review');
+      return;
+    }
+
+    this.isSubmittingReview.set(true);
+    this.reviewError.set(null);
+
+    const reviewData = {
+      userId: user.id,
+      businessId: this.restaurantId(),
+      overallRating: this.reviewForm.get('overallRating')?.value,
+      foodRating: this.reviewForm.get('foodRating')?.value || null,
+      serviceRating: this.reviewForm.get('serviceRating')?.value || null,
+      ambianceRating: this.reviewForm.get('ambianceRating')?.value || null,
+      valueRating: this.reviewForm.get('valueRating')?.value || null,
+      title: this.reviewForm.get('title')?.value || '',
+      comment: this.reviewForm.get('comment')?.value,
+      visitDate: this.reviewForm.get('visitDate')?.value || null,
+      wouldRecommend: this.reviewForm.get('wouldRecommend')?.value
+    };
+
+    this.http.post(`${environment.apiUrl}/reviews`, reviewData).subscribe({
+      next: (response: any) => {
+        this.isSubmittingReview.set(false);
+        this.reviewSuccess.set(true);
+        // Reload reviews to show the new one
+        this.loadReviews(this.restaurantId());
+      },
+      error: (error) => {
+        this.isSubmittingReview.set(false);
+        this.reviewError.set(error.error?.error || 'Failed to submit review. Please try again.');
+      }
+    });
   }
 
   // Mark review as helpful

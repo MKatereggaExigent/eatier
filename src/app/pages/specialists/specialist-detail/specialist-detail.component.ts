@@ -6,16 +6,19 @@ import {
   SpecialistService
 } from '../../../core/services/public-specialist.service';
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { InsightsService } from '../../../core/services/insights.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-specialist-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
   templateUrl: './specialist-detail.component.html',
   styleUrls: ['./specialist-detail.component.scss']
 })
@@ -25,6 +28,8 @@ export class SpecialistDetailComponent implements OnInit {
   private publicSpecialistService = inject(PublicSpecialistService);
   private authService = inject(AuthService);
   private insightsService = inject(InsightsService);
+  private fb = inject(FormBuilder);
+  private http = inject(HttpClient);
 
   specialist = signal<SpecialistDetail | null>(null);
   loading = signal(true);
@@ -41,6 +46,12 @@ export class SpecialistDetailComponent implements OnInit {
   bookingSuccess = signal(false);
   bookingError = signal<string | null>(null);
 
+  // Review modal state
+  showReviewModal = signal(false);
+  isSubmittingReview = signal(false);
+  reviewSuccess = signal(false);
+  reviewError = signal<string | null>(null);
+
   selectedService = signal<SpecialistService | null>(null);
   bookingForm = signal<BookingRequest>({
     bookingDate: '',
@@ -53,6 +64,24 @@ export class SpecialistDetailComponent implements OnInit {
     contactEmail: '',
     specialRequests: ''
   });
+
+  // Review form
+  reviewForm: FormGroup = this.fb.group({
+    overallRating: [0, [Validators.required, Validators.min(1), Validators.max(5)]],
+    foodQualityRating: [0],
+    professionalismRating: [0],
+    communicationRating: [0],
+    valueRating: [0],
+    title: [''],
+    comment: ['', [Validators.required, Validators.minLength(20)]],
+    eventType: [''],
+    eventDate: [''],
+    guestCount: [null]
+  });
+
+  // Star rating helper for template
+  ratingStars = [1, 2, 3, 4, 5];
+  today = new Date().toISOString().split('T')[0];
 
   eventTypes = [
     'Private Dinner',
@@ -260,5 +289,99 @@ export class SpecialistDetailComponent implements OnInit {
       deviceType: this.insightsService.getDeviceInfo().deviceType
     }).subscribe();
   }
-}
 
+  // Open review modal
+  openWriteReview(): void {
+    const user = this.authService.currentUser();
+    if (!user) {
+      alert('Please log in to write a review');
+      return;
+    }
+
+    this.reviewForm.reset({
+      overallRating: 0,
+      foodQualityRating: 0,
+      professionalismRating: 0,
+      communicationRating: 0,
+      valueRating: 0,
+      title: '',
+      comment: '',
+      eventType: '',
+      eventDate: '',
+      guestCount: null
+    });
+    this.reviewSuccess.set(false);
+    this.reviewError.set(null);
+    this.showReviewModal.set(true);
+  }
+
+  // Close review modal
+  closeReviewModal(): void {
+    this.showReviewModal.set(false);
+    this.reviewSuccess.set(false);
+    this.reviewError.set(null);
+  }
+
+  // Set rating for a specific field
+  setRating(field: string, rating: number): void {
+    this.reviewForm.get(field)?.setValue(rating);
+  }
+
+  // Get current rating value for display
+  getRatingValue(field: string): number {
+    return this.reviewForm.get(field)?.value || 0;
+  }
+
+  // Submit review
+  submitReview(): void {
+    if (this.reviewForm.invalid) {
+      if (this.reviewForm.get('overallRating')?.value < 1) {
+        this.reviewError.set('Please select an overall rating');
+        return;
+      }
+      if (this.reviewForm.get('comment')?.invalid) {
+        this.reviewError.set('Please write a review with at least 20 characters');
+        return;
+      }
+      return;
+    }
+
+    const user = this.authService.currentUser();
+    const specialist = this.specialist();
+    if (!user || !specialist) {
+      this.reviewError.set('Please log in to submit a review');
+      return;
+    }
+
+    this.isSubmittingReview.set(true);
+    this.reviewError.set(null);
+
+    const reviewData = {
+      userId: user.id,
+      specialistId: specialist.id,
+      rating: this.reviewForm.get('overallRating')?.value,
+      foodQualityRating: this.reviewForm.get('foodQualityRating')?.value || null,
+      professionalismRating: this.reviewForm.get('professionalismRating')?.value || null,
+      communicationRating: this.reviewForm.get('communicationRating')?.value || null,
+      valueRating: this.reviewForm.get('valueRating')?.value || null,
+      title: this.reviewForm.get('title')?.value || '',
+      comment: this.reviewForm.get('comment')?.value,
+      eventType: this.reviewForm.get('eventType')?.value || null,
+      eventDate: this.reviewForm.get('eventDate')?.value || null,
+      guestCount: this.reviewForm.get('guestCount')?.value || null
+    };
+
+    this.http.post(`${environment.apiUrl}/specialist-reviews`, reviewData).subscribe({
+      next: () => {
+        this.isSubmittingReview.set(false);
+        this.reviewSuccess.set(true);
+        // Reload specialist to show the new review
+        this.loadSpecialist(specialist.id);
+      },
+      error: (error) => {
+        this.isSubmittingReview.set(false);
+        this.reviewError.set(error.error?.error || 'Failed to submit review. Please try again.');
+      }
+    });
+  }
+}

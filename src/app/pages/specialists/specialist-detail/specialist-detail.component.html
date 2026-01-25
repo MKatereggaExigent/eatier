@@ -89,9 +89,14 @@
 
       <!-- Reviews Section -->
       <section class="reviews-section">
-        <h2>⭐ Reviews</h2>
+        <div class="reviews-header">
+          <h2>⭐ Reviews</h2>
+          <button class="write-review-btn" (click)="openWriteReview()">
+            ✍️ Write a Review
+          </button>
+        </div>
         @if (specialist()!.reviews.length === 0) {
-          <div class="empty-message">No reviews yet.</div>
+          <div class="empty-message">No reviews yet. Be the first to review!</div>
         } @else {
           <div class="reviews-list">
             @for (review of specialist()!.reviews; track review.id) {
@@ -228,6 +233,155 @@
         </div>
       </div>
     }
+
+    <!-- Review Modal -->
+    @if (showReviewModal()) {
+      <div class="modal-overlay" (click)="closeReviewModal()">
+        <div class="review-modal glass-morphic" (click)="$event.stopPropagation()">
+          <button class="close-btn" (click)="closeReviewModal()">✕</button>
+
+          @if (reviewSuccess()) {
+            <div class="success-state">
+              <span class="success-icon">✅</span>
+              <h3>Review Submitted!</h3>
+              <p>Thank you for reviewing {{ specialist()!.firstName }}. Your feedback helps others.</p>
+              <button class="done-btn" (click)="closeReviewModal()">Done</button>
+            </div>
+          } @else {
+            <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="review-form">
+              <h3>Review {{ specialist()!.firstName }}</h3>
+
+              <!-- Overall Rating -->
+              <div class="form-group rating-group">
+                <label>Overall Rating *</label>
+                <div class="star-rating">
+                  @for (star of ratingStars; track star) {
+                    <button
+                      type="button"
+                      class="star-btn"
+                      [class.active]="star <= getRatingValue('overallRating')"
+                      (click)="setRating('overallRating', star)">
+                      {{ star <= getRatingValue('overallRating') ? '★' : '☆' }}
+                    </button>
+                  }
+                  <span class="rating-label">
+                    @switch (getRatingValue('overallRating')) {
+                      @case (1) { Poor }
+                      @case (2) { Fair }
+                      @case (3) { Good }
+                      @case (4) { Very Good }
+                      @case (5) { Excellent }
+                      @default { Select }
+                    }
+                  </span>
+                </div>
+              </div>
+
+              <!-- Detailed Ratings -->
+              <div class="detailed-ratings">
+                <div class="rating-item">
+                  <label>Food Quality</label>
+                  <div class="mini-stars">
+                    @for (star of ratingStars; track star) {
+                      <button type="button" class="mini-star"
+                        [class.active]="star <= getRatingValue('foodQualityRating')"
+                        (click)="setRating('foodQualityRating', star)">
+                        {{ star <= getRatingValue('foodQualityRating') ? '★' : '☆' }}
+                      </button>
+                    }
+                  </div>
+                </div>
+                <div class="rating-item">
+                  <label>Professionalism</label>
+                  <div class="mini-stars">
+                    @for (star of ratingStars; track star) {
+                      <button type="button" class="mini-star"
+                        [class.active]="star <= getRatingValue('professionalismRating')"
+                        (click)="setRating('professionalismRating', star)">
+                        {{ star <= getRatingValue('professionalismRating') ? '★' : '☆' }}
+                      </button>
+                    }
+                  </div>
+                </div>
+                <div class="rating-item">
+                  <label>Communication</label>
+                  <div class="mini-stars">
+                    @for (star of ratingStars; track star) {
+                      <button type="button" class="mini-star"
+                        [class.active]="star <= getRatingValue('communicationRating')"
+                        (click)="setRating('communicationRating', star)">
+                        {{ star <= getRatingValue('communicationRating') ? '★' : '☆' }}
+                      </button>
+                    }
+                  </div>
+                </div>
+                <div class="rating-item">
+                  <label>Value</label>
+                  <div class="mini-stars">
+                    @for (star of ratingStars; track star) {
+                      <button type="button" class="mini-star"
+                        [class.active]="star <= getRatingValue('valueRating')"
+                        (click)="setRating('valueRating', star)">
+                        {{ star <= getRatingValue('valueRating') ? '★' : '☆' }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Event Details -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="reviewEventType">Event Type</label>
+                  <select id="reviewEventType" formControlName="eventType" class="form-control">
+                    <option value="">Select event type</option>
+                    @for (type of eventTypes; track type) {
+                      <option [value]="type">{{ type }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="reviewEventDate">Event Date</label>
+                  <input type="date" id="reviewEventDate" formControlName="eventDate"
+                         class="form-control" [max]="today">
+                </div>
+              </div>
+
+              <!-- Review Title -->
+              <div class="form-group">
+                <label for="reviewTitle">Review Title (Optional)</label>
+                <input type="text" id="reviewTitle" formControlName="title"
+                       placeholder="Summarize your experience" class="form-control" maxlength="100">
+              </div>
+
+              <!-- Review Content -->
+              <div class="form-group">
+                <label for="reviewComment">Your Review *</label>
+                <textarea id="reviewComment" formControlName="comment" rows="4"
+                          placeholder="Tell us about your experience..." class="form-control"
+                          minlength="20"></textarea>
+                <span class="char-hint">Minimum 20 characters</span>
+              </div>
+
+              @if (reviewError()) {
+                <div class="error-alert">{{ reviewError() }}</div>
+              }
+
+              <div class="form-actions">
+                <button type="button" class="cancel-btn" (click)="closeReviewModal()"
+                        [disabled]="isSubmittingReview()">Cancel</button>
+                <button type="submit" class="submit-btn" [disabled]="isSubmittingReview()">
+                  @if (isSubmittingReview()) {
+                    <span class="spinner-small"></span> Submitting...
+                  } @else {
+                    Submit Review
+                  }
+                </button>
+              </div>
+            </form>
+          }
+        </div>
+      </div>
+    }
   }
 </div>
-
