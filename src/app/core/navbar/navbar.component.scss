@@ -780,6 +780,7 @@ $nyt-dark-gray: #333333;
 
 .guest-menu-container {
   position: relative;
+  z-index: 100;
 
   @media (max-width: $breakpoint-desktop) {
     display: none;
@@ -795,11 +796,14 @@ $nyt-dark-gray: #333333;
   border-radius: 14px;
   padding: 5px 10px;
   cursor: pointer;
+  pointer-events: auto !important;
   transition: all 0.15s ease;
   font-family: $font-sans;
   font-weight: 600;
   font-size: 0.75rem;
   color: white;
+  position: relative;
+  z-index: 1000;
 
   &:hover {
     background: $itiyum-orange-dark;
@@ -808,15 +812,17 @@ $nyt-dark-gray: #333333;
   .menu-icon {
     font-size: 0.875rem;
     display: none;
+    pointer-events: none;
   }
 
   .menu-text {
-    // Always show on desktop
+    pointer-events: none;
   }
 
   .chevron-icon {
     font-size: 0.5rem;
     opacity: 0.8;
+    pointer-events: none;
   }
 
   @media (max-width: $breakpoint-tablet) {
@@ -838,6 +844,8 @@ $nyt-dark-gray: #333333;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   animation: slideDown 0.15s ease;
   padding: 5px;
+  z-index: 1001;
+  pointer-events: auto;
 
   @media (max-width: $breakpoint-mobile) {
     width: calc(100vw - 32px);
@@ -854,6 +862,7 @@ $nyt-dark-gray: #333333;
   border-radius: 50%;
   font-size: 1rem;
   cursor: pointer;
+  pointer-events: auto !important;
   padding: 0;
   color: $nyt-dark-gray;
   width: 28px;
@@ -863,6 +872,12 @@ $nyt-dark-gray: #333333;
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
+  position: relative;
+  z-index: 1000;
+
+  .hamburger-icon {
+    pointer-events: none;
+  }
 
   &:hover {
     background: rgba(0, 0, 0, 0.06);

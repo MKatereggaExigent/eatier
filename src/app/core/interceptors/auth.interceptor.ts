@@ -12,15 +12,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Get token from localStorage
   const token = localStorage.getItem('itiyum_token');
 
-  // Debug logging
-  if (req.url.includes('/api/')) {
-    console.log('🔐 Interceptor - URL:', req.url);
-    console.log('🔐 Interceptor - Token exists:', !!token);
-    if (token) {
-      console.log('🔐 Interceptor - Token preview:', token.substring(0, 20) + '...');
-    }
-  }
-
   // Clone request to add credentials (cookies) and Authorization header
   let authReq = req.clone({
     withCredentials: true
@@ -33,7 +24,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         Authorization: `Bearer ${token}`
       }
     });
-    console.log('🔐 Interceptor - Added Authorization header');
   }
 
   return next(authReq).pipe(
