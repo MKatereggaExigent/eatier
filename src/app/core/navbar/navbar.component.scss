@@ -628,10 +628,7 @@ $nyt-dark-gray: #333333;
   right: 16px;
   z-index: 1002; // Higher than actions-layer (1001)
   pointer-events: auto;
-
-  @media (max-width: $breakpoint-desktop) {
-    display: none;
-  }
+  display: block; // Always visible
 
   @media (max-width: $breakpoint-tablet) {
     right: 12px;
