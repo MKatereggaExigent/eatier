@@ -7,6 +7,7 @@ import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UserRole } from '../../shared/models/user.model';
 
 @Component({
   selector: 'app-navbar',
@@ -31,6 +32,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showSearchResults = signal(false);
   showMobileMenu = signal(false);
   isScrolled = signal(false);
+
+  // Auth Modal state (for guest users)
+  showAuthModal = signal(false);
+  authModalMode = signal<'login' | 'register'>('login');
+  authEmail = signal('');
+  authPassword = signal('');
+  authFirstName = signal('');
+  authLastName = signal('');
+  authConfirmPassword = signal('');
+  authError = signal('');
+  authLoading = signal(false);
 
   // Notification state
   notifications = this.notificationService.notifications;
@@ -93,7 +105,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   private handleClickOutside(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-    if (!target.closest('.user-menu-container') && !target.closest('.guest-menu-container')) {
+    if (!target.closest('.user-menu-container') && !target.closest('.guest-menu-container') && !target.closest('.profile-menu-container')) {
       this.showUserMenu.set(false);
       this.showGuestMenu.set(false);
     }
@@ -103,6 +115,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (!target.closest('.search-icon-container') && !target.closest('.search-modal')) {
       this.showSearchModal.set(false);
       this.showSearchResults.set(false);
+    }
+    // Close auth modal when clicking on backdrop (not the modal content)
+    if (target.classList.contains('auth-modal-backdrop')) {
+      this.closeAuthModal();
     }
   }
 
@@ -116,9 +132,83 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   toggleGuestMenu(event: Event): void {
     event.stopPropagation();
-    this.showGuestMenu.update(v => !v);
-    this.showUserMenu.set(false);
-    this.showNotifications.set(false);
+    // Open centered auth modal instead of dropdown
+    this.openAuthModal('login');
+  }
+
+  // Auth Modal methods
+  openAuthModal(mode: 'login' | 'register'): void {
+    this.authModalMode.set(mode);
+    this.showAuthModal.set(true);
+    this.authError.set('');
+    this.closeMenus();
+    // Focus email input after modal opens
+    setTimeout(() => {
+      const emailInput = document.querySelector('.auth-modal-input') as HTMLInputElement;
+      if (emailInput) emailInput.focus();
+    }, 100);
+  }
+
+  closeAuthModal(): void {
+    this.showAuthModal.set(false);
+    this.resetAuthForm();
+  }
+
+  switchAuthMode(): void {
+    const newMode = this.authModalMode() === 'login' ? 'register' : 'login';
+    this.authModalMode.set(newMode);
+    this.authError.set('');
+  }
+
+  resetAuthForm(): void {
+    this.authEmail.set('');
+    this.authPassword.set('');
+    this.authFirstName.set('');
+    this.authLastName.set('');
+    this.authConfirmPassword.set('');
+    this.authError.set('');
+    this.authLoading.set(false);
+  }
+
+  onAuthSubmit(): void {
+    this.authError.set('');
+    this.authLoading.set(true);
+
+    if (this.authModalMode() === 'login') {
+      this.authService.login({ email: this.authEmail(), password: this.authPassword() }).subscribe({
+        next: () => {
+          this.closeAuthModal();
+          this.router.navigate([this.getDashboardRoute()]);
+        },
+        error: (err) => {
+          this.authError.set(err.message || err.error?.message || 'Invalid email or password');
+          this.authLoading.set(false);
+        }
+      });
+    } else {
+      // Register
+      if (this.authPassword() !== this.authConfirmPassword()) {
+        this.authError.set('Passwords do not match');
+        this.authLoading.set(false);
+        return;
+      }
+      this.authService.register({
+        email: this.authEmail(),
+        password: this.authPassword(),
+        firstName: this.authFirstName(),
+        lastName: this.authLastName(),
+        role: UserRole.NORMAL_USER
+      }).subscribe({
+        next: () => {
+          this.closeAuthModal();
+          this.router.navigate(['/dashboard/user']);
+        },
+        error: (err) => {
+          this.authError.set(err.error?.message || 'Registration failed. Please try again.');
+          this.authLoading.set(false);
+        }
+      });
+    }
   }
 
   toggleNotifications(event: Event): void {

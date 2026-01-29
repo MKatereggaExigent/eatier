@@ -281,42 +281,170 @@
         </button>
       </div>
     }
-
-    <!-- Guest User Dropdown -->
-    @if (!isAuthenticated() && showGuestMenu()) {
-      <div class="profile-dropdown guest" (click)="$event.stopPropagation()">
-        <div class="guest-header">
-          <span class="guest-title">Welcome to Itiyum</span>
-          <span class="guest-subtitle">Sign in to access your account</span>
-        </div>
-
-        <div class="dropdown-divider"></div>
-
-        <a routerLink="/login" class="dropdown-item primary" (click)="closeMenus()">
-          <span class="item-icon">🔐</span>
-          <span>Sign In</span>
-        </a>
-
-        <a routerLink="/register" class="dropdown-item accent" (click)="closeMenus()">
-          <span class="item-icon">✍️</span>
-          <span>Create Account</span>
-        </a>
-
-        <div class="dropdown-divider"></div>
-
-        <a routerLink="/feedback" class="dropdown-item" (click)="closeMenus()">
-          <span class="item-icon">💬</span>
-          <span>Feedback</span>
-        </a>
-
-        <a routerLink="/help" class="dropdown-item" (click)="closeMenus()">
-          <span class="item-icon">❓</span>
-          <span>Help & Support</span>
-        </a>
-      </div>
-    }
   </div>
 </div>
+
+<!-- Auth Modal - Centered popup for Login/Register (Guest users only) -->
+@if (showAuthModal()) {
+  <div class="auth-modal-backdrop" (click)="closeAuthModal()">
+    <div class="auth-modal" (click)="$event.stopPropagation()">
+      <!-- Close Button -->
+      <button class="auth-modal-close" (click)="closeAuthModal()" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="auth-modal-header">
+        <img src="assets/images/itiyum-logo.jpeg" alt="Itiyum" class="auth-modal-logo" />
+        <h2 class="auth-modal-title">
+          {{ authModalMode() === 'login' ? 'Welcome Back' : 'Create Account' }}
+        </h2>
+        <p class="auth-modal-subtitle">
+          {{ authModalMode() === 'login' ? 'Sign in to your Itiyum account' : 'Join Itiyum today' }}
+        </p>
+      </div>
+
+      <!-- Error Message -->
+      @if (authError()) {
+        <div class="auth-modal-error">
+          <span class="error-icon">⚠️</span>
+          <span>{{ authError() }}</span>
+        </div>
+      }
+
+      <!-- Auth Form -->
+      <form class="auth-modal-form" (ngSubmit)="onAuthSubmit()">
+        <!-- Register: First & Last Name -->
+        @if (authModalMode() === 'register') {
+          <div class="auth-form-row">
+            <div class="auth-form-group">
+              <label for="firstName">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                class="auth-modal-input"
+                placeholder="John"
+                [ngModel]="authFirstName()"
+                (ngModelChange)="authFirstName.set($event)"
+                name="firstName"
+                required
+              />
+            </div>
+            <div class="auth-form-group">
+              <label for="lastName">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                class="auth-modal-input"
+                placeholder="Doe"
+                [ngModel]="authLastName()"
+                (ngModelChange)="authLastName.set($event)"
+                name="lastName"
+                required
+              />
+            </div>
+          </div>
+        }
+
+        <!-- Email -->
+        <div class="auth-form-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            class="auth-modal-input"
+            placeholder="you@example.com"
+            [ngModel]="authEmail()"
+            (ngModelChange)="authEmail.set($event)"
+            name="email"
+            required
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="auth-form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            class="auth-modal-input"
+            placeholder="••••••••"
+            [ngModel]="authPassword()"
+            (ngModelChange)="authPassword.set($event)"
+            name="password"
+            required
+          />
+        </div>
+
+        <!-- Register: Confirm Password -->
+        @if (authModalMode() === 'register') {
+          <div class="auth-form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              class="auth-modal-input"
+              placeholder="••••••••"
+              [ngModel]="authConfirmPassword()"
+              (ngModelChange)="authConfirmPassword.set($event)"
+              name="confirmPassword"
+              required
+            />
+          </div>
+        }
+
+        <!-- Forgot Password (Login only) -->
+        @if (authModalMode() === 'login') {
+          <div class="auth-forgot-password">
+            <a routerLink="/forgot-password" (click)="closeAuthModal()">Forgot password?</a>
+          </div>
+        }
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="auth-submit-btn"
+          [disabled]="authLoading()"
+        >
+          @if (authLoading()) {
+            <span class="auth-spinner"></span>
+            <span>{{ authModalMode() === 'login' ? 'Signing in...' : 'Creating account...' }}</span>
+          } @else {
+            <span>{{ authModalMode() === 'login' ? 'Sign In' : 'Create Account' }}</span>
+          }
+        </button>
+      </form>
+
+      <!-- Switch Mode -->
+      <div class="auth-modal-footer">
+        <span>{{ authModalMode() === 'login' ? "Don't have an account?" : 'Already have an account?' }}</span>
+        <button type="button" class="auth-switch-btn" (click)="switchAuthMode()">
+          {{ authModalMode() === 'login' ? 'Sign Up' : 'Sign In' }}
+        </button>
+      </div>
+
+      <!-- Social Login Divider -->
+      <div class="auth-divider">
+        <span>or continue with</span>
+      </div>
+
+      <!-- Social Login Buttons -->
+      <div class="auth-social-buttons">
+        <button type="button" class="auth-social-btn google" (click)="closeAuthModal()">
+          <svg viewBox="0 0 24 24" class="social-icon">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <span>Google</span>
+        </button>
+      </div>
+    </div>
+  </div>
+}
 
 <!-- Layer 5: Mobile Menu - Fixed overlay, independent -->
 @if (showMobileMenu()) {
