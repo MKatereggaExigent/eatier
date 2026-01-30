@@ -595,7 +595,8 @@ export class RestaurantDetailComponent implements OnInit {
       next: (response: any) => {
         this.isSubmittingBooking.set(false);
         this.bookingSuccess.set(true);
-        this.bookingReference.set(response.booking_reference || response.id);
+        // Use bookingReference (camelCase) as that's what transformBooking returns
+        this.bookingReference.set(response.bookingReference || response.booking_reference || response.id);
 
         // Store email before resetting form so success message can display it
         this.bookingConfirmedEmail.set(formValue.contactEmail);
