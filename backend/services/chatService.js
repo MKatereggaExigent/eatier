@@ -89,6 +89,26 @@ class ChatService {
           contextData.userBookings = await this.getUserBookings(userId, tenantId);
           break;
 
+        case 'user-overview':
+        case 'user-dashboard':
+          // User dashboard - get all user stats
+          contextData.userBookings = await this.getUserBookings(userId, tenantId);
+          contextData.userReviews = await this.getUserReviews(userId, tenantId);
+          contextData.userFavorites = await this.getUserFavorites(userId, tenantId);
+          contextData.recentFavorites = await this.getUserRecentFavorites(userId, tenantId, 5);
+          contextData.recentReviews = await this.getUserRecentReviews(userId, tenantId, 5);
+          break;
+
+        case 'user-reviews':
+          contextData.userReviews = await this.getUserReviews(userId, tenantId);
+          contextData.recentReviews = await this.getUserRecentReviews(userId, tenantId, 10);
+          break;
+
+        case 'user-favorites':
+          contextData.userFavorites = await this.getUserFavorites(userId, tenantId);
+          contextData.recentFavorites = await this.getUserRecentFavorites(userId, tenantId, 10);
+          break;
+
         default:
           // Include any page-specific data passed from frontend
           if (pageData) {
@@ -209,12 +229,78 @@ class ChatService {
       SELECT
         COUNT(*) as total,
         COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed,
-        COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending
+        COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
+        COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled,
+        COUNT(CASE WHEN booking_date >= CURRENT_DATE THEN 1 END) as upcoming
       FROM bookings
       WHERE user_id = $1 AND tenant_id = $2
     `, [userId, tenantId]);
 
     return bookings.rows[0];
+  }
+
+  /**
+   * Get user reviews (reviews the user has written)
+   */
+  async getUserReviews(userId, tenantId) {
+    const reviews = await pool.query(`
+      SELECT
+        COUNT(*) as total,
+        COALESCE(AVG(rating), 0) as average_rating,
+        COUNT(CASE WHEN created_at >= NOW() - INTERVAL '30 days' THEN 1 END) as recent_count,
+        MAX(created_at) as last_review_date
+      FROM reviews
+      WHERE user_id = $1 AND tenant_id = $2
+    `, [userId, tenantId]);
+
+    return reviews.rows[0];
+  }
+
+  /**
+   * Get user favorites (restaurants/businesses the user has favorited)
+   */
+  async getUserFavorites(userId, tenantId) {
+    const favorites = await pool.query(`
+      SELECT
+        COUNT(*) as total,
+        COUNT(CASE WHEN created_at >= NOW() - INTERVAL '30 days' THEN 1 END) as recent_count
+      FROM favorites
+      WHERE user_id = $1 AND tenant_id = $2
+    `, [userId, tenantId]);
+
+    return favorites.rows[0];
+  }
+
+  /**
+   * Get user's recent favorites with restaurant names
+   */
+  async getUserRecentFavorites(userId, tenantId, limit = 5) {
+    const favorites = await pool.query(`
+      SELECT f.id, b.business_name, b.cuisine_types, f.created_at
+      FROM favorites f
+      JOIN businesses b ON f.business_id = b.id
+      WHERE f.user_id = $1 AND f.tenant_id = $2
+      ORDER BY f.created_at DESC
+      LIMIT $3
+    `, [userId, tenantId, limit]);
+
+    return favorites.rows;
+  }
+
+  /**
+   * Get user's recent reviews with restaurant names
+   */
+  async getUserRecentReviews(userId, tenantId, limit = 5) {
+    const reviews = await pool.query(`
+      SELECT r.id, r.rating, r.content, r.created_at, b.business_name
+      FROM reviews r
+      JOIN businesses b ON r.business_id = b.id
+      WHERE r.user_id = $1 AND r.tenant_id = $2
+      ORDER BY r.created_at DESC
+      LIMIT $3
+    `, [userId, tenantId, limit]);
+
+    return reviews.rows;
   }
 
   /**
@@ -361,13 +447,53 @@ ${databaseContext || ''}
 `;
       }
     } else {
+      // Regular user context - show their personal stats
       if (contextData.userBookings) {
         systemMessage += `User Bookings:
 - Total: ${contextData.userBookings.total}
 - Confirmed: ${contextData.userBookings.confirmed}
 - Pending: ${contextData.userBookings.pending}
+- Cancelled: ${contextData.userBookings.cancelled || 0}
+- Upcoming: ${contextData.userBookings.upcoming || 0}
 
 `;
+      }
+
+      if (contextData.userReviews) {
+        const avgRating = parseFloat(contextData.userReviews.average_rating) || 0;
+        systemMessage += `User Reviews:
+- Total Reviews Written: ${contextData.userReviews.total}
+- Average Rating Given: ${avgRating > 0 ? avgRating.toFixed(1) + '/5' : 'N/A'}
+- Reviews in Last 30 Days: ${contextData.userReviews.recent_count || 0}
+${contextData.userReviews.last_review_date ? `- Last Review Date: ${new Date(contextData.userReviews.last_review_date).toLocaleDateString()}` : ''}
+
+`;
+      }
+
+      if (contextData.userFavorites) {
+        systemMessage += `User Favorites:
+- Total Favorites: ${contextData.userFavorites.total}
+- Added in Last 30 Days: ${contextData.userFavorites.recent_count || 0}
+
+`;
+      }
+
+      if (contextData.recentFavorites && contextData.recentFavorites.length > 0) {
+        systemMessage += `Recent Favorite Restaurants:\n`;
+        contextData.recentFavorites.forEach((fav, i) => {
+          const cuisines = Array.isArray(fav.cuisine_types) ? fav.cuisine_types.join(', ') : (fav.cuisine_types || 'Various');
+          systemMessage += `${i + 1}. ${fav.business_name} (${cuisines})\n`;
+        });
+        systemMessage += `\n`;
+      }
+
+      if (contextData.recentReviews && contextData.recentReviews.length > 0) {
+        systemMessage += `Recent Reviews Written:\n`;
+        contextData.recentReviews.forEach((rev, i) => {
+          const reviewDate = new Date(rev.created_at).toLocaleDateString();
+          systemMessage += `${i + 1}. ${rev.business_name} - ${rev.rating}/5 stars on ${reviewDate}\n`;
+        });
+        systemMessage += `\n`;
       }
     }
 

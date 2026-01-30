@@ -111,7 +111,7 @@ class RAGService {
 
 User Question: "${userMessage}"
 
-Available resources: users, businesses, bookings, menus, analytics, posts, ads
+Available resources: users, businesses, bookings, menus, analytics, posts, ads, reviews, favorites
 
 Respond ONLY with a valid JSON object (no markdown, no code blocks) containing:
 {
@@ -179,6 +179,14 @@ Only include resources that are directly relevant to answering the question.`;
     if (message.match(/\b(analytics|stats|statistics|metrics|performance|revenue)\b/)) {
       resources.push('analytics');
     }
+    // User reviews
+    if (message.match(/\b(review|reviews|rating|ratings|feedback|rate|rated)\b/)) {
+      resources.push('reviews');
+    }
+    // User favorites
+    if (message.match(/\b(favorite|favorites|favourite|favourites|saved|save|like|liked|wishlist)\b/)) {
+      resources.push('favorites');
+    }
 
     return {
       resources: resources.length > 0 ? resources : ['businesses'],
@@ -241,6 +249,12 @@ Only include resources that are directly relevant to answering the question.`;
 
       case 'analytics':
         return await this.fetchAnalytics(userId, tenantId, filters);
+
+      case 'reviews':
+        return await this.fetchReviews(userId, tenantId, filters, limit);
+
+      case 'favorites':
+        return await this.fetchFavorites(userId, tenantId, filters, limit);
 
       default:
         return [];
@@ -531,6 +545,64 @@ Only include resources that are directly relevant to answering the question.`;
   }
 
   /**
+   * Fetch user reviews with RBAC
+   * Users can only see their own reviews
+   */
+  async fetchReviews(userId, tenantId, filters, limit) {
+    let query = `
+      SELECT r.id, r.rating, r.content, r.created_at,
+             b.business_name
+      FROM reviews r
+      JOIN businesses b ON r.business_id = b.id
+      WHERE r.user_id = $1 AND r.tenant_id = $2
+    `;
+
+    const params = [userId, tenantId];
+
+    // Apply time filter
+    if (filters.timeRange === 'last month' || filters.timeRange === 'last30days') {
+      query += ` AND r.created_at >= NOW() - INTERVAL '30 days'`;
+    } else if (filters.timeRange === 'last week' || filters.timeRange === 'last7days') {
+      query += ` AND r.created_at >= NOW() - INTERVAL '7 days'`;
+    }
+
+    query += ` ORDER BY r.created_at DESC LIMIT $${params.length + 1}`;
+    params.push(limit);
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  }
+
+  /**
+   * Fetch user favorites with RBAC
+   * Users can only see their own favorites
+   */
+  async fetchFavorites(userId, tenantId, filters, limit) {
+    let query = `
+      SELECT f.id, f.created_at,
+             b.business_name, b.cuisine_types, b.city, b.average_rating
+      FROM favorites f
+      JOIN businesses b ON f.business_id = b.id
+      WHERE f.user_id = $1 AND f.tenant_id = $2
+    `;
+
+    const params = [userId, tenantId];
+
+    // Apply time filter
+    if (filters.timeRange === 'last month' || filters.timeRange === 'last30days') {
+      query += ` AND f.created_at >= NOW() - INTERVAL '30 days'`;
+    } else if (filters.timeRange === 'last week' || filters.timeRange === 'last7days') {
+      query += ` AND f.created_at >= NOW() - INTERVAL '7 days'`;
+    }
+
+    query += ` ORDER BY f.created_at DESC LIMIT $${params.length + 1}`;
+    params.push(limit);
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  }
+
+  /**
    * Format retrieved data into a context string for the AI
    */
   formatDataForContext(relevantData) {
@@ -592,6 +664,19 @@ Only include resources that are directly relevant to answering the question.`;
                 contextString += `${b.business_name} - Bookings: ${b.total_bookings} (${b.pending_bookings} pending), Menu Items: ${b.total_menu_items}\n`;
               });
             }
+            break;
+
+          case 'reviews':
+            const reviewDate = item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A';
+            const reviewContent = item.content ? item.content.substring(0, 80) + '...' : 'No content';
+            contextString += `Review of ${item.business_name} - ${item.rating}/5 stars on ${reviewDate}: "${reviewContent}"\n`;
+            break;
+
+          case 'favorites':
+            const cuisines = Array.isArray(item.cuisine_types) ? item.cuisine_types.join(', ') : (item.cuisine_types || 'Various');
+            const location = item.city || 'Unknown location';
+            const favRating = item.average_rating ? `${parseFloat(item.average_rating).toFixed(1)}/5` : 'Not rated';
+            contextString += `${item.business_name} (${cuisines}) in ${location} - Rating: ${favRating}\n`;
             break;
         }
       });

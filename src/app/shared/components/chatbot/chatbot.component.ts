@@ -127,6 +127,34 @@ export class ChatbotComponent implements OnInit, OnDestroy {
         'How many bookings do I have?',
         'How do I manage my menu?'
       ]);
+    } else if (url.includes('/dashboard/user/overview') || url.includes('/dashboard/user') && !url.includes('/dashboard/user/')) {
+      pageName = 'user-overview';
+      this.examplePrompts.set([
+        'How many reviews do I have?',
+        'How many bookings have I made?',
+        'What are my favorite restaurants?'
+      ]);
+    } else if (url.includes('/dashboard/user/bookings')) {
+      pageName = 'bookings';
+      this.examplePrompts.set([
+        'How many bookings do I have?',
+        'Do I have any upcoming reservations?',
+        'Show me my pending bookings'
+      ]);
+    } else if (url.includes('/dashboard/user/reviews')) {
+      pageName = 'user-reviews';
+      this.examplePrompts.set([
+        'How many reviews have I written?',
+        'What is my average rating?',
+        'Show me my recent reviews'
+      ]);
+    } else if (url.includes('/dashboard/user/favorites')) {
+      pageName = 'user-favorites';
+      this.examplePrompts.set([
+        'How many favorites do I have?',
+        'What restaurants have I saved?',
+        'Show me my favorite places'
+      ]);
     } else {
       this.examplePrompts.set([
         'What is Itiyum?',
