@@ -122,6 +122,21 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Profile button click handler
+  onProfileClick(event: Event): void {
+    event.stopPropagation();
+    console.log('🔵 Profile button clicked!');
+    console.log('🔵 isAuthenticated:', this.isAuthenticated());
+
+    if (this.isAuthenticated()) {
+      console.log('🔵 User is authenticated - toggling user menu');
+      this.toggleUserMenu(event);
+    } else {
+      console.log('🔵 User is NOT authenticated - opening auth modal');
+      this.toggleGuestMenu(event);
+    }
+  }
+
   // Menu toggles
   toggleUserMenu(event: Event): void {
     event.stopPropagation();
@@ -132,14 +147,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   toggleGuestMenu(event: Event): void {
     event.stopPropagation();
+    console.log('toggleGuestMenu called - opening auth modal');
     // Open centered auth modal instead of dropdown
     this.openAuthModal('login');
   }
 
   // Auth Modal methods
   openAuthModal(mode: 'login' | 'register'): void {
+    console.log('openAuthModal called with mode:', mode);
     this.authModalMode.set(mode);
     this.showAuthModal.set(true);
+    console.log('showAuthModal is now:', this.showAuthModal());
     this.authError.set('');
     this.closeMenus();
     // Focus email input after modal opens
