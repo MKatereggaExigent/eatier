@@ -101,7 +101,17 @@ export class BookingsComponent implements OnInit, OnDestroy {
   }
 
   loadBookings(): void {
-    const userId = this.currentUser()?.id || localStorage.getItem('user_id') || 'temp-user';
+    // Get user ID from AuthService (currentUser signal)
+    const userId = this.currentUser()?.id;
+
+    if (!userId) {
+      console.warn('No authenticated user found, cannot load bookings');
+      this.error.set('Please log in to view your bookings');
+      this.loading.set(false);
+      return;
+    }
+
+    console.log('📋 Loading bookings for user:', userId);
     this.loading.set(true);
     this.error.set(null);
 
@@ -116,6 +126,7 @@ export class BookingsComponent implements OnInit, OnDestroy {
         finalize(() => this.loading.set(false))
       )
       .subscribe(response => {
+        console.log('📋 Loaded bookings:', response.bookings?.length || 0);
         this.bookings.set(response.bookings || []);
       });
   }

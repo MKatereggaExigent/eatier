@@ -3,6 +3,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 
 import { ApiService } from '../core/services/api.service';
+import { AuthService } from '../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 
 export interface Restaurant {
@@ -137,6 +138,7 @@ export interface AvailableTimeSlot {
 })
 export class BookingsService {
   private apiService = inject(ApiService);
+  private authService = inject(AuthService);
 
   // State management
   private bookingsSubject = new BehaviorSubject<Booking[]>([]);
@@ -153,8 +155,17 @@ export class BookingsService {
     this.loadRestaurants();
   }
 
+  /**
+   * Get the current user's ID from AuthService
+   * Falls back to 'temp-user' for guest bookings
+   */
+  private getCurrentUserId(): string {
+    const currentUser = this.authService.currentUser();
+    return currentUser?.id || 'temp-user';
+  }
+
   private loadUserBookings(): void {
-    const userId = localStorage.getItem('user_id') || 'temp-user';
+    const userId = this.getCurrentUserId();
     this.isLoadingSubject.next(true);
 
     this.apiService.get<any>(`bookings/user/${userId}`).subscribe({
@@ -291,7 +302,8 @@ export class BookingsService {
 
   // Create new booking
   createBooking(bookingRequest: BookingRequest): Observable<Booking> {
-    const userId = localStorage.getItem('user_id') || 'temp-user';
+    // Get user ID from AuthService instead of localStorage
+    const userId = this.getCurrentUserId();
 
     const payload = {
       businessId: bookingRequest.restaurantId,
@@ -305,8 +317,10 @@ export class BookingsService {
       contactEmail: bookingRequest.contactEmail,
       tablePreferences: bookingRequest.tablePreferences,
       occasion: bookingRequest.occasion,
-      bookingTier: bookingRequest.bookingTier || 'basic' // NEW
+      bookingTier: bookingRequest.bookingTier || 'basic'
     };
+
+    console.log('📦 Creating booking with userId:', userId); // Debug log
 
     return this.apiService.post<any>('bookings', payload).pipe(
       map(response => this.transformBooking(response)),
