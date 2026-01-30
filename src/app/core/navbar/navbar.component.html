@@ -1,289 +1,283 @@
-<!-- Layer 1: Logo - Fixed top-left, independent of navbar -->
-<div class="logo-layer">
-  <a routerLink="/" class="logo" (click)="closeMenus()">
+<!-- ========== LAYER 1: LOGO CONTAINER - Fixed top-left, completely independent ========== -->
+<div class="logo-container">
+  <a routerLink="/" class="logo-link" (click)="closeMenus()">
     <img src="assets/images/itiyum-logo.jpeg" alt="Itiyum" class="logo-image" />
   </a>
 </div>
 
-<!-- Layer 2: Navigation Banner - Centered thin banner -->
-<nav class="navbar" [class.scrolled]="isScrolled()">
-  <div class="navbar-container">
-    <!-- Desktop Navigation -->
-    <div class="navbar-nav">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
-        Home
-      </a>
-      <a routerLink="/about" routerLinkActive="active" class="nav-link">
-        About
-      </a>
-      <a routerLink="/grow" routerLinkActive="active" class="nav-link">
-        Grow
-      </a>
-      <a routerLink="/restaurants" routerLinkActive="active" class="nav-link">
-        Restaurants
-      </a>
-      <a routerLink="/specialists" routerLinkActive="active" class="nav-link">
-        Specialists
-      </a>
-      <a routerLink="/pricing" routerLinkActive="active" class="nav-link">
-        Pricing
-      </a>
-      <a routerLink="/community" routerLinkActive="active" class="nav-link">
-        Community
-      </a>
-      <a routerLink="/faqs" routerLinkActive="active" class="nav-link">
-        FAQs
-      </a>
-      <a routerLink="/help" routerLinkActive="active" class="nav-link">
-        Help
-      </a>
-    </div>
+<!-- ========== LAYER 2: NAVBAR CONTAINER - Fixed center, completely independent ========== -->
+<nav class="navbar-container" [class.scrolled]="isScrolled()">
+  <div class="navbar-nav">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      Home
+    </a>
+    <a routerLink="/about" routerLinkActive="active" class="nav-link">
+      About
+    </a>
+    <a routerLink="/grow" routerLinkActive="active" class="nav-link">
+      Grow
+    </a>
+    <a routerLink="/restaurants" routerLinkActive="active" class="nav-link">
+      Restaurants
+    </a>
+    <a routerLink="/specialists" routerLinkActive="active" class="nav-link">
+      Specialists
+    </a>
+    <a routerLink="/pricing" routerLinkActive="active" class="nav-link">
+      Pricing
+    </a>
+    <a routerLink="/community" routerLinkActive="active" class="nav-link">
+      Community
+    </a>
+    <a routerLink="/faqs" routerLinkActive="active" class="nav-link">
+      FAQs
+    </a>
+    <a routerLink="/help" routerLinkActive="active" class="nav-link">
+      Help
+    </a>
   </div>
 </nav>
 
-<!-- Layer 3: Actions - Fixed top-right, independent of navbar -->
-<div class="actions-layer">
-      <!-- Search Icon Button -->
-      <div class="search-icon-container">
-        <button
-          class="icon-btn search-btn"
-          (click)="toggleSearchModal($event)"
-          type="button"
-          title="Search"
-          aria-label="Search"
-        >
-          <span class="search-icon">🔍</span>
-        </button>
-      </div>
+<!-- ========== LAYER 3: ACTIONS CONTAINER - Fixed top-right, for search/notifications/mobile toggle ========== -->
+<div class="actions-container">
+  <!-- Search Icon Button -->
+  <button
+    class="icon-btn search-btn"
+    (click)="toggleSearchModal($event)"
+    type="button"
+    title="Search"
+    aria-label="Search"
+  >
+    <span class="search-icon">🔍</span>
+  </button>
 
-      <!-- Search Modal -->
-      @if (showSearchModal()) {
-        <div class="search-modal">
-          <div class="search-modal-header">
-            <div class="search-modal-input-wrapper">
-              <span class="search-modal-icon">🔍</span>
-              <input
-                type="text"
-                class="search-modal-input"
-                placeholder="Search businesses, food, posts..."
-                [value]="searchQuery()"
-                (input)="onSearchInput($event)"
-                (focus)="onSearchFocus()"
-                autofocus
-              />
-              @if (searchQuery()) {
-                <button class="clear-search-btn" (click)="clearSearch()" type="button">
-                  <span>✕</span>
-                </button>
-              }
-            </div>
-          </div>
-
-          <!-- Search Results -->
-          @if (showSearchResults() && (isSearching() || hasResults())) {
-            <div class="search-modal-results">
-              @if (isSearching()) {
-                <div class="search-loading">
-                  <div class="spinner"></div>
-                  <span>Searching...</span>
-                </div>
-              } @else if (hasResults()) {
-                <div class="search-results">
-                  @for (result of searchResults(); track result.id) {
-                    <div class="search-result-item" (click)="navigateToResult(result)">
-                      <div class="result-icon">{{ result.icon }}</div>
-                      <div class="result-content">
-                        <div class="result-title">{{ result.title }}</div>
-                        @if (result.subtitle) {
-                          <div class="result-subtitle">{{ result.subtitle }}</div>
-                        }
-                        @if (result.description) {
-                          <div class="result-description">{{ result.description }}</div>
-                        }
-                      </div>
-                      <div class="result-type">{{ result.type }}</div>
-                    </div>
-                  }
-                </div>
-              } @else {
-                <div class="search-empty">
-                  <span class="empty-icon">🔍</span>
-                  <p>No results found</p>
-                </div>
-              }
-            </div>
-          } @else if (searchQuery().trim().length === 0) {
-            <div class="search-suggestions">
-              <p class="suggestions-title">Try searching for:</p>
-              <div class="suggestion-chips">
-                <button class="suggestion-chip" (click)="searchSuggestion('pizza')">🍕 Pizza</button>
-                <button class="suggestion-chip" (click)="searchSuggestion('coffee')">☕ Coffee</button>
-                <button class="suggestion-chip" (click)="searchSuggestion('sushi')">🍣 Sushi</button>
-                <button class="suggestion-chip" (click)="searchSuggestion('dessert')">🍰 Dessert</button>
-              </div>
-            </div>
-          }
-        </div>
-      }
-
-      <!-- Notifications (Authenticated Users Only) -->
-      @if (isAuthenticated()) {
-        <div class="notifications-container">
-          <button
-            class="icon-btn notifications-btn"
-            (click)="toggleNotifications($event)"
-            type="button"
-            title="Notifications"
-            aria-label="Notifications"
-          >
-            <span class="notification-icon">🔔</span>
-            @if (unreadCount() > 0) {
-              <span class="notification-badge">{{ unreadCount() }}</span>
-            }
-          </button>
-
-          <!-- Notifications Dropdown -->
-          @if (showNotifications()) {
-            <div class="notifications-dropdown" (click)="$event.stopPropagation()">
-              <div class="notifications-header">
-                <h3>Notifications</h3>
-                @if (unreadCount() > 0) {
-                  <button class="mark-all-read-btn" (click)="markAllAsRead()" type="button">
-                    Mark all read
-                  </button>
-                }
-              </div>
-
-              <div class="notifications-list">
-                @if (notifications().length > 0) {
-                  @for (notification of notifications(); track notification.id) {
-                    <div
-                      class="notification-item"
-                      [class.unread]="!notification.read"
-                      (click)="navigateToNotification(notification)"
-                    >
-                      <div class="notification-icon">{{ notification.icon }}</div>
-                      <div class="notification-content">
-                        <div class="notification-title">{{ notification.title }}</div>
-                        <div class="notification-message">{{ notification.message }}</div>
-                        <div class="notification-time">{{ getTimeAgo(notification.timestamp) }}</div>
-                      </div>
-                      <div class="notification-actions">
-                        @if (!notification.read) {
-                          <button
-                            class="notification-action-btn"
-                            (click)="markAsRead(notification, $event)"
-                            title="Mark as read"
-                            type="button"
-                          >
-                            ✓
-                          </button>
-                        }
-                        <button
-                          class="notification-action-btn delete"
-                          (click)="deleteNotification(notification.id, $event)"
-                          title="Delete"
-                          type="button"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </div>
-                  }
-                } @else {
-                  <div class="notifications-empty">
-                    <span class="empty-icon">🔔</span>
-                    <p>No notifications</p>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-        </div>
-      }
-
-  <!-- Profile Icon Button (like Search) -->
-  <div class="profile-icon-container">
+  <!-- Notifications (Authenticated Users Only) -->
+  @if (isAuthenticated()) {
     <button
-      class="icon-btn profile-btn"
-      (click)="onProfileClick($event)"
+      class="icon-btn notifications-btn"
+      (click)="toggleNotifications($event)"
       type="button"
-      [attr.title]="isAuthenticated() ? 'My Account' : 'Sign In'"
-      aria-label="Profile"
+      title="Notifications"
+      aria-label="Notifications"
     >
-      @if (isAuthenticated()) {
-        <div class="profile-avatar">
-          <span>{{ user()?.firstName?.charAt(0)?.toUpperCase() || 'U' }}</span>
-        </div>
-      } @else {
-        <svg class="profile-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
+      <span class="notification-icon">🔔</span>
+      @if (unreadCount() > 0) {
+        <span class="notification-badge">{{ unreadCount() }}</span>
       }
     </button>
-  </div>
-
-  <!-- Authenticated User Dropdown (like Search Modal) -->
-  @if (isAuthenticated() && showUserMenu()) {
-    <div class="user-dropdown" (click)="$event.stopPropagation()">
-      <div class="profile-header">
-        <div class="profile-avatar-large">
-          <span>{{ user()?.firstName?.charAt(0)?.toUpperCase() || 'U' }}</span>
-        </div>
-        <div class="profile-details">
-          <div class="profile-name">{{ user()?.firstName }} {{ user()?.lastName }}</div>
-          <div class="profile-role">{{ getUserRoleLabel() }}</div>
-        </div>
-      </div>
-
-      <div class="dropdown-divider"></div>
-
-      <a [routerLink]="getDashboardRoute()" class="dropdown-item" (click)="closeMenus()">
-        <span class="item-icon">📊</span>
-        <span>Dashboard</span>
-      </a>
-
-      <a routerLink="/profile" class="dropdown-item" (click)="closeMenus()">
-        <span class="item-icon">👤</span>
-        <span>Profile</span>
-      </a>
-
-      <a routerLink="/settings" class="dropdown-item" (click)="closeMenus()">
-        <span class="item-icon">⚙️</span>
-        <span>Settings</span>
-      </a>
-
-      <div class="dropdown-divider"></div>
-
-      <a routerLink="/feedback" class="dropdown-item" (click)="closeMenus()">
-        <span class="item-icon">💬</span>
-        <span>Feedback</span>
-      </a>
-
-      <a routerLink="/help" class="dropdown-item" (click)="closeMenus()">
-        <span class="item-icon">❓</span>
-        <span>Help & Support</span>
-      </a>
-
-      <div class="dropdown-divider"></div>
-
-      <button class="dropdown-item logout" (click)="logout()" type="button">
-        <span class="item-icon">🚪</span>
-        <span>Log Out</span>
-      </button>
-    </div>
   }
 
   <!-- Mobile Menu Toggle -->
-  <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" type="button">
+  <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" type="button" aria-label="Menu">
     <span class="hamburger-icon">☰</span>
   </button>
+</div>
 
-  <!-- Auth Modal - Centered popup for Login/Register (Guest users only) -->
-  @if (showAuthModal()) {
-    <div class="auth-modal-backdrop" (click)="closeAuthModal()">
-      <div class="auth-modal" (click)="$event.stopPropagation()">
+<!-- ========== LAYER 4: PROFILE CONTAINER - Fixed top-right, completely independent ========== -->
+<div class="profile-container">
+  <button
+    class="profile-btn"
+    (click)="onProfileClick($event)"
+    type="button"
+    [attr.title]="isAuthenticated() ? 'My Account' : 'Sign In'"
+    aria-label="Profile"
+  >
+    @if (isAuthenticated()) {
+      <div class="profile-avatar">
+        <span>{{ user()?.firstName?.charAt(0)?.toUpperCase() || 'U' }}</span>
+      </div>
+    } @else {
+      <svg class="profile-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    }
+  </button>
+</div>
+
+<!-- ========== PROFILE DROPDOWN - Fixed position, NOT constrained by any parent ========== -->
+@if (isAuthenticated() && showUserMenu()) {
+  <div class="profile-dropdown" (click)="$event.stopPropagation()">
+    <div class="profile-header">
+      <div class="profile-avatar-large">
+        <span>{{ user()?.firstName?.charAt(0)?.toUpperCase() || 'U' }}</span>
+      </div>
+      <div class="profile-details">
+        <div class="profile-name">{{ user()?.firstName }} {{ user()?.lastName }}</div>
+        <div class="profile-role">{{ getUserRoleLabel() }}</div>
+      </div>
+    </div>
+
+    <div class="dropdown-divider"></div>
+
+    <a [routerLink]="getDashboardRoute()" class="dropdown-item" (click)="closeMenus()">
+      <span class="item-icon">📊</span>
+      <span>Dashboard</span>
+    </a>
+
+    <a routerLink="/profile" class="dropdown-item" (click)="closeMenus()">
+      <span class="item-icon">👤</span>
+      <span>Profile</span>
+    </a>
+
+    <a routerLink="/settings" class="dropdown-item" (click)="closeMenus()">
+      <span class="item-icon">⚙️</span>
+      <span>Settings</span>
+    </a>
+
+    <div class="dropdown-divider"></div>
+
+    <a routerLink="/feedback" class="dropdown-item" (click)="closeMenus()">
+      <span class="item-icon">💬</span>
+      <span>Feedback</span>
+    </a>
+
+    <a routerLink="/help" class="dropdown-item" (click)="closeMenus()">
+      <span class="item-icon">❓</span>
+      <span>Help & Support</span>
+    </a>
+
+    <div class="dropdown-divider"></div>
+
+    <button class="dropdown-item logout" (click)="logout()" type="button">
+      <span class="item-icon">🚪</span>
+      <span>Log Out</span>
+    </button>
+  </div>
+}
+
+<!-- ========== SEARCH MODAL - Fixed position, centered ========== -->
+@if (showSearchModal()) {
+  <div class="search-modal">
+    <div class="search-modal-header">
+      <div class="search-modal-input-wrapper">
+        <span class="search-modal-icon">🔍</span>
+        <input
+          type="text"
+          class="search-modal-input"
+          placeholder="Search businesses, food, posts..."
+          [value]="searchQuery()"
+          (input)="onSearchInput($event)"
+          (focus)="onSearchFocus()"
+          autofocus
+        />
+        @if (searchQuery()) {
+          <button class="clear-search-btn" (click)="clearSearch()" type="button">
+            <span>✕</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    @if (showSearchResults() && (isSearching() || hasResults())) {
+      <div class="search-modal-results">
+        @if (isSearching()) {
+          <div class="search-loading">
+            <div class="spinner"></div>
+            <span>Searching...</span>
+          </div>
+        } @else if (hasResults()) {
+          <div class="search-results">
+            @for (result of searchResults(); track result.id) {
+              <div class="search-result-item" (click)="navigateToResult(result)">
+                <div class="result-icon">{{ result.icon }}</div>
+                <div class="result-content">
+                  <div class="result-title">{{ result.title }}</div>
+                  @if (result.subtitle) {
+                    <div class="result-subtitle">{{ result.subtitle }}</div>
+                  }
+                  @if (result.description) {
+                    <div class="result-description">{{ result.description }}</div>
+                  }
+                </div>
+                <div class="result-type">{{ result.type }}</div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="search-empty">
+            <span class="empty-icon">🔍</span>
+            <p>No results found</p>
+          </div>
+        }
+      </div>
+    } @else if (searchQuery().trim().length === 0) {
+      <div class="search-suggestions">
+        <p class="suggestions-title">Try searching for:</p>
+        <div class="suggestion-chips">
+          <button class="suggestion-chip" (click)="searchSuggestion('pizza')">🍕 Pizza</button>
+          <button class="suggestion-chip" (click)="searchSuggestion('coffee')">☕ Coffee</button>
+          <button class="suggestion-chip" (click)="searchSuggestion('sushi')">🍣 Sushi</button>
+          <button class="suggestion-chip" (click)="searchSuggestion('dessert')">🍰 Dessert</button>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<!-- ========== NOTIFICATIONS DROPDOWN - Fixed position ========== -->
+@if (isAuthenticated() && showNotifications()) {
+  <div class="notifications-dropdown" (click)="$event.stopPropagation()">
+    <div class="notifications-header">
+      <h3>Notifications</h3>
+      @if (unreadCount() > 0) {
+        <button class="mark-all-read-btn" (click)="markAllAsRead()" type="button">
+          Mark all read
+        </button>
+      }
+    </div>
+
+    <div class="notifications-list">
+      @if (notifications().length > 0) {
+        @for (notification of notifications(); track notification.id) {
+          <div
+            class="notification-item"
+            [class.unread]="!notification.read"
+            (click)="navigateToNotification(notification)"
+          >
+            <div class="notification-icon">{{ notification.icon }}</div>
+            <div class="notification-content">
+              <div class="notification-title">{{ notification.title }}</div>
+              <div class="notification-message">{{ notification.message }}</div>
+              <div class="notification-time">{{ getTimeAgo(notification.timestamp) }}</div>
+            </div>
+            <div class="notification-actions">
+              @if (!notification.read) {
+                <button
+                  class="notification-action-btn"
+                  (click)="markAsRead(notification, $event)"
+                  title="Mark as read"
+                  type="button"
+                >
+                  ✓
+                </button>
+              }
+              <button
+                class="notification-action-btn delete"
+                (click)="deleteNotification(notification.id, $event)"
+                title="Delete"
+                type="button"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="notifications-empty">
+          <span class="empty-icon">🔔</span>
+          <p>No notifications</p>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- ========== AUTH MODAL - Centered popup for Login/Register (Guest users only) ========== -->
+@if (showAuthModal()) {
+  <div class="auth-modal-backdrop" (click)="closeAuthModal()">
+    <div class="auth-modal" (click)="$event.stopPropagation()">
       <!-- Close Button -->
       <button class="auth-modal-close" (click)="closeAuthModal()" type="button" aria-label="Close">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -440,10 +434,9 @@
       </div>
     </div>
   </div>
-  }
-</div>
+}
 
-<!-- Layer 5: Mobile Menu - Fixed overlay, independent -->
+<!-- ========== LAYER 5: MOBILE MENU - Fixed overlay, independent ========== -->
 @if (showMobileMenu()) {
   <div class="mobile-menu">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="mobile-nav-link" (click)="closeMenus()">

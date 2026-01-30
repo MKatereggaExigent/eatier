@@ -1,4 +1,4 @@
-/* ========== Compact Navbar - Same width as navbar-nav ========== */
+/* ========== Four Independent Layout Layers ========== */
 
 // Breakpoints
 $breakpoint-mobile: 480px;
@@ -13,60 +13,66 @@ $itiyum-orange-dark: #e67e00;
 $nyt-black: #121212;
 $nyt-dark-gray: #333333;
 
-/* Navbar - Centered, same width as navbar-nav */
-.navbar {
+/* ========== LAYER 1: LOGO CONTAINER - Fixed top-left, completely independent ========== */
+.logo-container {
+  position: fixed;
+  top: 10px;
+  left: 16px;
+  z-index: 1003;
+  pointer-events: auto;
+
+  .logo-link {
+    display: block;
+    text-decoration: none;
+
+    &:hover .logo-image {
+      opacity: 0.85;
+      transform: scale(1.02);
+    }
+  }
+
+  .logo-image {
+    height: 54px; // Increased from 48px
+    width: auto;
+    transition: all 0.15s ease;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    @media (max-width: $breakpoint-tablet) {
+      height: 46px; // Increased from 40px
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+      height: 40px; // Increased from 36px
+    }
+  }
+}
+
+/* ========== LAYER 2: NAVBAR CONTAINER - Fixed center, completely independent ========== */
+.navbar-container {
   position: fixed;
   top: 14px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
-  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 5px;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 22px;
   border: 1px solid rgba(0, 0, 0, 0.05);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* Container - No extra width, just holds navbar-nav */
-.navbar-container {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 5px;
-}
-
-/* Logo Layer - Fixed top-left, independent of navbar */
-.logo-layer {
-  position: fixed;
-  top: 10px;
-  left: 16px;
-  z-index: 1001;
   pointer-events: auto;
 
-  .logo {
-    display: block;
-    text-decoration: none;
+  &.scrolled {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  }
 
-    &:hover .logo-image {
-      opacity: 0.85;
-    }
-
-    .logo-image {
-      height: 48px;
-      width: auto;
-      transition: opacity 0.15s ease;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-      @media (max-width: $breakpoint-tablet) {
-        height: 40px;
-      }
-
-      @media (max-width: $breakpoint-mobile) {
-        height: 36px;
-      }
-    }
+  @media (max-width: $breakpoint-desktop) {
+    display: none;
   }
 }
 
@@ -99,42 +105,52 @@ $nyt-dark-gray: #333333;
       font-weight: 600;
     }
   }
-
-  @media (max-width: $breakpoint-desktop) {
-    display: none;
-  }
 }
 
-/* Actions Layer - Fixed top-right, contains search, profile, and mobile toggle */
-.actions-layer {
+/* ========== LAYER 3: ACTIONS CONTAINER - Fixed top-right, for search/notifications/mobile toggle ========== */
+.actions-container {
   position: fixed;
   top: 14px;
-  right: 16px;
-  z-index: 1001;
+  right: 60px; // Leave space for profile container
+  z-index: 1002;
   display: flex;
   align-items: center;
   gap: 6px;
   pointer-events: auto;
 
   @media (max-width: $breakpoint-tablet) {
-    right: 12px;
+    right: 54px;
     top: 12px;
     gap: 4px;
   }
 
   @media (max-width: $breakpoint-mobile) {
-    right: 10px;
+    right: 50px;
     top: 10px;
     gap: 3px;
   }
 }
 
-/* ========== Search Styles ========== */
+/* ========== LAYER 4: PROFILE CONTAINER - Fixed top-right, completely independent ========== */
+.profile-container {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 1003;
+  pointer-events: auto;
 
-.search-icon-container {
-  position: relative;
-  z-index: 100;
+  @media (max-width: $breakpoint-tablet) {
+    top: 12px;
+    right: 12px;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    top: 10px;
+    right: 10px;
+  }
 }
+
+/* ========== Search Styles ========== */
 
 .search-btn {
   pointer-events: auto !important;
@@ -620,12 +636,7 @@ $nyt-dark-gray: #333333;
   }
 }
 
-/* ========== Profile Icon Container (like Search) ========== */
-
-.profile-icon-container {
-  position: relative;
-  z-index: 100;
-}
+/* ========== Profile Button Styles ========== */
 
 .profile-btn {
   pointer-events: auto !important;
@@ -652,17 +663,6 @@ $nyt-dark-gray: #333333;
 
   &:active {
     transform: scale(0.95);
-  }
-
-  &.authenticated {
-    background: transparent;
-    border: 2px solid $itiyum-orange;
-    padding: 0;
-
-    &:hover {
-      border-color: $itiyum-orange-dark;
-      box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.15);
-    }
   }
 
   .profile-icon {
@@ -704,8 +704,8 @@ $nyt-dark-gray: #333333;
   }
 }
 
-/* User Dropdown - Fixed position like Search Modal */
-.user-dropdown {
+/* ========== Profile Dropdown - Fixed position, NOT constrained by any parent ========== */
+.profile-dropdown {
   position: fixed;
   top: 64px;
   right: 16px;
@@ -722,7 +722,7 @@ $nyt-dark-gray: #333333;
     0 0 0 1px rgba(255, 255, 255, 0.8) inset;
   animation: slideDown 0.15s ease;
   padding: 10px;
-  z-index: 1001;
+  z-index: 1004; // Higher than all containers
   pointer-events: auto;
 
   // Decorative arrow
@@ -742,13 +742,13 @@ $nyt-dark-gray: #333333;
   }
 
   @media (max-width: $breakpoint-tablet) {
-    top: 60px;
+    top: 58px;
     right: 12px;
     width: 300px;
   }
 
   @media (max-width: $breakpoint-mobile) {
-    top: 56px;
+    top: 54px;
     right: 10px;
     width: calc(100vw - 24px);
     border-radius: 14px;
