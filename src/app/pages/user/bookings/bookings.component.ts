@@ -54,13 +54,17 @@ export class BookingsComponent implements OnInit, OnDestroy {
   error = signal<string | null>(null);
   activeTab = signal<'upcoming' | 'past' | 'cancelled'>('upcoming');
 
+  // Pagination state
+  currentPage = signal(1);
+  itemsPerPage = signal(5);
+
   // Modal state
   showCancelModal = signal(false);
   selectedBooking = signal<Booking | null>(null);
   cancellationReason = signal('');
   cancelling = signal(false);
 
-  // Computed
+  // Computed - filtered bookings (all items)
   upcomingBookings = computed(() => {
     const today = new Date().toISOString().split('T')[0];
     return this.bookings().filter(b =>
@@ -82,13 +86,64 @@ export class BookingsComponent implements OnInit, OnDestroy {
     ).sort((a, b) => b.booking_date.localeCompare(a.booking_date));
   });
 
-  currentBookings = computed(() => {
+  // All bookings for current tab (before pagination)
+  allCurrentBookings = computed(() => {
     switch (this.activeTab()) {
       case 'upcoming': return this.upcomingBookings();
       case 'past': return this.pastBookings();
       case 'cancelled': return this.cancelledBookings();
       default: return [];
     }
+  });
+
+  // Pagination computed values
+  totalItems = computed(() => this.allCurrentBookings().length);
+  totalPages = computed(() => Math.ceil(this.totalItems() / this.itemsPerPage()));
+
+  // Paginated bookings for display
+  currentBookings = computed(() => {
+    const all = this.allCurrentBookings();
+    const start = (this.currentPage() - 1) * this.itemsPerPage();
+    const end = start + this.itemsPerPage();
+    return all.slice(start, end);
+  });
+
+  // Page numbers for pagination UI
+  pageNumbers = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: (number | string)[] = [];
+
+    if (total <= 7) {
+      // Show all pages if 7 or fewer
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
+
+      if (current > 3) {
+        pages.push('...');
+      }
+
+      // Show pages around current
+      const start = Math.max(2, current - 1);
+      const end = Math.min(total - 1, current + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (current < total - 2) {
+        pages.push('...');
+      }
+
+      // Always show last page
+      pages.push(total);
+    }
+
+    return pages;
   });
 
   ngOnInit(): void {
@@ -133,6 +188,31 @@ export class BookingsComponent implements OnInit, OnDestroy {
 
   setActiveTab(tab: 'upcoming' | 'past' | 'cancelled'): void {
     this.activeTab.set(tab);
+    this.currentPage.set(1); // Reset to first page when switching tabs
+  }
+
+  // Pagination methods
+  goToPage(page: number | string): void {
+    if (typeof page === 'number' && page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.set(this.currentPage() + 1);
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage() > 1) {
+      this.currentPage.set(this.currentPage() - 1);
+    }
+  }
+
+  setItemsPerPage(count: number): void {
+    this.itemsPerPage.set(count);
+    this.currentPage.set(1); // Reset to first page when changing items per page
   }
 
   openCancelModal(booking: Booking): void {
