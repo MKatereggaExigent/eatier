@@ -7,20 +7,74 @@ const pool = require('../config/database');
  * Public endpoint - no authentication required
  * Returns ads that are:
  * - Status: active
+ * - is_active: true
  * - Start date <= now
- * - End date >= now
- * - Have remaining budget (spent_amount < total_budget)
+ * - End date >= now OR end_date is null
+ * - Have remaining budget (remaining_amount > 0)
  */
 router.get('/placements/:placement', async (req, res) => {
   try {
     const { placement } = req.params;
+    const { limit = 5, page_location } = req.query;
 
-    // TODO: Implement ads system - for now return empty array
-    // The business_ads table doesn't exist yet
+    // Query for active ads matching the placement
+    const result = await pool.query(`
+      SELECT
+        ac.id,
+        ac.title,
+        ac.description,
+        ac.headline,
+        ac.body_text,
+        ac.call_to_action,
+        ac.cta_type,
+        ac.cta_url,
+        ac.cta_phone,
+        ac.media_urls,
+        ac.video_urls,
+        ac.target_regions,
+        ac.target_locations,
+        ac.target_cities,
+        ac.start_date,
+        ac.end_date,
+        ac.impressions,
+        ac.clicks,
+        t.name as tier_name,
+        t.display_name as tier_display_name,
+        t.priority_weight as tier_priority,
+        p.name as placement_name,
+        p.display_name as placement_display_name,
+        p.page_location,
+        p.position,
+        p.width as placement_width,
+        p.height as placement_height,
+        b.business_name,
+        b.logo_url as business_logo,
+        u.first_name as advertiser_first_name,
+        u.last_name as advertiser_last_name
+      FROM ad_campaigns ac
+      LEFT JOIN ad_space_tiers t ON ac.tier_id = t.id
+      LEFT JOIN ad_placements p ON ac.placement_id = p.id
+      LEFT JOIN businesses b ON ac.business_id = b.id
+      LEFT JOIN users u ON ac.user_id = u.id
+      WHERE ac.status = 'active'
+        AND ac.is_active = true
+        AND ac.start_date <= CURRENT_TIMESTAMP
+        AND (ac.end_date IS NULL OR ac.end_date >= CURRENT_TIMESTAMP)
+        AND ac.remaining_amount > 0
+        AND (
+          p.name = $1
+          OR p.page_location = $1
+          OR p.position = $1
+          OR $1 = 'all'
+        )
+      ORDER BY t.priority_weight DESC, ac.created_at DESC
+      LIMIT $2
+    `, [placement, parseInt(limit)]);
+
     res.json({
       placement,
-      ads: [],
-      count: 0
+      ads: result.rows,
+      count: result.rows.length
     });
 
   } catch (error) {
@@ -35,8 +89,14 @@ router.get('/placements/:placement', async (req, res) => {
  */
 router.post('/impressions/:adId', async (req, res) => {
   try {
-    // TODO: Implement ads system - for now just return success
-    // The business_ads table doesn't exist yet
+    const { adId } = req.params;
+
+    await pool.query(`
+      UPDATE ad_campaigns
+      SET impressions = impressions + 1
+      WHERE id = $1 AND status = 'active'
+    `, [adId]);
+
     res.json({ success: true });
 
   } catch (error) {
@@ -51,13 +111,100 @@ router.post('/impressions/:adId', async (req, res) => {
  */
 router.post('/clicks/:adId', async (req, res) => {
   try {
-    // TODO: Implement ads system - for now just return success
-    // The business_ads table doesn't exist yet
+    const { adId } = req.params;
+
+    await pool.query(`
+      UPDATE ad_campaigns
+      SET clicks = clicks + 1
+      WHERE id = $1 AND status = 'active'
+    `, [adId]);
+
     res.json({ success: true });
 
   } catch (error) {
     console.error('Error tracking click:', error);
     res.status(500).json({ error: 'Failed to track click' });
+  }
+});
+
+/**
+ * Get all active ads
+ * Public endpoint - returns all currently active ads
+ */
+router.get('/active', async (req, res) => {
+  try {
+    const { limit = 20, page = 1 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const result = await pool.query(`
+      SELECT
+        ac.id,
+        ac.title,
+        ac.description,
+        ac.headline,
+        ac.body_text,
+        ac.call_to_action,
+        ac.cta_type,
+        ac.cta_url,
+        ac.cta_phone,
+        ac.media_urls,
+        ac.video_urls,
+        ac.target_regions,
+        ac.target_locations,
+        ac.target_cities,
+        ac.start_date,
+        ac.end_date,
+        ac.impressions,
+        ac.clicks,
+        t.name as tier_name,
+        t.display_name as tier_display_name,
+        t.priority_weight as tier_priority,
+        p.name as placement_name,
+        p.display_name as placement_display_name,
+        p.page_location,
+        p.position,
+        p.width as placement_width,
+        p.height as placement_height,
+        b.business_name,
+        b.logo_url as business_logo,
+        u.first_name as advertiser_first_name,
+        u.last_name as advertiser_last_name
+      FROM ad_campaigns ac
+      LEFT JOIN ad_space_tiers t ON ac.tier_id = t.id
+      LEFT JOIN ad_placements p ON ac.placement_id = p.id
+      LEFT JOIN businesses b ON ac.business_id = b.id
+      LEFT JOIN users u ON ac.user_id = u.id
+      WHERE ac.status = 'active'
+        AND ac.is_active = true
+        AND ac.start_date <= CURRENT_TIMESTAMP
+        AND (ac.end_date IS NULL OR ac.end_date >= CURRENT_TIMESTAMP)
+        AND ac.remaining_amount > 0
+      ORDER BY t.priority_weight DESC, ac.created_at DESC
+      LIMIT $1 OFFSET $2
+    `, [parseInt(limit), offset]);
+
+    // Get total count
+    const countResult = await pool.query(`
+      SELECT COUNT(*) as total
+      FROM ad_campaigns ac
+      WHERE ac.status = 'active'
+        AND ac.is_active = true
+        AND ac.start_date <= CURRENT_TIMESTAMP
+        AND (ac.end_date IS NULL OR ac.end_date >= CURRENT_TIMESTAMP)
+        AND ac.remaining_amount > 0
+    `);
+
+    res.json({
+      ads: result.rows,
+      count: result.rows.length,
+      total: parseInt(countResult.rows[0].total),
+      page: parseInt(page),
+      limit: parseInt(limit)
+    });
+
+  } catch (error) {
+    console.error('Error fetching active ads:', error);
+    res.status(500).json({ error: 'Failed to fetch active ads' });
   }
 });
 
