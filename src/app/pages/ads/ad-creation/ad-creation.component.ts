@@ -555,33 +555,59 @@ export class AdCreationComponent implements OnInit {
 
   // Form submission
   async submitCampaign(): Promise<void> {
+    console.log('=== CAMPAIGN SUBMIT INITIATED ===');
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
+    // Detailed validation logging
+    console.log('Form validation check:');
+    console.log('  - basicInfoForm valid:', this.basicInfoForm.valid, this.basicInfoForm.errors);
+    console.log('  - tierPlacementForm valid:', this.tierPlacementForm.valid, this.tierPlacementForm.errors);
+    console.log('  - targetingForm valid:', this.targetingForm.valid, this.targetingForm.errors);
+    console.log('  - contentForm valid:', this.contentForm.valid, this.contentForm.errors);
+    console.log('  - budgetForm valid:', this.budgetForm.valid, this.budgetForm.errors);
+    console.log('  - scheduleForm valid:', this.scheduleForm.valid, this.scheduleForm.errors);
+
     if (!this.isFormValid()) {
-      this.errorMessage.set('Please complete all required fields before launching the campaign.');
+      const invalidForms: string[] = [];
+      if (!this.basicInfoForm.valid) invalidForms.push('Basic Info');
+      if (!this.tierPlacementForm.valid) invalidForms.push('Tier/Placement');
+      if (!this.targetingForm.valid) invalidForms.push('Targeting');
+      if (!this.contentForm.valid) invalidForms.push('Content');
+      if (!this.budgetForm.valid) invalidForms.push('Budget');
+      if (!this.scheduleForm.valid) invalidForms.push('Schedule');
+
+      this.errorMessage.set(`Please complete all required fields before launching the campaign. Invalid sections: ${invalidForms.join(', ')}`);
+      console.log('Form validation failed. Invalid forms:', invalidForms);
       return;
     }
 
     this.isSubmitting.set(true);
+    console.log('Submitting campaign...');
 
     try {
       const campaignData = this.buildCampaignData();
+      console.log('Campaign data built:', campaignData);
 
       let campaign;
       if (this.isEditMode() && this.editCampaignId()) {
         // Update existing campaign
+        console.log('Updating existing campaign:', this.editCampaignId());
         campaign = await this.adService.updateCampaign(this.editCampaignId()!, campaignData);
         this.successMessage.set('Campaign updated successfully! Redirecting...');
       } else {
         // Create new campaign
+        console.log('Creating new campaign...');
         campaign = await this.adService.createCampaign(campaignData);
+        console.log('Campaign created successfully:', campaign);
         this.successMessage.set('Campaign created successfully! Redirecting...');
       }
 
-      // Navigate back to ad management dashboard
+      // Navigate back to ad management dashboard based on user role
+      const adsRoute = this.getAdsRoute();
+      console.log('Navigating to:', adsRoute);
       setTimeout(() => {
-        this.router.navigate(['/business/ads'], {
+        this.router.navigate([adsRoute], {
           queryParams: { [this.isEditMode() ? 'updated' : 'created']: campaign.id }
         });
       }, 1500);
@@ -590,6 +616,27 @@ export class AdCreationComponent implements OnInit {
       this.errorMessage.set(error?.message || `Failed to ${this.isEditMode() ? 'update' : 'create'} campaign. Please try again.`);
     } finally {
       this.isSubmitting.set(false);
+    }
+  }
+
+  // Get the correct ads route based on user role
+  private getAdsRoute(): string {
+    const user = this.currentUser();
+    if (!user) return '/business/ads';
+
+    switch (user.role) {
+      case 'specialist':
+        return '/dashboard/specialist/ads';
+      case 'business_owner':
+        return '/dashboard/business/ads';
+      case 'food_enthusiast':
+        return '/dashboard/food-enthusiast/ads';
+      case 'normal_user':
+        return '/dashboard/user/ads';
+      case 'itiyum_admin':
+        return '/admin/ads';
+      default:
+        return '/business/ads';
     }
   }
 
@@ -842,7 +889,7 @@ export class AdCreationComponent implements OnInit {
   // Cancel creation
   cancelCreation(): void {
     if (confirm('Are you sure you want to cancel? All progress will be lost.')) {
-      this.router.navigate(['/business/ads']);
+      this.router.navigate([this.getAdsRoute()]);
     }
   }
 }
