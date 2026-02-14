@@ -148,6 +148,8 @@
               id="dateOfBirth"
               type="date"
               formControlName="dateOfBirth"
+              [min]="getMinBirthDate()"
+              [max]="getMaxBirthDate()"
             />
             @if (calculateAge()) {
               <span class="age-display">Age: {{ calculateAge() }} years</span>

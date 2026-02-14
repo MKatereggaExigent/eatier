@@ -892,4 +892,9 @@ export class AdCreationComponent implements OnInit {
       this.router.navigate([this.getAdsRoute()]);
     }
   }
+
+  // Get today's date in YYYY-MM-DD format for date input min attribute
+  getTodayDate(): string {
+    return new Date().toISOString().split('T')[0];
+  }
 }

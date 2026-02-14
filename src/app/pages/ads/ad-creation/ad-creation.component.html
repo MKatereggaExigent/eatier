@@ -698,6 +698,7 @@
               type="date"
               id="startDate"
               formControlName="startDate"
+              [min]="getTodayDate()"
               class="form-input">
             <div class="form-help">When should your campaign begin?</div>
           </div>
@@ -720,6 +721,7 @@
                 type="date"
                 id="endDate"
                 formControlName="endDate"
+                [min]="scheduleForm.get('startDate')?.value || getTodayDate()"
                 class="form-input">
               <div class="form-help">Leave empty to run until budget is exhausted</div>
             </div>

@@ -349,4 +349,19 @@ export class UserProfileComponent implements OnInit {
 
     return age;
   }
+
+  // Date of birth constraints - allow users from age 13 to 120
+  getMinBirthDate(): string {
+    const today = new Date();
+    const minYear = today.getFullYear() - 120; // 120 years ago
+    return `${minYear}-01-01`;
+  }
+
+  getMaxBirthDate(): string {
+    const today = new Date();
+    const maxYear = today.getFullYear() - 13; // Must be at least 13 years old
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${maxYear}-${month}-${day}`;
+  }
 }

@@ -366,7 +366,7 @@
       <form [formGroup]="specialDateForm" (ngSubmit)="saveSpecialDate()" class="modal-form">
         <div class="form-group">
           <label for="specialDate">Date</label>
-          <input type="date" id="specialDate" formControlName="date" class="form-input">
+          <input type="date" id="specialDate" formControlName="date" class="form-input" [min]="getTodayDate()">
         </div>
         <div class="form-group">
           <label for="specialType">Type</label>

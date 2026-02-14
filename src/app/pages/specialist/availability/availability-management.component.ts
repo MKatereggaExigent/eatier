@@ -505,4 +505,9 @@ export class AvailabilityManagementComponent {
       console.log('Availability settings saved successfully');
     }, 1000);
   }
+
+  // Get today's date in YYYY-MM-DD format for date input min attribute
+  getTodayDate(): string {
+    return new Date().toISOString().split('T')[0];
+  }
 }
