@@ -377,7 +377,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
       'normal_user': 'Member'
     };
 
-    return roleLabels[currentUser.role] || 'User';
+    // Normalize role to lowercase for lookup (handles both 'normal_user' and 'NORMAL_USER')
+    const normalizedRole = currentUser.role?.toLowerCase?.() || '';
+    return roleLabels[normalizedRole] || 'Member';
   }
 
   logout(): void {
