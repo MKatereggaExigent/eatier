@@ -1,6 +1,38 @@
 const pool = require('../config/database');
 const OpenAI = require('openai');
 
+/**
+ * ============================================================================
+ * RAG SERVICE - SECURITY MODEL
+ * ============================================================================
+ *
+ * This service retrieves data from the database for AI context.
+ *
+ * DATA CLASSIFICATION:
+ *
+ * PUBLIC RESOURCES (No authentication required):
+ * - businesses: Restaurant names, locations, cuisines, aggregate ratings
+ * - menus: Public menu items from restaurants
+ * - posts: Published blog posts
+ *
+ * USER-SPECIFIC RESOURCES (Requires authentication, filtered by user_id):
+ * - bookings: User's own bookings ONLY (WHERE user_id = $userId)
+ * - reviews: Reviews written by the user ONLY (WHERE user_id = $userId)
+ * - favorites: User's own favorites ONLY (WHERE user_id = $userId)
+ *
+ * ADMIN-ONLY RESOURCES (Requires admin role):
+ * - users: User list (admins only)
+ * - ads: Advertisement data (admins/business owners)
+ * - analytics: Platform analytics (admins/business owners)
+ *
+ * SECURITY RULES:
+ * 1. All queries use parameterized queries ($1, $2) - NEVER string concatenation
+ * 2. User-specific data ALWAYS filtered by authenticated user's ID
+ * 3. Role checks performed before returning sensitive data
+ * 4. No cross-tenant data access (tenant_id always checked)
+ * ============================================================================
+ */
+
 // Initialize OpenAI client lazily to avoid crashing if API key is missing
 let openai = null;
 
@@ -350,6 +382,10 @@ Only include resources that are directly relevant to answering the question.`;
 
   /**
    * Fetch bookings data with RBAC
+   * SECURITY: USER-SPECIFIC DATA
+   * - Regular users: Only see their own bookings (user_id = $userId)
+   * - Business owners: Also see bookings for their business (owner_id = $userId)
+   * - Admins: Can see all bookings (for admin panel)
    */
   async fetchBookings(userId, tenantId, filters, limit) {
     const roleCheck = await pool.query(`
@@ -362,19 +398,19 @@ Only include resources that are directly relevant to answering the question.`;
     const userRole = roleCheck.rows[0]?.name;
     const isAdmin = isAdminRole(userRole);
 
+    // SECURITY: Select only necessary fields, no sensitive user data exposed
     let query = `
-      SELECT bk.id, bk.user_id, bk.business_id, bk.booking_date, bk.booking_time,
+      SELECT bk.id, bk.booking_date, bk.booking_time,
              bk.party_size, bk.status, bk.created_at,
-             b.business_name, u.first_name, u.last_name
+             b.business_name
       FROM bookings bk
       JOIN businesses b ON bk.business_id = b.id
-      JOIN users u ON bk.user_id = u.id
       WHERE bk.tenant_id = $1
     `;
 
     const params = [tenantId];
 
-    // Non-admins can only see their own bookings or bookings for their businesses
+    // SECURITY: Non-admins can only see their own bookings or bookings for their businesses
     if (!isAdmin) {
       query += ` AND (bk.user_id = $2 OR b.owner_id = $2)`;
       params.push(userId);
@@ -546,9 +582,11 @@ Only include resources that are directly relevant to answering the question.`;
 
   /**
    * Fetch user reviews with RBAC
-   * Users can only see their own reviews
+   * SECURITY: USER-SPECIFIC DATA - Only returns reviews written by the authenticated user
+   * Always filtered by user_id = $1 (parameterized query, cannot be bypassed)
    */
   async fetchReviews(userId, tenantId, filters, limit) {
+    // SECURITY: user_id filter is MANDATORY and uses parameterized query
     let query = `
       SELECT r.id, r.rating, r.content, r.created_at,
              b.business_name
@@ -575,9 +613,11 @@ Only include resources that are directly relevant to answering the question.`;
 
   /**
    * Fetch user favorites with RBAC
-   * Users can only see their own favorites
+   * SECURITY: USER-SPECIFIC DATA - Only returns favorites belonging to the authenticated user
+   * Always filtered by user_id = $1 (parameterized query, cannot be bypassed)
    */
   async fetchFavorites(userId, tenantId, filters, limit) {
+    // SECURITY: user_id filter is MANDATORY and uses parameterized query
     let query = `
       SELECT f.id, f.created_at,
              b.business_name, b.cuisine_types, b.city, b.average_rating
