@@ -99,6 +99,9 @@ function validatePassword(password, requirements) {
 router.post('/register', async (req, res) => {
   const client = await pool.connect();
   try {
+    // Start transaction to ensure all operations succeed or fail together
+    await client.query('BEGIN');
+
     const {
       email,
       password,
@@ -115,6 +118,10 @@ router.post('/register', async (req, res) => {
       businessCountry,
       addressDetails
     } = req.body;
+
+    console.log('=== REGISTRATION REQUEST ===');
+    console.log('Email:', email);
+    console.log('Role requested:', role);
 
     // Check if registrations are allowed
     const registrationsAllowed = await areRegistrationsAllowed();
@@ -212,21 +219,60 @@ router.post('/register', async (req, res) => {
     ]);
 
     const user = result.rows[0];
+    console.log('User created with ID:', user.id);
+
+    // Map role parameter to database role name
+    const roleNameMap = {
+      'business_owner': 'Business Owner',
+      'food_enthusiast': 'Food Enthusiast',
+      'specialist': 'Specialist',
+      'itiyum_admin': 'Itiyum Admin',
+      'normal_user': 'Normal User'
+    };
+    const dbRoleName = roleNameMap[role] || 'Normal User';
+    console.log('Looking for role in database:', dbRoleName);
 
     // Assign role to user via user_roles table
     const roleResult = await client.query(
-      "SELECT id FROM roles WHERE name = $1 LIMIT 1",
-      [role === 'business_owner' ? 'Business Owner' :
-       role === 'food_enthusiast' ? 'Food Enthusiast' :
-       role === 'specialist' ? 'Specialist' :
-       role === 'itiyum_admin' ? 'Itiyum Admin' : 'Normal User']
+      "SELECT id, name FROM roles WHERE LOWER(name) = LOWER($1) LIMIT 1",
+      [dbRoleName]
     );
 
+    console.log('Role lookup result:', roleResult.rows);
+
     if (roleResult.rows.length > 0) {
+      const roleId = roleResult.rows[0].id;
+      console.log('Assigning role ID:', roleId, 'to user:', user.id);
+
       await client.query(`
         INSERT INTO user_roles (user_id, role_id)
         VALUES ($1, $2)
-      `, [user.id, roleResult.rows[0].id]);
+      `, [user.id, roleId]);
+
+      console.log('✅ Role successfully assigned to user');
+    } else {
+      // Role not found - this is a critical error, log it!
+      console.error('❌ CRITICAL: Role not found in database:', dbRoleName);
+      console.log('Available roles:');
+      const allRoles = await client.query("SELECT id, name FROM roles");
+      console.log(allRoles.rows);
+
+      // Try to create the role if it doesn't exist
+      console.log('Attempting to create missing role:', dbRoleName);
+      const createRoleResult = await client.query(
+        "INSERT INTO roles (name, description) VALUES ($1, $2) ON CONFLICT (name) DO UPDATE SET name = $1 RETURNING id",
+        [dbRoleName, `${dbRoleName} role`]
+      );
+
+      if (createRoleResult.rows.length > 0) {
+        const newRoleId = createRoleResult.rows[0].id;
+        console.log('Created role with ID:', newRoleId);
+        await client.query(`
+          INSERT INTO user_roles (user_id, role_id)
+          VALUES ($1, $2)
+        `, [user.id, newRoleId]);
+        console.log('✅ Role created and assigned to user');
+      }
     }
 
     // If business owner, create business record
@@ -289,6 +335,10 @@ router.post('/register', async (req, res) => {
       [tenantId]
     );
 
+    // COMMIT the transaction - this is CRITICAL for persisting the role assignment
+    await client.query('COMMIT');
+    console.log('✅ Transaction committed successfully - user and role persisted');
+
     res.status(201).json({
       message: 'User registered successfully',
       user: {
@@ -308,7 +358,9 @@ router.post('/register', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Registration error:', error);
+    // ROLLBACK on any error to prevent partial data from being saved
+    await client.query('ROLLBACK');
+    console.error('❌ Registration error (transaction rolled back):', error);
     res.status(500).json({ error: 'Failed to register user' });
   } finally {
     client.release();
