@@ -351,6 +351,12 @@ export class FoodEnthusiastReviewsComponent implements OnInit {
     }
   }
 
+  markFormTouched(): void {
+    Object.keys(this.reviewForm.controls).forEach(key => {
+      this.reviewForm.get(key)?.markAsTouched();
+    });
+  }
+
   createReview(): void {
     if (this.reviewForm.valid) {
       const formValue = this.reviewForm.value;

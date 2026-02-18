@@ -383,12 +383,16 @@
               id="restaurant"
               formControlName="restaurantId"
               class="form-control"
+              [class.is-invalid]="reviewForm.get('restaurantId')?.invalid && reviewForm.get('restaurantId')?.touched"
               (change)="onRestaurantChange()">
               <option value="">Select a restaurant</option>
               @for (restaurant of restaurants(); track restaurant.id) {
-                <option [value]="restaurant.id">{{ restaurant.name }} - {{ restaurant.cuisineTypes.join(', ') }}</option>
+                <option [value]="restaurant.id">{{ restaurant.name }}</option>
               }
             </select>
+            @if (reviewForm.get('restaurantId')?.invalid && reviewForm.get('restaurantId')?.touched) {
+              <span class="error-message">Please select a restaurant</span>
+            }
           </div>
 
           <!-- Overall Rating -->
@@ -460,8 +464,16 @@
               id="content"
               formControlName="content"
               class="form-control"
+              [class.is-invalid]="reviewForm.get('content')?.invalid && reviewForm.get('content')?.touched"
               rows="6"
               placeholder="Share your dining experience... (minimum 50 characters)"></textarea>
+            @if (reviewForm.get('content')?.invalid && reviewForm.get('content')?.touched) {
+              @if (reviewForm.get('content')?.errors?.['required']) {
+                <span class="error-message">Review content is required</span>
+              } @else if (reviewForm.get('content')?.errors?.['minlength']) {
+                <span class="error-message">Review must be at least 50 characters (currently {{ reviewForm.get('content')?.value?.length || 0 }})</span>
+              }
+            }
           </div>
 
           <!-- Visit Details -->
@@ -529,6 +541,23 @@
           </div>
         </div>
 
+        @if (reviewForm.invalid && reviewForm.touched) {
+          <div class="form-errors">
+            <p class="error-summary">Please fix the following errors:</p>
+            <ul>
+              @if (reviewForm.get('restaurantId')?.errors?.['required']) {
+                <li>Select a restaurant</li>
+              }
+              @if (reviewForm.get('content')?.errors?.['required']) {
+                <li>Write your review content</li>
+              }
+              @if (reviewForm.get('content')?.errors?.['minlength']) {
+                <li>Review must be at least 50 characters</li>
+              }
+            </ul>
+          </div>
+        }
+
         <div class="modal-footer">
           <button type="button" class="btn-secondary" (click)="closeNewReviewModal()">
             Cancel
@@ -536,7 +565,8 @@
           <button
             type="submit"
             class="btn-primary"
-            [disabled]="!reviewForm.valid || isLoading()">
+            (click)="markFormTouched()"
+            [disabled]="isLoading()">
             @if (isLoading()) {
               <span class="loading-spinner small"></span>
               Publishing...

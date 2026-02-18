@@ -908,6 +908,33 @@
   padding: var(--space-6);
   color: var(--color-black);
 
+  .form-errors {
+    background-color: #fff8f8;
+    border: 1px solid #c62828;
+    border-radius: 4px;
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+
+    .error-summary {
+      color: #c62828;
+      font-family: var(--font-sans);
+      font-weight: var(--font-semibold);
+      margin: 0 0 var(--space-2) 0;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: var(--space-5);
+      color: #c62828;
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+
+      li {
+        margin-bottom: var(--space-1);
+      }
+    }
+  }
+
   .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -959,6 +986,19 @@
         min-height: 150px;
         font-family: var(--font-serif);
         line-height: 1.6;
+      }
+
+      .form-control.is-invalid {
+        border-color: #c62828;
+        background-color: #fff8f8;
+      }
+
+      .error-message {
+        display: block;
+        color: #c62828;
+        font-size: var(--text-sm);
+        font-family: var(--font-sans);
+        margin-top: var(--space-1);
       }
 
       .checkbox-label {
