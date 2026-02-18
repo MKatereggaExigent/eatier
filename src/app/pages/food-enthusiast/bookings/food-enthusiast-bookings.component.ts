@@ -105,16 +105,20 @@ export class FoodEnthusiastBookingsComponent implements OnInit {
   // Computed properties
   filteredBookings = computed(() => {
     let filtered = this.bookings();
-    const query = this.searchQuery().toLowerCase();
+    const query = this.searchQuery().toLowerCase().trim();
     const currentFilters = this.filters();
 
-    // Search filter
+    // Search filter - with null-safe checks
     if (query) {
-      filtered = filtered.filter(booking =>
-        booking.restaurant.name.toLowerCase().includes(query) ||
-        booking.bookingReference.toLowerCase().includes(query) ||
-        booking.contactName.toLowerCase().includes(query)
-      );
+      filtered = filtered.filter(booking => {
+        const restaurantName = booking.restaurant?.name?.toLowerCase() || '';
+        const bookingRef = booking.bookingReference?.toLowerCase() || '';
+        const contactName = booking.contactName?.toLowerCase() || '';
+
+        return restaurantName.includes(query) ||
+               bookingRef.includes(query) ||
+               contactName.includes(query);
+      });
     }
 
     // Status filter
@@ -148,17 +152,19 @@ export class FoodEnthusiastBookingsComponent implements OnInit {
       filtered = filtered.filter(booking => booking.restaurantId === currentFilters.restaurant);
     }
 
-    // Sort
+    // Sort - with null-safe checks
     filtered.sort((a, b) => {
       switch (currentFilters.sortBy) {
         case 'date_asc':
-          return new Date(a.bookingDate).getTime() - new Date(b.bookingDate).getTime();
+          return new Date(a.bookingDate || 0).getTime() - new Date(b.bookingDate || 0).getTime();
         case 'date_desc':
-          return new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime();
+          return new Date(b.bookingDate || 0).getTime() - new Date(a.bookingDate || 0).getTime();
         case 'restaurant':
-          return a.restaurant.name.localeCompare(b.restaurant.name);
+          const nameA = a.restaurant?.name || '';
+          const nameB = b.restaurant?.name || '';
+          return nameA.localeCompare(nameB);
         case 'status':
-          return a.status.localeCompare(b.status);
+          return (a.status || '').localeCompare(b.status || '');
         default:
           return 0;
       }

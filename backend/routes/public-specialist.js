@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
       LEFT JOIN specialist_services ss ON u.id = ss.specialist_id AND ss.is_active = true
       LEFT JOIN specialist_reviews sr ON u.id = sr.specialist_id AND sr.status = 'published'
       LEFT JOIN specialist_bookings sb ON u.id = sb.specialist_id
-      WHERE r.name = 'Specialist'
+      WHERE LOWER(r.name) = LOWER('Specialist')
         AND u.account_status = 'active'
     `;
 
@@ -101,7 +101,7 @@ router.get('/', async (req, res) => {
       FROM users u
       JOIN user_roles ur ON u.id = ur.user_id
       JOIN roles r ON ur.role_id = r.id
-      WHERE r.name = 'Specialist' AND u.account_status = 'active'
+      WHERE LOWER(r.name) = LOWER('Specialist') AND u.account_status = 'active'
     `;
     const countResult = await pool.query(countQuery);
 
@@ -160,7 +160,7 @@ router.get('/:id', async (req, res) => {
       JOIN roles r ON ur.role_id = r.id
       LEFT JOIN specialist_reviews sr ON u.id = sr.specialist_id AND sr.status = 'published'
       LEFT JOIN specialist_bookings sb ON u.id = sb.specialist_id
-      WHERE u.id = $1 AND r.name = 'Specialist'
+      WHERE u.id = $1 AND LOWER(r.name) = LOWER('Specialist')
       GROUP BY u.id
     `;
     const specialistResult = await pool.query(specialistQuery, [id]);
@@ -281,7 +281,7 @@ router.post('/:id/book', authenticateToken, async (req, res) => {
       FROM users u
       JOIN user_roles ur ON u.id = ur.user_id
       JOIN roles r ON ur.role_id = r.id
-      WHERE u.id = $1 AND r.name = 'Specialist' AND u.account_status = 'active'
+      WHERE u.id = $1 AND LOWER(r.name) = LOWER('Specialist') AND u.account_status = 'active'
     `, [specialistId]);
 
     if (specialistCheck.rows.length === 0) {
