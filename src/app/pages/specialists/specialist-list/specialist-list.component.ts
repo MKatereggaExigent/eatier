@@ -69,16 +69,20 @@ export class SpecialistListComponent implements OnInit {
 
   pageSizeOptions = [6, 12, 24, 48];
 
+  // These must match the service types in services-management.component.ts
+  // and backend/routes/specialist.js GET /api/specialist/service-types
   specialtyTypes = [
-    'All Specialties',
-    'Private Chef',
-    'Catering',
-    'Cooking Class',
-    'Event Catering',
-    'Meal Prep',
-    'BBQ & Grilling',
-    'Consultation',
-    'Event Service'
+    { value: '', label: 'All Specialties' },
+    { value: 'private_chef', label: 'Private Chef' },
+    { value: 'catering', label: 'Catering' },
+    { value: 'cooking_class', label: 'Cooking Class' },
+    { value: 'event_catering', label: 'Event Catering' },
+    { value: 'meal_prep', label: 'Meal Prep' },
+    { value: 'consultation', label: 'Consultation' },
+    { value: 'wine_pairing', label: 'Wine Pairing' },
+    { value: 'baking', label: 'Baking' },
+    { value: 'bbq', label: 'BBQ/Grilling' },
+    { value: 'dietary', label: 'Dietary Specialist' }
   ];
 
   ratingFilters = [

@@ -57,9 +57,9 @@
             (change)="onSpecialtyChange($any($event.target).value)"
             class="filter-select"
           >
-            @for (specialty of specialtyTypes; track specialty) {
-              <option [value]="specialty === 'All Specialties' ? '' : specialty">
-                {{ specialty }}
+            @for (specialty of specialtyTypes; track specialty.value) {
+              <option [value]="specialty.value">
+                {{ specialty.label }}
               </option>
             }
           </select>

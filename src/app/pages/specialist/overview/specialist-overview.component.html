@@ -12,7 +12,10 @@
         </p>
       </div>
       <div class="quick-actions">
-        <button type="button" class="action-btn primary" routerLink="../availability">
+        <button type="button" class="action-btn primary" routerLink="../services">
+          🍽️ Manage Services
+        </button>
+        <button type="button" class="action-btn secondary" routerLink="../availability">
           📅 Update Availability
         </button>
         <button type="button" class="action-btn secondary" routerLink="../portfolio">
@@ -21,6 +24,20 @@
       </div>
     </div>
   </header>
+
+  <!-- Onboarding Prompt for No Services -->
+  @if (showServicesOnboarding()) {
+    <div class="onboarding-alert" role="alert">
+      <div class="onboarding-icon">⚠️</div>
+      <div class="onboarding-content">
+        <h3>Complete Your Profile</h3>
+        <p>You haven't added any services yet. Clients won't be able to book you until you add at least one service.</p>
+      </div>
+      <a routerLink="../services" class="onboarding-cta">
+        Add Your First Service →
+      </a>
+    </div>
+  }
 
   <!-- Business Metrics Cards -->
   <section class="metrics-section" aria-label="Business Metrics">

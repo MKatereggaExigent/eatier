@@ -1,4 +1,5 @@
 /* NYT-Inspired About Page - Modern Glassmorphic Design */
+@use 'sass:color';
 
 // NYT Color Palette
 $nyt-black: #121212;
@@ -513,7 +514,7 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       color: white;
 
       &:hover {
-        background: darken($itiyum-orange, 5%);
+        background: color.adjust($itiyum-orange, $lightness: -5%);
         transform: translateY(-3px);
         box-shadow: 0 10px 30px rgba(255, 140, 0, 0.3);
       }

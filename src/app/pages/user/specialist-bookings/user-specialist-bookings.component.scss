@@ -1,4 +1,4 @@
-@import '../shared-user-styles.scss';
+@use '../shared-user-styles.scss' as *;
 
 // NYT Editorial Design Variables
 :host {

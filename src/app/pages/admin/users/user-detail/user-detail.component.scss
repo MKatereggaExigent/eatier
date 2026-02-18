@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 // NYT Editorial Design Variables
 $font-serif: 'Noto Serif', Georgia, serif;
 $font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -167,24 +169,24 @@ $border-medium: 2px solid $color-black;
 
 .status-badge {
   &.status-active {
-    background: lighten($color-success, 50%);
+    background: color.adjust($color-success, $lightness: 50%);
     color: $color-success;
     border-color: $color-success;
   }
   &.status-frozen {
-    background: lighten($color-warning, 40%);
-    color: darken($color-warning, 10%);
+    background: color.adjust($color-warning, $lightness: 40%);
+    color: color.adjust($color-warning, $lightness: -10%);
     border-color: $color-warning;
   }
   &.status-pending_deletion {
-    background: lighten($color-danger, 40%);
+    background: color.adjust($color-danger, $lightness: 40%);
     color: $color-danger;
     border-color: $color-danger;
   }
 }
 
 .verified-badge {
-  background: lighten($color-success, 50%);
+  background: color.adjust($color-success, $lightness: 50%);
   color: $color-success;
   border-color: $color-success;
 }

@@ -1,6 +1,7 @@
 // ===================================
 // ACCOUNTS CENTER - NYT EDITORIAL DESIGN
 // ===================================
+@use 'sass:color';
 
 // NYT Typography
 $font-serif: Georgia, 'Times New Roman', serif;
@@ -745,7 +746,7 @@ $space-2xl: 3rem;
       flex: 1;
 
       &:hover:not(:disabled) {
-        background: darken($color-warning, 10%);
+        background: color.adjust($color-warning, $lightness: -10%);
       }
     }
 
@@ -755,7 +756,7 @@ $space-2xl: 3rem;
       flex: 1;
 
       &:hover:not(:disabled) {
-        background: darken($color-error, 10%);
+        background: color.adjust($color-error, $lightness: -10%);
       }
     }
 

@@ -20,7 +20,7 @@
         <div class="stat-label">Total Reviews</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value">{{ reviewStats().averageRating?.toFixed(1) || '0.0' }}</div>
+        <div class="stat-value">{{ reviewStats().averageRating.toFixed(1) || '0.0' }}</div>
         <div class="stat-label">Average Rating</div>
         <div class="rating-stars">
           @for (star of getStarArray(reviewStats().averageRating || 0); track $index) {

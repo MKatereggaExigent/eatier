@@ -88,6 +88,15 @@ export class SpecialistOverviewComponent implements OnInit {
   // Recent reviews from database
   recentReviews = signal<Review[]>([]);
 
+  // Services count for onboarding prompt
+  servicesCount = signal(0);
+  loadingServices = signal(true);
+
+  // Computed: show onboarding prompt when no services
+  showServicesOnboarding = computed(() =>
+    !this.loadingServices() && this.servicesCount() === 0
+  );
+
   ngOnInit(): void {
     this.loadData();
   }
@@ -200,6 +209,19 @@ export class SpecialistOverviewComponent implements OnInit {
       error: (err) => {
         console.error('Error loading earnings:', err);
         this.loadingEarnings.set(false);
+      }
+    });
+
+    // Load services count for onboarding prompt
+    this.loadingServices.set(true);
+    this.specialistService.getServices().subscribe({
+      next: (data) => {
+        this.servicesCount.set(data.services.length);
+        this.loadingServices.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading services:', err);
+        this.loadingServices.set(false);
       }
     });
   }

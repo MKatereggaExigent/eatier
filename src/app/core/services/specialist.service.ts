@@ -103,6 +103,32 @@ export interface PortfolioSettings {
   theme: string;
 }
 
+// Service interfaces
+export interface SpecialistServiceItem {
+  id: string;
+  serviceName: string;
+  serviceType: string;
+  description?: string;
+  basePrice: number;
+  pricePerPerson?: number;
+  minGuests: number;
+  maxGuests?: number;
+  durationHours?: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ServiceTypeOption {
+  value: string;
+  label: string;
+}
+
+export interface CuisineTypeOption {
+  value: string;
+  label: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -279,6 +305,83 @@ export class SpecialistService {
    */
   updatePortfolioSettings(data: { portfolioTitle?: string; portfolioDescription?: string; showContactInfo?: boolean; allowDownloads?: boolean; watermarkImages?: boolean; theme?: string }): Observable<{ settings: PortfolioSettings }> {
     return this.http.put<{ settings: PortfolioSettings }>(`${this.apiUrl}/portfolio/settings`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // ============================================
+  // SERVICE MANAGEMENT METHODS
+  // ============================================
+
+  /**
+   * Get all services for the logged-in specialist
+   */
+  getServices(): Observable<{ services: SpecialistServiceItem[] }> {
+    return this.http.get<{ services: SpecialistServiceItem[] }>(`${this.apiUrl}/services`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Create a new service
+   */
+  createService(data: {
+    serviceName: string;
+    serviceType: string;
+    description?: string;
+    basePrice: number;
+    pricePerPerson?: number;
+    minGuests?: number;
+    maxGuests?: number;
+    durationHours?: number;
+  }): Observable<{ message: string; service: SpecialistServiceItem }> {
+    return this.http.post<{ message: string; service: SpecialistServiceItem }>(`${this.apiUrl}/services`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Update an existing service
+   */
+  updateService(id: string, data: {
+    serviceName?: string;
+    serviceType?: string;
+    description?: string;
+    basePrice?: number;
+    pricePerPerson?: number;
+    minGuests?: number;
+    maxGuests?: number;
+    durationHours?: number;
+    isActive?: boolean;
+  }): Observable<{ message: string; service: SpecialistServiceItem }> {
+    return this.http.put<{ message: string; service: SpecialistServiceItem }>(`${this.apiUrl}/services/${id}`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Delete a service
+   */
+  deleteService(id: string): Observable<{ message: string; deletedId: string }> {
+    return this.http.delete<{ message: string; deletedId: string }>(`${this.apiUrl}/services/${id}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get available service types
+   */
+  getServiceTypes(): Observable<{ serviceTypes: ServiceTypeOption[] }> {
+    return this.http.get<{ serviceTypes: ServiceTypeOption[] }>(`${this.apiUrl}/service-types`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get available cuisine types
+   */
+  getCuisineTypes(): Observable<{ cuisineTypes: CuisineTypeOption[] }> {
+    return this.http.get<{ cuisineTypes: CuisineTypeOption[] }>(`${this.apiUrl}/cuisine-types`, {
       headers: this.getHeaders()
     });
   }

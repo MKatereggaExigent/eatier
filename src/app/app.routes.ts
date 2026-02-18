@@ -219,6 +219,7 @@ export const routes: Routes = [
         children: [
             { path: '', redirectTo: 'overview', pathMatch: 'full' },
             { path: 'overview', loadComponent: () => import('./pages/specialist/overview/specialist-overview.component').then(m => m.SpecialistOverviewComponent) },
+            { path: 'services', loadComponent: () => import('./pages/specialist/services/services-management.component').then(m => m.ServicesManagementComponent) },
             { path: 'portfolio', loadComponent: () => import('./pages/specialist/portfolio/portfolio-management.component').then(m => m.PortfolioManagementComponent) },
             { path: 'availability', loadComponent: () => import('./pages/specialist/availability/availability-management.component').then(m => m.AvailabilityManagementComponent) },
             { path: 'ads/:adId/edit', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },

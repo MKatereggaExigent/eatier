@@ -174,7 +174,7 @@ router.get('/:id', async (req, res) => {
     // Get services
     const servicesQuery = `
       SELECT id, service_name, description, service_type, base_price, price_per_person,
-             minimum_guests, maximum_guests, duration_hours, is_active
+             min_guests, max_guests, duration_hours, is_active
       FROM specialist_services
       WHERE specialist_id = $1 AND is_active = true
       ORDER BY service_type, service_name
@@ -213,8 +213,8 @@ router.get('/:id', async (req, res) => {
         category: s.service_type,
         basePrice: parseFloat(s.base_price) || 0,
         pricePerPerson: parseFloat(s.price_per_person) || 0,
-        minGuests: s.minimum_guests,
-        maxGuests: s.maximum_guests,
+        minGuests: s.min_guests,
+        maxGuests: s.max_guests,
         durationHours: s.duration_hours
       })),
       reviews: reviewsResult.rows.map(r => ({

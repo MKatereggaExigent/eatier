@@ -101,6 +101,70 @@
 }
 
 // ===================================
+// ONBOARDING ALERT
+// ===================================
+
+.onboarding-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-8);
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  animation: fadeInUp 0.5s ease-out;
+
+  .onboarding-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .onboarding-content {
+    flex: 1;
+
+    h3 {
+      font-family: 'Noto Serif', Georgia, serif;
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      color: #92400e;
+      margin: 0 0 var(--space-1) 0;
+    }
+
+    p {
+      font-size: var(--text-sm);
+      color: #78350f;
+      margin: 0;
+    }
+  }
+
+  .onboarding-cta {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-3) var(--space-5);
+    background: #92400e;
+    color: #ffffff;
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &:hover {
+      background: #78350f;
+      transform: translateX(4px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-3);
+  }
+}
+
+// ===================================
 // METRICS SECTION
 // ===================================
 
