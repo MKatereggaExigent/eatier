@@ -344,7 +344,9 @@ router.post('/', async (req, res) => {
 
   } catch (error) {
     console.error('Error creating review:', error);
-    res.status(500).json({ error: 'Failed to create review' });
+    console.error('Error details:', error.message);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ error: 'Failed to create review', details: error.message });
   }
 });
 

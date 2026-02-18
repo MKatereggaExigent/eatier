@@ -120,8 +120,25 @@ export class ReviewsService {
     this.loadRestaurants();
   }
 
+  private getUserId(): string {
+    const userJson = localStorage.getItem('itiyum_user');
+    if (userJson) {
+      try {
+        const user = JSON.parse(userJson);
+        return user.id;
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+    return '';
+  }
+
   private loadUserReviews(): void {
-    const userId = localStorage.getItem('user_id') || 'temp-user';
+    const userId = this.getUserId();
+    if (!userId) {
+      this.reviewsSubject.next([]);
+      return;
+    }
     this.isLoadingSubject.next(true);
 
     this.apiService.get<any>(`reviews/user/${userId}`).subscribe({
@@ -255,7 +272,10 @@ export class ReviewsService {
 
   // Create new review
   createReview(reviewRequest: ReviewRequest): Observable<Review> {
-    const userId = localStorage.getItem('user_id') || 'temp-user';
+    const userId = this.getUserId();
+    if (!userId) {
+      return throwError(() => new Error('User not authenticated'));
+    }
 
     const payload = {
       businessId: reviewRequest.restaurantId,
@@ -291,7 +311,10 @@ export class ReviewsService {
 
   // Update review
   updateReview(reviewId: string, updates: Partial<Review>): Observable<boolean> {
-    const userId = localStorage.getItem('user_id') || 'temp-user';
+    const userId = this.getUserId();
+    if (!userId) {
+      return of(false);
+    }
     const payload = {
       userId,
       overallRating: updates.overallRating,
@@ -323,7 +346,10 @@ export class ReviewsService {
 
   // Delete review
   deleteReview(reviewId: string): Observable<boolean> {
-    const userId = localStorage.getItem('user_id') || 'temp-user';
+    const userId = this.getUserId();
+    if (!userId) {
+      return of(false);
+    }
     return this.apiService.delete(`reviews/${reviewId}?userId=${userId}`).pipe(
       map(() => true),
       tap(() => {
