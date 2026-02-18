@@ -247,6 +247,67 @@ $itiyum-orange-dark: #e67e00;
       color: $nyt-black;
     }
   }
+
+  .view-controls-row {
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid $nyt-border;
+    margin-top: 8px;
+  }
+
+  .view-mode-toggle {
+    display: flex;
+    gap: 4px;
+    background: $nyt-light-gray;
+    padding: 4px;
+    border-radius: 6px;
+
+    .view-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      color: $nyt-medium-gray;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: $nyt-black;
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      &.active {
+        background: white;
+        color: $itiyum-orange;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .page-size-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .filter-label {
+      margin: 0;
+    }
+
+    .page-size-select {
+      min-width: 140px;
+    }
+  }
+
+  .results-info {
+    font-family: $font-sans;
+    font-size: 0.85rem;
+    color: $nyt-medium-gray;
+  }
 }
 
 /* ========== Results Section ========== */
@@ -510,6 +571,261 @@ $itiyum-orange-dark: #e67e00;
   }
 }
 
+/* ========== List View ========== */
+.specialists-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .specialist-list-item {
+    display: flex;
+    gap: 24px;
+    padding: 20px;
+    background: white;
+    border: 1px solid $nyt-border;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+
+    &:hover {
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border-color: $itiyum-orange;
+    }
+
+    .list-item-image {
+      position: relative;
+      width: 180px;
+      min-width: 180px;
+      height: 180px;
+      border-radius: 4px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .top-rated-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: $itiyum-orange;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 2px;
+        font-family: $font-sans;
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+    }
+
+    .list-item-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .list-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+
+        .specialist-name {
+          font-family: $font-serif;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: $nyt-black;
+          margin: 0;
+        }
+      }
+
+      .specialist-bio {
+        font-family: $font-sans;
+        font-size: 0.95rem;
+        color: $nyt-medium-gray;
+        line-height: 1.6;
+        margin: 0;
+      }
+
+      .list-item-footer {
+        display: flex;
+        gap: 20px;
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid $nyt-border;
+        font-family: $font-sans;
+        font-size: 0.85rem;
+        color: $nyt-medium-gray;
+
+        .pricing {
+          color: $nyt-black;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+/* ========== Gallery View ========== */
+.specialists-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+
+  .gallery-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+
+    .gallery-image {
+      width: 100%;
+      height: 100%;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+      }
+
+      .gallery-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 20px;
+        opacity: 1;
+        transition: all 0.3s ease;
+
+        .gallery-name {
+          font-family: $font-serif;
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: white;
+          margin: 0 0 8px;
+        }
+
+        .gallery-rating {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: $itiyum-orange;
+          font-family: $font-sans;
+          font-size: 0.9rem;
+          font-weight: 600;
+        }
+
+        .gallery-price {
+          font-family: $font-sans;
+          font-size: 0.85rem;
+          color: rgba(255, 255, 255, 0.9);
+          margin-top: 6px;
+        }
+      }
+
+      .top-rated-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: $itiyum-orange;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 2px;
+        font-family: $font-sans;
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+    }
+
+    &:hover {
+      .gallery-image img {
+        transform: scale(1.08);
+      }
+    }
+  }
+}
+
+/* ========== Pagination ========== */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid $nyt-border;
+
+  .pagination-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: white;
+    border: 1px solid $nyt-border;
+    border-radius: 4px;
+    font-family: $font-sans;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: $nyt-dark-gray;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: $nyt-light-gray;
+      border-color: $nyt-dark-gray;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  .pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .pagination-page {
+      min-width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 1px solid $nyt-border;
+      border-radius: 4px;
+      font-family: $font-sans;
+      font-size: 0.9rem;
+      color: $nyt-dark-gray;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: $nyt-light-gray;
+      }
+
+      &.active {
+        background: $itiyum-orange;
+        border-color: $itiyum-orange;
+        color: white;
+      }
+    }
+
+    .pagination-ellipsis {
+      padding: 0 8px;
+      color: $nyt-medium-gray;
+    }
+  }
+}
+
 /* ========== Responsive Design ========== */
 
 // Large tablet breakpoint
@@ -517,6 +833,10 @@ $itiyum-orange-dark: #e67e00;
   .specialists-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
+  }
+
+  .specialists-gallery {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .results-section {
@@ -595,6 +915,56 @@ $itiyum-orange-dark: #e67e00;
   .specialists-grid {
     grid-template-columns: 1fr;
     gap: 20px;
+  }
+
+  .specialists-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .specialists-list {
+    .specialist-list-item {
+      flex-direction: column;
+
+      .list-item-image {
+        width: 100%;
+        height: 200px;
+      }
+    }
+  }
+
+  .view-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+
+    .view-mode-toggle {
+      justify-content: center;
+    }
+
+    .page-size-control {
+      justify-content: center;
+    }
+
+    .results-info {
+      text-align: center;
+    }
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .pagination-btn {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+
+    .pagination-pages {
+      order: -1;
+      width: 100%;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
   }
 
   .results-section {

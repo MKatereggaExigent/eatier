@@ -1,9 +1,11 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { PublicSpecialistService, SpecialistListItem } from '../../../core/services/public-specialist.service';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+
+export type ViewMode = 'grid' | 'list' | 'gallery';
 
 @Component({
   selector: 'app-specialist-list',
@@ -19,6 +21,39 @@ export class SpecialistListComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
 
+  // View mode
+  viewMode = signal<ViewMode>('grid');
+
+  // Pagination
+  currentPage = signal(1);
+  pageSize = signal(12);
+  totalItems = signal(0);
+
+  totalPages = computed(() => Math.ceil(this.totalItems() / this.pageSize()));
+  paginatedSpecialists = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize();
+    const end = start + this.pageSize();
+    return this.specialists().slice(start, end);
+  });
+  pageNumbers = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: (number | string)[] = [];
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (current > 3) pages.push('...');
+      for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+        pages.push(i);
+      }
+      if (current < total - 2) pages.push('...');
+      pages.push(total);
+    }
+    return pages;
+  });
+
   searchQuery = signal('');
   selectedSpecialty = signal('');
   selectedRating = signal('');
@@ -31,6 +66,8 @@ export class SpecialistListComponent implements OnInit {
     totalReviews: 0,
     avgRating: 0
   });
+
+  pageSizeOptions = [6, 12, 24, 48];
 
   specialtyTypes = [
     'All Specialties',
@@ -70,10 +107,10 @@ export class SpecialistListComponent implements OnInit {
 
   priceRanges = [
     { value: '', label: 'Any Price', min: 0, max: 0 },
-    { value: 'budget', label: '$ Budget (Under $100)', min: 0, max: 100 },
-    { value: 'moderate', label: '$$ Moderate ($100-$300)', min: 100, max: 300 },
-    { value: 'premium', label: '$$$ Premium ($300-$500)', min: 300, max: 500 },
-    { value: 'luxury', label: '$$$$ Luxury ($500+)', min: 500, max: 0 }
+    { value: 'budget', label: '$ Budget (Under R1000)', min: 0, max: 1000 },
+    { value: 'moderate', label: '$$ Moderate (R1000-R3000)', min: 1000, max: 3000 },
+    { value: 'premium', label: '$$$ Premium (R3000-R5000)', min: 3000, max: 5000 },
+    { value: 'luxury', label: '$$$$ Luxury (R5000+)', min: 5000, max: 0 }
   ];
 
   ngOnInit(): void {
@@ -122,6 +159,7 @@ export class SpecialistListComponent implements OnInit {
         }
 
         this.specialists.set(filtered);
+        this.totalItems.set(filtered.length);
         this.stats.set({
           totalSpecialists: response.total,
           totalReviews: filtered.reduce((sum, s) => sum + s.reviewCount, 0),
@@ -139,33 +177,71 @@ export class SpecialistListComponent implements OnInit {
     });
   }
 
+  // View mode methods
+  setViewMode(mode: ViewMode): void {
+    this.viewMode.set(mode);
+  }
+
+  // Pagination methods
+  goToPage(page: number | string): void {
+    if (typeof page === 'number' && page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      window.scrollTo({ top: 400, behavior: 'smooth' });
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.set(this.currentPage() + 1);
+      window.scrollTo({ top: 400, behavior: 'smooth' });
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage() > 1) {
+      this.currentPage.set(this.currentPage() - 1);
+      window.scrollTo({ top: 400, behavior: 'smooth' });
+    }
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+  }
+
   onSearchChange(value: string): void {
     this.searchQuery.set(value);
+    this.currentPage.set(1);
     this.loadSpecialists();
   }
 
   onSpecialtyChange(value: string): void {
     this.selectedSpecialty.set(value);
+    this.currentPage.set(1);
     this.loadSpecialists();
   }
 
   onRatingChange(value: string): void {
     this.selectedRating.set(value);
+    this.currentPage.set(1);
     this.loadSpecialists();
   }
 
   onCountryChange(value: string): void {
     this.selectedCountry.set(value);
+    this.currentPage.set(1);
     this.loadSpecialists();
   }
 
   onCuisineChange(value: string): void {
     this.selectedCuisine.set(value);
+    this.currentPage.set(1);
     this.loadSpecialists();
   }
 
   onPriceRangeChange(value: string): void {
     this.selectedPriceRange.set(value);
+    this.currentPage.set(1);
     this.loadSpecialists();
   }
 
@@ -176,6 +252,7 @@ export class SpecialistListComponent implements OnInit {
     this.selectedCountry.set('');
     this.selectedCuisine.set('');
     this.selectedPriceRange.set('');
+    this.currentPage.set(1);
     this.loadSpecialists();
   }
 
@@ -202,6 +279,11 @@ export class SpecialistListComponent implements OnInit {
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
     const index = name.charCodeAt(0) % colors.length;
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=${colors[index].slice(1)}&color=fff&size=200`;
+  }
+
+  // Helper for template - Math.min
+  minValue(a: number, b: number): number {
+    return Math.min(a, b);
   }
 }
 
