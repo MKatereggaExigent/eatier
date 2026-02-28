@@ -72,7 +72,7 @@
   } @else {
     <!-- Services Grid -->
     <div class="services-grid">
-      @for (service of services(); track service.id) {
+      @for (service of paginatedServices(); track service.id) {
         <div class="service-card" [class.inactive]="!service.isActive">
           <div class="card-header">
             <span class="service-type-badge">{{ getServiceTypeLabel(service.serviceType) }}</span>
@@ -141,6 +141,68 @@
         </div>
       }
     </div>
+
+    <!-- Pagination Controls -->
+    @if (totalPages() > 1) {
+      <div class="pagination-container">
+        <div class="pagination-info">
+          Showing {{ showingFrom() }} - {{ showingTo() }} of {{ totalServices() }} services
+        </div>
+        <div class="pagination-controls">
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="currentPage() === 1"
+            (click)="previousPage()"
+            aria-label="Previous page"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Previous
+          </button>
+
+          <div class="page-numbers">
+            @for (page of pageNumbers(); track $index) {
+              @if (page === -1) {
+                <span class="pagination-ellipsis">...</span>
+              } @else {
+                <button
+                  type="button"
+                  class="page-number"
+                  [class.active]="page === currentPage()"
+                  (click)="goToPage(page)"
+                  [attr.aria-current]="page === currentPage() ? 'page' : null"
+                >
+                  {{ page }}
+                </button>
+              }
+            }
+          </div>
+
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="currentPage() === totalPages()"
+            (click)="nextPage()"
+            aria-label="Next page"
+          >
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+        <div class="page-size-selector">
+          <label for="pageSize">Per page:</label>
+          <select id="pageSize" [ngModel]="pageSize()" (ngModelChange)="changePageSize($event)">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size">{{ size }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    }
   }
 
   <!-- Service Modal -->
