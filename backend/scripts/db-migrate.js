@@ -15,21 +15,13 @@
  *   --force     Force re-run a specific migration (dangerous!)
  */
 
-const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
-// Database connection
-const pool = new Pool({
-  user: process.env.DB_USER || 'itiyum_user',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'itiyum_platform',
-  password: process.env.DB_PASSWORD || 'itiyum_secure_password_2024',
-  port: process.env.DB_PORT || 5432,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
-});
+// Use the existing database config
+const pool = require('../config/database');
 
 const MIGRATIONS_DIR = path.join(__dirname, 'migrations');
 
