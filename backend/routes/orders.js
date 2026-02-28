@@ -21,7 +21,7 @@ router.get('/', authenticateToken, async (req, res) => {
     const { status, limit = 20, offset = 0 } = req.query;
 
     let query = `
-      SELECT o.*, b.name as business_name, b.logo_url as business_logo,
+      SELECT o.*, b.business_name as business_name, b.logo_url as business_logo,
              b.address as business_address
       FROM orders o
       LEFT JOIN businesses b ON o.business_id = b.id
@@ -91,7 +91,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
 
     const result = await pool.query(
-      `SELECT o.*, b.name as business_name, b.logo_url as business_logo,
+      `SELECT o.*, b.business_name as business_name, b.logo_url as business_logo,
               b.address as business_address, b.phone as business_phone
        FROM orders o
        LEFT JOIN businesses b ON o.business_id = b.id
