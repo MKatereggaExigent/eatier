@@ -46,7 +46,7 @@ router.get('/', authenticateToken, async (req, res) => {
         u.last_name as specialist_last_name,
         u.email as specialist_email,
         -- Service info
-        ss.name as service_name,
+        ss.service_name as service_name,
         ss.description as service_description,
         ss.base_price as service_base_price
       FROM specialist_bookings sb
@@ -151,7 +151,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
         u.first_name as specialist_first_name,
         u.last_name as specialist_last_name,
         u.email as specialist_email,
-        ss.name as service_name,
+        ss.service_name as service_name,
         ss.description as service_description,
         ss.base_price as service_base_price
       FROM specialist_bookings sb
@@ -229,7 +229,7 @@ router.get('/status/reviewable', authenticateToken, async (req, res) => {
         u.id as specialist_id,
         u.first_name as specialist_first_name,
         u.last_name as specialist_last_name,
-        ss.name as service_name
+        ss.service_name as service_name
       FROM specialist_bookings sb
       JOIN users u ON sb.specialist_id = u.id
       LEFT JOIN specialist_services ss ON sb.service_id = ss.id
