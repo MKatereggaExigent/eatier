@@ -23,7 +23,7 @@ router.get('/specialist/:specialistId', async (req, res) => {
         u.first_name || ' ' || COALESCE(LEFT(u.last_name, 1) || '.', '') as reviewer_name,
         u.profile_image as reviewer_avatar
       FROM specialist_reviews sr
-      JOIN users u ON sr.user_id = u.id
+      JOIN users u ON sr.client_id = u.id
       WHERE sr.specialist_id = $1 AND sr.status = 'published'
     `;
     const params = [specialistId];
@@ -143,13 +143,13 @@ router.post('/', async (req, res) => {
     // Check if user already reviewed this specialist (without booking)
     if (!bookingId) {
       const existingReview = await pool.query(
-        `SELECT id FROM specialist_reviews 
-         WHERE specialist_id = $1 AND user_id = $2 AND booking_id IS NULL`,
+        `SELECT id FROM specialist_reviews
+         WHERE specialist_id = $1 AND client_id = $2 AND booking_id IS NULL`,
         [specialistId, userId]
       );
       if (existingReview.rows.length > 0) {
-        return res.status(400).json({ 
-          error: 'You have already reviewed this specialist' 
+        return res.status(400).json({
+          error: 'You have already reviewed this specialist'
         });
       }
     }
@@ -158,7 +158,7 @@ router.post('/', async (req, res) => {
     let isVerifiedBooking = false;
     if (bookingId) {
       const bookingCheck = await pool.query(
-        'SELECT id FROM specialist_bookings WHERE id = $1 AND user_id = $2',
+        'SELECT id FROM specialist_bookings WHERE id = $1 AND client_id = $2',
         [bookingId, userId]
       );
       isVerifiedBooking = bookingCheck.rows.length > 0;
@@ -166,7 +166,7 @@ router.post('/', async (req, res) => {
 
     const result = await pool.query(`
       INSERT INTO specialist_reviews (
-        tenant_id, specialist_id, user_id, booking_id,
+        tenant_id, specialist_id, client_id, booking_id,
         rating, food_quality_rating, professionalism_rating,
         communication_rating, value_rating,
         title, comment, event_type, event_date, guest_count,
@@ -224,7 +224,7 @@ router.put('/:reviewId', async (req, res) => {
 
     // Verify ownership
     const ownerCheck = await pool.query(
-      'SELECT user_id FROM specialist_reviews WHERE id = $1',
+      'SELECT client_id FROM specialist_reviews WHERE id = $1',
       [reviewId]
     );
 
@@ -232,7 +232,7 @@ router.put('/:reviewId', async (req, res) => {
       return res.status(404).json({ error: 'Review not found' });
     }
 
-    if (ownerCheck.rows[0].user_id !== userId) {
+    if (ownerCheck.rows[0].client_id !== userId) {
       return res.status(403).json({ error: 'You can only edit your own reviews' });
     }
 
@@ -264,7 +264,7 @@ router.delete('/:reviewId', async (req, res) => {
     const userId = req.query.userId || req.body.userId;
 
     const ownerCheck = await pool.query(
-      'SELECT user_id FROM specialist_reviews WHERE id = $1',
+      'SELECT client_id FROM specialist_reviews WHERE id = $1',
       [reviewId]
     );
 
@@ -272,7 +272,7 @@ router.delete('/:reviewId', async (req, res) => {
       return res.status(404).json({ error: 'Review not found' });
     }
 
-    if (ownerCheck.rows[0].user_id !== userId) {
+    if (ownerCheck.rows[0].client_id !== userId) {
       return res.status(403).json({ error: 'You can only delete your own reviews' });
     }
 
@@ -362,7 +362,7 @@ router.get('/user/:userId', async (req, res) => {
         u.profile_image as specialist_avatar
       FROM specialist_reviews sr
       JOIN users u ON sr.specialist_id = u.id
-      WHERE sr.user_id = $1
+      WHERE sr.client_id = $1
       ORDER BY sr.created_at DESC
       LIMIT $2 OFFSET $3
     `, [userId, parseInt(limit), parseInt(offset)]);
