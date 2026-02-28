@@ -33,8 +33,12 @@
             <p class="bio">{{ specialist()!.bio || 'Professional culinary specialist ready to create amazing experiences.' }}</p>
             <div class="quick-stats">
               <div class="stat">
-                <span class="value">{{ specialist()!.completedBookings }}</span>
+                <span class="value">{{ specialist()!.totalBookings }}</span>
                 <span class="label">Bookings</span>
+              </div>
+              <div class="stat">
+                <span class="value">{{ specialist()!.completedBookings }}</span>
+                <span class="label">Completed</span>
               </div>
               <div class="stat">
                 <span class="value">{{ specialist()!.services.length }}</span>

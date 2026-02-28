@@ -262,7 +262,7 @@
                   <p class="specialist-bio">{{ specialist.bio | slice:0:100 }}{{ specialist.bio.length > 100 ? '...' : '' }}</p>
                 }
                 <div class="specialist-stats">
-                  <span class="stat">{{ specialist.completedBookings }} bookings completed</span>
+                  <span class="stat">{{ specialist.totalBookings }} bookings ({{ specialist.completedBookings }} completed)</span>
                   <span class="stat">{{ specialist.services.length }} services</span>
                 </div>
               </div>
@@ -310,7 +310,7 @@
                   @if (specialist.minPrice > 0) {
                     <span class="pricing">From R{{ specialist.minPrice }}</span>
                   }
-                  <span class="stat">{{ specialist.completedBookings }} bookings</span>
+                  <span class="stat">{{ specialist.totalBookings }} bookings ({{ specialist.completedBookings }} completed)</span>
                 </div>
               </div>
             </a>

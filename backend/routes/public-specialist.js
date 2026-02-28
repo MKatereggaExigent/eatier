@@ -22,6 +22,7 @@ router.get('/', async (req, res) => {
         u.created_at,
         COALESCE(AVG(sr.rating), 0) as average_rating,
         COUNT(DISTINCT sr.id) as review_count,
+        COUNT(DISTINCT sb.id) as total_bookings,
         COUNT(DISTINCT sb.id) FILTER (WHERE sb.status = 'completed') as completed_bookings,
         ARRAY_AGG(DISTINCT ss.service_name) FILTER (WHERE ss.service_name IS NOT NULL) as services,
         ARRAY_AGG(DISTINCT ss.service_type) FILTER (WHERE ss.service_type IS NOT NULL) as specialties,
@@ -115,6 +116,7 @@ router.get('/', async (req, res) => {
         bio: row.bio,
         averageRating: parseFloat(row.average_rating) || 0,
         reviewCount: parseInt(row.review_count) || 0,
+        totalBookings: parseInt(row.total_bookings) || 0,
         completedBookings: parseInt(row.completed_bookings) || 0,
         services: row.services?.filter(Boolean) || [],
         specialties: [...new Set(row.specialties?.filter(Boolean) || [])],
@@ -154,6 +156,7 @@ router.get('/:id', async (req, res) => {
         u.created_at,
         COALESCE(AVG(sr.rating), 0) as average_rating,
         COUNT(DISTINCT sr.id) as review_count,
+        COUNT(DISTINCT sb.id) as total_bookings,
         COUNT(DISTINCT sb.id) FILTER (WHERE sb.status = 'completed') as completed_bookings
       FROM users u
       JOIN user_roles ur ON u.id = ur.user_id
@@ -205,6 +208,7 @@ router.get('/:id', async (req, res) => {
       memberSince: specialist.created_at,
       averageRating: parseFloat(specialist.average_rating) || 0,
       reviewCount: parseInt(specialist.review_count) || 0,
+      totalBookings: parseInt(specialist.total_bookings) || 0,
       completedBookings: parseInt(specialist.completed_bookings) || 0,
       services: servicesResult.rows.map(s => ({
         id: s.id,

@@ -13,6 +13,7 @@ export interface SpecialistListItem {
   bio: string | null;
   averageRating: number;
   reviewCount: number;
+  totalBookings: number;
   completedBookings: number;
   services: string[];
   specialties: string[];
@@ -55,6 +56,7 @@ export interface SpecialistDetail {
   memberSince: string;
   averageRating: number;
   reviewCount: number;
+  totalBookings: number;
   completedBookings: number;
   services: SpecialistService[];
   reviews: SpecialistReviewPublic[];
