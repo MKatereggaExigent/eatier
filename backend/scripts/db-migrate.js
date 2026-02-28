@@ -230,8 +230,12 @@ Examples:
 }
 
 // Run migrations
+console.log('Starting migration runner...');
 runMigrations(options)
-  .then(() => process.exit(0))
+  .then(() => {
+    console.log('Migration runner completed.');
+    process.exit(0);
+  })
   .catch(err => {
     console.error('Fatal error:', err);
     process.exit(1);
