@@ -159,7 +159,9 @@ export class ServicesManagementComponent implements OnInit {
           setTimeout(() => this.successMessage.set(null), 3000);
         },
         error: (err) => {
-          this.error.set(err.error?.message || 'Failed to create service');
+          console.error('Create service error:', err);
+          const errorMsg = err.error?.details || err.error?.message || 'Failed to create service';
+          this.error.set(errorMsg);
           this.saving.set(false);
         }
       });

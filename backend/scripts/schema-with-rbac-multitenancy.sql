@@ -221,13 +221,19 @@ CREATE TABLE specialist_profiles (
 -- ============================================
 CREATE TABLE specialist_services (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    specialist_id UUID REFERENCES specialist_profiles(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    specialist_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    service_name VARCHAR(255) NOT NULL,
+    service_type VARCHAR(100),
     description TEXT,
-    duration_minutes INTEGER,
-    price DECIMAL(10, 2),
+    base_price DECIMAL(10, 2) DEFAULT 0,
+    price_per_person DECIMAL(10, 2),
+    min_guests INTEGER DEFAULT 1,
+    max_guests INTEGER,
+    duration_hours DECIMAL(4, 2),
     is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============================================

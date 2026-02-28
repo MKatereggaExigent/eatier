@@ -265,7 +265,13 @@ router.post('/services', authenticateToken, async (req, res) => {
 
   } catch (error) {
     console.error('Error creating specialist service:', error);
-    res.status(500).json({ error: 'Failed to create service' });
+    console.error('Error details:', error.message);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({
+      error: 'Failed to create service',
+      details: error.message,
+      hint: error.hint || null
+    });
   }
 });
 
