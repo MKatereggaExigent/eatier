@@ -31,12 +31,21 @@ router.get('/:userId/stats', async (req, res) => {
       WHERE user_id = $1 AND tenant_id = $2 AND status = 'published'
     `, [userId, tenantId]);
 
-    // Get booking count (include guest bookings made with user's email)
-    const bookingsResult = await pool.query(`
+    // Get restaurant booking count (include guest bookings made with user's email)
+    const restaurantBookingsResult = await pool.query(`
       SELECT COUNT(*) as count FROM bookings
       WHERE (user_id = $1 AND tenant_id = $2)
          OR (user_id IS NULL AND LOWER(contact_email) = LOWER($3))
     `, [userId, tenantId, userEmail]);
+
+    // Get specialist/chef booking count
+    const specialistBookingsResult = await pool.query(`
+      SELECT COUNT(*) as count FROM specialist_bookings
+      WHERE client_id = $1 AND tenant_id = $2
+    `, [userId, tenantId]);
+
+    // Total bookings = restaurant + specialist
+    const totalBookings = parseInt(restaurantBookingsResult.rows[0].count) + parseInt(specialistBookingsResult.rows[0].count);
 
     // Get favorites count
     const favoritesResult = await pool.query(`
@@ -58,7 +67,7 @@ router.get('/:userId/stats', async (req, res) => {
 
     res.json({
       totalReviews: parseInt(reviewsResult.rows[0].count),
-      totalBookings: parseInt(bookingsResult.rows[0].count),
+      totalBookings: totalBookings,
       totalFavorites: parseInt(favoritesResult.rows[0].count),
       totalPhotos: parseInt(photosResult.rows[0].count)
     });
