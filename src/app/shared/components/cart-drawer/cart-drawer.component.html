@@ -1,0 +1,115 @@
+<!-- Cart Drawer Overlay -->
+<div class="cart-overlay" [class.open]="isOpen()" (click)="close()"></div>
+
+<!-- Cart Drawer Panel -->
+<div class="cart-drawer" [class.open]="isOpen()">
+  <!-- Header -->
+  <div class="cart-header">
+    <h2>
+      <span class="cart-icon">🛒</span>
+      Your Cart
+      @if (totalItemCount() > 0) {
+        <span class="item-badge">{{ totalItemCount() }}</span>
+      }
+    </h2>
+    <button type="button" class="close-btn" (click)="close()" aria-label="Close cart">
+      ✕
+    </button>
+  </div>
+
+  <!-- Cart Content -->
+  <div class="cart-content">
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading your cart...</p>
+      </div>
+    } @else if (carts().length === 0) {
+      <div class="empty-cart">
+        <div class="empty-icon">🛒</div>
+        <h3>Your cart is empty</h3>
+        <p>Browse restaurants and add delicious items to your cart</p>
+        <button type="button" class="btn-primary" (click)="continueShopping()">
+          Browse Restaurants
+        </button>
+      </div>
+    } @else {
+      <!-- Cart Groups (one per business) -->
+      @for (cart of carts(); track cart.id) {
+        <div class="cart-group">
+          <!-- Business Header -->
+          <div class="business-header">
+            <div class="business-info">
+              @if (cart.businessLogo) {
+                <img [src]="cart.businessLogo" [alt]="cart.businessName" class="business-logo">
+              } @else {
+                <div class="business-logo placeholder">🍽️</div>
+              }
+              <div>
+                <h4>{{ cart.businessName }}</h4>
+                <span class="order-type">{{ cart.orderType | titlecase }}</span>
+              </div>
+            </div>
+            <button type="button" class="clear-btn" (click)="clearCart(cart)" title="Clear cart">
+              🗑️
+            </button>
+          </div>
+
+          <!-- Cart Items -->
+          <div class="cart-items">
+            @for (item of cart.items; track item.id) {
+              <div class="cart-item">
+                @if (item.itemImageUrl) {
+                  <img [src]="item.itemImageUrl" [alt]="item.itemName" class="item-image">
+                } @else {
+                  <div class="item-image placeholder">🍔</div>
+                }
+                
+                <div class="item-details">
+                  <h5>{{ item.itemName }}</h5>
+                  <p class="item-price">{{ formatPrice(item.unitPrice) }}</p>
+                  @if (item.specialInstructions) {
+                    <p class="special-instructions">{{ item.specialInstructions }}</p>
+                  }
+                </div>
+
+                <div class="item-actions">
+                  <div class="quantity-controls">
+                    <button type="button" (click)="decrementItem(item)" class="qty-btn">−</button>
+                    <span class="quantity">{{ item.quantity }}</span>
+                    <button type="button" (click)="incrementItem(item)" class="qty-btn">+</button>
+                  </div>
+                  <p class="item-total">{{ formatPrice(item.totalPrice) }}</p>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Cart Summary -->
+          <div class="cart-summary">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span>{{ formatPrice(cart.subtotal) }}</span>
+            </div>
+            @if (cart.discountAmount > 0) {
+              <div class="summary-row discount">
+                <span>Discount</span>
+                <span>-{{ formatPrice(cart.discountAmount) }}</span>
+              </div>
+            }
+            <div class="summary-row total">
+              <span>Total</span>
+              <span>{{ formatPrice(cart.subtotal - cart.discountAmount) }}</span>
+            </div>
+          </div>
+
+          <!-- Checkout Button -->
+          <button type="button" class="btn-checkout" (click)="proceedToCheckout(cart)">
+            Proceed to Checkout
+          </button>
+        </div>
+      }
+    }
+  </div>
+</div>
+

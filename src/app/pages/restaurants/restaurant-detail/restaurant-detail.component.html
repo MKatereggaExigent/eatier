@@ -126,29 +126,39 @@
     </div>
   </div>
 
-  <!-- Popular Dishes / Menu Section -->
+  <!-- Add to Cart Notification -->
+  @if (addedToCartNotification()) {
+    <div class="cart-notification">
+      ✓ {{ addedToCartNotification() }} added to cart!
+    </div>
+  }
+
+  <!-- Menu Section -->
   <div id="menu-section" class="popular-dishes">
-    <h2>Popular Dishes</h2>
-    @if (popularDishes().length > 0) {
+    <h2>Menu</h2>
+    @if (menuItems().length > 0) {
       <div class="dishes-grid">
-        @for (dish of popularDishes(); track dish.name) {
+        @for (item of menuItems(); track item.id) {
           <div class="dish-card">
-            <img [src]="dish.image" [alt]="dish.name" class="dish-image" />
+            <img [src]="item.image" [alt]="item.name" class="dish-image" />
             <div class="dish-info">
               <div class="dish-header">
-                <h3>{{ dish.name }}</h3>
-                <span class="dish-price">{{ dish.price }}</span>
+                <h3>{{ item.name }}</h3>
+                <span class="dish-price">{{ item.formattedPrice }}</span>
               </div>
-              <p>{{ dish.description }}</p>
-              <div class="dish-meta">
-                <span class="rating">
-                  <span class="icon">⭐</span>
-                  {{ dish.rating }}
-                </span>
-                <span class="orders">
-                  <span class="icon">🔥</span>
-                  {{ dish.orders }} orders
-                </span>
+              <p>{{ item.description }}</p>
+              <div class="dish-actions">
+                <button
+                  type="button"
+                  class="add-to-cart-btn"
+                  [disabled]="item.isAdding"
+                  (click)="addToCart(item)">
+                  @if (item.isAdding) {
+                    <span class="btn-spinner"></span> Adding...
+                  } @else {
+                    🛒 Add to Cart
+                  }
+                </button>
               </div>
             </div>
           </div>

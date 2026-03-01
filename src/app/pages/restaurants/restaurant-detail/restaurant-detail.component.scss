@@ -14,6 +14,10 @@ $nyt-border: #e2e2e2;
 $itiyum-orange: #ff8c00;
 $itiyum-orange-dark: #e67e00;
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .restaurant-detail {
   width: 100%;
   min-height: 100vh;
@@ -21,6 +25,32 @@ $itiyum-orange-dark: #e67e00;
   padding: 0;
   margin: 0;
   overflow-x: hidden;
+}
+
+// Cart notification toast
+.cart-notification {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  background: linear-gradient(135deg, #28a745, #22c55e);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(40, 167, 69, 0.3);
+  z-index: 1000;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 /* ========== Hero Section ========== */
@@ -589,6 +619,48 @@ $itiyum-orange-dark: #e67e00;
             .icon {
               font-size: 0.9rem;
             }
+          }
+        }
+
+        .dish-actions {
+          margin-top: 1rem;
+          padding-top: 0.75rem;
+          border-top: 1px solid $nyt-border;
+        }
+
+        .add-to-cart-btn {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          background: linear-gradient(135deg, #ff6b35, #f7931a);
+          border: none;
+          border-radius: 8px;
+          color: white;
+          font-size: 0.95rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+
+          &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.35);
+          }
+
+          &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+          }
+
+          .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
           }
         }
       }

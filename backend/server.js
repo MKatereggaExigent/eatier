@@ -151,6 +151,8 @@ const specialistReviewsRoutes = require('./routes/specialist-reviews');
 const paymentsRoutes = require('./routes/payments');
 const subscriptionsRoutes = require('./routes/subscriptions');
 const premiumListingsRoutes = require('./routes/premium-listings');
+const cartRoutes = require('./routes/cart');
+const checkoutRoutes = require('./routes/checkout');
 
 // Static file serving for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -187,6 +189,8 @@ app.use('/api/uploads', uploadRoutes); // File upload endpoints
 app.use('/api/favorites', favoritesRoutes); // User favorites endpoints
 app.use('/api/user-preferences', userPreferencesRoutes); // User preferences for personalization
 app.use('/api/orders', ordersRoutes); // Order history and management
+app.use('/api/cart', cartRoutes); // Shopping cart management
+app.use('/api/checkout', checkoutRoutes); // Checkout and order creation
 app.use('/api/member-promotions', memberPromotionsRoutes); // Member-only promotions
 app.use('/api/booking-incentives', bookingIncentivesRoutes); // Booking discounts/cashback
 app.use('/api/wallet', userWalletRoutes); // User wallet/cashback

@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { AuthService } from './services/auth.service';
+import { CartService } from './services/cart.service';
 import { CommonModule } from '@angular/common';
 import { FooterAdComponent } from '../shared/components/ads/footer-ad/footer-ad.component';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +12,7 @@ import { NotificationService } from './services/notification.service';
 import { RightSidebarAdComponent } from '../shared/components/ads/right-sidebar-ad/right-sidebar-ad.component';
 import { SearchService } from './services/search.service';
 import { User } from '../shared/models/user.model';
+import { CartDrawerComponent } from '../shared/components/cart-drawer/cart-drawer.component';
 
 // Navigation item interface
 interface NavItem {
@@ -34,7 +36,8 @@ interface NavItem {
     HeaderAdComponent,
     FooterAdComponent,
     LeftSidebarAdComponent,
-    RightSidebarAdComponent
+    RightSidebarAdComponent,
+    CartDrawerComponent
   ]
 })
 export class LayoutComponent {
@@ -43,6 +46,7 @@ export class LayoutComponent {
   protected authService = inject(AuthService);
   protected searchService = inject(SearchService);
   protected notificationService = inject(NotificationService);
+  protected cartService = inject(CartService);
 
   // State management for UI interactions
   showProfileMenu = signal(false);
@@ -61,6 +65,10 @@ export class LayoutComponent {
   // Notification state
   notifications = this.notificationService.notifications;
   unreadCount = this.notificationService.unreadCount;
+
+  // Cart state
+  cartItemCount = this.cartService.totalItemCount;
+  hasCartItems = this.cartService.hasItems;
 
   // Computed values from AuthService
   isLoggedIn = computed(() => this.authService.isAuthenticated());
@@ -200,6 +208,12 @@ export class LayoutComponent {
     this.showProfileMenu.set(false);
     this.showSearchModal.set(false);
     this.showNotifications.set(false);
+  }
+
+  toggleCart(): void {
+    this.cartService.toggleCartDrawer();
+    // Close other menus
+    this.closeAllMenus();
   }
 
   // Close all menus when clicking outside

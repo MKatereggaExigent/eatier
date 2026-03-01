@@ -1,14 +1,27 @@
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PublicBusiness, PublicBusinessService } from '../../../core/services/public-business.service';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { BookingsService } from '../../../services/bookings.service';
+import { CartService } from '../../../core/services/cart.service';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { InsightsService } from '../../../core/services/insights.service';
 import { environment } from '../../../../environments/environment';
+
+interface MenuItem {
+  id: string;
+  name: string;
+  price: number;
+  formattedPrice: string;
+  description: string;
+  image: string;
+  rating: number;
+  orders: number;
+  isAdding?: boolean;
+}
 
 @Component({
   selector: 'app-restaurant-detail',
@@ -19,12 +32,14 @@ import { environment } from '../../../../environments/environment';
 })
 export class RestaurantDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private publicBusinessService = inject(PublicBusinessService);
   private bookingsService = inject(BookingsService);
   private http = inject(HttpClient);
   private fb = inject(FormBuilder);
   private insightsService = inject(InsightsService);
   private authService = inject(AuthService);
+  protected cartService = inject(CartService);
 
   restaurantId = signal<string>('');
   isLoading = signal<boolean>(true);
@@ -32,6 +47,12 @@ export class RestaurantDetailComponent implements OnInit {
   private sessionId = this.generateSessionId();
   private sessionStartTime = Date.now();
   private pagesVisited = 1;
+
+  // Menu items with IDs for cart
+  menuItems = signal<MenuItem[]>([]);
+
+  // Cart notification state
+  addedToCartNotification = signal<string | null>(null);
 
   // Booking modal state
   showBookingModal = signal<boolean>(false);
@@ -225,24 +246,84 @@ export class RestaurantDetailComponent implements OnInit {
     // Fetch menu items for this specific business only
     this.http.get<any[]>(`${environment.apiUrl}/menus/business/${businessId}`).subscribe({
       next: (menus) => {
-        // Map menu items to dish format for display
-        const dishes = menus.map((menu: any) => ({
+        // Map menu items with IDs for cart functionality
+        const items: MenuItem[] = menus.map((menu: any) => ({
+          id: menu.id,
           name: menu.title,
-          price: `$${menu.price.toFixed(2)}`,
+          price: menu.price,
+          formattedPrice: `UGX ${menu.price.toLocaleString()}`,
           description: menu.description,
           image: menu.backgroundImage || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop',
-          rating: 0, // No ratings yet
-          orders: 0  // No order tracking yet
+          rating: 0,
+          orders: 0,
+          isAdding: false
         }));
 
+        this.menuItems.set(items);
+
+        // Also set popular dishes for backward compatibility
+        const dishes = items.map(item => ({
+          name: item.name,
+          price: item.formattedPrice,
+          description: item.description,
+          image: item.image,
+          rating: item.rating,
+          orders: item.orders
+        }));
         this.popularDishes.set(dishes);
       },
       error: (error) => {
         console.error('Error loading menu items:', error);
-        // Keep empty array on error
+        this.menuItems.set([]);
         this.popularDishes.set([]);
       }
     });
+  }
+
+  // Add item to cart
+  addToCart(item: MenuItem): void {
+    if (!this.authService.isAuthenticated()) {
+      // Redirect to login if not authenticated
+      this.router.navigate(['/auth/login'], {
+        queryParams: { returnUrl: `/restaurants/${this.restaurantId()}` }
+      });
+      return;
+    }
+
+    // Set loading state for this item
+    this.menuItems.update(items =>
+      items.map(i => i.id === item.id ? { ...i, isAdding: true } : i)
+    );
+
+    this.cartService.addToCart({
+      businessId: this.restaurantId(),
+      menuItemId: item.id,
+      quantity: 1
+    }).subscribe({
+      next: () => {
+        // Reset loading state
+        this.menuItems.update(items =>
+          items.map(i => i.id === item.id ? { ...i, isAdding: false } : i)
+        );
+
+        // Show notification
+        this.addedToCartNotification.set(item.name);
+        setTimeout(() => this.addedToCartNotification.set(null), 3000);
+      },
+      error: (error) => {
+        console.error('Error adding to cart:', error);
+        // Reset loading state
+        this.menuItems.update(items =>
+          items.map(i => i.id === item.id ? { ...i, isAdding: false } : i)
+        );
+        alert('Failed to add item to cart. Please try again.');
+      }
+    });
+  }
+
+  // Check if user is logged in
+  isLoggedIn(): boolean {
+    return this.authService.isAuthenticated();
   }
 
   loadReviews(businessId: string): void {

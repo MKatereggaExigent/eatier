@@ -299,6 +299,7 @@
       }
 
       .search-btn,
+      .cart-btn,
       .notifications-btn,
       .profile-btn {
         background: var(--glass-white);
@@ -323,6 +324,29 @@
           background: rgba(255, 255, 255, 0.4);
           transform: translateY(-2px);
           box-shadow: var(--shadow-md);
+        }
+      }
+
+      .cart-btn {
+        position: relative;
+
+        .cart-badge {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          background: linear-gradient(135deg, #ff6b35 0%, #f7931a 100%);
+          color: white;
+          font-size: 10px;
+          font-weight: var(--font-bold);
+          padding: 2px 6px;
+          border-radius: var(--radius-full);
+          min-width: 18px;
+          height: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          border: 2px solid white;
         }
       }
 
@@ -755,6 +779,7 @@
         gap: var(--space-1);
 
         .search-btn,
+        .cart-btn,
         .notifications-btn,
         .profile-btn {
           width: 32px;

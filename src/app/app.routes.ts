@@ -30,6 +30,18 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/restaurants/restaurant-detail/restaurant-detail.component').then(m => m.RestaurantDetailComponent)
             },
 
+            // Checkout (requires authentication)
+            {
+                path: 'checkout/:cartId',
+                loadComponent: () => import('./pages/checkout/checkout.component').then(m => m.CheckoutComponent)
+            },
+
+            // Order confirmation
+            {
+                path: 'order-confirmation/:orderId',
+                loadComponent: () => import('./pages/checkout/order-confirmation/order-confirmation.component').then(m => m.OrderConfirmationComponent)
+            },
+
             // Public specialist discovery
             {
                 path: 'specialists',

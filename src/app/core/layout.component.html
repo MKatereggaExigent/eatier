@@ -24,6 +24,16 @@
           🔍
         </button>
 
+        <!-- Cart Button - Only show for authenticated users -->
+        @if (isLoggedIn()) {
+          <button type="button" class="cart-btn" title="Shopping Cart" (click)="toggleCart(); $event.stopPropagation()">
+            🛒
+            @if (cartItemCount() > 0) {
+              <span class="cart-badge">{{ cartItemCount() }}</span>
+            }
+          </button>
+        }
+
         <!-- Notifications - Only show for authenticated users -->
         @if (isLoggedIn()) {
           <button type="button" class="notifications-btn" title="Notifications" (click)="toggleNotifications(); $event.stopPropagation()">
@@ -332,4 +342,7 @@
       </div>
     </div>
   </footer>
+
+  <!-- Cart Drawer -->
+  <app-cart-drawer></app-cart-drawer>
 </div>
