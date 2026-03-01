@@ -42,10 +42,10 @@ router.get('/:userId/stats', async (req, res) => {
       WHERE user_id = $1 AND tenant_id = $2
     `, [userId, tenantId]);
 
-    // Get photos count (from reviews with images)
+    // Get photos count (from reviews with images - images is JSONB)
     const photosResult = await pool.query(`
       SELECT COUNT(*) as count FROM reviews
-      WHERE user_id = $1 AND tenant_id = $2 AND images IS NOT NULL AND array_length(images, 1) > 0
+      WHERE user_id = $1 AND tenant_id = $2 AND images IS NOT NULL AND jsonb_array_length(images) > 0
     `, [userId, tenantId]);
 
     res.json({
@@ -335,7 +335,7 @@ router.get('/:userId/recommendations', async (req, res) => {
         b.id,
         b.business_name as name,
         b.cuisine_types as cuisine,
-        b.featured_image as image,
+        COALESCE(b.cover_image_url, b.profile_photos->0->>'url', b.profile_photos->>0) as image,
         b.address,
         COALESCE(AVG(r.rating), 0) as rating,
         COUNT(DISTINCT r.id) as review_count
@@ -363,7 +363,7 @@ router.get('/:userId/recommendations', async (req, res) => {
     }
 
     query += `
-      GROUP BY b.id, b.business_name, b.cuisine_types, b.featured_image, b.address
+      GROUP BY b.id, b.business_name, b.cuisine_types, b.cover_image_url, b.profile_photos, b.address
       ORDER BY rating DESC, review_count DESC
       LIMIT $${paramIndex}
     `;
