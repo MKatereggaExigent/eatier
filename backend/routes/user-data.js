@@ -18,6 +18,7 @@ router.get('/:userId/stats', async (req, res) => {
   try {
     const { userId } = req.params;
     const tenantId = req.user.tenant_id;
+    const userEmail = req.user.email;
 
     // Verify user can access this data (own data or admin)
     if (req.user.id !== userId && req.user.role !== 'itiyum-admin') {
@@ -30,11 +31,12 @@ router.get('/:userId/stats', async (req, res) => {
       WHERE user_id = $1 AND tenant_id = $2 AND status = 'published'
     `, [userId, tenantId]);
 
-    // Get booking count
+    // Get booking count (include guest bookings made with user's email)
     const bookingsResult = await pool.query(`
       SELECT COUNT(*) as count FROM bookings
-      WHERE user_id = $1 AND tenant_id = $2
-    `, [userId, tenantId]);
+      WHERE (user_id = $1 AND tenant_id = $2)
+         OR (user_id IS NULL AND LOWER(contact_email) = LOWER($3))
+    `, [userId, tenantId, userEmail]);
 
     // Get favorites count
     const favoritesResult = await pool.query(`
@@ -74,6 +76,7 @@ router.get('/:userId/activity', async (req, res) => {
     const { userId } = req.params;
     const { limit = 10 } = req.query;
     const tenantId = req.user.tenant_id;
+    const userEmail = req.user.email;
 
     // Verify user can access this data
     if (req.user.id !== userId && req.user.role !== 'itiyum-admin') {
@@ -96,7 +99,7 @@ router.get('/:userId/activity', async (req, res) => {
       LIMIT $3
     `;
 
-    // Get recent bookings
+    // Get recent bookings (include guest bookings made with user's email)
     const bookingsQuery = `
       SELECT
         bk.id,
@@ -107,7 +110,8 @@ router.get('/:userId/activity', async (req, res) => {
         bk.created_at
       FROM bookings bk
       JOIN businesses b ON bk.business_id = b.id
-      WHERE bk.user_id = $1 AND bk.tenant_id = $2
+      WHERE (bk.user_id = $1 AND bk.tenant_id = $2)
+         OR (bk.user_id IS NULL AND LOWER(bk.contact_email) = LOWER($4))
       ORDER BY bk.created_at DESC
       LIMIT $3
     `;
@@ -130,7 +134,7 @@ router.get('/:userId/activity', async (req, res) => {
     // Execute all queries
     const [reviews, bookings, favorites] = await Promise.all([
       pool.query(reviewsQuery, [userId, tenantId, limit]),
-      pool.query(bookingsQuery, [userId, tenantId, limit]),
+      pool.query(bookingsQuery, [userId, tenantId, limit, userEmail]),
       pool.query(favoritesQuery, [userId, tenantId, limit])
     ]);
 
