@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Subject, of } from 'rxjs';
+import { Subject, of, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
@@ -14,6 +14,10 @@ interface Review {
   businessName: string;
   businessType?: string;
   rating: number;
+  foodRating?: number;
+  serviceRating?: number;
+  ambianceRating?: number;
+  valueRating?: number;
   title: string;
   comment: string;
   images: string[];
@@ -24,6 +28,13 @@ interface Review {
   notHelpfulCount: number;
   wouldRecommend: boolean;
   status: 'draft' | 'published' | 'flagged' | 'archived';
+}
+
+interface Business {
+  id: string;
+  businessName: string;
+  businessType: string;
+  profilePhotos?: string[];
 }
 
 interface ReviewStats {
@@ -40,6 +51,19 @@ interface FilterOptions {
   sortBy: 'newest' | 'oldest' | 'rating_high' | 'rating_low' | 'helpful';
 }
 
+interface NewReviewForm {
+  businessId: string;
+  overallRating: number;
+  foodRating: number;
+  serviceRating: number;
+  ambianceRating: number;
+  valueRating: number;
+  title: string;
+  comment: string;
+  visitDate: string;
+  wouldRecommend: boolean;
+}
+
 @Component({
   selector: 'app-user-reviews',
   standalone: true,
@@ -51,6 +75,7 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
+  private businessSearch$ = new Subject<string>();
 
   currentUser = this.authService.currentUser;
 
@@ -62,6 +87,45 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
   showEditModal = signal(false);
   showDeleteConfirm = signal(false);
   deleting = signal(false);
+  submittingReview = signal(false);
+
+  // Business search for new review
+  businessSearchQuery = signal('');
+  businessSearchResults = signal<Business[]>([]);
+  searchingBusinesses = signal(false);
+  selectedBusiness = signal<Business | null>(null);
+
+  // New review form
+  newReviewForm = signal<NewReviewForm>({
+    businessId: '',
+    overallRating: 0,
+    foodRating: 0,
+    serviceRating: 0,
+    ambianceRating: 0,
+    valueRating: 0,
+    title: '',
+    comment: '',
+    visitDate: '',
+    wouldRecommend: true
+  });
+
+  // Edit review form
+  editReviewForm = signal<NewReviewForm>({
+    businessId: '',
+    overallRating: 0,
+    foodRating: 0,
+    serviceRating: 0,
+    ambianceRating: 0,
+    valueRating: 0,
+    title: '',
+    comment: '',
+    visitDate: '',
+    wouldRecommend: true
+  });
+
+  // Star rating helper
+  ratingStars = [1, 2, 3, 4, 5];
+  today = new Date().toISOString().split('T')[0];
 
   // Filter and search
   searchQuery = signal('');
@@ -83,11 +147,50 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadReviews();
+    this.setupBusinessSearch();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  setupBusinessSearch(): void {
+    this.businessSearch$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$),
+      switchMap(query => {
+        if (!query || query.length < 2) {
+          return of({ businesses: [] });
+        }
+        this.searchingBusinesses.set(true);
+        return this.http.get<any>(`${environment.apiUrl}/businesses`, {
+          params: { limit: '10' }
+        }).pipe(
+          catchError(() => of({ businesses: [] }))
+        );
+      })
+    ).subscribe(response => {
+      const query = this.businessSearchQuery().toLowerCase();
+      const filtered = (response.businesses || []).filter((b: Business) =>
+        b.businessName.toLowerCase().includes(query)
+      );
+      this.businessSearchResults.set(filtered);
+      this.searchingBusinesses.set(false);
+    });
+  }
+
+  onBusinessSearch(query: string): void {
+    this.businessSearchQuery.set(query);
+    this.businessSearch$.next(query);
+  }
+
+  selectBusiness(business: Business): void {
+    this.selectedBusiness.set(business);
+    this.newReviewForm.update(form => ({ ...form, businessId: business.id }));
+    this.businessSearchResults.set([]);
+    this.businessSearchQuery.set(business.businessName);
   }
 
   loadReviews(): void {
@@ -110,7 +213,29 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
         finalize(() => this.isLoading.set(false))
       )
       .subscribe(response => {
-        this.reviews.set(response.reviews || []);
+        // Map snake_case from backend to camelCase for frontend
+        const mappedReviews = (response.reviews || []).map((r: any) => ({
+          id: r.id,
+          businessId: r.business_id,
+          businessName: r.business_name,
+          businessType: r.business_type,
+          rating: r.overall_rating || r.rating,
+          foodRating: r.food_rating,
+          serviceRating: r.service_rating,
+          ambianceRating: r.ambiance_rating,
+          valueRating: r.value_rating,
+          title: r.title || '',
+          comment: r.content || r.comment || '',
+          images: r.images || r.photos || [],
+          visitDate: r.visit_date,
+          createdAt: r.created_at,
+          updatedAt: r.updated_at,
+          helpfulCount: r.helpful_votes || 0,
+          notHelpfulCount: 0,
+          wouldRecommend: r.would_recommend !== false,
+          status: r.status || 'published'
+        }));
+        this.reviews.set(mappedReviews);
         this.reviewStats.set(response.stats || { totalReviews: 0, averageRating: 0, helpfulVotes: 0 });
       });
   }
@@ -183,21 +308,150 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
 
   // Action methods
   openNewReviewModal(): void {
+    this.resetNewReviewForm();
     this.showNewReviewModal.set(true);
   }
 
   closeNewReviewModal(): void {
     this.showNewReviewModal.set(false);
+    this.resetNewReviewForm();
+  }
+
+  resetNewReviewForm(): void {
+    this.newReviewForm.set({
+      businessId: '',
+      overallRating: 0,
+      foodRating: 0,
+      serviceRating: 0,
+      ambianceRating: 0,
+      valueRating: 0,
+      title: '',
+      comment: '',
+      visitDate: '',
+      wouldRecommend: true
+    });
+    this.selectedBusiness.set(null);
+    this.businessSearchQuery.set('');
+    this.businessSearchResults.set([]);
+  }
+
+  updateNewReviewField(field: keyof NewReviewForm, value: any): void {
+    this.newReviewForm.update(form => ({ ...form, [field]: value }));
+  }
+
+  setNewReviewRating(field: 'overallRating' | 'foodRating' | 'serviceRating' | 'ambianceRating' | 'valueRating', rating: number): void {
+    this.newReviewForm.update(form => ({ ...form, [field]: rating }));
+  }
+
+  submitNewReview(): void {
+    const form = this.newReviewForm();
+    const userId = this.currentUser()?.id || localStorage.getItem('user_id');
+
+    if (!form.businessId || !form.overallRating || !form.comment || !userId) {
+      this.error.set('Please fill in all required fields');
+      return;
+    }
+
+    this.submittingReview.set(true);
+    this.error.set(null);
+
+    this.http.post(`${environment.apiUrl}/reviews`, {
+      userId,
+      businessId: form.businessId,
+      overallRating: form.overallRating,
+      foodRating: form.foodRating || null,
+      serviceRating: form.serviceRating || null,
+      ambianceRating: form.ambianceRating || null,
+      valueRating: form.valueRating || null,
+      title: form.title,
+      comment: form.comment,
+      visitDate: form.visitDate || null,
+      wouldRecommend: form.wouldRecommend,
+      status: 'published'
+    }).pipe(
+      takeUntil(this.destroy$),
+      catchError(err => {
+        console.error('Error submitting review:', err);
+        this.error.set(err.error?.error || 'Failed to submit review');
+        return of(null);
+      }),
+      finalize(() => this.submittingReview.set(false))
+    ).subscribe(response => {
+      if (response) {
+        this.loadReviews();
+        this.closeNewReviewModal();
+      }
+    });
   }
 
   editReview(review: Review): void {
     this.selectedReview.set(review);
+    this.editReviewForm.set({
+      businessId: review.businessId,
+      overallRating: review.rating,
+      foodRating: review.foodRating || 0,
+      serviceRating: review.serviceRating || 0,
+      ambianceRating: review.ambianceRating || 0,
+      valueRating: review.valueRating || 0,
+      title: review.title,
+      comment: review.comment,
+      visitDate: review.visitDate ? review.visitDate.split('T')[0] : '',
+      wouldRecommend: review.wouldRecommend
+    });
     this.showEditModal.set(true);
   }
 
   closeEditModal(): void {
     this.selectedReview.set(null);
     this.showEditModal.set(false);
+  }
+
+  updateEditReviewField(field: keyof NewReviewForm, value: any): void {
+    this.editReviewForm.update(form => ({ ...form, [field]: value }));
+  }
+
+  setEditReviewRating(field: 'overallRating' | 'foodRating' | 'serviceRating' | 'ambianceRating' | 'valueRating', rating: number): void {
+    this.editReviewForm.update(form => ({ ...form, [field]: rating }));
+  }
+
+  submitEditReview(): void {
+    const review = this.selectedReview();
+    const form = this.editReviewForm();
+    const userId = this.currentUser()?.id || localStorage.getItem('user_id');
+
+    if (!review || !form.overallRating || !form.comment || !userId) {
+      this.error.set('Please fill in all required fields');
+      return;
+    }
+
+    this.submittingReview.set(true);
+    this.error.set(null);
+
+    this.http.put(`${environment.apiUrl}/reviews/${review.id}`, {
+      userId,
+      overallRating: form.overallRating,
+      foodRating: form.foodRating || null,
+      serviceRating: form.serviceRating || null,
+      ambianceRating: form.ambianceRating || null,
+      valueRating: form.valueRating || null,
+      title: form.title,
+      comment: form.comment,
+      visitDate: form.visitDate || null,
+      wouldRecommend: form.wouldRecommend
+    }).pipe(
+      takeUntil(this.destroy$),
+      catchError(err => {
+        console.error('Error updating review:', err);
+        this.error.set(err.error?.error || 'Failed to update review');
+        return of(null);
+      }),
+      finalize(() => this.submittingReview.set(false))
+    ).subscribe(response => {
+      if (response) {
+        this.loadReviews();
+        this.closeEditModal();
+      }
+    });
   }
 
   deleteReview(reviewId: string): void {

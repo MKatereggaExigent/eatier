@@ -217,12 +217,146 @@
         <button type="button" class="modal-close" (click)="closeNewReviewModal()">×</button>
       </div>
       <div class="modal-body">
-        <p>New review form would go here...</p>
-        <p class="note">This would include restaurant selection, rating inputs, photo upload, etc.</p>
+        <!-- Business Search -->
+        <div class="form-group">
+          <label>Select Restaurant *</label>
+          <div class="business-search-container">
+            <input
+              type="text"
+              [value]="businessSearchQuery()"
+              (input)="onBusinessSearch($any($event.target).value)"
+              placeholder="Search for a restaurant..."
+              class="form-input"
+              [disabled]="selectedBusiness() !== null">
+            @if (selectedBusiness()) {
+              <button type="button" class="clear-business" (click)="resetNewReviewForm()">✕</button>
+            }
+          </div>
+          @if (searchingBusinesses()) {
+            <div class="search-loading">Searching...</div>
+          }
+          @if (businessSearchResults().length > 0) {
+            <div class="business-dropdown">
+              @for (business of businessSearchResults(); track business.id) {
+                <div class="business-option" (click)="selectBusiness(business)">
+                  <span class="business-name">{{ business.businessName }}</span>
+                  <span class="business-type">{{ business.businessType }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Overall Rating -->
+        <div class="form-group rating-group">
+          <label>Overall Rating *</label>
+          <div class="star-rating">
+            @for (star of ratingStars; track star) {
+              <button type="button" class="star-btn"
+                      [class.filled]="star <= newReviewForm().overallRating"
+                      (click)="setNewReviewRating('overallRating', star)">★</button>
+            }
+            <span class="rating-label">{{ newReviewForm().overallRating || 0 }}/5</span>
+          </div>
+        </div>
+
+        <!-- Detailed Ratings -->
+        <div class="detailed-ratings-grid">
+          <div class="rating-item">
+            <label>Food</label>
+            <div class="mini-star-rating">
+              @for (star of ratingStars; track star) {
+                <button type="button" class="star-btn small"
+                        [class.filled]="star <= newReviewForm().foodRating"
+                        (click)="setNewReviewRating('foodRating', star)">★</button>
+              }
+            </div>
+          </div>
+          <div class="rating-item">
+            <label>Service</label>
+            <div class="mini-star-rating">
+              @for (star of ratingStars; track star) {
+                <button type="button" class="star-btn small"
+                        [class.filled]="star <= newReviewForm().serviceRating"
+                        (click)="setNewReviewRating('serviceRating', star)">★</button>
+              }
+            </div>
+          </div>
+          <div class="rating-item">
+            <label>Ambiance</label>
+            <div class="mini-star-rating">
+              @for (star of ratingStars; track star) {
+                <button type="button" class="star-btn small"
+                        [class.filled]="star <= newReviewForm().ambianceRating"
+                        (click)="setNewReviewRating('ambianceRating', star)">★</button>
+              }
+            </div>
+          </div>
+          <div class="rating-item">
+            <label>Value</label>
+            <div class="mini-star-rating">
+              @for (star of ratingStars; track star) {
+                <button type="button" class="star-btn small"
+                        [class.filled]="star <= newReviewForm().valueRating"
+                        (click)="setNewReviewRating('valueRating', star)">★</button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <div class="form-group">
+          <label>Review Title</label>
+          <input
+            type="text"
+            [value]="newReviewForm().title"
+            (input)="updateNewReviewField('title', $any($event.target).value)"
+            placeholder="Summarize your experience"
+            class="form-input">
+        </div>
+
+        <!-- Comment -->
+        <div class="form-group">
+          <label>Your Review *</label>
+          <textarea
+            [value]="newReviewForm().comment"
+            (input)="updateNewReviewField('comment', $any($event.target).value)"
+            placeholder="Tell us about your experience (minimum 20 characters)"
+            class="form-textarea"
+            rows="4"></textarea>
+        </div>
+
+        <!-- Visit Date -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Visit Date</label>
+            <input
+              type="date"
+              [value]="newReviewForm().visitDate"
+              [max]="today"
+              (input)="updateNewReviewField('visitDate', $any($event.target).value)"
+              class="form-input">
+          </div>
+          <div class="form-group checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                [checked]="newReviewForm().wouldRecommend"
+                (change)="updateNewReviewField('wouldRecommend', $any($event.target).checked)">
+              I would recommend this restaurant
+            </label>
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="error-message">{{ error() }}</div>
+        }
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn-secondary" (click)="closeNewReviewModal()">Cancel</button>
-        <button type="button" class="btn-primary">Save Review</button>
+        <button type="button" class="btn-secondary" (click)="closeNewReviewModal()" [disabled]="submittingReview()">Cancel</button>
+        <button type="button" class="btn-primary" (click)="submitNewReview()" [disabled]="submittingReview()">
+          {{ submittingReview() ? 'Submitting...' : 'Submit Review' }}
+        </button>
       </div>
     </div>
   </div>
@@ -237,12 +371,122 @@
         <button type="button" class="modal-close" (click)="closeEditModal()">×</button>
       </div>
       <div class="modal-body">
-        <p>Edit review form would go here...</p>
-        <p class="note">Pre-populated with existing review data: {{ selectedReview()?.title }}</p>
+        <!-- Business Name (read-only) -->
+        <div class="form-group">
+          <label>Restaurant</label>
+          <div class="business-display">{{ selectedReview()?.businessName }}</div>
+        </div>
+
+        <!-- Overall Rating -->
+        <div class="form-group rating-group">
+          <label>Overall Rating *</label>
+          <div class="star-rating">
+            @for (star of ratingStars; track star) {
+              <button type="button" class="star-btn"
+                      [class.filled]="star <= editReviewForm().overallRating"
+                      (click)="setEditReviewRating('overallRating', star)">★</button>
+            }
+            <span class="rating-label">{{ editReviewForm().overallRating || 0 }}/5</span>
+          </div>
+        </div>
+
+        <!-- Detailed Ratings -->
+        <div class="detailed-ratings-grid">
+          <div class="rating-item">
+            <label>Food</label>
+            <div class="mini-star-rating">
+              @for (star of ratingStars; track star) {
+                <button type="button" class="star-btn small"
+                        [class.filled]="star <= editReviewForm().foodRating"
+                        (click)="setEditReviewRating('foodRating', star)">★</button>
+              }
+            </div>
+          </div>
+          <div class="rating-item">
+            <label>Service</label>
+            <div class="mini-star-rating">
+              @for (star of ratingStars; track star) {
+                <button type="button" class="star-btn small"
+                        [class.filled]="star <= editReviewForm().serviceRating"
+                        (click)="setEditReviewRating('serviceRating', star)">★</button>
+              }
+            </div>
+          </div>
+          <div class="rating-item">
+            <label>Ambiance</label>
+            <div class="mini-star-rating">
+              @for (star of ratingStars; track star) {
+                <button type="button" class="star-btn small"
+                        [class.filled]="star <= editReviewForm().ambianceRating"
+                        (click)="setEditReviewRating('ambianceRating', star)">★</button>
+              }
+            </div>
+          </div>
+          <div class="rating-item">
+            <label>Value</label>
+            <div class="mini-star-rating">
+              @for (star of ratingStars; track star) {
+                <button type="button" class="star-btn small"
+                        [class.filled]="star <= editReviewForm().valueRating"
+                        (click)="setEditReviewRating('valueRating', star)">★</button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <div class="form-group">
+          <label>Review Title</label>
+          <input
+            type="text"
+            [value]="editReviewForm().title"
+            (input)="updateEditReviewField('title', $any($event.target).value)"
+            placeholder="Summarize your experience"
+            class="form-input">
+        </div>
+
+        <!-- Comment -->
+        <div class="form-group">
+          <label>Your Review *</label>
+          <textarea
+            [value]="editReviewForm().comment"
+            (input)="updateEditReviewField('comment', $any($event.target).value)"
+            placeholder="Tell us about your experience"
+            class="form-textarea"
+            rows="4"></textarea>
+        </div>
+
+        <!-- Visit Date -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Visit Date</label>
+            <input
+              type="date"
+              [value]="editReviewForm().visitDate"
+              [max]="today"
+              (input)="updateEditReviewField('visitDate', $any($event.target).value)"
+              class="form-input">
+          </div>
+          <div class="form-group checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                [checked]="editReviewForm().wouldRecommend"
+                (change)="updateEditReviewField('wouldRecommend', $any($event.target).checked)">
+              I would recommend this restaurant
+            </label>
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="error-message">{{ error() }}</div>
+        }
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn-secondary" (click)="closeEditModal()">Cancel</button>
-        <button type="button" class="btn-primary">Update Review</button>
+        <button type="button" class="btn-secondary" (click)="closeEditModal()" [disabled]="submittingReview()">Cancel</button>
+        <button type="button" class="btn-primary" (click)="submitEditReview()" [disabled]="submittingReview()">
+          {{ submittingReview() ? 'Updating...' : 'Update Review' }}
+        </button>
       </div>
     </div>
   </div>
