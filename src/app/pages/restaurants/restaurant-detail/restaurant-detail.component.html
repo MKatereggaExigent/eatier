@@ -416,15 +416,22 @@
               </select>
             </div>
 
-            <div class="form-group">
+            <div class="form-group table-preference-group">
               <label for="tablePreferences">Table Preference (Optional)</label>
-              <select id="tablePreferences" formControlName="tablePreferences" class="form-control">
+              <select id="tablePreferences" formControlName="tablePreferences" class="form-control"
+                      (change)="onTablePreferenceChange($event)">
                 <option value="">No preference</option>
                 <option value="window">Window seat</option>
                 <option value="quiet">Quiet area</option>
                 <option value="outdoor">Outdoor seating</option>
                 <option value="booth">Booth</option>
               </select>
+              @if (showTablePreferenceNotice()) {
+                <div class="preference-notice">
+                  <span class="notice-icon">ℹ️</span>
+                  <span>This area may be reserved. We'll confirm availability.</span>
+                </div>
+              }
             </div>
           </div>
 
@@ -437,6 +444,12 @@
               placeholder="Any dietary restrictions, allergies, or special requests..."
               class="form-control"
             ></textarea>
+          </div>
+
+          <!-- Availability Notice -->
+          <div class="availability-notice">
+            <span class="notice-icon">📋</span>
+            <span class="notice-text">Reservations are subject to space availability. The restaurant will confirm your booking.</span>
           </div>
 
           @if (bookingError()) {

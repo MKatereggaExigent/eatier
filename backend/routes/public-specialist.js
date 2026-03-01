@@ -512,5 +512,62 @@ router.get('/:id/can-review', authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * GET /api/public/specialists/:id/availability
+ * Get specialist availability for calendar preview (public endpoint)
+ * Returns unavailable dates and weekly schedule for the next 3 months
+ */
+router.get('/:id/availability', async (req, res) => {
+  try {
+    const specialistId = req.params.id;
+    const { month, year } = req.query;
+
+    // Get current date info
+    const now = new Date();
+    const targetMonth = month ? parseInt(month) : now.getMonth() + 1;
+    const targetYear = year ? parseInt(year) : now.getFullYear();
+
+    // Get confirmed/pending bookings for this specialist (dates that are busy)
+    const bookingsResult = await pool.query(`
+      SELECT DISTINCT booking_date
+      FROM specialist_bookings
+      WHERE specialist_id = $1
+        AND status IN ('pending', 'confirmed')
+        AND booking_date >= CURRENT_DATE
+        AND booking_date <= CURRENT_DATE + INTERVAL '90 days'
+      ORDER BY booking_date
+    `, [specialistId]);
+
+    // For now, we'll use default weekly availability (Mon-Fri available)
+    // In the future, this could be fetched from a specialist_availability table
+    const defaultWeeklyAvailability = {
+      monday: true,
+      tuesday: true,
+      wednesday: true,
+      thursday: true,
+      friday: true,
+      saturday: false,
+      sunday: false
+    };
+
+    // Get unavailable dates (busy with bookings)
+    const unavailableDates = bookingsResult.rows.map(row => {
+      const date = new Date(row.booking_date);
+      return date.toISOString().split('T')[0];
+    });
+
+    res.json({
+      specialistId,
+      weeklyAvailability: defaultWeeklyAvailability,
+      unavailableDates,
+      month: targetMonth,
+      year: targetYear
+    });
+  } catch (error) {
+    console.error('Error fetching specialist availability:', error);
+    res.status(500).json({ error: 'Failed to fetch availability' });
+  }
+});
+
 module.exports = router;
 

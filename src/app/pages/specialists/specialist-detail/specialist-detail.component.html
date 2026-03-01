@@ -154,11 +154,54 @@
 
             <form (ngSubmit)="submitBooking()" class="booking-form">
               <div class="form-row">
-                <div class="form-group">
+                <div class="form-group date-group">
                   <label>Event Date *</label>
-                  <input type="date" [value]="bookingForm().bookingDate"
-                         [min]="today"
-                         (input)="updateBookingField('bookingDate', $any($event.target).value)" required />
+                  <div class="date-input-wrapper">
+                    <input type="date" [value]="bookingForm().bookingDate"
+                           [min]="today"
+                           (focus)="showAvailabilityCalendar.set(true)"
+                           (input)="updateBookingField('bookingDate', $any($event.target).value)" required />
+                    <button type="button" class="calendar-toggle-btn" (click)="toggleAvailabilityCalendar()">
+                      📅
+                    </button>
+                  </div>
+
+                  <!-- Availability Calendar Preview -->
+                  @if (showAvailabilityCalendar()) {
+                    <div class="availability-calendar-preview">
+                      <div class="calendar-header">
+                        <button type="button" class="nav-btn" (click)="previousMonth()">‹</button>
+                        <span class="month-year">{{ calendarMonthYear() }}</span>
+                        <button type="button" class="nav-btn" (click)="nextMonth()">›</button>
+                        <button type="button" class="close-calendar" (click)="showAvailabilityCalendar.set(false)">✕</button>
+                      </div>
+                      <div class="calendar-legend">
+                        <span class="legend-item available"><span class="dot"></span> Available</span>
+                        <span class="legend-item unavailable"><span class="dot"></span> Unavailable</span>
+                      </div>
+                      <div class="calendar-weekdays">
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                      </div>
+                      <div class="calendar-days">
+                        @for (day of calendarDays(); track day.date) {
+                          <button type="button"
+                                  class="calendar-day"
+                                  [class.other-month]="!day.isCurrentMonth"
+                                  [class.available]="day.isAvailable && day.isCurrentMonth"
+                                  [class.unavailable]="!day.isAvailable && day.isCurrentMonth"
+                                  [class.past]="day.isPast"
+                                  [class.selected]="day.isSelected"
+                                  [disabled]="!day.isAvailable || day.isPast || !day.isCurrentMonth"
+                                  (click)="selectDate(day)">
+                            {{ day.day }}
+                          </button>
+                        }
+                      </div>
+                      @if (loadingAvailability()) {
+                        <div class="loading-availability">Loading availability...</div>
+                      }
+                    </div>
+                  }
                 </div>
                 <div class="form-group">
                   <label>Guests *</label>
@@ -220,6 +263,12 @@
                           (input)="updateBookingField('specialRequests', $any($event.target).value)"
                           placeholder="Any dietary requirements, preferences, or special notes..."
                           rows="3"></textarea>
+              </div>
+
+              <!-- Availability Notice -->
+              <div class="availability-notice">
+                <span class="notice-icon">📅</span>
+                <span class="notice-text">Bookings are subject to availability. The chef will confirm your request.</span>
               </div>
 
               @if (bookingError()) {

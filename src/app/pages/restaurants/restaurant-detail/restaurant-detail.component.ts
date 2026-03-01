@@ -98,6 +98,9 @@ export class RestaurantDetailComponent implements OnInit {
   reviewSuccess = signal(false);
   reviewError = signal<string | null>(null);
 
+  // Table preference notice
+  showTablePreferenceNotice = signal(false);
+
   // Booking form
   bookingForm: FormGroup = this.fb.group({
     bookingDate: ['', Validators.required],
@@ -628,6 +631,12 @@ export class RestaurantDetailComponent implements OnInit {
     if (selectedDate) {
       this.loadAvailableTimeSlots(selectedDate);
     }
+  }
+
+  onTablePreferenceChange(event: any): void {
+    const preference = event.target.value;
+    // Show notice when user selects a specific seating preference
+    this.showTablePreferenceNotice.set(preference !== '');
   }
 
   loadAvailableTimeSlots(date: string): void {

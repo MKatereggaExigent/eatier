@@ -5,7 +5,7 @@ import {
   SpecialistDetail,
   SpecialistService
 } from '../../../core/services/public-specialist.service';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -14,6 +14,15 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { InsightsService } from '../../../core/services/insights.service';
 import { environment } from '../../../../environments/environment';
+
+interface CalendarDay {
+  date: string;
+  day: number;
+  isCurrentMonth: boolean;
+  isAvailable: boolean;
+  isPast: boolean;
+  isSelected: boolean;
+}
 
 @Component({
   selector: 'app-specialist-detail',
@@ -45,6 +54,30 @@ export class SpecialistDetailComponent implements OnInit {
   bookingLoading = signal(false);
   bookingSuccess = signal(false);
   bookingError = signal<string | null>(null);
+
+  // Availability calendar
+  showAvailabilityCalendar = signal(false);
+  loadingAvailability = signal(false);
+  currentCalendarMonth = signal(new Date());
+  unavailableDates = signal<string[]>([]);
+  weeklyAvailability = signal<{ [key: string]: boolean }>({
+    monday: true,
+    tuesday: true,
+    wednesday: true,
+    thursday: true,
+    friday: true,
+    saturday: false,
+    sunday: false
+  });
+
+  calendarMonthYear = computed(() => {
+    const date = this.currentCalendarMonth();
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  });
+
+  calendarDays = computed(() => {
+    return this.generateCalendarDays();
+  });
 
   // Review modal state
   showReviewModal = signal(false);
@@ -148,10 +181,140 @@ export class SpecialistDetailComponent implements OnInit {
     this.showBookingForm.set(false);
     this.bookingSuccess.set(false);
     this.bookingError.set(null);
+    this.showAvailabilityCalendar.set(false);
   }
 
   updateBookingField(field: keyof BookingRequest, value: any): void {
     this.bookingForm.update(form => ({ ...form, [field]: value }));
+  }
+
+  // ============ AVAILABILITY CALENDAR METHODS ============
+
+  toggleAvailabilityCalendar(): void {
+    const isShowing = this.showAvailabilityCalendar();
+    this.showAvailabilityCalendar.set(!isShowing);
+    if (!isShowing) {
+      this.loadAvailability();
+    }
+  }
+
+  loadAvailability(): void {
+    const specialist = this.specialist();
+    if (!specialist) return;
+
+    this.loadingAvailability.set(true);
+    const month = this.currentCalendarMonth();
+
+    this.http.get<any>(`${environment.apiUrl}/public/specialists/${specialist.id}/availability`, {
+      params: {
+        month: (month.getMonth() + 1).toString(),
+        year: month.getFullYear().toString()
+      }
+    }).subscribe({
+      next: (data) => {
+        this.unavailableDates.set(data.unavailableDates || []);
+        if (data.weeklyAvailability) {
+          this.weeklyAvailability.set(data.weeklyAvailability);
+        }
+        this.loadingAvailability.set(false);
+      },
+      error: () => {
+        this.loadingAvailability.set(false);
+      }
+    });
+  }
+
+  previousMonth(): void {
+    const current = this.currentCalendarMonth();
+    const newDate = new Date(current.getFullYear(), current.getMonth() - 1, 1);
+    this.currentCalendarMonth.set(newDate);
+    this.loadAvailability();
+  }
+
+  nextMonth(): void {
+    const current = this.currentCalendarMonth();
+    const newDate = new Date(current.getFullYear(), current.getMonth() + 1, 1);
+    this.currentCalendarMonth.set(newDate);
+    this.loadAvailability();
+  }
+
+  selectDate(day: CalendarDay): void {
+    if (!day.isAvailable || day.isPast || !day.isCurrentMonth) return;
+
+    this.updateBookingField('bookingDate', day.date);
+    this.showAvailabilityCalendar.set(false);
+  }
+
+  private generateCalendarDays(): CalendarDay[] {
+    const currentMonth = this.currentCalendarMonth();
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    const daysInMonth = lastDayOfMonth.getDate();
+    const startingDayOfWeek = firstDayOfMonth.getDay();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const selectedDate = this.bookingForm().bookingDate;
+    const unavailable = this.unavailableDates();
+    const weekly = this.weeklyAvailability();
+
+    const days: CalendarDay[] = [];
+
+    // Days from previous month
+    const prevMonth = new Date(year, month, 0);
+    const prevMonthDays = prevMonth.getDate();
+    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+      const day = prevMonthDays - i;
+      const date = new Date(year, month - 1, day);
+      days.push({
+        date: date.toISOString().split('T')[0],
+        day,
+        isCurrentMonth: false,
+        isAvailable: false,
+        isPast: true,
+        isSelected: false
+      });
+    }
+
+    // Days in current month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const dateStr = date.toISOString().split('T')[0];
+      const dayOfWeek = date.getDay();
+      const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const isWeeklyAvailable = weekly[dayNames[dayOfWeek]] ?? true;
+      const isUnavailable = unavailable.includes(dateStr);
+      const isPast = date < today;
+
+      days.push({
+        date: dateStr,
+        day,
+        isCurrentMonth: true,
+        isAvailable: isWeeklyAvailable && !isUnavailable && !isPast,
+        isPast,
+        isSelected: dateStr === selectedDate
+      });
+    }
+
+    // Days from next month to fill the grid
+    const remainingDays = 42 - days.length;
+    for (let day = 1; day <= remainingDays; day++) {
+      const date = new Date(year, month + 1, day);
+      days.push({
+        date: date.toISOString().split('T')[0],
+        day,
+        isCurrentMonth: false,
+        isAvailable: false,
+        isPast: false,
+        isSelected: false
+      });
+    }
+
+    return days;
   }
 
   submitBooking(): void {
