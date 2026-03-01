@@ -268,6 +268,7 @@ router.post('/', async (req, res) => {
       overallRating,
       foodRating,
       serviceRating,
+      hygieneRating,
       ambianceRating,
       valueRating,
       title,
@@ -301,14 +302,14 @@ router.post('/', async (req, res) => {
     const result = await pool.query(`
       INSERT INTO reviews (
         tenant_id, business_id, user_id, rating, food_rating, service_rating,
-        ambiance_rating, value_rating, title, content, comment,
+        hygiene_rating, ambiance_rating, value_rating, title, content, comment,
         images, visit_date, would_recommend, status
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
       RETURNING *
     `, [
       tenantId, businessId, userId, rating,
-      foodRating || null, serviceRating || null,
+      foodRating || null, serviceRating || null, hygieneRating || null,
       ambianceRating || null, valueRating || null,
       title || '', content || comment || '', content || comment || '',
       images || [], visitDate || null, wouldRecommend !== false, status
@@ -325,6 +326,7 @@ router.post('/', async (req, res) => {
       overall_rating: r.rating,
       food_rating: r.food_rating,
       service_rating: r.service_rating,
+      hygiene_rating: r.hygiene_rating,
       ambiance_rating: r.ambiance_rating,
       value_rating: r.value_rating,
       title: r.title,
@@ -362,6 +364,7 @@ router.put('/:reviewId', async (req, res) => {
       overallRating,
       foodRating,
       serviceRating,
+      hygieneRating,
       ambianceRating,
       valueRating,
       title,
@@ -397,20 +400,21 @@ router.put('/:reviewId', async (req, res) => {
         rating = COALESCE($1, rating),
         food_rating = COALESCE($2, food_rating),
         service_rating = COALESCE($3, service_rating),
-        ambiance_rating = COALESCE($4, ambiance_rating),
-        value_rating = COALESCE($5, value_rating),
-        title = COALESCE($6, title),
-        content = COALESCE($7, content),
-        comment = COALESCE($8, comment),
-        images = COALESCE($9, images),
-        visit_date = COALESCE($10, visit_date),
-        would_recommend = COALESCE($11, would_recommend),
-        status = COALESCE($12, status),
+        hygiene_rating = COALESCE($4, hygiene_rating),
+        ambiance_rating = COALESCE($5, ambiance_rating),
+        value_rating = COALESCE($6, value_rating),
+        title = COALESCE($7, title),
+        content = COALESCE($8, content),
+        comment = COALESCE($9, comment),
+        images = COALESCE($10, images),
+        visit_date = COALESCE($11, visit_date),
+        would_recommend = COALESCE($12, would_recommend),
+        status = COALESCE($13, status),
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = $13
+      WHERE id = $14
       RETURNING *
     `, [
-      rating, foodRating, serviceRating, ambianceRating, valueRating,
+      rating, foodRating, serviceRating, hygieneRating, ambianceRating, valueRating,
       title, content || comment, content || comment, images,
       visitDate, wouldRecommend, status, reviewId
     ]);
@@ -426,6 +430,7 @@ router.put('/:reviewId', async (req, res) => {
       overall_rating: r.rating,
       food_rating: r.food_rating,
       service_rating: r.service_rating,
+      hygiene_rating: r.hygiene_rating,
       ambiance_rating: r.ambiance_rating,
       value_rating: r.value_rating,
       title: r.title,
