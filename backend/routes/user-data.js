@@ -306,7 +306,7 @@ router.get('/:userId/recommendations', async (req, res) => {
     const tenantId = req.user.tenant_id;
 
     // Verify user can access this data
-    if (req.user.id !== userId && req.user.role !== 'itiyum_admin') {
+    if (req.user.id !== userId && req.user.role !== 'itiyum-admin') {
       return res.status(403).json({ error: 'Access denied' });
     }
 

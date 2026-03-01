@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular
 import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService, UserStats, UserActivity, Favorite } from '../../../core/services/user.service';
@@ -228,20 +228,28 @@ export class UserOverviewComponent implements OnInit, OnDestroy {
     this.loading.update(state => ({ ...state, wallet: true }));
     this.errors.update(state => ({ ...state, wallet: null }));
 
-    this.http.get<any>(`${environment.apiUrl}/wallet`)
+    this.http.get<any>(`${environment.apiUrl}/wallet`, {
+      headers: this.getAuthHeaders()
+    })
       .pipe(
         takeUntil(this.destroy$),
         catchError(error => {
           console.error('Error loading wallet:', error);
           this.errors.update(state => ({ ...state, wallet: 'Failed to load wallet' }));
-          return of({ wallet: null });
+          return of(null);
         }),
         finalize(() => {
           this.loading.update(state => ({ ...state, wallet: false }));
         })
       )
       .subscribe(response => {
-        this.wallet.set(response.wallet);
+        // Backend returns wallet data directly, not wrapped in { wallet: ... }
+        if (response) {
+          this.wallet.set({
+            cashbackBalance: response.cashbackBalance || 0,
+            loyaltyPoints: response.loyaltyPoints || 0
+          });
+        }
       });
   }
 
@@ -249,7 +257,9 @@ export class UserOverviewComponent implements OnInit, OnDestroy {
     this.loading.update(state => ({ ...state, promotions: true }));
     this.errors.update(state => ({ ...state, promotions: null }));
 
-    this.http.get<any>(`${environment.apiUrl}/member-promotions`)
+    this.http.get<any>(`${environment.apiUrl}/member-promotions`, {
+      headers: this.getAuthHeaders()
+    })
       .pipe(
         takeUntil(this.destroy$),
         catchError(error => {
@@ -278,6 +288,14 @@ export class UserOverviewComponent implements OnInit, OnDestroy {
   }
 
   // Helper methods
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('auth_token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
   getActivityIcon(type: string): string {
     const icons = {
       review: '📝',
