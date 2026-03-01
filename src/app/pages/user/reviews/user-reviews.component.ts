@@ -306,10 +306,30 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
     return filtered;
   });
 
+  // All businesses for dropdown
+  allBusinesses = signal<Business[]>([]);
+  loadingBusinesses = signal(false);
+
   // Action methods
   openNewReviewModal(): void {
     this.resetNewReviewForm();
+    this.loadAllBusinesses();
     this.showNewReviewModal.set(true);
+  }
+
+  loadAllBusinesses(): void {
+    if (this.allBusinesses().length > 0) return; // Already loaded
+
+    this.loadingBusinesses.set(true);
+    this.http.get<any>(`${environment.apiUrl}/businesses`, {
+      params: { limit: '100' }
+    }).pipe(
+      takeUntil(this.destroy$),
+      catchError(() => of({ businesses: [] })),
+      finalize(() => this.loadingBusinesses.set(false))
+    ).subscribe(response => {
+      this.allBusinesses.set(response.businesses || []);
+    });
   }
 
   closeNewReviewModal(): void {

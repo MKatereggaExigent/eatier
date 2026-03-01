@@ -217,33 +217,21 @@
         <button type="button" class="modal-close" (click)="closeNewReviewModal()">×</button>
       </div>
       <div class="modal-body">
-        <!-- Business Search -->
+        <!-- Business Dropdown -->
         <div class="form-group">
           <label>Select Restaurant *</label>
-          <div class="business-search-container">
-            <input
-              type="text"
-              [value]="businessSearchQuery()"
-              (input)="onBusinessSearch($any($event.target).value)"
-              placeholder="Search for a restaurant..."
-              class="form-input"
-              [disabled]="selectedBusiness() !== null">
-            @if (selectedBusiness()) {
-              <button type="button" class="clear-business" (click)="resetNewReviewForm()">✕</button>
-            }
-          </div>
-          @if (searchingBusinesses()) {
-            <div class="search-loading">Searching...</div>
-          }
-          @if (businessSearchResults().length > 0) {
-            <div class="business-dropdown">
-              @for (business of businessSearchResults(); track business.id) {
-                <div class="business-option" (click)="selectBusiness(business)">
-                  <span class="business-name">{{ business.businessName }}</span>
-                  <span class="business-type">{{ business.businessType }}</span>
-                </div>
+          @if (loadingBusinesses()) {
+            <div class="loading-text">Loading restaurants...</div>
+          } @else {
+            <select
+              class="form-select"
+              [value]="newReviewForm().businessId"
+              (change)="updateNewReviewField('businessId', $any($event.target).value)">
+              <option value="">-- Select a restaurant --</option>
+              @for (business of allBusinesses(); track business.id) {
+                <option [value]="business.id">{{ business.businessName }} ({{ business.businessType }})</option>
               }
-            </div>
+            </select>
           }
         </div>
 
