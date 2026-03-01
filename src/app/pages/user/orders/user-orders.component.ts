@@ -1,30 +1,44 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
+import { CartService } from '../../../core/services/cart.service';
 
 interface OrderItem {
   id: string;
+  menuItemId?: string;
   name: string;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
 }
 
+interface Business {
+  id: string;
+  name: string;
+  logo: string;
+  address: string;
+}
+
 interface Order {
   id: string;
   orderNumber: string;
+  businessId: string;
   businessName: string;
   businessLogo: string;
+  business?: Business;
   status: string;
   orderType: string;
   subtotal: number;
   discount: number;
+  discountAmount: number;
   deliveryFee: number;
   totalAmount: number;
   items: OrderItem[];
   createdAt: Date;
   rating: number | null;
+  orderRating: number | null;
 }
 
 @Component({
@@ -36,6 +50,8 @@ interface Order {
 })
 export class UserOrdersComponent implements OnInit {
   private http = inject(HttpClient);
+  private router = inject(Router);
+  private cartService = inject(CartService);
 
   loading = signal(true);
   orders = signal<Order[]>([]);
@@ -50,7 +66,15 @@ export class UserOrdersComponent implements OnInit {
     this.loading.set(true);
     this.http.get<any>(`${environment.apiUrl}/orders`).subscribe({
       next: (data) => {
-        this.orders.set(data.orders || []);
+        // Map the nested business object to flat properties for template
+        const mappedOrders = (data.orders || []).map((order: any) => ({
+          ...order,
+          businessId: order.business?.id || order.businessId,
+          businessName: order.business?.name || order.businessName || 'Restaurant',
+          businessLogo: order.business?.logo || order.businessLogo,
+          rating: order.orderRating || order.rating
+        }));
+        this.orders.set(mappedOrders);
         this.loading.set(false);
       },
       error: () => {
@@ -68,18 +92,52 @@ export class UserOrdersComponent implements OnInit {
   }
 
   reorder(orderId: string): void {
+    const order = this.orders().find(o => o.id === orderId);
+    if (!order) return;
+
     this.reordering.set(orderId);
-    this.http.post<any>(`${environment.apiUrl}/orders/${orderId}/reorder`, {}).subscribe({
-      next: (data) => {
-        this.reordering.set(null);
-        // Reload orders to show the new order
-        this.loadOrders();
-        alert('Order placed successfully! Order #' + data.order.orderNumber);
-      },
-      error: (err) => {
-        this.reordering.set(null);
-        alert(err.error?.error || 'Failed to reorder');
-      }
+
+    // Add all items from the order to the cart
+    const businessId = order.businessId || order.business?.id;
+    if (!businessId) {
+      this.reordering.set(null);
+      alert('Cannot reorder: Business information missing');
+      return;
+    }
+
+    // Add items to cart one by one
+    let addedCount = 0;
+    const totalItems = order.items.length;
+
+    order.items.forEach(item => {
+      this.cartService.addToCart(
+        businessId,
+        order.businessName,
+        {
+          id: item.menuItemId || item.id,
+          name: item.name,
+          price: item.unitPrice,
+          quantity: item.quantity
+        }
+      ).subscribe({
+        next: () => {
+          addedCount++;
+          if (addedCount === totalItems) {
+            this.reordering.set(null);
+            // Navigate to checkout
+            this.router.navigate(['/checkout', businessId]);
+          }
+        },
+        error: (err) => {
+          addedCount++;
+          console.error('Error adding item to cart:', err);
+          if (addedCount === totalItems) {
+            this.reordering.set(null);
+            // Still try to navigate to checkout even if some items failed
+            this.router.navigate(['/checkout', businessId]);
+          }
+        }
+      });
     });
   }
 
