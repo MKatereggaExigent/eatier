@@ -45,13 +45,15 @@ router.get('/:userId/stats', async (req, res) => {
     `, [userId, tenantId]);
 
     // Get photos count (from reviews with images - images is JSONB)
-    // Check jsonb_typeof to ensure it's an array before calling jsonb_array_length
+    // Use CASE to safely handle non-array values and avoid jsonb_array_length errors
     const photosResult = await pool.query(`
       SELECT COUNT(*) as count FROM reviews
       WHERE user_id = $1 AND tenant_id = $2
         AND images IS NOT NULL
-        AND jsonb_typeof(images) = 'array'
-        AND jsonb_array_length(images) > 0
+        AND CASE
+              WHEN jsonb_typeof(images) = 'array' THEN jsonb_array_length(images) > 0
+              ELSE false
+            END
     `, [userId, tenantId]);
 
     res.json({
