@@ -285,7 +285,9 @@ router.post('/', async (req, res) => {
     } = req.body;
 
     // Support both overallRating and rating for backward compatibility
-    const rating = overallRating || req.body.rating;
+    // Round to nearest integer since the database column is INTEGER
+    const rawRating = overallRating || req.body.rating;
+    const rating = Math.round(Number(rawRating));
 
     if (!userId || !businessId || !rating) {
       return res.status(400).json({ error: 'User ID, business ID, and rating are required' });
@@ -377,7 +379,9 @@ router.put('/:reviewId', async (req, res) => {
     } = req.body;
 
     // Support both overallRating and rating for backward compatibility
-    const rating = overallRating || req.body.rating;
+    // Round to nearest integer since the database column is INTEGER
+    const rawRating = overallRating || req.body.rating;
+    const rating = rawRating ? Math.round(Number(rawRating)) : null;
 
     // Verify ownership
     const ownerCheck = await pool.query(`
