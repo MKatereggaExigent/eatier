@@ -110,16 +110,11 @@ export class UserOrdersComponent implements OnInit {
     const totalItems = order.items.length;
 
     order.items.forEach(item => {
-      this.cartService.addToCart(
-        businessId,
-        order.businessName,
-        {
-          id: item.menuItemId || item.id,
-          name: item.name,
-          price: item.unitPrice,
-          quantity: item.quantity
-        }
-      ).subscribe({
+      this.cartService.addToCart({
+        businessId: businessId,
+        menuItemId: item.menuItemId || item.id,
+        quantity: item.quantity
+      }).subscribe({
         next: () => {
           addedCount++;
           if (addedCount === totalItems) {
