@@ -753,6 +753,76 @@
     border: 1px solid #d1d1d1;
     border-radius: 4px;
   }
+
+  .ratings-section {
+    margin-bottom: 24px;
+
+    .section-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .section-hint {
+      font-size: 13px;
+      color: #666;
+      margin: 0 0 16px 0;
+      font-style: italic;
+    }
+
+    .weight {
+      font-weight: 400;
+      font-size: 11px;
+      color: #888;
+      text-transform: none;
+    }
+  }
+
+  .calculated-rating {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f8f6f0 0%, #f0ede4 100%);
+    border-radius: 8px;
+    margin-top: 16px;
+    border: 1px solid #e0ddd4;
+
+    .label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .rating-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #888;
+      font-family: Georgia, 'Times New Roman', serif;
+
+      &.has-rating {
+        color: #333;
+      }
+    }
+
+    .rating-stars {
+      display: flex;
+      gap: 2px;
+
+      .star {
+        font-size: 18px;
+        color: #ddd;
+
+        &.filled {
+          color: #f4c150;
+        }
+      }
+    }
+  }
 }
 
 .business-search-container {

@@ -235,60 +235,75 @@
           }
         </div>
 
-        <!-- Overall Rating -->
-        <div class="form-group rating-group">
-          <label>Overall Rating *</label>
-          <div class="star-rating">
-            @for (star of ratingStars; track star) {
-              <button type="button" class="star-btn"
-                      [class.filled]="star <= newReviewForm().overallRating"
-                      (click)="setNewReviewRating('overallRating', star)">★</button>
-            }
-            <span class="rating-label">{{ newReviewForm().overallRating || 0 }}/5</span>
-          </div>
-        </div>
+        <!-- Detailed Ratings (weights shown) -->
+        <div class="ratings-section">
+          <label class="section-label">Rate Your Experience *</label>
+          <p class="section-hint">Rate at least one category. Overall rating is calculated automatically.</p>
 
-        <!-- Detailed Ratings -->
-        <div class="detailed-ratings-grid">
-          <div class="rating-item">
-            <label>Food</label>
-            <div class="mini-star-rating">
-              @for (star of ratingStars; track star) {
-                <button type="button" class="star-btn small"
-                        [class.filled]="star <= newReviewForm().foodRating"
-                        (click)="setNewReviewRating('foodRating', star)">★</button>
-              }
+          <div class="detailed-ratings-grid">
+            <div class="rating-item">
+              <label>Food <span class="weight">(30%)</span></label>
+              <div class="mini-star-rating">
+                @for (star of ratingStars; track star) {
+                  <button type="button" class="star-btn small"
+                          [class.filled]="star <= newReviewForm().foodRating"
+                          (click)="setNewReviewRating('foodRating', star)">★</button>
+                }
+              </div>
+            </div>
+            <div class="rating-item">
+              <label>Service <span class="weight">(30%)</span></label>
+              <div class="mini-star-rating">
+                @for (star of ratingStars; track star) {
+                  <button type="button" class="star-btn small"
+                          [class.filled]="star <= newReviewForm().serviceRating"
+                          (click)="setNewReviewRating('serviceRating', star)">★</button>
+                }
+              </div>
+            </div>
+            <div class="rating-item">
+              <label>Hygiene <span class="weight">(20%)</span></label>
+              <div class="mini-star-rating">
+                @for (star of ratingStars; track star) {
+                  <button type="button" class="star-btn small"
+                          [class.filled]="star <= newReviewForm().hygieneRating"
+                          (click)="setNewReviewRating('hygieneRating', star)">★</button>
+                }
+              </div>
+            </div>
+            <div class="rating-item">
+              <label>Value <span class="weight">(10%)</span></label>
+              <div class="mini-star-rating">
+                @for (star of ratingStars; track star) {
+                  <button type="button" class="star-btn small"
+                          [class.filled]="star <= newReviewForm().valueRating"
+                          (click)="setNewReviewRating('valueRating', star)">★</button>
+                }
+              </div>
+            </div>
+            <div class="rating-item">
+              <label>Ambiance <span class="weight">(10%)</span></label>
+              <div class="mini-star-rating">
+                @for (star of ratingStars; track star) {
+                  <button type="button" class="star-btn small"
+                          [class.filled]="star <= newReviewForm().ambianceRating"
+                          (click)="setNewReviewRating('ambianceRating', star)">★</button>
+                }
+              </div>
             </div>
           </div>
-          <div class="rating-item">
-            <label>Service</label>
-            <div class="mini-star-rating">
+
+          <!-- Calculated Overall Rating Display -->
+          <div class="calculated-rating">
+            <span class="label">Overall Rating:</span>
+            <span class="rating-value" [class.has-rating]="calculatedNewReviewRating() > 0">
+              {{ calculatedNewReviewRating() > 0 ? calculatedNewReviewRating().toFixed(1) : '—' }} / 5
+            </span>
+            <span class="rating-stars">
               @for (star of ratingStars; track star) {
-                <button type="button" class="star-btn small"
-                        [class.filled]="star <= newReviewForm().serviceRating"
-                        (click)="setNewReviewRating('serviceRating', star)">★</button>
+                <span class="star" [class.filled]="star <= calculatedNewReviewRating()">★</span>
               }
-            </div>
-          </div>
-          <div class="rating-item">
-            <label>Ambiance</label>
-            <div class="mini-star-rating">
-              @for (star of ratingStars; track star) {
-                <button type="button" class="star-btn small"
-                        [class.filled]="star <= newReviewForm().ambianceRating"
-                        (click)="setNewReviewRating('ambianceRating', star)">★</button>
-              }
-            </div>
-          </div>
-          <div class="rating-item">
-            <label>Value</label>
-            <div class="mini-star-rating">
-              @for (star of ratingStars; track star) {
-                <button type="button" class="star-btn small"
-                        [class.filled]="star <= newReviewForm().valueRating"
-                        (click)="setNewReviewRating('valueRating', star)">★</button>
-              }
-            </div>
+            </span>
           </div>
         </div>
 
@@ -365,60 +380,75 @@
           <div class="business-display">{{ selectedReview()?.businessName }}</div>
         </div>
 
-        <!-- Overall Rating -->
-        <div class="form-group rating-group">
-          <label>Overall Rating *</label>
-          <div class="star-rating">
-            @for (star of ratingStars; track star) {
-              <button type="button" class="star-btn"
-                      [class.filled]="star <= editReviewForm().overallRating"
-                      (click)="setEditReviewRating('overallRating', star)">★</button>
-            }
-            <span class="rating-label">{{ editReviewForm().overallRating || 0 }}/5</span>
-          </div>
-        </div>
+        <!-- Detailed Ratings (weights shown) -->
+        <div class="ratings-section">
+          <label class="section-label">Rate Your Experience *</label>
+          <p class="section-hint">Rate at least one category. Overall rating is calculated automatically.</p>
 
-        <!-- Detailed Ratings -->
-        <div class="detailed-ratings-grid">
-          <div class="rating-item">
-            <label>Food</label>
-            <div class="mini-star-rating">
-              @for (star of ratingStars; track star) {
-                <button type="button" class="star-btn small"
-                        [class.filled]="star <= editReviewForm().foodRating"
-                        (click)="setEditReviewRating('foodRating', star)">★</button>
-              }
+          <div class="detailed-ratings-grid">
+            <div class="rating-item">
+              <label>Food <span class="weight">(30%)</span></label>
+              <div class="mini-star-rating">
+                @for (star of ratingStars; track star) {
+                  <button type="button" class="star-btn small"
+                          [class.filled]="star <= editReviewForm().foodRating"
+                          (click)="setEditReviewRating('foodRating', star)">★</button>
+                }
+              </div>
+            </div>
+            <div class="rating-item">
+              <label>Service <span class="weight">(30%)</span></label>
+              <div class="mini-star-rating">
+                @for (star of ratingStars; track star) {
+                  <button type="button" class="star-btn small"
+                          [class.filled]="star <= editReviewForm().serviceRating"
+                          (click)="setEditReviewRating('serviceRating', star)">★</button>
+                }
+              </div>
+            </div>
+            <div class="rating-item">
+              <label>Hygiene <span class="weight">(20%)</span></label>
+              <div class="mini-star-rating">
+                @for (star of ratingStars; track star) {
+                  <button type="button" class="star-btn small"
+                          [class.filled]="star <= editReviewForm().hygieneRating"
+                          (click)="setEditReviewRating('hygieneRating', star)">★</button>
+                }
+              </div>
+            </div>
+            <div class="rating-item">
+              <label>Value <span class="weight">(10%)</span></label>
+              <div class="mini-star-rating">
+                @for (star of ratingStars; track star) {
+                  <button type="button" class="star-btn small"
+                          [class.filled]="star <= editReviewForm().valueRating"
+                          (click)="setEditReviewRating('valueRating', star)">★</button>
+                }
+              </div>
+            </div>
+            <div class="rating-item">
+              <label>Ambiance <span class="weight">(10%)</span></label>
+              <div class="mini-star-rating">
+                @for (star of ratingStars; track star) {
+                  <button type="button" class="star-btn small"
+                          [class.filled]="star <= editReviewForm().ambianceRating"
+                          (click)="setEditReviewRating('ambianceRating', star)">★</button>
+                }
+              </div>
             </div>
           </div>
-          <div class="rating-item">
-            <label>Service</label>
-            <div class="mini-star-rating">
+
+          <!-- Calculated Overall Rating Display -->
+          <div class="calculated-rating">
+            <span class="label">Overall Rating:</span>
+            <span class="rating-value" [class.has-rating]="calculatedEditReviewRating() > 0">
+              {{ calculatedEditReviewRating() > 0 ? calculatedEditReviewRating().toFixed(1) : '—' }} / 5
+            </span>
+            <span class="rating-stars">
               @for (star of ratingStars; track star) {
-                <button type="button" class="star-btn small"
-                        [class.filled]="star <= editReviewForm().serviceRating"
-                        (click)="setEditReviewRating('serviceRating', star)">★</button>
+                <span class="star" [class.filled]="star <= calculatedEditReviewRating()">★</span>
               }
-            </div>
-          </div>
-          <div class="rating-item">
-            <label>Ambiance</label>
-            <div class="mini-star-rating">
-              @for (star of ratingStars; track star) {
-                <button type="button" class="star-btn small"
-                        [class.filled]="star <= editReviewForm().ambianceRating"
-                        (click)="setEditReviewRating('ambianceRating', star)">★</button>
-              }
-            </div>
-          </div>
-          <div class="rating-item">
-            <label>Value</label>
-            <div class="mini-star-rating">
-              @for (star of ratingStars; track star) {
-                <button type="button" class="star-btn small"
-                        [class.filled]="star <= editReviewForm().valueRating"
-                        (click)="setEditReviewRating('valueRating', star)">★</button>
-              }
-            </div>
+            </span>
           </div>
         </div>
 

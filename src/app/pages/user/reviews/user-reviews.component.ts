@@ -16,6 +16,7 @@ interface Review {
   rating: number;
   foodRating?: number;
   serviceRating?: number;
+  hygieneRating?: number;
   ambianceRating?: number;
   valueRating?: number;
   title: string;
@@ -56,6 +57,7 @@ interface NewReviewForm {
   overallRating: number;
   foodRating: number;
   serviceRating: number;
+  hygieneRating: number;
   ambianceRating: number;
   valueRating: number;
   title: string;
@@ -101,6 +103,7 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
     overallRating: 0,
     foodRating: 0,
     serviceRating: 0,
+    hygieneRating: 0,
     ambianceRating: 0,
     valueRating: 0,
     title: '',
@@ -115,6 +118,7 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
     overallRating: 0,
     foodRating: 0,
     serviceRating: 0,
+    hygieneRating: 0,
     ambianceRating: 0,
     valueRating: 0,
     title: '',
@@ -126,6 +130,24 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
   // Star rating helper
   ratingStars = [1, 2, 3, 4, 5];
   today = new Date().toISOString().split('T')[0];
+
+  // Computed overall rating using weighted formula
+  // 0.3 * food + 0.3 * service + 0.2 * hygiene + 0.1 * value + 0.1 * ambiance
+  calculatedNewReviewRating = computed(() => {
+    const form = this.newReviewForm();
+    const weighted = (0.3 * form.foodRating) + (0.3 * form.serviceRating) +
+                     (0.2 * form.hygieneRating) + (0.1 * form.valueRating) +
+                     (0.1 * form.ambianceRating);
+    return Math.round(weighted * 10) / 10; // Round to 1 decimal
+  });
+
+  calculatedEditReviewRating = computed(() => {
+    const form = this.editReviewForm();
+    const weighted = (0.3 * form.foodRating) + (0.3 * form.serviceRating) +
+                     (0.2 * form.hygieneRating) + (0.1 * form.valueRating) +
+                     (0.1 * form.ambianceRating);
+    return Math.round(weighted * 10) / 10;
+  });
 
   // Filter and search
   searchQuery = signal('');
@@ -222,6 +244,7 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
           rating: r.overall_rating || r.rating,
           foodRating: r.food_rating,
           serviceRating: r.service_rating,
+          hygieneRating: r.hygiene_rating,
           ambianceRating: r.ambiance_rating,
           valueRating: r.value_rating,
           title: r.title || '',
@@ -343,6 +366,7 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
       overallRating: 0,
       foodRating: 0,
       serviceRating: 0,
+      hygieneRating: 0,
       ambianceRating: 0,
       valueRating: 0,
       title: '',
@@ -359,16 +383,21 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
     this.newReviewForm.update(form => ({ ...form, [field]: value }));
   }
 
-  setNewReviewRating(field: 'overallRating' | 'foodRating' | 'serviceRating' | 'ambianceRating' | 'valueRating', rating: number): void {
+  setNewReviewRating(field: 'overallRating' | 'foodRating' | 'serviceRating' | 'hygieneRating' | 'ambianceRating' | 'valueRating', rating: number): void {
     this.newReviewForm.update(form => ({ ...form, [field]: rating }));
   }
 
   submitNewReview(): void {
     const form = this.newReviewForm();
     const userId = this.currentUser()?.id || localStorage.getItem('user_id');
+    const calculatedRating = this.calculatedNewReviewRating();
 
-    if (!form.businessId || !form.overallRating || !form.comment || !userId) {
-      this.error.set('Please fill in all required fields');
+    // Validate: need business, at least one rating, and a comment
+    const hasAnyRating = form.foodRating > 0 || form.serviceRating > 0 || form.hygieneRating > 0 ||
+                         form.ambianceRating > 0 || form.valueRating > 0;
+
+    if (!form.businessId || !hasAnyRating || !form.comment || !userId) {
+      this.error.set('Please select a restaurant, rate at least one category, and write a comment');
       return;
     }
 
@@ -378,9 +407,10 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
     this.http.post(`${environment.apiUrl}/reviews`, {
       userId,
       businessId: form.businessId,
-      overallRating: form.overallRating,
+      overallRating: calculatedRating || 1, // Use calculated rating
       foodRating: form.foodRating || null,
       serviceRating: form.serviceRating || null,
+      hygieneRating: form.hygieneRating || null,
       ambianceRating: form.ambianceRating || null,
       valueRating: form.valueRating || null,
       title: form.title,
@@ -411,6 +441,7 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
       overallRating: review.rating,
       foodRating: review.foodRating || 0,
       serviceRating: review.serviceRating || 0,
+      hygieneRating: review.hygieneRating || 0,
       ambianceRating: review.ambianceRating || 0,
       valueRating: review.valueRating || 0,
       title: review.title,
@@ -430,7 +461,7 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
     this.editReviewForm.update(form => ({ ...form, [field]: value }));
   }
 
-  setEditReviewRating(field: 'overallRating' | 'foodRating' | 'serviceRating' | 'ambianceRating' | 'valueRating', rating: number): void {
+  setEditReviewRating(field: 'overallRating' | 'foodRating' | 'serviceRating' | 'hygieneRating' | 'ambianceRating' | 'valueRating', rating: number): void {
     this.editReviewForm.update(form => ({ ...form, [field]: rating }));
   }
 
@@ -438,9 +469,14 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
     const review = this.selectedReview();
     const form = this.editReviewForm();
     const userId = this.currentUser()?.id || localStorage.getItem('user_id');
+    const calculatedRating = this.calculatedEditReviewRating();
 
-    if (!review || !form.overallRating || !form.comment || !userId) {
-      this.error.set('Please fill in all required fields');
+    // Validate: need at least one rating and a comment
+    const hasAnyRating = form.foodRating > 0 || form.serviceRating > 0 || form.hygieneRating > 0 ||
+                         form.ambianceRating > 0 || form.valueRating > 0;
+
+    if (!review || !hasAnyRating || !form.comment || !userId) {
+      this.error.set('Please rate at least one category and write a comment');
       return;
     }
 
@@ -449,9 +485,10 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
 
     this.http.put(`${environment.apiUrl}/reviews/${review.id}`, {
       userId,
-      overallRating: form.overallRating,
+      overallRating: calculatedRating || 1,
       foodRating: form.foodRating || null,
       serviceRating: form.serviceRating || null,
+      hygieneRating: form.hygieneRating || null,
       ambianceRating: form.ambianceRating || null,
       valueRating: form.valueRating || null,
       title: form.title,
