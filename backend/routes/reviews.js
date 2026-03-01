@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('../config/database');
+const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
 /**
@@ -258,12 +259,11 @@ router.get('/user/:userId', async (req, res) => {
 
 /**
  * POST /api/reviews
- * Create a new review
+ * Create a new review (requires authentication)
  */
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
     const {
-      userId,
       businessId,
       overallRating,
       foodRating,
@@ -284,21 +284,24 @@ router.post('/', async (req, res) => {
       status = 'published'
     } = req.body;
 
+    // Get userId and tenantId from authenticated user (proper multi-tenancy)
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
+
     // Support both overallRating and rating for backward compatibility
     // Round to nearest integer since the database column is INTEGER
     const rawRating = overallRating || req.body.rating;
     const rating = Math.round(Number(rawRating));
 
-    if (!userId || !businessId || !rating) {
-      return res.status(400).json({ error: 'User ID, business ID, and rating are required' });
+    if (!businessId || !rating) {
+      return res.status(400).json({ error: 'Business ID and rating are required' });
     }
 
-    // Get tenant_id from business
-    const businessResult = await pool.query('SELECT tenant_id, business_name FROM businesses WHERE id = $1', [businessId]);
+    // Get business name for response (no longer using business tenant_id)
+    const businessResult = await pool.query('SELECT business_name FROM businesses WHERE id = $1', [businessId]);
     if (businessResult.rows.length === 0) {
       return res.status(404).json({ error: 'Business not found' });
     }
-    const tenantId = businessResult.rows[0].tenant_id;
     const businessName = businessResult.rows[0].business_name;
 
     const result = await pool.query(`

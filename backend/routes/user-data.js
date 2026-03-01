@@ -24,7 +24,7 @@ router.get('/:userId/stats', async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    // Get review count
+    // Get review count (filtered by user_id and tenant_id for proper multi-tenancy)
     const reviewsResult = await pool.query(`
       SELECT COUNT(*) as count FROM reviews
       WHERE user_id = $1 AND tenant_id = $2 AND status = 'published'
@@ -80,7 +80,7 @@ router.get('/:userId/activity', async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    // Get recent reviews
+    // Get recent reviews (filtered by tenant_id for multi-tenancy)
     const reviewsQuery = `
       SELECT
         r.id,
@@ -170,6 +170,7 @@ router.get('/:userId/favorites', async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
+    // Query by user_id and tenant_id for proper multi-tenancy
     const result = await pool.query(`
       SELECT
         f.id,
@@ -230,7 +231,7 @@ router.post('/:userId/favorites', async (req, res) => {
       return res.status(400).json({ error: 'Business ID is required' });
     }
 
-    // Check if already favorited
+    // Check if already favorited (with tenant_id for multi-tenancy)
     const existingResult = await pool.query(`
       SELECT id FROM favorites
       WHERE user_id = $1 AND business_id = $2 AND tenant_id = $3
@@ -240,7 +241,7 @@ router.post('/:userId/favorites', async (req, res) => {
       return res.status(400).json({ error: 'Business already in favorites' });
     }
 
-    // Add to favorites
+    // Add to favorites with user's tenant_id
     const result = await pool.query(`
       INSERT INTO favorites (user_id, business_id, tenant_id)
       VALUES ($1, $2, $3)
@@ -272,7 +273,7 @@ router.delete('/:userId/favorites/:favoriteId', async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    // Delete favorite
+    // Delete favorite (with tenant_id for multi-tenancy)
     const result = await pool.query(`
       DELETE FROM favorites
       WHERE id = $1 AND user_id = $2 AND tenant_id = $3

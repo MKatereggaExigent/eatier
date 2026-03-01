@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../config/database');
 const { sendBookingConfirmation } = require('../services/emailService');
+const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const router = express.Router();
 
 // Get all bookings for a user
@@ -223,12 +224,11 @@ router.get('/slots/:businessId', async (req, res) => {
   }
 });
 
-// Create new booking
-router.post('/', async (req, res) => {
+// Create new booking (supports both authenticated and guest users)
+router.post('/', optionalAuth, async (req, res) => {
   try {
     const {
       businessId,
-      userId,
       bookingDate,
       bookingTime,
       partySize,
@@ -304,20 +304,20 @@ router.post('/', async (req, res) => {
     // Generate booking reference
     const bookingRef = `BK${Date.now().toString().slice(-8)}`;
 
-    // Get tenant ID
-    const tenantResult = await pool.query(`
-      SELECT tenant_id FROM businesses WHERE id = $1
-    `, [businessId]);
-    const tenantId = tenantResult.rows[0]?.tenant_id;
-
-    // Handle guest bookings (userId might be 'temp-user' or invalid)
+    // Multi-tenancy: Use authenticated user's tenant_id, or fall back to business tenant_id for guests
+    let tenantId;
     let validUserId = null;
-    if (userId && userId !== 'temp-user') {
-      // Validate if it's a proper UUID
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (uuidRegex.test(userId)) {
-        validUserId = userId;
-      }
+
+    if (req.user) {
+      // Authenticated user - use their tenant_id and user_id
+      tenantId = req.user.tenant_id;
+      validUserId = req.user.id;
+    } else {
+      // Guest booking - use business's tenant_id
+      const tenantResult = await pool.query(`
+        SELECT tenant_id FROM businesses WHERE id = $1
+      `, [businessId]);
+      tenantId = tenantResult.rows[0]?.tenant_id;
     }
 
     const result = await pool.query(`
