@@ -7,6 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { BookingsService } from '../../../services/bookings.service';
 import { CartService } from '../../../core/services/cart.service';
 import { CommonModule } from '@angular/common';
+import { FavoritesService } from '../../../services/favorites.service';
 import { HttpClient } from '@angular/common/http';
 import { InsightsService } from '../../../core/services/insights.service';
 import { environment } from '../../../../environments/environment';
@@ -40,6 +41,7 @@ export class RestaurantDetailComponent implements OnInit {
   private insightsService = inject(InsightsService);
   private authService = inject(AuthService);
   protected cartService = inject(CartService);
+  private favoritesService = inject(FavoritesService);
 
   restaurantId = signal<string>('');
   isLoading = signal<boolean>(true);
@@ -47,6 +49,10 @@ export class RestaurantDetailComponent implements OnInit {
   private sessionId = this.generateSessionId();
   private sessionStartTime = Date.now();
   private pagesVisited = 1;
+
+  // Favorites state
+  isFavorite = signal<boolean>(false);
+  isSavingFavorite = signal<boolean>(false);
 
   // Menu items with IDs for cart
   menuItems = signal<MenuItem[]>([]);
@@ -140,6 +146,7 @@ export class RestaurantDetailComponent implements OnInit {
       this.loadRestaurantData(businessId);
       this.loadMenuItems(businessId);
       this.loadReviews(businessId);
+      this.checkFavoriteStatus(businessId);
     });
 
     // Handle query parameters for actions (e.g., ?action=book)
@@ -396,6 +403,62 @@ export class RestaurantDetailComponent implements OnInit {
     this.trackContactClick('directions');
     const address = encodeURIComponent(this.restaurant().address);
     window.open(`https://maps.google.com?q=${address}`, '_blank');
+  }
+
+  // Check if restaurant is in user's favorites
+  checkFavoriteStatus(businessId: string): void {
+    if (!this.authService.isAuthenticated()) {
+      return;
+    }
+
+    this.favoritesService.favorites$.subscribe(favorites => {
+      const isFav = favorites.some(fav => fav.businessId === businessId);
+      this.isFavorite.set(isFav);
+    });
+  }
+
+  // Toggle favorite status
+  toggleFavorite(): void {
+    if (!this.authService.isAuthenticated()) {
+      // Redirect to login or show login prompt
+      this.router.navigate(['/auth/login'], {
+        queryParams: { returnUrl: `/restaurants/${this.restaurantId()}` }
+      });
+      return;
+    }
+
+    const businessId = this.restaurantId();
+    if (!businessId) return;
+
+    this.isSavingFavorite.set(true);
+
+    if (this.isFavorite()) {
+      // Find the favorite ID and remove it
+      this.favoritesService.favorites$.subscribe(favorites => {
+        const favorite = favorites.find(fav => fav.businessId === businessId);
+        if (favorite) {
+          this.favoritesService.removeFromFavorites(favorite.id).subscribe({
+            next: () => {
+              this.isFavorite.set(false);
+              this.isSavingFavorite.set(false);
+            },
+            error: () => {
+              this.isSavingFavorite.set(false);
+            }
+          });
+        }
+      }).unsubscribe();
+    } else {
+      this.favoritesService.addToFavorites(businessId).subscribe({
+        next: () => {
+          this.isFavorite.set(true);
+          this.isSavingFavorite.set(false);
+        },
+        error: () => {
+          this.isSavingFavorite.set(false);
+        }
+      });
+    }
   }
 
   visitWebsite(): void {

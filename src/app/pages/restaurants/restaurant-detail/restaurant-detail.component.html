@@ -68,8 +68,11 @@
         <button type="button" class="secondary-btn" (click)="getDirections()">
           🗺️ Directions
         </button>
-        <button type="button" class="secondary-btn">
-          ❤️ Save
+        <button type="button" class="secondary-btn"
+                [class.saved]="isFavorite()"
+                [disabled]="isSavingFavorite()"
+                (click)="toggleFavorite()">
+          {{ isFavorite() ? '💖 Saved' : '🤍 Save' }}
         </button>
         <button type="button" class="secondary-btn" (click)="shareRestaurant()">
           📤 Share

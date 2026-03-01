@@ -1,14 +1,16 @@
 const express = require('express');
 const pool = require('../config/database');
+const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
 // Get all favorites for a user
-router.get('/:userId', async (req, res) => {
+router.get('/:userId', authenticateToken, async (req, res) => {
   try {
     const { userId } = req.params;
-    
+    const tenantId = req.user.tenant_id;
+
     const result = await pool.query(`
-      SELECT 
+      SELECT
         f.*,
         json_build_object(
           'id', b.id,
@@ -28,10 +30,10 @@ router.get('/:userId', async (req, res) => {
         ) as business
       FROM favorites f
       LEFT JOIN businesses b ON f.business_id = b.id
-      WHERE f.user_id = $1
-      ORDER BY f.added_at DESC
-    `, [userId]);
-    
+      WHERE f.user_id = $1 AND f.tenant_id = $2
+      ORDER BY f.created_at DESC
+    `, [userId, tenantId]);
+
     res.json({ favorites: result.rows });
   } catch (error) {
     console.error('Error fetching favorites:', error);
@@ -40,16 +42,17 @@ router.get('/:userId', async (req, res) => {
 });
 
 // Get collections for a user
-router.get('/collections/:userId', async (req, res) => {
+router.get('/collections/:userId', authenticateToken, async (req, res) => {
   try {
     const { userId } = req.params;
-    
+    const tenantId = req.user.tenant_id;
+
     const result = await pool.query(`
       SELECT * FROM favorite_collections
-      WHERE user_id = $1
+      WHERE user_id = $1 AND tenant_id = $2
       ORDER BY created_at DESC
-    `, [userId]);
-    
+    `, [userId, tenantId]);
+
     res.json({ collections: result.rows });
   } catch (error) {
     console.error('Error fetching collections:', error);
@@ -58,28 +61,28 @@ router.get('/collections/:userId', async (req, res) => {
 });
 
 // Add to favorites
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
-    const { userId, businessId, notes, tags } = req.body;
-    
+    const { businessId, notes } = req.body;
+    const userId = req.user.userId;
+    const tenantId = req.user.tenant_id;
+
     const result = await pool.query(`
-      INSERT INTO favorites (user_id, business_id, notes, tags)
+      INSERT INTO favorites (user_id, business_id, tenant_id, notes)
       VALUES ($1, $2, $3, $4)
       ON CONFLICT (user_id, business_id) DO UPDATE SET
-        notes = EXCLUDED.notes,
-        tags = EXCLUDED.tags,
-        updated_at = CURRENT_TIMESTAMP
+        notes = EXCLUDED.notes
       RETURNING *
-    `, [userId, businessId, notes, tags || []]);
-    
+    `, [userId, businessId, tenantId, notes]);
+
     // Fetch the business details
     const businessResult = await pool.query(`
       SELECT * FROM businesses WHERE id = $1
     `, [businessId]);
-    
+
     const favorite = result.rows[0];
     favorite.business = businessResult.rows[0] || {};
-    
+
     res.status(201).json(favorite);
   } catch (error) {
     console.error('Error adding to favorites:', error);
@@ -88,45 +91,22 @@ router.post('/', async (req, res) => {
 });
 
 // Update favorite
-router.patch('/:favoriteId', async (req, res) => {
+router.patch('/:favoriteId', authenticateToken, async (req, res) => {
   try {
     const { favoriteId } = req.params;
-    const { notes, tags, isPublic, rating } = req.body;
-    
-    const updates = [];
-    const values = [];
-    let paramCount = 1;
-    
-    if (notes !== undefined) {
-      updates.push(`notes = $${paramCount++}`);
-      values.push(notes);
-    }
-    if (tags !== undefined) {
-      updates.push(`tags = $${paramCount++}`);
-      values.push(tags);
-    }
-    if (isPublic !== undefined) {
-      updates.push(`is_public = $${paramCount++}`);
-      values.push(isPublic);
-    }
-    if (rating !== undefined) {
-      updates.push(`rating = $${paramCount++}`);
-      values.push(rating);
-    }
-    
-    updates.push(`updated_at = CURRENT_TIMESTAMP`);
-    values.push(favoriteId);
-    
+    const { notes } = req.body;
+    const tenantId = req.user.tenant_id;
+
     const result = await pool.query(`
-      UPDATE favorites SET ${updates.join(', ')}
-      WHERE id = $${paramCount}
+      UPDATE favorites SET notes = $1
+      WHERE id = $2 AND tenant_id = $3
       RETURNING *
-    `, values);
-    
+    `, [notes, favoriteId, tenantId]);
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Favorite not found' });
     }
-    
+
     res.json(result.rows[0]);
   } catch (error) {
     console.error('Error updating favorite:', error);
@@ -135,18 +115,19 @@ router.patch('/:favoriteId', async (req, res) => {
 });
 
 // Remove from favorites
-router.delete('/:favoriteId', async (req, res) => {
+router.delete('/:favoriteId', authenticateToken, async (req, res) => {
   try {
     const { favoriteId } = req.params;
-    
+    const tenantId = req.user.tenant_id;
+
     const result = await pool.query(`
-      DELETE FROM favorites WHERE id = $1 RETURNING id
-    `, [favoriteId]);
-    
+      DELETE FROM favorites WHERE id = $1 AND tenant_id = $2 RETURNING id
+    `, [favoriteId, tenantId]);
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Favorite not found' });
     }
-    
+
     res.json({ message: 'Removed from favorites' });
   } catch (error) {
     console.error('Error removing from favorites:', error);
@@ -155,16 +136,18 @@ router.delete('/:favoriteId', async (req, res) => {
 });
 
 // Create collection
-router.post('/collections', async (req, res) => {
+router.post('/collections', authenticateToken, async (req, res) => {
   try {
-    const { userId, name, description, isPublic } = req.body;
-    
+    const { name, description, isPublic } = req.body;
+    const userId = req.user.userId;
+    const tenantId = req.user.tenant_id;
+
     const result = await pool.query(`
-      INSERT INTO favorite_collections (user_id, name, description, is_public)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO favorite_collections (user_id, tenant_id, name, description, is_public)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *
-    `, [userId, name, description, isPublic || false]);
-    
+    `, [userId, tenantId, name, description, isPublic || false]);
+
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error creating collection:', error);
