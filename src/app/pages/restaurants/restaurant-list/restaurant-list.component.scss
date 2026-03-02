@@ -330,14 +330,29 @@ $itiyum-orange-dark: #e67e00;
 .sponsored-banner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1.5rem 2rem 0;
+  padding: 0 2rem;
+
+  // Hide empty placeholder completely
+  &:has(.banner-ad-placeholder) {
+    display: none;
+  }
+
+  // Only add spacing when there's an actual ad
+  &:has(.banner-ad-container) {
+    padding-top: 1.5rem;
+  }
+
+  // Fallback: hide empty placeholder
+  .banner-ad-placeholder {
+    display: none;
+  }
 }
 
 /* ========== Restaurant Grid ========== */
 .restaurant-grid {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2.5rem 2rem;
+  padding: 1.5rem 2rem 2.5rem;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
