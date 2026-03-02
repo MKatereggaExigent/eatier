@@ -138,37 +138,164 @@
 
   <!-- Menu Section -->
   <div id="menu-section" class="popular-dishes">
-    <h2>Menu</h2>
+    <div class="menu-header">
+      <h2>Menu ({{ menuItems().length }} items)</h2>
+      <div class="menu-controls">
+        <!-- View Mode Toggle -->
+        <div class="view-mode-toggle">
+          <button type="button"
+                  class="view-mode-btn"
+                  [class.active]="menuViewMode() === 'grid'"
+                  (click)="setMenuViewMode('grid')"
+                  title="Grid View">
+            <span>⊞</span>
+          </button>
+          <button type="button"
+                  class="view-mode-btn"
+                  [class.active]="menuViewMode() === 'list'"
+                  (click)="setMenuViewMode('list')"
+                  title="List View">
+            <span>☰</span>
+          </button>
+          <button type="button"
+                  class="view-mode-btn"
+                  [class.active]="menuViewMode() === 'gallery'"
+                  (click)="setMenuViewMode('gallery')"
+                  title="Gallery View">
+            <span>🖼️</span>
+          </button>
+          <button type="button"
+                  class="view-mode-btn"
+                  [class.active]="menuViewMode() === 'table'"
+                  (click)="setMenuViewMode('table')"
+                  title="Table View">
+            <span>📋</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     @if (menuItems().length > 0) {
-      <div class="dishes-grid">
-        @for (item of menuItems(); track item.id) {
-          <div class="dish-card">
-            <img [src]="item.image" [alt]="item.name" class="dish-image" />
-            <div class="dish-info">
-              <div class="dish-header">
-                <h3>{{ item.name }}</h3>
-                <span class="dish-price">{{ item.formattedPrice }}</span>
+      <!-- Grid View -->
+      @if (menuViewMode() === 'grid') {
+        <div class="dishes-grid">
+          @for (item of paginatedMenuItems(); track item.id) {
+            <div class="dish-card">
+              <img [src]="item.image" [alt]="item.name" class="dish-image" />
+              <div class="dish-info">
+                <div class="dish-header">
+                  <h3>{{ item.name }}</h3>
+                  <span class="dish-price">{{ item.formattedPrice }}</span>
+                </div>
+                <p>{{ item.description }}</p>
+                <div class="dish-actions">
+                  <button type="button" class="add-to-cart-btn" [disabled]="item.isAdding" (click)="addToCart(item)">
+                    @if (item.isAdding) { <span class="btn-spinner"></span> Adding... } @else { 🛒 Add to Cart }
+                  </button>
+                </div>
               </div>
-              <p>{{ item.description }}</p>
-              <div class="dish-actions">
-                <button
-                  type="button"
-                  class="add-to-cart-btn"
-                  [disabled]="item.isAdding"
-                  (click)="addToCart(item)">
-                  @if (item.isAdding) {
-                    <span class="btn-spinner"></span> Adding...
-                  } @else {
-                    🛒 Add to Cart
-                  }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- List View -->
+      @if (menuViewMode() === 'list') {
+        <div class="dishes-list">
+          @for (item of paginatedMenuItems(); track item.id) {
+            <div class="dish-list-item">
+              <img [src]="item.image" [alt]="item.name" class="dish-list-image" />
+              <div class="dish-list-info">
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.description }}</p>
+              </div>
+              <div class="dish-list-actions">
+                <span class="dish-price">{{ item.formattedPrice }}</span>
+                <button type="button" class="add-to-cart-btn" [disabled]="item.isAdding" (click)="addToCart(item)">
+                  @if (item.isAdding) { Adding... } @else { 🛒 Add }
                 </button>
               </div>
             </div>
+          }
+        </div>
+      }
+
+      <!-- Gallery View -->
+      @if (menuViewMode() === 'gallery') {
+        <div class="dishes-gallery">
+          @for (item of paginatedMenuItems(); track item.id) {
+            <div class="dish-gallery-item">
+              <img [src]="item.image" [alt]="item.name" class="dish-gallery-image" />
+              <div class="dish-gallery-overlay">
+                <h3>{{ item.name }}</h3>
+                <span class="dish-price">{{ item.formattedPrice }}</span>
+                <button type="button" class="add-to-cart-btn-small" [disabled]="item.isAdding" (click)="addToCart(item)">
+                  @if (item.isAdding) { ... } @else { 🛒 }
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Table View -->
+      @if (menuViewMode() === 'table') {
+        <div class="dishes-table-wrapper">
+          <table class="dishes-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of paginatedMenuItems(); track item.id) {
+                <tr>
+                  <td class="table-item-name">
+                    <img [src]="item.image" [alt]="item.name" class="table-item-image" />
+                    <span>{{ item.name }}</span>
+                  </td>
+                  <td class="table-item-desc">{{ item.description }}</td>
+                  <td class="table-item-price">{{ item.formattedPrice }}</td>
+                  <td class="table-item-action">
+                    <button type="button" class="add-to-cart-btn-small" [disabled]="item.isAdding" (click)="addToCart(item)">
+                      @if (item.isAdding) { ... } @else { 🛒 Add }
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- Pagination -->
+      @if (menuTotalPages() > 1) {
+        <div class="menu-pagination">
+          <button type="button" class="pagination-btn" [disabled]="menuPage() === 1" (click)="prevMenuPage()">
+            ← Previous
+          </button>
+          <div class="pagination-numbers">
+            @for (page of getMenuPageNumbers(); track page) {
+              <button type="button"
+                      class="pagination-num"
+                      [class.active]="page === menuPage()"
+                      (click)="goToMenuPage(page)">
+                {{ page }}
+              </button>
+            }
           </div>
-        }
-      </div>
+          <button type="button" class="pagination-btn" [disabled]="menuPage() === menuTotalPages()" (click)="nextMenuPage()">
+            Next →
+          </button>
+        </div>
+      }
+
+      <!-- View Full Menu Button -->
       <button type="button" class="view-menu-btn" (click)="viewFullMenu()">
-        View Full Menu
+        📋 View Full Menu ({{ menuItems().length }} items)
       </button>
     } @else {
       <div class="empty-state">
@@ -650,6 +777,120 @@
           </div>
         </form>
       }
+    </div>
+  </div>
+}
+
+<!-- Full Menu Modal -->
+@if (showFullMenuModal()) {
+  <div class="modal-overlay" (click)="closeFullMenuModal()">
+    <div class="modal-container full-menu-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Full Menu - {{ restaurant().name }}</h2>
+        <div class="modal-view-modes">
+          <button type="button" class="view-mode-btn" [class.active]="menuViewMode() === 'grid'" (click)="setMenuViewMode('grid')" title="Grid">⊞</button>
+          <button type="button" class="view-mode-btn" [class.active]="menuViewMode() === 'list'" (click)="setMenuViewMode('list')" title="List">☰</button>
+          <button type="button" class="view-mode-btn" [class.active]="menuViewMode() === 'gallery'" (click)="setMenuViewMode('gallery')" title="Gallery">🖼️</button>
+          <button type="button" class="view-mode-btn" [class.active]="menuViewMode() === 'table'" (click)="setMenuViewMode('table')" title="Table">📋</button>
+        </div>
+        <button type="button" class="close-btn" (click)="closeFullMenuModal()">×</button>
+      </div>
+      <div class="modal-body full-menu-body">
+        <!-- Grid View in Modal -->
+        @if (menuViewMode() === 'grid') {
+          <div class="dishes-grid modal-grid">
+            @for (item of menuItems(); track item.id) {
+              <div class="dish-card">
+                <img [src]="item.image" [alt]="item.name" class="dish-image" />
+                <div class="dish-info">
+                  <div class="dish-header">
+                    <h3>{{ item.name }}</h3>
+                    <span class="dish-price">{{ item.formattedPrice }}</span>
+                  </div>
+                  <p>{{ item.description }}</p>
+                  <div class="dish-actions">
+                    <button type="button" class="add-to-cart-btn" [disabled]="item.isAdding" (click)="addToCart(item)">
+                      @if (item.isAdding) { Adding... } @else { 🛒 Add to Cart }
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- List View in Modal -->
+        @if (menuViewMode() === 'list') {
+          <div class="dishes-list">
+            @for (item of menuItems(); track item.id) {
+              <div class="dish-list-item">
+                <img [src]="item.image" [alt]="item.name" class="dish-list-image" />
+                <div class="dish-list-info">
+                  <h3>{{ item.name }}</h3>
+                  <p>{{ item.description }}</p>
+                </div>
+                <div class="dish-list-actions">
+                  <span class="dish-price">{{ item.formattedPrice }}</span>
+                  <button type="button" class="add-to-cart-btn" [disabled]="item.isAdding" (click)="addToCart(item)">
+                    @if (item.isAdding) { Adding... } @else { 🛒 Add }
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Gallery View in Modal -->
+        @if (menuViewMode() === 'gallery') {
+          <div class="dishes-gallery modal-gallery">
+            @for (item of menuItems(); track item.id) {
+              <div class="dish-gallery-item">
+                <img [src]="item.image" [alt]="item.name" class="dish-gallery-image" />
+                <div class="dish-gallery-overlay">
+                  <h3>{{ item.name }}</h3>
+                  <span class="dish-price">{{ item.formattedPrice }}</span>
+                  <button type="button" class="add-to-cart-btn-small" [disabled]="item.isAdding" (click)="addToCart(item)">
+                    @if (item.isAdding) { ... } @else { 🛒 }
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Table View in Modal -->
+        @if (menuViewMode() === 'table') {
+          <div class="dishes-table-wrapper">
+            <table class="dishes-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Description</th>
+                  <th>Price</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of menuItems(); track item.id) {
+                  <tr>
+                    <td class="table-item-name">
+                      <img [src]="item.image" [alt]="item.name" class="table-item-image" />
+                      <span>{{ item.name }}</span>
+                    </td>
+                    <td class="table-item-desc">{{ item.description }}</td>
+                    <td class="table-item-price">{{ item.formattedPrice }}</td>
+                    <td class="table-item-action">
+                      <button type="button" class="add-to-cart-btn-small" [disabled]="item.isAdding" (click)="addToCart(item)">
+                        @if (item.isAdding) { ... } @else { 🛒 Add }
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
     </div>
   </div>
 }

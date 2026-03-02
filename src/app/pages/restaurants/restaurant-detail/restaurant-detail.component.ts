@@ -1,5 +1,5 @@
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PublicBusiness, PublicBusinessService } from '../../../core/services/public-business.service';
 
@@ -56,6 +56,27 @@ export class RestaurantDetailComponent implements OnInit {
 
   // Menu items with IDs for cart
   menuItems = signal<MenuItem[]>([]);
+
+  // Menu view mode and pagination
+  menuViewMode = signal<'grid' | 'list' | 'gallery' | 'table'>('grid');
+  menuPage = signal<number>(1);
+  menuPageSize = signal<number>(6);
+  showFullMenuModal = signal<boolean>(false);
+
+  // Computed: paginated menu items
+  paginatedMenuItems = computed(() => {
+    const items = this.menuItems();
+    const page = this.menuPage();
+    const pageSize = this.menuPageSize();
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    return items.slice(start, end);
+  });
+
+  // Computed: total pages for menu pagination
+  menuTotalPages = computed(() => {
+    return Math.ceil(this.menuItems().length / this.menuPageSize());
+  });
 
   // Cart notification state
   addedToCartNotification = signal<string | null>(null);
@@ -475,17 +496,58 @@ export class RestaurantDetailComponent implements OnInit {
     }
   }
 
-  // View full menu - navigate to menu page or open modal
+  // View full menu - open modal with all items
   viewFullMenu(): void {
     // Track menu view for analytics
     this.trackPageView(this.restaurantId(), 'menu');
     this.pagesVisited++;
+    this.showFullMenuModal.set(true);
+  }
 
-    // Option 1: Navigate to menu page
-    // this.router.navigate(['/restaurants', this.restaurantId(), 'menu']);
+  // Close full menu modal
+  closeFullMenuModal(): void {
+    this.showFullMenuModal.set(false);
+  }
 
-    // Option 2: Show alert for now (you can implement a modal later)
-    alert('Opening full menu... This will navigate to the menu page or open a modal with the complete menu.');
+  // Set menu view mode
+  setMenuViewMode(mode: 'grid' | 'list' | 'gallery' | 'table'): void {
+    this.menuViewMode.set(mode);
+  }
+
+  // Menu pagination methods
+  goToMenuPage(page: number): void {
+    if (page >= 1 && page <= this.menuTotalPages()) {
+      this.menuPage.set(page);
+    }
+  }
+
+  nextMenuPage(): void {
+    if (this.menuPage() < this.menuTotalPages()) {
+      this.menuPage.set(this.menuPage() + 1);
+    }
+  }
+
+  prevMenuPage(): void {
+    if (this.menuPage() > 1) {
+      this.menuPage.set(this.menuPage() - 1);
+    }
+  }
+
+  // Get array of page numbers for pagination
+  getMenuPageNumbers(): number[] {
+    const total = this.menuTotalPages();
+    const current = this.menuPage();
+    const pages: number[] = [];
+
+    // Show max 5 pages at a time
+    let start = Math.max(1, current - 2);
+    let end = Math.min(total, start + 4);
+    start = Math.max(1, end - 4);
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
   }
 
   // Share restaurant - track and open share dialog
@@ -652,13 +714,13 @@ export class RestaurantDetailComponent implements OnInit {
     }
   }
 
-  // View all reviews - navigate to reviews page
+  // View all reviews - scroll to reviews section
   viewAllReviews(): void {
-    // Option 1: Navigate to reviews page
-    // this.router.navigate(['/restaurants', this.restaurantId(), 'reviews']);
-
-    // Option 2: Show alert for now
-    alert(`Viewing all ${this.restaurant().reviewCount} reviews... This will navigate to a dedicated reviews page or expand the current section.`);
+    // Scroll to reviews section
+    const reviewsSection = document.querySelector('.reviews-section');
+    if (reviewsSection) {
+      reviewsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   // ============ BOOKING FUNCTIONALITY ============
