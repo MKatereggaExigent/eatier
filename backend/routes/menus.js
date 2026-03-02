@@ -3,6 +3,62 @@ const pool = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 
+/**
+ * GET /api/menus/item/:menuItemId
+ * Get a single menu item by ID with business info (PUBLIC - for guest cart)
+ */
+router.get('/item/:menuItemId', async (req, res) => {
+  try {
+    const { menuItemId } = req.params;
+
+    const result = await pool.query(`
+      SELECT
+        m.id,
+        m.business_id,
+        m.title,
+        m.category,
+        m.description,
+        m.price,
+        m.background_image,
+        m.is_active,
+        b.business_name,
+        b.logo_url as business_logo,
+        b.address as business_address
+      FROM menus m
+      JOIN businesses b ON m.business_id = b.id
+      WHERE m.id = $1 AND m.is_active = true
+    `, [menuItemId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Menu item not found' });
+    }
+
+    const menu = result.rows[0];
+
+    res.json({
+      menuItem: {
+        id: menu.id,
+        businessId: menu.business_id,
+        title: menu.title,
+        name: menu.title, // alias for compatibility
+        category: menu.category,
+        description: menu.description,
+        price: menu.price,
+        backgroundImage: menu.background_image,
+        image: menu.background_image, // alias for compatibility
+        isActive: menu.is_active,
+        businessName: menu.business_name,
+        businessLogo: menu.business_logo,
+        businessAddress: menu.business_address
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching menu item:', error);
+    res.status(500).json({ error: 'Failed to fetch menu item' });
+  }
+});
+
 // Get menus for a business
 router.get('/business/:businessId', async (req, res) => {
   try {
