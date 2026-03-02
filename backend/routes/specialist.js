@@ -104,6 +104,92 @@ router.get('/bookings', authenticateToken, async (req, res) => {
 });
 
 /**
+ * PATCH /api/specialist/bookings/:id/status
+ * Update booking status (accept, decline, complete, cancel)
+ */
+router.patch('/bookings/:id/status', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const bookingId = req.params.id;
+    const { status, reason } = req.body;
+
+    // Validate status
+    const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled', 'declined'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        error: 'Invalid status',
+        validStatuses
+      });
+    }
+
+    // Verify booking belongs to this specialist
+    const bookingCheck = await pool.query(`
+      SELECT id, status FROM specialist_bookings
+      WHERE id = $1 AND specialist_id = $2
+    `, [bookingId, userId]);
+
+    if (bookingCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    const currentStatus = bookingCheck.rows[0].status;
+
+    // Validate status transitions
+    const validTransitions = {
+      'pending': ['confirmed', 'declined', 'cancelled'],
+      'confirmed': ['completed', 'cancelled'],
+      'completed': [],
+      'cancelled': [],
+      'declined': []
+    };
+
+    if (!validTransitions[currentStatus]?.includes(status)) {
+      return res.status(400).json({
+        error: 'Invalid status transition',
+        message: `Cannot change status from '${currentStatus}' to '${status}'`
+      });
+    }
+
+    // Build update query based on status
+    let updateFields = ['status = $1', 'updated_at = CURRENT_TIMESTAMP'];
+    let params = [status];
+    let paramIndex = 2;
+
+    if (status === 'confirmed') {
+      updateFields.push('confirmed_at = CURRENT_TIMESTAMP');
+    } else if (status === 'completed') {
+      updateFields.push('completed_at = CURRENT_TIMESTAMP');
+    } else if (status === 'cancelled' || status === 'declined') {
+      updateFields.push(`cancelled_at = CURRENT_TIMESTAMP`);
+      if (reason) {
+        updateFields.push(`cancellation_reason = $${paramIndex}`);
+        params.push(reason);
+        paramIndex++;
+      }
+    }
+
+    params.push(bookingId);
+    params.push(userId);
+
+    const result = await pool.query(`
+      UPDATE specialist_bookings
+      SET ${updateFields.join(', ')}
+      WHERE id = $${paramIndex} AND specialist_id = $${paramIndex + 1}
+      RETURNING *
+    `, params);
+
+    res.json({
+      message: `Booking ${status} successfully`,
+      booking: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Error updating booking status:', error);
+    res.status(500).json({ error: 'Failed to update booking status' });
+  }
+});
+
+/**
  * GET /api/specialist/reviews
  * Get reviews for the logged-in specialist
  */

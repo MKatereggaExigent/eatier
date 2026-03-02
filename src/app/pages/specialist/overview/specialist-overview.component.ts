@@ -308,19 +308,41 @@ export class SpecialistOverviewComponent implements OnInit {
 
   // Action methods
   acceptRequest(requestId: string): void {
-    const requests = this.recentRequests();
-    const updatedRequests = requests.map(req =>
-      req.id === requestId ? { ...req, status: 'accepted' as const } : req
-    );
-    this.recentRequests.set(updatedRequests);
+    // Call API to confirm the booking
+    this.specialistService.updateBookingStatus(requestId, 'confirmed').subscribe({
+      next: (response) => {
+        // Update local state after successful API call
+        const requests = this.recentRequests();
+        const updatedRequests = requests.filter(req => req.id !== requestId);
+        this.recentRequests.set(updatedRequests);
+
+        // Reload data to reflect changes
+        this.loadData();
+      },
+      error: (error) => {
+        console.error('Error accepting request:', error);
+        alert('Failed to accept request. Please try again.');
+      }
+    });
   }
 
   declineRequest(requestId: string): void {
-    const requests = this.recentRequests();
-    const updatedRequests = requests.map(req =>
-      req.id === requestId ? { ...req, status: 'declined' as const } : req
-    );
-    this.recentRequests.set(updatedRequests);
+    // Call API to decline the booking
+    this.specialistService.updateBookingStatus(requestId, 'declined').subscribe({
+      next: (response) => {
+        // Update local state after successful API call
+        const requests = this.recentRequests();
+        const updatedRequests = requests.filter(req => req.id !== requestId);
+        this.recentRequests.set(updatedRequests);
+
+        // Reload data to reflect changes
+        this.loadData();
+      },
+      error: (error) => {
+        console.error('Error declining request:', error);
+        alert('Failed to decline request. Please try again.');
+      }
+    });
   }
 
   viewBookingDetails(bookingId: string): void {

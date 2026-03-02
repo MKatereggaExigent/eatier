@@ -168,6 +168,17 @@ export class SpecialistService {
   }
 
   /**
+   * Update booking status (accept/confirm, decline, complete, cancel)
+   */
+  updateBookingStatus(bookingId: string, status: 'confirmed' | 'declined' | 'completed' | 'cancelled', reason?: string): Observable<{ message: string; booking: SpecialistBooking }> {
+    return this.http.patch<{ message: string; booking: SpecialistBooking }>(
+      `${this.apiUrl}/bookings/${bookingId}/status`,
+      { status, reason },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  /**
    * Get specialist reviews
    */
   getReviews(limit: number = 10): Observable<{ reviews: SpecialistReview[] }> {
