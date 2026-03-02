@@ -42,6 +42,7 @@ router.get('/', async (req, res) => {
       ownerEmail: business.owner_email,
       businessName: business.business_name,
       businessType: business.business_type,
+      cuisineTypes: business.cuisine_types || [], // Array of cuisines
       email: business.email,
       phone: business.phone,
       country: business.country,
@@ -104,6 +105,7 @@ router.get('/:businessId', async (req, res) => {
         ownerEmail: business.owner_email,
         businessName: business.business_name,
         businessType: business.business_type,
+        cuisineTypes: business.cuisine_types || [], // Array of cuisines
         email: business.email,
         phone: business.phone,
         country: business.country,

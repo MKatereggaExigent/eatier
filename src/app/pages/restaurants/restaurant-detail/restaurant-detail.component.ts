@@ -215,10 +215,15 @@ export class RestaurantDetailComponent implements OnInit {
         const hours = this.generateHoursFromOpenClose(business.opensAt, business.closesAt);
         const isOpen = this.isBusinessOpen(business.opensAt, business.closesAt);
 
+        // Get primary cuisine from cuisineTypes array, or fallback to formatted business type
+        const cuisine = business.cuisineTypes && business.cuisineTypes.length > 0
+          ? business.cuisineTypes.join(', ') // Show all cuisines
+          : this.formatBusinessType(business.businessType);
+
         this.restaurant.set({
           id: business.id,
           name: business.businessName,
-          cuisine: business.businessType,
+          cuisine,
           priceRange: '$', // Default, could be added to business model later
           rating: 0, // Will be calculated from reviews later
           reviewCount: 0, // Will be fetched from reviews later
@@ -926,5 +931,16 @@ export class RestaurantDetailComponent implements OnInit {
       browser: deviceInfo.browser,
       os: deviceInfo.os
     }).subscribe();
+  }
+
+  /**
+   * Format business type for display (e.g., 'food_truck' -> 'Food Truck')
+   */
+  private formatBusinessType(businessType?: string): string {
+    if (!businessType) return 'Restaurant';
+    return businessType
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 }

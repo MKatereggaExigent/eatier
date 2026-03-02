@@ -10,6 +10,7 @@ export interface PublicBusiness {
   ownerEmail: string;
   businessName: string;
   businessType: string;
+  cuisineTypes?: string[]; // Array of cuisines like ['Italian', 'Mediterranean']
   email: string;
   phone: string;
   country: string;

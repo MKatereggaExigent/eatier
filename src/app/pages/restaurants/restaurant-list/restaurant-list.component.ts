@@ -52,13 +52,34 @@ export class RestaurantListComponent implements OnInit {
   // Error state for when API fails
   loadError = signal<string | null>(null);
 
+  // Standard cuisine types - same as specialists page
   cuisineTypes = [
     'All Cuisines',
     'Italian',
+    'French',
     'Japanese',
-    'American',
-    'Mediterranean',
+    'Chinese',
+    'Indian',
     'Mexican',
+    'Thai',
+    'Mediterranean',
+    'African',
+    'American',
+    'Fusion',
+    'Vegan',
+    'Vegetarian',
+    'Seafood',
+    'Steakhouse',
+    'BBQ',
+    'Sushi',
+    'Pizza',
+    'Burgers',
+    'Fine Dining',
+    'Casual Dining',
+    'Fast Food',
+    'Cafe',
+    'Bakery',
+    'Desserts',
     'Chinese',
     'Indian',
     'Thai',
@@ -112,10 +133,7 @@ export class RestaurantListComponent implements OnInit {
         const restaurants = response.businesses.map(business => this.mapBusinessToRestaurant(business));
         this.restaurants.set(restaurants);
         this.updateFilters();
-
-        // Update cuisines from real data
-        const uniqueCuisines = new Set(restaurants.map(r => r.cuisine));
-        this.cuisineTypes = ['All Cuisines', ...Array.from(uniqueCuisines).sort()];
+        // Keep standard cuisine types - don't override with business types
       },
       error: (error) => {
         console.error('Error loading restaurants:', error);
@@ -154,10 +172,15 @@ export class RestaurantListComponent implements OnInit {
     // Map facilities to features
     const features = business.facilities || [];
 
+    // Get primary cuisine from cuisineTypes array, or fallback to businessType display
+    const cuisine = business.cuisineTypes && business.cuisineTypes.length > 0
+      ? business.cuisineTypes[0] // Use first cuisine type
+      : this.formatBusinessType(business.businessType); // Fallback to formatted business type
+
     return {
       id: business.id,
       name: business.businessName,
-      cuisine: business.businessType,
+      cuisine,
       priceRange: this.convertPriceRangeToSymbol(business.priceRange), // Auto-calculated from menu prices
       rating: 0, // Will be populated when reviews are available
       reviewCount: 0, // Will be populated when reviews are available
@@ -167,6 +190,17 @@ export class RestaurantListComponent implements OnInit {
       isOpen,
       features
     };
+  }
+
+  /**
+   * Format business type for display (e.g., 'food_truck' -> 'Food Truck')
+   */
+  private formatBusinessType(businessType?: string): string {
+    if (!businessType) return 'Restaurant';
+    return businessType
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
   /**
