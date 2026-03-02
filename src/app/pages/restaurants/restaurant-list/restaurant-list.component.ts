@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { PublicBusiness, PublicBusinessService } from '../../../core/services/public-business.service';
 
 import { BannerAdComponent } from '../../../shared/components/ads/banner-ad/banner-ad.component';
@@ -74,6 +74,26 @@ export class RestaurantListComponent implements OnInit {
   ];
 
   filteredRestaurants = signal<Restaurant[]>([]);
+
+  // Pagination signals
+  currentPage = signal<number>(1);
+  pageSize = signal<number>(6);
+  pageSizeOptions = [6, 12, 24, 48];
+
+  // Computed: paginated restaurants
+  paginatedRestaurants = computed(() => {
+    const items = this.filteredRestaurants();
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    const end = start + size;
+    return items.slice(start, end);
+  });
+
+  // Computed: total pages
+  totalPages = computed(() => {
+    return Math.ceil(this.filteredRestaurants().length / this.pageSize());
+  });
 
   // Track favorite restaurants (stored in localStorage)
   favorites = signal<Set<string>>(new Set());
@@ -223,6 +243,8 @@ export class RestaurantListComponent implements OnInit {
     }
 
     this.filteredRestaurants.set(filtered);
+    // Reset to first page when filters change
+    this.currentPage.set(1);
   }
 
   getStarArray(rating: number): boolean[] {
@@ -242,6 +264,59 @@ export class RestaurantListComponent implements OnInit {
     this.selectedCuisine.set('');
     this.selectedPriceRange.set('');
     this.updateFilters();
+  }
+
+  // ==================== PAGINATION FUNCTIONALITY ====================
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      // Scroll to top of restaurant grid
+      this.scrollToGrid();
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.set(this.currentPage() + 1);
+      this.scrollToGrid();
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage() > 1) {
+      this.currentPage.set(this.currentPage() - 1);
+      this.scrollToGrid();
+    }
+  }
+
+  changePageSize(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1); // Reset to first page
+  }
+
+  getPageNumbers(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
+
+    // Show max 5 pages at a time
+    let start = Math.max(1, current - 2);
+    let end = Math.min(total, start + 4);
+    start = Math.max(1, end - 4);
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  }
+
+  private scrollToGrid(): void {
+    const grid = document.querySelector('.restaurant-grid');
+    if (grid) {
+      grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   // ==================== FAVORITES FUNCTIONALITY ====================

@@ -106,7 +106,7 @@
 
   <!-- Restaurant Grid -->
   <div class="restaurant-grid">
-    @for (restaurant of filteredRestaurants(); track restaurant.id) {
+    @for (restaurant of paginatedRestaurants(); track restaurant.id) {
       <article class="restaurant-card">
         <a [routerLink]="['/restaurants', restaurant.id]" class="restaurant-link">
           <div class="card-image-wrapper">
@@ -224,15 +224,81 @@
     }
   </div>
 
-  <!-- Load More -->
-  @if (filteredRestaurants().length > 0 && filteredRestaurants().length >= 5) {
-    <div class="load-more-section">
-      <button type="button" class="load-more-btn">
-        <span>Load More</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 9l6 6 6-6"></path>
-        </svg>
-      </button>
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <div class="pagination-section">
+      <div class="pagination-container">
+        <!-- Page Size Selector -->
+        <div class="page-size-selector">
+          <label class="page-size-label">Show:</label>
+          <select
+            class="page-size-select"
+            [value]="pageSize()"
+            (change)="changePageSize(+$any($event.target).value)">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size">{{ size }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+          <!-- Previous Button -->
+          <button
+            type="button"
+            class="pagination-btn prev"
+            [disabled]="currentPage() === 1"
+            (click)="prevPage()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6"></path>
+            </svg>
+          </button>
+
+          <!-- Page Numbers -->
+          <div class="page-numbers">
+            @if (getPageNumbers()[0] > 1) {
+              <button type="button" class="page-btn" (click)="goToPage(1)">1</button>
+              @if (getPageNumbers()[0] > 2) {
+                <span class="page-ellipsis">...</span>
+              }
+            }
+            @for (page of getPageNumbers(); track page) {
+              <button
+                type="button"
+                class="page-btn"
+                [class.active]="page === currentPage()"
+                (click)="goToPage(page)">
+                {{ page }}
+              </button>
+            }
+            @if (getPageNumbers()[getPageNumbers().length - 1] < totalPages()) {
+              @if (getPageNumbers()[getPageNumbers().length - 1] < totalPages() - 1) {
+                <span class="page-ellipsis">...</span>
+              }
+              <button type="button" class="page-btn" (click)="goToPage(totalPages())">{{ totalPages() }}</button>
+            }
+          </div>
+
+          <!-- Next Button -->
+          <button
+            type="button"
+            class="pagination-btn next"
+            [disabled]="currentPage() === totalPages()"
+            (click)="nextPage()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Page Info -->
+        <div class="page-info">
+          <span class="page-info-text">
+            {{ (currentPage() - 1) * pageSize() + 1 }}–{{ currentPage() * pageSize() > filteredRestaurants().length ? filteredRestaurants().length : currentPage() * pageSize() }}
+            of {{ filteredRestaurants().length }}
+          </span>
+        </div>
+      </div>
     </div>
   }
 </div>
