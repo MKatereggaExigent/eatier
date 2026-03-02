@@ -10,11 +10,11 @@ const pool = require('../config/database');
 router.get('/stats', async (req, res) => {
   try {
     // Get real statistics from database
-    // Note: reviews table doesn't exist yet, so we'll return 0 for now
     const stats = await pool.query(`
       SELECT
         (SELECT COUNT(*) FROM public.users) as total_users,
         (SELECT COUNT(*) FROM public.businesses) as total_businesses,
+        (SELECT COUNT(*) FROM public.reviews WHERE status = 'published') as total_reviews,
         (SELECT COUNT(*) FROM public.users u
          JOIN public.user_roles ur ON u.id = ur.user_id
          JOIN public.roles r ON ur.role_id = r.id
@@ -26,7 +26,7 @@ router.get('/stats', async (req, res) => {
     res.json({
       activeUsers: parseInt(row.total_users) || 0,
       restaurants: parseInt(row.total_businesses) || 0,
-      reviews: 0, // Reviews table doesn't exist yet
+      reviews: parseInt(row.total_reviews) || 0,
       specialists: parseInt(row.total_specialists) || 0
     });
   } catch (error) {
