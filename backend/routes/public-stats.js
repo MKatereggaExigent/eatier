@@ -10,11 +10,15 @@ const pool = require('../config/database');
 router.get('/stats', async (req, res) => {
   try {
     // Get real statistics from database
+    // Aggregate reviews from both reviews (restaurant) and specialist_reviews tables
     const stats = await pool.query(`
       SELECT
         (SELECT COUNT(*) FROM public.users) as total_users,
         (SELECT COUNT(*) FROM public.businesses) as total_businesses,
-        (SELECT COUNT(*) FROM public.reviews WHERE status = 'published') as total_reviews,
+        (
+          (SELECT COUNT(*) FROM public.reviews WHERE status = 'published') +
+          (SELECT COUNT(*) FROM public.specialist_reviews WHERE status = 'published')
+        ) as total_reviews,
         (SELECT COUNT(*) FROM public.users u
          JOIN public.user_roles ur ON u.id = ur.user_id
          JOIN public.roles r ON ur.role_id = r.id
