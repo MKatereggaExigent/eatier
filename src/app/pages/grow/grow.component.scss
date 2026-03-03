@@ -330,14 +330,16 @@ $accent-gold: #c9a227;
     margin-bottom: 4rem;
     position: relative;
 
-    // NYT-style decorative element
+    // NYT-style decorative element with animation
     &::after {
       content: '';
       display: block;
       width: 60px;
       height: 3px;
-      background: $nyt-black;
+      background: linear-gradient(90deg, $itiyum-orange, $nyt-black, $itiyum-orange);
+      background-size: 200% 100%;
       margin: 1.5rem auto 0;
+      animation: shimmer 3s ease-in-out infinite;
     }
 
     .section-title {
@@ -347,6 +349,7 @@ $accent-gold: #c9a227;
       margin-bottom: 1rem;
       color: $nyt-black;
       letter-spacing: -0.02em;
+      animation: fadeInUp 0.6s ease-out;
     }
 
     .section-subtitle {
@@ -356,6 +359,7 @@ $accent-gold: #c9a227;
       max-width: 650px;
       margin: 0 auto;
       line-height: 1.7;
+      animation: fadeInUp 0.6s ease-out 0.1s backwards;
     }
   }
 }
@@ -381,13 +385,21 @@ $accent-gold: #c9a227;
   .ad-type-card {
     background: #ffffff;
     border: 1px solid $nyt-border;
-    border-radius: 2px;
+    border-radius: 4px;
     padding: 2.5rem 2rem;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    animation: fadeInUp 0.6s ease-out backwards;
 
-    // Top accent line
+    // Staggered animations
+    @for $i from 1 through 6 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.1}s;
+      }
+    }
+
+    // Top accent line with gradient
     &::before {
       content: '';
       position: absolute;
@@ -395,21 +407,50 @@ $accent-gold: #c9a227;
       left: 0;
       right: 0;
       height: 3px;
-      background: $itiyum-orange;
+      background: linear-gradient(90deg, $itiyum-orange, $accent-gold);
       transform: scaleX(0);
-      transition: transform 0.3s ease;
+      transform-origin: left;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    // Shine effect
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+      );
+      transition: left 0.5s ease;
+      pointer-events: none;
     }
 
     &:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      transform: translateY(-10px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+      border-color: rgba($itiyum-orange, 0.3);
 
       &::before {
         transform: scaleX(1);
       }
 
+      &::after {
+        left: 100%;
+      }
+
       .card-icon {
-        transform: scale(1.1);
+        transform: scale(1.15) rotate(5deg);
+        color: $itiyum-orange;
+      }
+
+      .card-title {
+        color: $itiyum-orange;
       }
     }
 
@@ -417,7 +458,9 @@ $accent-gold: #c9a227;
       font-size: 3rem;
       margin-bottom: 1.25rem;
       display: block;
-      transition: transform 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 1;
     }
 
     .card-title {
@@ -426,6 +469,9 @@ $accent-gold: #c9a227;
       font-weight: 700;
       margin-bottom: 0.75rem;
       color: $nyt-black;
+      transition: color 0.3s ease;
+      position: relative;
+      z-index: 1;
     }
 
     .card-description {
@@ -434,12 +480,16 @@ $accent-gold: #c9a227;
       color: $nyt-medium-gray;
       margin-bottom: 1.5rem;
       line-height: 1.65;
+      position: relative;
+      z-index: 1;
     }
 
     .card-features {
       list-style: none;
       padding: 0;
       margin: 0 0 1.5rem 0;
+      position: relative;
+      z-index: 1;
 
       .feature-item {
         display: flex;
@@ -465,6 +515,8 @@ $accent-gold: #c9a227;
       color: $itiyum-orange;
       padding-top: 1.25rem;
       border-top: 1px solid $nyt-border;
+      position: relative;
+      z-index: 1;
     }
   }
 }
@@ -521,21 +573,49 @@ $accent-gold: #c9a227;
   background: $nyt-light-gray;
   border-radius: 4px;
   border: 1px solid $nyt-border;
+  position: relative;
+  animation: fadeInLeft 0.8s ease-out;
+  overflow: hidden;
+
+  // Subtle animated gradient background
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba($itiyum-orange, 0.03) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+    pointer-events: none;
+  }
 
   .globe-icon {
     font-size: 7rem;
     margin-bottom: 2rem;
     display: block;
     animation: float 4s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
   }
 
   .targeting-stats {
     display: flex;
     justify-content: center;
     gap: 4rem;
+    position: relative;
+    z-index: 1;
 
     .stat {
       text-align: center;
+      animation: fadeInUp 0.6s ease-out backwards;
+
+      @for $i from 1 through 3 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.15}s;
+        }
+      }
 
       .stat-number {
         display: block;
@@ -545,6 +625,11 @@ $accent-gold: #c9a227;
         color: $itiyum-orange;
         margin-bottom: 0.5rem;
         line-height: 1;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.1);
+        }
       }
 
       .stat-label {
@@ -559,6 +644,8 @@ $accent-gold: #c9a227;
 }
 
 .geo-examples {
+  animation: fadeInRight 0.8s ease-out;
+
   .examples-title {
     font-family: $font-serif;
     font-size: 1.5rem;
@@ -575,7 +662,12 @@ $accent-gold: #c9a227;
       left: 0;
       width: 40px;
       height: 2px;
-      background: $itiyum-orange;
+      background: linear-gradient(90deg, $itiyum-orange, $accent-gold);
+      transition: width 0.4s ease;
+    }
+
+    &:hover::after {
+      width: 80px;
     }
   }
 
@@ -586,14 +678,45 @@ $accent-gold: #c9a227;
     .example-card {
       background: #ffffff;
       border: 1px solid $nyt-border;
-      border-radius: 2px;
+      border-radius: 4px;
       padding: 1.5rem;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.5s ease-out backwards;
+
+      @for $i from 1 through 5 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{0.2 + ($i * 0.1)}s;
+        }
+      }
+
+      // Left accent line
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 3px;
+        background: $itiyum-orange;
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+      }
 
       &:hover {
         border-color: $itiyum-orange;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-        transform: translateX(4px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        transform: translateX(8px);
+        background: rgba($itiyum-orange, 0.02);
+
+        &::before {
+          transform: scaleY(1);
+        }
+
+        .example-region {
+          color: $itiyum-orange;
+        }
       }
 
       .example-region {
@@ -602,6 +725,7 @@ $accent-gold: #c9a227;
         font-weight: 700;
         color: $nyt-black;
         margin-bottom: 0.75rem;
+        transition: color 0.3s ease;
       }
 
       .example-countries {
@@ -615,14 +739,16 @@ $accent-gold: #c9a227;
           background: $nyt-light-gray;
           color: $nyt-dark-gray;
           padding: 0.375rem 0.75rem;
-          border-radius: 2px;
+          border-radius: 20px;
           border: 1px solid $nyt-border;
-          transition: all 0.2s ease;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
           &:hover {
             background: $itiyum-orange;
             color: white;
             border-color: $itiyum-orange;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba($itiyum-orange, 0.3);
           }
         }
       }
@@ -648,18 +774,69 @@ $accent-gold: #c9a227;
     .feature-card {
       background: #ffffff;
       border: 1px solid $nyt-border;
-      border-radius: 2px;
+      border-radius: 4px;
       padding: 2rem 1.5rem;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.6s ease-out backwards;
+
+      // Staggered animations
+      @for $i from 1 through 4 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.1}s;
+        }
+      }
+
+      // Bottom accent line
+      &::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, $itiyum-orange, $accent-gold);
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      // Subtle gradient overlay
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba($itiyum-orange, 0.02), transparent);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+      }
 
       &:hover {
         border-color: $itiyum-orange;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-        transform: translateY(-6px);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.1);
+        transform: translateY(-8px);
+
+        &::before {
+          transform: scaleX(1);
+        }
+
+        &::after {
+          opacity: 1;
+        }
 
         .feature-icon {
-          transform: scale(1.15);
+          transform: scale(1.2) rotate(5deg);
+          color: $itiyum-orange;
+        }
+
+        .feature-title {
+          color: $itiyum-orange;
         }
       }
 
@@ -667,7 +844,9 @@ $accent-gold: #c9a227;
         font-size: 2.5rem;
         margin-bottom: 1.25rem;
         display: block;
-        transition: transform 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 1;
       }
 
       .feature-title {
@@ -676,6 +855,9 @@ $accent-gold: #c9a227;
         font-weight: 700;
         margin-bottom: 0.75rem;
         color: $nyt-black;
+        transition: color 0.3s ease;
+        position: relative;
+        z-index: 1;
       }
 
       .feature-description {
@@ -684,6 +866,8 @@ $accent-gold: #c9a227;
         color: $nyt-medium-gray;
         line-height: 1.6;
         margin: 0;
+        position: relative;
+        z-index: 1;
       }
     }
   }
@@ -691,21 +875,24 @@ $accent-gold: #c9a227;
   .booking-cta {
     background: white;
     border: 1px solid $nyt-border;
-    border-radius: 2px;
+    border-radius: 4px;
     padding: 3rem;
     text-align: center;
     position: relative;
+    animation: scaleIn 0.6s ease-out;
 
-    // Top accent
+    // Top accent with shimmer
     &::before {
       content: '';
       position: absolute;
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 60px;
+      width: 80px;
       height: 3px;
-      background: $itiyum-orange;
+      background: linear-gradient(90deg, $itiyum-orange, $accent-gold, $itiyum-orange);
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
     }
 
     .booking-cta-text {
@@ -739,19 +926,57 @@ $accent-gold: #c9a227;
 .enquiry-example {
   max-width: 550px;
   margin: 0 auto;
+  animation: scaleIn 0.7s ease-out;
 
   .enquiry-card {
     background: $nyt-light-gray;
     border: 1px solid $nyt-border;
-    border-radius: 2px;
+    border-radius: 4px;
     padding: 2.5rem;
     text-align: center;
     position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    // Subtle corner accent
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, rgba($itiyum-orange, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(-45deg, rgba($itiyum-orange, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      border-color: rgba($itiyum-orange, 0.3);
+
+      .enquiry-icon {
+        transform: scale(1.15);
+      }
+    }
 
     .enquiry-icon {
       font-size: 3rem;
       margin-bottom: 1.25rem;
       display: block;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: float 3s ease-in-out infinite;
     }
 
     .enquiry-title {
@@ -765,10 +990,18 @@ $accent-gold: #c9a227;
     .enquiry-message {
       background: white;
       border: 1px solid $nyt-border;
-      border-radius: 2px;
+      border-radius: 4px;
       padding: 2rem;
       text-align: left;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: rgba($itiyum-orange, 0.3);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+      }
 
       .message-greeting {
         font-family: $font-serif;
@@ -798,6 +1031,21 @@ $accent-gold: #c9a227;
   color: #ffffff;
   max-width: 100%;
   position: relative;
+  overflow: hidden;
+
+  // Animated background gradient
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 50%, rgba($itiyum-orange, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba($accent-gold, 0.06) 0%, transparent 50%);
+    animation: pulse 6s ease-in-out infinite;
+    pointer-events: none;
+  }
 
   .cta-content {
     max-width: 900px;
@@ -809,6 +1057,23 @@ $accent-gold: #c9a227;
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 4px;
+    position: relative;
+    z-index: 1;
+    animation: scaleIn 0.8s ease-out;
+
+    // Top accent line with shimmer
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(90deg, $itiyum-orange, $accent-gold, $itiyum-orange);
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
+    }
 
     .cta-title {
       font-family: $font-serif;
@@ -817,6 +1082,7 @@ $accent-gold: #c9a227;
       margin-bottom: 1rem;
       line-height: 1.2;
       letter-spacing: -0.02em;
+      animation: fadeInUp 0.6s ease-out;
     }
 
     .cta-subtitle {
@@ -825,6 +1091,7 @@ $accent-gold: #c9a227;
       margin-bottom: 2.5rem;
       opacity: 0.85;
       line-height: 1.6;
+      animation: fadeInUp 0.6s ease-out 0.1s backwards;
     }
 
     .cta-buttons {
@@ -832,12 +1099,13 @@ $accent-gold: #c9a227;
       justify-content: center;
       gap: 1.25rem;
       flex-wrap: wrap;
+      animation: fadeInUp 0.6s ease-out 0.2s backwards;
     }
 
     .upgrade-message {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 2px;
+      border-radius: 4px;
       padding: 1.5rem 2rem;
       display: flex;
       align-items: flex-start;
@@ -845,10 +1113,18 @@ $accent-gold: #c9a227;
       text-align: left;
       max-width: 600px;
       margin: 0 auto;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-3px);
+      }
 
       svg {
         flex-shrink: 0;
         color: $itiyum-orange;
+        animation: pulse 2s ease-in-out infinite;
       }
 
       p {
@@ -873,6 +1149,60 @@ $accent-gold: #c9a227;
   50% {
     transform: translateY(-12px);
   }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 // =====================================================

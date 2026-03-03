@@ -241,9 +241,52 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 }
 
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ========== Mission Section ========== */
@@ -251,8 +294,9 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   padding: 6rem 2rem;
   background: white;
   position: relative;
+  overflow: hidden;
 
-  // NYT-style decorative line
+  // NYT-style decorative line with animation
   &::before {
     content: '';
     position: absolute;
@@ -261,13 +305,16 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     transform: translateX(-50%);
     width: 100px;
     height: 3px;
-    background: $nyt-black;
+    background: linear-gradient(90deg, $itiyum-orange, $nyt-black, $itiyum-orange);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
   }
 
   .mission-content {
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
+    animation: fadeInUp 0.8s ease-out;
   }
 
   .mission-text {
@@ -277,6 +324,19 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: $nyt-dark-gray;
     margin: 2rem 0 0;
     font-style: italic;
+    position: relative;
+
+    // Decorative quotes
+    &::before {
+      content: '"';
+      position: absolute;
+      left: -2rem;
+      top: -0.5rem;
+      font-size: 4rem;
+      color: rgba($itiyum-orange, 0.2);
+      font-family: $font-serif;
+      line-height: 1;
+    }
   }
 }
 
@@ -290,6 +350,7 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: $nyt-black;
   letter-spacing: -0.02em;
   line-height: 1.2;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .section-subtitle {
@@ -300,6 +361,7 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0 auto 3.5rem;
   max-width: 650px;
   line-height: 1.7;
+  animation: fadeInUp 0.6s ease-out 0.1s backwards;
 }
 
 /* ========== User Groups Section ========== */
@@ -320,18 +382,53 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
 .user-group-card {
   background: white;
-  border-radius: 2px;
+  border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid $nyt-border;
+  position: relative;
+  animation: fadeInUp 0.6s ease-out backwards;
+
+  // Staggered animation for cards
+  @for $i from 1 through 6 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1}s;
+    }
+  }
+
+  // Shine effect on hover
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s ease;
+    pointer-events: none;
+  }
 
   &:hover {
     transform: translateY(-12px);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+
+    &::after {
+      left: 100%;
+    }
 
     .card-header .icon-wrapper {
-      transform: scale(1.1);
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    .card-header::before {
+      transform: scale(1.5);
     }
   }
 
@@ -341,11 +438,26 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     position: relative;
     overflow: hidden;
 
+    // Animated background gradient
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      transition: transform 0.6s ease;
+      pointer-events: none;
+    }
+
     .icon-wrapper {
       font-size: 3.5rem;
       margin-bottom: 1rem;
       display: inline-block;
-      transition: transform 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 1;
     }
 
     .card-title {
@@ -556,9 +668,18 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     padding: 2.5rem 2rem;
     background: white;
     border: 1px solid $nyt-border;
-    border-radius: 2px;
+    border-radius: 4px;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    animation: fadeInUp 0.6s ease-out backwards;
+    overflow: hidden;
+
+    // Staggered animation
+    @for $i from 1 through 4 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.1}s;
+      }
+    }
 
     // Top accent line
     &::before {
@@ -568,21 +689,46 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       left: 0;
       right: 0;
       height: 3px;
-      background: $nyt-black;
+      background: linear-gradient(90deg, $itiyum-orange, $nyt-black);
       transform: scaleX(0);
-      transition: transform 0.3s ease;
+      transform-origin: left;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    // Subtle gradient overlay on hover
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(to top, rgba($itiyum-orange, 0.03), transparent);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
     }
 
     &:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      transform: translateY(-10px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+      border-color: rgba($itiyum-orange, 0.3);
 
       &::before {
         transform: scaleX(1);
       }
 
+      &::after {
+        opacity: 1;
+      }
+
       .resource-icon {
-        transform: scale(1.1);
+        transform: scale(1.15) rotate(5deg);
+        color: $itiyum-orange;
+      }
+
+      h3 {
+        color: $itiyum-orange;
       }
     }
 
@@ -590,7 +736,9 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 2.5rem;
       margin-bottom: 1.25rem;
       display: block;
-      transition: transform 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 1;
     }
 
     h3 {
@@ -599,6 +747,9 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-weight: 700;
       margin: 0 0 0.75rem;
       color: $nyt-black;
+      transition: color 0.3s ease;
+      position: relative;
+      z-index: 1;
     }
 
     p {
@@ -607,6 +758,8 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       line-height: 1.6;
       color: $nyt-medium-gray;
       margin: 0;
+      position: relative;
+      z-index: 1;
     }
   }
 }
