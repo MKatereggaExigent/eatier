@@ -82,12 +82,14 @@ $accent-gold: #c9a227;
 
   .hero-content {
     position: absolute;
-    bottom: 15%;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     z-index: 2;
     width: 90%;
     max-width: 900px;
+    max-height: 90%;
+    overflow-y: auto;
     text-align: center;
     color: #ffffff;
 
@@ -1534,7 +1536,7 @@ $accent-gold: #c9a227;
     min-height: 520px;
 
     .hero-content {
-      margin-top: 5rem;
+      margin: 5rem auto 2rem;
       padding: 1.25rem 1rem;
       width: 94%;
 
