@@ -1,5 +1,5 @@
-import { AccountActivity, AccountFreezeOptions, NotificationSettings } from '../../../shared/models/business-profile.model';
-import { Business, BusinessOwnerService, BusinessSubscription } from '../../../core/services/business-owner.service';
+import { AccountFreezeOptions } from '../../../shared/models/business-profile.model';
+import { AccountActivity, Business, BusinessOwnerService, BusinessSubscription, NotificationSettings } from '../../../core/services/business-owner.service';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
