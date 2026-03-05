@@ -50,6 +50,13 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
   showDeleteModal = signal<boolean>(false);
   showPaymentModal = signal<boolean>(false);
   isProcessingPayment = signal<boolean>(false);
+  showChangePasswordModal = signal<boolean>(false);
+  show2FAModal = signal<boolean>(false);
+  showSessionsModal = signal<boolean>(false);
+  twoFactorEnabled = signal<boolean>(false);
+  twoFactorMethod = signal<'email' | 'mobile' | null>(null);
+  backupCodes = signal<string[]>([]);
+  sessions = signal<any[]>([]);
 
   // Subscription & Billing
   subscription = signal<BusinessSubscription | null>(null);
@@ -62,6 +69,8 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
   freezeForm: FormGroup;
   deleteForm: FormGroup;
   paymentForm: FormGroup;
+  changePasswordForm: FormGroup;
+  enable2FAForm: FormGroup;
 
   // Data
   accountActivity = signal<AccountActivity[]>([]);
@@ -174,6 +183,18 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
       // Save for future
       savePaymentMethod: [true]
     });
+
+    // Change password form
+    this.changePasswordForm = this.fb.group({
+      currentPassword: ['', Validators.required],
+      newPassword: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required]
+    });
+
+    // Enable 2FA form
+    this.enable2FAForm = this.fb.group({
+      method: ['email', Validators.required]
+    });
   }
 
   ngOnInit(): void {
@@ -210,13 +231,42 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
             this.subscription.set(response.subscription);
           }
 
-          // Load notification settings (using defaults until API is available)
-          this.notificationSettings.set(this.defaultNotificationSettings);
-          this.notificationForm.patchValue(this.defaultNotificationSettings);
+          // Load notification settings from API
+          this.loadNotificationSettings();
 
-          // Account activity will be empty until API is available
-          this.accountActivity.set([]);
+          // Load account activity from API
+          this.loadAccountActivity();
         }
+      });
+  }
+
+  loadNotificationSettings(): void {
+    this.businessOwnerService.getNotificationSettings()
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading notification settings:', error);
+          // Use defaults on error
+          return of(this.defaultNotificationSettings);
+        })
+      )
+      .subscribe(settings => {
+        this.notificationSettings.set(settings);
+        this.notificationForm.patchValue(settings);
+      });
+  }
+
+  loadAccountActivity(): void {
+    this.businessOwnerService.getAccountActivity(50, 0)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading account activity:', error);
+          return of({ activities: [], total: 0, limit: 50, offset: 0 });
+        })
+      )
+      .subscribe(response => {
+        this.accountActivity.set(response.activities);
       });
   }
 
@@ -227,15 +277,29 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
   onNotificationSubmit(): void {
     if (this.notificationForm.valid) {
       this.isLoading.set(true);
+      this.errorMessage.set(null);
 
-      // Mock API call
-      setTimeout(() => {
-        const formValue = this.notificationForm.value;
-        this.notificationSettings.set(formValue);
-        this.isLoading.set(false);
-        this.successMessage.set('Notification settings updated successfully!');
-        setTimeout(() => this.successMessage.set(null), 3000);
-      }, 1000);
+      const formValue = this.notificationForm.value;
+
+      this.businessOwnerService.updateNotificationSettings(formValue)
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError(error => {
+            console.error('Error updating notification settings:', error);
+            this.errorMessage.set('Failed to update notification settings. Please try again.');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading.set(false);
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            this.notificationSettings.set(response.settings);
+            this.successMessage.set('Notification settings updated successfully!');
+            setTimeout(() => this.successMessage.set(null), 3000);
+          }
+        });
     }
   }
 
@@ -560,5 +624,189 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
       return sub.trialDaysLeft;
     }
     return null;
+  }
+
+  // ===================================
+  // SECURITY METHODS
+  // ===================================
+
+  openChangePasswordModal(): void {
+    this.showChangePasswordModal.set(true);
+    this.changePasswordForm.reset();
+  }
+
+  closeChangePasswordModal(): void {
+    this.showChangePasswordModal.set(false);
+    this.changePasswordForm.reset();
+  }
+
+  onChangePasswordSubmit(): void {
+    if (this.changePasswordForm.valid) {
+      const { currentPassword, newPassword, confirmPassword } = this.changePasswordForm.value;
+
+      if (newPassword !== confirmPassword) {
+        this.errorMessage.set('New passwords do not match');
+        setTimeout(() => this.errorMessage.set(null), 3000);
+        return;
+      }
+
+      this.isLoading.set(true);
+      this.errorMessage.set(null);
+
+      this.businessOwnerService.changePassword(currentPassword, newPassword)
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError(error => {
+            console.error('Error changing password:', error);
+            this.errorMessage.set(error.error?.error || 'Failed to change password. Please try again.');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading.set(false);
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            this.closeChangePasswordModal();
+            this.successMessage.set('Password changed successfully!');
+            setTimeout(() => this.successMessage.set(null), 3000);
+          }
+        });
+    }
+  }
+
+  open2FAModal(): void {
+    this.show2FAModal.set(true);
+    this.load2FAStatus();
+  }
+
+  close2FAModal(): void {
+    this.show2FAModal.set(false);
+    this.backupCodes.set([]);
+  }
+
+  load2FAStatus(): void {
+    this.businessOwnerService.get2FAStatus()
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading 2FA status:', error);
+          return of({ enabled: false, method: null, phoneVerified: false });
+        })
+      )
+      .subscribe(status => {
+        this.twoFactorEnabled.set(status.enabled);
+        this.twoFactorMethod.set(status.method);
+      });
+  }
+
+  onEnable2FA(): void {
+    if (this.enable2FAForm.valid) {
+      const { method } = this.enable2FAForm.value;
+
+      this.isLoading.set(true);
+      this.errorMessage.set(null);
+
+      this.businessOwnerService.enable2FA(method)
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError(error => {
+            console.error('Error enabling 2FA:', error);
+            this.errorMessage.set(error.error?.error || 'Failed to enable 2FA. Please try again.');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading.set(false);
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            this.twoFactorEnabled.set(true);
+            this.twoFactorMethod.set(response.method as 'email' | 'mobile');
+            this.backupCodes.set(response.backupCodes);
+            this.successMessage.set('2FA enabled successfully! Please save your backup codes.');
+            setTimeout(() => this.successMessage.set(null), 5000);
+          }
+        });
+    }
+  }
+
+  onDisable2FA(): void {
+    if (confirm('Are you sure you want to disable two-factor authentication?')) {
+      this.isLoading.set(true);
+      this.errorMessage.set(null);
+
+      this.businessOwnerService.disable2FA()
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError(error => {
+            console.error('Error disabling 2FA:', error);
+            this.errorMessage.set(error.error?.error || 'Failed to disable 2FA. Please try again.');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading.set(false);
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            this.twoFactorEnabled.set(false);
+            this.twoFactorMethod.set(null);
+            this.backupCodes.set([]);
+            this.successMessage.set('2FA disabled successfully.');
+            setTimeout(() => this.successMessage.set(null), 3000);
+          }
+        });
+    }
+  }
+
+  openSessionsModal(): void {
+    this.showSessionsModal.set(true);
+    this.loadSessions();
+  }
+
+  closeSessionsModal(): void {
+    this.showSessionsModal.set(false);
+  }
+
+  loadSessions(): void {
+    this.businessOwnerService.getSessions()
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading sessions:', error);
+          return of({ sessions: [] });
+        })
+      )
+      .subscribe(response => {
+        this.sessions.set(response.sessions);
+      });
+  }
+
+  revokeSession(sessionId: string): void {
+    if (confirm('Are you sure you want to revoke this session?')) {
+      this.isLoading.set(true);
+      this.errorMessage.set(null);
+
+      this.businessOwnerService.revokeSession(sessionId)
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError(error => {
+            console.error('Error revoking session:', error);
+            this.errorMessage.set(error.error?.error || 'Failed to revoke session. Please try again.');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading.set(false);
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            this.loadSessions(); // Reload sessions
+            this.successMessage.set('Session revoked successfully.');
+            setTimeout(() => this.successMessage.set(null), 3000);
+          }
+        });
+    }
   }
 }

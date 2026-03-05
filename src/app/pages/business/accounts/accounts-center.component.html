@@ -369,15 +369,20 @@
             <h3>🔑 Change Password</h3>
             <p>Update your account password for better security</p>
           </div>
-          <button type="button" class="secondary-btn">Change Password</button>
+          <button type="button" class="secondary-btn" (click)="openChangePasswordModal()">Change Password</button>
         </div>
 
         <div class="security-item">
           <div class="security-content">
             <h3>📱 Two-Factor Authentication</h3>
             <p>Add an extra layer of security to your account</p>
+            @if (twoFactorEnabled()) {
+              <span class="badge badge-success">Enabled ({{ twoFactorMethod() }})</span>
+            }
           </div>
-          <button type="button" class="secondary-btn">Enable 2FA</button>
+          <button type="button" class="secondary-btn" (click)="open2FAModal()">
+            {{ twoFactorEnabled() ? 'Manage 2FA' : 'Enable 2FA' }}
+          </button>
         </div>
 
         <div class="security-item">
@@ -385,7 +390,7 @@
             <h3>🔐 Active Sessions</h3>
             <p>Manage devices that are currently logged in</p>
           </div>
-          <button type="button" class="secondary-btn">View Sessions</button>
+          <button type="button" class="secondary-btn" (click)="openSessionsModal()">View Sessions</button>
         </div>
       </div>
     </div>
@@ -627,6 +632,190 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+}
+
+<!-- Change Password Modal -->
+@if (showChangePasswordModal()) {
+  <div class="modal-overlay" (click)="closeChangePasswordModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>🔑 Change Password</h2>
+        <button type="button" class="close-btn" (click)="closeChangePasswordModal()">&times;</button>
+      </div>
+
+      <form [formGroup]="changePasswordForm" (ngSubmit)="onChangePasswordSubmit()">
+        <div class="form-group">
+          <label for="currentPassword">Current Password</label>
+          <input
+            id="currentPassword"
+            type="password"
+            formControlName="currentPassword"
+            placeholder="Enter current password"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <input
+            id="newPassword"
+            type="password"
+            formControlName="newPassword"
+            placeholder="Enter new password (min 8 characters)"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="Confirm new password"
+            required
+          />
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" (click)="closeChangePasswordModal()">Cancel</button>
+          <button type="submit" class="primary-btn" [disabled]="!changePasswordForm.valid || isLoading()">
+            @if (isLoading()) {
+              <span class="loading-spinner"></span>
+              Changing...
+            } @else {
+              Change Password
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- 2FA Modal -->
+@if (show2FAModal()) {
+  <div class="modal-overlay" (click)="close2FAModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>📱 Two-Factor Authentication</h2>
+        <button type="button" class="close-btn" (click)="close2FAModal()">&times;</button>
+      </div>
+
+      @if (!twoFactorEnabled()) {
+        <form [formGroup]="enable2FAForm" (ngSubmit)="onEnable2FA()">
+          <p>Add an extra layer of security to your account by enabling two-factor authentication.</p>
+
+          <div class="form-group">
+            <label>Choose 2FA Method</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" formControlName="method" value="email" />
+                <span>📧 Email - Receive codes via email</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" formControlName="method" value="mobile" />
+                <span>📱 Mobile - Receive codes via SMS</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="secondary-btn" (click)="close2FAModal()">Cancel</button>
+            <button type="submit" class="primary-btn" [disabled]="!enable2FAForm.valid || isLoading()">
+              @if (isLoading()) {
+                <span class="loading-spinner"></span>
+                Enabling...
+              } @else {
+                Enable 2FA
+              }
+            </button>
+          </div>
+        </form>
+
+        @if (backupCodes().length > 0) {
+          <div class="backup-codes">
+            <h3>⚠️ Save Your Backup Codes</h3>
+            <p>Store these codes in a safe place. You can use them to access your account if you lose access to your 2FA method.</p>
+            <div class="codes-list">
+              @for (code of backupCodes(); track code) {
+                <code>{{ code }}</code>
+              }
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="twofa-status">
+          <p>✅ Two-factor authentication is currently <strong>enabled</strong> via <strong>{{ twoFactorMethod() }}</strong>.</p>
+
+          <div class="modal-actions">
+            <button type="button" class="secondary-btn" (click)="close2FAModal()">Close</button>
+            <button type="button" class="danger-btn" (click)="onDisable2FA()" [disabled]="isLoading()">
+              @if (isLoading()) {
+                <span class="loading-spinner"></span>
+                Disabling...
+              } @else {
+                Disable 2FA
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- Sessions Modal -->
+@if (showSessionsModal()) {
+  <div class="modal-overlay" (click)="closeSessionsModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>🔐 Active Sessions</h2>
+        <button type="button" class="close-btn" (click)="closeSessionsModal()">&times;</button>
+      </div>
+
+      <p>Manage devices and locations where you're currently logged in.</p>
+
+      @if (sessions().length === 0) {
+        <div class="empty-state">
+          <p>No active sessions found.</p>
+        </div>
+      } @else {
+        <div class="sessions-list">
+          @for (session of sessions(); track session.id) {
+            <div class="session-item">
+              <div class="session-info">
+                <h4>{{ session.device_name || 'Unknown Device' }}</h4>
+                <p>
+                  <strong>Browser:</strong> {{ session.browser || 'Unknown' }} |
+                  <strong>OS:</strong> {{ session.os || 'Unknown' }}
+                </p>
+                <p>
+                  <strong>IP:</strong> {{ session.ip_address || 'Unknown' }} |
+                  <strong>Location:</strong> {{ session.location || 'Unknown' }}
+                </p>
+                <p class="session-time">
+                  <strong>Last Active:</strong> {{ session.last_activity | date: 'medium' }}
+                </p>
+              </div>
+              <button
+                type="button"
+                class="danger-btn small"
+                (click)="revokeSession(session.id)"
+                [disabled]="isLoading()"
+              >
+                Revoke
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" (click)="closeSessionsModal()">Close</button>
+      </div>
     </div>
   </div>
 }

@@ -24,6 +24,71 @@ export interface DigitalCardCustomization {
   includeSocial: boolean;
 }
 
+export interface UserSession {
+  id: string;
+  device_name?: string;
+  device_type?: string;
+  browser?: string;
+  os?: string;
+  ip_address?: string;
+  location?: string;
+  is_active: boolean;
+  last_activity: string;
+  created_at: string;
+}
+
+export interface AccountActivity {
+  id: string;
+  action: string;
+  details?: any;
+  ip_address?: string;
+  user_agent?: string;
+  location?: string;
+  status: string;
+  created_at: string;
+}
+
+export interface NotificationSettings {
+  messages: boolean;
+  updates: boolean;
+  customerAlerts: boolean;
+  marketingEmails: boolean;
+  systemNotifications: boolean;
+  emailFrequency: 'immediate' | 'daily' | 'weekly';
+}
+
+export interface AccountOverview {
+  user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    avatarUrl?: string;
+    accountStatus: string;
+    twoFactorEnabled: boolean;
+    createdAt: string;
+    lastLoginAt?: string;
+  };
+  business: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    logo_url?: string;
+  } | null;
+  stats: {
+    recentActivityCount: number;
+    activeSessionsCount: number;
+  };
+}
+
+export interface TwoFactorStatus {
+  enabled: boolean;
+  method: 'email' | 'mobile' | null;
+  phoneVerified: boolean;
+}
+
 export interface Business {
   id: string;
   owner_id: string;
@@ -339,6 +404,111 @@ export class BusinessOwnerService {
   getDigitalCardCustomization(): Observable<{ customization: DigitalCardCustomization | null }> {
     return this.http.get<{ customization: DigitalCardCustomization | null }>(
       `${this.apiUrl}/digital-card-customization`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // ===================================
+  // ACCOUNTS CENTRE - SECURITY
+  // ===================================
+
+  changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.apiUrl}/change-password`,
+      { currentPassword, newPassword },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  enable2FA(method: 'email' | 'mobile'): Observable<{ message: string; method: string; backupCodes: string[] }> {
+    return this.http.post<{ message: string; method: string; backupCodes: string[] }>(
+      `${this.apiUrl}/2fa/enable`,
+      { method },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  disable2FA(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.apiUrl}/2fa/disable`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  get2FAStatus(): Observable<TwoFactorStatus> {
+    return this.http.get<TwoFactorStatus>(
+      `${this.apiUrl}/2fa/status`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getSessions(): Observable<{ sessions: UserSession[] }> {
+    return this.http.get<{ sessions: UserSession[] }>(
+      `${this.apiUrl}/sessions`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  revokeSession(sessionId: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(
+      `${this.apiUrl}/sessions/${sessionId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // ===================================
+  // ACCOUNTS CENTRE - ACTIVITY
+  // ===================================
+
+  getAccountActivity(limit: number = 50, offset: number = 0): Observable<{
+    activities: AccountActivity[];
+    total: number;
+    limit: number;
+    offset: number;
+  }> {
+    return this.http.get<{
+      activities: AccountActivity[];
+      total: number;
+      limit: number;
+      offset: number;
+    }>(`${this.apiUrl}/activity?limit=${limit}&offset=${offset}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // ===================================
+  // ACCOUNTS CENTRE - NOTIFICATIONS
+  // ===================================
+
+  getNotificationSettings(): Observable<NotificationSettings> {
+    return this.http.get<NotificationSettings>(
+      `${this.apiUrl}/notification-settings`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  updateNotificationSettings(settings: NotificationSettings): Observable<{
+    message: string;
+    settings: NotificationSettings;
+  }> {
+    return this.http.put<{
+      message: string;
+      settings: NotificationSettings;
+    }>(
+      `${this.apiUrl}/notification-settings`,
+      settings,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // ===================================
+  // ACCOUNTS CENTRE - OVERVIEW
+  // ===================================
+
+  getAccountOverview(): Observable<AccountOverview> {
+    return this.http.get<AccountOverview>(
+      `${this.apiUrl}/account-overview`,
       { headers: this.getHeaders() }
     );
   }
