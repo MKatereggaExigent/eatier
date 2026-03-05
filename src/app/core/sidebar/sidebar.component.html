@@ -28,6 +28,7 @@
           routerLink="overview"
           routerLinkActive="active"
           class="nav-link"
+          (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Overview' + (isCollapsed() ? '' : ' - View business statistics and recent activity')">
           <span class="nav-icon" aria-hidden="true">📊</span>
           @if (!isCollapsed()) {
@@ -42,6 +43,7 @@
           routerLink="menu"
           routerLinkActive="active"
           class="nav-link"
+          (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Menu Management' + (isCollapsed() ? '' : ' - Manage your restaurant menu items')">
           <span class="nav-icon" aria-hidden="true">🍽️</span>
           @if (!isCollapsed()) {
@@ -56,6 +58,7 @@
           routerLink="bookings"
           routerLinkActive="active"
           class="nav-link"
+          (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Bookings' + (isCollapsed() ? '' : ' - Manage customer reservations and bookings')">
           <span class="nav-icon" aria-hidden="true">📅</span>
           @if (!isCollapsed()) {
@@ -70,6 +73,7 @@
           routerLink="reviews"
           routerLinkActive="active"
           class="nav-link"
+          (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Reviews' + (isCollapsed() ? '' : ' - View and respond to customer reviews')">
           <span class="nav-icon" aria-hidden="true">⭐</span>
           @if (!isCollapsed()) {
@@ -89,6 +93,7 @@
           routerLink="profile"
           routerLinkActive="active"
           class="nav-link"
+          (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Business Profile' + (isCollapsed() ? '' : ' - Edit your restaurant information and photos')">
           <span class="nav-icon" aria-hidden="true">🏪</span>
           @if (!isCollapsed()) {
@@ -103,6 +108,7 @@
           routerLink="digital-card"
           routerLinkActive="active"
           class="nav-link"
+          (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Digital Card' + (isCollapsed() ? '' : ' - Create and customize your digital business card')">
           <span class="nav-icon" aria-hidden="true">💳</span>
           @if (!isCollapsed()) {
@@ -117,6 +123,7 @@
           routerLink="insights"
           routerLinkActive="active"
           class="nav-link"
+          (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Insights' + (isCollapsed() ? '' : ' - View detailed analytics and performance metrics')">
           <span class="nav-icon" aria-hidden="true">📈</span>
           @if (!isCollapsed()) {
@@ -131,6 +138,7 @@
           routerLink="ads"
           routerLinkActive="active"
           class="nav-link"
+          (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Manage My Ads' + (isCollapsed() ? '' : ' - Create and manage advertising campaigns')">
           <span class="nav-icon" aria-hidden="true">📢</span>
           @if (!isCollapsed()) {
@@ -150,6 +158,7 @@
           routerLink="accounts"
           routerLinkActive="active"
           class="nav-link"
+          (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Account Settings' + (isCollapsed() ? '' : ' - Manage subscription and billing')">
           <span class="nav-icon" aria-hidden="true">⚙️</span>
           @if (!isCollapsed()) {
@@ -163,6 +172,7 @@
         <a
           routerLink="/help"
           class="nav-link"
+          (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Help & Support' + (isCollapsed() ? '' : ' - Get help and contact support')">
           <span class="nav-icon" aria-hidden="true">❓</span>
           @if (!isCollapsed()) {
