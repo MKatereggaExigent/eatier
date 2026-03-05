@@ -343,13 +343,15 @@
             <div class="activity-content">
               <div class="activity-header">
                 <span class="activity-action">{{ activity.action }}</span>
-                <span class="activity-time">{{ formatTimestamp(activity.timestamp) }}</span>
+                <span class="activity-time">{{ formatTimestamp(activity.created_at) }}</span>
               </div>
               <div class="activity-details">
                 @if (activity.details) {
                   <span class="activity-description">{{ formatActivityDetails(activity.details) }}</span>
                 }
-                <span class="activity-location">IP: {{ activity.ipAddress }}</span>
+                @if (activity.ip_address) {
+                  <span class="activity-location">IP: {{ activity.ip_address }}</span>
+                }
               </div>
             </div>
           </div>

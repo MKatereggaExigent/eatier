@@ -397,8 +397,9 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
     return this.freezeDurations.find(d => d.value === duration)?.description || '';
   }
 
-  formatTimestamp(timestamp: Date): string {
-    return timestamp.toLocaleString('en-US', {
+  formatTimestamp(timestamp: Date | string): string {
+    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+    return date.toLocaleString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -415,9 +416,14 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
       'Login': '🔐',
       'Logout': '🚪',
       'Password Changed': '🔑',
+      'password_changed': '🔑',
       'Menu Access Granted': '🔗',
       'Menu Access Revoked': '🚫',
-      'Settings Updated': '⚙️'
+      'Settings Updated': '⚙️',
+      'two_factor_enabled': '📱',
+      'two_factor_disabled': '📱',
+      'session_revoked': '🔐',
+      'notification_settings_updated': '🔔'
     };
     return icons[action] || '📄';
   }
