@@ -1,4 +1,16 @@
-<app-sidebar></app-sidebar>
+<!-- Mobile Menu Toggle Button -->
+<button type="button" class="mobile-sidebar-toggle" (click)="toggleMobileSidebar()" aria-label="Toggle sidebar menu">
+  <span class="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </span>
+</button>
+
+<!-- Mobile Overlay -->
+<div class="mobile-overlay" (click)="closeMobileSidebar()" [class.visible]="isMobileSidebarOpen()"></div>
+
+<app-sidebar #sidebar></app-sidebar>
 
 <main class="dashboard">
   <h1><span class="itiyum-brand">Itiyum</span> for Business</h1>

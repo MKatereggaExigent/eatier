@@ -82,9 +82,19 @@ $space-lg: 1.5rem;
     transform: translateX(-100%);
     z-index: 1001;
     top: 64px;
+    box-shadow: none;
 
     &.mobile-open {
       transform: translateX(0);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  // Ensure sidebar doesn't interfere when hidden on mobile
+  @media (max-width: 1023px) {
+    &:not(.mobile-open) {
+      pointer-events: none;
+      visibility: hidden;
     }
   }
 }

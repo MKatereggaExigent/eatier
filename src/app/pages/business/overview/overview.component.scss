@@ -794,12 +794,80 @@ $space-2xl: 3rem;
     padding: $space-sm;
   }
 
-  .welcome-section .welcome-title {
-    font-size: 1.5rem;
+  .welcome-section {
+    .welcome-title {
+      font-size: 1.5rem;
+    }
+
+    .welcome-subtitle {
+      font-size: 0.9rem;
+    }
   }
 
   .stat-card .stat-content .stat-number {
     font-size: 2rem;
+  }
+
+  .quick-actions .action-card {
+    padding: $space-md;
+
+    .action-icon {
+      font-size: 1.5rem;
+    }
+
+    .action-title {
+      font-size: 0.9rem;
+    }
+
+    .action-description {
+      font-size: 0.75rem;
+    }
+  }
+
+  .recent-reviews .review-card {
+    padding: $space-sm;
+
+    .review-header {
+      .customer-name {
+        font-size: 0.9rem;
+      }
+
+      .review-date {
+        font-size: 0.7rem;
+      }
+    }
+
+    .review-text {
+      font-size: 0.85rem;
+    }
+  }
+
+  .tips-section .tip-card {
+    padding: $space-md;
+
+    .tip-number {
+      font-size: 1.25rem;
+      width: 32px;
+      height: 32px;
+    }
+
+    h4 {
+      font-size: 0.9rem;
+    }
+
+    p {
+      font-size: 0.75rem;
+    }
+  }
+
+  .action-btn {
+    padding: $space-xs $space-sm;
+    font-size: 0.7rem;
+  }
+
+  .booking-status {
+    font-size: 0.65rem;
+    padding: 2px $space-xs;
   }
 }
 
@@ -1100,6 +1168,95 @@ $space-2xl: 3rem;
     .search-box {
       max-width: 100%;
     }
+
+    .page-size-selector {
+      justify-content: space-between;
+    }
+  }
+
+  // Make table responsive with card layout on mobile
+  .bookings-table-container {
+    border: none;
+  }
+
+  .bookings-table {
+    thead {
+      display: none; // Hide table headers on mobile
+    }
+
+    tbody {
+      tr {
+        display: block;
+        margin-bottom: $space-md;
+        border: 1px solid $color-black;
+        padding: $space-md;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      td {
+        display: block;
+        text-align: left !important;
+        padding: $space-sm 0;
+        border-bottom: 1px solid $color-gray-200;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        // Add labels for mobile
+        &::before {
+          content: attr(data-label);
+          font-weight: 600;
+          text-transform: uppercase;
+          font-size: 0.7rem;
+          color: $color-gray-600;
+          display: block;
+          margin-bottom: $space-xs;
+          letter-spacing: 0.05em;
+        }
+
+        &.booking-ref::before {
+          content: 'Booking Ref';
+        }
+
+        &.customer-info::before {
+          content: 'Customer';
+        }
+
+        &.datetime::before {
+          content: 'Date & Time';
+        }
+
+        &.party-size::before {
+          content: 'Party Size';
+        }
+
+        &.special-requests::before {
+          content: 'Special Requests';
+        }
+
+        &.status::before {
+          content: 'Status';
+        }
+
+        &.actions::before {
+          content: 'Actions';
+        }
+
+        &.special-requests {
+          max-width: 100%;
+          white-space: normal;
+        }
+
+        &.actions .action-buttons {
+          flex-wrap: wrap;
+          justify-content: flex-start;
+        }
+      }
+    }
   }
 
   .pagination-controls {
@@ -1109,6 +1266,7 @@ $space-2xl: 3rem;
 
     .pagination-buttons {
       justify-content: center;
+      flex-wrap: wrap;
     }
   }
 }
