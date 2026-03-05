@@ -5,6 +5,7 @@
 // Typography
 $font-serif: Georgia, 'Times New Roman', serif;
 $font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Courier New', monospace;
 
 // Colors
 $color-black: #000;
@@ -178,28 +179,66 @@ $space-2xl: 3rem;
       gap: $space-md;
 
       .color-input {
+        display: flex;
+        flex-direction: column;
+
         label {
           font-family: $font-sans;
           display: block;
           font-weight: 600;
           color: $color-black;
           margin-bottom: $space-sm;
-          font-size: 0.75rem;
+          font-size: 0.875rem;
           text-transform: uppercase;
           letter-spacing: 0.05em;
         }
 
         input[type='color'] {
           width: 100%;
-          height: 40px;
-          border: 1px solid $color-black;
+          height: 60px;
+          border: 2px solid $color-black;
+          border-radius: 4px;
           cursor: pointer;
-          background: none;
+          background: $color-white;
+          padding: 4px;
+          transition: all 0.2s ease;
+
+          &:hover {
+            border-color: $color-gray-600;
+            transform: scale(1.02);
+          }
 
           &:focus {
             outline: none;
-            border-width: 2px;
+            border-width: 3px;
+            border-color: $color-black;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
           }
+
+          // Style the color swatch
+          &::-webkit-color-swatch-wrapper {
+            padding: 0;
+          }
+
+          &::-webkit-color-swatch {
+            border: none;
+            border-radius: 2px;
+          }
+
+          &::-moz-color-swatch {
+            border: none;
+            border-radius: 2px;
+          }
+        }
+
+        // Display current color value
+        .color-value {
+          font-family: $font-mono, monospace;
+          font-size: 0.75rem;
+          color: $color-gray-600;
+          margin-top: $space-xs;
+          text-align: center;
+          font-weight: 500;
         }
       }
     }

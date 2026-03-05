@@ -15,6 +15,15 @@ export interface BusinessSubscription {
   trialDaysLeft?: number;
 }
 
+export interface DigitalCardCustomization {
+  primaryColor: string;
+  secondaryColor: string;
+  logoPosition: 'top' | 'center' | 'bottom';
+  includeQR: boolean;
+  includeContact: boolean;
+  includeSocial: boolean;
+}
+
 export interface Business {
   id: string;
   owner_id: string;
@@ -33,6 +42,7 @@ export interface Business {
   total_reviews?: number;
   average_rating?: number;
   total_menu_items?: number;
+  digital_card_customization?: DigitalCardCustomization;
   created_at: string;
   updated_at: string;
 }
@@ -310,6 +320,25 @@ export class BusinessOwnerService {
     return this.http.post<{ message: string; review: Review }>(
       `${this.apiUrl}/reviews/${reviewId}/response`,
       { response },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // ===================================
+  // DIGITAL CARD CUSTOMIZATION
+  // ===================================
+
+  updateDigitalCardCustomization(customization: DigitalCardCustomization): Observable<{ message: string; customization: DigitalCardCustomization }> {
+    return this.http.put<{ message: string; customization: DigitalCardCustomization }>(
+      `${this.apiUrl}/digital-card-customization`,
+      customization,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getDigitalCardCustomization(): Observable<{ customization: DigitalCardCustomization | null }> {
+    return this.http.get<{ customization: DigitalCardCustomization | null }>(
+      `${this.apiUrl}/digital-card-customization`,
       { headers: this.getHeaders() }
     );
   }

@@ -143,9 +143,40 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
           this.businessProfile.set(mappedProfile);
           this.qrCodeUrl.set(mappedProfile.qrCodeUrl || '');
 
-          // Populate form with existing customization
-          if (mappedProfile.businessCardCustomization) {
-            this.customizationForm.patchValue(mappedProfile.businessCardCustomization);
+          // Load saved customization from API
+          this.loadSavedCustomization();
+        }
+      });
+  }
+
+  loadSavedCustomization(): void {
+    this.businessOwnerService.getDigitalCardCustomization()
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading customization:', error);
+          // Use default customization if loading fails
+          return of({ customization: null });
+        })
+      )
+      .subscribe(response => {
+        if (response && response.customization) {
+          // Update form with saved customization
+          this.customizationForm.patchValue(response.customization);
+
+          // Update profile with saved customization
+          if (this.businessProfile()) {
+            const updatedProfile = {
+              ...this.businessProfile()!,
+              businessCardCustomization: response.customization
+            };
+            this.businessProfile.set(updatedProfile);
+          }
+        } else {
+          // Use default customization from profile
+          const profile = this.businessProfile();
+          if (profile && profile.businessCardCustomization) {
+            this.customizationForm.patchValue(profile.businessCardCustomization);
           }
         }
       });
@@ -199,40 +230,96 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
   }
 
   shareCard(): void {
-    const businessUrl = `https://itiyum.com/business/${this.businessProfile()?.id}`;
+    const profile = this.businessProfile();
+    const business = this.business();
+
+    if (!profile || !business) {
+      this.errorMessage.set('Business profile not loaded. Please try again.');
+      setTimeout(() => this.errorMessage.set(null), 3000);
+      return;
+    }
+
+    const businessUrl = `https://itiyum.com/business/${business.id}`;
+    const shareTitle = `${business.business_name} - Digital Business Card`;
+    const shareText = `Check out ${business.business_name} on Itiyum!\n\n` +
+      `📍 ${business.address || 'Location not specified'}\n` +
+      `📞 ${business.phone || 'Phone not available'}\n` +
+      `✉️ ${business.email || 'Email not available'}\n\n` +
+      `Visit: ${businessUrl}`;
 
     if (navigator.share) {
       navigator.share({
-        title: `${this.businessProfile()?.businessName} - Digital Business Card`,
-        text: `Check out ${this.businessProfile()?.businessName} on Itiyum!`,
+        title: shareTitle,
+        text: shareText,
         url: businessUrl
+      }).then(() => {
+        this.successMessage.set('Business card shared successfully!');
+        setTimeout(() => this.successMessage.set(null), 3000);
+      }).catch((error) => {
+        // User cancelled or error occurred
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing:', error);
+          // Fallback to clipboard
+          this.copyToClipboard(shareText);
+        }
       });
     } else {
       // Fallback to clipboard
-      navigator.clipboard.writeText(businessUrl).then(() => {
-        this.successMessage.set('Business card link copied to clipboard!');
-        setTimeout(() => this.successMessage.set(null), 3000);
-      });
+      this.copyToClipboard(shareText);
     }
+  }
+
+  private copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text).then(() => {
+      this.successMessage.set('Business card details copied to clipboard!');
+      setTimeout(() => this.successMessage.set(null), 3000);
+    }).catch((error) => {
+      console.error('Error copying to clipboard:', error);
+      this.errorMessage.set('Failed to copy to clipboard. Please try again.');
+      setTimeout(() => this.errorMessage.set(null), 3000);
+    });
   }
 
   saveCustomization(): void {
     const formValue = this.customizationForm.value;
 
-    // Mock API call to save customization
-    setTimeout(() => {
-      if (this.businessProfile()) {
-        const updatedProfile = {
-          ...this.businessProfile()!,
-          businessCardCustomization: formValue,
-          updatedAt: new Date()
-        };
-        this.businessProfile.set(updatedProfile);
-      }
+    if (!formValue) {
+      this.errorMessage.set('No customization data to save.');
+      setTimeout(() => this.errorMessage.set(null), 3000);
+      return;
+    }
 
-      this.successMessage.set('Customization saved successfully!');
-      setTimeout(() => this.successMessage.set(null), 3000);
-    }, 1000);
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.businessOwnerService.updateDigitalCardCustomization(formValue)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error saving customization:', error);
+          this.errorMessage.set('Failed to save customization. Please try again.');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading.set(false);
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          // Update local profile with saved customization
+          if (this.businessProfile()) {
+            const updatedProfile = {
+              ...this.businessProfile()!,
+              businessCardCustomization: response.customization,
+              updatedAt: new Date()
+            };
+            this.businessProfile.set(updatedProfile);
+          }
+
+          this.successMessage.set('Customization saved successfully!');
+          setTimeout(() => this.successMessage.set(null), 3000);
+        }
+      });
   }
 
   getPreviewStyle(): any {

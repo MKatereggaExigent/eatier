@@ -58,7 +58,10 @@
 
       <!-- Custom Colors -->
       <div class="customization-section">
-        <h3>Custom Colors</h3>
+        <h3>🎨 Custom Colors - Pick Any Color You Want!</h3>
+        <p style="font-size: 0.875rem; color: #666; margin-bottom: 1rem;">
+          Click on the color boxes below to choose your own custom colors for your digital business card.
+        </p>
         <div class="color-inputs">
           <div class="color-input">
             <label for="primaryColor">Primary Color</label>
@@ -67,6 +70,7 @@
               type="color"
               formControlName="primaryColor"
             />
+            <span class="color-value">{{ customizationForm.get('primaryColor')?.value }}</span>
           </div>
           <div class="color-input">
             <label for="secondaryColor">Secondary Color</label>
@@ -75,6 +79,7 @@
               type="color"
               formControlName="secondaryColor"
             />
+            <span class="color-value">{{ customizationForm.get('secondaryColor')?.value }}</span>
           </div>
         </div>
       </div>

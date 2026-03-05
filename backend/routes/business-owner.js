@@ -718,4 +718,111 @@ router.post('/reviews/:reviewId/response', async (req, res) => {
   }
 });
 
+// ===================================
+// DIGITAL CARD CUSTOMIZATION
+// ===================================
+
+/**
+ * GET /api/business-owner/digital-card-customization
+ * Get digital card customization settings for the business
+ */
+router.get('/digital-card-customization', async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
+
+    // Get business ID
+    const businessResult = await pool.query(`
+      SELECT id, digital_card_customization
+      FROM businesses
+      WHERE owner_id = $1 AND tenant_id = $2
+      LIMIT 1
+    `, [userId, tenantId]);
+
+    if (businessResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    const customization = businessResult.rows[0].digital_card_customization;
+
+    res.json({
+      customization: customization || null
+    });
+
+  } catch (error) {
+    console.error('Error fetching digital card customization:', error);
+    res.status(500).json({ error: 'Failed to fetch customization settings' });
+  }
+});
+
+/**
+ * PUT /api/business-owner/digital-card-customization
+ * Update digital card customization settings
+ */
+router.put('/digital-card-customization', async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
+
+    const {
+      primaryColor,
+      secondaryColor,
+      logoPosition,
+      includeQR,
+      includeContact,
+      includeSocial
+    } = req.body;
+
+    // Validate required fields
+    if (!primaryColor || !secondaryColor || !logoPosition) {
+      return res.status(400).json({ error: 'Missing required customization fields' });
+    }
+
+    // Validate logoPosition
+    if (!['top', 'center', 'bottom'].includes(logoPosition)) {
+      return res.status(400).json({ error: 'Invalid logo position' });
+    }
+
+    // Get business ID
+    const businessCheck = await pool.query(`
+      SELECT id FROM businesses WHERE owner_id = $1 AND tenant_id = $2
+    `, [userId, tenantId]);
+
+    if (businessCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    const businessId = businessCheck.rows[0].id;
+
+    // Create customization object
+    const customization = {
+      primaryColor,
+      secondaryColor,
+      logoPosition,
+      includeQR: includeQR !== undefined ? includeQR : true,
+      includeContact: includeContact !== undefined ? includeContact : true,
+      includeSocial: includeSocial !== undefined ? includeSocial : true
+    };
+
+    // Update business with customization
+    const result = await pool.query(`
+      UPDATE businesses
+      SET
+        digital_card_customization = $1,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $2 AND tenant_id = $3
+      RETURNING digital_card_customization
+    `, [JSON.stringify(customization), businessId, tenantId]);
+
+    res.json({
+      message: 'Digital card customization updated successfully',
+      customization: result.rows[0].digital_card_customization
+    });
+
+  } catch (error) {
+    console.error('Error updating digital card customization:', error);
+    res.status(500).json({ error: 'Failed to update customization settings' });
+  }
+});
+
 module.exports = router;
