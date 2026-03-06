@@ -394,36 +394,6 @@ $space-2xl: 3rem;
         }
       }
 
-      // Logo Position Variants
-      &.logo-top {
-        .business-logo {
-          align-self: flex-start;
-          order: -1;
-        }
-      }
-
-      &.logo-center {
-        align-items: center;
-        text-align: center;
-
-        .business-logo {
-          align-self: center;
-          order: -1;
-        }
-
-        .business-info {
-          align-items: center;
-        }
-      }
-
-      &.logo-bottom {
-        .business-logo {
-          align-self: flex-start;
-          order: 999;
-        }
-      }
-    }
-
       .business-info {
         .business-name {
           font-family: $font-serif;
@@ -500,6 +470,35 @@ $space-2xl: 3rem;
           opacity: 0.8;
           text-transform: uppercase;
           letter-spacing: 0.05em;
+        }
+      }
+
+      // Logo Position Variants
+      &.logo-top {
+        .business-logo {
+          align-self: flex-start;
+          order: -1;
+        }
+      }
+
+      &.logo-center {
+        align-items: center;
+        text-align: center;
+
+        .business-logo {
+          align-self: center;
+          order: -1;
+        }
+
+        .business-info {
+          align-items: center;
+        }
+      }
+
+      &.logo-bottom {
+        .business-logo {
+          align-self: flex-start;
+          order: 999;
         }
       }
     }
