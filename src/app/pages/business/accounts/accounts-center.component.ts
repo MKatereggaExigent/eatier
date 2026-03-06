@@ -565,13 +565,20 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
     if (this.selectedPlan()) {
       this.isProcessingPayment.set(true);
 
-      // Get user info from localStorage
-      const userId = localStorage.getItem('user_id');
+      // Get user info from localStorage or business data
+      let userId = localStorage.getItem('user_id');
       const userEmail = localStorage.getItem('user_email') || this.business()?.email;
+
+      // If user_id is not in localStorage, use owner_id from business
+      if (!userId && this.business()?.owner_id) {
+        userId = this.business()!.owner_id;
+        console.log('📌 Using owner_id from business:', userId);
+      }
 
       console.log('👤 User ID:', userId);
       console.log('📧 User Email:', userEmail);
       console.log('🏢 Business Email:', this.business()?.email);
+      console.log('🏢 Business Owner ID:', this.business()?.owner_id);
 
       if (!userId || !userEmail) {
         console.error('❌ Missing user information');
