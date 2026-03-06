@@ -476,6 +476,12 @@ $space-2xl: 3rem;
       // Logo Position Variants
       &.logo-top {
         // Logo at the top, left-aligned (default)
+        .qr-code {
+          position: absolute;
+          top: $space-md;
+          right: $space-md;
+        }
+
         .business-logo.card-element {
           order: 1;
         }
@@ -483,16 +489,18 @@ $space-2xl: 3rem;
         .business-info.card-element {
           order: 2;
         }
-
-        .qr-code.card-element {
-          order: 3;
-        }
       }
 
       &.logo-center {
         // Everything centered
         align-items: center;
         text-align: center;
+
+        .qr-code {
+          position: absolute;
+          top: $space-md;
+          right: $space-md;
+        }
 
         .business-logo.card-element {
           align-self: center;
@@ -503,21 +511,17 @@ $space-2xl: 3rem;
           align-items: center;
           order: 2;
         }
-
-        .qr-code.card-element {
-          align-self: center;
-          order: 3;
-        }
       }
 
       &.logo-bottom {
-        // Logo at the bottom, after business info and QR
-        .business-info.card-element {
-          order: 1;
+        // Logo at the bottom - QR code in flow, not absolute
+        .qr-code {
+          position: static;
+          order: 2;
         }
 
-        .qr-code.card-element {
-          order: 2;
+        .business-info.card-element {
+          order: 1;
         }
 
         .business-logo.card-element {
