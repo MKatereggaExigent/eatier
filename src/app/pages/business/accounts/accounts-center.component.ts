@@ -494,8 +494,10 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
   }
 
   selectPlan(plan: SubscriptionPlan): void {
+    console.log('🎯 Plan selected:', plan);
     this.selectedPlan.set(plan);
     this.showPaymentModal.set(true);
+    console.log('📋 Payment modal should be visible:', this.showPaymentModal());
   }
 
   openPaymentModal(): void {
@@ -557,6 +559,9 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
   }
 
   onPaymentSubmit(): void {
+    console.log('💳 Payment submit triggered');
+    console.log('📦 Selected plan:', this.selectedPlan());
+
     if (this.selectedPlan()) {
       this.isProcessingPayment.set(true);
 
@@ -564,26 +569,39 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
       const userId = localStorage.getItem('user_id');
       const userEmail = localStorage.getItem('user_email') || this.business()?.email;
 
+      console.log('👤 User ID:', userId);
+      console.log('📧 User Email:', userEmail);
+      console.log('🏢 Business Email:', this.business()?.email);
+
       if (!userId || !userEmail) {
+        console.error('❌ Missing user information');
         this.errorMessage.set('User information not found. Please log in again.');
         this.isProcessingPayment.set(false);
         return;
       }
 
-      // Initialize Paystack payment
-      this.http.post<any>(`${environment.apiUrl}/subscriptions/subscribe`, {
+      const payload = {
         userId,
         planId: this.selectedPlan()!.id,
         billingCycle: this.billingCycle(),
         email: userEmail
-      }).subscribe({
+      };
+
+      console.log('📤 Sending payment request:', payload);
+      console.log('🔗 API URL:', `${environment.apiUrl}/subscriptions/subscribe`);
+
+      // Initialize Paystack payment
+      this.http.post<any>(`${environment.apiUrl}/subscriptions/subscribe`, payload).subscribe({
         next: (response) => {
+          console.log('✅ Payment response:', response);
           this.isProcessingPayment.set(false);
 
           if (response.success && response.authorization_url) {
+            console.log('🔗 Redirecting to Paystack:', response.authorization_url);
             // Redirect to Paystack payment page
             window.location.href = response.authorization_url;
           } else if (response.success && response.subscription) {
+            console.log('✅ Free plan activated');
             // Free plan activated immediately
             this.closePaymentModal();
             const newSubscription: BusinessSubscription = {
@@ -600,11 +618,15 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
+          console.error('❌ Payment error:', error);
+          console.error('❌ Error details:', error.error);
           this.isProcessingPayment.set(false);
           this.errorMessage.set(error.error?.error || 'Failed to initialize payment. Please try again.');
           setTimeout(() => this.errorMessage.set(null), 5000);
         }
       });
+    } else {
+      console.warn('⚠️ No plan selected');
     }
   }
 
