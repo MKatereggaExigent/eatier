@@ -134,7 +134,7 @@
           }
 
           <!-- Card Content -->
-          <div class="card-content">
+          <div class="card-content" [ngClass]="getLogoPositionClass()">
             <!-- Business Logo/Photo -->
             @if (businessProfile()!.profilePhotos && businessProfile()!.profilePhotos!.length > 0) {
               <div class="business-logo">

@@ -183,8 +183,22 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
   }
 
   updatePreview(): void {
-    // This would update the preview in real-time
-    // For now, we'll just trigger a re-render
+    // Update the business profile's customization to reflect form changes
+    const currentProfile = this.businessProfile();
+    if (currentProfile && currentProfile.businessCardCustomization) {
+      const formValue = this.customizationForm.value;
+      currentProfile.businessCardCustomization = {
+        ...currentProfile.businessCardCustomization,
+        primaryColor: formValue.primaryColor || '#667eea',
+        secondaryColor: formValue.secondaryColor || '#764ba2',
+        logoPosition: formValue.logoPosition || 'top',
+        includeQR: formValue.includeQR ?? true,
+        includeContact: formValue.includeContact ?? true,
+        includeSocial: formValue.includeSocial ?? true
+      };
+      // Trigger change detection
+      this.businessProfile.set({ ...currentProfile });
+    }
   }
 
   applyColorPreset(preset: typeof this.colorPresets[0]): void {
@@ -328,6 +342,11 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
       background: `linear-gradient(135deg, ${form.primaryColor} 0%, ${form.secondaryColor} 100%)`,
       color: 'white'
     };
+  }
+
+  getLogoPositionClass(): string {
+    const position = this.customizationForm.get('logoPosition')?.value || 'top';
+    return `logo-${position}`;
   }
 
   getOpenHours(): string {
