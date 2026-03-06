@@ -137,13 +137,13 @@
           <div class="card-content" [ngClass]="getLogoPositionClass()">
             <!-- Business Logo/Photo -->
             @if (businessProfile()!.profilePhotos && businessProfile()!.profilePhotos!.length > 0) {
-              <div class="business-logo">
+              <div class="business-logo card-element">
                 <img [src]="businessProfile()!.profilePhotos![0]" [alt]="businessProfile()!.businessName" />
               </div>
             }
 
             <!-- Business Info -->
-            <div class="business-info">
+            <div class="business-info card-element">
               <h3 class="business-name">{{ businessProfile()!.businessName }}</h3>
 
               @if (customizationForm.get('includeContact')?.value && businessProfile()!.address) {
@@ -184,7 +184,7 @@
 
             <!-- QR Code -->
             @if (customizationForm.get('includeQR')?.value && qrCodeUrl()) {
-              <div class="qr-code">
+              <div class="qr-code card-element">
                 <img [src]="qrCodeUrl()" alt="QR Code" />
                 <span class="qr-label">Scan to visit</span>
               </div>

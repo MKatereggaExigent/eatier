@@ -476,17 +476,16 @@ $space-2xl: 3rem;
       // Logo Position Variants
       &.logo-top {
         // Logo at the top, left-aligned (default)
-        .business-logo {
-          align-self: flex-start;
-          order: 1 !important;
+        .business-logo.card-element {
+          order: 1;
         }
 
-        .business-info {
-          order: 2 !important;
+        .business-info.card-element {
+          order: 2;
         }
 
-        .qr-code {
-          order: 3 !important;
+        .qr-code.card-element {
+          order: 3;
         }
       }
 
@@ -495,35 +494,34 @@ $space-2xl: 3rem;
         align-items: center;
         text-align: center;
 
-        .business-logo {
+        .business-logo.card-element {
           align-self: center;
-          order: 1 !important;
+          order: 1;
         }
 
-        .business-info {
+        .business-info.card-element {
           align-items: center;
-          order: 2 !important;
+          order: 2;
         }
 
-        .qr-code {
+        .qr-code.card-element {
           align-self: center;
-          order: 3 !important;
+          order: 3;
         }
       }
 
       &.logo-bottom {
         // Logo at the bottom, after business info and QR
-        .business-logo {
-          align-self: flex-start;
-          order: 10 !important;
+        .business-info.card-element {
+          order: 1;
         }
 
-        .business-info {
-          order: 1 !important;
+        .qr-code.card-element {
+          order: 2;
         }
 
-        .qr-code {
-          order: 5 !important;
+        .business-logo.card-element {
+          order: 3;
         }
       }
     }

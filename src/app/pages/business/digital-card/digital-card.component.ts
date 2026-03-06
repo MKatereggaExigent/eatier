@@ -95,6 +95,9 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
         if (response && response.business) {
           this.business.set(response.business);
 
+          console.log('🏢 Business ID:', response.business.id);
+          console.log('🏢 Full Business Data:', response.business);
+
           // Map Business to BusinessProfile for the digital card
           const mappedProfile: BusinessProfile = {
             id: response.business.id,
@@ -142,6 +145,9 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
 
           this.businessProfile.set(mappedProfile);
           this.qrCodeUrl.set(mappedProfile.qrCodeUrl || '');
+
+          console.log('📱 QR Code URL:', mappedProfile.qrCodeUrl);
+          console.log('🔗 Restaurant URL:', `https://itiyum.com/restaurants/${response.business.id}`);
 
           // Load saved customization from API
           this.loadSavedCustomization();
