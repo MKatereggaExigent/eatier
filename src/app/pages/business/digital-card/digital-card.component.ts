@@ -129,7 +129,7 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
             status: 'active',
             createdAt: new Date(),
             updatedAt: new Date(),
-            qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://itiyum.com/business/${response.business.id}`,
+            qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://itiyum.com/restaurants/${response.business.id}`,
             businessCardCustomization: {
               primaryColor: '#0284c7',
               secondaryColor: '#0369a1',
@@ -213,7 +213,7 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
 
     // Mock QR code generation
     setTimeout(() => {
-      const businessUrl = `https://itiyum.com/business/${this.businessProfile()?.id}`;
+      const businessUrl = `https://itiyum.com/restaurants/${this.businessProfile()?.id}`;
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(businessUrl)}`;
 
       this.qrCodeUrl.set(qrUrl);

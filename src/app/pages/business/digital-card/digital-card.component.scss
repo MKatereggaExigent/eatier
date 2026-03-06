@@ -478,15 +478,15 @@ $space-2xl: 3rem;
         // Logo at the top, left-aligned (default)
         .business-logo {
           align-self: flex-start;
-          order: 1;
+          order: 1 !important;
         }
 
         .business-info {
-          order: 2;
+          order: 2 !important;
         }
 
         .qr-code {
-          order: 3;
+          order: 3 !important;
         }
       }
 
@@ -497,33 +497,33 @@ $space-2xl: 3rem;
 
         .business-logo {
           align-self: center;
-          order: 1;
+          order: 1 !important;
         }
 
         .business-info {
           align-items: center;
-          order: 2;
+          order: 2 !important;
         }
 
         .qr-code {
           align-self: center;
-          order: 3;
+          order: 3 !important;
         }
       }
 
       &.logo-bottom {
-        // Logo at the bottom, after business info
+        // Logo at the bottom, after business info and QR
         .business-logo {
           align-self: flex-start;
-          order: 3;
+          order: 10 !important;
         }
 
         .business-info {
-          order: 1;
+          order: 1 !important;
         }
 
         .qr-code {
-          order: 2;
+          order: 5 !important;
         }
       }
     }
