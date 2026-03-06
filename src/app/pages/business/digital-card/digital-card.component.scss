@@ -475,30 +475,55 @@ $space-2xl: 3rem;
 
       // Logo Position Variants
       &.logo-top {
+        // Logo at the top, left-aligned (default)
         .business-logo {
           align-self: flex-start;
-          order: -1;
+          order: 1;
+        }
+
+        .business-info {
+          order: 2;
+        }
+
+        .qr-code {
+          order: 3;
         }
       }
 
       &.logo-center {
+        // Everything centered
         align-items: center;
         text-align: center;
 
         .business-logo {
           align-self: center;
-          order: -1;
+          order: 1;
         }
 
         .business-info {
           align-items: center;
+          order: 2;
+        }
+
+        .qr-code {
+          align-self: center;
+          order: 3;
         }
       }
 
       &.logo-bottom {
+        // Logo at the bottom, after business info
         .business-logo {
           align-self: flex-start;
-          order: 999;
+          order: 3;
+        }
+
+        .business-info {
+          order: 1;
+        }
+
+        .qr-code {
+          order: 2;
         }
       }
     }
