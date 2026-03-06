@@ -1,19 +1,27 @@
 const { Pool } = require('pg');
 const path = require('path');
+const fs = require('fs');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
 // Load environment variables:
-// - Production (Vercel): Uses Vercel's environment variables directly (no dotenv needed)
+// - Production (Server): Use .env file if it exists
 // - Development (Local): Load from .env.local file
 // - Docker: Uses container environment variables (DB_HOST='postgres')
 const isDocker = process.env.DB_HOST === 'postgres';
-if (!isProduction && !isDocker) {
-  try {
-    require('dotenv').config({ path: path.join(__dirname, '..', '.env.local') });
+const prodEnvPath = path.join(__dirname, '..', '.env');
+const devEnvPath = path.join(__dirname, '..', '.env.local');
+
+// Priority: .env (production) > .env.local (development)
+if (!isDocker) {
+  if (fs.existsSync(prodEnvPath)) {
+    // Production .env file exists - use it
+    require('dotenv').config({ path: prodEnvPath });
+    console.log('🌐 Loaded .env for production');
+  } else if (fs.existsSync(devEnvPath)) {
+    // Fallback to .env.local for development
+    require('dotenv').config({ path: devEnvPath });
     console.log('💻 Loaded .env.local for development');
-  } catch (err) {
-    console.log('⚠️ Could not load .env.local:', err.message);
   }
 }
 

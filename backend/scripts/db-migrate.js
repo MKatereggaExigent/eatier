@@ -2,13 +2,13 @@
 
 /**
  * Database Migration Runner
- * 
+ *
  * This script automatically runs all pending database migrations in order.
  * It tracks which migrations have been applied using the schema_migrations table.
- * 
+ *
  * Usage:
  *   node db-migrate.js [options]
- * 
+ *
  * Options:
  *   --status    Show migration status without running anything
  *   --rollback  Rollback the last migration (if rollback file exists)
@@ -18,7 +18,14 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+
+// Load environment variables from .env file (production)
+// This will be overridden by database.js if .env.local exists
+const envPath = path.join(__dirname, '..', '.env');
+if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
+  console.log('📄 Loaded .env file');
+}
 
 // Use the existing database config
 const pool = require('../config/database');
