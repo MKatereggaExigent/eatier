@@ -281,6 +281,7 @@ export class AuthService {
 
     // Store access token (backend also sets HTTP-only cookie)
     localStorage.setItem(this.TOKEN_KEY, response.accessToken);
+    localStorage.setItem('auth_token', response.accessToken); // Also store as 'auth_token' for compatibility
 
     // Store refresh token if provided (backend also sets HTTP-only cookie)
     if (response.refreshToken) {
@@ -293,10 +294,16 @@ export class AuthService {
     // Store user information
     localStorage.setItem(this.USER_KEY, JSON.stringify(transformedUser));
 
+    // Store user_id and user_email separately for payment and other services
+    localStorage.setItem('user_id', transformedUser.id);
+    localStorage.setItem('user_email', transformedUser.email);
+
     // Update current user state
     this.setCurrentUser(transformedUser);
 
     console.log('🔑 Token stored in localStorage:', localStorage.getItem(this.TOKEN_KEY)?.substring(0, 20) + '...');
+    console.log('🔑 User ID stored:', transformedUser.id);
+    console.log('🔑 User Email stored:', transformedUser.email);
   }
 
   /**
@@ -548,6 +555,10 @@ export class AuthService {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
+    // Also remove compatibility keys
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('user_email');
   }
 
   private setCurrentUser(user: User | null): void {
