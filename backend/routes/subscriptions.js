@@ -89,13 +89,23 @@ router.post('/subscribe', async (req, res) => {
       return res.status(400).json({ error: 'userId, planId, and email are required' });
     }
 
-    // Get plan details
-    const planResult = await pool.query(`
+    // Get plan details - try by plan_code first (for string IDs like "basic"), then by UUID
+    let planResult = await pool.query(`
       SELECT sp.*, t.id as tenant_id
       FROM subscription_plans sp
       JOIN tenants t ON sp.tenant_id = t.id
-      WHERE sp.id = $1 AND t.slug = $2
+      WHERE sp.plan_code = $1 AND t.slug = $2
     `, [planId, tenantSlug]);
+
+    // If not found by plan_code, try by UUID (for backward compatibility)
+    if (planResult.rows.length === 0) {
+      planResult = await pool.query(`
+        SELECT sp.*, t.id as tenant_id
+        FROM subscription_plans sp
+        JOIN tenants t ON sp.tenant_id = t.id
+        WHERE sp.id = $1 AND t.slug = $2
+      `, [planId, tenantSlug]);
+    }
 
     if (planResult.rows.length === 0) {
       return res.status(404).json({ error: 'Plan not found' });
