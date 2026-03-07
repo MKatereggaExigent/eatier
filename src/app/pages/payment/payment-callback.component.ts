@@ -117,16 +117,27 @@ export class PaymentCallbackComponent implements OnInit {
   }
 
   goToDashboard(): void {
-    const userRole = localStorage.getItem('user_role') || 'normal_user';
+    // Get user role from the stored user object
+    let userRole = 'normal_user';
+    try {
+      const userJson = localStorage.getItem('itiyum_user');
+      if (userJson) {
+        const user = JSON.parse(userJson);
+        userRole = user.role || 'normal_user';
+      }
+    } catch (e) {
+      console.error('Error parsing user data:', e);
+    }
+
     const dashboardRoutes: Record<string, string> = {
-      'itiyum_admin': '/admin',
-      'business_owner': '/business',
-      'business': '/business',
-      'specialist': '/dashboard/specialist',
-      'food_enthusiast': '/dashboard/food-enthusiast',
-      'normal_user': '/dashboard/user'
+      'itiyum_admin': '/admin/overview',
+      'business_owner': '/business/overview',
+      'business': '/business/overview',
+      'specialist': '/dashboard/specialist/overview',
+      'food_enthusiast': '/dashboard/food-enthusiast/overview',
+      'normal_user': '/dashboard/user/overview'
     };
-    this.router.navigate([dashboardRoutes[userRole] || '/dashboard/user']);
+    this.router.navigate([dashboardRoutes[userRole] || '/dashboard/user/overview']);
   }
 
   retryPayment(): void {
