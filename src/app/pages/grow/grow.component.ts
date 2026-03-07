@@ -207,7 +207,7 @@ export class GrowComponent implements OnInit, OnDestroy {
 
     // Navigate to Create Ad page based on role
     if (user.role === 'business_owner') {
-      this.router.navigate(['/business-owner/ads/create']);
+      this.router.navigate(['/business/ads/create']);
     } else if (user.role === 'specialist') {
       this.router.navigate(['/dashboard/specialist/ads/create']);
     }
@@ -222,7 +222,7 @@ export class GrowComponent implements OnInit, OnDestroy {
 
     // Navigate to dashboard based on role
     if (user.role === 'business_owner') {
-      this.router.navigate(['/business-owner']);
+      this.router.navigate(['/business/overview']);
     } else if (user.role === 'specialist') {
       this.router.navigate(['/dashboard/specialist']);
     } else {
