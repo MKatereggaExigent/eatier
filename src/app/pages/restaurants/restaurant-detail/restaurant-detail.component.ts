@@ -212,8 +212,13 @@ export class RestaurantDetailComponent implements OnInit {
               'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop'
             ];
 
-        const hours = this.generateHoursFromOpenClose(business.opensAt, business.closesAt);
-        const isOpen = this.isBusinessOpen(business.opensAt, business.closesAt);
+        // Use actual business hours from database if available, otherwise fallback to opensAt/closesAt
+        const hours = business.hours && business.hours.length > 0
+          ? this.generateHoursFromDatabase(business.hours)
+          : this.generateHoursFromOpenClose(business.opensAt, business.closesAt);
+        const isOpen = business.hours && business.hours.length > 0
+          ? this.isBusinessOpenFromHours(business.hours)
+          : this.isBusinessOpen(business.opensAt, business.closesAt);
 
         // Get primary cuisine from cuisineTypes array, or fallback to formatted business type
         const cuisine = business.cuisineTypes && business.cuisineTypes.length > 0
@@ -248,6 +253,66 @@ export class RestaurantDetailComponent implements OnInit {
         this.isLoading.set(false);
       }
     });
+  }
+
+  private generateHoursFromDatabase(hoursData: any[]): any[] {
+    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    // Create a map of day_of_week to hours
+    const hoursMap = new Map();
+    hoursData.forEach(hour => {
+      hoursMap.set(hour.day_of_week, hour);
+    });
+
+    // Generate hours array for all 7 days
+    return dayNames.map((dayName, index) => {
+      // Database uses 0-6 where 0=Sunday, 1=Monday, ..., 6=Saturday
+      // dayNames array is [Monday, Tuesday, ..., Sunday]
+      // So: Monday (index 0) -> 1, Tuesday (index 1) -> 2, ..., Saturday (index 5) -> 6, Sunday (index 6) -> 0
+      const dayOfWeek = index === 6 ? 0 : index + 1;
+      const dayHours = hoursMap.get(dayOfWeek);
+
+      if (!dayHours || dayHours.is_closed) {
+        return { day: dayName, hours: 'Closed' };
+      }
+
+      // Format time from 24h to 12h format
+      const openTime = this.formatTime(dayHours.open_time);
+      const closeTime = this.formatTime(dayHours.close_time);
+
+      return { day: dayName, hours: `${openTime} - ${closeTime}` };
+    });
+  }
+
+  private formatTime(time: string): string {
+    if (!time) return '';
+
+    const [hours, minutes] = time.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  }
+
+  private isBusinessOpenFromHours(hoursData: any[]): boolean {
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+
+    // Database uses same convention: 0=Sunday, 1=Monday, ..., 6=Saturday
+    const todayHours = hoursData.find(h => h.day_of_week === currentDay);
+
+    if (!todayHours || todayHours.is_closed) {
+      return false;
+    }
+
+    const [openHour, openMin] = todayHours.open_time.split(':').map(Number);
+    const [closeHour, closeMin] = todayHours.close_time.split(':').map(Number);
+
+    const openTime = openHour * 60 + openMin;
+    const closeTime = closeHour * 60 + closeMin;
+
+    return currentTime >= openTime && currentTime <= closeTime;
   }
 
   private generateHoursFromOpenClose(opensAt?: string, closesAt?: string): any[] {

@@ -227,7 +227,9 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
           const hoursData: any = {};
 
           response.hours.forEach((hour: any) => {
-            const dayIndex = hour.day_of_week - 1; // Convert 1-7 to 0-6
+            // Database uses 0-6 where 0=Sunday, 1=Monday, ..., 6=Saturday
+            // Convert to our array index: 0->6 (sunday), 1->0 (monday), 2->1 (tuesday), etc.
+            const dayIndex = hour.day_of_week === 0 ? 6 : hour.day_of_week - 1;
             if (dayIndex >= 0 && dayIndex < 7) {
               const dayName = days[dayIndex];
               hoursData[`${dayName}Open`] = !hour.is_closed;
@@ -319,12 +321,19 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
     const formValue = this.profileForm.value;
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
-    const hours = days.map((day, index) => ({
-      day_of_week: index + 1, // 1 = Monday, 7 = Sunday
-      open_time: formValue[`${day}Open`] ? formValue[`${day}OpenTime`] : null,
-      close_time: formValue[`${day}Open`] ? formValue[`${day}CloseTime`] : null,
-      is_closed: !formValue[`${day}Open`]
-    }));
+    const hours = days.map((day, index) => {
+      // Database uses 0-6 where 0=Sunday, 1=Monday, ..., 6=Saturday
+      // Our array is [monday, tuesday, ..., sunday] so we need to convert:
+      // monday (index 0) -> 1, tuesday (index 1) -> 2, ..., saturday (index 5) -> 6, sunday (index 6) -> 0
+      const day_of_week = index === 6 ? 0 : index + 1;
+
+      return {
+        day_of_week,
+        open_time: formValue[`${day}Open`] ? formValue[`${day}OpenTime`] : null,
+        close_time: formValue[`${day}Open`] ? formValue[`${day}CloseTime`] : null,
+        is_closed: !formValue[`${day}Open`]
+      };
+    });
 
     // Only update if at least one day has hours set
     const hasHours = hours.some(h => h.open_time || h.close_time);

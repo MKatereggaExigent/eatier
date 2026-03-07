@@ -97,6 +97,14 @@ router.get('/:businessId', async (req, res) => {
 
     const business = result.rows[0];
 
+    // Fetch business hours from business_hours table
+    const hoursResult = await pool.query(`
+      SELECT day_of_week, open_time, close_time, is_closed
+      FROM business_hours
+      WHERE business_id = $1
+      ORDER BY day_of_week
+    `, [businessId]);
+
     res.json({
       business: {
         id: business.id,
@@ -122,6 +130,7 @@ router.get('/:businessId', async (req, res) => {
         priceRange: business.price_range, // Auto-calculated based on menu prices
         freezeUntil: business.freeze_until,
         freezeDuration: business.freeze_duration,
+        hours: hoursResult.rows, // Include business hours
         createdAt: business.created_at,
         updatedAt: business.updated_at
       }
