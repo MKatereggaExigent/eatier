@@ -3,6 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export interface BusinessHour {
+  id?: string;
+  business_id?: string;
+  day_of_week: number; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  open_time: string;
+  close_time: string;
+  is_closed: boolean;
+}
+
 export interface PublicBusiness {
   id: string;
   ownerId: string;
@@ -25,6 +34,7 @@ export interface PublicBusiness {
   backgroundImage?: string;
   accountStatus: string;
   priceRange?: string; // Auto-calculated: 'budget', 'moderate', 'expensive', 'luxury'
+  hours?: BusinessHour[]; // Business hours from business_hours table
   createdAt: string;
   updatedAt: string;
 }
