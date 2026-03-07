@@ -156,6 +156,19 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
   }
 
   populateForm(business: any): void {
+    // Parse facilities array from database
+    const facilities = business.facilities || [];
+    const facilitiesMap: any = {
+      parking: facilities.includes('parking'),
+      petFriendly: facilities.includes('pet_friendly'),
+      carWash: facilities.includes('car_wash'),
+      swimming: facilities.includes('swimming'),
+      wifi: facilities.includes('wifi'),
+      airConditioning: facilities.includes('air_conditioning'),
+      outdoorSeating: facilities.includes('outdoor_seating'),
+      wheelchairAccessible: facilities.includes('wheelchair_accessible')
+    };
+
     this.profileForm.patchValue({
       businessName: business.business_name || '',
       businessType: business.business_type || '',
@@ -169,8 +182,41 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
       zipCode: business.postal_code || '',
       bio: business.description || business.sustainability_ethos || '',
       description: business.description || '',
-      website: business.website || ''
+      website: business.website || '',
+      ...facilitiesMap
     });
+
+    // Load business hours
+    this.loadBusinessHours();
+  }
+
+  private loadBusinessHours(): void {
+    this.businessOwnerService.getBusinessHours()
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading business hours:', error);
+          return of({ hours: [] });
+        })
+      )
+      .subscribe(response => {
+        if (response && response.hours) {
+          const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+          const hoursData: any = {};
+
+          response.hours.forEach((hour: any) => {
+            const dayIndex = hour.day_of_week - 1; // Convert 1-7 to 0-6
+            if (dayIndex >= 0 && dayIndex < 7) {
+              const dayName = days[dayIndex];
+              hoursData[`${dayName}Open`] = !hour.is_closed;
+              hoursData[`${dayName}OpenTime`] = hour.open_time || '';
+              hoursData[`${dayName}CloseTime`] = hour.close_time || '';
+            }
+          });
+
+          this.profileForm.patchValue(hoursData);
+        }
+      });
   }
 
   resetForm(): void {
@@ -192,18 +238,32 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
       this.errorMessage.set(null);
 
       const formValue = this.profileForm.value;
+
+      // Build facilities array from form checkboxes
+      const facilities = [];
+      if (formValue.parking) facilities.push('parking');
+      if (formValue.petFriendly) facilities.push('pet_friendly');
+      if (formValue.carWash) facilities.push('car_wash');
+      if (formValue.swimming) facilities.push('swimming');
+      if (formValue.wifi) facilities.push('wifi');
+      if (formValue.airConditioning) facilities.push('air_conditioning');
+      if (formValue.outdoorSeating) facilities.push('outdoor_seating');
+      if (formValue.wheelchairAccessible) facilities.push('wheelchair_accessible');
+
       const updateData = {
         businessName: formValue.businessName,
         businessType: formValue.businessType,
         email: formValue.email,
-        phone: formValue.contactNumber, // Fixed: use 'phone' instead of 'contact_number'
+        phone: formValue.contactNumber,
+        country: formValue.country,
         address: formValue.street,
         city: formValue.city,
         state: formValue.state,
         zipCode: formValue.zipCode,
         sustainabilityEthos: formValue.sustainabilityEthos,
         bio: formValue.bio,
-        website: formValue.website
+        website: formValue.website,
+        facilities: facilities // Include facilities array
       };
 
       this.businessOwnerService.updateMyBusiness(updateData)
@@ -220,6 +280,9 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
         )
         .subscribe(response => {
           if (response) {
+            // Also update business hours if they were modified
+            this.updateBusinessHours();
+
             this.successMessage.set('Profile updated successfully!');
             this.loadBusinessProfile(); // Reload to get updated data
             setTimeout(() => this.successMessage.set(null), 3000);
@@ -227,6 +290,36 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
         });
     } else {
       this.markFormGroupTouched();
+    }
+  }
+
+  private updateBusinessHours(): void {
+    const formValue = this.profileForm.value;
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+    const hours = days.map((day, index) => ({
+      day_of_week: index + 1, // 1 = Monday, 7 = Sunday
+      open_time: formValue[`${day}Open`] ? formValue[`${day}OpenTime`] : null,
+      close_time: formValue[`${day}Open`] ? formValue[`${day}CloseTime`] : null,
+      is_closed: !formValue[`${day}Open`]
+    }));
+
+    // Only update if at least one day has hours set
+    const hasHours = hours.some(h => h.open_time || h.close_time);
+    if (hasHours) {
+      this.businessOwnerService.updateBusinessHours(hours)
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError(error => {
+            console.error('Error updating business hours:', error);
+            return of(null);
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            console.log('Business hours updated successfully');
+          }
+        });
     }
   }
 

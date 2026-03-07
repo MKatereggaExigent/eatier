@@ -40,7 +40,7 @@ sleep 10
 
 # Check if PostgreSQL is ready
 for i in {1..30}; do
-    if docker exec itiyum-postgres-prod pg_isready -U itiyum > /dev/null 2>&1; then
+    if docker exec itiyum-postgres pg_isready -U itiyum_user > /dev/null 2>&1; then
         echo "✅ PostgreSQL is ready!"
         break
     fi
@@ -56,7 +56,7 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🗄️  STEP 4: Running database migrations"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-docker exec itiyum-backend-prod npm run migrate
+docker exec itiyum-backend npm run migrate
 
 # Step 5: Build frontend
 echo ""
