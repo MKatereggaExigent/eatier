@@ -4,7 +4,6 @@ import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../environments/environment';
