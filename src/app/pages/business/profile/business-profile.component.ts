@@ -155,21 +155,21 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
       });
   }
 
-  populateForm(business: Business): void {
+  populateForm(business: any): void {
     this.profileForm.patchValue({
-      businessName: business.business_name,
-      businessType: business.business_type,
-      email: business.email,
-      contactNumber: business.phone,
-      country: '', // Not available in Business model
+      businessName: business.business_name || '',
+      businessType: business.business_type || '',
+      email: business.email || '',
+      contactNumber: business.phone || '',
+      country: business.country || '',
       sustainabilityEthos: business.sustainability_ethos || '',
-      street: business.address,
-      city: '', // Not available in Business model
-      state: '', // Not available in Business model
-      zipCode: '', // Not available in Business model
-      bio: business.sustainability_ethos || '', // Using sustainability_ethos as placeholder
-      description: '',
-      website: '' // Not available in Business model
+      street: business.address || '',
+      city: business.city || '',
+      state: business.state || '',
+      zipCode: business.postal_code || '',
+      bio: business.description || business.sustainability_ethos || '',
+      description: business.description || '',
+      website: business.website || ''
     });
   }
 
@@ -193,16 +193,16 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
 
       const formValue = this.profileForm.value;
       const updateData = {
-        business_name: formValue.businessName,
-        business_type: formValue.businessType,
+        businessName: formValue.businessName,
+        businessType: formValue.businessType,
         email: formValue.email,
-        contact_number: formValue.contactNumber,
-        address: formValue.street, // Map street to address
+        phone: formValue.contactNumber, // Fixed: use 'phone' instead of 'contact_number'
+        address: formValue.street,
         city: formValue.city,
         state: formValue.state,
-        zip_code: formValue.zipCode,
-        sustainability_ethos: formValue.sustainabilityEthos,
-        description: formValue.bio,
+        zipCode: formValue.zipCode,
+        sustainabilityEthos: formValue.sustainabilityEthos,
+        bio: formValue.bio,
         website: formValue.website
       };
 

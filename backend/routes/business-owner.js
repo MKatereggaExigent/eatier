@@ -104,7 +104,12 @@ router.put('/my-business', async (req, res) => {
       phone,
       country,
       address,
+      city,
+      state,
+      zipCode,
       sustainabilityEthos,
+      bio,
+      website,
       opensAt,
       closesAt,
       facilities
@@ -131,16 +136,22 @@ router.put('/my-business', async (req, res) => {
         phone = COALESCE($4, phone),
         country = COALESCE($5, country),
         address = COALESCE($6, address),
-        sustainability_ethos = COALESCE($7, sustainability_ethos),
-        opens_at = COALESCE($8, opens_at),
-        closes_at = COALESCE($9, closes_at),
-        facilities = COALESCE($10, facilities),
+        city = COALESCE($7, city),
+        state = COALESCE($8, state),
+        postal_code = COALESCE($9, postal_code),
+        sustainability_ethos = COALESCE($10, sustainability_ethos),
+        description = COALESCE($11, description),
+        website = COALESCE($12, website),
+        opens_at = COALESCE($13, opens_at),
+        closes_at = COALESCE($14, closes_at),
+        facilities = COALESCE($15, facilities),
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = $11 AND tenant_id = $12
+      WHERE id = $16 AND tenant_id = $17
       RETURNING *
     `, [
       businessName, businessType, email, phone, country, address,
-      sustainabilityEthos, opensAt, closesAt, facilities,
+      city, state, zipCode, sustainabilityEthos, bio, website,
+      opensAt, closesAt, facilities,
       businessId, tenantId
     ]);
 
