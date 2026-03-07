@@ -3,9 +3,11 @@ import { Business, BusinessOwnerService } from '../../../core/services/business-
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-business-profile',
@@ -18,6 +20,7 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private businessOwnerService = inject(BusinessOwnerService);
+  private http = inject(HttpClient);
   private destroy$ = new Subject<void>();
 
   profileForm: FormGroup;
@@ -374,18 +377,79 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
         return;
       }
 
-      // Mock file upload - in real app, upload to cloud storage
-      const mockUrl = URL.createObjectURL(file);
-
-      if (type === 'profile') {
-        const current = this.profilePhotos();
-        if (current.length < this.constraints.MAX_PROFILE_PHOTOS) {
-          this.profilePhotos.set([...current, mockUrl]);
-        }
-      } else {
-        this.backgroundImage.set(mockUrl);
-      }
+      // Upload file to backend
+      this.uploadImageToBackend(file, type);
     }
+  }
+
+  private uploadImageToBackend(file: File, type: 'profile' | 'background'): void {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    this.isLoading.set(true);
+
+    // Upload to businesses category
+    this.http.post<any>(`${environment.apiUrl}/uploads/businesses/single`, formData)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error uploading image:', error);
+          this.errorMessage.set('Failed to upload image. Please try again.');
+          this.isLoading.set(false);
+          return of(null);
+        })
+      )
+      .subscribe(response => {
+        this.isLoading.set(false);
+
+        if (response && response.file) {
+          const imageUrl = response.file.url;
+
+          if (type === 'profile') {
+            const current = this.profilePhotos();
+            if (current.length < this.constraints.MAX_PROFILE_PHOTOS) {
+              this.profilePhotos.set([...current, imageUrl]);
+              // Save to database
+              this.saveProfilePhotoToDatabase(imageUrl);
+            }
+          } else {
+            this.backgroundImage.set(imageUrl);
+            // Save to database
+            this.saveBackgroundImageToDatabase(imageUrl);
+          }
+        }
+      });
+  }
+
+  private saveProfilePhotoToDatabase(photoUrl: string): void {
+    this.businessOwnerService.addBusinessPhoto({
+      photo_url: photoUrl,
+      photo_type: 'profile',
+      is_primary: this.profilePhotos().length === 1 // First photo is primary
+    } as any)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error saving photo to database:', error);
+          return of(null);
+        })
+      )
+      .subscribe();
+  }
+
+  private saveBackgroundImageToDatabase(imageUrl: string): void {
+    // Update business with background image
+    this.businessOwnerService.updateMyBusiness({
+      background_image: imageUrl
+    } as any)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error saving background image:', error);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
   removeProfilePhoto(index: number): void {
