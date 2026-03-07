@@ -126,6 +126,9 @@ router.put('/my-business', async (req, res) => {
 
     const businessId = ownerCheck.rows[0].id;
 
+    // Convert facilities array to JSON if it exists
+    const facilitiesJson = facilities ? JSON.stringify(facilities) : null;
+
     // Update business
     const result = await pool.query(`
       UPDATE businesses
@@ -144,14 +147,14 @@ router.put('/my-business', async (req, res) => {
         website = COALESCE($12, website),
         opens_at = COALESCE($13, opens_at),
         closes_at = COALESCE($14, closes_at),
-        facilities = COALESCE($15, facilities),
+        facilities = COALESCE($15::jsonb, facilities),
         updated_at = CURRENT_TIMESTAMP
       WHERE id = $16 AND tenant_id = $17
       RETURNING *
     `, [
       businessName, businessType, email, phone, country, address,
       city, state, zipCode, sustainabilityEthos, bio, website,
-      opensAt, closesAt, facilities,
+      opensAt, closesAt, facilitiesJson,
       businessId, tenantId
     ]);
 
