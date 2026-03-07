@@ -6,7 +6,7 @@ import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-business-profile',
