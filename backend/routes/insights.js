@@ -278,7 +278,19 @@ router.post('/track/pageview', async (req, res) => {
     const businessResult = await pool.query(`
       SELECT tenant_id FROM businesses WHERE id = $1
     `, [businessId]);
-    const tenantId = businessResult.rows[0]?.tenant_id;
+
+    if (!businessResult.rows[0]) {
+      console.error(`Business not found: ${businessId}`);
+      // Don't fail - just log and return success (silent tracking failure)
+      return res.json({ success: true, tracked: false, reason: 'business_not_found' });
+    }
+
+    const tenantId = businessResult.rows[0].tenant_id;
+
+    if (!tenantId) {
+      console.error(`Business ${businessId} has no tenant_id`);
+      return res.json({ success: true, tracked: false, reason: 'no_tenant_id' });
+    }
 
     await pool.query(`
       INSERT INTO page_view_events (
@@ -323,8 +335,8 @@ router.post('/track/pageview', async (req, res) => {
     // Update daily analytics with comprehensive tracking
     const viewColumn = pageType === 'menu' ? 'menu_views' :
                        pageType === 'profile' ? 'profile_views' : 'total_views';
-    const deviceColumn = deviceType === 'mobile' ? 'mobile_visits' :
-                         deviceType === 'tablet' ? 'tablet_visits' : 'desktop_visits';
+    const deviceColumn = deviceType === 'mobile' ? 'mobile_views' :
+                         deviceType === 'tablet' ? 'tablet_views' : 'desktop_views';
     const trafficColumn = `${trafficSource}_traffic`;
 
     // Build dynamic update query
@@ -350,10 +362,20 @@ router.post('/track/pageview', async (req, res) => {
       DO UPDATE SET ${updateParts.join(', ')}
     `, [tenantId, businessId, today]);
 
-    res.json({ success: true });
+    res.json({ success: true, tracked: true });
   } catch (error) {
     console.error('Error tracking page view:', error);
-    res.status(500).json({ error: 'Failed to track page view' });
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      detail: error.detail,
+      constraint: error.constraint,
+      table: error.table
+    });
+    res.status(500).json({
+      error: 'Failed to track page view',
+      details: error.message
+    });
   }
 });
 
