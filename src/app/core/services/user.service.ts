@@ -30,6 +30,7 @@ export interface UserStats {
   totalBookings: number;
   totalFavorites: number;
   totalPhotos: number;
+  restaurantsVisited?: number;  // Based on page views
 }
 
 export interface UserActivity {

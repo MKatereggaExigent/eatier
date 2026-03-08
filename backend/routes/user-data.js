@@ -44,8 +44,18 @@ router.get('/:userId/stats', async (req, res) => {
       WHERE client_id = $1 AND tenant_id = $2
     `, [userId, tenantId]);
 
+    // Get unique restaurants visited (based on page views)
+    const restaurantsVisitedResult = await pool.query(`
+      SELECT COUNT(DISTINCT business_id) as count
+      FROM page_view_events
+      WHERE user_id = $1 AND tenant_id = $2 AND page_type = 'profile'
+    `, [userId, tenantId]);
+
     // Total bookings = restaurant + specialist
     const totalBookings = parseInt(restaurantBookingsResult.rows[0].count) + parseInt(specialistBookingsResult.rows[0].count);
+
+    // Restaurants visited = unique page views
+    const restaurantsVisited = parseInt(restaurantsVisitedResult.rows[0].count) || 0;
 
     // Get favorites count
     const favoritesResult = await pool.query(`
@@ -69,7 +79,8 @@ router.get('/:userId/stats', async (req, res) => {
       totalReviews: parseInt(reviewsResult.rows[0].count),
       totalBookings: totalBookings,
       totalFavorites: parseInt(favoritesResult.rows[0].count),
-      totalPhotos: parseInt(photosResult.rows[0].count)
+      totalPhotos: parseInt(photosResult.rows[0].count),
+      restaurantsVisited: restaurantsVisited  // Add this for the dashboard
     });
 
   } catch (error) {
@@ -317,7 +328,12 @@ router.delete('/:userId/favorites/:favoriteId', async (req, res) => {
 
 /**
  * GET /api/users/:userId/recommendations
- * Get personalized restaurant recommendations for user
+ * Get personalized restaurant recommendations for user based on:
+ * - Page views (restaurants they've clicked on)
+ * - Favorites
+ * - Reviews
+ * - User preferences
+ * - Similar users' behavior
  */
 router.get('/:userId/recommendations', async (req, res) => {
   try {
@@ -338,7 +354,7 @@ router.get('/:userId/recommendations', async (req, res) => {
     );
     const prefs = prefsResult.rows[0];
 
-    // Get businesses the user has already favorited or reviewed
+    // Get businesses the user has already favorited or reviewed (exclude from recommendations)
     const excludeResult = await pool.query(
       `SELECT DISTINCT business_id FROM (
         SELECT business_id FROM favorites WHERE user_id = $1 AND tenant_id = $2
@@ -349,24 +365,58 @@ router.get('/:userId/recommendations', async (req, res) => {
     );
     const excludeIds = excludeResult.rows.map(r => r.business_id);
 
-    // Build recommendation query
+    // Get businesses the user has viewed (for collaborative filtering)
+    const viewedResult = await pool.query(
+      `SELECT business_id, COUNT(*) as view_count
+       FROM page_view_events
+       WHERE user_id = $1 AND tenant_id = $2 AND page_type = 'profile'
+       GROUP BY business_id
+       ORDER BY view_count DESC
+       LIMIT 10`,
+      [userId, tenantId]
+    );
+    const viewedBusinessIds = viewedResult.rows.map(r => r.business_id);
+
+    // Build smart recommendation query with scoring
     let query = `
       SELECT
         b.id,
         b.business_name as name,
         b.cuisine_types as cuisine,
-        COALESCE(b.cover_image_url, b.profile_photos->0->>'url', b.profile_photos->>0) as image,
+        b.price_range as "priceRange",
+        COALESCE(b.cover_image_url, b.logo_url, b.profile_photos->0->>'url', b.profile_photos->>0) as image,
         b.address,
-        COALESCE(AVG(r.rating), 0) as rating,
-        COUNT(DISTINCT r.id) as review_count
+        COALESCE(AVG(r.rating), 0) as "avgRating",
+        COUNT(DISTINCT r.id) as review_count,
+        -- Scoring system
+        (
+          -- Base score: average rating
+          COALESCE(AVG(r.rating), 0) * 10 +
+          -- Cuisine match bonus
+          CASE
+            WHEN $${2}::text[] IS NOT NULL AND b.cuisine_types && $${2}::text[] THEN 20
+            ELSE 0
+          END +
+          -- Similar to viewed restaurants (collaborative filtering)
+          CASE
+            WHEN $${3}::uuid[] IS NOT NULL AND b.cuisine_types && (
+              SELECT array_agg(DISTINCT unnest(cuisine_types))
+              FROM businesses
+              WHERE id = ANY($${3}::uuid[])
+            ) THEN 15
+            ELSE 0
+          END +
+          -- Popularity bonus
+          (COUNT(DISTINCT r.id) / 10.0)
+        ) as recommendation_score
       FROM businesses b
       LEFT JOIN reviews r ON b.id = r.business_id AND r.status = 'published'
       WHERE b.account_status = 'active'
         AND b.tenant_id = $1
     `;
 
-    const params = [tenantId];
-    let paramIndex = 2;
+    const params = [tenantId, prefs?.cuisine_preferences || null, viewedBusinessIds.length > 0 ? viewedBusinessIds : null];
+    let paramIndex = 4;
 
     // Exclude already interacted businesses
     if (excludeIds.length > 0) {
@@ -375,16 +425,9 @@ router.get('/:userId/recommendations', async (req, res) => {
       paramIndex++;
     }
 
-    // Filter by cuisine preferences if available
-    if (prefs?.cuisine_preferences && prefs.cuisine_preferences.length > 0) {
-      query += ` AND b.cuisine_types && $${paramIndex}::text[]`;
-      params.push(prefs.cuisine_preferences);
-      paramIndex++;
-    }
-
     query += `
-      GROUP BY b.id, b.business_name, b.cuisine_types, b.cover_image_url, b.profile_photos, b.address
-      ORDER BY rating DESC, review_count DESC
+      GROUP BY b.id, b.business_name, b.cuisine_types, b.price_range, b.cover_image_url, b.logo_url, b.profile_photos, b.address
+      ORDER BY recommendation_score DESC, review_count DESC
       LIMIT $${paramIndex}
     `;
     params.push(parseInt(limit));
@@ -394,10 +437,13 @@ router.get('/:userId/recommendations', async (req, res) => {
     const businesses = result.rows.map(b => ({
       id: b.id,
       name: b.name,
-      cuisine: Array.isArray(b.cuisine) ? b.cuisine.join(', ') : b.cuisine,
-      rating: parseFloat(b.rating) || 0,
+      cuisine: Array.isArray(b.cuisine) ? b.cuisine : (b.cuisine ? [b.cuisine] : []),
+      rating: parseFloat(b.avgRating) || 0,
+      avgRating: parseFloat(b.avgRating) || 0,
       image: b.image,
+      logo: b.image,
       address: b.address,
+      priceRange: b.priceRange || '$$',
       reviewCount: parseInt(b.review_count) || 0
     }));
 

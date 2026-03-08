@@ -130,14 +130,17 @@ export class FoodEnthusiastOverviewComponent implements OnInit {
         })
       )
       .subscribe(stats => {
+        // Use restaurantsVisited from page views, fallback to bookings
+        const visited = stats.restaurantsVisited || stats.totalBookings || 0;
+
         this.userStats.set({
           reviewsWritten: stats.totalReviews || 0,
-          restaurantsVisited: stats.totalBookings || 0,
-          cuisinesExplored: Math.floor((stats.totalBookings || 0) / 3), // Estimate
+          restaurantsVisited: visited,
+          cuisinesExplored: Math.floor(visited / 3), // Estimate based on visits
           followersCount: 0, // TODO: Add followers endpoint
           averageRating: 0, // TODO: Calculate from reviews
           monthlyGoal: 8,
-          monthlyProgress: Math.min(stats.totalBookings || 0, 8)
+          monthlyProgress: Math.min(visited, 8)
         });
       });
   }
