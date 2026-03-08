@@ -155,11 +155,14 @@ router.put('/:userId', async (req, res) => {
     } = req.body;
 
     // Debug: Log specialty dishes and certifications
-    console.log('Updating user profile:', {
+    console.log('📝 Updating user profile:', {
+      userId,
       specialtyDishes,
       certifications,
       specialtyDishesType: typeof specialtyDishes,
-      certificationsType: typeof certifications
+      certificationsType: typeof certifications,
+      specialtyDishesLength: Array.isArray(specialtyDishes) ? specialtyDishes.length : 'N/A',
+      certificationsLength: Array.isArray(certifications) ? certifications.length : 'N/A'
     });
     
     // Build dynamic update query
@@ -266,12 +269,19 @@ router.put('/:userId', async (req, res) => {
     `;
     
     const result = await pool.query(query, values);
-    
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     const user = result.rows[0];
+
+    // Debug: Log what was saved to database
+    console.log('✅ Profile updated in DB:', {
+      userId: user.id,
+      specialty_dishes: user.specialty_dishes,
+      certifications: user.certifications
+    });
     
     res.json({
       message: 'Profile updated successfully',
