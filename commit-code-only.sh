@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# Commit and push all fixes
+# Commit and push only the code changes (no documentation)
 
-echo "📝 Committing fixes..."
+echo "📝 Committing code fixes..."
 echo ""
 
 # First, pull the latest changes
@@ -12,27 +12,18 @@ git pull origin development-v2
 echo ""
 echo "📦 Adding changed files..."
 
-# Add the changed files
+# Add only the code files that exist on the server
 git add backend/scripts/migrations/010_industry_news_feed.sql
 git add src/app/pages/business/profile/business-profile.component.ts
 git add src/app/pages/food-enthusiast/overview/food-enthusiast-overview.component.ts
 
-# Check if documentation files exist before adding them
-if [ -f "FOOD_ENTHUSIAST_VIEW_ALL_FIX.md" ]; then
-  git add FOOD_ENTHUSIAST_VIEW_ALL_FIX.md
-fi
-
-if [ -f "FOOD_ENTHUSIAST_SECURITY_AUDIT.md" ]; then
-  git add FOOD_ENTHUSIAST_SECURITY_AUDIT.md
-fi
-
 echo ""
 echo "📊 Checking for changes..."
 if git diff --cached --quiet; then
-  echo "⚠️  No changes to commit. Files may already be committed or don't exist."
+  echo "⚠️  No changes to commit. Files may already be up to date."
   echo ""
-  echo "Attempting to push anyway in case there are unpushed commits..."
-  git push origin development-v2
+  echo "Current git status:"
+  git status
   exit 0
 fi
 
@@ -40,12 +31,7 @@ echo ""
 echo "💾 Committing changes..."
 
 # Commit
-git commit -m "Fix: Migration, import path, and food enthusiast VIEW ALL buttons
-
-Backend/Build Fixes:
-- Added blog_categories and blog_posts table creation to migration 010
-- Fixed environment import path from ../../../ to ../../../../ in business-profile
-- Component is 4 levels deep: src/app/pages/business/profile/
+git commit -m "Fix: Food enthusiast dashboard VIEW ALL buttons and backend integration
 
 Food Enthusiast Dashboard:
 - Connected all VIEW ALL buttons to actual routes and backend APIs
@@ -58,18 +44,26 @@ Food Enthusiast Dashboard:
 - Added navigation: Trending → /restaurants
 - Added navigation: Events → /dashboard/food-enthusiast/favorites
 - Implemented error handling and loading states
+- Added ngOnInit lifecycle hook to load data on component initialization
+
+Security:
+- All endpoints use JWT authentication via HTTP interceptor
+- Multi-tenancy enforced via tenant_id from JWT token
+- RBAC checks ensure users can only access their own data
+- Admin role can override for support purposes
 
 Fixes:
-- Migration failure (blog tables not existing)
-- Production build error (wrong import path)
-- Non-functional VIEW ALL buttons on food enthusiast dashboard"
+- Non-functional VIEW ALL buttons on food enthusiast dashboard
+- Dashboard now shows real data from database instead of empty placeholders"
 
 # Push to development-v2 branch
+echo ""
+echo "📤 Pushing to GitHub..."
 git push origin development-v2
 
 echo ""
 echo "✅ Changes committed and pushed!"
 echo ""
-echo "Now you can run the deployment script again on the server:"
+echo "Now you can run the deployment script:"
 echo "  ./latest_caprover_deployment.sh"
 
