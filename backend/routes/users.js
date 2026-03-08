@@ -225,15 +225,15 @@ router.put('/:userId', async (req, res) => {
       values.push(experienceYears);
     }
     if (specialtyDishes !== undefined) {
-      updates.push(`specialty_dishes = $${paramCount++}::jsonb`);
+      updates.push(`specialty_dishes = $${paramCount++}`);
       values.push(JSON.stringify(specialtyDishes));
     }
     if (certifications !== undefined) {
-      updates.push(`certifications = $${paramCount++}::jsonb`);
+      updates.push(`certifications = $${paramCount++}`);
       values.push(JSON.stringify(certifications));
     }
     if (portfolioImages !== undefined) {
-      updates.push(`portfolio_images = $${paramCount++}::jsonb`);
+      updates.push(`portfolio_images = $${paramCount++}`);
       values.push(JSON.stringify(portfolioImages));
     }
 
