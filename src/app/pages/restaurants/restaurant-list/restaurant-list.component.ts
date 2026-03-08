@@ -6,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PublicStatsService } from '../../../core/services/public-stats.service';
 import { RouterModule } from '@angular/router';
+import { FavoritesService } from '../../../services/favorites.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Restaurant {
   id: string;
@@ -36,6 +38,8 @@ interface Restaurant {
 export class RestaurantListComponent implements OnInit {
   private publicBusinessService = inject(PublicBusinessService);
   private publicStatsService = inject(PublicStatsService);
+  private favoritesService = inject(FavoritesService);
+  private authService = inject(AuthService);
 
   searchQuery = signal<string>('');
   selectedCuisine = signal<string>('');
@@ -356,22 +360,15 @@ export class RestaurantListComponent implements OnInit {
   // ==================== FAVORITES FUNCTIONALITY ====================
 
   private loadFavorites(): void {
-    try {
-      const stored = localStorage.getItem('itiyum_favorites');
-      if (stored) {
-        this.favorites.set(new Set(JSON.parse(stored)));
-      }
-    } catch {
-      this.favorites.set(new Set());
-    }
+    // Load favorites from the FavoritesService (which fetches from backend)
+    this.favoritesService.favorites$.subscribe(favorites => {
+      const favoriteIds = new Set(favorites.map(fav => fav.businessId));
+      this.favorites.set(favoriteIds);
+    });
   }
 
   private saveFavorites(): void {
-    try {
-      localStorage.setItem('itiyum_favorites', JSON.stringify([...this.favorites()]));
-    } catch {
-      console.error('Failed to save favorites to localStorage');
-    }
+    // No longer needed - favorites are saved via API calls
   }
 
   isFavorite(restaurantId: string): boolean {
@@ -382,17 +379,49 @@ export class RestaurantListComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
 
-    const current = this.favorites();
-    const newFavorites = new Set(current);
-
-    if (newFavorites.has(restaurant.id)) {
-      newFavorites.delete(restaurant.id);
-    } else {
-      newFavorites.add(restaurant.id);
+    // Check if user is authenticated
+    if (!this.authService.isAuthenticated()) {
+      // Could redirect to login or show a message
+      console.warn('User must be logged in to save favorites');
+      return;
     }
 
-    this.favorites.set(newFavorites);
-    this.saveFavorites();
+    const isFav = this.isFavorite(restaurant.id);
+
+    if (isFav) {
+      // Remove from favorites
+      this.favoritesService.favorites$.subscribe(favorites => {
+        const favorite = favorites.find(fav => fav.businessId === restaurant.id);
+        if (favorite) {
+          this.favoritesService.removeFromFavorites(favorite.id).subscribe({
+            next: () => {
+              // Update local state
+              const current = this.favorites();
+              const newFavorites = new Set(current);
+              newFavorites.delete(restaurant.id);
+              this.favorites.set(newFavorites);
+            },
+            error: (error) => {
+              console.error('Error removing from favorites:', error);
+            }
+          });
+        }
+      }).unsubscribe();
+    } else {
+      // Add to favorites
+      this.favoritesService.addToFavorites(restaurant.id).subscribe({
+        next: () => {
+          // Update local state
+          const current = this.favorites();
+          const newFavorites = new Set(current);
+          newFavorites.add(restaurant.id);
+          this.favorites.set(newFavorites);
+        },
+        error: (error) => {
+          console.error('Error adding to favorites:', error);
+        }
+      });
+    }
   }
 
   // ==================== SHARE FUNCTIONALITY ====================
