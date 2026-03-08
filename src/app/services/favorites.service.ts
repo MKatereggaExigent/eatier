@@ -118,7 +118,7 @@ export class FavoritesService {
       restaurant: this.transformBusinessToRestaurant(fav.business),
       notes: fav.notes,
       tags: fav.tags || [],
-      addedAt: new Date(fav.added_at),
+      addedAt: new Date(fav.created_at || fav.added_at), // Backend returns created_at
       visitCount: fav.visit_count || 0,
       lastVisited: fav.last_visited ? new Date(fav.last_visited) : undefined,
       isPublic: fav.is_public || false,
@@ -139,22 +139,43 @@ export class FavoritesService {
   }
 
   private transformBusinessToRestaurant(business: any): Restaurant {
+    // Handle case where business is null or undefined
+    if (!business) {
+      return {
+        id: '',
+        name: 'Unknown Restaurant',
+        slug: 'unknown',
+        description: '',
+        cuisineTypes: [],
+        priceRange: 'moderate',
+        averageRating: 0,
+        totalReviews: 0,
+        imageUrl: '',
+        address: '',
+        city: '',
+        state: '',
+        phone: '',
+        email: '',
+        website: ''
+      };
+    }
+
     return {
       id: business.id,
-      name: business.name,
-      slug: business.slug || business.name.toLowerCase().replace(/\s+/g, '-'),
+      name: business.name || business.business_name || 'Unknown Restaurant',
+      slug: business.slug || (business.name || business.business_name || 'unknown').toLowerCase().replace(/\s+/g, '-'),
       description: business.description || '',
       cuisineTypes: business.cuisine_types || [],
       priceRange: business.price_range || 'moderate',
       averageRating: business.average_rating || 0,
       totalReviews: business.total_reviews || 0,
-      imageUrl: business.image_url || '',
+      imageUrl: business.image_url || business.cover_image_url || '',
       address: business.address || '',
       city: business.city || '',
       state: business.state || '',
       phone: business.phone || '',
       email: business.email || '',
-      website: business.website
+      website: business.website || ''
     };
   }
 

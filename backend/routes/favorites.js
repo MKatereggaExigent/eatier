@@ -75,13 +75,49 @@ router.post('/', authenticateToken, async (req, res) => {
       RETURNING *
     `, [userId, businessId, tenantId, notes]);
 
-    // Fetch the business details
+    // Fetch the business details with consistent structure
     const businessResult = await pool.query(`
-      SELECT * FROM businesses WHERE id = $1
+      SELECT
+        id,
+        business_name,
+        description,
+        cuisine_types,
+        price_range,
+        average_rating,
+        total_reviews,
+        cover_image_url,
+        address,
+        city,
+        state,
+        phone,
+        email,
+        website
+      FROM businesses WHERE id = $1
     `, [businessId]);
 
     const favorite = result.rows[0];
-    favorite.business = businessResult.rows[0] || {};
+
+    // Transform business data to match GET endpoint format
+    if (businessResult.rows[0]) {
+      favorite.business = {
+        id: businessResult.rows[0].id,
+        name: businessResult.rows[0].business_name,
+        description: businessResult.rows[0].description,
+        cuisine_types: businessResult.rows[0].cuisine_types,
+        price_range: businessResult.rows[0].price_range,
+        average_rating: businessResult.rows[0].average_rating,
+        total_reviews: businessResult.rows[0].total_reviews,
+        image_url: businessResult.rows[0].cover_image_url,
+        address: businessResult.rows[0].address,
+        city: businessResult.rows[0].city,
+        state: businessResult.rows[0].state,
+        phone: businessResult.rows[0].phone,
+        email: businessResult.rows[0].email,
+        website: businessResult.rows[0].website
+      };
+    } else {
+      favorite.business = null;
+    }
 
     res.status(201).json(favorite);
   } catch (error) {
