@@ -211,15 +211,15 @@ router.put('/:userId', async (req, res) => {
       values.push(experienceYears);
     }
     if (specialtyDishes !== undefined) {
-      updates.push(`specialty_dishes = $${paramCount++}`);
+      updates.push(`specialty_dishes = $${paramCount++}::jsonb`);
       values.push(JSON.stringify(specialtyDishes));
     }
     if (certifications !== undefined) {
-      updates.push(`certifications = $${paramCount++}`);
+      updates.push(`certifications = $${paramCount++}::jsonb`);
       values.push(JSON.stringify(certifications));
     }
     if (portfolioImages !== undefined) {
-      updates.push(`portfolio_images = $${paramCount++}`);
+      updates.push(`portfolio_images = $${paramCount++}::jsonb`);
       values.push(JSON.stringify(portfolioImages));
     }
 
@@ -319,8 +319,16 @@ router.put('/:userId', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error updating user:', error);
-    res.status(500).json({ error: 'Failed to update user profile' });
+    console.error('❌ Error updating user:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      code: error.code
+    });
+    res.status(500).json({
+      error: 'Failed to update user profile',
+      details: error.message
+    });
   }
 });
 
