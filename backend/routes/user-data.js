@@ -377,6 +377,17 @@ router.get('/:userId/recommendations', async (req, res) => {
     );
     const viewedBusinessIds = viewedResult.rows.map(r => r.business_id);
 
+    // Get cuisine types from viewed businesses for collaborative filtering
+    let viewedCuisines = [];
+    if (viewedBusinessIds.length > 0) {
+      const cuisinesResult = await pool.query(`
+        SELECT DISTINCT unnest(cuisine_types) as cuisine
+        FROM businesses
+        WHERE id = ANY($1::uuid[])
+      `, [viewedBusinessIds]);
+      viewedCuisines = cuisinesResult.rows.map(r => r.cuisine);
+    }
+
     // Build smart recommendation query with scoring
     let query = `
       SELECT
@@ -394,16 +405,12 @@ router.get('/:userId/recommendations', async (req, res) => {
           COALESCE(AVG(r.rating), 0) * 10 +
           -- Cuisine match bonus
           CASE
-            WHEN $${2}::text[] IS NOT NULL AND b.cuisine_types && $${2}::text[] THEN 20
+            WHEN $2::text[] IS NOT NULL AND b.cuisine_types && $2::text[] THEN 20
             ELSE 0
           END +
           -- Similar to viewed restaurants (collaborative filtering)
           CASE
-            WHEN $${3}::uuid[] IS NOT NULL AND b.cuisine_types && (
-              SELECT array_agg(DISTINCT unnest(cuisine_types))
-              FROM businesses
-              WHERE id = ANY($${3}::uuid[])
-            ) THEN 15
+            WHEN $3::text[] IS NOT NULL AND b.cuisine_types && $3::text[] THEN 15
             ELSE 0
           END +
           -- Popularity bonus
@@ -415,7 +422,7 @@ router.get('/:userId/recommendations', async (req, res) => {
         AND b.tenant_id = $1
     `;
 
-    const params = [tenantId, prefs?.cuisine_preferences || null, viewedBusinessIds.length > 0 ? viewedBusinessIds : null];
+    const params = [tenantId, prefs?.cuisine_preferences || null, viewedCuisines.length > 0 ? viewedCuisines : null];
     let paramIndex = 4;
 
     // Exclude already interacted businesses
