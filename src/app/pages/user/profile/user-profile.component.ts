@@ -151,10 +151,11 @@ export class UserProfileComponent implements OnInit {
     // Handle dateOfBirth - it could be a Date object or a string
     let dateOfBirthValue = '';
     if (profile.dateOfBirth) {
-      if (profile.dateOfBirth instanceof Date) {
-        dateOfBirthValue = profile.dateOfBirth.toISOString().split('T')[0];
-      } else if (typeof profile.dateOfBirth === 'string') {
-        dateOfBirthValue = profile.dateOfBirth.split('T')[0];
+      const dob: any = profile.dateOfBirth;
+      if (dob instanceof Date) {
+        dateOfBirthValue = dob.toISOString().split('T')[0];
+      } else if (typeof dob === 'string') {
+        dateOfBirthValue = dob.split('T')[0];
       }
     }
 
