@@ -160,7 +160,7 @@ export class UserProfileComponent implements OnInit {
       this.errorMessage.set(null);
 
       const formValue = this.profileForm.value;
-      const user = this.currentUser();
+      const user = this.authService.currentUser();
 
       if (!user?.id) {
         this.errorMessage.set('User not found. Please log in again.');
@@ -168,11 +168,12 @@ export class UserProfileComponent implements OnInit {
         return;
       }
 
-      const updateData: UserProfileUpdateData = {
+      // Build update data with proper type conversion
+      const updateData: any = {
         firstName: formValue.firstName,
         lastName: formValue.lastName,
         country: formValue.country,
-        dateOfBirth: formValue.dateOfBirth ? new Date(formValue.dateOfBirth) : undefined,
+        dateOfBirth: formValue.dateOfBirth || undefined,
         gender: formValue.gender,
         email: formValue.email,
         phone: formValue.phone,
@@ -183,7 +184,7 @@ export class UserProfileComponent implements OnInit {
           zipCode: formValue.zipCode,
           country: formValue.country
         },
-        experience: formValue.experience,
+        experienceYears: formValue.experience,
         bio: formValue.bio,
         profilePhoto: this.profilePhoto() || undefined,
         backgroundPhoto: this.backgroundPhoto() || undefined,
