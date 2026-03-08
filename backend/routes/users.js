@@ -153,6 +153,14 @@ router.put('/:userId', async (req, res) => {
       showContactInfo,
       showLocation
     } = req.body;
+
+    // Debug: Log specialty dishes and certifications
+    console.log('Updating user profile:', {
+      specialtyDishes,
+      certifications,
+      specialtyDishesType: typeof specialtyDishes,
+      certificationsType: typeof certifications
+    });
     
     // Build dynamic update query
     const updates = [];
@@ -201,15 +209,15 @@ router.put('/:userId', async (req, res) => {
     }
     if (specialtyDishes !== undefined) {
       updates.push(`specialty_dishes = $${paramCount++}`);
-      values.push(specialtyDishes);
+      values.push(JSON.stringify(specialtyDishes));
     }
     if (certifications !== undefined) {
       updates.push(`certifications = $${paramCount++}`);
-      values.push(certifications);
+      values.push(JSON.stringify(certifications));
     }
     if (portfolioImages !== undefined) {
       updates.push(`portfolio_images = $${paramCount++}`);
-      values.push(portfolioImages);
+      values.push(JSON.stringify(portfolioImages));
     }
 
     // Address fields
