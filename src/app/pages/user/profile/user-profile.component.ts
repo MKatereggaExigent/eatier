@@ -198,6 +198,7 @@ export class UserProfileComponent implements OnInit {
       }
 
       // Build update data with proper type conversion
+      const profile = this.currentProfile();
       const updateData: any = {
         firstName: formValue.firstName,
         lastName: formValue.lastName,
@@ -215,6 +216,8 @@ export class UserProfileComponent implements OnInit {
         },
         experienceYears: formValue.experience,
         bio: formValue.bio,
+        specialtyDishes: profile?.specialtyDishes || [],
+        certifications: profile?.certifications || [],
         profilePhoto: this.profilePhoto() || undefined,
         backgroundPhoto: this.backgroundPhoto() || undefined,
         portfolioImages: this.portfolioImages(),
