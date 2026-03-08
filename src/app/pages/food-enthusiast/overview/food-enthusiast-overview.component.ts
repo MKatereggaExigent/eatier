@@ -1,9 +1,13 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { catchError, of } from 'rxjs';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FoodEnthusiast } from '../../../shared/models/user.model';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { UserService } from '../../../core/services/user.service';
+import { environment } from '../../../../environments/environment';
 
 interface RestaurantRecommendation {
   id: string;
@@ -56,11 +60,17 @@ interface CulinaryEvent {
   templateUrl: './food-enthusiast-overview.component.html',
   styleUrls: ['./food-enthusiast-overview.component.scss']
 })
-export class FoodEnthusiastOverviewComponent {
+export class FoodEnthusiastOverviewComponent implements OnInit {
   private authService = inject(AuthService);
+  private router = inject(Router);
+  private userService = inject(UserService);
+  private http = inject(HttpClient);
 
   currentUser = this.authService.currentUser;
   foodEnthusiast = computed(() => this.currentUser() as FoodEnthusiast);
+
+  // Loading states
+  isLoading = signal(false);
 
   // User stats - will be populated from API
   userStats = signal({
@@ -95,10 +105,116 @@ export class FoodEnthusiastOverviewComponent {
     this.recommendations().slice(0, 3)
   );
 
+  ngOnInit(): void {
+    const user = this.currentUser();
+    if (user?.id) {
+      this.loadUserStats(user.id);
+      this.loadRecommendations(user.id);
+      this.loadRecentReviews(user.id);
+      this.loadTrendingDishes();
+    }
+  }
+
+  // Data loading methods
+  private loadUserStats(userId: string): void {
+    this.userService.getUserStats(userId)
+      .pipe(
+        catchError(error => {
+          console.error('Error loading user stats:', error);
+          return of({
+            totalReviews: 0,
+            totalBookings: 0,
+            totalFavorites: 0,
+            totalPhotos: 0
+          });
+        })
+      )
+      .subscribe(stats => {
+        this.userStats.set({
+          reviewsWritten: stats.totalReviews || 0,
+          restaurantsVisited: stats.totalBookings || 0,
+          cuisinesExplored: Math.floor((stats.totalBookings || 0) / 3), // Estimate
+          followersCount: 0, // TODO: Add followers endpoint
+          averageRating: 0, // TODO: Calculate from reviews
+          monthlyGoal: 8,
+          monthlyProgress: Math.min(stats.totalBookings || 0, 8)
+        });
+      });
+  }
+
+  private loadRecommendations(userId: string): void {
+    this.userService.getRecommendedBusinesses(userId, { limit: 6 })
+      .pipe(
+        catchError(error => {
+          console.error('Error loading recommendations:', error);
+          return of({ businesses: [] });
+        })
+      )
+      .subscribe(response => {
+        const recommendations = response.businesses.map((business: any) => ({
+          id: business.id,
+          name: business.name,
+          image: business.image || business.logo || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400',
+          cuisine: Array.isArray(business.cuisine) ? business.cuisine.join(', ') : business.cuisine || 'Various',
+          rating: parseFloat(business.avgRating || business.rating || '4.0'),
+          priceRange: business.priceRange || '$$',
+          distance: '2.5 km', // TODO: Calculate actual distance
+          specialties: business.specialties || [],
+          isNew: false
+        }));
+        this.recommendations.set(recommendations);
+      });
+  }
+
+  private loadRecentReviews(userId: string): void {
+    this.http.get<any>(`${environment.apiUrl}/reviews/user/${userId}?limit=5`)
+      .pipe(
+        catchError(error => {
+          console.error('Error loading reviews:', error);
+          return of({ reviews: [] });
+        })
+      )
+      .subscribe(response => {
+        const reviews = (response.reviews || []).map((review: any) => ({
+          id: review.id,
+          restaurantName: review.business_name,
+          restaurantImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=100',
+          rating: review.overall_rating || review.rating,
+          comment: review.content || review.comment,
+          date: new Date(review.created_at),
+          likes: review.helpful_votes || 0,
+          isPublic: review.status === 'published'
+        }));
+        this.recentReviews.set(reviews);
+      });
+  }
+
+  private loadTrendingDishes(): void {
+    this.http.get<any>(`${environment.apiUrl}/recommendations/trending?limit=6`)
+      .pipe(
+        catchError(error => {
+          console.error('Error loading trending dishes:', error);
+          return of({ trending: [] });
+        })
+      )
+      .subscribe(response => {
+        const trending = (response.trending || []).map((item: any) => ({
+          id: item.id,
+          name: item.name || 'Signature Dish',
+          image: item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400',
+          restaurant: item.restaurant || item.business_name,
+          cuisine: item.cuisine || 'Various',
+          popularity: Math.floor(Math.random() * 30) + 70, // Mock popularity
+          description: item.description || 'A trending favorite'
+        }));
+        this.trendingDishes.set(trending);
+      });
+  }
+
   // Action methods
   bookmarkRestaurant(restaurantId: string): void {
     console.log('Bookmarking restaurant:', restaurantId);
-    // TODO: Implement bookmark functionality
+    // TODO: Implement bookmark functionality via favorites API
   }
 
   bookmarkEvent(eventId: string): void {
@@ -110,28 +226,29 @@ export class FoodEnthusiastOverviewComponent {
   }
 
   viewRestaurant(restaurantId: string): void {
-    console.log('Viewing restaurant:', restaurantId);
-    // TODO: Navigate to restaurant details
+    // Navigate to restaurant detail page
+    this.router.navigate(['/restaurants', restaurantId]);
   }
 
   viewAllRecommendations(): void {
-    console.log('Navigate to all recommendations');
-    // TODO: Navigate to recommendations page
+    // Navigate to public restaurants page (can show all restaurants)
+    this.router.navigate(['/restaurants']);
   }
 
   viewAllTrending(): void {
-    console.log('Navigate to trending dishes');
-    // TODO: Navigate to trending page
+    // Navigate to public restaurants page (can add trending filter later)
+    this.router.navigate(['/restaurants']);
   }
 
   viewAllReviews(): void {
-    console.log('Navigate to all reviews');
-    // TODO: Navigate to reviews page
+    // Navigate to food enthusiast reviews page
+    this.router.navigate(['/dashboard/food-enthusiast/reviews']);
   }
 
   viewAllEvents(): void {
-    console.log('Navigate to all events');
-    // TODO: Navigate to events page
+    // Navigate to public restaurants page (events can be added later)
+    // For now, navigate to favorites where users can see bookmarked items
+    this.router.navigate(['/dashboard/food-enthusiast/favorites']);
   }
 
   // Utility methods
