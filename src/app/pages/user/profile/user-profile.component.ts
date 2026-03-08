@@ -89,52 +89,80 @@ export class UserProfileComponent implements OnInit {
   loadProfile(): void {
     const user = this.authService.currentUser();
 
-    if (user) {
-      // Create profile from authenticated user data
-      const profile: UserProfile = {
-        id: user.id,
-        userId: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        country: '',
-        email: user.email,
-        phone: '',
-        specialtyDishes: [],
-        bio: '',
-        experience: 0,
-        profilePhoto: '',
-        status: 'active',
-        isVerified: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        businessCardCustomization: {
-          primaryColor: '#667eea',
-          secondaryColor: '#764ba2',
-          layout: 'professional',
-          includeQR: true,
-          includeContact: true,
-          includeSpecialties: true,
-          includeBio: true
-        },
-        profileVisibility: 'public',
-        showContactInfo: true,
-        showLocation: false
-      };
+    if (user?.id) {
+      // Fetch the actual profile data from the backend
+      this.isLoading.set(true);
+      this.userService.getUserProfile(user.id).subscribe({
+        next: (profileData: any) => {
+          // Map backend response to UserProfile
+          const profile: UserProfile = {
+            id: profileData.id,
+            userId: profileData.id,
+            firstName: profileData.firstName || user.firstName,
+            lastName: profileData.lastName || user.lastName,
+            country: profileData.country || '',
+            email: profileData.email || user.email,
+            phone: profileData.phone || '',
+            dateOfBirth: profileData.dateOfBirth ? new Date(profileData.dateOfBirth) : undefined,
+            gender: profileData.gender,
+            address: profileData.address,
+            specialtyDishes: profileData.specialtyDishes || [],
+            bio: profileData.bio || '',
+            experience: profileData.experienceYears || 0,
+            certifications: profileData.certifications || [],
+            profilePhoto: profileData.profilePhoto || '',
+            backgroundPhoto: profileData.backgroundPhoto || '',
+            portfolioImages: profileData.portfolioImages || [],
+            status: profileData.accountStatus || 'active',
+            isVerified: false,
+            createdAt: profileData.createdAt ? new Date(profileData.createdAt) : new Date(),
+            updatedAt: profileData.updatedAt ? new Date(profileData.updatedAt) : new Date(),
+            businessCardCustomization: {
+              primaryColor: '#667eea',
+              secondaryColor: '#764ba2',
+              layout: 'professional',
+              includeQR: true,
+              includeContact: true,
+              includeSpecialties: true,
+              includeBio: true
+            },
+            profileVisibility: profileData.profileVisibility || 'public',
+            showContactInfo: profileData.showContactInfo !== false,
+            showLocation: profileData.showLocation || false
+          };
 
-      this.currentProfile.set(profile);
-      this.populateForm(profile);
-      this.profilePhoto.set(profile.profilePhoto || null);
-      this.backgroundPhoto.set(profile.backgroundPhoto || null);
-      this.portfolioImages.set(profile.portfolioImages || []);
+          this.currentProfile.set(profile);
+          this.populateForm(profile);
+          this.profilePhoto.set(profile.profilePhoto || null);
+          this.backgroundPhoto.set(profile.backgroundPhoto || null);
+          this.portfolioImages.set(profile.portfolioImages || []);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading profile:', error);
+          this.isLoading.set(false);
+          this.errorMessage.set('Failed to load profile data');
+        }
+      });
     }
   }
 
   populateForm(profile: UserProfile): void {
+    // Handle dateOfBirth - it could be a Date object or a string
+    let dateOfBirthValue = '';
+    if (profile.dateOfBirth) {
+      if (profile.dateOfBirth instanceof Date) {
+        dateOfBirthValue = profile.dateOfBirth.toISOString().split('T')[0];
+      } else if (typeof profile.dateOfBirth === 'string') {
+        dateOfBirthValue = profile.dateOfBirth.split('T')[0];
+      }
+    }
+
     this.profileForm.patchValue({
       firstName: profile.firstName,
       lastName: profile.lastName,
       country: profile.country,
-      dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.toISOString().split('T')[0] : '',
+      dateOfBirth: dateOfBirthValue,
       gender: profile.gender,
       email: profile.email,
       phone: profile.phone,
@@ -199,6 +227,10 @@ export class UserProfileComponent implements OnInit {
         next: (response) => {
           this.isLoading.set(false);
           this.successMessage.set('Profile updated successfully!');
+
+          // Reload the profile to show updated data
+          this.loadProfile();
+
           setTimeout(() => this.successMessage.set(null), 3000);
         },
         error: (error) => {
