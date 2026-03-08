@@ -89,6 +89,20 @@ router.get('/:userId', async (req, res) => {
     
     const user = result.rows[0];
     
+    // Parse JSONB fields if they're strings
+    const parseJsonbField = (field) => {
+      if (!field) return [];
+      if (Array.isArray(field)) return field;
+      if (typeof field === 'string') {
+        try {
+          return JSON.parse(field);
+        } catch (e) {
+          return [];
+        }
+      }
+      return [];
+    };
+
     res.json({
       id: user.id,
       email: user.email,
@@ -104,9 +118,9 @@ router.get('/:userId', async (req, res) => {
       backgroundPhoto: user.background_photo,
       bio: user.bio,
       experienceYears: user.experience_years,
-      specialtyDishes: user.specialty_dishes || [],
-      certifications: user.certifications || [],
-      portfolioImages: user.portfolio_images || [],
+      specialtyDishes: parseJsonbField(user.specialty_dishes),
+      certifications: parseJsonbField(user.certifications),
+      portfolioImages: parseJsonbField(user.portfolio_images),
       address: {
         street: user.street,
         city: user.city,
@@ -283,6 +297,20 @@ router.put('/:userId', async (req, res) => {
       certifications: user.certifications
     });
     
+    // Parse JSONB fields if they're strings (same helper function)
+    const parseJsonbField = (field) => {
+      if (!field) return [];
+      if (Array.isArray(field)) return field;
+      if (typeof field === 'string') {
+        try {
+          return JSON.parse(field);
+        } catch (e) {
+          return [];
+        }
+      }
+      return [];
+    };
+
     res.json({
       message: 'Profile updated successfully',
       user: {
@@ -300,9 +328,9 @@ router.put('/:userId', async (req, res) => {
         backgroundPhoto: user.background_photo,
         bio: user.bio,
         experienceYears: user.experience_years,
-        specialtyDishes: user.specialty_dishes || [],
-        certifications: user.certifications || [],
-        portfolioImages: user.portfolio_images || [],
+        specialtyDishes: parseJsonbField(user.specialty_dishes),
+        certifications: parseJsonbField(user.certifications),
+        portfolioImages: parseJsonbField(user.portfolio_images),
         address: {
           street: user.street,
           city: user.city,
