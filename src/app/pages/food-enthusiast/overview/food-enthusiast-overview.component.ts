@@ -125,7 +125,8 @@ export class FoodEnthusiastOverviewComponent implements OnInit {
             totalReviews: 0,
             totalBookings: 0,
             totalFavorites: 0,
-            totalPhotos: 0
+            totalPhotos: 0,
+            restaurantsVisited: 0
           });
         })
       )
