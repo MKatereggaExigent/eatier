@@ -72,10 +72,12 @@ router.get('/:userId', async (req, res) => {
     const { userId } = req.params;
     
     const result = await pool.query(`
-      SELECT 
-        id, email, first_name, last_name, phone, country, 
+      SELECT
+        id, email, first_name, last_name, phone, country,
         date_of_birth, gender, is_chef, profile_photo, background_photo,
-        bio, experience_years, specialty_dishes, certifications,
+        bio, experience_years, specialty_dishes, certifications, portfolio_images,
+        street, city, state, zip_code,
+        profile_visibility, show_contact_info, show_location,
         account_status, freeze_until, freeze_duration, created_at, updated_at
       FROM users
       WHERE id = $1 AND account_status != 'deleted'
@@ -104,6 +106,17 @@ router.get('/:userId', async (req, res) => {
       experienceYears: user.experience_years,
       specialtyDishes: user.specialty_dishes || [],
       certifications: user.certifications || [],
+      portfolioImages: user.portfolio_images || [],
+      address: {
+        street: user.street,
+        city: user.city,
+        state: user.state,
+        zipCode: user.zip_code,
+        country: user.country
+      },
+      profileVisibility: user.profile_visibility || 'public',
+      showContactInfo: user.show_contact_info !== false,
+      showLocation: user.show_location || false,
       accountStatus: user.account_status,
       freezeUntil: user.freeze_until,
       freezeDuration: user.freeze_duration,
@@ -133,7 +146,12 @@ router.put('/:userId', async (req, res) => {
       bio,
       experienceYears,
       specialtyDishes,
-      certifications
+      certifications,
+      portfolioImages,
+      address,
+      profileVisibility,
+      showContactInfo,
+      showLocation
     } = req.body;
     
     // Build dynamic update query
@@ -189,7 +207,43 @@ router.put('/:userId', async (req, res) => {
       updates.push(`certifications = $${paramCount++}`);
       values.push(certifications);
     }
-    
+    if (portfolioImages !== undefined) {
+      updates.push(`portfolio_images = $${paramCount++}`);
+      values.push(portfolioImages);
+    }
+
+    // Address fields
+    if (address?.street !== undefined) {
+      updates.push(`street = $${paramCount++}`);
+      values.push(address.street);
+    }
+    if (address?.city !== undefined) {
+      updates.push(`city = $${paramCount++}`);
+      values.push(address.city);
+    }
+    if (address?.state !== undefined) {
+      updates.push(`state = $${paramCount++}`);
+      values.push(address.state);
+    }
+    if (address?.zipCode !== undefined) {
+      updates.push(`zip_code = $${paramCount++}`);
+      values.push(address.zipCode);
+    }
+
+    // Privacy settings
+    if (profileVisibility !== undefined) {
+      updates.push(`profile_visibility = $${paramCount++}`);
+      values.push(profileVisibility);
+    }
+    if (showContactInfo !== undefined) {
+      updates.push(`show_contact_info = $${paramCount++}`);
+      values.push(showContactInfo);
+    }
+    if (showLocation !== undefined) {
+      updates.push(`show_location = $${paramCount++}`);
+      values.push(showLocation);
+    }
+
     if (updates.length === 0) {
       return res.status(400).json({ error: 'No fields to update' });
     }
@@ -230,6 +284,17 @@ router.put('/:userId', async (req, res) => {
         experienceYears: user.experience_years,
         specialtyDishes: user.specialty_dishes || [],
         certifications: user.certifications || [],
+        portfolioImages: user.portfolio_images || [],
+        address: {
+          street: user.street,
+          city: user.city,
+          state: user.state,
+          zipCode: user.zip_code,
+          country: user.country
+        },
+        profileVisibility: user.profile_visibility || 'public',
+        showContactInfo: user.show_contact_info !== false,
+        showLocation: user.show_location || false,
         accountStatus: user.account_status,
         updatedAt: user.updated_at
       }

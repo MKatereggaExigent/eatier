@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { USER_PROFILE_CONSTRAINTS, UserProfile, UserProfileUpdateData } from '../../../shared/models/user-profile.model';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -15,6 +16,7 @@ import { CommonModule } from '@angular/common';
 export class UserProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private userService = inject(UserService);
 
   // State management
   profileForm: FormGroup;
@@ -158,6 +160,14 @@ export class UserProfileComponent implements OnInit {
       this.errorMessage.set(null);
 
       const formValue = this.profileForm.value;
+      const user = this.currentUser();
+
+      if (!user?.id) {
+        this.errorMessage.set('User not found. Please log in again.');
+        this.isLoading.set(false);
+        return;
+      }
+
       const updateData: UserProfileUpdateData = {
         firstName: formValue.firstName,
         lastName: formValue.lastName,
@@ -183,12 +193,19 @@ export class UserProfileComponent implements OnInit {
         showLocation: formValue.showLocation
       };
 
-      // Mock API call
-      setTimeout(() => {
-        this.isLoading.set(false);
-        this.successMessage.set('Profile updated successfully!');
-        setTimeout(() => this.successMessage.set(null), 3000);
-      }, 1000);
+      // Call the real API
+      this.userService.updateUserProfile(user.id, updateData).subscribe({
+        next: (response) => {
+          this.isLoading.set(false);
+          this.successMessage.set('Profile updated successfully!');
+          setTimeout(() => this.successMessage.set(null), 3000);
+        },
+        error: (error) => {
+          console.error('Error updating profile:', error);
+          this.isLoading.set(false);
+          this.errorMessage.set('Failed to update profile. Please try again.');
+        }
+      });
     } else {
       this.markFormGroupTouched();
     }
