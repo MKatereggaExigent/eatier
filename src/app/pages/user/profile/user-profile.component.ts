@@ -226,6 +226,13 @@ export class UserProfileComponent implements OnInit {
         showLocation: formValue.showLocation
       };
 
+      // Debug: Log what we're sending
+      console.log('🔍 Submitting profile update:', {
+        specialtyDishes: updateData.specialtyDishes,
+        certifications: updateData.certifications,
+        profileData: updateData
+      });
+
       // Call the real API
       this.userService.updateUserProfile(user.id, updateData).subscribe({
         next: (response) => {
