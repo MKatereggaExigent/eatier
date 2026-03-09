@@ -69,7 +69,7 @@ export interface AdTier {
 })
 export class AdServingService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/ads`;
+  private apiUrl = `${environment.apiUrl}/ads-public`;
 
   // Cache for ads by placement
   private adsCache = new Map<string, BehaviorSubject<Ad[]>>();
@@ -113,7 +113,7 @@ export class AdServingService {
     const backendPlacement = placementMap[placement] || placement;
 
     this.http.get<{ ads: any[]; count: number }>(
-      `${this.apiUrl}/public?placement=${backendPlacement}&limit=${limit}`
+      `${this.apiUrl}/placements/${backendPlacement}?limit=${limit}`
     ).pipe(
       map(response => this.transformAds(response.ads || [], placement)),
       catchError(error => {
@@ -186,7 +186,7 @@ export class AdServingService {
    * Called when a user clicks on an ad
    */
   trackClick(adId: string): void {
-    this.http.post(`${this.apiUrl}/click/${adId}`, {})
+    this.http.post(`${this.apiUrl}/clicks/${adId}`, {})
       .pipe(
         catchError(error => {
           console.error('Error tracking click:', error);
