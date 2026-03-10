@@ -1092,4 +1092,9 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   width: 100%;
   border-radius: 12px;
   border: 1px solid $nyt-border;
+
+  // Hide empty placeholder completely - only show when there's an actual ad
+  &:has(.banner-ad-placeholder) {
+    display: none;
+  }
 }
