@@ -17,6 +17,18 @@ router.get('/placements/:placement', async (req, res) => {
     const { placement } = req.params;
     const { limit = 5, page_location } = req.query;
 
+    // Map frontend placement names to backend position/page_location
+    const placementMap = {
+      'sidebar_left': { position: 'sidebar', page_location: 'all_pages' },
+      'sidebar_right': { position: 'sidebar', page_location: 'all_pages' },
+      'header_banner': { position: 'header', page_location: 'homepage' },
+      'footer_banner': { position: 'footer', page_location: 'all_pages' },
+      'inline_content': { position: 'inline', page_location: 'all_pages' },
+      'homepage_banner': { position: 'hero', page_location: 'homepage' }
+    };
+
+    const mappedPlacement = placementMap[placement];
+
     // Query for active ads matching the placement
     const result = await pool.query(`
       SELECT
@@ -62,14 +74,30 @@ router.get('/placements/:placement', async (req, res) => {
         AND (ac.end_date IS NULL OR ac.end_date >= CURRENT_TIMESTAMP)
         AND ac.remaining_amount > 0
         AND (
+          -- Match by exact name
           p.name = $1
-          OR p.page_location = $1
+          -- Or match by mapped position and page_location
+          OR (p.position = $2 AND p.page_location = $3)
+          -- Or match by position only for flexible placement
           OR p.position = $1
+          -- Or show all if requested
           OR $1 = 'all'
         )
       ORDER BY t.priority_weight DESC, ac.created_at DESC
-      LIMIT $2
-    `, [placement, parseInt(limit)]);
+      LIMIT $4
+    `, [
+      placement,
+      mappedPlacement?.position || placement,
+      mappedPlacement?.page_location || 'all_pages',
+      parseInt(limit)
+    ]);
+
+    console.log(`📢 Ads query for placement "${placement}":`, {
+      placement,
+      mappedPosition: mappedPlacement?.position,
+      mappedPageLocation: mappedPlacement?.page_location,
+      foundAds: result.rows.length
+    });
 
     res.json({
       placement,
