@@ -30,13 +30,10 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   min-height: 600px;
   max-height: 900px;
   overflow: hidden;
-  width: 100vw;
-  margin: 0;
+  width: 100%;
+  margin: 0 0 3rem 0;
   padding: 0;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  border-radius: 16px;
 
   .carousel-container {
     position: relative;
@@ -1080,13 +1077,8 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 .ads-banner-section {
   padding: 2.5rem 0;
   background: $nyt-light-gray;
-  margin: 0;
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  border-top: 1px solid $nyt-border;
-  border-bottom: 1px solid $nyt-border;
+  margin: 3rem 0;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid $nyt-border;
 }
