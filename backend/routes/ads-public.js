@@ -18,17 +18,18 @@ router.get('/placements/:placement', async (req, res) => {
     const { limit = 5, page_location } = req.query;
 
     // Map frontend placement names to backend position/page_location
-    // Right sidebar is premium (higher tier), left sidebar is standard (lower tier)
+    // Frontend adapts to whatever tiers are available in the database
+    // Ads are ordered by tier priority (featured > premium > standard > basic)
     const placementMap = {
-      'sidebar_left': { position: 'sidebar', page_location: 'all_pages', preferredTier: 'standard' },
-      'sidebar_right': { position: 'sidebar', page_location: 'all_pages', preferredTier: 'premium' },
-      'header_banner': { position: 'header', page_location: 'homepage', preferredTier: 'premium' },
-      'footer_banner': { position: 'footer', page_location: 'all_pages', preferredTier: 'premium' },
-      'inline_content': { position: 'inline', page_location: 'all_pages', preferredTier: 'standard' },
-      'homepage_banner': { position: 'hero', page_location: 'homepage', preferredTier: 'premium' },
-      'community_feed': { position: 'feed', page_location: 'community', preferredTier: 'standard' },
-      'restaurant_list': { position: 'inline', page_location: 'restaurant_list', preferredTier: 'standard' },
-      'specialist_list': { position: 'inline', page_location: 'specialists', preferredTier: 'standard' }
+      'sidebar_left': { position: 'sidebar', page_location: 'all_pages' },
+      'sidebar_right': { position: 'sidebar', page_location: 'all_pages' },
+      'header_banner': { position: 'header', page_location: 'homepage' },
+      'footer_banner': { position: 'footer', page_location: 'all_pages' },
+      'inline_content': { position: 'inline', page_location: 'all_pages' },
+      'homepage_banner': { position: 'hero', page_location: 'homepage' },
+      'community_feed': { position: 'feed', page_location: 'community' },
+      'restaurant_list': { position: 'inline', page_location: 'restaurant_list' },
+      'specialist_list': { position: 'inline', page_location: 'specialists' }
     };
 
     const mappedPlacement = placementMap[placement];
@@ -38,31 +39,18 @@ router.get('/placements/:placement', async (req, res) => {
     let queryParams;
 
     if (mappedPlacement) {
-      // Match by position, page_location, and preferred tier for mapped placements
-      if (mappedPlacement.preferredTier) {
-        whereClause = `
-          WHERE ac.status = 'active'
-            AND ac.is_active = true
-            AND ac.start_date <= CURRENT_TIMESTAMP
-            AND (ac.end_date IS NULL OR ac.end_date >= CURRENT_TIMESTAMP)
-            AND ac.remaining_amount > 0
-            AND p.position = $1
-            AND p.page_location = $2
-            AND t.name = $3
-        `;
-        queryParams = [mappedPlacement.position, mappedPlacement.page_location, mappedPlacement.preferredTier, parseInt(limit)];
-      } else {
-        whereClause = `
-          WHERE ac.status = 'active'
-            AND ac.is_active = true
-            AND ac.start_date <= CURRENT_TIMESTAMP
-            AND (ac.end_date IS NULL OR ac.end_date >= CURRENT_TIMESTAMP)
-            AND ac.remaining_amount > 0
-            AND p.position = $1
-            AND p.page_location = $2
-        `;
-        queryParams = [mappedPlacement.position, mappedPlacement.page_location, parseInt(limit)];
-      }
+      // Match by position and page_location
+      // Return all ads for this position, ordered by tier priority
+      whereClause = `
+        WHERE ac.status = 'active'
+          AND ac.is_active = true
+          AND ac.start_date <= CURRENT_TIMESTAMP
+          AND (ac.end_date IS NULL OR ac.end_date >= CURRENT_TIMESTAMP)
+          AND ac.remaining_amount > 0
+          AND p.position = $1
+          AND p.page_location = $2
+      `;
+      queryParams = [mappedPlacement.position, mappedPlacement.page_location, parseInt(limit)];
     } else {
       // Fallback: try to match by exact placement name
       whereClause = `
@@ -125,7 +113,7 @@ router.get('/placements/:placement', async (req, res) => {
       mappedPosition: mappedPlacement?.position,
       mappedPageLocation: mappedPlacement?.page_location,
       foundAds: result.rows.length,
-      adTitles: result.rows.map(ad => `${ad.title} (${ad.tier_name})`)
+      adTitles: result.rows.map(ad => `${ad.title} (${ad.tier_name} - ${ad.placement_name})`)
     });
 
     res.json({
