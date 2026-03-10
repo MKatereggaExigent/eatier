@@ -24,8 +24,11 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 // Hero Section
 .hero-section {
   padding: 5rem 2rem 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
   text-align: center;
   background: linear-gradient(180deg, #ffffff 0%, $nyt-light-gray 100%);
+  border-radius: 12px;
   border-bottom: 1px solid $nyt-border;
 }
 
@@ -116,7 +119,10 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 // User Type Tabs
 .user-type-section {
   padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
   background: white;
+  border-radius: 12px;
   border-bottom: 1px solid $nyt-border;
 }
 
@@ -124,7 +130,7 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   display: flex;
   justify-content: center;
   gap: 1rem;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   flex-wrap: wrap;
 }
@@ -219,7 +225,7 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 // Plans Section
 .plans-section {
   padding: 4rem 2rem;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -417,7 +423,10 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 // Comparison Section
 .comparison-section {
   padding: 5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
   background: white;
+  border-radius: 12px;
   border-top: 1px solid $nyt-border;
 }
 
@@ -475,7 +484,10 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 // FAQ Section
 .faq-section {
   padding: 5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
   background: $nyt-light-gray;
+  border-radius: 12px;
 }
 
 .faq-grid {
@@ -512,7 +524,10 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 // CTA Section
 .cta-section {
   padding: 5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
   background: linear-gradient(135deg, $itiyum-orange 0%, $itiyum-orange-dark 100%);
+  border-radius: 12px;
   text-align: center;
   color: white;
 

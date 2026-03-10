@@ -289,6 +289,8 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 /* ========== Mission Section ========== */
 .mission-section {
   padding: 6rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
   background: white;
   position: relative;
   overflow: hidden;
@@ -364,16 +366,19 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 /* ========== User Groups Section ========== */
 .user-groups-section {
   padding: 6rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
   background: $nyt-light-gray;
   position: relative;
+  border-radius: 12px;
 
   .user-groups-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     gap: 2rem;
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0;
   }
 }
 
@@ -555,10 +560,13 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 /* ========== Community Section ========== */
 .community-section {
   padding: 7rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
   background: $nyt-black;
   color: white;
   text-align: center;
   position: relative;
+  border-radius: 12px;
 
   // Glassmorphic overlay card
   .community-content {
@@ -646,10 +654,13 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 /* ========== Resources Section ========== */
 .resources-section {
   padding: 6rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
   background: $nyt-light-gray;
+  border-radius: 12px;
 
   .resources-content {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
   }
 
