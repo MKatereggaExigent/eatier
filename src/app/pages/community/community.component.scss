@@ -47,7 +47,10 @@ $itiyum-orange-dark: #e67e00;
   text-align: center;
   margin-bottom: 0;
   padding: 80px 20px 50px;
+  max-width: 1200px;
+  margin: 0 auto;
   background: white;
+  border-radius: 12px;
   border-bottom: 1px solid $nyt-border;
 
   .header-content {
@@ -82,7 +85,10 @@ $itiyum-orange-dark: #e67e00;
   gap: 0;
   margin-bottom: 0;
   flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
   background: white;
+  border-radius: 12px;
   border-bottom: 1px solid $nyt-border;
   padding: 0 20px;
 
@@ -128,7 +134,7 @@ $itiyum-orange-dark: #e67e00;
 
 /* ========== Community Content ========== */
 .community-content {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
   min-height: 400px;
   padding: 40px 20px;
@@ -491,7 +497,7 @@ $itiyum-orange-dark: #e67e00;
 
 /* ========== Trending Section ========== */
 .trending-section {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
 
   .trending-topics-grid {
@@ -708,7 +714,7 @@ $itiyum-orange-dark: #e67e00;
 
 /* ========== Chefs Section ========== */
 .chefs-section {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
 
   // Top Chef Spotlight

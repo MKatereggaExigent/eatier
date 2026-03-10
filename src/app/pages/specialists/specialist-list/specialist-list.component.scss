@@ -23,7 +23,10 @@ $itiyum-orange-dark: #e67e00;
 .hero-header {
   position: relative;
   padding: 100px 20px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
   background: url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1600') center/cover;
+  border-radius: 12px;
   overflow: hidden;
 
   .hero-overlay {
@@ -34,6 +37,7 @@ $itiyum-orange-dark: #e67e00;
       rgba(0, 0, 0, 0.5) 0%,
       rgba(0, 0, 0, 0.7) 100%
     );
+    border-radius: 12px;
   }
 
   // Animated accent line
@@ -193,11 +197,14 @@ $itiyum-orange-dark: #e67e00;
 /* ========== Filters Section ========== */
 .filters-section {
   padding: 28px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
   background: white;
+  border-radius: 12px;
   border-bottom: 1px solid $nyt-border;
 
   .filters-container {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -344,7 +351,7 @@ $itiyum-orange-dark: #e67e00;
 /* ========== Results Section ========== */
 .results-section {
   padding: 48px 20px;
-  max-width: 1300px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 

@@ -36,11 +36,14 @@ $itiyum-orange-dark: #e67e00;
 .hero-header {
   position: relative;
   padding: 6rem 2rem 5rem;
+  max-width: 1200px;
+  margin: 0 auto;
   min-height: 450px;
   display: flex;
   align-items: center;
   overflow: hidden;
   background: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920&h=600&fit=crop') center/cover;
+  border-radius: 12px;
 
   .hero-overlay {
     position: absolute;
@@ -55,6 +58,7 @@ $itiyum-orange-dark: #e67e00;
       rgba(0, 0, 0, 0.75) 100%
     );
     z-index: 1;
+    border-radius: 12px;
   }
 
   .hero-content {
@@ -206,11 +210,14 @@ $itiyum-orange-dark: #e67e00;
 /* ========== Filters Section ========== */
 .filters-section {
   padding: 1.5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
   background: white;
+  border-radius: 12px;
   border-bottom: 1px solid $nyt-border;
 
   .filters-container {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     display: flex;
     gap: 1rem;

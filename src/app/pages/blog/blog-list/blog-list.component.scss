@@ -33,7 +33,10 @@ $itiyum-orange-dark: #e67e00;
   align-items: center;
   justify-content: center;
   padding: 6rem 2rem 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
   background: linear-gradient(135deg, $nyt-black 0%, #2d2d2d 100%);
+  border-radius: 12px;
 
   // Background pattern
   &::before {

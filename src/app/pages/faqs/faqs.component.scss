@@ -28,6 +28,9 @@ $itiyum-orange-dark: #e67e00;
   background: white;
   border-bottom: 1px solid $nyt-border;
   padding: 80px 20px 50px;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 12px;
   margin-bottom: 0;
 
   .header-content {
@@ -35,7 +38,7 @@ $itiyum-orange-dark: #e67e00;
     justify-content: space-between;
     align-items: flex-end;
     gap: 32px;
-    max-width: 1000px;
+    max-width: 100%;
     margin: 0 auto;
 
     .title-section {
@@ -108,10 +111,13 @@ $itiyum-orange-dark: #e67e00;
   background: white;
   border-bottom: 1px solid $nyt-border;
   padding: 32px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 12px;
   margin-bottom: 0;
 
   .search-container {
-    max-width: 1000px;
+    max-width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -220,7 +226,7 @@ $itiyum-orange-dark: #e67e00;
 /* ========== Categories Overview ========== */
 .categories-overview {
   padding: 48px 20px;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
 
   .categories-grid {
@@ -327,7 +333,7 @@ $itiyum-orange-dark: #e67e00;
 /* ========== FAQ Results ========== */
 .faqs-results {
   padding: 48px 20px;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
 
   .empty-state {
@@ -601,7 +607,7 @@ $itiyum-orange-dark: #e67e00;
 /* ========== Contact Support ========== */
 .contact-support {
   padding: 48px 20px 80px;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
 
   .support-card {
