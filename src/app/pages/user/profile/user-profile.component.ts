@@ -214,6 +214,7 @@ export class UserProfileComponent implements OnInit {
           zipCode: formValue.zipCode,
           country: formValue.country
         },
+        isChef: formValue.isChef || false,
         experienceYears: formValue.experience,
         bio: formValue.bio,
         specialtyDishes: profile?.specialtyDishes || [],
