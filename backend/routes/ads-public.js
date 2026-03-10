@@ -18,16 +18,63 @@ router.get('/placements/:placement', async (req, res) => {
     const { limit = 5, page_location } = req.query;
 
     // Map frontend placement names to backend position/page_location
+    // Right sidebar is premium (higher tier), left sidebar is standard (lower tier)
     const placementMap = {
-      'sidebar_left': { position: 'sidebar', page_location: 'all_pages' },
-      'sidebar_right': { position: 'sidebar', page_location: 'all_pages' },
-      'header_banner': { position: 'header', page_location: 'homepage' },
-      'footer_banner': { position: 'footer', page_location: 'all_pages' },
-      'inline_content': { position: 'inline', page_location: 'all_pages' },
-      'homepage_banner': { position: 'hero', page_location: 'homepage' }
+      'sidebar_left': { position: 'sidebar', page_location: 'all_pages', preferredTier: 'standard' },
+      'sidebar_right': { position: 'sidebar', page_location: 'all_pages', preferredTier: 'premium' },
+      'header_banner': { position: 'header', page_location: 'homepage', preferredTier: 'premium' },
+      'footer_banner': { position: 'footer', page_location: 'all_pages', preferredTier: 'premium' },
+      'inline_content': { position: 'inline', page_location: 'all_pages', preferredTier: 'standard' },
+      'homepage_banner': { position: 'hero', page_location: 'homepage', preferredTier: 'premium' },
+      'community_feed': { position: 'feed', page_location: 'community', preferredTier: 'standard' },
+      'restaurant_list': { position: 'inline', page_location: 'restaurant_list', preferredTier: 'standard' },
+      'specialist_list': { position: 'inline', page_location: 'specialists', preferredTier: 'standard' }
     };
 
     const mappedPlacement = placementMap[placement];
+
+    // Build the WHERE clause based on whether we have a mapped placement
+    let whereClause;
+    let queryParams;
+
+    if (mappedPlacement) {
+      // Match by position, page_location, and preferred tier for mapped placements
+      if (mappedPlacement.preferredTier) {
+        whereClause = `
+          WHERE ac.status = 'active'
+            AND ac.is_active = true
+            AND ac.start_date <= CURRENT_TIMESTAMP
+            AND (ac.end_date IS NULL OR ac.end_date >= CURRENT_TIMESTAMP)
+            AND ac.remaining_amount > 0
+            AND p.position = $1
+            AND p.page_location = $2
+            AND t.name = $3
+        `;
+        queryParams = [mappedPlacement.position, mappedPlacement.page_location, mappedPlacement.preferredTier, parseInt(limit)];
+      } else {
+        whereClause = `
+          WHERE ac.status = 'active'
+            AND ac.is_active = true
+            AND ac.start_date <= CURRENT_TIMESTAMP
+            AND (ac.end_date IS NULL OR ac.end_date >= CURRENT_TIMESTAMP)
+            AND ac.remaining_amount > 0
+            AND p.position = $1
+            AND p.page_location = $2
+        `;
+        queryParams = [mappedPlacement.position, mappedPlacement.page_location, parseInt(limit)];
+      }
+    } else {
+      // Fallback: try to match by exact placement name
+      whereClause = `
+        WHERE ac.status = 'active'
+          AND ac.is_active = true
+          AND ac.start_date <= CURRENT_TIMESTAMP
+          AND (ac.end_date IS NULL OR ac.end_date >= CURRENT_TIMESTAMP)
+          AND ac.remaining_amount > 0
+          AND (p.name = $1 OR p.position = $1 OR $1 = 'all')
+      `;
+      queryParams = [placement, parseInt(limit)];
+    }
 
     // Query for active ads matching the placement
     const result = await pool.query(`
@@ -68,35 +115,17 @@ router.get('/placements/:placement', async (req, res) => {
       LEFT JOIN ad_placements p ON ac.placement_id = p.id
       LEFT JOIN businesses b ON ac.business_id = b.id
       LEFT JOIN users u ON ac.user_id = u.id
-      WHERE ac.status = 'active'
-        AND ac.is_active = true
-        AND ac.start_date <= CURRENT_TIMESTAMP
-        AND (ac.end_date IS NULL OR ac.end_date >= CURRENT_TIMESTAMP)
-        AND ac.remaining_amount > 0
-        AND (
-          -- Match by exact name
-          p.name = $1
-          -- Or match by mapped position and page_location
-          OR (p.position = $2 AND p.page_location = $3)
-          -- Or match by position only for flexible placement
-          OR p.position = $1
-          -- Or show all if requested
-          OR $1 = 'all'
-        )
+      ${whereClause}
       ORDER BY t.priority_weight DESC, ac.created_at DESC
-      LIMIT $4
-    `, [
-      placement,
-      mappedPlacement?.position || placement,
-      mappedPlacement?.page_location || 'all_pages',
-      parseInt(limit)
-    ]);
+      LIMIT $${queryParams.length}
+    `, queryParams);
 
     console.log(`📢 Ads query for placement "${placement}":`, {
       placement,
       mappedPosition: mappedPlacement?.position,
       mappedPageLocation: mappedPlacement?.page_location,
-      foundAds: result.rows.length
+      foundAds: result.rows.length,
+      adTitles: result.rows.map(ad => `${ad.title} (${ad.tier_name})`)
     });
 
     res.json({

@@ -14,8 +14,8 @@ import { CommonModule } from '@angular/common';
 })
 export class LeftSidebarAdComponent implements OnInit, OnDestroy {
   @Input() placement: string = 'sidebar_left';
-  @Input() autoRotate: boolean = false; // Disable auto-rotation for stacked display
-  @Input() rotationInterval: number = 7000; // 7 seconds
+  @Input() autoRotate: boolean = true; // Enable auto-rotation for standard ads
+  @Input() rotationInterval: number = 5000; // 5 seconds (fast rotation for standard)
   @Input() limit: number = 5; // Show 5 ads stacked
 
   private adService = inject(AdServingService);

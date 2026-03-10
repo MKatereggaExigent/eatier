@@ -14,8 +14,8 @@ import { CommonModule } from '@angular/common';
 })
 export class RightSidebarAdComponent implements OnInit, OnDestroy {
   @Input() placement: string = 'sidebar_right';
-  @Input() autoRotate: boolean = false; // Disable auto-rotation for stacked display
-  @Input() rotationInterval: number = 7000; // 7 seconds
+  @Input() autoRotate: boolean = true; // Enable auto-rotation for premium ads
+  @Input() rotationInterval: number = 15000; // 15 seconds (slow rotation for premium)
   @Input() limit: number = 5; // Show 5 ads stacked
 
   private adService = inject(AdServingService);
