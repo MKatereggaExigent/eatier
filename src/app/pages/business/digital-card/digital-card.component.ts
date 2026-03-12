@@ -259,7 +259,8 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const businessUrl = `https://itiyum.com/business/${business.id}`;
+    // Use public restaurant URL instead of protected business URL
+    const businessUrl = `https://itiyum.com/restaurants/${business.id}`;
     const shareTitle = `${business.business_name} - Digital Business Card`;
     const shareText = `Check out ${business.business_name} on Itiyum!\n\n` +
       `📍 ${business.address || 'Location not specified'}\n` +
