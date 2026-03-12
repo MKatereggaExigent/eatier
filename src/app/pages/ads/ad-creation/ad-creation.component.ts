@@ -903,36 +903,45 @@ export class AdCreationComponent implements OnInit {
   }
 
   // Multi-select helper methods
-  toggleCountry(country: string): void {
+  toggleCountry(country: Country): void {
     const currentCountries = this.targetingForm.get('countries')?.value || [];
-    const index = currentCountries.indexOf(country);
+    const countryId = country.id;
+    const index = currentCountries.indexOf(countryId);
     if (index === -1) {
-      this.targetingForm.patchValue({ countries: [...currentCountries, country] });
+      this.targetingForm.patchValue({ countries: [...currentCountries, countryId] });
     } else {
-      this.targetingForm.patchValue({ countries: currentCountries.filter((c: string) => c !== country) });
+      this.targetingForm.patchValue({ countries: currentCountries.filter((c: string) => c !== countryId) });
     }
     // Reset cities when countries change
     this.targetingForm.patchValue({ cities: [] });
+    // Load cities for selected countries
+    this.loadCitiesForSelectedCountries();
   }
 
-  isCountrySelected(country: string): boolean {
+  isCountrySelected(country: Country): boolean {
     const countries = this.targetingForm.get('countries')?.value || [];
-    return countries.includes(country);
+    return countries.includes(country.id);
   }
 
-  toggleCity(city: string): void {
+  toggleCity(city: any): void {
     const currentCities = this.targetingForm.get('cities')?.value || [];
-    const index = currentCities.indexOf(city);
+    const cityId = city.id;
+    const index = currentCities.indexOf(cityId);
     if (index === -1) {
-      this.targetingForm.patchValue({ cities: [...currentCities, city] });
+      this.targetingForm.patchValue({ cities: [...currentCities, cityId] });
     } else {
-      this.targetingForm.patchValue({ cities: currentCities.filter((c: string) => c !== city) });
+      this.targetingForm.patchValue({ cities: currentCities.filter((c: string) => c !== cityId) });
     }
   }
 
-  isCitySelected(city: string): boolean {
+  isCitySelected(city: any): boolean {
     const cities = this.targetingForm.get('cities')?.value || [];
-    return cities.includes(city);
+    return cities.includes(city.id);
+  }
+
+  loadCitiesForSelectedCountries(): void {
+    // Cities are already loaded and filtered by the availableCities computed signal
+    // This method is here for future enhancements if needed
   }
 
   toggleUserType(userType: string): void {
