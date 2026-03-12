@@ -94,6 +94,7 @@ export interface Business {
   owner_id: string;
   business_name: string;
   business_type: string;
+  slug?: string; // URL-friendly identifier (e.g., 'joes-pizza-kampala')
   email: string;
   phone: string;
   country: string;

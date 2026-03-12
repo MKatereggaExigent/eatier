@@ -19,6 +19,7 @@ export interface PublicBusiness {
   ownerEmail: string;
   businessName: string;
   businessType: string;
+  slug?: string; // URL-friendly identifier (e.g., 'joes-pizza-kampala')
   cuisineTypes?: string[]; // Array of cuisines like ['Italian', 'Mediterranean']
   email: string;
   phone: string;
