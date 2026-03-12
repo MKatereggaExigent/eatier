@@ -16,7 +16,10 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 
 import { AdManagementService } from '../../../core/services/ad-management.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CurrencyService, CurrencyInfo, Country } from '../../../core/services/currency.service';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 interface StepValidation {
   isValid: boolean;
@@ -41,6 +44,8 @@ interface UploadedMedia {
 export class AdCreationComponent implements OnInit {
   private authService = inject(AuthService);
   private adService = inject(AdManagementService);
+  private currencyService = inject(CurrencyService);
+  private http = inject(HttpClient);
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -98,33 +103,14 @@ export class AdCreationComponent implements OnInit {
     }
   ];
 
-  currencies: { value: Currency; label: string; symbol: string }[] = [
-    { value: 'USD', label: 'US Dollar', symbol: '$' },
-    { value: 'EUR', label: 'Euro', symbol: '€' },
-    { value: 'GBP', label: 'British Pound', symbol: '£' },
-    { value: 'KES', label: 'Kenyan Shilling', symbol: 'KSh' },
-    { value: 'ETB', label: 'Ethiopian Birr', symbol: 'Br' },
-    { value: 'UGX', label: 'Ugandan Shilling', symbol: 'USh' },
-    { value: 'TZS', label: 'Tanzanian Shilling', symbol: 'TSh' }
-  ];
+  // Dynamic data from API
+  currencies: { value: Currency; label: string; symbol: string }[] = [];
+  regions: { id: string; value: string; label: string; code: string }[] = [];
+  countries: Country[] = [];
+  cities: { id: string; name: string; country_id: string; country_name: string; country_code: string }[] = [];
 
-  regions = [
-    { value: 'southern-africa', label: 'Southern Africa', countries: ['South Africa', 'Botswana', 'Zimbabwe', 'Namibia', 'Mozambique'] },
-    { value: 'east-africa', label: 'East Africa', countries: ['Kenya', 'Uganda', 'Tanzania', 'Ethiopia', 'Rwanda'] },
-    { value: 'west-africa', label: 'West Africa', countries: ['Nigeria', 'Ghana', 'Senegal', 'Mali', 'Burkina Faso'] },
-    { value: 'north-america', label: 'North America', countries: ['United States', 'Canada', 'Mexico'] },
-    { value: 'europe', label: 'Europe', countries: ['United Kingdom', 'Germany', 'France', 'Spain', 'Italy'] }
-  ];
-
-  cities: { [country: string]: string[] } = {
-    'South Africa': ['Johannesburg', 'Cape Town', 'Durban', 'Pretoria', 'Port Elizabeth', 'Sandton', 'Rosebank'],
-    'Kenya': ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret'],
-    'Uganda': ['Kampala', 'Entebbe', 'Jinja', 'Mbale', 'Gulu'],
-    'Tanzania': ['Dar es Salaam', 'Arusha', 'Mwanza', 'Dodoma', 'Mbeya'],
-    'Ethiopia': ['Addis Ababa', 'Dire Dawa', 'Mekelle', 'Gondar', 'Hawassa'],
-    'United States': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'],
-    'United Kingdom': ['London', 'Manchester', 'Birmingham', 'Leeds', 'Glasgow']
-  };
+  // Grouped cities by country for easy lookup
+  citiesByCountry: { [countryId: string]: any[] } = {};
 
   ctaTypes: { value: CTAType; label: string }[] = [
     { value: 'book_now', label: 'Book Now' },
@@ -161,8 +147,8 @@ export class AdCreationComponent implements OnInit {
 
   // Computed properties
   // Writable signals for reactive form dependencies
-  currentRegionValue = signal<string>('east-africa');
-  currentCountriesValue = signal<string[]>(['Kenya']);
+  currentRegionValue = signal<string>('');
+  currentCountriesValue = signal<string[]>([]);
 
   selectedAdType = computed(() => {
     const typeValue = this.basicInfoForm?.get('type')?.value;
@@ -171,19 +157,29 @@ export class AdCreationComponent implements OnInit {
 
   selectedRegion = computed(() => {
     const regionValue = this.currentRegionValue();
-    return this.regions.find(region => region.value === regionValue);
+    return this.regions.find(region => region.value === regionValue || region.code === regionValue);
   });
 
   availableCountries = computed(() => {
-    return this.selectedRegion()?.countries || [];
+    const regionValue = this.currentRegionValue();
+    if (!regionValue) return [];
+
+    // Filter countries by selected region
+    return this.countries.filter(country => {
+      const region = this.regions.find(r => r.value === regionValue || r.code === regionValue);
+      return region && country.region_id === region.id;
+    });
   });
 
   availableCities = computed(() => {
     const selectedCountries = this.currentCountriesValue();
-    const cities: string[] = [];
-    selectedCountries.forEach((country: string) => {
-      if (this.cities[country]) {
-        cities.push(...this.cities[country]);
+    if (!selectedCountries || selectedCountries.length === 0) return [];
+
+    // Get cities for selected countries
+    const cities: any[] = [];
+    selectedCountries.forEach((countryId: string) => {
+      if (this.citiesByCountry[countryId]) {
+        cities.push(...this.citiesByCountry[countryId]);
       }
     });
     return cities;
@@ -247,6 +243,8 @@ export class AdCreationComponent implements OnInit {
     this.initializeForms();
     this.formsInitialized.set(true); // Signal that forms are ready
     this.loadTiersAndPlacements();
+    this.loadGeoData(); // Load regions, countries, and cities
+    this.loadCurrencies(); // Load available currencies
 
     // Check if we're in edit mode
     const adId = this.route.snapshot.paramMap.get('adId');
@@ -297,8 +295,8 @@ export class AdCreationComponent implements OnInit {
 
     // Targeting
     this.targetingForm.patchValue({
-      region: campaign.targeting?.geographic?.regions?.[0] || 'east-africa',
-      countries: campaign.targeting?.geographic?.countries || ['Kenya'],
+      region: campaign.targeting?.geographic?.regions?.[0] || '',
+      countries: campaign.targeting?.geographic?.countries || [],
       cities: campaign.targeting?.geographic?.cities || [],
       radius: campaign.targeting?.geographic?.radius || 25,
       ageMin: campaign.targeting?.demographic?.ageRange?.min || 18,
@@ -408,6 +406,87 @@ export class AdCreationComponent implements OnInit {
     this.tierPlacementForm.patchValue({ placementId: placement.id });
   }
 
+  // Load geo-targeting data (regions, countries, cities)
+  private async loadGeoData(): Promise<void> {
+    try {
+      const apiUrl = environment.apiUrl;
+
+      // Load regions
+      this.http.get<any[]>(`${apiUrl}/business-ads/regions`).subscribe({
+        next: (regions) => {
+          this.regions = regions.map(r => ({
+            id: r.id,
+            value: r.code,
+            label: r.name,
+            code: r.code
+          }));
+
+          // Set default region to Southern Africa (where business is registered)
+          const defaultRegion = this.regions.find(r => r.code === 'southern-africa');
+          if (defaultRegion && !this.isEditMode()) {
+            this.currentRegionValue.set(defaultRegion.value);
+            this.targetingForm.patchValue({ region: defaultRegion.value });
+          }
+        },
+        error: (error) => console.error('Error loading regions:', error)
+      });
+
+      // Load countries
+      this.http.get<Country[]>(`${apiUrl}/business-ads/countries`).subscribe({
+        next: (countries) => {
+          this.countries = countries;
+
+          // Set default country to South Africa (where business is registered)
+          const southAfrica = countries.find(c => c.code === 'ZA');
+          if (southAfrica && !this.isEditMode()) {
+            this.currentCountriesValue.set([southAfrica.id]);
+            this.targetingForm.patchValue({ countries: [southAfrica.id] });
+          }
+        },
+        error: (error) => console.error('Error loading countries:', error)
+      });
+
+      // Load cities
+      this.http.get<any[]>(`${apiUrl}/business-ads/cities`).subscribe({
+        next: (cities) => {
+          this.cities = cities;
+
+          // Group cities by country for easy lookup
+          this.citiesByCountry = {};
+          cities.forEach(city => {
+            if (!this.citiesByCountry[city.country_id]) {
+              this.citiesByCountry[city.country_id] = [];
+            }
+            this.citiesByCountry[city.country_id].push(city);
+          });
+        },
+        error: (error) => console.error('Error loading cities:', error)
+      });
+    } catch (error) {
+      console.error('Error in loadGeoData:', error);
+    }
+  }
+
+  // Load available currencies
+  private loadCurrencies(): void {
+    this.currencyService.getAvailableCurrencies().subscribe({
+      next: (currencies) => {
+        this.currencies = currencies.map(c => ({
+          value: c.code as Currency,
+          label: c.name,
+          symbol: c.symbol
+        }));
+
+        // Set default currency based on user's location or business country (ZAR)
+        const currentCurrency = this.currencyService.getCurrentCurrency();
+        if (currentCurrency && !this.isEditMode()) {
+          this.budgetForm.patchValue({ currency: currentCurrency.code as Currency });
+        }
+      },
+      error: (error) => console.error('Error loading currencies:', error)
+    });
+  }
+
   // Custom validator for non-empty arrays
   private arrayNotEmpty(control: any): { [key: string]: boolean } | null {
     if (!control.value || !Array.isArray(control.value) || control.value.length === 0) {
@@ -434,8 +513,8 @@ export class AdCreationComponent implements OnInit {
 
     // Targeting Form
     this.targetingForm = this.fb.group({
-      region: ['east-africa', Validators.required],
-      countries: [['Kenya'], this.arrayNotEmpty.bind(this)],
+      region: ['', Validators.required], // Will be set to 'southern-africa' after data loads
+      countries: [[], this.arrayNotEmpty.bind(this)], // Will be set to South Africa after data loads
       cities: [[]],
       radius: [25, [Validators.min(5), Validators.max(100)]],
       ageMin: [18, [Validators.min(13), Validators.max(100)]],

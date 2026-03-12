@@ -71,6 +71,50 @@ router.get('/countries/region/:regionId', async (req, res) => {
   }
 });
 
+// Get all cities
+router.get('/cities', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        ci.id, ci.name, ci.state_province, ci.is_capital, ci.is_major_city,
+        ci.country_id,
+        c.name as country_name,
+        c.code as country_code,
+        c.currency_code,
+        c.currency_symbol
+      FROM cities ci
+      JOIN countries c ON ci.country_id = c.id
+      WHERE ci.is_active = true
+      ORDER BY c.name ASC, ci.name ASC
+    `);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching cities:', error);
+    res.status(500).json({ error: 'Failed to fetch cities' });
+  }
+});
+
+// Get cities by country
+router.get('/cities/country/:countryId', async (req, res) => {
+  try {
+    const { countryId } = req.params;
+
+    const result = await pool.query(`
+      SELECT
+        id, name, state_province, is_capital, is_major_city
+      FROM cities
+      WHERE country_id = $1 AND is_active = true
+      ORDER BY name ASC
+    `, [countryId]);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching cities by country:', error);
+    res.status(500).json({ error: 'Failed to fetch cities' });
+  }
+});
+
 // =====================================================
 // 2. ADS MANAGEMENT ENDPOINTS (Using ad_campaigns table)
 // =====================================================

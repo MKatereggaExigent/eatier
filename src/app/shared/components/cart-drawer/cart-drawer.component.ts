@@ -2,6 +2,7 @@ import { Component, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { CartService, Cart, CartItem } from '../../../core/services/cart.service';
+import { CurrencyService } from '../../../core/services/currency.service';
 
 @Component({
   selector: 'app-cart-drawer',
@@ -12,6 +13,7 @@ import { CartService, Cart, CartItem } from '../../../core/services/cart.service
 })
 export class CartDrawerComponent implements OnInit {
   cartService = inject(CartService);
+  currencyService = inject(CurrencyService);
   private router = inject(Router);
 
   isOpen = this.cartService.cartDrawerOpen;
@@ -52,11 +54,8 @@ export class CartDrawerComponent implements OnInit {
   }
 
   formatPrice(amount: number): string {
-    return new Intl.NumberFormat('en-UG', {
-      style: 'currency',
-      currency: 'UGX',
-      minimumFractionDigits: 0
-    }).format(amount);
+    // Use CurrencyService for dynamic currency formatting
+    return this.currencyService.formatAmount(amount);
   }
 
   continueShopping(): void {

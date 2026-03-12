@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CartService, CheckoutSummary, DeliveryAddress, CheckoutRequest } from '../../core/services/cart.service';
+import { CurrencyService } from '../../core/services/currency.service';
 
 @Component({
   selector: 'app-checkout',
@@ -15,6 +16,7 @@ export class CheckoutComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private cartService = inject(CartService);
+  private currencyService = inject(CurrencyService);
 
   // State
   loading = signal(true);
@@ -166,7 +168,7 @@ export class CheckoutComponent implements OnInit {
   }
 
   formatPrice(amount: number): string {
-    return `UGX ${amount.toLocaleString()}`;
+    return this.currencyService.formatAmount(amount);
   }
 
   goBack(): void {

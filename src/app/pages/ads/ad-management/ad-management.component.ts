@@ -4,6 +4,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { AdCampaign } from '../../../core/models/ad-management.models';
 import { AdManagementService } from '../../../core/services/ad-management.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CurrencyService } from '../../../core/services/currency.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -48,6 +49,7 @@ interface DashboardStats {
 export class AdManagementComponent implements OnInit {
   private authService = inject(AuthService);
   private adService = inject(AdManagementService);
+  private currencyService = inject(CurrencyService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -282,18 +284,7 @@ export class AdManagementComponent implements OnInit {
   }
 
   formatCurrency(amount: number, currency: string = 'USD'): string {
-    const symbols: { [key: string]: string } = {
-      'USD': '$',
-      'EUR': '€',
-      'GBP': '£',
-      'KES': 'KSh',
-      'ETB': 'Br',
-      'UGX': 'USh',
-      'TZS': 'TSh'
-    };
-
-    const symbol = symbols[currency] || '$';
-    return `${symbol}${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return this.currencyService.formatAmount(amount, currency);
   }
 
   formatNumber(num: number): string {
