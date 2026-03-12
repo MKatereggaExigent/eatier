@@ -74,12 +74,21 @@ export class FavoritesService {
   isLoading$ = this.isLoadingSubject.asObservable();
 
   constructor() {
-    this.loadUserFavorites();
-    this.loadUserCollections();
+    // Only load favorites if user is authenticated
+    const token = localStorage.getItem('itiyum_token');
+    if (token) {
+      this.loadUserFavorites();
+      this.loadUserCollections();
+    }
   }
 
   private loadUserFavorites(): void {
-    const userId = localStorage.getItem('user_id') || 'temp-user';
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+      this.favoritesSubject.next([]);
+      return;
+    }
+
     this.isLoadingSubject.next(true);
 
     this.apiService.get<any>(`favorites/${userId}`).subscribe({
@@ -97,7 +106,11 @@ export class FavoritesService {
   }
 
   private loadUserCollections(): void {
-    const userId = localStorage.getItem('user_id') || 'temp-user';
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+      this.collectionsSubject.next([]);
+      return;
+    }
 
     this.apiService.get<any>(`favorites/collections/${userId}`).subscribe({
       next: (response) => {
