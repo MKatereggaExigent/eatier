@@ -28,13 +28,23 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // If we get a 401 error and it's not a login/register/refresh request
-      if (
-        error.status === 401 &&
-        !req.url.includes('/auth/login') &&
-        !req.url.includes('/auth/register') &&
-        !req.url.includes('/auth/refresh')
-      ) {
+      // List of public endpoints that should NOT trigger auth redirects
+      const publicEndpoints = [
+        '/auth/login',
+        '/auth/register',
+        '/auth/refresh',
+        '/businesses',  // Public business discovery
+        '/public/specialists',  // Public specialist discovery
+        '/blog',  // Public blog
+        '/ads-public',  // Public ads
+        '/public'  // Other public endpoints
+      ];
+
+      // Check if this is a public endpoint
+      const isPublicEndpoint = publicEndpoints.some(endpoint => req.url.includes(endpoint));
+
+      // If we get a 401 error and it's not a public endpoint
+      if (error.status === 401 && !isPublicEndpoint) {
         // Try to refresh the token
         return authService.refreshToken().pipe(
           switchMap(() => {
