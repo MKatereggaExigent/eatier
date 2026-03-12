@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 import { UserSpecialistBookingsService, SpecialistBooking, ReviewableBooking } from '../../../core/services/user-specialist-bookings.service';
+import { CurrencyService } from '../../../core/services/currency.service';
 
 @Component({
   selector: 'app-user-specialist-bookings',
@@ -15,6 +16,7 @@ import { UserSpecialistBookingsService, SpecialistBooking, ReviewableBooking } f
 })
 export class UserSpecialistBookingsComponent implements OnInit, OnDestroy {
   private bookingsService = inject(UserSpecialistBookingsService);
+  private currencyService = inject(CurrencyService);
   private destroy$ = new Subject<void>();
 
   // State
@@ -244,10 +246,7 @@ export class UserSpecialistBookingsComponent implements OnInit, OnDestroy {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    return this.currencyService.formatAmount(amount);
   }
 
   getStarArray(rating: number): boolean[] {

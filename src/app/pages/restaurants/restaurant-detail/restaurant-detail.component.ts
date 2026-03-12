@@ -6,6 +6,7 @@ import { PublicBusiness, PublicBusinessService } from '../../../core/services/pu
 import { AuthService } from '../../../core/services/auth.service';
 import { BookingsService } from '../../../services/bookings.service';
 import { CartService } from '../../../core/services/cart.service';
+import { CurrencyService } from '../../../core/services/currency.service';
 import { CommonModule } from '@angular/common';
 import { FavoritesService } from '../../../services/favorites.service';
 import { HttpClient } from '@angular/common/http';
@@ -41,6 +42,7 @@ export class RestaurantDetailComponent implements OnInit {
   private insightsService = inject(InsightsService);
   private authService = inject(AuthService);
   protected cartService = inject(CartService);
+  private currencyService = inject(CurrencyService);
   private favoritesService = inject(FavoritesService);
 
   restaurantId = signal<string>('');
@@ -352,7 +354,7 @@ export class RestaurantDetailComponent implements OnInit {
           id: menu.id,
           name: menu.title,
           price: menu.price,
-          formattedPrice: `UGX ${menu.price.toLocaleString()}`,
+          formattedPrice: this.currencyService.formatAmount(menu.price),
           description: menu.description,
           image: menu.backgroundImage || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop',
           rating: 0,

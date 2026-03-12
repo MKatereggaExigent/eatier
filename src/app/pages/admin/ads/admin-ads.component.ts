@@ -3,6 +3,7 @@ import { Router, RouterModule } from '@angular/router';
 
 import { AdminService } from '../../../core/services/admin.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CurrencyService } from '../../../core/services/currency.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -47,6 +48,7 @@ interface AdStats {
 export class AdminAdsComponent implements OnInit {
   private authService = inject(AuthService);
   private adminService = inject(AdminService);
+  private currencyService = inject(CurrencyService);
   private router = inject(Router);
   currentUser = this.authService.currentUser;
 
@@ -548,12 +550,7 @@ export class AdminAdsComponent implements OnInit {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
+    return this.currencyService.formatAmount(amount);
   }
 
   formatNumber(num: number): string {

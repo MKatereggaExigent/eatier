@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, of } from 'rxjs';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { CurrencyService } from '../../../core/services/currency.service';
 import { CommonModule } from '@angular/common';
 import { FoodEnthusiast } from '../../../shared/models/user.model';
 import { Router, RouterModule } from '@angular/router';
@@ -64,6 +65,7 @@ export class FoodEnthusiastOverviewComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private userService = inject(UserService);
+  private currencyService = inject(CurrencyService);
   private http = inject(HttpClient);
 
   currentUser = this.authService.currentUser;
@@ -265,10 +267,8 @@ export class FoodEnthusiastOverviewComponent implements OnInit {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    // Use CurrencyService for dynamic currency formatting
+    return this.currencyService?.formatAmount(amount) || `$${amount.toFixed(2)}`;
   }
 
   getStarArray(rating: number): boolean[] {
