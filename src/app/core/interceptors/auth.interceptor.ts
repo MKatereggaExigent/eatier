@@ -37,7 +37,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         '/public/specialists',  // Public specialist discovery
         '/blog',  // Public blog
         '/ads-public',  // Public ads
-        '/public'  // Other public endpoints
+        '/public',  // Other public endpoints
+        '/reviews/business',  // Public reviews for businesses
+        '/menus/business'  // Public menus for businesses
       ];
 
       // Check if this is a public endpoint
