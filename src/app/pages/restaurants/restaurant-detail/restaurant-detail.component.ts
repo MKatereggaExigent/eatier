@@ -385,19 +385,12 @@ export class RestaurantDetailComponent implements OnInit {
 
   // Add item to cart
   addToCart(item: MenuItem): void {
-    if (!this.authService.isAuthenticated()) {
-      // Redirect to login if not authenticated
-      this.router.navigate(['/auth/login'], {
-        queryParams: { returnUrl: `/restaurants/${this.restaurantId()}` }
-      });
-      return;
-    }
-
     // Set loading state for this item
     this.menuItems.update(items =>
       items.map(i => i.id === item.id ? { ...i, isAdding: true } : i)
     );
 
+    // CartService handles both authenticated and guest users
     this.cartService.addToCart({
       businessId: this.restaurantId(),
       menuItemId: item.id,
