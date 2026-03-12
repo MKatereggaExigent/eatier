@@ -76,20 +76,27 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get business by ID
+// Get business by ID or slug (PUBLIC endpoint)
 router.get('/:businessId', async (req, res) => {
   try {
     const { businessId } = req.params;
 
-    const result = await pool.query(`
+    // Check if businessId is a UUID or a slug
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const isUUID = uuidRegex.test(businessId);
+
+    // Query by UUID or slug
+    const query = `
       SELECT
         b.*,
         u.first_name || ' ' || u.last_name as owner_name,
         u.email as owner_email
       FROM businesses b
       JOIN users u ON b.owner_id = u.id
-      WHERE b.id = $1 AND b.account_status != 'deleted'
-    `, [businessId]);
+      WHERE ${isUUID ? 'b.id = $1' : 'b.slug = $1'} AND b.account_status != 'deleted'
+    `;
+
+    const result = await pool.query(query, [businessId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Business not found' });

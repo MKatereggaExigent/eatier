@@ -132,7 +132,7 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
             status: 'active',
             createdAt: new Date(),
             updatedAt: new Date(),
-            qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://itiyum.com/restaurants/${response.business.id}`,
+            qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://itiyum.com/restaurants/${response.business.slug || response.business.id}`,
             businessCardCustomization: {
               primaryColor: '#0284c7',
               secondaryColor: '#0369a1',
@@ -147,7 +147,7 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
           this.qrCodeUrl.set(mappedProfile.qrCodeUrl || '');
 
           console.log('📱 QR Code URL:', mappedProfile.qrCodeUrl);
-          console.log('🔗 Restaurant URL:', `https://itiyum.com/restaurants/${response.business.id}`);
+          console.log('🔗 Restaurant URL:', `https://itiyum.com/restaurants/${response.business.slug || response.business.id}`);
 
           // Load saved customization from API
           this.loadSavedCustomization();
@@ -219,7 +219,9 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
 
     // Mock QR code generation
     setTimeout(() => {
-      const businessUrl = `https://itiyum.com/restaurants/${this.businessProfile()?.id}`;
+      const business = this.business();
+      const businessIdentifier = (business as any)?.slug || this.businessProfile()?.id;
+      const businessUrl = `https://itiyum.com/restaurants/${businessIdentifier}`;
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(businessUrl)}`;
 
       this.qrCodeUrl.set(qrUrl);
@@ -259,8 +261,9 @@ export class DigitalCardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Use public restaurant URL instead of protected business URL
-    const businessUrl = `https://itiyum.com/restaurants/${business.id}`;
+    // Use slug if available, otherwise fall back to UUID
+    const businessIdentifier = (business as any).slug || business.id;
+    const businessUrl = `https://itiyum.com/restaurants/${businessIdentifier}`;
     const shareTitle = `${business.business_name} - Digital Business Card`;
     const shareText = `Check out ${business.business_name} on Itiyum!\n\n` +
       `📍 ${business.address || 'Location not specified'}\n` +
