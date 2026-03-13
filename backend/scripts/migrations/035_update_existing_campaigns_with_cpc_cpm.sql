@@ -1,4 +1,4 @@
--- Migration 034: Update existing ad campaigns with CPC/CPM from their tiers
+-- Migration 035: Update existing ad campaigns with CPC/CPM from their tiers
 -- Date: 2026-03-13
 -- Description: Backfills cpc and cpm values for existing campaigns based on their tier
 
