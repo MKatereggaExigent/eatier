@@ -7,12 +7,15 @@ The ads pipeline for business owners is **already fully built and integrated** w
 ## Correct URLs
 
 ### ✅ Working URLs:
-- **Ad Management**: `https://itiyum.com/business/ads`
-- **Create Ad**: `https://itiyum.com/business/ads/create`
-- **Edit Ad**: `https://itiyum.com/business/ads/{adId}/edit`
+- **Ad Management**: `https://itiyum.com/dashboard/business/ads`
+- **Create Ad**: `https://itiyum.com/dashboard/business/ads/create`
+- **Edit Ad**: `https://itiyum.com/dashboard/business/ads/{adId}/edit`
+- **Analytics**: `https://itiyum.com/dashboard/business/analytics`
 
-### ❌ Invalid URLs:
-- `https://itiyum.com/business-owner/ads/create` (This route does NOT exist)
+### ❌ Invalid URLs (DO NOT USE):
+- `https://itiyum.com/business/ads` (Missing /dashboard/ prefix)
+- `https://itiyum.com/business/analytics` (Missing /dashboard/ prefix)
+- `https://itiyum.com/business-owner/ads/create` (Old route, does NOT exist)
 
 ## Architecture Overview
 
@@ -162,7 +165,7 @@ https://itiyum.com/business/ads/create
 1. ✅ Ads pipeline is fully functional
 2. ✅ Payment integration works
 3. ✅ Database tables are wired up
-4. ⚠️ **Update any links** pointing to `/business-owner/ads/*` to use `/business/ads/*`
+4. ✅ **All URLs use correct `/dashboard/business/` prefix**
 5. 🔄 Consider adding subscription feature checks to limit ad creation based on plan
 
 ## Files Reference
