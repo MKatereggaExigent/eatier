@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, interval } from 'rxjs';
+import { BehaviorSubject, Observable, interval, of } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
 import { catchError, map, tap } from 'rxjs/operators';
 
@@ -177,8 +177,15 @@ export class AdServingService {
 
     this.shownAds.add(adId);
 
-    // Impressions are tracked automatically when fetching public ads
-    // No separate endpoint needed
+    // Track impression via API
+    this.http.post(`${this.apiUrl}/impressions/${adId}`, {})
+      .pipe(
+        catchError(error => {
+          console.error('Error tracking impression:', error);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
   /**
