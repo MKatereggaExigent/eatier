@@ -24,15 +24,13 @@
           🔍
         </button>
 
-        <!-- Cart Button - Only show for authenticated users -->
-        @if (isLoggedIn()) {
-          <button type="button" class="cart-btn" title="Shopping Cart" (click)="toggleCart(); $event.stopPropagation()">
-            🛒
-            @if (cartItemCount() > 0) {
-              <span class="cart-badge">{{ cartItemCount() }}</span>
-            }
-          </button>
-        }
+        <!-- Cart Button - Show for all users (guests and authenticated) -->
+        <button type="button" class="cart-btn" title="Shopping Cart" (click)="toggleCart(); $event.stopPropagation()">
+          🛒
+          @if (cartItemCount() > 0) {
+            <span class="cart-badge">{{ cartItemCount() }}</span>
+          }
+        </button>
 
         <!-- Notifications - Only show for authenticated users -->
         @if (isLoggedIn()) {

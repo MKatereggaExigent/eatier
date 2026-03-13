@@ -384,5 +384,118 @@ router.patch('/:id/rate', authenticateToken, async (req, res) => {
   }
 });
 
+// ============================================================================
+// POST /api/orders/guest - Create order for guest users (no authentication required)
+// ============================================================================
+router.post('/guest', async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const {
+      businessId,
+      orderType = 'delivery',
+      items,
+      deliveryAddress,
+      deliveryInstructions,
+      paymentMethod = 'cash',
+      guestInfo, // { name, email, phone }
+      subtotal,
+      taxAmount,
+      deliveryFee,
+      totalAmount
+    } = req.body;
+
+    // Validate required fields
+    if (!businessId || !items || items.length === 0) {
+      return res.status(400).json({ error: 'Business ID and items are required' });
+    }
+
+    if (!guestInfo || !guestInfo.email || !guestInfo.phone || !guestInfo.name) {
+      return res.status(400).json({
+        error: 'Guest information required',
+        required: ['name', 'email', 'phone']
+      });
+    }
+
+    if (orderType === 'delivery' && !deliveryAddress) {
+      return res.status(400).json({ error: 'Delivery address is required for delivery orders' });
+    }
+
+    // Get business details and tenant_id
+    const businessResult = await client.query(
+      'SELECT id, tenant_id, business_name FROM businesses WHERE id = $1',
+      [businessId]
+    );
+
+    if (businessResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    const business = businessResult.rows[0];
+    const tenantId = business.tenant_id;
+
+    // Generate order number
+    const orderNumber = generateOrderNumber();
+
+    // Calculate totals if not provided
+    const calculatedSubtotal = subtotal || items.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+    const calculatedTaxAmount = taxAmount || (calculatedSubtotal * 0.15); // 15% tax
+    const calculatedDeliveryFee = deliveryFee || (orderType === 'delivery' ? 5000 : 0);
+    const calculatedTotal = totalAmount || (calculatedSubtotal + calculatedTaxAmount + calculatedDeliveryFee);
+
+    // Prepare order items
+    const orderItems = items.map(item => ({
+      menuItemId: item.menuItemId,
+      itemName: item.itemName || 'Menu Item',
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      totalPrice: item.unitPrice * item.quantity,
+      customizations: item.customizations || [],
+      specialInstructions: item.specialInstructions || ''
+    }));
+
+    // Create order with guest information
+    const orderResult = await client.query(`
+      INSERT INTO orders (
+        user_id, business_id, tenant_id, order_number, status, order_type,
+        items, subtotal, tax_amount, delivery_fee, total_amount,
+        delivery_address, delivery_instructions, payment_method, payment_status,
+        guest_name, guest_email, guest_phone
+      ) VALUES (NULL, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+      RETURNING *
+    `, [
+      businessId, tenantId, orderNumber, 'pending', orderType,
+      JSON.stringify(orderItems), calculatedSubtotal, calculatedTaxAmount,
+      calculatedDeliveryFee, calculatedTotal,
+      JSON.stringify(deliveryAddress), deliveryInstructions,
+      paymentMethod, 'pending',
+      guestInfo.name, guestInfo.email, guestInfo.phone
+    ]);
+
+    const order = orderResult.rows[0];
+
+    await client.query('COMMIT');
+
+    res.status(201).json({
+      message: 'Order created successfully',
+      order: {
+        id: order.id,
+        orderNumber: order.order_number,
+        status: order.status,
+        orderType: order.order_type,
+        totalAmount: order.total_amount,
+        createdAt: order.created_at
+      }
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error creating guest order:', error);
+    res.status(500).json({ error: 'Failed to create order' });
+  } finally {
+    client.release();
+  }
+});
+
 module.exports = router;
 

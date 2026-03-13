@@ -75,6 +75,12 @@ export interface AddToCartRequest {
   specialInstructions?: string;
 }
 
+export interface GuestInfo {
+  name: string;
+  email: string;
+  phone: string;
+}
+
 export interface CheckoutRequest {
   deliveryAddress?: {
     recipientName?: string;
@@ -93,6 +99,7 @@ export interface CheckoutRequest {
   paymentMethod?: string;
   saveAddress?: boolean;
   addressLabel?: string;
+  guestInfo?: GuestInfo; // For guest checkout
 }
 
 @Injectable({
@@ -261,10 +268,19 @@ export class CartService {
   // Checkout Operations
   // ============================================================================
   getCheckoutSummary(cartId: string): Observable<CheckoutSummary> {
+    // For guest users, build checkout summary from localStorage cart
+    if (!this.authService.isAuthenticated()) {
+      return this.getGuestCheckoutSummary(cartId);
+    }
     return this.http.get<CheckoutSummary>(`${this.apiUrl}/checkout/${cartId}/summary`);
   }
 
   checkout(cartId: string, request: CheckoutRequest): Observable<any> {
+    // For guest users, create order directly without authentication
+    if (!this.authService.isAuthenticated()) {
+      return this.guestCheckout(cartId, request);
+    }
+
     return this.http.post(`${this.apiUrl}/checkout/${cartId}`, request).pipe(
       tap(() => {
         this.loadCarts().subscribe();
@@ -542,6 +558,106 @@ export class CartService {
       // Ignore
     }
     return false;
+  }
+
+  // ============================================================================
+  // Guest Checkout Operations
+  // ============================================================================
+
+  private getGuestCheckoutSummary(cartId: string): Observable<CheckoutSummary> {
+    const cart = this._carts().find(c => c.id === cartId);
+
+    if (!cart) {
+      return of({
+        cart: {} as any,
+        pricing: {
+          subtotal: 0,
+          taxAmount: 0,
+          taxRate: 0,
+          deliveryFee: 0,
+          discountAmount: 0,
+          totalAmount: 0
+        },
+        savedAddresses: []
+      });
+    }
+
+    // Build checkout summary from guest cart
+    return of({
+      cart: {
+        ...cart,
+        businessPhone: '' // Guest users don't have business phone
+      },
+      pricing: {
+        subtotal: cart.subtotal,
+        taxAmount: cart.taxAmount,
+        taxRate: 15, // Default tax rate
+        deliveryFee: cart.deliveryFee,
+        discountAmount: cart.discountAmount,
+        promotionCode: cart.promotionCode,
+        totalAmount: cart.totalAmount
+      },
+      savedAddresses: [] // Guest users don't have saved addresses
+    });
+  }
+
+  private guestCheckout(cartId: string, request: CheckoutRequest): Observable<any> {
+    const cart = this._carts().find(c => c.id === cartId);
+
+    if (!cart) {
+      return of({ error: 'Cart not found' });
+    }
+
+    // Validate guest information
+    if (!request.guestInfo || !request.guestInfo.name || !request.guestInfo.email || !request.guestInfo.phone) {
+      return of({
+        error: 'Guest information required',
+        required: ['name', 'email', 'phone']
+      });
+    }
+
+    // For guest checkout, we need to create an order via a guest-friendly endpoint
+    // This will require contact information (email, phone, name)
+    const guestOrderRequest = {
+      businessId: cart.businessId,
+      orderType: cart.orderType,
+      items: cart.items.map(item => ({
+        menuItemId: item.menuItemId,
+        itemName: item.itemName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        customizations: item.customizations,
+        specialInstructions: item.specialInstructions
+      })),
+      deliveryAddress: request.deliveryAddress,
+      deliveryInstructions: request.deliveryInstructions,
+      paymentMethod: request.paymentMethod || 'cash',
+      guestInfo: request.guestInfo,
+      subtotal: cart.subtotal,
+      taxAmount: cart.taxAmount,
+      deliveryFee: cart.deliveryFee,
+      totalAmount: cart.totalAmount
+    };
+
+    // Call guest order endpoint (we'll need to create this in the backend)
+    return this.http.post(`${this.apiUrl}/orders/guest`, guestOrderRequest).pipe(
+      tap((response) => {
+        // Clear the guest cart after successful checkout
+        this.clearGuestCart(cartId).subscribe();
+        this.closeCartDrawer();
+      }),
+      catchError(error => {
+        console.error('Guest checkout error:', error);
+        // If guest endpoint doesn't exist yet, show helpful message
+        if (error.status === 404) {
+          return of({
+            error: 'Guest checkout is not yet available. Please create an account to complete your order.',
+            requiresAuth: true
+          });
+        }
+        return of({ error: error.error?.error || 'Checkout failed' });
+      })
+    );
   }
 }
 
