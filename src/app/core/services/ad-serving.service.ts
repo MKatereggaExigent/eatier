@@ -149,8 +149,8 @@ export class AdServingService {
       business_id: ad.business_id,
       headline: ad.headline,
       body_text: ad.body_text,
-      phone: ad.phone || ad.cta_phone,
-      website: ad.website,
+      phone: ad.business_phone || ad.cta_phone,
+      website: ad.business_website || ad.cta_url,
       tier_name: ad.tier_name,
       tier_priority: ad.tier_priority,
       rotation_speed_seconds: ad.rotation_speed_seconds

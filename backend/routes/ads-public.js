@@ -68,6 +68,8 @@ router.get('/placements/:placement', async (req, res) => {
     const result = await pool.query(`
       SELECT
         ac.id,
+        ac.business_id,
+        ac.user_id,
         ac.title,
         ac.description,
         ac.headline,
@@ -96,6 +98,8 @@ router.get('/placements/:placement', async (req, res) => {
         p.height as placement_height,
         b.business_name,
         b.logo_url as business_logo,
+        b.phone as business_phone,
+        b.website as business_website,
         u.first_name as advertiser_first_name,
         u.last_name as advertiser_last_name
       FROM ad_campaigns ac
