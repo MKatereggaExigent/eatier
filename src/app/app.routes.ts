@@ -143,6 +143,7 @@ export const routes: Routes = [
             { path: 'ads/create', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
             { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
             { path: 'digital-card', loadComponent: () => import('./pages/business/digital-card/digital-card.component').then(m => m.DigitalCardComponent) },
+            { path: 'analytics', loadComponent: () => import('./pages/business/analytics/business-analytics.component').then(m => m.BusinessAnalyticsComponent) },
             { path: 'accounts', loadComponent: () => import('./pages/business/accounts/accounts-center.component').then(m => m.AccountsCenterComponent) }
         ]
     },
