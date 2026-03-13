@@ -12,6 +12,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Get token from localStorage
   const token = localStorage.getItem('itiyum_token');
 
+  // Skip interceptor for external APIs (geolocation, etc.)
+  const externalDomains = ['ipapi.co', 'api.country.is', 'maps.googleapis.com'];
+  const isExternalRequest = externalDomains.some(domain => req.url.includes(domain));
+
+  if (isExternalRequest) {
+    // Don't add credentials or auth headers to external requests
+    return next(req);
+  }
+
   // Clone request to add credentials (cookies) and Authorization header
   let authReq = req.clone({
     withCredentials: true

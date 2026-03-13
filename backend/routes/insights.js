@@ -488,16 +488,30 @@ router.post('/track/session-end', async (req, res) => {
       return res.status(400).json({ error: 'businessId and sessionId are required' });
     }
 
-    // Update the session with duration
+    // Update the session with duration (silent fail if session doesn't exist)
     await pool.query(`
       UPDATE page_view_events
       SET session_duration = $1
       WHERE business_id = $2 AND session_id = $3
-    `, [duration || 0, businessId, sessionId]);
+    `, [duration || 0, businessId, sessionId]).catch(err => {
+      console.warn('Could not update session duration:', err.message);
+    });
 
     // Update daily analytics with session metrics
     const businessResult = await pool.query(`SELECT tenant_id FROM businesses WHERE id = $1`, [businessId]);
+
+    if (!businessResult.rows[0]) {
+      console.warn(`Business not found: ${businessId}`);
+      return res.json({ success: true, tracked: false, reason: 'business_not_found' });
+    }
+
     const tenantId = businessResult.rows[0]?.tenant_id;
+
+    if (!tenantId) {
+      console.warn(`Business ${businessId} has no tenant_id`);
+      return res.json({ success: true, tracked: false, reason: 'no_tenant_id' });
+    }
+
     const today = new Date().toISOString().split('T')[0];
 
     // Calculate if this was a bounce (only 1 page visited)
@@ -509,6 +523,11 @@ router.post('/track/session-end', async (req, res) => {
       FROM business_analytics_daily
       WHERE business_id = $1 AND analytics_date = $2
     `, [businessId, today]);
+
+    if (!currentStats.rows[0]) {
+      console.warn(`No analytics record found for business ${businessId} on ${today}`);
+      return res.json({ success: true, tracked: false, reason: 'no_analytics_record' });
+    }
 
     const currentAvgDuration = currentStats.rows[0]?.average_session_duration || 0;
     const currentBounceRate = parseFloat(currentStats.rows[0]?.bounce_rate || 0);
@@ -524,10 +543,16 @@ router.post('/track/session-end', async (req, res) => {
       WHERE business_id = $3 AND analytics_date = $4
     `, [newAvgDuration, newBounceRate, businessId, today]);
 
-    res.json({ success: true });
+    res.json({ success: true, tracked: true });
   } catch (error) {
     console.error('Error tracking session end:', error);
-    res.status(500).json({ error: 'Failed to track session end' });
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      detail: error.detail
+    });
+    // Don't fail - return success to prevent client-side errors
+    res.json({ success: true, tracked: false, error: error.message });
   }
 });
 

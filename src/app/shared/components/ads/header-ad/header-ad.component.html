@@ -23,7 +23,7 @@
 } @else {
   @if (currentAd(); as ad) {
     <div class="header-ad-container" [class.fade-animation]="animationType === 'fade'" [class.carousel-animation]="animationType === 'carousel'">
-      <div class="header-ad" [class.transitioning]="isTransitioning()" (click)="onAdClick(ad)">
+      <div class="header-ad" [class.transitioning]="isTransitioning()">
         <!-- Background Image/Video -->
         @if (ad.video_url) {
           <div class="ad-background">
@@ -53,7 +53,7 @@
           <h2 class="ad-title">{{ ad.title }}</h2>
           <p class="ad-description">{{ ad.description }}</p>
 
-          <button type="button" class="ad-cta" (click)="onAdClick(ad); $event.stopPropagation()">
+          <button type="button" class="ad-cta" (click)="onAdClick(ad)">
             {{ ad.cta_text }}
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="cta-icon">
               <path d="M7 15L13 10L7 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
