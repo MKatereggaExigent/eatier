@@ -280,7 +280,7 @@ async function getTopMenuItems(businessId, tenantId, startDate, endDate) {
        m.id,
        m.name,
        COUNT(oi.id) as orders,
-       COALESCE(SUM(oi.price * oi.quantity), 0) as revenue,
+       COALESCE(SUM(oi.unit_price * oi.quantity), 0) as revenue,
        m.image_url as image
      FROM order_items oi
      JOIN orders o ON oi.order_id = o.id

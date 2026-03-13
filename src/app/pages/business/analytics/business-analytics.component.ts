@@ -132,7 +132,9 @@ export class BusinessAnalyticsComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         catchError(error => {
           console.error('Error loading analytics:', error);
-          this.error.set('Failed to load analytics data');
+          const errorMessage = error?.error?.error || error?.message || 'Failed to load analytics data';
+          console.error('Detailed error:', errorMessage);
+          this.error.set(errorMessage);
           // Generate mock data for development
           this.generateMockData();
           return of(null);
