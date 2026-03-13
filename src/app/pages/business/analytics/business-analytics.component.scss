@@ -1,0 +1,780 @@
+.analytics-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+// Header
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .header-content {
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 1rem;
+      margin: 0;
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+
+    .period-selector {
+      padding: 0.75rem 1.5rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: #4CAF50;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: #4CAF50;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+      }
+    }
+
+    .export-btn {
+      padding: 0.75rem 1.5rem;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover:not(:disabled) {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// Loading & Error States
+.loading-state,
+.error-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  p {
+    color: #666;
+    font-size: 1.1rem;
+  }
+}
+
+.error-state {
+  .error-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    color: #d32f2f;
+    margin-bottom: 0.5rem;
+  }
+
+  .retry-btn {
+    margin-top: 1rem;
+    padding: 0.75rem 2rem;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #45a049;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Analytics Content
+.analytics-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// Metrics Grid
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.metric-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  .metric-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #f5f5f5;
+  }
+
+  &.revenue .metric-icon { background: #e8f5e9; }
+  &.orders .metric-icon { background: #e3f2fd; }
+  &.aov .metric-icon { background: #fff3e0; }
+  &.customers .metric-icon { background: #f3e5f5; }
+
+  .metric-content {
+    flex: 1;
+
+    h3 {
+      font-size: 0.875rem;
+      color: #666;
+      margin: 0 0 0.5rem 0;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 0.25rem 0;
+    }
+
+    .metric-change {
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      display: inline-block;
+
+      &.positive {
+        color: #2e7d32;
+        background: #e8f5e9;
+      }
+
+      &.negative {
+        color: #c62828;
+        background: #ffebee;
+      }
+    }
+
+    .metric-info {
+      font-size: 0.875rem;
+      color: #999;
+    }
+  }
+}
+
+// Chart Section
+.chart-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .section-header {
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 0.5rem 0;
+    }
+
+    p {
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  .revenue-chart {
+    .chart-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 300px;
+      padding: 1rem 0;
+      border-bottom: 2px solid #e0e0e0;
+
+      .chart-bar {
+        flex: 1;
+        background: linear-gradient(to top, #4CAF50, #81C784);
+        border-radius: 4px 4px 0 0;
+        position: relative;
+        min-height: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          background: linear-gradient(to top, #45a049, #66bb6a);
+          transform: scaleY(1.05);
+
+          .bar-label {
+            opacity: 1;
+          }
+        }
+
+        .bar-label {
+          position: absolute;
+          top: -25px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          white-space: nowrap;
+          opacity: 0;
+          transition: opacity 0.2s;
+        }
+      }
+    }
+
+    .chart-labels {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 0.5rem;
+
+      .label {
+        font-size: 0.875rem;
+        color: #666;
+      }
+    }
+  }
+}
+
+// Status Section
+.status-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+.status-card {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-left: 4px solid;
+
+  &.completed {
+    border-color: #4CAF50;
+    .status-icon { color: #4CAF50; }
+  }
+
+  &.pending {
+    border-color: #FF9800;
+    .status-icon { color: #FF9800; }
+  }
+
+  &.cancelled {
+    border-color: #f44336;
+    .status-icon { color: #f44336; }
+  }
+
+  .status-icon {
+    font-size: 2rem;
+  }
+
+  .status-content {
+    flex: 1;
+
+    h3 {
+      font-size: 0.875rem;
+      color: #666;
+      margin: 0 0 0.5rem 0;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .status-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 0.25rem 0;
+    }
+
+    .status-percentage {
+      font-size: 0.875rem;
+      color: #666;
+      font-weight: 500;
+    }
+  }
+}
+
+// Top Items Section
+.top-items-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .top-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #e8f5e9;
+    transform: translateX(4px);
+  }
+
+  .item-rank {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+
+  .item-details {
+    flex: 1;
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .item-stats {
+      display: flex;
+      gap: 2rem;
+
+      .stat {
+        display: flex;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+
+        .stat-label {
+          color: #666;
+        }
+
+        .stat-value {
+          color: #1a1a1a;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+// Customer Section
+.customer-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .customer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+.customer-card {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+
+  h3 {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0 0 0.5rem 0;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  .customer-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+  }
+
+  .customer-bar {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+
+      &.new {
+        background: linear-gradient(to right, #4CAF50, #81C784);
+      }
+
+      &.returning {
+        background: linear-gradient(to right, #2196F3, #64B5F6);
+      }
+
+      &.retention {
+        background: linear-gradient(to right, #9C27B0, #BA68C8);
+      }
+    }
+  }
+}
+
+// Order Types Section
+.order-types-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .order-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+.order-type-card {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+
+  .type-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .type-count {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0 0 1rem 0;
+  }
+
+  .type-percentage-bar {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+
+    .percentage-fill {
+      height: 100%;
+      background: linear-gradient(to right, #4CAF50, #81C784);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+  }
+
+  .type-percentage {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #4CAF50;
+  }
+}
+
+// Peak Hours Section
+.peak-hours-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .peak-hours-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    gap: 1rem;
+    height: 250px;
+    padding: 1rem 0;
+  }
+}
+
+.hour-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+
+  .bar {
+    width: 100%;
+    background: linear-gradient(to top, #2196F3, #64B5F6);
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    min-height: 30px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 0.5rem;
+    transition: all 0.3s;
+
+    &:hover {
+      background: linear-gradient(to top, #1976D2, #42A5F5);
+      transform: scaleY(1.05);
+    }
+
+    .bar-value {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: white;
+    }
+  }
+
+  .hour-label {
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 500;
+  }
+}
+
+// Actions Section
+.actions-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+.action-card {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+
+  &:hover {
+    background: white;
+    border-color: #4CAF50;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  .action-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .analytics-container {
+    padding: 1rem;
+  }
+
+  .analytics-header {
+    flex-direction: column;
+    gap: 1rem;
+
+    .header-actions {
+      width: 100%;
+      flex-direction: column;
+
+      .period-selector,
+      .export-btn {
+        width: 100%;
+      }
+    }
+  }
+
+  .metrics-grid,
+  .status-grid,
+  .customer-grid,
+  .order-types-grid,
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-card {
+    .metric-icon {
+      font-size: 2rem;
+      width: 50px;
+      height: 50px;
+    }
+
+    .metric-content {
+      .metric-value {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .chart-section {
+    .revenue-chart {
+      .chart-container {
+        height: 200px;
+      }
+    }
+  }
+
+  .peak-hours-section {
+    .peak-hours-chart {
+      height: 180px;
+    }
+  }
+}
+

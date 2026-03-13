@@ -132,6 +132,21 @@
         </a>
       </li>
 
+      <!-- Analytics -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="analytics"
+          routerLinkActive="active"
+          class="nav-link"
+          (click)="closeMobileSidebar()"
+          [attr.aria-label]="'Navigate to Analytics' + (isCollapsed() ? '' : ' - Comprehensive business analytics dashboard')">
+          <span class="nav-icon" aria-hidden="true">📊</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Analytics</span>
+          }
+        </a>
+      </li>
+
       <!-- Manage My Ads -->
       <li class="nav-item" role="listitem">
         <a

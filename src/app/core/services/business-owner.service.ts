@@ -513,5 +513,16 @@ export class BusinessOwnerService {
       { headers: this.getHeaders() }
     );
   }
+
+  // ===================================
+  // ANALYTICS
+  // ===================================
+
+  getBusinessAnalytics(businessId: string, period: string): Observable<any> {
+    return this.http.get<any>(
+      `${environment.apiUrl}/business/analytics/${businessId}?period=${period}`,
+      { headers: this.getHeaders() }
+    );
+  }
 }
 

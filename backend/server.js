@@ -153,6 +153,7 @@ const subscriptionsRoutes = require('./routes/subscriptions');
 const premiumListingsRoutes = require('./routes/premium-listings');
 const cartRoutes = require('./routes/cart');
 const checkoutRoutes = require('./routes/checkout');
+const businessAnalyticsRoutes = require('./routes/business-analytics');
 
 // Static file serving for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -204,6 +205,7 @@ app.use('/api/specialist-reviews', specialistReviewsRoutes); // Specialist revie
 app.use('/api/payments', paymentsRoutes); // Paystack payment gateway
 app.use('/api/subscriptions', subscriptionsRoutes); // Subscription plans and management
 app.use('/api/premium-listings', premiumListingsRoutes); // Premium listing purchases
+app.use('/api/business', businessAnalyticsRoutes); // Business analytics dashboard
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
