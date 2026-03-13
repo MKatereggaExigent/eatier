@@ -327,9 +327,15 @@ router.post('/my-ads', async (req, res) => {
       return res.status(400).json({ error: 'User is not associated with a tenant' });
     }
 
-    // Verify the tier and placement exist and match
+    // Verify the tier and placement exist and match, and get pricing
     const tierCheck = await pool.query(`
-      SELECT t.id, t.priority_weight, p.id as placement_id, p.tier_id
+      SELECT
+        t.id,
+        t.priority_weight,
+        t.cost_per_click,
+        t.cost_per_impression,
+        p.id as placement_id,
+        p.tier_id
       FROM ad_space_tiers t
       JOIN ad_placements p ON p.tier_id = t.id
       WHERE t.id = $1 AND p.id = $2 AND t.is_active = true AND p.is_active = true
@@ -346,6 +352,10 @@ router.post('/my-ads', async (req, res) => {
     const tierPriority = tierCheck.rows[0].priority_weight;
     const priorityScore = Math.floor(tierPriority + (parseFloat(dailyBudget || 0) / 10));
 
+    // Get CPC and CPM from tier
+    const costPerClick = tierCheck.rows[0].cost_per_click || 0;
+    const costPerImpression = tierCheck.rows[0].cost_per_impression || 0;
+
     const result = await pool.query(`
       INSERT INTO ad_campaigns (
         tenant_id, user_id, business_id,
@@ -355,11 +365,12 @@ router.post('/my-ads', async (req, res) => {
         media_urls, video_urls,
         target_regions, target_locations, target_cities,
         currency, total_budget, daily_budget, remaining_amount,
+        cpc, cpm,
         start_date, end_date,
         priority_score, payment_required,
         status, is_active
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $20, $22, $23, $24, true, 'draft', false)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $20, $22, $23, $24, $25, $26, true, 'draft', false)
       RETURNING *
     `, [
       tenantId, userId, businessId || null,
@@ -369,6 +380,7 @@ router.post('/my-ads', async (req, res) => {
       mediaUrls || [], videoUrls || [],
       targetRegions || [], targetLocations || [], targetCities || [],
       currency || 'USD', totalBudget, dailyBudget || totalBudget,
+      costPerClick, costPerImpression,
       startDate || new Date(), endDate || null,
       priorityScore
     ]);
