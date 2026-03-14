@@ -29,6 +29,7 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🐳 STEP 2: Rebuilding Docker containers"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+docker compose down --remove-orphans 2>/dev/null || true
 docker compose up --build -d
 
 # Step 3: Wait for PostgreSQL to be ready
