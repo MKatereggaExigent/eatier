@@ -12,7 +12,7 @@ echo "1️⃣  Build and deploy frontend"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 cd ~/eatier
 npm run build
-./deploy_to_caprover_v2.sh
+./scripts/deploy_to_caprover_v2.sh
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

@@ -98,9 +98,9 @@ echo ""
 # Run frontend deployment script (use user's home for CapRover config)
 if [ "$EUID" -eq 0 ] && [ -n "$SUDO_USER" ]; then
     echo "📝 Running CapRover deployment as $SUDO_USER..."
-    sudo -u "$SUDO_USER" ./deploy_to_caprover.sh
+    sudo -u "$SUDO_USER" ./scripts/deploy_to_caprover.sh
 else
-    ./deploy_to_caprover.sh
+    ./scripts/deploy_to_caprover.sh
 fi
 
 # ===========================================
