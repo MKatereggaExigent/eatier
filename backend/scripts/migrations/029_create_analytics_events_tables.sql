@@ -67,17 +67,29 @@ CREATE TABLE IF NOT EXISTS business_analytics_daily (
     direction_clicks INTEGER DEFAULT 0,
     website_clicks INTEGER DEFAULT 0,
     phone_clicks INTEGER DEFAULT 0,
-    
+    qr_scans INTEGER DEFAULT 0,
+    share_count INTEGER DEFAULT 0,
+    average_session_duration INTEGER DEFAULT 0,
+    bounce_rate DECIMAL(5, 4) DEFAULT 0,
+    return_visitor_rate DECIMAL(5, 4) DEFAULT 0,
+
     -- Device breakdown
     mobile_views INTEGER DEFAULT 0,
     desktop_views INTEGER DEFAULT 0,
     tablet_views INTEGER DEFAULT 0,
-    
+    mobile_visits INTEGER DEFAULT 0,
+    desktop_visits INTEGER DEFAULT 0,
+    tablet_visits INTEGER DEFAULT 0,
+
     -- Traffic sources
     direct_traffic INTEGER DEFAULT 0,
     search_traffic INTEGER DEFAULT 0,
     social_traffic INTEGER DEFAULT 0,
     referral_traffic INTEGER DEFAULT 0,
+
+    -- Additional data
+    geo_data JSONB DEFAULT '{}',
+    peak_hours JSONB DEFAULT '[]',
     
     -- Timestamps
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

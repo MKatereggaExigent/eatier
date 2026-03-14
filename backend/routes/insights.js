@@ -55,7 +55,7 @@ router.get('/business/:businessId', async (req, res) => {
     const ownershipCheck = await pool.query(`
       SELECT b.id, b.tenant_id
       FROM businesses b
-      WHERE b.id = $1 AND b.user_id = $2
+      WHERE b.id = $1 AND b.owner_id = $2
     `, [businessId, userId]);
 
     if (ownershipCheck.rows.length === 0) {
