@@ -172,11 +172,11 @@ export class LayoutComponent {
       if (!isAuth) {
         // Close all menus when user logs out
         this.closeAllMenus();
+      } else {
+        // Load notifications only when user is authenticated
+        this.notificationService.loadNotifications();
       }
     });
-
-    // Load notifications when component initializes
-    this.notificationService.loadNotifications();
   }
 
   // Toggle methods for interactive elements
