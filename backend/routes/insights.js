@@ -1,6 +1,10 @@
 const express = require('express');
 const pool = require('../config/database');
+const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
+
+// Apply authentication to all routes
+router.use(authenticateToken);
 
 // Helper function to calculate date range
 function getDateRange(period, startDate, endDate) {
