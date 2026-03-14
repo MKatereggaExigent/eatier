@@ -43,7 +43,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         '/auth/register',
         '/auth/refresh',
         '/businesses',  // Public business discovery
-        '/public/specialists',  // Public specialist discovery
+        '/specialists',  // Public specialist discovery
+        '/public/specialists',  // Public specialist discovery (alternative endpoint)
         '/blog',  // Public blog
         '/ads-public',  // Public ads
         '/public',  // Other public endpoints
