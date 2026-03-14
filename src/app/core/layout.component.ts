@@ -4,6 +4,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { AuthService } from './services/auth.service';
 import { CartService } from './services/cart.service';
 import { CommonModule } from '@angular/common';
+import { FavoritesService } from '../services/favorites.service';
 import { FooterAdComponent } from '../shared/components/ads/footer-ad/footer-ad.component';
 import { FormsModule } from '@angular/forms';
 import { HeaderAdComponent } from '../shared/components/ads/header-ad/header-ad.component';
@@ -47,6 +48,7 @@ export class LayoutComponent {
   protected searchService = inject(SearchService);
   protected notificationService = inject(NotificationService);
   protected cartService = inject(CartService);
+  private favoritesService = inject(FavoritesService);
 
   // State management for UI interactions
   showProfileMenu = signal(false);
@@ -173,8 +175,9 @@ export class LayoutComponent {
         // Close all menus when user logs out
         this.closeAllMenus();
       } else {
-        // Load notifications only when user is authenticated
+        // Load notifications and favorites only when user is authenticated
         this.notificationService.loadNotifications();
+        this.favoritesService.initializeFavorites();
       }
     });
   }

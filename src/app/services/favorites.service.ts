@@ -74,7 +74,13 @@ export class FavoritesService {
   isLoading$ = this.isLoadingSubject.asObservable();
 
   constructor() {
-    // Only load favorites if user is authenticated
+    // Don't load favorites in constructor - let components trigger it when needed
+  }
+
+  /**
+   * Initialize favorites - should be called by authenticated components
+   */
+  initializeFavorites(): void {
     const token = localStorage.getItem('itiyum_token');
     if (token) {
       this.loadUserFavorites();

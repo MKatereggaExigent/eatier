@@ -161,6 +161,9 @@ export class UserFavoritesComponent implements OnInit {
   });
 
   ngOnInit() {
+    // Initialize favorites service for authenticated user
+    this.favoritesService.initializeFavorites();
+
     this.loadFavorites();
     this.loadCollections();
     this.loadStats();
