@@ -124,15 +124,15 @@ export class AdManagementComponent implements OnInit {
         description: c.description,
         type: c.type,
         status: c.status,
-        totalBudget: c.total_budget || 0,
-        dailyBudget: c.daily_budget || 0,
-        spentAmount: c.spent_amount || 0,
-        remainingAmount: c.remaining_amount || 0,
-        currency: c.currency || 'USD',
+        totalBudget: parseFloat(c.total_budget) || 0,
+        dailyBudget: parseFloat(c.daily_budget) || 0,
+        spentAmount: parseFloat(c.spent) || 0,  // Fixed: database column is 'spent', not 'spent_amount'
+        remainingAmount: parseFloat(c.remaining_amount) || 0,
+        currency: 'ZAR',  // South African Rand (R)
         impressions: c.impressions || 0,
         clicks: c.clicks || 0,
         conversions: c.conversions || 0,
-        clickThroughRate: c.click_through_rate || 0,
+        clickThroughRate: c.clicks > 0 && c.impressions > 0 ? (c.clicks / c.impressions) * 100 : 0,  // Calculate CTR from actual data
         startDate: c.start_date,
         endDate: c.end_date,
         createdAt: c.created_at
