@@ -9,7 +9,7 @@ set -e
 # Configuration
 CAPROVER_NAME="aidoc-server"
 CAPROVER_APP="itiyum"
-BACKEND_HOST="41.76.109.131"
+BACKEND_HOST="itiyum-backend"
 BACKEND_PORT="3001"
 
 echo ""

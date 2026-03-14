@@ -56,25 +56,32 @@ for i in {1..30}; do
     sleep 2
 done
 
-# Step 4: Run ALL migrations comprehensively INSIDE the Docker container
+# Step 4: Connect backend to CapRover network
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🗄️  STEP 4: Running ALL database migrations"
+echo "🔗 STEP 4: Connecting backend to CapRover network"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+docker network connect captain-overlay-network itiyum-backend 2>/dev/null || echo "   Already connected to captain network"
+
+# Step 5: Run ALL migrations comprehensively INSIDE the Docker container
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "🗄️  STEP 5: Running ALL database migrations"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 docker exec itiyum-backend npm run migrate
 
-# Step 5: Build frontend for production
+# Step 6: Build frontend for production
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🏗️  STEP 5: Building frontend for production"
+echo "🏗️  STEP 6: Building frontend for production"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 cd ~/eatier
 npm run build
 
-# Step 6: Deploy frontend to CapRover
+# Step 7: Deploy frontend to CapRover
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🚀 STEP 6: Deploying to CapRover"
+echo "🚀 STEP 7: Deploying to CapRover"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 ./scripts/deploy_to_caprover_v2.sh
 
