@@ -1,0 +1,177 @@
+<div class="contact-page">
+  <!-- Hero Section -->
+  <section class="contact-hero">
+    <div class="hero-content">
+      <h1>Get in Touch</h1>
+      <p class="hero-subtitle">We'd love to hear from you. Our team is here to help.</p>
+    </div>
+  </section>
+
+  <div class="contact-container">
+    <!-- Contact Form Section -->
+    <section class="contact-form-section">
+      <div class="form-header">
+        <h2>Send Us a Message</h2>
+        <p>Fill out the form below and we'll get back to you within 24 hours.</p>
+      </div>
+
+      @if (submitSuccess()) {
+        <div class="success-message">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p>Thank you! Your message has been sent successfully. We'll be in touch soon.</p>
+        </div>
+      }
+
+      @if (submitError()) {
+        <div class="error-message">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p>{{ submitError() }}</p>
+        </div>
+      }
+
+      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Full Name *</label>
+            <input 
+              type="text" 
+              id="name" 
+              formControlName="name"
+              [class.invalid]="isFieldInvalid('name')"
+              placeholder="John Doe">
+            @if (isFieldInvalid('name')) {
+              <span class="error-text">{{ getFieldError('name') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input 
+              type="email" 
+              id="email" 
+              formControlName="email"
+              [class.invalid]="isFieldInvalid('email')"
+              placeholder="john@example.com">
+            @if (isFieldInvalid('email')) {
+              <span class="error-text">{{ getFieldError('email') }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Phone Number (Optional)</label>
+            <input 
+              type="tel" 
+              id="phone" 
+              formControlName="phone"
+              placeholder="+27 12 345 6789">
+          </div>
+
+          <div class="form-group">
+            <label for="reason">Reason for Contact *</label>
+            <select id="reason" formControlName="reason">
+              @for (reason of contactReasons; track reason.value) {
+                <option [value]="reason.value">{{ reason.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="subject">Subject *</label>
+          <input 
+            type="text" 
+            id="subject" 
+            formControlName="subject"
+            [class.invalid]="isFieldInvalid('subject')"
+            placeholder="Brief description of your inquiry">
+          @if (isFieldInvalid('subject')) {
+            <span class="error-text">{{ getFieldError('subject') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="message">Message *</label>
+          <textarea 
+            id="message" 
+            formControlName="message"
+            [class.invalid]="isFieldInvalid('message')"
+            rows="6"
+            placeholder="Please provide details about your inquiry..."></textarea>
+          @if (isFieldInvalid('message')) {
+            <span class="error-text">{{ getFieldError('message') }}</span>
+          }
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="consent">
+            <span>I consent to Itiyum processing my personal data in accordance with the <a routerLink="/legal/privacy">Privacy Policy</a> *</span>
+          </label>
+          @if (isFieldInvalid('consent')) {
+            <span class="error-text">You must consent to continue</span>
+          }
+        </div>
+
+        <button 
+          type="submit" 
+          class="submit-button"
+          [disabled]="isSubmitting()">
+          @if (isSubmitting()) {
+            <span>Sending...</span>
+          } @else {
+            <span>Send Message</span>
+          }
+        </button>
+      </form>
+    </section>
+
+    <!-- Contact Information Section -->
+    <section class="contact-info-section">
+      <div class="info-card">
+        <h3>📧 Email Us</h3>
+        <p><a href="mailto:hello@itiyum.com">hello@itiyum.com</a></p>
+        <p class="info-description">For general inquiries and support</p>
+      </div>
+
+      <div class="info-card">
+        <h3>📞 Call Us</h3>
+        <p>+27 (0) 21 123 4567</p>
+        <p class="info-description">Monday - Friday: 9:00 AM - 6:00 PM SAST</p>
+      </div>
+
+      <div class="info-card">
+        <h3>💬 Live Chat</h3>
+        <p><a routerLink="/help">Visit Help Centre</a></p>
+        <p class="info-description">Get instant support from our team</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Offices Section -->
+  <section class="offices-section">
+    <div class="section-container">
+      <h2 class="section-title">Our Offices</h2>
+      <div class="offices-grid">
+        @for (office of offices; track office.city) {
+          <div class="office-card">
+            <h3>{{ office.city }}</h3>
+            <p class="office-country">{{ office.country }}</p>
+            <div class="office-details">
+              <p><strong>📍 Address:</strong><br>{{ office.address }}</p>
+              <p><strong>📞 Phone:</strong><br>{{ office.phone }}</p>
+              <p><strong>📧 Email:</strong><br><a [href]="'mailto:' + office.email">{{ office.email }}</a></p>
+              <p><strong>🕒 Hours:</strong><br>{{ office.hours }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+</div>
+

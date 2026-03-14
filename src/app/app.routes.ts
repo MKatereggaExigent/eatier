@@ -18,7 +18,11 @@ export const routes: Routes = [
             { path: 'faqs', loadComponent: () => import('./pages/faqs/faqs.component').then(m => m.FaqsComponent) },
             { path: 'legal/terms', loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent), data: { page: 'terms' } },
             { path: 'legal/privacy', loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent), data: { page: 'privacy' } },
+            { path: 'legal/cookies', loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent), data: { page: 'cookies' } },
             { path: 'legal', redirectTo: 'legal/terms', pathMatch: 'full' },
+            { path: 'careers', loadComponent: () => import('./pages/careers/careers.component').then(m => m.CareersComponent) },
+            { path: 'accessibility', loadComponent: () => import('./pages/accessibility/accessibility.component').then(m => m.AccessibilityComponent) },
+            { path: 'contact', loadComponent: () => import('./pages/contact/contact.component').then(m => m.ContactComponent) },
 
             // Public restaurant discovery
             {

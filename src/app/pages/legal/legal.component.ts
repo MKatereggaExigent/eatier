@@ -10,8 +10,8 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
   styleUrls: ['./legal.component.scss']
 })
 export class LegalComponent implements OnInit {
-  currentPage = signal<'terms' | 'privacy'>('terms');
-  lastUpdated = signal<string>('January 22, 2026');
+  currentPage = signal<'terms' | 'privacy' | 'cookies'>('terms');
+  lastUpdated = signal<string>('March 14, 2026');
 
   constructor(private route: ActivatedRoute) {}
 

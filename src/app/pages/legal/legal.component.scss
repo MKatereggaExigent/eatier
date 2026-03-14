@@ -410,3 +410,57 @@ $font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
   }
 }
+
+// Cookie Policy specific styles
+.cookie-table {
+  margin: 2rem 0;
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border: 1px solid $border-light;
+
+    thead {
+      background: #f8f9fa;
+
+      tr {
+        th {
+          padding: 1rem;
+          text-align: left;
+          font-weight: 600;
+          color: $text-dark;
+          border-bottom: 2px solid $border-light;
+          font-size: 0.95rem;
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid $border-light;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:hover {
+          background: #f8f9fa;
+        }
+
+        td {
+          padding: 1rem;
+          color: $text-muted;
+          font-size: 0.9rem;
+
+          &:first-child {
+            font-family: 'Courier New', monospace;
+            color: $text-dark;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+  }
+}

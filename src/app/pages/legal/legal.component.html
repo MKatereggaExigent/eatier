@@ -2,7 +2,7 @@
   <!-- Hero Section -->
   <section class="legal-hero">
     <div class="hero-content">
-      <h1>{{ currentPage() === 'terms' ? 'Terms of Service' : 'Privacy Policy' }}</h1>
+      <h1>{{ currentPage() === 'terms' ? 'Terms of Service' : currentPage() === 'privacy' ? 'Privacy Policy' : 'Cookie Policy' }}</h1>
       <p class="last-updated">Last Updated: {{ lastUpdated() }}</p>
     </div>
   </section>
@@ -19,6 +19,11 @@
          [class.active]="currentPage() === 'privacy'"
          class="nav-tab">
         Privacy Policy
+      </a>
+      <a routerLink="/legal/cookies"
+         [class.active]="currentPage() === 'cookies'"
+         class="nav-tab">
+        Cookie Policy
       </a>
     </div>
   </nav>
@@ -46,7 +51,7 @@
           <li><a href="/legal/terms#changes">15. Changes to Terms</a></li>
           <li><a href="/legal/terms#contact">16. Contact Information</a></li>
         </ul>
-      } @else {
+      } @else if (currentPage() === 'privacy') {
         <ul>
           <li><a href="/legal/privacy#introduction">1. Introduction</a></li>
           <li><a href="/legal/privacy#information-collected">2. Information We Collect</a></li>
@@ -61,6 +66,17 @@
           <li><a href="/legal/privacy#third-party">11. Third-Party Services</a></li>
           <li><a href="/legal/privacy#updates">12. Policy Updates</a></li>
           <li><a href="/legal/privacy#contact">13. Contact Us</a></li>
+        </ul>
+      } @else {
+        <ul>
+          <li><a href="/legal/cookies#what-are-cookies">1. What Are Cookies?</a></li>
+          <li><a href="/legal/cookies#how-we-use">2. How We Use Cookies</a></li>
+          <li><a href="/legal/cookies#types">3. Types of Cookies We Use</a></li>
+          <li><a href="/legal/cookies#third-party">4. Third-Party Cookies</a></li>
+          <li><a href="/legal/cookies#manage">5. Managing Cookies</a></li>
+          <li><a href="/legal/cookies#consent">6. Cookie Consent</a></li>
+          <li><a href="/legal/cookies#updates">7. Updates to This Policy</a></li>
+          <li><a href="/legal/cookies#contact">8. Contact Us</a></li>
         </ul>
       }
     </aside>
@@ -612,6 +628,280 @@
               <p>General Support: <a href="mailto:support@itiyum.com">support&#64;itiyum.com</a></p>
             </div>
             <p>For data protection complaints, you may also contact the Information Regulator of South Africa or the relevant data protection authority in your jurisdiction.</p>
+          </section>
+        </article>
+      }
+
+      <!-- COOKIE POLICY -->
+      @if (currentPage() === 'cookies') {
+        <article class="cookies-content">
+          <section id="what-are-cookies" class="legal-section">
+            <h2>1. What Are Cookies?</h2>
+            <p>Cookies are small text files that are placed on your device (computer, smartphone, or tablet) when you visit a website. They are widely used to make websites work more efficiently and provide information to website owners.</p>
+
+            <p>Cookies help us:</p>
+            <ul>
+              <li>Remember your preferences and settings</li>
+              <li>Understand how you use our platform</li>
+              <li>Improve your user experience</li>
+              <li>Provide personalized content and recommendations</li>
+              <li>Analyze platform performance and traffic</li>
+            </ul>
+          </section>
+
+          <section id="how-we-use" class="legal-section">
+            <h2>2. How We Use Cookies</h2>
+            <p>Itiyum uses cookies and similar tracking technologies to enhance your experience on our platform. We use cookies for the following purposes:</p>
+
+            <h3>Essential Operations</h3>
+            <ul>
+              <li>Maintaining your login session</li>
+              <li>Remembering items in your cart</li>
+              <li>Ensuring platform security</li>
+              <li>Enabling core functionality</li>
+            </ul>
+
+            <h3>Performance and Analytics</h3>
+            <ul>
+              <li>Understanding how visitors use our platform</li>
+              <li>Identifying popular content and features</li>
+              <li>Detecting and fixing technical issues</li>
+              <li>Measuring advertising effectiveness</li>
+            </ul>
+
+            <h3>Personalization</h3>
+            <ul>
+              <li>Remembering your location and currency preferences</li>
+              <li>Providing personalized restaurant recommendations</li>
+              <li>Customizing content based on your interests</li>
+              <li>Remembering your language preferences</li>
+            </ul>
+
+            <h3>Marketing and Advertising</h3>
+            <ul>
+              <li>Delivering relevant advertisements</li>
+              <li>Measuring ad campaign performance</li>
+              <li>Preventing ad fraud</li>
+              <li>Retargeting visitors with relevant offers</li>
+            </ul>
+          </section>
+
+          <section id="types" class="legal-section">
+            <h2>3. Types of Cookies We Use</h2>
+
+            <h3>3.1 Strictly Necessary Cookies</h3>
+            <p>These cookies are essential for the platform to function properly. They enable core functionality such as security, network management, and accessibility. You cannot opt out of these cookies.</p>
+
+            <div class="cookie-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cookie Name</th>
+                    <th>Purpose</th>
+                    <th>Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>session_id</td>
+                    <td>Maintains your login session</td>
+                    <td>Session</td>
+                  </tr>
+                  <tr>
+                    <td>csrf_token</td>
+                    <td>Security protection against cross-site request forgery</td>
+                    <td>Session</td>
+                  </tr>
+                  <tr>
+                    <td>cookie_consent</td>
+                    <td>Stores your cookie preferences</td>
+                    <td>1 year</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>3.2 Performance Cookies</h3>
+            <p>These cookies collect information about how you use our platform, such as which pages you visit most often. This data helps us improve platform performance.</p>
+
+            <div class="cookie-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cookie Name</th>
+                    <th>Purpose</th>
+                    <th>Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>_ga</td>
+                    <td>Google Analytics - distinguishes users</td>
+                    <td>2 years</td>
+                  </tr>
+                  <tr>
+                    <td>_gid</td>
+                    <td>Google Analytics - distinguishes users</td>
+                    <td>24 hours</td>
+                  </tr>
+                  <tr>
+                    <td>_gat</td>
+                    <td>Google Analytics - throttles request rate</td>
+                    <td>1 minute</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>3.3 Functional Cookies</h3>
+            <p>These cookies allow the platform to remember choices you make (such as your username, language, or region) and provide enhanced, personalized features.</p>
+
+            <div class="cookie-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cookie Name</th>
+                    <th>Purpose</th>
+                    <th>Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>user_location</td>
+                    <td>Stores your location for localized content</td>
+                    <td>30 days</td>
+                  </tr>
+                  <tr>
+                    <td>currency_preference</td>
+                    <td>Remembers your preferred currency</td>
+                    <td>1 year</td>
+                  </tr>
+                  <tr>
+                    <td>language</td>
+                    <td>Stores your language preference</td>
+                    <td>1 year</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>3.4 Targeting/Advertising Cookies</h3>
+            <p>These cookies are used to deliver advertisements more relevant to you and your interests. They also help measure the effectiveness of advertising campaigns.</p>
+
+            <p><strong>Third-party advertising cookies may include:</strong></p>
+            <ul>
+              <li>Google Ads</li>
+              <li>Facebook Pixel</li>
+              <li>LinkedIn Insight Tag</li>
+              <li>Twitter Conversion Tracking</li>
+            </ul>
+          </section>
+
+          <section id="third-party" class="legal-section">
+            <h2>4. Third-Party Cookies</h2>
+            <p>We work with third-party service providers who may also set cookies on your device when you visit our platform. These include:</p>
+
+            <h3>Analytics Providers</h3>
+            <ul>
+              <li><strong>Google Analytics:</strong> Helps us understand how visitors use our platform</li>
+              <li><strong>Hotjar:</strong> Provides heatmaps and user behavior analytics</li>
+            </ul>
+
+            <h3>Advertising Partners</h3>
+            <ul>
+              <li><strong>Google Ads:</strong> Delivers targeted advertising</li>
+              <li><strong>Facebook:</strong> Enables social media integration and advertising</li>
+              <li><strong>LinkedIn:</strong> Professional network advertising</li>
+            </ul>
+
+            <h3>Payment Processors</h3>
+            <ul>
+              <li><strong>Stripe:</strong> Processes secure payments</li>
+              <li><strong>PayFast:</strong> South African payment gateway</li>
+            </ul>
+
+            <p>These third parties have their own privacy policies and cookie policies. We recommend reviewing their policies to understand how they use cookies.</p>
+          </section>
+
+          <section id="manage" class="legal-section">
+            <h2>5. Managing Cookies</h2>
+            <p>You have the right to decide whether to accept or reject cookies. You can manage your cookie preferences through:</p>
+
+            <h3>5.1 Browser Settings</h3>
+            <p>Most web browsers allow you to control cookies through their settings. You can:</p>
+            <ul>
+              <li>View what cookies are stored and delete them individually</li>
+              <li>Block third-party cookies</li>
+              <li>Block all cookies from specific websites</li>
+              <li>Block all cookies from being set</li>
+              <li>Delete all cookies when you close your browser</li>
+            </ul>
+
+            <p><strong>Browser-specific instructions:</strong></p>
+            <ul>
+              <li><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener noreferrer">Google Chrome</a></li>
+              <li><a href="https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-desktop" target="_blank" rel="noopener noreferrer">Mozilla Firefox</a></li>
+              <li><a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac" target="_blank" rel="noopener noreferrer">Apple Safari</a></li>
+              <li><a href="https://support.microsoft.com/en-us/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" rel="noopener noreferrer">Microsoft Edge</a></li>
+            </ul>
+
+            <h3>5.2 Our Cookie Preference Center</h3>
+            <p>When you first visit Itiyum, you'll see a cookie banner allowing you to accept or customize your cookie preferences. You can change your preferences at any time by clicking the "Cookie Settings" link in the footer.</p>
+
+            <h3>5.3 Opt-Out Tools</h3>
+            <p>You can opt out of certain third-party cookies:</p>
+            <ul>
+              <li><a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a></li>
+              <li><a href="https://www.youronlinechoices.com/" target="_blank" rel="noopener noreferrer">Your Online Choices (EU)</a></li>
+              <li><a href="https://optout.networkadvertising.org/" target="_blank" rel="noopener noreferrer">Network Advertising Initiative Opt-out</a></li>
+            </ul>
+
+            <p><strong>Important:</strong> Blocking or deleting cookies may impact your experience on our platform. Some features may not function properly without cookies.</p>
+          </section>
+
+          <section id="consent" class="legal-section">
+            <h2>6. Cookie Consent</h2>
+            <p>In compliance with the Protection of Personal Information Act (POPIA) and other applicable data protection laws, we obtain your consent before placing non-essential cookies on your device.</p>
+
+            <h3>How We Obtain Consent</h3>
+            <ul>
+              <li>Cookie banner displayed on first visit</li>
+              <li>Clear information about cookie types and purposes</li>
+              <li>Option to accept all, reject all, or customize preferences</li>
+              <li>Ability to withdraw consent at any time</li>
+            </ul>
+
+            <h3>Withdrawing Consent</h3>
+            <p>You can withdraw your cookie consent at any time by:</p>
+            <ul>
+              <li>Clicking "Cookie Settings" in the footer</li>
+              <li>Adjusting your browser settings</li>
+              <li>Contacting us at <a href="mailto:privacy@itiyum.com">privacy&#64;itiyum.com</a></li>
+            </ul>
+          </section>
+
+          <section id="updates" class="legal-section">
+            <h2>7. Updates to This Policy</h2>
+            <p>We may update this Cookie Policy from time to time to reflect changes in technology, legislation, or our business practices. We will notify you of any significant changes by:</p>
+            <ul>
+              <li>Posting the updated policy on this page</li>
+              <li>Updating the "Last Updated" date</li>
+              <li>Displaying a notice on our platform</li>
+            </ul>
+            <p>We encourage you to review this Cookie Policy periodically to stay informed about how we use cookies.</p>
+          </section>
+
+          <section id="contact" class="legal-section">
+            <h2>8. Contact Us</h2>
+            <p>If you have questions about our use of cookies or this Cookie Policy, please contact us:</p>
+            <div class="contact-info">
+              <p><strong>Data Protection Officer</strong></p>
+              <p>Itiyum (Pty) Ltd.</p>
+              <p>Johannesburg, South Africa</p>
+              <p>Email: <a href="mailto:privacy@itiyum.com">privacy&#64;itiyum.com</a></p>
+              <p>General Support: <a href="mailto:support@itiyum.com">support&#64;itiyum.com</a></p>
+            </div>
+            <p>For data protection complaints, you may contact the Information Regulator of South Africa.</p>
           </section>
         </article>
       }
