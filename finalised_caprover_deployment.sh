@@ -17,7 +17,7 @@ set -e  # Exit on any error
 CAPROVER_NAME="aidoc-server"
 CAPROVER_APP="itiyum"
 BACKEND_HOST="41.76.109.131"
-BACKEND_PORT="3002"
+BACKEND_PORT="3001"
 
 echo ""
 echo "=========================================="
@@ -125,11 +125,16 @@ server {
     server_name localhost;
 
     root /usr/share/nginx/html;
-    index index.html index.htm;
+    index index.html;
 
     # Frontend - Angular SPA
     location / {
-        try_files \\\$uri \\\$uri/ /index.html;
+        try_files \\\$uri \\\$uri/ /index.html =404;
+    }
+
+    # Explicitly serve index.html
+    location = /index.html {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
     }
 
     # API Proxy to backend
