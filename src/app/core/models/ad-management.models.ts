@@ -258,7 +258,7 @@ export interface TimeRange {
 // Enums
 export type AdType = 'promoted' | 'sponsored' | 'partnership';
 export type CampaignStatus = 'draft' | 'active' | 'paused' | 'completed' | 'cancelled';
-export type Currency = 'USD' | 'EUR' | 'GBP' | 'KES' | 'ETB' | 'UGX' | 'TZS';
+export type Currency = 'USD' | 'EUR' | 'GBP' | 'KES' | 'ETB' | 'UGX' | 'TZS' | 'ZAR' | 'NGN' | 'RWF' | 'BWP' | 'ZMW' | 'MWK' | 'LSL' | 'SZL' | 'NAD';
 export type BillingCycle = 'daily' | 'weekly' | 'monthly';
 export type Gender = 'male' | 'female' | 'non-binary' | 'all';
 export type UserType = 'business' | 'specialist' | 'food_enthusiast' | 'normal_user';

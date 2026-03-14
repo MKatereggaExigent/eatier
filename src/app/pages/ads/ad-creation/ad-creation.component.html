@@ -264,14 +264,14 @@
             <div class="form-group">
               <label class="form-label">Countries *</label>
               <div class="multi-select-grid">
-                @for (country of availableCountries(); track country) {
+                @for (country of availableCountries(); track country.id) {
                   <label class="multi-select-item" [class.selected]="isCountrySelected(country)">
                     <input
                       type="checkbox"
                       [checked]="isCountrySelected(country)"
                       (change)="toggleCountry(country)"
                       class="multi-select-input">
-                    <span class="multi-select-label">{{ country }}</span>
+                    <span class="multi-select-label">{{ country.name }}</span>
                   </label>
                 }
               </div>
@@ -282,14 +282,14 @@
               <label class="form-label">Cities (Optional)</label>
               @if (availableCities().length > 0) {
                 <div class="multi-select-grid">
-                  @for (city of availableCities(); track city) {
+                  @for (city of availableCities(); track city.id) {
                     <label class="multi-select-item" [class.selected]="isCitySelected(city)">
                       <input
                         type="checkbox"
                         [checked]="isCitySelected(city)"
                         (change)="toggleCity(city)"
                         class="multi-select-input">
-                      <span class="multi-select-label">{{ city }}</span>
+                      <span class="multi-select-label">{{ city.name }}</span>
                     </label>
                   }
                 </div>

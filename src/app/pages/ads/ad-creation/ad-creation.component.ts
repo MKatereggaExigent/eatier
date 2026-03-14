@@ -541,11 +541,12 @@ export class AdCreationComponent implements OnInit {
       videos: [[]]
     });
 
-    // Budget Form
+    // Budget Form - Use detected currency from CurrencyService
+    const detectedCurrency = this.currencyService.getCurrentCurrency();
     this.budgetForm = this.fb.group({
       totalBudget: [100, [Validators.required, Validators.min(5)]],
       dailyBudget: [10, [Validators.required, Validators.min(5)]],
-      currency: ['USD', Validators.required],
+      currency: [detectedCurrency.code, Validators.required],
       billingCycle: ['daily', Validators.required]
     });
 
