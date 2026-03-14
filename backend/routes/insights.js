@@ -41,6 +41,24 @@ router.get('/business/:businessId', async (req, res) => {
   try {
     const { businessId } = req.params;
     const { period = 'daily', startDate, endDate } = req.query;
+    const userId = req.user?.id; // From auth middleware
+
+    // RBAC: Verify user owns this business
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const ownershipCheck = await pool.query(`
+      SELECT b.id, b.tenant_id
+      FROM businesses b
+      WHERE b.id = $1 AND b.user_id = $2
+    `, [businessId, userId]);
+
+    if (ownershipCheck.rows.length === 0) {
+      return res.status(403).json({ error: 'Access denied. You do not own this business.' });
+    }
+
+    const tenantId = ownershipCheck.rows[0].tenant_id;
 
     // Validate period
     const validPeriods = ['daily', 'weekly', 'monthly', 'yearly', 'custom'];
@@ -56,7 +74,7 @@ router.get('/business/:businessId', async (req, res) => {
     const fromDateStr = fromDate.toISOString().split('T')[0];
     const toDateStr = toDate.toISOString().split('T')[0];
 
-    // Get analytics data from business_analytics_daily
+    // Get analytics data from business_analytics_daily (with multi-tenancy)
     const analyticsResult = await pool.query(`
       SELECT
         analytics_date as date,
@@ -81,10 +99,11 @@ router.get('/business/:businessId', async (req, res) => {
         peak_hours
       FROM business_analytics_daily
       WHERE business_id = $1
-        AND analytics_date >= $2
-        AND analytics_date <= $3
+        AND tenant_id = $2
+        AND analytics_date >= $3
+        AND analytics_date <= $4
       ORDER BY analytics_date DESC
-    `, [businessId, fromDateStr, toDateStr]);
+    `, [businessId, tenantId, fromDateStr, toDateStr]);
 
     // Get booking stats for the period
     const bookingStats = await pool.query(`

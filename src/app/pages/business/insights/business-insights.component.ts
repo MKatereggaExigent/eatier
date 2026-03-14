@@ -99,11 +99,7 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         catchError(error => {
           console.error('Error fetching insights:', error);
-          // Fall back to business data if API fails
-          const business = this.business();
-          if (business) {
-            this.generateFallbackInsights(business);
-          }
+          this.errorMessage.set('Failed to load insights. Please try again.');
           return of(null);
         })
       )
@@ -134,54 +130,7 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
     this.insights.set(insights);
   }
 
-  generateFallbackInsights(business: Business): void {
-    // Fallback to estimated data if API fails
-    const insights: BusinessInsights = {
-      businessId: business.id,
-      period: {
-        start: new Date(new Date().setDate(1)),
-        end: new Date(),
-        type: this.selectedPeriod() as 'daily' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
-      },
-      metrics: {
-        totalViews: business.total_bookings ? business.total_bookings * 10 : 0,
-        uniqueVisitors: business.total_bookings ? business.total_bookings * 7 : 0,
-        menuViews: business.total_menu_items ? business.total_menu_items * 50 : 0,
-        profileViews: business.total_reviews ? business.total_reviews * 15 : 0,
-        contactClicks: business.total_bookings || 0,
-        qrScans: Math.floor((business.total_bookings || 0) * 0.3),
-        shareCount: Math.floor((business.total_reviews || 0) * 0.5)
-      },
-      engagement: {
-        averageSessionDuration: 0,
-        bounceRate: 0,
-        returnVisitorRate: 0,
-        peakHours: [],
-        popularMenuItems: []
-      },
-      growth: {
-        viewsGrowth: 0,
-        engagementGrowth: 0,
-        customerGrowth: 0
-      },
-      demographics: {
-        topCountries: [
-          { country: business.country || 'Unknown', count: business.total_bookings || 0 }
-        ],
-        deviceTypes: [
-          { type: 'Mobile', percentage: 0 },
-          { type: 'Desktop', percentage: 0 },
-          { type: 'Tablet', percentage: 0 }
-        ],
-        referralSources: [
-          { source: 'Google Search', count: 0 },
-          { source: 'Social Media', count: 0 },
-          { source: 'Direct', count: 0 }
-        ]
-      }
-    };
-    this.insights.set(insights);
-  }
+
 
   loadInsights(): void {
     const business = this.business();
