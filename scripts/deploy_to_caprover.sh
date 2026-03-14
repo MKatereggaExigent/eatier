@@ -19,9 +19,10 @@ echo "====================================="
 echo "📍 Running on server - deploying to CapRover"
 echo ""
 
-# Get script directory
+# Get script directory and navigate to project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
 
 # Step 1: Ensure we're in the project root
 if [ ! -f "angular.json" ]; then
