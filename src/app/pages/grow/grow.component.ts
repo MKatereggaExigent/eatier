@@ -75,7 +75,7 @@ export class GrowComponent implements OnInit, OnDestroy {
         'Increased visibility to target audience',
         'Real-time performance tracking'
       ],
-      basePrice: 100 // R100 in ZAR
+      basePrice: 5 // R5/day - Basic tier minimum
     },
     {
       id: 'sponsored',
@@ -88,7 +88,7 @@ export class GrowComponent implements OnInit, OnDestroy {
         'Advanced targeting options',
         'Detailed analytics dashboard'
       ],
-      basePrice: 100 // R100 in ZAR
+      basePrice: 15 // R15/day - Standard tier minimum
     },
     {
       id: 'partnership',
@@ -101,7 +101,7 @@ export class GrowComponent implements OnInit, OnDestroy {
         'Partner network exposure',
         'Custom campaign design'
       ],
-      basePrice: 100 // R100 in ZAR
+      basePrice: 35 // R35/day - Premium tier minimum
     }
   ];
 
@@ -110,7 +110,7 @@ export class GrowComponent implements OnInit, OnDestroy {
     const currency = this.currentCurrency();
     return this.adTypes.map(adType => ({
       ...adType,
-      pricing: `Starting at ${currency.symbol}${adType.basePrice}`
+      pricing: `Starting at ${currency.symbol}${adType.basePrice}/day`
     }));
   });
 
