@@ -71,7 +71,7 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🚀 STEP 6: Deploying to CapRover"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-./deploy_to_caprover_v2.sh
+./scripts/deploy_to_caprover_v2.sh
 
 echo ""
 echo "=========================================="
