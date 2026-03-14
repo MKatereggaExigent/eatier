@@ -6,4 +6,4 @@ npm run build
 
 docker compose up --build -d
 
-./latest_caprover_deployment.sh
+./scripts/latest_caprover_deployment.sh
