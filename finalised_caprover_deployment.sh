@@ -183,16 +183,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "🚀 STEP 7: Deploying to CapRover"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Check if CapRover is configured
-if [ ! -f ~/.caprover/configs.json ]; then
-    echo ""
-    echo "❌ CapRover not configured. Please run:"
-    echo "   caprover login"
-    echo ""
-    exit 1
-fi
-
-# Deploy to CapRover
+# Deploy to CapRover (it will prompt for login if needed)
 caprover deploy \
   --caproverName "$CAPROVER_NAME" \
   --caproverApp "$CAPROVER_APP" \
