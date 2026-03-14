@@ -32,9 +32,10 @@ if [ "$EUID" -eq 0 ]; then
     read -p "Press Enter to continue anyway, or Ctrl+C to cancel..."
 fi
 
-# Get script directory
+# Get script directory and navigate to project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
 
 # Ensure we're in the project root
 if [ ! -f "angular.json" ] || [ ! -f "docker-compose.prod.yml" ]; then
