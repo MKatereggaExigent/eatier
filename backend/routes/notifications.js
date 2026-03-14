@@ -7,172 +7,74 @@ const { authenticateToken } = require('../middleware/auth');
 // USER NOTIFICATIONS (FEED)
 // ===================================
 
-// System-wide notifications for non-authenticated users
-const systemNotifications = [
-  {
-    id: 'sys-1',
-    user_id: null,
-    type: 'info',
-    title: '🎉 New Feature: Advanced Search',
-    message: 'Search across restaurants, dishes, and reviews with our enhanced search feature!',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-    read: false,
-    action_url: null,
-    icon: '🔍'
-  },
-  {
-    id: 'sys-2',
-    user_id: null,
-    type: 'info',
-    title: '📱 Mobile App Coming Soon',
-    message: 'Download our mobile app for iOS and Android. Launching next month!',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-    read: false,
-    action_url: null,
-    icon: '📱'
-  },
-  {
-    id: 'sys-3',
-    user_id: null,
-    type: 'success',
-    title: '✨ Platform Update',
-    message: 'We\'ve improved performance and added new features. Check out what\'s new!',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48), // 2 days ago
-    read: false,
-    action_url: '/about',
-    icon: '🚀'
-  },
-  {
-    id: 'sys-4',
-    user_id: null,
-    type: 'info',
-    title: '🎁 Special Promotion',
-    message: 'Sign up today and get 20% off your first booking at participating restaurants!',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72), // 3 days ago
-    read: false,
-    action_url: '/auth/register',
-    icon: '🎁'
-  },
-  {
-    id: 'sys-5',
-    user_id: null,
-    type: 'info',
-    title: '🔐 Login to See Your Notifications',
-    message: 'Create an account or login to receive personalized notifications about your bookings, reviews, and more.',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 96), // 4 days ago
-    read: false,
-    action_url: '/auth/login',
-    icon: '👤'
-  }
-];
-
 /**
  * GET /api/notifications
- * Get notifications - user-specific if authenticated, system-wide if not
- * Public endpoint that adapts based on authentication status
+ * Get notifications for authenticated user only
+ * Requires authentication
  */
-router.get('/', async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
-    // Check if user is authenticated (token in Authorization header or cookie)
-    const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
 
-    if (token) {
-      // User is authenticated - try to get user-specific notifications from database
-      try {
-        const jwt = require('jsonwebtoken');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-this-in-production');
-        const userId = decoded.id;
+    // Query user-specific notifications from database
+    const result = await pool.query(`
+      SELECT
+        id,
+        type,
+        title,
+        message,
+        created_at as timestamp,
+        is_read as read,
+        data->>'action_url' as action_url,
+        CASE
+          WHEN type = 'booking' THEN '📅'
+          WHEN type = 'review' THEN '⭐'
+          WHEN type = 'message' THEN '💬'
+          WHEN type = 'success' THEN '✅'
+          WHEN type = 'warning' THEN '⚠️'
+          WHEN type = 'error' THEN '❌'
+          ELSE 'ℹ️'
+        END as icon
+      FROM notifications
+      WHERE user_id = $1 AND tenant_id = $2
+      ORDER BY created_at DESC
+      LIMIT 20
+    `, [userId, tenantId]);
 
-        // Query user-specific notifications from database
-        const result = await pool.query(`
-          SELECT
-            id,
-            type,
-            title,
-            message,
-            created_at as timestamp,
-            is_read as read,
-            data->>'action_url' as action_url,
-            CASE
-              WHEN type = 'booking' THEN '📅'
-              WHEN type = 'review' THEN '⭐'
-              WHEN type = 'message' THEN '💬'
-              WHEN type = 'success' THEN '✅'
-              WHEN type = 'warning' THEN '⚠️'
-              WHEN type = 'error' THEN '❌'
-              ELSE 'ℹ️'
-            END as icon
-          FROM notifications
-          WHERE user_id = $1
-          ORDER BY created_at DESC
-          LIMIT 20
-        `, [userId]);
-
-        if (result.rows.length > 0) {
-          return res.json(result.rows);
-        }
-
-        // If no notifications in database, return empty array with a welcome message
-        return res.json([
-          {
-            id: 'welcome-1',
-            type: 'info',
-            title: '👋 Welcome to Itiyum!',
-            message: 'You\'ll see your personalized notifications here - bookings, reviews, messages, and more.',
-            timestamp: new Date(),
-            read: false,
-            action_url: null,
-            icon: '🎉'
-          }
-        ]);
-
-      } catch (jwtError) {
-        console.error('JWT verification failed:', jwtError);
-        // Token invalid, fall through to system notifications
-      }
-    }
-
-    // User is NOT authenticated - return system-wide notifications
-    res.json(systemNotifications);
+    // Return notifications (empty array if none exist)
+    res.json(result.rows);
 
   } catch (error) {
     console.error('Error fetching notifications:', error);
-    // Fallback to system notifications on error
-    res.json(systemNotifications);
+    res.status(500).json({ error: 'Failed to fetch notifications' });
   }
 });
 
 /**
  * PATCH /api/notifications/:id/read
  * Mark a specific notification as read
+ * Requires authentication
  */
-router.patch('/:id/read', async (req, res) => {
+router.patch('/:id/read', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
 
-    if (!token) {
-      // For system notifications (non-authenticated), just return success
-      return res.json({ success: true });
+    // Update notification in database (only if it belongs to this user and tenant)
+    const result = await pool.query(`
+      UPDATE notifications
+      SET is_read = true, read_at = NOW()
+      WHERE id = $1 AND user_id = $2 AND tenant_id = $3
+      RETURNING id
+    `, [id, userId, tenantId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Notification not found' });
     }
 
-    try {
-      const jwt = require('jsonwebtoken');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-this-in-production');
-      const userId = decoded.id;
-
-      // Update notification in database
-      await pool.query(`
-        UPDATE notifications
-        SET is_read = true, read_at = NOW()
-        WHERE id = $1 AND user_id = $2
-      `, [id, userId]);
-
-      res.json({ success: true });
-    } catch (jwtError) {
-      console.error('JWT verification failed:', jwtError);
-      res.json({ success: true }); // Return success anyway for UX
-    }
+    res.json({ success: true });
   } catch (error) {
     console.error('Error marking notification as read:', error);
     res.status(500).json({ error: 'Failed to mark notification as read' });
@@ -182,33 +84,21 @@ router.patch('/:id/read', async (req, res) => {
 /**
  * PATCH /api/notifications/read-all
  * Mark all notifications as read for current user
+ * Requires authentication
  */
-router.patch('/read-all', async (req, res) => {
+router.patch('/read-all', authenticateToken, async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
 
-    if (!token) {
-      // For system notifications (non-authenticated), just return success
-      return res.json({ success: true });
-    }
+    // Mark all notifications as read in database
+    await pool.query(`
+      UPDATE notifications
+      SET is_read = true, read_at = NOW()
+      WHERE user_id = $1 AND tenant_id = $2 AND is_read = false
+    `, [userId, tenantId]);
 
-    try {
-      const jwt = require('jsonwebtoken');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-this-in-production');
-      const userId = decoded.id;
-
-      // Mark all notifications as read in database
-      await pool.query(`
-        UPDATE notifications
-        SET is_read = true, read_at = NOW()
-        WHERE user_id = $1 AND is_read = false
-      `, [userId]);
-
-      res.json({ success: true });
-    } catch (jwtError) {
-      console.error('JWT verification failed:', jwtError);
-      res.json({ success: true }); // Return success anyway for UX
-    }
+    res.json({ success: true });
   } catch (error) {
     console.error('Error marking all notifications as read:', error);
     res.status(500).json({ error: 'Failed to mark all notifications as read' });
@@ -218,33 +108,26 @@ router.patch('/read-all', async (req, res) => {
 /**
  * DELETE /api/notifications/:id
  * Delete a specific notification
+ * Requires authentication
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
+    const userId = req.user.id;
+    const tenantId = req.user.tenant_id;
 
-    if (!token) {
-      // For system notifications (non-authenticated), just return success
-      return res.json({ success: true });
+    // Delete notification from database (only if it belongs to this user and tenant)
+    const result = await pool.query(`
+      DELETE FROM notifications
+      WHERE id = $1 AND user_id = $2 AND tenant_id = $3
+      RETURNING id
+    `, [id, userId, tenantId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Notification not found' });
     }
 
-    try {
-      const jwt = require('jsonwebtoken');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-this-in-production');
-      const userId = decoded.id;
-
-      // Delete notification from database
-      await pool.query(`
-        DELETE FROM notifications
-        WHERE id = $1 AND user_id = $2
-      `, [id, userId]);
-
-      res.json({ success: true });
-    } catch (jwtError) {
-      console.error('JWT verification failed:', jwtError);
-      res.json({ success: true }); // Return success anyway for UX
-    }
+    res.json({ success: true });
   } catch (error) {
     console.error('Error deleting notification:', error);
     res.status(500).json({ error: 'Failed to delete notification' });
