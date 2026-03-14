@@ -118,24 +118,26 @@ export class AdManagementComponent implements OnInit {
     }
 
     this.adService.getUserCampaigns(userId).then(response => {
+      // The service already transforms the data into AdCampaign objects with nested structure
+      // We need to flatten it for the component's Campaign interface
       const campaigns = response.campaigns.map((c: any) => ({
         id: c.id,
         title: c.title,
         description: c.description,
         type: c.type,
         status: c.status,
-        totalBudget: parseFloat(c.total_budget) || 0,
-        dailyBudget: parseFloat(c.daily_budget) || 0,
-        spentAmount: parseFloat(c.spent) || 0,  // Fixed: database column is 'spent', not 'spent_amount'
-        remainingAmount: parseFloat(c.remaining_amount) || 0,
-        currency: 'ZAR',  // South African Rand (R)
-        impressions: c.impressions || 0,
-        clicks: c.clicks || 0,
-        conversions: c.conversions || 0,
-        clickThroughRate: c.clicks > 0 && c.impressions > 0 ? (c.clicks / c.impressions) * 100 : 0,  // Calculate CTR from actual data
-        startDate: c.start_date,
-        endDate: c.end_date,
-        createdAt: c.created_at
+        totalBudget: c.budget?.totalBudget || 0,
+        dailyBudget: c.budget?.dailyBudget || 0,
+        spentAmount: c.budget?.spentAmount || 0,
+        remainingAmount: c.budget?.remainingAmount || 0,
+        currency: c.budget?.currency || 'ZAR',
+        impressions: c.analytics?.impressions || 0,
+        clicks: c.analytics?.clicks || 0,
+        conversions: c.analytics?.conversions || 0,
+        clickThroughRate: c.analytics?.clickThroughRate || 0,
+        startDate: c.startDate,
+        endDate: c.endDate,
+        createdAt: c.createdAt
       }));
 
       this.campaigns.set(campaigns);
