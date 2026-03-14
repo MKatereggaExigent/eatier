@@ -31,8 +31,8 @@ router.get('/overview', authenticateToken, async (req, res) => {
       FROM specialist_earnings
       WHERE specialist_id = $1
         AND status = 'paid'
-        AND EXTRACT(MONTH FROM payment_date) = EXTRACT(MONTH FROM CURRENT_DATE)
-        AND EXTRACT(YEAR FROM payment_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+        AND EXTRACT(MONTH FROM paid_at) = EXTRACT(MONTH FROM CURRENT_DATE)
+        AND EXTRACT(YEAR FROM paid_at) = EXTRACT(YEAR FROM CURRENT_DATE)
     `, [userId]);
 
     // Get review statistics
