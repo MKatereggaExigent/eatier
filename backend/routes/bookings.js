@@ -2,6 +2,7 @@ const express = require('express');
 const pool = require('../config/database');
 const { sendBookingConfirmation } = require('../services/emailService');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
+const { notifyBookingConfirmed } = require('../utils/notificationHelper');
 const router = express.Router();
 
 // Get all bookings for a user
@@ -378,6 +379,18 @@ router.post('/', optionalAuth, async (req, res) => {
         }
       })
       .catch(err => console.error('Email sending error:', err));
+
+    // Create notification for user (non-blocking)
+    if (validUserId) {
+      notifyBookingConfirmed({
+        userId: validUserId,
+        tenantId: tenantId,
+        businessName: businessName,
+        bookingDate: bookingDate,
+        bookingTime: bookingTime,
+        bookingId: booking.id
+      }).catch(err => console.error('Notification creation error:', err));
+    }
 
     res.status(201).json(booking);
 

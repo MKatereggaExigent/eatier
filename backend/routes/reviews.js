@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
+const { notifyNewReview } = require('../utils/notificationHelper');
 const router = express.Router();
 
 /**
@@ -321,6 +322,23 @@ router.post('/', authenticateToken, async (req, res) => {
     ]);
 
     const r = result.rows[0];
+
+    // Get business owner to notify them of the new review
+    const ownerResult = await pool.query('SELECT owner_id FROM businesses WHERE id = $1', [businessId]);
+    if (ownerResult.rows.length > 0) {
+      const ownerId = ownerResult.rows[0].owner_id;
+      const reviewerName = `${req.user.first_name || 'A customer'} ${req.user.last_name || ''}`.trim();
+
+      // Create notification for business owner (non-blocking)
+      notifyNewReview({
+        userId: ownerId,
+        tenantId: tenantId,
+        businessName: businessName,
+        rating: rating,
+        reviewerName: reviewerName,
+        businessId: businessId
+      }).catch(err => console.error('Notification creation error:', err));
+    }
 
     // Return in the format expected by the frontend
     res.status(201).json({
