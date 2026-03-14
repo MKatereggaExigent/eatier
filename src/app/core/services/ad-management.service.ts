@@ -37,9 +37,10 @@ export class AdManagementService {
       const response = await this.apiService.get<any>(`ads/campaigns/${userId}`).toPromise();
 
       const campaigns = response.campaigns || [];
-      const totalSpend = campaigns.reduce((sum: number, c: any) => sum + (c.spent_amount || 0), 0);
-      const totalImpressions = campaigns.reduce((sum: number, c: any) => sum + (c.impressions || 0), 0);
-      const totalClicks = campaigns.reduce((sum: number, c: any) => sum + (c.clicks || 0), 0);
+      // Fixed: database column is 'spent', not 'spent_amount'
+      const totalSpend = campaigns.reduce((sum: number, c: any) => sum + (parseFloat(c.spent) || 0), 0);
+      const totalImpressions = campaigns.reduce((sum: number, c: any) => sum + (parseInt(c.impressions) || 0), 0);
+      const totalClicks = campaigns.reduce((sum: number, c: any) => sum + (parseInt(c.clicks) || 0), 0);
       const averageCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
 
       return {
@@ -84,10 +85,10 @@ export class AdManagementService {
       category: c.category,
       objectives: c.objectives || [],
       budget: {
-        totalBudget: parseFloat(c.total_budget),
-        dailyBudget: parseFloat(c.daily_budget),
-        spentAmount: parseFloat(c.spent_amount || 0),
-        remainingAmount: parseFloat(c.remaining_amount || c.total_budget),
+        totalBudget: parseFloat(c.total_budget) || parseFloat(c.budget) || 0,
+        dailyBudget: parseFloat(c.daily_budget) || 0,
+        spentAmount: parseFloat(c.spent) || 0,  // Fixed: database column is 'spent', not 'spent_amount'
+        remainingAmount: parseFloat(c.remaining_amount) || parseFloat(c.total_budget) || parseFloat(c.budget) || 0,
         currency: c.currency || 'USD',
         billingCycle: c.billing_cycle || 'daily',
         minimumSpend: parseFloat(c.minimum_spend || 5)
