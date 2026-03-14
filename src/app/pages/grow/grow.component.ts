@@ -1,9 +1,10 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal, computed } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { PublicStatsService } from '../../core/services/public-stats.service';
+import { CurrencyService } from '../../core/services/currency.service';
 
 interface AdType {
   id: string;
@@ -11,7 +12,7 @@ interface AdType {
   description: string;
   icon: string;
   features: string[];
-  pricing: string;
+  basePrice: number; // Base price in ZAR
 }
 
 @Component({
@@ -25,9 +26,13 @@ export class GrowComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
   private publicStatsService = inject(PublicStatsService);
+  private currencyService = inject(CurrencyService);
 
   isAuthenticated = this.authService.isAuthenticated;
   currentUser = this.authService.currentUser;
+
+  // Currency state
+  currentCurrency = signal({ code: 'ZAR', symbol: 'R' });
 
   // Carousel state
   currentSlide = signal<number>(0);
@@ -70,7 +75,7 @@ export class GrowComponent implements OnInit, OnDestroy {
         'Increased visibility to target audience',
         'Real-time performance tracking'
       ],
-      pricing: 'Starting at $5 / €5 / £5'
+      basePrice: 100 // R100 in ZAR
     },
     {
       id: 'sponsored',
@@ -83,7 +88,7 @@ export class GrowComponent implements OnInit, OnDestroy {
         'Advanced targeting options',
         'Detailed analytics dashboard'
       ],
-      pricing: 'Starting at $5 / €5 / £5'
+      basePrice: 100 // R100 in ZAR
     },
     {
       id: 'partnership',
@@ -96,9 +101,18 @@ export class GrowComponent implements OnInit, OnDestroy {
         'Partner network exposure',
         'Custom campaign design'
       ],
-      pricing: 'Starting at $5 / €5 / £5'
+      basePrice: 100 // R100 in ZAR
     }
   ];
+
+  // Computed pricing strings based on current currency
+  adTypesWithPricing = computed(() => {
+    const currency = this.currentCurrency();
+    return this.adTypes.map(adType => ({
+      ...adType,
+      pricing: `Starting at ${currency.symbol}${adType.basePrice}`
+    }));
+  });
 
   regions = [
     { name: 'East Africa', countries: ['Kenya', 'Ethiopia', 'Tanzania', 'Uganda'] },
@@ -110,6 +124,19 @@ export class GrowComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.startCarousel();
     this.loadStatistics();
+    this.loadCurrency();
+  }
+
+  /**
+   * Load user's currency based on IP location
+   */
+  private loadCurrency(): void {
+    this.currencyService.currentCurrency$.subscribe(currency => {
+      this.currentCurrency.set({
+        code: currency.code,
+        symbol: currency.symbol
+      });
+    });
   }
 
   ngOnDestroy(): void {
