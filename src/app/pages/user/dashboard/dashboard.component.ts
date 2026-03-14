@@ -8,6 +8,7 @@ interface NavigationItem {
   path: string;
   label: string;
   icon: string;
+  isAbsolute?: boolean; // Flag to indicate if path is absolute (e.g., /about)
 }
 
 @Component({
@@ -35,6 +36,7 @@ export class UserDashboardComponent {
       case 'itiyum_admin':
         return [
           { path: 'overview', label: 'Overview', icon: '📊' },
+          { path: '/about', label: 'Site', icon: '🌐', isAbsolute: true },
           { path: 'users', label: 'Users', icon: '👥' },
           { path: 'businesses', label: 'Businesses', icon: '🏪' },
           { path: 'bookings', label: 'Bookings', icon: '📅' },
@@ -48,6 +50,7 @@ export class UserDashboardComponent {
       case 'specialist':
         return [
           { path: 'overview', label: 'Overview', icon: '📊' },
+          { path: '/about', label: 'Site', icon: '🌐', isAbsolute: true },
           { path: 'portfolio', label: 'Portfolio', icon: '📸' },
           { path: 'availability', label: 'Availability', icon: '📅' },
           { path: 'bookings', label: 'Bookings', icon: '📋' },
@@ -59,6 +62,7 @@ export class UserDashboardComponent {
       case 'food_enthusiast':
         return [
           { path: 'overview', label: 'Overview', icon: '📊' },
+          { path: '/about', label: 'Site', icon: '🌐', isAbsolute: true },
           { path: 'profile', label: 'Profile', icon: '👤' },
           { path: 'favorites', label: 'Favorites', icon: '❤️' },
           { path: 'reviews', label: 'My Reviews', icon: '⭐' },
@@ -72,6 +76,7 @@ export class UserDashboardComponent {
       default:
         return [
           { path: 'overview', label: 'Overview', icon: '📊' },
+          { path: '/about', label: 'Site', icon: '🌐', isAbsolute: true },
           { path: 'favorites', label: 'Favorites', icon: '❤️' },
           { path: 'orders', label: 'Order History', icon: '📦' },
           { path: 'bookings', label: 'Bookings', icon: '📅' },
