@@ -12,19 +12,26 @@
   </div>
 
   <div class="widget-tabs">
-    <button 
+    <button
       type="button"
-      class="tab-btn" 
+      class="tab-btn"
       [class.active]="activeTab() === 'followers'"
       (click)="setActiveTab('followers')">
       Followers ({{ followerCount() }})
     </button>
-    <button 
+    <button
       type="button"
-      class="tab-btn" 
+      class="tab-btn"
       [class.active]="activeTab() === 'following'"
       (click)="setActiveTab('following')">
       Following ({{ followingCount() }})
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'online'"
+      (click)="setActiveTab('online')">
+      🟢 Online ({{ onlineUsers().length }})
     </button>
   </div>
 
@@ -44,19 +51,33 @@
           <div class="user-list">
             @for (user of followers(); track user.id || user.user_id) {
               <div class="user-item">
-                <img 
-                  [src]="getUserAvatar(user)" 
-                  [alt]="getUserName(user)"
-                  class="user-avatar">
+                <div class="user-avatar-wrapper">
+                  <img
+                    [src]="getUserAvatar(user)"
+                    [alt]="getUserName(user)"
+                    class="user-avatar">
+                </div>
                 <div class="user-info">
                   <h4>{{ getUserName(user) }}</h4>
                   <p class="user-role">{{ formatRole(user.role) }}</p>
                 </div>
-                <a 
-                  [routerLink]="['/profile', user.user_id || user.id]"
-                  class="view-profile-btn">
-                  View
-                </a>
+                <div class="user-actions">
+                  <button
+                    type="button"
+                    class="action-btn chat-btn"
+                    (click)="startChat(user.user_id || user.id)"
+                    title="Start Chat">
+                    💬
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn poke-btn"
+                    (click)="pokeUser(user.user_id || user.id)"
+                    [disabled]="pokingUserId() === (user.user_id || user.id)"
+                    title="Poke">
+                    👋
+                  </button>
+                </div>
               </div>
             }
           </div>
@@ -72,20 +93,87 @@
           <div class="user-list">
             @for (user of following(); track user.id || user.user_id) {
               <div class="user-item">
-                <img 
-                  [src]="getUserAvatar(user)" 
-                  [alt]="getUserName(user)"
-                  class="user-avatar">
+                <div class="user-avatar-wrapper">
+                  <img
+                    [src]="getUserAvatar(user)"
+                    [alt]="getUserName(user)"
+                    class="user-avatar">
+                </div>
                 <div class="user-info">
                   <h4>{{ getUserName(user) }}</h4>
                   <p class="user-role">{{ formatRole(user.role) }}</p>
                 </div>
-                <button 
-                  type="button"
-                  class="unfollow-btn"
-                  (click)="unfollowUser(user.user_id || user.id)">
-                  Unfollow
-                </button>
+                <div class="user-actions">
+                  <button
+                    type="button"
+                    class="action-btn chat-btn"
+                    (click)="startChat(user.user_id || user.id)"
+                    title="Start Chat">
+                    💬
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn poke-btn"
+                    (click)="pokeUser(user.user_id || user.id)"
+                    [disabled]="pokingUserId() === (user.user_id || user.id)"
+                    title="Poke">
+                    👋
+                  </button>
+                  <button
+                    type="button"
+                    class="unfollow-btn"
+                    (click)="unfollowUser(user.user_id || user.id)">
+                    Unfollow
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+
+      @if (activeTab() === 'online') {
+        @if (onlineUsers().length === 0) {
+          <div class="empty-state">
+            <p>No one is online right now</p>
+          </div>
+        } @else {
+          <div class="user-list">
+            @for (user of onlineUsers(); track user.id) {
+              <div class="user-item">
+                <div class="user-avatar-wrapper">
+                  <img
+                    [src]="user.avatar_url || '/assets/images/default-avatar.png'"
+                    [alt]="user.first_name + ' ' + user.last_name"
+                    class="user-avatar">
+                  <span
+                    class="status-indicator"
+                    [style.background-color]="getStatusColor(user.status)"
+                    [title]="getStatusLabel(user.status)">
+                  </span>
+                </div>
+                <div class="user-info">
+                  <h4>{{ user.first_name }} {{ user.last_name }}</h4>
+                  <p class="user-role">{{ formatRole(user.role) }}</p>
+                  <p class="user-status">{{ getStatusLabel(user.status) }}</p>
+                </div>
+                <div class="user-actions">
+                  <button
+                    type="button"
+                    class="action-btn chat-btn"
+                    (click)="startChat(user.id)"
+                    title="Start Chat">
+                    💬
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn poke-btn"
+                    (click)="pokeUser(user.id)"
+                    [disabled]="pokingUserId() === user.id"
+                    title="Poke">
+                    👋
+                  </button>
+                </div>
               </div>
             }
           </div>

@@ -143,6 +143,8 @@ const bookingIncentivesRoutes = require('./routes/booking-incentives');
 const userWalletRoutes = require('./routes/user-wallet');
 const socialRoutes = require('./routes/social');
 const messagingRoutes = require('./routes/messaging');
+const presenceRoutes = require('./routes/presence');
+const pokesRoutes = require('./routes/pokes');
 const recommendationsRoutes = require('./routes/recommendations');
 const userSpecialistBookingsRoutes = require('./routes/user-specialist-bookings');
 const blogRoutes = require('./routes/blog');
@@ -198,6 +200,8 @@ app.use('/api/booking-incentives', bookingIncentivesRoutes); // Booking discount
 app.use('/api/wallet', userWalletRoutes); // User wallet/cashback
 app.use('/api/social', socialRoutes); // Social features (follow, activity feed)
 app.use('/api/messaging', messagingRoutes); // User-to-user messaging (Erlang-style actor model)
+app.use('/api/presence', presenceRoutes); // Real-time user presence tracking
+app.use('/api/pokes', pokesRoutes); // Poke/nudge feature
 app.use('/api/recommendations', recommendationsRoutes); // Personalized recommendations
 app.use('/api/user/specialist-bookings', userSpecialistBookingsRoutes); // User specialist booking history & testimonials
 app.use('/api/blog', blogRoutes); // Public blog endpoints

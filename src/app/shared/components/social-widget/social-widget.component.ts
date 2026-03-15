@@ -1,7 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { SocialService, UserProfile } from '../../../core/services/social.service';
+import { PresenceService, UserPresence } from '../../../core/services/presence.service';
+import { PokesService } from '../../../core/services/pokes.service';
+import { MessagingService } from '../../../core/services/messaging.service';
+import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-social-widget',
@@ -10,18 +14,41 @@ import { SocialService, UserProfile } from '../../../core/services/social.servic
   templateUrl: './social-widget.component.html',
   styleUrls: ['./social-widget.component.scss']
 })
-export class SocialWidgetComponent implements OnInit {
+export class SocialWidgetComponent implements OnInit, OnDestroy {
   followers = signal<UserProfile[]>([]);
   following = signal<UserProfile[]>([]);
   followerCount = signal<number>(0);
   followingCount = signal<number>(0);
   loading = signal<boolean>(true);
-  activeTab = signal<'followers' | 'following'>('followers');
+  activeTab = signal<'followers' | 'following' | 'online'>('followers');
 
-  constructor(private socialService: SocialService) {}
+  onlineUsers = signal<UserPresence[]>([]);
+  pokingUserId = signal<string | null>(null);
+
+  private presenceSubscription?: Subscription;
+
+  constructor(
+    private socialService: SocialService,
+    private presenceService: PresenceService,
+    private pokesService: PokesService,
+    private messagingService: MessagingService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadSocialData();
+    this.loadOnlineUsers();
+
+    // Refresh online users every 30 seconds
+    this.presenceSubscription = interval(30000).subscribe(() => {
+      this.loadOnlineUsers();
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.presenceSubscription) {
+      this.presenceSubscription.unsubscribe();
+    }
   }
 
   loadSocialData(): void {
@@ -50,8 +77,20 @@ export class SocialWidgetComponent implements OnInit {
     });
   }
 
-  setActiveTab(tab: 'followers' | 'following'): void {
+  loadOnlineUsers(): void {
+    this.presenceService.getOnlineUsers().subscribe({
+      next: (response) => {
+        this.onlineUsers.set(response.online_users);
+      },
+      error: (err) => console.error('Error loading online users:', err)
+    });
+  }
+
+  setActiveTab(tab: 'followers' | 'following' | 'online'): void {
     this.activeTab.set(tab);
+    if (tab === 'online') {
+      this.loadOnlineUsers();
+    }
   }
 
   unfollowUser(userId: string): void {
@@ -83,6 +122,49 @@ export class SocialWidgetComponent implements OnInit {
       'itiyum_admin': 'Itiyum Admin'
     };
     return roleMap[role] || role;
+  }
+
+  /**
+   * Start a chat with a user
+   */
+  startChat(userId: string): void {
+    this.messagingService.sendChatRequest(userId).subscribe({
+      next: () => {
+        this.router.navigate(['/dashboard/user/messages']);
+      },
+      error: (err) => console.error('Error starting chat:', err)
+    });
+  }
+
+  /**
+   * Send a poke to a user
+   */
+  pokeUser(userId: string): void {
+    this.pokingUserId.set(userId);
+    this.pokesService.sendPoke(userId, '👋 Hey there!').subscribe({
+      next: () => {
+        this.pokingUserId.set(null);
+        alert('Poke sent!');
+      },
+      error: (err) => {
+        console.error('Error sending poke:', err);
+        this.pokingUserId.set(null);
+      }
+    });
+  }
+
+  /**
+   * Get status color for presence indicator
+   */
+  getStatusColor(status: string): string {
+    return this.presenceService.getStatusColor(status);
+  }
+
+  /**
+   * Get status label
+   */
+  getStatusLabel(status: string): string {
+    return this.presenceService.getStatusLabel(status);
   }
 }
 
