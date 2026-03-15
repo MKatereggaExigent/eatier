@@ -156,6 +156,36 @@ async function notifyAdCampaignStatus({ userId, tenantId, campaignName, status, 
   });
 }
 
+/**
+ * Create specialist booking confirmed notification (for client)
+ */
+async function notifySpecialistBookingConfirmed({ userId, tenantId, specialistName, eventType, bookingDate, bookingId }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'success',
+    title: 'Booking Request Accepted',
+    message: `${specialistName} has accepted your ${eventType} booking request for ${bookingDate}.`,
+    actionUrl: `/dashboard/user/specialist-bookings/${bookingId}`,
+    metadata: { bookingId, specialistName, eventType, bookingDate }
+  });
+}
+
+/**
+ * Create specialist booking declined notification (for client)
+ */
+async function notifySpecialistBookingDeclined({ userId, tenantId, specialistName, eventType, bookingDate, reason }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'warning',
+    title: 'Booking Request Declined',
+    message: `${specialistName} has declined your ${eventType} booking request for ${bookingDate}. ${reason || ''}`,
+    actionUrl: '/dashboard/user/specialist-bookings',
+    metadata: { specialistName, eventType, bookingDate, reason }
+  });
+}
+
 module.exports = {
   createNotification,
   notifyBookingConfirmed,
@@ -164,6 +194,8 @@ module.exports = {
   notifyReviewResponse,
   notifyPaymentSuccess,
   notifyPaymentFailed,
-  notifyAdCampaignStatus
+  notifyAdCampaignStatus,
+  notifySpecialistBookingConfirmed,
+  notifySpecialistBookingDeclined
 };
 

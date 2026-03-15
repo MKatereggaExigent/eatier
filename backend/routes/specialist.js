@@ -4,6 +4,7 @@ const router = express.Router();
 
 // Middleware to verify JWT and get user info
 const { authenticateToken } = require('../middleware/auth');
+const { notifySpecialistBookingConfirmed, notifySpecialistBookingDeclined } = require('../utils/notificationHelper');
 
 /**
  * GET /api/specialist/overview
@@ -178,9 +179,62 @@ router.patch('/bookings/:id/status', authenticateToken, async (req, res) => {
       RETURNING *
     `, params);
 
+    const updatedBooking = result.rows[0];
+
+    // Send notification to client when specialist accepts or declines
+    if (status === 'confirmed' || status === 'declined') {
+      try {
+        // Get client and specialist details for notification
+        const detailsQuery = await pool.query(`
+          SELECT
+            sb.client_id,
+            sb.tenant_id,
+            sb.event_type,
+            sb.booking_date,
+            sb.cancellation_reason,
+            u.first_name || ' ' || u.last_name as specialist_name
+          FROM specialist_bookings sb
+          JOIN users u ON sb.specialist_id = u.id
+          WHERE sb.id = $1
+        `, [bookingId]);
+
+        if (detailsQuery.rows.length > 0) {
+          const details = detailsQuery.rows[0];
+          const bookingDateFormatted = new Date(details.booking_date).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+          });
+
+          if (status === 'confirmed') {
+            await notifySpecialistBookingConfirmed({
+              userId: details.client_id,
+              tenantId: details.tenant_id,
+              specialistName: details.specialist_name,
+              eventType: details.event_type || 'event',
+              bookingDate: bookingDateFormatted,
+              bookingId: bookingId
+            });
+          } else if (status === 'declined') {
+            await notifySpecialistBookingDeclined({
+              userId: details.client_id,
+              tenantId: details.tenant_id,
+              specialistName: details.specialist_name,
+              eventType: details.event_type || 'event',
+              bookingDate: bookingDateFormatted,
+              reason: reason || ''
+            });
+          }
+        }
+      } catch (notifError) {
+        // Don't fail the request if notification fails
+        console.error('Error sending booking status notification:', notifError);
+      }
+    }
+
     res.json({
       message: `Booking ${status} successfully`,
-      booking: result.rows[0]
+      booking: updatedBooking
     });
 
   } catch (error) {

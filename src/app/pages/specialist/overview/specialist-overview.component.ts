@@ -129,11 +129,11 @@ export class SpecialistOverviewComponent implements OnInit {
       }
     });
 
-    // Load bookings
+    // Load pending booking requests
     this.loadingBookings.set(true);
-    this.specialistService.getBookings(undefined, 10).subscribe({
+    this.specialistService.getBookings('pending', 10).subscribe({
       next: (data) => {
-        // Transform bookings to match existing format
+        // Transform pending bookings to match existing format
         const bookings = data.bookings.map(b => ({
           id: b.id,
           clientName: b.client_name,
@@ -147,10 +147,20 @@ export class SpecialistOverviewComponent implements OnInit {
           requestDate: new Date(b.created_at)
         }));
         this.recentRequests.set(bookings as BookingRequest[]);
+        this.loadingBookings.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading pending bookings:', err);
+        this.loadingBookings.set(false);
+      }
+    });
 
-        // Set upcoming bookings (confirmed future bookings)
+    // Load confirmed upcoming bookings separately
+    this.specialistService.getBookings('confirmed', 10).subscribe({
+      next: (data) => {
+        // Filter for future bookings only
         const upcoming = data.bookings
-          .filter(b => b.status === 'confirmed' && new Date(b.booking_date) >= new Date())
+          .filter(b => new Date(b.booking_date) >= new Date())
           .map(b => ({
             id: b.id,
             clientName: b.client_name,
@@ -162,11 +172,9 @@ export class SpecialistOverviewComponent implements OnInit {
             status: 'confirmed'
           }));
         this.upcomingBookings.set(upcoming);
-        this.loadingBookings.set(false);
       },
       error: (err) => {
-        console.error('Error loading bookings:', err);
-        this.loadingBookings.set(false);
+        console.error('Error loading upcoming bookings:', err);
       }
     });
 
