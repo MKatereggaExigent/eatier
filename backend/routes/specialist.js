@@ -192,7 +192,7 @@ router.patch('/bookings/:id/status', authenticateToken, async (req, res) => {
             sb.event_type,
             sb.booking_date,
             sb.cancellation_reason,
-            u.first_name || ' ' || u.last_name as specialist_name
+            COALESCE(u.first_name || ' ' || COALESCE(u.last_name, ''), u.email, 'Specialist') as specialist_name
           FROM specialist_bookings sb
           JOIN users u ON sb.specialist_id = u.id
           WHERE sb.id = $1
@@ -229,6 +229,7 @@ router.patch('/bookings/:id/status', authenticateToken, async (req, res) => {
       } catch (notifError) {
         // Don't fail the request if notification fails
         console.error('Error sending booking status notification:', notifError);
+        console.error('Notification error details:', notifError.message, notifError.stack);
       }
     }
 
@@ -239,7 +240,17 @@ router.patch('/bookings/:id/status', authenticateToken, async (req, res) => {
 
   } catch (error) {
     console.error('Error updating booking status:', error);
-    res.status(500).json({ error: 'Failed to update booking status' });
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      bookingId,
+      status,
+      userId
+    });
+    res.status(500).json({
+      error: 'Failed to update booking status',
+      details: error.message
+    });
   }
 });
 
