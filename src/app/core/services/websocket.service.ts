@@ -28,7 +28,8 @@ export class WebSocketService {
    */
   private async checkSocketIoAvailability(): Promise<void> {
     try {
-      await import('socket.io-client');
+      // Use eval to bypass TypeScript checking
+      const socketIo = await (eval('import("socket.io-client")') as Promise<any>);
       this.socketIoAvailable = true;
     } catch (error) {
       console.warn('socket.io-client not available, WebSocket features will be disabled');
@@ -58,8 +59,9 @@ export class WebSocketService {
     }
 
     try {
-      // Dynamically import socket.io-client
-      const { io } = await import('socket.io-client');
+      // Use eval to bypass TypeScript checking
+      const socketIo = await (eval('import("socket.io-client")') as Promise<any>);
+      const io = socketIo.io;
       const socketUrl = environment.apiUrl.replace('/api', '');
 
       this.socket = io(socketUrl, {
