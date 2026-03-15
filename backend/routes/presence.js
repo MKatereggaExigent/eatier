@@ -100,9 +100,9 @@ router.get('/online', async (req, res) => {
           ELSE false
         END as is_follower
       FROM users u
-      JOIN user_presence up ON u.id = up.user_id
-      LEFT JOIN followers f1 ON f1.following_id = u.id AND f1.follower_id = $2 AND f1.tenant_id = $1
-      LEFT JOIN followers f2 ON f2.follower_id = u.id AND f2.following_id = $2 AND f2.tenant_id = $1
+      JOIN user_presence up ON u.id = up.user_id AND up.tenant_id = $1
+      LEFT JOIN user_follows f1 ON f1.following_id = u.id AND f1.follower_id = $2 AND f1.tenant_id = $1
+      LEFT JOIN user_follows f2 ON f2.follower_id = u.id AND f2.following_id = $2 AND f2.tenant_id = $1
       WHERE up.tenant_id = $1
         AND up.status IN ('online', 'away', 'busy')
         AND up.last_activity > (CURRENT_TIMESTAMP - INTERVAL '5 minutes')
