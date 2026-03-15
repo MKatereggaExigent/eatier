@@ -1,0 +1,75 @@
+<div class="public-profile-container">
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading profile...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <h2>{{ error() }}</h2>
+      <p>The profile you're looking for doesn't exist or has been removed.</p>
+      <button type="button" (click)="goHome()">Go Home</button>
+    </div>
+  } @else if (profile()) {
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <img [src]="getUserAvatar()" [alt]="getUserName()">
+      </div>
+      <div class="profile-info">
+        <h1>{{ getUserName() }}</h1>
+        <p class="profile-role">{{ profile()?.role }}</p>
+        @if (profile()?.bio) {
+          <p class="profile-bio">{{ profile()?.bio }}</p>
+        }
+        @if (profile()?.location) {
+          <p class="profile-location">📍 {{ profile()?.location }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="profile-stats">
+      <div class="stat-item">
+        <strong>{{ profile()?.follower_count || 0 }}</strong>
+        <span>Followers</span>
+      </div>
+      <div class="stat-item">
+        <strong>{{ profile()?.following_count || 0 }}</strong>
+        <span>Following</span>
+      </div>
+      <div class="stat-item">
+        <strong>{{ profile()?.review_count || 0 }}</strong>
+        <span>Reviews</span>
+      </div>
+    </div>
+
+    @if (!isOwnProfile() && currentUser()) {
+      <div class="profile-actions">
+        <button 
+          type="button"
+          class="btn-follow" 
+          [class.following]="isFollowing()"
+          (click)="toggleFollow()">
+          {{ isFollowing() ? 'Unfollow' : 'Follow' }}
+        </button>
+        <button 
+          type="button"
+          class="btn-message" 
+          (click)="sendMessage()">
+          Message
+        </button>
+      </div>
+    }
+
+    @if (isOwnProfile()) {
+      <div class="profile-actions">
+        <button
+          type="button"
+          class="btn-edit"
+          (click)="editProfile()">
+          Edit Profile
+        </button>
+      </div>
+    }
+  }
+</div>
+

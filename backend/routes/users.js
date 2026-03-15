@@ -2,6 +2,55 @@ const express = require('express');
 const pool = require('../config/database');
 const router = express.Router();
 
+// ============================================================================
+// GET /api/users/:id/profile - Get public profile for a user
+// ============================================================================
+router.get('/:id/profile', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `SELECT
+        u.id,
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.avatar_url,
+        u.role,
+        u.bio,
+        u.location,
+        (SELECT COUNT(*) FROM user_follows WHERE following_id = u.id) as follower_count,
+        (SELECT COUNT(*) FROM user_follows WHERE follower_id = u.id) as following_count,
+        (SELECT COUNT(*) FROM reviews WHERE user_id = u.id) as review_count
+       FROM users u
+       WHERE u.id = $1 AND u.account_status != 'deleted'`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = result.rows[0];
+    res.json({
+      id: user.id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      avatar_url: user.avatar_url,
+      role: user.role,
+      bio: user.bio,
+      location: user.location,
+      follower_count: parseInt(user.follower_count) || 0,
+      following_count: parseInt(user.following_count) || 0,
+      review_count: parseInt(user.review_count) || 0
+    });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ error: 'Failed to fetch user profile' });
+  }
+});
+
 // Get all users (for admin/testing purposes)
 router.get('/', async (req, res) => {
   try {

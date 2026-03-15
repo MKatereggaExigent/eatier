@@ -71,6 +71,31 @@ export const routes: Routes = [
                 path: 'pricing',
                 loadComponent: () => import('./pages/subscribe/subscribe.component').then(m => m.SubscribeComponent)
             },
+
+            // Public user profile
+            {
+                path: 'profile/:id',
+                loadComponent: () => import('./pages/user/public-profile/public-profile.component').then(m => m.PublicProfileComponent)
+            },
+
+            // Social page (requires authentication)
+            {
+                path: 'social',
+                canActivate: [AuthGuard],
+                loadComponent: () => import('./pages/user/social/user-social.component').then(m => m.UserSocialComponent)
+            },
+
+            // Messages page (requires authentication)
+            {
+                path: 'messages',
+                canActivate: [AuthGuard],
+                loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent)
+            },
+            {
+                path: 'messages/:id',
+                canActivate: [AuthGuard],
+                loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent)
+            },
         ]
     },
 

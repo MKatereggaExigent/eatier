@@ -77,7 +77,7 @@ router.get('/followers', authenticateToken, async (req, res) => {
     const { limit = 20, offset = 0 } = req.query;
 
     const result = await pool.query(
-      `SELECT u.id, u.first_name, u.last_name, u.avatar_url, uf.created_at as followed_at
+      `SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.role, uf.created_at as followed_at
        FROM user_follows uf
        JOIN users u ON uf.follower_id = u.id
        WHERE uf.following_id = $1
@@ -94,12 +94,18 @@ router.get('/followers', authenticateToken, async (req, res) => {
     res.json({
       followers: result.rows.map(f => ({
         id: f.id,
-        firstName: f.first_name,
-        lastName: f.last_name,
-        avatar: f.avatar_url,
-        followedAt: f.followed_at
+        user_id: f.id,
+        first_name: f.first_name,
+        last_name: f.last_name,
+        email: f.email,
+        profile_image_url: f.avatar_url,
+        avatar_url: f.avatar_url,
+        role: f.role,
+        followed_at: f.followed_at
       })),
-      total: parseInt(countResult.rows[0].count)
+      total: parseInt(countResult.rows[0].count),
+      limit: parseInt(limit),
+      offset: parseInt(offset)
     });
   } catch (error) {
     console.error('Error fetching followers:', error);
@@ -116,7 +122,7 @@ router.get('/following', authenticateToken, async (req, res) => {
     const { limit = 20, offset = 0 } = req.query;
 
     const result = await pool.query(
-      `SELECT u.id, u.first_name, u.last_name, u.avatar_url, uf.created_at as followed_at
+      `SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.role, uf.created_at as followed_at
        FROM user_follows uf
        JOIN users u ON uf.following_id = u.id
        WHERE uf.follower_id = $1
@@ -133,12 +139,18 @@ router.get('/following', authenticateToken, async (req, res) => {
     res.json({
       following: result.rows.map(f => ({
         id: f.id,
-        firstName: f.first_name,
-        lastName: f.last_name,
-        avatar: f.avatar_url,
-        followedAt: f.followed_at
+        user_id: f.id,
+        first_name: f.first_name,
+        last_name: f.last_name,
+        email: f.email,
+        profile_image_url: f.avatar_url,
+        avatar_url: f.avatar_url,
+        role: f.role,
+        followed_at: f.followed_at
       })),
-      total: parseInt(countResult.rows[0].count)
+      total: parseInt(countResult.rows[0].count),
+      limit: parseInt(limit),
+      offset: parseInt(offset)
     });
   } catch (error) {
     console.error('Error fetching following:', error);
