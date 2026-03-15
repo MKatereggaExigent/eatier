@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
+const { emitPoke } = require('../websocket/socketHandler');
 
 // Apply authentication to all routes
 router.use(authenticateToken);
@@ -53,14 +54,19 @@ router.post('/send', async (req, res) => {
       WHERE id = $1
     `, [pokerId]);
 
+    const pokeData = {
+      ...result.rows[0],
+      poker_first_name: pokerInfo.rows[0].first_name,
+      poker_last_name: pokerInfo.rows[0].last_name,
+      poker_avatar_url: pokerInfo.rows[0].avatar_url
+    };
+
+    // Emit WebSocket event to recipient
+    emitPoke(pokedId, pokeData);
+
     res.json({
       message: 'Poke sent successfully',
-      poke: {
-        ...result.rows[0],
-        poker_first_name: pokerInfo.rows[0].first_name,
-        poker_last_name: pokerInfo.rows[0].last_name,
-        poker_avatar_url: pokerInfo.rows[0].avatar_url
-      }
+      poke: pokeData
     });
 
   } catch (error) {

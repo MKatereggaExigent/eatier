@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessagingService, ChatConversation, ChatMessage, ChatRequest } from '../../core/services/messaging.service';
-import { interval, Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { WebSocketService } from '../../core/services/websocket.service';
+import { PresenceService } from '../../core/services/presence.service';
+import { interval, Subscription, Subject } from 'rxjs';
+import { switchMap, debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-messages',
@@ -25,23 +27,44 @@ export class MessagesComponent implements OnInit, OnDestroy {
   sendingMessage = signal<boolean>(false);
   
   activeView = signal<'conversations' | 'requests'>('conversations');
-  
+  typingUsers = signal<string[]>([]);
+  uploadingFile = signal<boolean>(false);
+  selectedFile = signal<File | null>(null);
+
   private pollingSubscription?: Subscription;
   private currentUserId: string = '';
+  private typingSubject = new Subject<string>();
+  private typingTimeout: any;
 
   constructor(
     private messagingService: MessagingService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private websocketService: WebSocketService,
+    private presenceService: PresenceService
   ) {
     // Get current user ID from localStorage
     this.currentUserId = localStorage.getItem('userId') || '';
+
+    // Setup typing debounce
+    this.typingSubject.pipe(
+      debounceTime(3000)
+    ).subscribe(conversationId => {
+      this.websocketService.stopTyping(conversationId);
+    });
   }
 
   ngOnInit(): void {
     this.loadConversations();
     this.loadChatRequests();
-    
+
+    // Connect to WebSocket
+    this.websocketService.connect();
+    this.presenceService.startHeartbeat();
+
+    // Setup WebSocket listeners
+    this.setupWebSocketListeners();
+
     // Check if there's a conversation ID in the route
     this.route.params.subscribe(params => {
       const conversationId = params['id'];
@@ -50,12 +73,20 @@ export class MessagesComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Start polling for new messages every 5 seconds
+    // Start polling for new messages every 5 seconds (fallback)
     this.startPolling();
   }
 
   ngOnDestroy(): void {
     this.stopPolling();
+
+    // Leave current conversation
+    const currentConv = this.selectedConversation();
+    if (currentConv) {
+      this.websocketService.leaveConversation(currentConv.id);
+    }
+
+    this.presenceService.stopHeartbeat();
   }
 
   private startPolling(): void {
@@ -177,6 +208,140 @@ export class MessagesComponent implements OnInit, OnDestroy {
     if (messagesContainer) {
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
+  }
+
+  /**
+   * Setup WebSocket event listeners
+   */
+  private setupWebSocketListeners(): void {
+    // Listen for new messages
+    this.websocketService.onNewMessage((message: ChatMessage) => {
+      const currentConv = this.selectedConversation();
+      if (currentConv && message.conversation_id === currentConv.id) {
+        const current = this.messages();
+        this.messages.set([...current, message]);
+        setTimeout(() => this.scrollToBottom(), 100);
+      }
+
+      // Update conversation list
+      this.loadConversations();
+    });
+
+    // Listen for typing indicators
+    this.websocketService.onNewMessage((data: any) => {
+      // Typing indicators are handled via the typingUsers signal
+    });
+
+    // Listen for pokes
+    this.websocketService.onPoke((poke: any) => {
+      console.log('Received poke:', poke);
+      // Could show a notification here
+    });
+
+    // Listen for presence changes
+    this.websocketService.onPresenceChange((data: { userId: string; status: string }) => {
+      console.log('Presence changed:', data);
+      // Update UI to reflect presence changes
+    });
+
+    // Listen for reactions
+    this.websocketService.onMessageReaction((data: { messageId: string; reaction: any }) => {
+      console.log('Message reaction:', data);
+      // Update message with new reaction
+    });
+  }
+
+  /**
+   * Handle typing in message input
+   */
+  onMessageInput(): void {
+    const currentConv = this.selectedConversation();
+    if (!currentConv) return;
+
+    // Emit typing start
+    this.websocketService.startTyping(currentConv.id);
+
+    // Clear existing timeout
+    if (this.typingTimeout) {
+      clearTimeout(this.typingTimeout);
+    }
+
+    // Set new timeout to stop typing after 3 seconds
+    this.typingTimeout = setTimeout(() => {
+      this.websocketService.stopTyping(currentConv.id);
+    }, 3000);
+  }
+
+  /**
+   * Handle file selection
+   */
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile.set(file);
+    }
+  }
+
+  /**
+   * Upload and send file
+   */
+  async sendFileMessage(): Promise<void> {
+    const file = this.selectedFile();
+    const currentConv = this.selectedConversation();
+
+    if (!file || !currentConv) return;
+
+    this.uploadingFile.set(true);
+
+    try {
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Upload file (you'll need to implement this endpoint)
+      const response = await fetch(`${this.messagingService['apiUrl']}/uploads`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+
+      // Send message with file attachment
+      this.messagingService.sendMessage(currentConv.id, {
+        content: file.name,
+        messageType: 'file',
+        fileUrl: data.fileUrl,
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size
+      }).subscribe({
+        next: () => {
+          this.selectedFile.set(null);
+          this.uploadingFile.set(false);
+          this.loadMessages(currentConv.id);
+        },
+        error: (err) => {
+          console.error('Error sending file:', err);
+          this.uploadingFile.set(false);
+        }
+      });
+
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      this.uploadingFile.set(false);
+    }
+  }
+
+  /**
+   * Add reaction to message
+   */
+  addReaction(messageId: string, reaction: string): void {
+    // Call messaging service to add reaction
+    // This will be implemented in the messaging service
+    console.log('Adding reaction:', messageId, reaction);
   }
 
   acceptChatRequest(requestId: string): void {

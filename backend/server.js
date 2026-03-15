@@ -29,7 +29,11 @@ if (!isProduction && !isDocker) {
 }
 
 const app = express();
+const server = require('http').createServer(app);
 const PORT = process.env.PORT || 3001;
+
+// Initialize WebSocket (will be started when server starts)
+const { initializeWebSocket } = require('./websocket/socketHandler');
 
 // Security middleware
 app.use(helmet());
@@ -248,10 +252,14 @@ app.use((err, req, res, next) => {
 
 // Start server only if not in serverless environment (Vercel)
 if (!process.env.VERCEL) {
-  app.listen(PORT, () => {
+  // Initialize WebSocket
+  const io = initializeWebSocket(server);
+
+  server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📱 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:4200'}`);
     console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
+    console.log(`🔌 WebSocket server initialized`);
   });
 }
 

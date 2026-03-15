@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
+const { emitNewMessage, emitReaction } = require('../websocket/socketHandler');
 
 // Apply authentication to all routes
 router.use(authenticateToken);
@@ -218,7 +219,7 @@ router.get('/conversations', async (req, res) => {
 // ============================================
 router.post('/conversations/:conversationId/messages', async (req, res) => {
   const { conversationId } = req.params;
-  const { content, messageType, attachments, replyToMessageId } = req.body;
+  const { content, messageType, attachments, replyToMessageId, fileUrl, fileName, fileType, fileSize } = req.body;
   const senderId = req.user.userId;
 
   try {
@@ -232,8 +233,9 @@ router.post('/conversations/:conversationId/messages', async (req, res) => {
       return res.status(403).json({ error: 'Not a participant in this conversation' });
     }
 
-    if (!content || !content.trim()) {
-      return res.status(400).json({ error: 'Message content is required' });
+    // Allow empty content if file is attached
+    if ((!content || !content.trim()) && !fileUrl) {
+      return res.status(400).json({ error: 'Message content or file is required' });
     }
 
     // Insert message into the conversation's mailbox
@@ -251,11 +253,32 @@ router.post('/conversations/:conversationId/messages', async (req, res) => {
     `, [
       conversationId,
       senderId,
-      messageType || 'text',
-      content.trim(),
+      messageType || (fileUrl ? 'file' : 'text'),
+      content ? content.trim() : (fileName || 'File attachment'),
       JSON.stringify(attachments || []),
       replyToMessageId || null
     ]);
+
+    // If file is attached, create message_file record
+    if (fileUrl && fileName) {
+      await pool.query(`
+        INSERT INTO message_files (
+          message_id,
+          file_name,
+          file_type,
+          file_size,
+          file_url,
+          upload_status
+        )
+        VALUES ($1, $2, $3, $4, $5, 'completed')
+      `, [
+        message.rows[0].id,
+        fileName,
+        fileType || 'application/octet-stream',
+        fileSize || 0,
+        fileUrl
+      ]);
+    }
 
     // Update conversation's last_message_at
     await pool.query(
@@ -269,6 +292,9 @@ router.post('/conversations/:conversationId/messages', async (req, res) => {
       SET unread_count = unread_count + 1
       WHERE conversation_id = $1 AND user_id != $2
     `, [conversationId, senderId]);
+
+    // Emit WebSocket event for real-time delivery
+    emitNewMessage(conversationId, message.rows[0]);
 
     res.json({
       message: 'Message sent successfully',
@@ -359,6 +385,166 @@ router.get('/conversations/:conversationId/messages', async (req, res) => {
   } catch (error) {
     console.error('Error getting messages:', error);
     res.status(500).json({ error: 'Failed to get messages' });
+  }
+});
+
+// ============================================
+// POST /api/messaging/conversations/:conversationId/typing
+// Set typing indicator
+// ============================================
+router.post('/conversations/:conversationId/typing', async (req, res) => {
+  const { conversationId } = req.params;
+  const { isTyping } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    if (isTyping) {
+      // Upsert typing indicator
+      await pool.query(`
+        INSERT INTO typing_indicators (conversation_id, user_id, is_typing, started_at, expires_at)
+        VALUES ($1, $2, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '10 seconds')
+        ON CONFLICT (conversation_id, user_id)
+        DO UPDATE SET
+          is_typing = true,
+          started_at = CURRENT_TIMESTAMP,
+          expires_at = CURRENT_TIMESTAMP + INTERVAL '10 seconds'
+      `, [conversationId, userId]);
+    } else {
+      // Remove typing indicator
+      await pool.query(
+        'DELETE FROM typing_indicators WHERE conversation_id = $1 AND user_id = $2',
+        [conversationId, userId]
+      );
+    }
+
+    res.json({ message: 'Typing indicator updated' });
+
+  } catch (error) {
+    console.error('Error updating typing indicator:', error);
+    res.status(500).json({ error: 'Failed to update typing indicator' });
+  }
+});
+
+// ============================================
+// GET /api/messaging/conversations/:conversationId/typing
+// Get who is typing in a conversation
+// ============================================
+router.get('/conversations/:conversationId/typing', async (req, res) => {
+  const { conversationId } = req.params;
+  const userId = req.user.userId;
+
+  try {
+    const result = await pool.query(`
+      SELECT
+        ti.user_id,
+        u.first_name,
+        u.last_name
+      FROM typing_indicators ti
+      JOIN users u ON ti.user_id = u.id
+      WHERE ti.conversation_id = $1
+        AND ti.user_id != $2
+        AND ti.is_typing = true
+        AND ti.expires_at > CURRENT_TIMESTAMP
+    `, [conversationId, userId]);
+
+    res.json({ typing_users: result.rows });
+
+  } catch (error) {
+    console.error('Error fetching typing indicators:', error);
+    res.status(500).json({ error: 'Failed to fetch typing indicators' });
+  }
+});
+
+// ============================================
+// POST /api/messaging/messages/:messageId/react
+// Add a reaction to a message
+// ============================================
+router.post('/messages/:messageId/react', async (req, res) => {
+  const { messageId } = req.params;
+  const { reaction } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    if (!reaction || reaction.trim().length === 0) {
+      return res.status(400).json({ error: 'Reaction is required' });
+    }
+
+    // Upsert reaction
+    const result = await pool.query(`
+      INSERT INTO message_reactions (message_id, user_id, reaction)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (message_id, user_id, reaction)
+      DO NOTHING
+      RETURNING *
+    `, [messageId, userId, reaction.trim()]);
+
+    // Emit WebSocket event
+    if (result.rows[0]) {
+      emitReaction(null, messageId, result.rows[0]);
+    }
+
+    res.json({
+      message: 'Reaction added',
+      reaction: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Error adding reaction:', error);
+    res.status(500).json({ error: 'Failed to add reaction' });
+  }
+});
+
+// ============================================
+// DELETE /api/messaging/messages/:messageId/react
+// Remove a reaction from a message
+// ============================================
+router.delete('/messages/:messageId/react', async (req, res) => {
+  const { messageId } = req.params;
+  const { reaction } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    await pool.query(
+      'DELETE FROM message_reactions WHERE message_id = $1 AND user_id = $2 AND reaction = $3',
+      [messageId, userId, reaction]
+    );
+
+    res.json({ message: 'Reaction removed' });
+
+  } catch (error) {
+    console.error('Error removing reaction:', error);
+    res.status(500).json({ error: 'Failed to remove reaction' });
+  }
+});
+
+// ============================================
+// GET /api/messaging/messages/:messageId/reactions
+// Get all reactions for a message
+// ============================================
+router.get('/messages/:messageId/reactions', async (req, res) => {
+  const { messageId } = req.params;
+
+  try {
+    const result = await pool.query(`
+      SELECT
+        mr.reaction,
+        COUNT(*) as count,
+        json_agg(json_build_object(
+          'user_id', u.id,
+          'first_name', u.first_name,
+          'last_name', u.last_name
+        )) as users
+      FROM message_reactions mr
+      JOIN users u ON mr.user_id = u.id
+      WHERE mr.message_id = $1
+      GROUP BY mr.reaction
+    `, [messageId]);
+
+    res.json({ reactions: result.rows });
+
+  } catch (error) {
+    console.error('Error fetching reactions:', error);
+    res.status(500).json({ error: 'Failed to fetch reactions' });
   }
 });
 
