@@ -13,16 +13,38 @@ export class WebSocketService {
   private socket: any = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
+  private socketIoAvailable = false;
 
   connected = signal<boolean>(false);
   typingUsers = signal<Map<string, TypingUser[]>>(new Map());
 
-  constructor() {}
+  constructor() {
+    // Check if socket.io-client is available
+    this.checkSocketIoAvailability();
+  }
+
+  /**
+   * Check if socket.io-client is available
+   */
+  private async checkSocketIoAvailability(): Promise<void> {
+    try {
+      await import('socket.io-client');
+      this.socketIoAvailable = true;
+    } catch (error) {
+      console.warn('socket.io-client not available, WebSocket features will be disabled');
+      this.socketIoAvailable = false;
+    }
+  }
 
   /**
    * Connect to WebSocket server
    */
   async connect(): Promise<void> {
+    if (!this.socketIoAvailable) {
+      console.warn('WebSocket connection skipped - socket.io-client not available');
+      return;
+    }
+
     const token = localStorage.getItem('token');
 
     if (!token) {
