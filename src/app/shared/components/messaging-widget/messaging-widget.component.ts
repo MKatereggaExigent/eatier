@@ -111,7 +111,8 @@ export class MessagingWidgetComponent implements OnInit {
   }
 
   getRequesterName(request: ChatRequest): string {
-    return `${request.first_name || ''} ${request.last_name || ''}`.trim() || request.email;
+    const name = `${request.first_name || ''} ${request.last_name || ''}`.trim();
+    return name || request.email || 'Unknown User';
   }
 
   getRequesterAvatar(request: ChatRequest): string {

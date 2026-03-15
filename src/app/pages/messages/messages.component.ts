@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MessagingService, ChatConversation, ChatMessage, ChatRequest } from '../../core/services/messaging.service';
 import { interval, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -9,7 +9,7 @@ import { switchMap } from 'rxjs/operators';
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.scss']
 })
@@ -219,7 +219,8 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   getRequesterName(request: ChatRequest): string {
-    return `${request.first_name || ''} ${request.last_name || ''}`.trim() || request.email;
+    const name = `${request.first_name || ''} ${request.last_name || ''}`.trim();
+    return name || request.email || 'Unknown User';
   }
 
   getRequesterAvatar(request: ChatRequest): string {
