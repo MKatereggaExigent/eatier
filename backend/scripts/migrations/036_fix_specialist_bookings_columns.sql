@@ -15,6 +15,7 @@ ALTER TABLE specialist_bookings ADD COLUMN IF NOT EXISTS contact_phone VARCHAR(5
 ALTER TABLE specialist_bookings ADD COLUMN IF NOT EXISTS contact_email VARCHAR(255);
 ALTER TABLE specialist_bookings ADD COLUMN IF NOT EXISTS special_requests TEXT;
 ALTER TABLE specialist_bookings ADD COLUMN IF NOT EXISTS payment_status VARCHAR(50) DEFAULT 'pending';
+ALTER TABLE specialist_bookings ADD COLUMN IF NOT EXISTS confirmed_at TIMESTAMP WITH TIME ZONE;
 ALTER TABLE specialist_bookings ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP WITH TIME ZONE;
 ALTER TABLE specialist_bookings ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMP WITH TIME ZONE;
 ALTER TABLE specialist_bookings ADD COLUMN IF NOT EXISTS cancellation_reason TEXT;
