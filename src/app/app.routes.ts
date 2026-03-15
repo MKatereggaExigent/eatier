@@ -149,6 +149,7 @@ export const routes: Routes = [
             { path: 'ads', loadComponent: () => import('./pages/admin/ads/admin-ads.component').then(m => m.AdminAdsComponent) },
             { path: 'analytics', loadComponent: () => import('./pages/admin/analytics/admin-analytics.component').then(m => m.AdminAnalyticsComponent) },
             { path: 'reports', loadComponent: () => import('./pages/admin/reports/admin-reports.component').then(m => m.AdminReportsComponent) },
+            { path: 'social', loadComponent: () => import('./pages/user/social/user-social.component').then(m => m.UserSocialComponent) },
             { path: 'settings', loadComponent: () => import('./pages/admin/settings/admin-settings.component').then(m => m.AdminSettingsComponent) },
             { path: 'blog', loadComponent: () => import('./pages/admin/blog-management/blog-management.component').then(m => m.BlogManagementComponent) }
         ]
@@ -173,7 +174,8 @@ export const routes: Routes = [
             { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
             { path: 'digital-card', loadComponent: () => import('./pages/business/digital-card/digital-card.component').then(m => m.DigitalCardComponent) },
             { path: 'analytics', loadComponent: () => import('./pages/business/analytics/business-analytics.component').then(m => m.BusinessAnalyticsComponent) },
-            { path: 'accounts', loadComponent: () => import('./pages/business/accounts/accounts-center.component').then(m => m.AccountsCenterComponent) }
+            { path: 'accounts', loadComponent: () => import('./pages/business/accounts/accounts-center.component').then(m => m.AccountsCenterComponent) },
+            { path: 'social', loadComponent: () => import('./pages/business/social/business-social.component').then(m => m.BusinessSocialComponent) }
         ]
     },
 
@@ -197,6 +199,7 @@ export const routes: Routes = [
             { path: 'digital-card', loadComponent: () => import('./pages/business/digital-card/digital-card.component').then(m => m.DigitalCardComponent) },
             { path: 'analytics', loadComponent: () => import('./pages/business/analytics/business-analytics.component').then(m => m.BusinessAnalyticsComponent) },
             { path: 'accounts', loadComponent: () => import('./pages/business/accounts/accounts-center.component').then(m => m.AccountsCenterComponent) },
+            { path: 'social', loadComponent: () => import('./pages/business/social/business-social.component').then(m => m.BusinessSocialComponent) },
             { path: 'messages', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) },
             { path: 'messages/:id', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) }
         ]
@@ -219,10 +222,12 @@ export const routes: Routes = [
             { path: 'ads/:adId/edit', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
             { path: 'ads/create', loadComponent: () => import('./pages/ads/ad-creation/ad-creation.component').then(m => m.AdCreationComponent) },
             { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
+            { path: 'social', loadComponent: () => import('./pages/user/social/user-social.component').then(m => m.UserSocialComponent) },
             { path: 'insights', loadComponent: () => import('./pages/user/insights/user-insights.component').then(m => m.UserInsightsComponent) },
             { path: 'digital-card', loadComponent: () => import('./pages/user/digital-card/user-digital-card.component').then(m => m.UserDigitalCardComponent) },
             { path: 'legacy-access', loadComponent: () => import('./pages/user/legacy-access/legacy-access.component').then(m => m.LegacyAccessComponent) },
             { path: 'accounts', loadComponent: () => import('./pages/user/accounts/user-accounts-center.component').then(m => m.UserAccountsCenterComponent) },
+            { path: 'social', loadComponent: () => import('./pages/user/social/user-social.component').then(m => m.UserSocialComponent) },
             { path: 'messages', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) },
             { path: 'messages/:id', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) }
         ]
@@ -281,6 +286,7 @@ export const routes: Routes = [
             { path: 'accounts', loadComponent: () => import('./pages/user/accounts/user-accounts-center.component').then(m => m.UserAccountsCenterComponent) },
             { path: 'bookings', loadComponent: () => import('./pages/user/bookings/bookings.component').then(m => m.BookingsComponent) },
             { path: 'wallet', loadComponent: () => import('./pages/user/wallet/user-wallet.component').then(m => m.UserWalletComponent) },
+            { path: 'social', loadComponent: () => import('./pages/specialist/social/specialist-social.component').then(m => m.SpecialistSocialComponent) },
             { path: 'messages', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) },
             { path: 'messages/:id', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) }
         ]
