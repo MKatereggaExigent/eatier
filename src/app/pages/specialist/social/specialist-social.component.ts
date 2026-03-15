@@ -25,13 +25,13 @@ interface ActivityItem {
 }
 
 @Component({
-  selector: 'app-user-social',
+  selector: 'app-specialist-social',
   standalone: true,
   imports: [CommonModule, SocialWidgetComponent, MessagingWidgetComponent],
-  templateUrl: './user-social.component.html',
-  styleUrls: ['./user-social.component.scss']
+  templateUrl: './specialist-social.component.html',
+  styleUrls: ['./specialist-social.component.scss']
 })
-export class UserSocialComponent implements OnInit {
+export class SpecialistSocialComponent implements OnInit {
   private http = inject(HttpClient);
 
   loading = signal(true);
@@ -102,7 +102,6 @@ export class UserSocialComponent implements OnInit {
       next: () => {
         inProgress.delete(userId);
         this.followingInProgress.set(new Set(inProgress));
-        // Update the user's following status in all lists
         this.updateFollowStatus(userId, !isCurrentlyFollowing);
       },
       error: () => {

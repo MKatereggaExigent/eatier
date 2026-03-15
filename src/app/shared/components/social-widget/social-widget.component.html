@@ -50,7 +50,7 @@
                   class="user-avatar">
                 <div class="user-info">
                   <h4>{{ getUserName(user) }}</h4>
-                  <p class="user-role">{{ user.role }}</p>
+                  <p class="user-role">{{ formatRole(user.role) }}</p>
                 </div>
                 <a 
                   [routerLink]="['/profile', user.user_id || user.id]"
@@ -78,7 +78,7 @@
                   class="user-avatar">
                 <div class="user-info">
                   <h4>{{ getUserName(user) }}</h4>
-                  <p class="user-role">{{ user.role }}</p>
+                  <p class="user-role">{{ formatRole(user.role) }}</p>
                 </div>
                 <button 
                   type="button"

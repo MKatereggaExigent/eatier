@@ -73,5 +73,16 @@ export class SocialWidgetComponent implements OnInit {
   getUserName(user: UserProfile): string {
     return `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
   }
+
+  formatRole(role: string): string {
+    const roleMap: { [key: string]: string } = {
+      'normal_user': 'Normal User',
+      'food_enthusiast': 'Food Enthusiast',
+      'business_owner': 'Business Owner',
+      'specialist': 'Specialist',
+      'itiyum_admin': 'Itiyum Admin'
+    };
+    return roleMap[role] || role;
+  }
 }
 
