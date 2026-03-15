@@ -186,6 +186,81 @@ async function notifySpecialistBookingDeclined({ userId, tenantId, specialistNam
   });
 }
 
+/**
+ * Notify user they have a new follower
+ */
+async function notifyUserFollowed({ userId, tenantId, followerName, followerId }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'social',
+    title: 'New Follower',
+    message: `${followerName} started following you`,
+    actionUrl: `/profile/${followerId}`,
+    metadata: {
+      follower_id: followerId,
+      follower_name: followerName
+    }
+  });
+}
+
+/**
+ * Notify user of a new chat request
+ */
+async function notifyChatRequest({ userId, tenantId, requesterName, requesterId, requestId }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'message',
+    title: 'New Chat Request',
+    message: `${requesterName} wants to chat with you`,
+    actionUrl: `/messages/requests`,
+    metadata: {
+      requester_id: requesterId,
+      requester_name: requesterName,
+      request_id: requestId
+    }
+  });
+}
+
+/**
+ * Notify user their chat request was accepted
+ */
+async function notifyChatRequestAccepted({ userId, tenantId, recipientName, recipientId, conversationId }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'message',
+    title: 'Chat Request Accepted',
+    message: `${recipientName} accepted your chat request`,
+    actionUrl: `/messages/${conversationId}`,
+    metadata: {
+      recipient_id: recipientId,
+      recipient_name: recipientName,
+      conversation_id: conversationId
+    }
+  });
+}
+
+/**
+ * Notify user of a new message
+ */
+async function notifyNewMessage({ userId, tenantId, senderName, senderId, conversationId, messagePreview }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'message',
+    title: `New message from ${senderName}`,
+    message: messagePreview.substring(0, 100),
+    actionUrl: `/messages/${conversationId}`,
+    metadata: {
+      sender_id: senderId,
+      sender_name: senderName,
+      conversation_id: conversationId
+    }
+  });
+}
+
 module.exports = {
   createNotification,
   notifyBookingConfirmed,
@@ -196,6 +271,10 @@ module.exports = {
   notifyPaymentFailed,
   notifyAdCampaignStatus,
   notifySpecialistBookingConfirmed,
-  notifySpecialistBookingDeclined
+  notifySpecialistBookingDeclined,
+  notifyUserFollowed,
+  notifyChatRequest,
+  notifyChatRequestAccepted,
+  notifyNewMessage
 };
 
