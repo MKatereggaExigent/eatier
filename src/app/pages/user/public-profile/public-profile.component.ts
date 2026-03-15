@@ -34,7 +34,6 @@ export class PublicProfileComponent implements OnInit {
   error = signal<string | null>(null);
   isFollowing = signal<boolean>(false);
   isOwnProfile = signal<boolean>(false);
-  currentUser = this.authService.currentUser;
 
   constructor(
     private route: ActivatedRoute,
@@ -44,6 +43,10 @@ export class PublicProfileComponent implements OnInit {
     private messagingService: MessagingService,
     private authService: AuthService
   ) {}
+
+  get currentUser() {
+    return this.authService.currentUser;
+  }
 
   ngOnInit(): void {
     const userId = this.route.snapshot.paramMap.get('id');
