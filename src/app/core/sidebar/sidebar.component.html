@@ -176,6 +176,21 @@
         </a>
       </li>
 
+      <!-- Social -->
+      <li class="nav-item" role="listitem">
+        <a
+          routerLink="social"
+          routerLinkActive="active"
+          class="nav-link"
+          (click)="closeMobileSidebar()"
+          [attr.aria-label]="'Navigate to Social' + (isCollapsed() ? '' : ' - Connect with followers and manage messages')">
+          <span class="nav-icon" aria-hidden="true">👥</span>
+          @if (!isCollapsed()) {
+            <span class="nav-text">Social</span>
+          }
+        </a>
+      </li>
+
       <!-- Divider -->
       @if (!isCollapsed()) {
         <li class="nav-divider" role="separator" aria-hidden="true"></li>

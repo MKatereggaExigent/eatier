@@ -42,6 +42,7 @@ export class UserDashboardComponent {
           { path: 'bookings', label: 'Bookings', icon: '📅' },
           { path: 'blog', label: 'Blog', icon: '📝' },
           { path: 'ads', label: 'Manage My Ads', icon: '📢' },
+          { path: 'social', label: 'Social', icon: '👥' },
           { path: 'analytics', label: 'Analytics', icon: '📈' },
           { path: 'reports', label: 'Reports', icon: '📋' },
           { path: 'settings', label: 'Settings', icon: '⚙️' }
@@ -56,6 +57,7 @@ export class UserDashboardComponent {
           { path: 'bookings', label: 'Bookings', icon: '📋' },
           { path: 'wallet', label: 'Earnings', icon: '💰' },
           { path: 'ads', label: 'Manage My Ads', icon: '📢' },
+          { path: 'social', label: 'Social', icon: '👥' },
           { path: 'profile', label: 'Profile', icon: '👤' }
         ];
 
@@ -67,6 +69,7 @@ export class UserDashboardComponent {
           { path: 'favorites', label: 'Favorites', icon: '❤️' },
           { path: 'reviews', label: 'My Reviews', icon: '⭐' },
           { path: 'ads', label: 'Manage My Ads', icon: '📢' },
+          { path: 'social', label: 'Social', icon: '👥' },
           { path: 'insights', label: 'Insights', icon: '📈' },
           { path: 'bookings', label: 'Bookings', icon: '📋' },
           { path: 'specialist-bookings', label: 'Chef Bookings', icon: '👨‍🍳' }
