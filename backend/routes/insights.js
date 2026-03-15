@@ -3,8 +3,9 @@ const pool = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
-// Apply authentication to all routes
-router.use(authenticateToken);
+// NOTE: Authentication is applied selectively below
+// - Tracking endpoints (/track/*) are PUBLIC (for analytics on public pages)
+// - Business insights endpoints require authentication (business owners only)
 
 // Helper function to calculate date range
 function getDateRange(period, startDate, endDate) {
@@ -40,8 +41,8 @@ function getDateRange(period, startDate, endDate) {
   return { fromDate, toDate };
 }
 
-// Get comprehensive business insights
-router.get('/business/:businessId', async (req, res) => {
+// Get comprehensive business insights (requires authentication)
+router.get('/business/:businessId', authenticateToken, async (req, res) => {
   try {
     const { businessId } = req.params;
     const { period = 'daily', startDate, endDate } = req.query;
@@ -579,8 +580,8 @@ router.post('/track/session-end', async (req, res) => {
   }
 });
 
-// Get user insights
-router.get('/user/:userId', async (req, res) => {
+// Get user insights (requires authentication)
+router.get('/user/:userId', authenticateToken, async (req, res) => {
   try {
     const { userId } = req.params;
     const { period = 'daily', startDate, endDate } = req.query;
@@ -724,8 +725,8 @@ function generateMockUserInsights(fromDate, toDate) {
   return insights.reverse();
 }
 
-// Export insights data as PDF (placeholder endpoint)
-router.post('/export/:type/:id', async (req, res) => {
+// Export insights data as PDF (requires authentication)
+router.post('/export/:type/:id', authenticateToken, async (req, res) => {
   try {
     const { type, id } = req.params; // 'business' or 'user'
     const { period, startDate, endDate, format = 'pdf' } = req.body;
