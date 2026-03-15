@@ -1270,3 +1270,18 @@ $space-2xl: 3rem;
     }
   }
 }
+
+// Widgets Section
+.widgets-section {
+  margin: $space-xl 0;
+
+  .widgets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: $space-lg;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}

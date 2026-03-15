@@ -5,6 +5,8 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Specialist } from '../../../shared/models/user.model';
+import { SocialWidgetComponent } from '../../../shared/components/social-widget/social-widget.component';
+import { MessagingWidgetComponent } from '../../../shared/components/messaging-widget/messaging-widget.component';
 
 interface BookingRequest {
   id: string;
@@ -42,7 +44,7 @@ interface Review {
 @Component({
   selector: 'app-specialist-overview',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SocialWidgetComponent, MessagingWidgetComponent],
   templateUrl: './specialist-overview.component.html',
   styleUrls: ['./specialist-overview.component.scss']
 })

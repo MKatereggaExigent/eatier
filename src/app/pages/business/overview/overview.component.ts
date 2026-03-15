@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { BusinessOwnerService, Business, Review, Booking } from '../../../core/services/business-owner.service';
+import { SocialWidgetComponent } from '../../../shared/components/social-widget/social-widget.component';
+import { MessagingWidgetComponent } from '../../../shared/components/messaging-widget/messaging-widget.component';
 
 interface DashboardStats {
   totalBookings: number;
@@ -31,7 +33,7 @@ interface ErrorState {
 @Component({
   selector: 'app-overview',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, SocialWidgetComponent, MessagingWidgetComponent],
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss']
 })

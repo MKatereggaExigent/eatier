@@ -7,6 +7,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService, UserStats, UserActivity, Favorite } from '../../../core/services/user.service';
 import { environment } from '../../../../environments/environment';
+import { SocialWidgetComponent } from '../../../shared/components/social-widget/social-widget.component';
+import { MessagingWidgetComponent } from '../../../shared/components/messaging-widget/messaging-widget.component';
 
 interface LoadingState {
   stats: boolean;
@@ -43,7 +45,7 @@ interface Promotion {
 @Component({
   selector: 'app-user-overview',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SocialWidgetComponent, MessagingWidgetComponent],
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss']
 })

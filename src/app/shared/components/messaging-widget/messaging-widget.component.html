@@ -1,0 +1,125 @@
+<div class="messaging-widget">
+  <div class="widget-header">
+    <h3>Messages</h3>
+    @if (unreadCount() > 0) {
+      <span class="unread-badge">{{ unreadCount() }}</span>
+    }
+  </div>
+
+  <div class="widget-tabs">
+    <button 
+      type="button"
+      class="tab-btn" 
+      [class.active]="activeTab() === 'conversations'"
+      (click)="setActiveTab('conversations')">
+      Chats
+      @if (unreadCount() > 0) {
+        <span class="tab-badge">{{ unreadCount() }}</span>
+      }
+    </button>
+    <button 
+      type="button"
+      class="tab-btn" 
+      [class.active]="activeTab() === 'requests'"
+      (click)="setActiveTab('requests')">
+      Requests
+      @if (pendingRequestsCount() > 0) {
+        <span class="tab-badge">{{ pendingRequestsCount() }}</span>
+      }
+    </button>
+  </div>
+
+  <div class="widget-content">
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    } @else {
+      @if (activeTab() === 'conversations') {
+        @if (conversations().length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">💬</div>
+            <p>No conversations yet</p>
+            <small>Start chatting with other users</small>
+          </div>
+        } @else {
+          <div class="conversation-list">
+            @for (conversation of conversations(); track conversation.id) {
+              <a 
+                [routerLink]="['/messages', conversation.id]"
+                class="conversation-item"
+                [class.unread]="conversation.unread_count > 0">
+                <img 
+                  [src]="getParticipantAvatar(conversation)" 
+                  [alt]="getParticipantName(conversation)"
+                  class="conversation-avatar">
+                <div class="conversation-info">
+                  <div class="conversation-header">
+                    <h4>{{ getParticipantName(conversation) }}</h4>
+                    <span class="conversation-time">
+                      {{ formatTimestamp(conversation.last_message_at) }}
+                    </span>
+                  </div>
+                  <p class="conversation-preview">
+                    {{ truncateMessage(conversation.last_message?.content || 'No messages yet') }}
+                  </p>
+                </div>
+                @if (conversation.unread_count > 0) {
+                  <span class="unread-indicator">{{ conversation.unread_count }}</span>
+                }
+              </a>
+            }
+          </div>
+        }
+      }
+
+      @if (activeTab() === 'requests') {
+        @if (chatRequests().length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">📨</div>
+            <p>No pending requests</p>
+            <small>Chat requests will appear here</small>
+          </div>
+        } @else {
+          <div class="request-list">
+            @for (request of chatRequests(); track request.id) {
+              <div class="request-item">
+                <img 
+                  [src]="getRequesterAvatar(request)" 
+                  [alt]="getRequesterName(request)"
+                  class="request-avatar">
+                <div class="request-info">
+                  <h4>{{ getRequesterName(request) }}</h4>
+                  @if (request.message) {
+                    <p class="request-message">{{ truncateMessage(request.message, 60) }}</p>
+                  }
+                  <span class="request-time">{{ formatTimestamp(request.created_at) }}</span>
+                </div>
+                <div class="request-actions">
+                  <button 
+                    type="button"
+                    class="accept-btn"
+                    (click)="acceptChatRequest(request.id)">
+                    ✓
+                  </button>
+                  <button 
+                    type="button"
+                    class="decline-btn"
+                    (click)="declineChatRequest(request.id)">
+                    ✕
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+    }
+  </div>
+
+  <div class="widget-footer">
+    <a routerLink="/messages" class="view-all-link">View All Messages</a>
+  </div>
+</div>
+

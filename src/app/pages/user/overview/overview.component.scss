@@ -1059,3 +1059,18 @@ $border-thick: 3px solid $color-black;
     }
   }
 }
+
+// Widgets Section
+.widgets-section {
+  margin: 2rem 0;
+
+  .widgets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}

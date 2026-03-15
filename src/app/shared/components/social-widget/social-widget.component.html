@@ -1,0 +1,101 @@
+<div class="social-widget">
+  <div class="widget-header">
+    <h3>Social</h3>
+    <div class="stats">
+      <span class="stat-item">
+        <strong>{{ followerCount() }}</strong> Followers
+      </span>
+      <span class="stat-item">
+        <strong>{{ followingCount() }}</strong> Following
+      </span>
+    </div>
+  </div>
+
+  <div class="widget-tabs">
+    <button 
+      type="button"
+      class="tab-btn" 
+      [class.active]="activeTab() === 'followers'"
+      (click)="setActiveTab('followers')">
+      Followers ({{ followerCount() }})
+    </button>
+    <button 
+      type="button"
+      class="tab-btn" 
+      [class.active]="activeTab() === 'following'"
+      (click)="setActiveTab('following')">
+      Following ({{ followingCount() }})
+    </button>
+  </div>
+
+  <div class="widget-content">
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    } @else {
+      @if (activeTab() === 'followers') {
+        @if (followers().length === 0) {
+          <div class="empty-state">
+            <p>No followers yet</p>
+          </div>
+        } @else {
+          <div class="user-list">
+            @for (user of followers(); track user.id || user.user_id) {
+              <div class="user-item">
+                <img 
+                  [src]="getUserAvatar(user)" 
+                  [alt]="getUserName(user)"
+                  class="user-avatar">
+                <div class="user-info">
+                  <h4>{{ getUserName(user) }}</h4>
+                  <p class="user-role">{{ user.role }}</p>
+                </div>
+                <a 
+                  [routerLink]="['/profile', user.user_id || user.id]"
+                  class="view-profile-btn">
+                  View
+                </a>
+              </div>
+            }
+          </div>
+        }
+      }
+
+      @if (activeTab() === 'following') {
+        @if (following().length === 0) {
+          <div class="empty-state">
+            <p>Not following anyone yet</p>
+          </div>
+        } @else {
+          <div class="user-list">
+            @for (user of following(); track user.id || user.user_id) {
+              <div class="user-item">
+                <img 
+                  [src]="getUserAvatar(user)" 
+                  [alt]="getUserName(user)"
+                  class="user-avatar">
+                <div class="user-info">
+                  <h4>{{ getUserName(user) }}</h4>
+                  <p class="user-role">{{ user.role }}</p>
+                </div>
+                <button 
+                  type="button"
+                  class="unfollow-btn"
+                  (click)="unfollowUser(user.user_id || user.id)">
+                  Unfollow
+                </button>
+              </div>
+            }
+          </div>
+        }
+      }
+    }
+  </div>
+
+  <div class="widget-footer">
+    <a routerLink="/social" class="view-all-link">View All</a>
+  </div>
+</div>
+

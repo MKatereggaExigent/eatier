@@ -171,7 +171,9 @@ export const routes: Routes = [
             { path: 'ads', loadComponent: () => import('./pages/ads/ad-management/ad-management.component').then(m => m.AdManagementComponent) },
             { path: 'digital-card', loadComponent: () => import('./pages/business/digital-card/digital-card.component').then(m => m.DigitalCardComponent) },
             { path: 'analytics', loadComponent: () => import('./pages/business/analytics/business-analytics.component').then(m => m.BusinessAnalyticsComponent) },
-            { path: 'accounts', loadComponent: () => import('./pages/business/accounts/accounts-center.component').then(m => m.AccountsCenterComponent) }
+            { path: 'accounts', loadComponent: () => import('./pages/business/accounts/accounts-center.component').then(m => m.AccountsCenterComponent) },
+            { path: 'messages', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) },
+            { path: 'messages/:id', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) }
         ]
     },
 
@@ -195,7 +197,9 @@ export const routes: Routes = [
             { path: 'insights', loadComponent: () => import('./pages/user/insights/user-insights.component').then(m => m.UserInsightsComponent) },
             { path: 'digital-card', loadComponent: () => import('./pages/user/digital-card/user-digital-card.component').then(m => m.UserDigitalCardComponent) },
             { path: 'legacy-access', loadComponent: () => import('./pages/user/legacy-access/legacy-access.component').then(m => m.LegacyAccessComponent) },
-            { path: 'accounts', loadComponent: () => import('./pages/user/accounts/user-accounts-center.component').then(m => m.UserAccountsCenterComponent) }
+            { path: 'accounts', loadComponent: () => import('./pages/user/accounts/user-accounts-center.component').then(m => m.UserAccountsCenterComponent) },
+            { path: 'messages', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) },
+            { path: 'messages/:id', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) }
         ]
     },
 
@@ -224,7 +228,9 @@ export const routes: Routes = [
             { path: 'orders', loadComponent: () => import('./pages/user/orders/user-orders.component').then(m => m.UserOrdersComponent) },
             { path: 'wallet', loadComponent: () => import('./pages/user/wallet/user-wallet.component').then(m => m.UserWalletComponent) },
             { path: 'promotions', loadComponent: () => import('./pages/user/promotions/user-promotions.component').then(m => m.UserPromotionsComponent) },
-            { path: 'social', loadComponent: () => import('./pages/user/social/user-social.component').then(m => m.UserSocialComponent) }
+            { path: 'social', loadComponent: () => import('./pages/user/social/user-social.component').then(m => m.UserSocialComponent) },
+            { path: 'messages', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) },
+            { path: 'messages/:id', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) }
         ]
     },
 
@@ -249,7 +255,9 @@ export const routes: Routes = [
             { path: 'legacy-access', loadComponent: () => import('./pages/user/legacy-access/legacy-access.component').then(m => m.LegacyAccessComponent) },
             { path: 'accounts', loadComponent: () => import('./pages/user/accounts/user-accounts-center.component').then(m => m.UserAccountsCenterComponent) },
             { path: 'bookings', loadComponent: () => import('./pages/user/bookings/bookings.component').then(m => m.BookingsComponent) },
-            { path: 'wallet', loadComponent: () => import('./pages/user/wallet/user-wallet.component').then(m => m.UserWalletComponent) }
+            { path: 'wallet', loadComponent: () => import('./pages/user/wallet/user-wallet.component').then(m => m.UserWalletComponent) },
+            { path: 'messages', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) },
+            { path: 'messages/:id', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) }
         ]
     },
 

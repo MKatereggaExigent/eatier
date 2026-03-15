@@ -988,3 +988,18 @@
     }
   }
 }
+
+// Widgets Section
+.widgets-section {
+  margin: var(--space-8) 0;
+
+  .widgets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--space-6);
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}

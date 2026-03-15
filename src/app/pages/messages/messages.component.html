@@ -1,0 +1,190 @@
+<div class="messages-page">
+  <div class="messages-container-wrapper">
+    <!-- Sidebar: Conversations List -->
+    <div class="conversations-sidebar">
+      <div class="sidebar-header">
+        <h2>Messages</h2>
+        <div class="header-tabs">
+          <button 
+            type="button"
+            class="tab-btn"
+            [class.active]="activeView() === 'conversations'"
+            (click)="setActiveView('conversations')">
+            Chats
+          </button>
+          <button 
+            type="button"
+            class="tab-btn"
+            [class.active]="activeView() === 'requests'"
+            (click)="setActiveView('requests')">
+            Requests
+            @if (chatRequests().length > 0) {
+              <span class="badge">{{ chatRequests().length }}</span>
+            }
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        @if (loading()) {
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+          </div>
+        } @else {
+          @if (activeView() === 'conversations') {
+            @if (conversations().length === 0) {
+              <div class="empty-state">
+                <div class="empty-icon">💬</div>
+                <p>No conversations yet</p>
+                <small>Start chatting with other users</small>
+              </div>
+            } @else {
+              <div class="conversation-list">
+                @for (conversation of conversations(); track conversation.id) {
+                  <div 
+                    class="conversation-item"
+                    [class.active]="selectedConversation()?.id === conversation.id"
+                    [class.unread]="conversation.unread_count > 0"
+                    (click)="selectConversation(conversation)">
+                    <img 
+                      [src]="getParticipantAvatar(conversation)" 
+                      [alt]="getParticipantName(conversation)"
+                      class="conversation-avatar">
+                    <div class="conversation-info">
+                      <div class="conversation-header">
+                        <h4>{{ getParticipantName(conversation) }}</h4>
+                        <span class="conversation-time">
+                          {{ formatTimestamp(conversation.last_message_at) }}
+                        </span>
+                      </div>
+                      <p class="conversation-preview">
+                        {{ conversation.last_message?.content || 'No messages yet' }}
+                      </p>
+                    </div>
+                    @if (conversation.unread_count > 0) {
+                      <span class="unread-badge">{{ conversation.unread_count }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
+
+          @if (activeView() === 'requests') {
+            @if (chatRequests().length === 0) {
+              <div class="empty-state">
+                <div class="empty-icon">📨</div>
+                <p>No pending requests</p>
+                <small>Chat requests will appear here</small>
+              </div>
+            } @else {
+              <div class="request-list">
+                @for (request of chatRequests(); track request.id) {
+                  <div class="request-item">
+                    <img 
+                      [src]="getRequesterAvatar(request)" 
+                      [alt]="getRequesterName(request)"
+                      class="request-avatar">
+                    <div class="request-info">
+                      <h4>{{ getRequesterName(request) }}</h4>
+                      @if (request.message) {
+                        <p class="request-message">{{ request.message }}</p>
+                      }
+                      <span class="request-time">{{ formatTimestamp(request.created_at) }}</span>
+                    </div>
+                    <div class="request-actions">
+                      <button 
+                        type="button"
+                        class="accept-btn"
+                        (click)="acceptChatRequest(request.id)">
+                        Accept
+                      </button>
+                      <button 
+                        type="button"
+                        class="decline-btn"
+                        (click)="declineChatRequest(request.id)">
+                        Decline
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Main: Chat View -->
+    <div class="chat-view">
+      @if (!selectedConversation()) {
+        <div class="no-conversation-selected">
+          <div class="empty-icon">💬</div>
+          <h3>Select a conversation</h3>
+          <p>Choose a conversation from the sidebar to start messaging</p>
+        </div>
+      } @else {
+        <div class="chat-header">
+          <img 
+            [src]="getParticipantAvatar(selectedConversation()!)" 
+            [alt]="getParticipantName(selectedConversation()!)"
+            class="chat-avatar">
+          <div class="chat-info">
+            <h3>{{ getParticipantName(selectedConversation()!) }}</h3>
+            <span class="chat-status">Active</span>
+          </div>
+        </div>
+
+        <div class="messages-container">
+          @if (loadingMessages()) {
+            <div class="loading-messages">
+              <div class="spinner"></div>
+            </div>
+          } @else {
+            @for (message of messages(); track message.id) {
+              <div 
+                class="message"
+                [class.my-message]="isMyMessage(message)"
+                [class.their-message]="!isMyMessage(message)">
+                @if (!isMyMessage(message)) {
+                  <img 
+                    [src]="getParticipantAvatar(selectedConversation()!)" 
+                    [alt]="message.sender_first_name"
+                    class="message-avatar">
+                }
+                <div class="message-content">
+                  <p>{{ message.content }}</p>
+                  <span class="message-time">{{ formatMessageTime(message.created_at) }}</span>
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <div class="message-input-container">
+          <form (submit)="sendMessage(); $event.preventDefault()">
+            <input 
+              type="text"
+              [(ngModel)]="newMessage"
+              name="message"
+              placeholder="Type a message..."
+              class="message-input"
+              [disabled]="sendingMessage()">
+            <button 
+              type="submit"
+              class="send-btn"
+              [disabled]="!newMessage().trim() || sendingMessage()">
+              @if (sendingMessage()) {
+                <span class="spinner-small"></span>
+              } @else {
+                Send
+              }
+            </button>
+          </form>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
