@@ -1,7 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
-import { AuthService } from './auth.service';
 
 export interface TypingUser {
   userId: string;
@@ -12,21 +10,21 @@ export interface TypingUser {
   providedIn: 'root'
 })
 export class WebSocketService {
-  private socket: Socket | null = null;
+  private socket: any = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
-  
+
   connected = signal<boolean>(false);
   typingUsers = signal<Map<string, TypingUser[]>>(new Map());
 
-  constructor(private authService: AuthService) {}
+  constructor() {}
 
   /**
    * Connect to WebSocket server
    */
-  connect(): void {
-    const token = this.authService.getToken();
-    
+  async connect(): Promise<void> {
+    const token = localStorage.getItem('token');
+
     if (!token) {
       console.error('No auth token available for WebSocket connection');
       return;
@@ -37,18 +35,25 @@ export class WebSocketService {
       return;
     }
 
-    const socketUrl = environment.apiUrl.replace('/api', '');
-    
-    this.socket = io(socketUrl, {
-      auth: { token },
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      reconnectionAttempts: this.maxReconnectAttempts
-    });
+    try {
+      // Dynamically import socket.io-client
+      const { io } = await import('socket.io-client');
+      const socketUrl = environment.apiUrl.replace('/api', '');
 
-    this.setupEventListeners();
+      this.socket = io(socketUrl, {
+        auth: { token },
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        reconnectionAttempts: this.maxReconnectAttempts
+      });
+
+      this.setupEventListeners();
+    } catch (error) {
+      console.error('Failed to load socket.io-client:', error);
+      this.connected.set(false);
+    }
   }
 
   /**
@@ -74,12 +79,12 @@ export class WebSocketService {
       this.reconnectAttempts = 0;
     });
 
-    this.socket.on('disconnect', (reason) => {
+    this.socket.on('disconnect', (reason: string) => {
       console.log('❌ WebSocket disconnected:', reason);
       this.connected.set(false);
     });
 
-    this.socket.on('connect_error', (error) => {
+    this.socket.on('connect_error', (error: Error) => {
       console.error('WebSocket connection error:', error);
       this.reconnectAttempts++;
       

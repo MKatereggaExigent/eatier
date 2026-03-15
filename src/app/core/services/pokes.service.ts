@@ -43,7 +43,7 @@ export class PokesService {
    * Get received pokes
    */
   getReceivedPokes(unreadOnly: boolean = false): Observable<{ pokes: Poke[]; unread_count: number }> {
-    const params = unreadOnly ? { unread: 'true' } : {};
+    const params: any = unreadOnly ? { unread: 'true' } : {};
     return this.http.get<{ pokes: Poke[]; unread_count: number }>(`${this.apiUrl}/received`, { params });
   }
 

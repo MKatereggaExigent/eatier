@@ -189,19 +189,36 @@ export class MessagingService {
    */
   sendMessage(
     conversationId: string,
-    content: string,
+    contentOrPayload: string | {
+      content?: string;
+      messageType?: string;
+      fileUrl?: string;
+      fileName?: string;
+      fileType?: string;
+      fileSize?: number;
+      attachments?: any[];
+      replyToMessageId?: string;
+    },
     messageType: 'text' | 'image' | 'file' = 'text',
     attachments?: any[],
     replyToMessageId?: string
   ): Observable<{ message: string; data: ChatMessage }> {
-    return this.http.post<{ message: string; data: ChatMessage }>(
-      `${this.apiUrl}/conversations/${conversationId}/messages`,
-      {
-        content,
+    let payload: any;
+
+    if (typeof contentOrPayload === 'string') {
+      payload = {
+        content: contentOrPayload,
         messageType,
         attachments,
         replyToMessageId
-      }
+      };
+    } else {
+      payload = contentOrPayload;
+    }
+
+    return this.http.post<{ message: string; data: ChatMessage }>(
+      `${this.apiUrl}/conversations/${conversationId}/messages`,
+      payload
     );
   }
 
