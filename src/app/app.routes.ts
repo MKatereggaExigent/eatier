@@ -23,6 +23,7 @@ export const routes: Routes = [
             { path: 'careers', loadComponent: () => import('./pages/careers/careers.component').then(m => m.CareersComponent) },
             { path: 'accessibility', loadComponent: () => import('./pages/accessibility/accessibility.component').then(m => m.AccessibilityComponent) },
             { path: 'contact', loadComponent: () => import('./pages/contact/contact.component').then(m => m.ContactComponent) },
+            { path: 'system-status', loadComponent: () => import('./pages/system-status/system-status.component').then(m => m.SystemStatusComponent) },
 
             // Public restaurant discovery
             {

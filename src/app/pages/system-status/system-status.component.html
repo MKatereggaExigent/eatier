@@ -1,0 +1,127 @@
+<div class="system-status-page">
+  <div class="status-header">
+    <h1>System Status</h1>
+    <p class="subtitle">Real-time status of Itiyum platform services</p>
+  </div>
+
+  @if (loading() && !systemStatus()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading system status...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-banner">
+      <span class="error-icon">⚠️</span>
+      <div class="error-content">
+        <h3>Unable to Load Status</h3>
+        <p>{{ error() }}</p>
+        <button type="button" class="retry-btn" (click)="refresh()">Retry</button>
+      </div>
+    </div>
+  }
+
+  @if (systemStatus()) {
+    <!-- Overall Status Banner -->
+    <div class="overall-status" [ngClass]="getStatusClass(systemStatus()!.overall)">
+      <div class="status-indicator">
+        <span class="status-icon">{{ getStatusIcon(systemStatus()!.overall) }}</span>
+        <div class="status-info">
+          <h2>{{ getStatusText(systemStatus()!.overall) }}</h2>
+          <p class="status-time">Last updated: {{ formatTimestamp(lastUpdated().toISOString()) }}</p>
+        </div>
+      </div>
+      <button type="button" class="refresh-btn" (click)="refresh()" title="Refresh status">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+        </svg>
+        Refresh
+      </button>
+    </div>
+
+    <!-- Uptime Statistics -->
+    @if (uptimeInfo()) {
+      <div class="uptime-section">
+        <h3>System Uptime</h3>
+        <div class="uptime-stats">
+          <div class="uptime-card">
+            <div class="uptime-percentage">{{ calculateUptime().toFixed(2) }}%</div>
+            <div class="uptime-label">Last 30 Days</div>
+          </div>
+          <div class="uptime-card">
+            <div class="uptime-value">{{ uptimeInfo()!.uptime.formatted }}</div>
+            <div class="uptime-label">Current Uptime</div>
+          </div>
+          <div class="uptime-card">
+            <div class="uptime-value">{{ systemStatus()!.responseTime }}</div>
+            <div class="uptime-label">Response Time</div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Service Status Details -->
+    <div class="services-section">
+      <h3>Service Status</h3>
+      <div class="services-grid">
+        @if (systemStatus()!.services.api) {
+          <div class="service-card" [ngClass]="getStatusClass(systemStatus()!.services.api!.status)">
+            <div class="service-header">
+              <span class="service-icon">{{ getStatusIcon(systemStatus()!.services.api!.status) }}</span>
+              <h4>API Service</h4>
+            </div>
+            <p class="service-status">{{ systemStatus()!.services.api!.status }}</p>
+            <p class="service-message">{{ systemStatus()!.services.api!.message }}</p>
+          </div>
+        }
+
+        @if (systemStatus()!.services.database) {
+          <div class="service-card" [ngClass]="getStatusClass(systemStatus()!.services.database!.status)">
+            <div class="service-header">
+              <span class="service-icon">{{ getStatusIcon(systemStatus()!.services.database!.status) }}</span>
+              <h4>Database</h4>
+            </div>
+            <p class="service-status">{{ systemStatus()!.services.database!.status }}</p>
+            <p class="service-message">{{ systemStatus()!.services.database!.message }}</p>
+            @if (systemStatus()!.services.database!.responseTime) {
+              <p class="service-response-time">Response: {{ systemStatus()!.services.database!.responseTime }}</p>
+            }
+          </div>
+        }
+
+        @if (systemStatus()!.services.websocket) {
+          <div class="service-card" [ngClass]="getStatusClass(systemStatus()!.services.websocket!.status)">
+            <div class="service-header">
+              <span class="service-icon">{{ getStatusIcon(systemStatus()!.services.websocket!.status) }}</span>
+              <h4>WebSocket</h4>
+            </div>
+            <p class="service-status">{{ systemStatus()!.services.websocket!.status }}</p>
+            <p class="service-message">{{ systemStatus()!.services.websocket!.message }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Additional Information -->
+    <div class="info-section">
+      <h3>About This Page</h3>
+      <p>This page displays the real-time operational status of the Itiyum platform. Status information is automatically updated every 30 seconds.</p>
+      <div class="status-legend">
+        <div class="legend-item">
+          <span class="legend-icon status-operational">✓</span>
+          <span>Operational - Service is functioning normally</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-icon status-degraded">⚠</span>
+          <span>Degraded - Service is experiencing performance issues</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-icon status-down">✗</span>
+          <span>Down - Service is currently unavailable</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

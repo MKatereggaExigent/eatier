@@ -1,0 +1,20 @@
+feat: Add System Status page and fix blog/status links
+
+Backend:
+- Add /api/system-status endpoint for real-time system health
+- Add /api/system-status/uptime endpoint for uptime statistics  
+- Check API, Database, and WebSocket service status
+- Return operational/degraded/down status for each service
+
+Frontend:
+- Create SystemStatusComponent with real-time status display
+- Show overall system status with color-coded indicators
+- Display uptime statistics and response times
+- Auto-refresh status every 30 seconds
+- Responsive design for mobile and desktop
+
+Updates:
+- Fix blog link from https://blog.itiyum.com to /blog
+- Fix status link from https://status.itiyum.com to /system-status
+- Add system-status route to app.routes.ts
+

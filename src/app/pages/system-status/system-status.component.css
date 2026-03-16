@@ -1,0 +1,371 @@
+.system-status-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.status-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.status-header h1 {
+  font-size: 2.5rem;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Loading State */
+.loading-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #ff6b35;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error Banner */
+.error-banner {
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.error-icon {
+  font-size: 2rem;
+}
+
+.error-content h3 {
+  margin: 0 0 0.5rem 0;
+  color: #c00;
+}
+
+.retry-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #c00;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.retry-btn:hover {
+  background: #a00;
+}
+
+/* Overall Status Banner */
+.overall-status {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 6px solid;
+}
+
+.overall-status.status-operational {
+  border-left-color: #10b981;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.overall-status.status-degraded {
+  border-left-color: #f59e0b;
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+}
+
+.overall-status.status-down {
+  border-left-color: #ef4444;
+  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.status-icon {
+  font-size: 3rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.status-operational .status-icon {
+  color: #10b981;
+}
+
+.status-degraded .status-icon {
+  color: #f59e0b;
+}
+
+.status-down .status-icon {
+  color: #ef4444;
+}
+
+.status-info h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+  color: #1a1a1a;
+}
+
+.status-time {
+  color: #666;
+  margin: 0;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+/* Uptime Section */
+.uptime-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.uptime-section h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  color: #1a1a1a;
+}
+
+.uptime-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.uptime-card {
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.uptime-percentage,
+.uptime-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #10b981;
+  margin-bottom: 0.5rem;
+}
+
+.uptime-label {
+  color: #666;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Services Section */
+.services-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.services-section h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  color: #1a1a1a;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.service-card {
+  background: #f9fafb;
+  border: 2px solid;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: transform 0.2s;
+}
+
+.service-card:hover {
+  transform: translateY(-2px);
+}
+
+.service-card.status-operational {
+  border-color: #10b981;
+}
+
+.service-card.status-degraded {
+  border-color: #f59e0b;
+}
+
+.service-card.status-down {
+  border-color: #ef4444;
+}
+
+.service-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.service-header .service-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: white;
+}
+
+.service-header h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #1a1a1a;
+}
+
+.service-status {
+  font-weight: 600;
+  text-transform: capitalize;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.service-card.status-operational .service-status {
+  color: #10b981;
+}
+
+.service-card.status-degraded .service-status {
+  color: #f59e0b;
+}
+
+.service-card.status-down .service-status {
+  color: #ef4444;
+}
+
+.service-message {
+  color: #666;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.service-response-time {
+  color: #999;
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0 0;
+}
+
+/* Info Section */
+.info-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.info-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  color: #1a1a1a;
+}
+
+.info-section p {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.status-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.legend-icon {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .system-status-page {
+    padding: 1rem;
+  }
+
+  .status-header h1 {
+    font-size: 2rem;
+  }
+
+  .overall-status {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .uptime-stats,
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
