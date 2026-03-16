@@ -28,7 +28,7 @@ router.post('/send', async (req, res) => {
     // Check if users are connected (following each other)
     const connectionCheck = await pool.query(`
       SELECT COUNT(*) as count
-      FROM followers
+      FROM user_follows
       WHERE tenant_id = $1
         AND (
           (follower_id = $2 AND following_id = $3) OR
