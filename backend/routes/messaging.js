@@ -19,7 +19,7 @@ router.use(authenticateToken);
 router.post('/request', async (req, res) => {
   const { recipientId, message } = req.body;
   const requesterId = req.user.userId;
-  const tenantId = req.user.tenantId;
+  const tenantId = req.user.tenant_id;
 
   try {
     // Prevent self-request
@@ -137,12 +137,12 @@ router.get('/requests', async (req, res) => {
     const otherColumn = type === 'received' ? 'requester_id' : 'recipient_id';
 
     const result = await pool.query(`
-      SELECT 
+      SELECT
         cr.*,
         u.first_name,
         u.last_name,
         u.email,
-        u.profile_image_url
+        COALESCE(u.avatar_url, u.profile_photo) as profile_image_url
       FROM chat_requests cr
       JOIN users u ON cr.${otherColumn} = u.id
       WHERE cr.${column} = $1 AND cr.status = 'pending'
@@ -180,7 +180,7 @@ router.get('/conversations', async (req, res) => {
             'first_name', u.first_name,
             'last_name', u.last_name,
             'email', u.email,
-            'profile_image_url', u.profile_image_url
+            'profile_image_url', COALESCE(u.avatar_url, u.profile_photo)
           ))
           FROM chat_participants cp2
           JOIN users u ON cp2.user_id = u.id
@@ -335,7 +335,7 @@ router.get('/conversations/:conversationId/messages', async (req, res) => {
         cm.*,
         u.first_name as sender_first_name,
         u.last_name as sender_last_name,
-        u.profile_image_url as sender_avatar,
+        COALESCE(u.avatar_url, u.profile_photo) as sender_avatar,
         (
           SELECT json_agg(json_build_object(
             'user_id', cmr.user_id,
