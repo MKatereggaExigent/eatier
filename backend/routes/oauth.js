@@ -72,7 +72,11 @@ function isProviderConfigured(provider) {
     google: process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
     facebook: process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET,
     github: process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET,
-    linkedin: process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET
+    linkedin: process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET,
+    microsoft: process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET,
+    apple: process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPLE_KEY_ID,
+    twitter: process.env.TWITTER_CONSUMER_KEY && process.env.TWITTER_CONSUMER_SECRET,
+    instagram: process.env.INSTAGRAM_CLIENT_ID && process.env.INSTAGRAM_CLIENT_SECRET
   };
   return configs[provider] || false;
 }
@@ -153,19 +157,98 @@ router.get('/linkedin/callback',
   handleOAuthSuccess
 );
 
+// Microsoft OAuth Routes
+router.get('/microsoft', (req, res, next) => {
+  if (!isProviderConfigured('microsoft')) {
+    return res.redirect(`${process.env.FRONTEND_URL}/login?error=microsoft_not_configured&message=Microsoft OAuth is not configured. Please add MICROSOFT_CLIENT_ID and MICROSOFT_CLIENT_SECRET to the .env file.`);
+  }
+  passport.authenticate('microsoft', {
+    scope: ['user.read'],
+    session: false
+  })(req, res, next);
+});
+
+router.get('/microsoft/callback',
+  passport.authenticate('microsoft', {
+    session: false,
+    failureRedirect: `${process.env.FRONTEND_URL}/login?error=microsoft_auth_failed`
+  }),
+  handleOAuthSuccess
+);
+
+// Apple Sign In Routes
+router.get('/apple', (req, res, next) => {
+  if (!isProviderConfigured('apple')) {
+    return res.redirect(`${process.env.FRONTEND_URL}/login?error=apple_not_configured&message=Apple Sign In is not configured. Please add APPLE_CLIENT_ID, APPLE_TEAM_ID, and APPLE_KEY_ID to the .env file.`);
+  }
+  passport.authenticate('apple', {
+    session: false
+  })(req, res, next);
+});
+
+router.post('/apple/callback',
+  passport.authenticate('apple', {
+    session: false,
+    failureRedirect: `${process.env.FRONTEND_URL}/login?error=apple_auth_failed`
+  }),
+  handleOAuthSuccess
+);
+
+// Twitter OAuth Routes
+router.get('/twitter', (req, res, next) => {
+  if (!isProviderConfigured('twitter')) {
+    return res.redirect(`${process.env.FRONTEND_URL}/login?error=twitter_not_configured&message=Twitter OAuth is not configured. Please add TWITTER_CONSUMER_KEY and TWITTER_CONSUMER_SECRET to the .env file.`);
+  }
+  passport.authenticate('twitter', {
+    session: false
+  })(req, res, next);
+});
+
+router.get('/twitter/callback',
+  passport.authenticate('twitter', {
+    session: false,
+    failureRedirect: `${process.env.FRONTEND_URL}/login?error=twitter_auth_failed`
+  }),
+  handleOAuthSuccess
+);
+
+// Instagram OAuth Routes
+router.get('/instagram', (req, res, next) => {
+  if (!isProviderConfigured('instagram')) {
+    return res.redirect(`${process.env.FRONTEND_URL}/login?error=instagram_not_configured&message=Instagram OAuth is not configured. Please add INSTAGRAM_CLIENT_ID and INSTAGRAM_CLIENT_SECRET to the .env file.`);
+  }
+  passport.authenticate('instagram', {
+    session: false
+  })(req, res, next);
+});
+
+router.get('/instagram/callback',
+  passport.authenticate('instagram', {
+    session: false,
+    failureRedirect: `${process.env.FRONTEND_URL}/login?error=instagram_auth_failed`
+  }),
+  handleOAuthSuccess
+);
+
 // Test endpoint to check OAuth configuration
 router.get('/status', (req, res) => {
   const providers = {
     google: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
     facebook: !!(process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET),
     github: !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
-    linkedin: !!(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET)
+    linkedin: !!(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET),
+    microsoft: !!(process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET),
+    apple: !!(process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPLE_KEY_ID),
+    twitter: !!(process.env.TWITTER_CONSUMER_KEY && process.env.TWITTER_CONSUMER_SECRET),
+    instagram: !!(process.env.INSTAGRAM_CLIENT_ID && process.env.INSTAGRAM_CLIENT_SECRET)
   };
 
   res.json({
     message: 'OAuth configuration status',
     providers,
-    configured: Object.values(providers).some(v => v)
+    configured: Object.values(providers).some(v => v),
+    configuredCount: Object.values(providers).filter(v => v).length,
+    totalProviders: Object.keys(providers).length
   });
 });
 

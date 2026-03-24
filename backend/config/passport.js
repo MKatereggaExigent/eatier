@@ -3,6 +3,10 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
+const MicrosoftStrategy = require('passport-microsoft').Strategy;
+const AppleStrategy = require('passport-apple');
+const TwitterStrategy = require('passport-twitter').Strategy;
+const InstagramStrategy = require('passport-instagram').Strategy;
 
 // Use the shared database pool from database.js
 const pool = require('./database');
@@ -173,6 +177,73 @@ passport.use(new LinkedInStrategy({
 async (accessToken, refreshToken, profile, done) => {
   try {
     const user = await findOrCreateOAuthUser(profile, 'linkedin');
+    return done(null, user);
+  } catch (error) {
+    return done(error, null);
+  }
+}));
+
+// Microsoft OAuth Strategy
+passport.use(new MicrosoftStrategy({
+  clientID: process.env.MICROSOFT_CLIENT_ID || 'dummy-client-id',
+  clientSecret: process.env.MICROSOFT_CLIENT_SECRET || 'dummy-client-secret',
+  callbackURL: process.env.MICROSOFT_CALLBACK_URL || 'http://localhost:3001/api/auth/microsoft/callback',
+  scope: ['user.read']
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    const user = await findOrCreateOAuthUser(profile, 'microsoft');
+    return done(null, user);
+  } catch (error) {
+    return done(error, null);
+  }
+}));
+
+// Apple Sign In Strategy
+if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPLE_KEY_ID) {
+  passport.use(new AppleStrategy({
+    clientID: process.env.APPLE_CLIENT_ID,
+    teamID: process.env.APPLE_TEAM_ID,
+    callbackURL: process.env.APPLE_CALLBACK_URL || 'http://localhost:3001/api/auth/apple/callback',
+    keyID: process.env.APPLE_KEY_ID,
+    privateKeyString: process.env.APPLE_PRIVATE_KEY || '',
+    passReqToCallback: false
+  },
+  async (accessToken, refreshToken, idToken, profile, done) => {
+    try {
+      const user = await findOrCreateOAuthUser(profile, 'apple');
+      return done(null, user);
+    } catch (error) {
+      return done(error, null);
+    }
+  }));
+}
+
+// Twitter OAuth Strategy
+passport.use(new TwitterStrategy({
+  consumerKey: process.env.TWITTER_CONSUMER_KEY || 'dummy-consumer-key',
+  consumerSecret: process.env.TWITTER_CONSUMER_SECRET || 'dummy-consumer-secret',
+  callbackURL: process.env.TWITTER_CALLBACK_URL || 'http://localhost:3001/api/auth/twitter/callback',
+  includeEmail: true
+},
+async (token, tokenSecret, profile, done) => {
+  try {
+    const user = await findOrCreateOAuthUser(profile, 'twitter');
+    return done(null, user);
+  } catch (error) {
+    return done(error, null);
+  }
+}));
+
+// Instagram OAuth Strategy
+passport.use(new InstagramStrategy({
+  clientID: process.env.INSTAGRAM_CLIENT_ID || 'dummy-client-id',
+  clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || 'dummy-client-secret',
+  callbackURL: process.env.INSTAGRAM_CALLBACK_URL || 'http://localhost:3001/api/auth/instagram/callback'
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    const user = await findOrCreateOAuthUser(profile, 'instagram');
     return done(null, user);
   } catch (error) {
     return done(error, null);
