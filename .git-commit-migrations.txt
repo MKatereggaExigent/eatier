@@ -1,0 +1,20 @@
+feat: Add comprehensive migration bash script and guide
+
+- Created run_all_migrations.sh: Universal migration runner
+  - Works both locally and in Docker
+  - Supports --docker, --status, --force flags
+  - Color-coded output for better readability
+  
+- Created MIGRATION_GUIDE.md: Complete migration documentation
+  - Quick reference for common tasks
+  - Troubleshooting guide
+  - Best practices
+  - Production deployment workflow
+  
+- Made scripts executable
+  - run_all_migrations.sh
+  - backend/scripts/db-migrate.sh
+
+This provides a simple, reliable way to run all database migrations
+in any environment (local development or production Docker).
+

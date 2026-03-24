@@ -1,0 +1,10 @@
+fix: Correct tenant_id and profile image column references in messaging routes
+
+- Fix tenant_id: Changed req.user.tenantId to req.user.tenant_id (snake_case)
+- Fix profile image: Changed u.profile_image_url to COALESCE(u.avatar_url, u.profile_photo)
+- Applied fixes to all occurrences in messaging.js
+
+This resolves the 500 errors:
+- "null value in column tenant_id violates not-null constraint"
+- "column u.profile_image_url does not exist"
+
