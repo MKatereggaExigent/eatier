@@ -74,14 +74,10 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center; // Center the content wrapper
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-
-  // Fixed-width content wrapper
-  > * {
-    max-width: 1200px; // Fixed maximum width for content
-    width: 100%;
-  }
+  max-width: 1200px; // Fixed maximum width for entire content
+  margin: 0 auto; // Center the content
+  width: 100%;
 
   .ad-header {
     display: flex;
@@ -122,9 +118,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    white-space: nowrap; // Prevent text wrapping
-    overflow: hidden;
-    text-overflow: ellipsis; // Add ellipsis if text is too long
   }
 
   .ad-description {
@@ -158,6 +151,7 @@
     animation: slideInFromLeft 0.6s ease-out 0.3s backwards;
     align-self: flex-start;
     white-space: nowrap; // Prevent button text wrapping
+    width: auto; // Override any width inheritance
 
     &:hover {
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
