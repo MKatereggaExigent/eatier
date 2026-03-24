@@ -8,7 +8,7 @@
 
 .header-ad {
   position: relative;
-  height: 100px; // Compact height for overlay
+  height: 150px; // Increased height for better spacing
   cursor: pointer;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.85); // Semi-transparent
@@ -68,13 +68,20 @@
 .ad-content {
   position: relative;
   z-index: 1;
-  padding: 1.5rem 3rem;
+  padding: 2rem 3rem; // Increased vertical padding
   color: #fff;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center; // Center the content wrapper
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Fixed-width content wrapper
+  > * {
+    max-width: 1200px; // Fixed maximum width for content
+    width: 100%;
+  }
 
   .ad-header {
     display: flex;
@@ -115,6 +122,9 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    white-space: nowrap; // Prevent text wrapping
+    overflow: hidden;
+    text-overflow: ellipsis; // Add ellipsis if text is too long
   }
 
   .ad-description {
@@ -122,7 +132,7 @@
     line-height: 1.4;
     margin: 0 0 0.8rem 0;
     opacity: 0.95;
-    max-width: 600px;
+    max-width: 800px; // Fixed width for description
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     animation: slideInFromLeft 0.6s ease-out 0.2s backwards;
     display: -webkit-box;
@@ -147,6 +157,7 @@
     box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
     animation: slideInFromLeft 0.6s ease-out 0.3s backwards;
     align-self: flex-start;
+    white-space: nowrap; // Prevent button text wrapping
 
     &:hover {
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -270,19 +281,20 @@
 // Responsive
 @media (max-width: 768px) {
   .header-ad {
-    height: 140px;
+    height: 180px; // Increased mobile height for better spacing
   }
 
   .ad-content {
-    padding: 1rem 1.5rem;
+    padding: 1.5rem 1.5rem; // Increased vertical padding
 
     .ad-title {
       font-size: 1.2rem;
+      white-space: normal; // Allow wrapping on mobile
     }
 
     .ad-description {
       font-size: 0.8rem;
-      -webkit-line-clamp: 1;
+      -webkit-line-clamp: 2; // Allow 2 lines on mobile
     }
 
     .ad-cta {
