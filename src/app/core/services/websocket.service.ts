@@ -28,8 +28,9 @@ export class WebSocketService {
    */
   private async checkSocketIoAvailability(): Promise<void> {
     try {
-      // Dynamic import without eval
-      const socketIo = await import('socket.io-client');
+      // Try to dynamically import socket.io-client
+      // This will fail gracefully if the package is not installed
+      await (new Function('return import("socket.io-client")')());
       this.socketIoAvailable = true;
     } catch (error) {
       console.warn('socket.io-client not available, WebSocket features will be disabled');
@@ -59,8 +60,8 @@ export class WebSocketService {
     }
 
     try {
-      // Dynamic import without eval
-      const socketIo = await import('socket.io-client');
+      // Dynamic import without eval - using Function constructor to bypass build-time module check
+      const socketIo = await (new Function('return import("socket.io-client")')());
       const io = socketIo.io;
       const socketUrl = environment.apiUrl.replace('/api', '');
 
