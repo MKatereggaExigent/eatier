@@ -185,7 +185,7 @@ npm run build
 
 ### **Step 2: Run Database Migrations on Production**
 
-SSH into your production server and run:
+SSH into your production server (`41.76.109.131`) and run:
 
 ```bash
 cd ~/eatier
@@ -198,26 +198,30 @@ cd ~/eatier
 
 ```bash
 # Migration 037 - Social and Messaging System
-docker exec -i eatier-postgres psql -U itiyum_user -d itiyum_platform < backend/scripts/migrations/037_social_and_messaging_system.sql
+docker exec -i itiyum-postgres psql -U itiyum_user -d itiyum_platform < backend/scripts/migrations/037_social_and_messaging_system.sql
 
 # Migration 038 - Presence and Enhanced Messaging
-docker exec -i eatier-postgres psql -U itiyum_user -d itiyum_platform < backend/scripts/migrations/038_presence_and_enhanced_messaging.sql
+docker exec -i itiyum-postgres psql -U itiyum_user -d itiyum_platform < backend/scripts/migrations/038_presence_and_enhanced_messaging.sql
 ```
 
 ### **Step 3: Verify Tables Exist**
 
 ```bash
 # Check if tables were created
-docker exec eatier-postgres psql -U itiyum_user -d itiyum_platform -c "\dt chat_requests"
-docker exec eatier-postgres psql -U itiyum_user -d itiyum_platform -c "\dt chat_conversations"
-docker exec eatier-postgres psql -U itiyum_user -d itiyum_platform -c "\dt user_follows"
+docker exec itiyum-postgres psql -U itiyum_user -d itiyum_platform -c "\dt chat_requests"
+docker exec itiyum-postgres psql -U itiyum_user -d itiyum_platform -c "\dt chat_conversations"
+docker exec itiyum-postgres psql -U itiyum_user -d itiyum_platform -c "\dt user_follows"
+
+# Or use the automated check script
+chmod +x scripts/check_messaging_tables.sh
+./scripts/check_messaging_tables.sh
 ```
 
 ### **Step 4: Restart Backend**
 
 ```bash
 # Restart the backend container to ensure it picks up the new tables
-docker restart eatier-backend
+docker restart itiyum-backend
 ```
 
 ---

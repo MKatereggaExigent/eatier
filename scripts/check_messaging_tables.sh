@@ -28,7 +28,7 @@ echo ""
 
 # Check recent backend logs for messaging errors
 echo "5️⃣  Checking recent backend logs for messaging errors..."
-docker logs eatier-backend --tail=50 2>&1 | grep -i "messaging\|chat\|request\|400" || echo "No messaging-related errors found in recent logs"
+docker logs itiyum-backend --tail=50 2>&1 | grep -i "messaging\|chat\|request\|400" || echo "No messaging-related errors found in recent logs"
 echo ""
 
 # Check if there are any existing chat requests
