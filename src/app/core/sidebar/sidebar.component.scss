@@ -40,7 +40,7 @@ $space-lg: 1.5rem;
 .business-sidebar {
   position: fixed;
   left: 0;
-  top: 72px;
+  top: 0; // Start from top, will be pushed down by padding
   bottom: 0;
   width: 260px;
   background: $color-white;
@@ -48,8 +48,9 @@ $space-lg: 1.5rem;
   display: flex;
   flex-direction: column;
   z-index: 900;
-  transition: width 0.2s ease;
+  transition: width 0.2s ease, transform 0.3s ease;
   overflow: hidden;
+  padding-top: 72px; // Account for navbar height (desktop)
 
   &.collapsed {
     width: 64px;
@@ -78,10 +79,11 @@ $space-lg: 1.5rem;
     }
   }
 
+  // Tablet and mobile - slide in from left
   @media (max-width: 1023px) {
     transform: translateX(-100%);
     z-index: 1001;
-    top: 64px;
+    padding-top: 64px; // Smaller navbar on tablet/mobile
     box-shadow: none;
 
     &.mobile-open {
@@ -96,6 +98,11 @@ $space-lg: 1.5rem;
       pointer-events: none;
       visibility: hidden;
     }
+  }
+
+  // Mobile - even smaller navbar
+  @media (max-width: 768px) {
+    padding-top: 60px; // Match mobile navbar height
   }
 }
 

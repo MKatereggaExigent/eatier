@@ -80,11 +80,14 @@
   margin-left: 260px; // Account for sidebar width (260px)
   min-height: 100vh;
   padding: var(--space-8) var(--space-12);
+  padding-top: calc(72px + var(--space-8)); // Account for fixed navbar + padding
   background: #ffffff; // NYT white background
-  transition: margin-left var(--transition-normal);
+  transition: margin-left 0.3s ease, padding-top 0.3s ease;
   width: calc(100% - 260px); // Ensure proper width calculation
+  max-width: 100%; // Prevent overflow
   position: relative;
   z-index: 1; // Below sidebar overlay
+  box-sizing: border-box; // Include padding in width calculation
 
   h1 {
     font-family: 'Noto Serif', Georgia, 'Times New Roman', serif; // NYT serif font
@@ -105,15 +108,17 @@
   .dashboard {
     margin-left: 0;
     width: 100%;
+    max-width: 100vw; // Prevent horizontal overflow
     padding: var(--space-6) var(--space-8);
-    padding-top: calc(var(--space-6) + 60px); // Add space for mobile toggle button
+    padding-top: calc(64px + var(--space-6) + 60px); // Navbar + padding + mobile toggle button
+    overflow-x: hidden; // Prevent horizontal scroll
   }
 }
 
 @media (max-width: 768px) {
   .dashboard {
     padding: var(--space-4) var(--space-6);
-    padding-top: calc(var(--space-4) + 60px); // Add space for mobile toggle button
+    padding-top: calc(60px + var(--space-4) + 60px); // Smaller navbar + padding + mobile toggle button
 
     h1 {
       font-size: var(--text-3xl);
@@ -124,7 +129,7 @@
 @media (max-width: 480px) {
   .dashboard {
     padding: var(--space-4);
-    padding-top: calc(var(--space-4) + 60px); // Add space for mobile toggle button
+    padding-top: calc(60px + var(--space-4) + 60px); // Navbar + padding + mobile toggle button
 
     h1 {
       font-size: var(--text-2xl);
@@ -140,11 +145,14 @@
 .dashboard.sidebar-collapsed {
   margin-left: 64px; // Collapsed sidebar width
   width: calc(100% - 64px);
+  max-width: 100%; // Prevent overflow
+  transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
 @media (max-width: 1023px) {
   .dashboard.sidebar-collapsed {
     margin-left: 0;
     width: 100%;
+    max-width: 100vw;
   }
 }
