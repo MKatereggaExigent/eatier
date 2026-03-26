@@ -1,6 +1,5 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 
 interface JobOpening {
   id: string;
@@ -15,7 +14,7 @@ interface JobOpening {
 @Component({
   selector: 'app-careers',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './careers.component.html',
   styleUrls: ['./careers.component.scss']
 })
