@@ -22,9 +22,24 @@ router.post('/request', async (req, res) => {
   const tenantId = req.user.tenant_id;
 
   try {
+    // Validate recipientId
+    if (!recipientId) {
+      return res.status(400).json({ error: 'Recipient ID is required' });
+    }
+
     // Prevent self-request
     if (requesterId === recipientId) {
       return res.status(400).json({ error: 'Cannot send chat request to yourself' });
+    }
+
+    // Verify recipient exists
+    const recipientCheck = await pool.query(
+      'SELECT id FROM users WHERE id = $1',
+      [recipientId]
+    );
+
+    if (recipientCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Recipient not found' });
     }
 
     // Check if request already exists
@@ -57,6 +72,8 @@ router.post('/request', async (req, res) => {
 
   } catch (error) {
     console.error('Error creating chat request:', error);
+    console.error('Request body:', req.body);
+    console.error('User info:', { userId: req.user.userId, tenantId: req.user.tenant_id });
     res.status(500).json({ error: 'Failed to send chat request' });
   }
 });
