@@ -41,12 +41,7 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🚀 STEP 3: Deploying Frontend to CapRover"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-cd dist/eatier/browser
-tar -czf ../../../deploy.tar.gz *
-cd ../../..
-
-echo "Deploying to CapRover..."
-caprover deploy -t deploy.tar.gz -a itiyum
+./scripts/deploy_to_caprover_v2.sh
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

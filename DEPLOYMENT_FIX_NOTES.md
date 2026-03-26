@@ -71,16 +71,22 @@ cd ~/eatier
 # Pull latest changes
 git pull origin development-v2
 
-# Option 1: Quick deployment (recommended for these changes)
-./quick_deploy.sh
-
-# Option 2: Full deployment (includes migrations)
+# Option 1: Full deployment (RECOMMENDED - includes migrations)
 ./deploy_entire_project.sh
+
+# Option 2: Quick deployment (faster, skips migrations)
+./quick_deploy.sh
 
 # Option 3: Manual backend-only rebuild
 docker compose down
 docker compose up --build -d
 docker network connect captain-overlay-network itiyum-backend
+
+# To check migration status:
+docker exec itiyum-backend npm run migrate:status
+
+# To manually run migrations:
+docker exec itiyum-backend npm run migrate
 ```
 
 ### Expected Results After Deployment:
@@ -117,6 +123,43 @@ After deployment, monitor:
 2. Backend logs: `docker logs -f itiyum-backend`
 3. User reports of messaging issues
 
+## Troubleshooting
+
+### If migrations don't run:
+1. Check backend logs:
+   ```bash
+   docker logs itiyum-backend --tail 100
+   ```
+
+2. Manually run migrations:
+   ```bash
+   docker exec itiyum-backend npm run migrate
+   ```
+
+3. Check migration status:
+   ```bash
+   docker exec itiyum-backend npm run migrate:status
+   ```
+
+4. Verify database connection:
+   ```bash
+   docker exec itiyum-postgres psql -U itiyum_user -d itiyum_db -c "SELECT version();"
+   ```
+
+### If frontend build fails:
+1. Check Node version in Docker container
+2. Clear node_modules and reinstall:
+   ```bash
+   rm -rf node_modules package-lock.json
+   npm install
+   npm run build
+   ```
+
+### If CapRover deployment fails:
+1. Check if tarball was created: `ls -lh ~/itiyum-frontend.tar.gz`
+2. Verify CapRover connection: `caprover list`
+3. Check CapRover app status in web UI
+
 ## Rollback Plan
 
 If issues occur:
@@ -132,4 +175,5 @@ git reset --hard origin/development-v2
 - All existing avatar fallback logic remains intact
 - The messaging validation is backwards compatible
 - No database changes required
+- The `deploy_entire_project.sh` script should run migrations automatically via `docker exec itiyum-backend npm run migrate`
 
