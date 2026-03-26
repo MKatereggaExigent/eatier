@@ -28,7 +28,7 @@ function initializeWebSocket(server) {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       socket.userId = decoded.userId;
-      socket.tenantId = decoded.tenantId;
+      socket.tenantId = decoded.tenant_id; // Fixed: JWT contains tenant_id, not tenantId
       socket.userRole = decoded.role;
       
       next();

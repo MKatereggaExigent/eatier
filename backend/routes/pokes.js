@@ -14,7 +14,7 @@ router.use(authenticateToken);
 router.post('/send', async (req, res) => {
   try {
     const pokerId = req.user.userId;
-    const tenantId = req.user.tenantId;
+    const tenantId = req.user.tenant_id; // Fixed: use tenant_id instead of tenantId
     const { pokedId, message } = req.body;
 
     if (!pokedId) {
@@ -82,7 +82,7 @@ router.post('/send', async (req, res) => {
 router.get('/received', async (req, res) => {
   try {
     const userId = req.user.userId;
-    const tenantId = req.user.tenantId;
+    const tenantId = req.user.tenant_id; // Fixed: use tenant_id instead of tenantId
     const unreadOnly = req.query.unread === 'true';
 
     let query = `
@@ -124,7 +124,7 @@ router.put('/:pokeId/read', async (req, res) => {
   try {
     const { pokeId } = req.params;
     const userId = req.user.userId;
-    const tenantId = req.user.tenantId;
+    const tenantId = req.user.tenant_id; // Fixed: use tenant_id instead of tenantId
 
     const result = await pool.query(`
       UPDATE pokes
@@ -155,7 +155,7 @@ router.put('/:pokeId/read', async (req, res) => {
 router.get('/unread-count', async (req, res) => {
   try {
     const userId = req.user.userId;
-    const tenantId = req.user.tenantId;
+    const tenantId = req.user.tenant_id; // Fixed: use tenant_id instead of tenantId
 
     const result = await pool.query(`
       SELECT COUNT(*) as count

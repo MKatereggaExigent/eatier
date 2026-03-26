@@ -13,7 +13,7 @@ router.use(authenticateToken);
 router.post('/update', async (req, res) => {
   try {
     const userId = req.user.userId;
-    const tenantId = req.user.tenantId;
+    const tenantId = req.user.tenant_id; // Fixed: use tenant_id instead of tenantId
     const { status, deviceInfo } = req.body;
 
     // Validate status
@@ -54,7 +54,7 @@ router.post('/update', async (req, res) => {
 router.post('/heartbeat', async (req, res) => {
   try {
     const userId = req.user.userId;
-    const tenantId = req.user.tenantId;
+    const tenantId = req.user.tenant_id; // Fixed: use tenant_id instead of tenantId
 
     await pool.query(`
       UPDATE user_presence
@@ -76,7 +76,7 @@ router.post('/heartbeat', async (req, res) => {
 // ============================================
 router.get('/online', async (req, res) => {
   try {
-    const tenantId = req.user.tenantId;
+    const tenantId = req.user.tenant_id; // Fixed: use tenant_id instead of tenantId
     const userId = req.user.userId;
 
     // Get online users from followers/following
@@ -130,7 +130,7 @@ router.get('/online', async (req, res) => {
 router.get('/status/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const tenantId = req.user.tenantId;
+    const tenantId = req.user.tenant_id; // Fixed: use tenant_id instead of tenantId
 
     const result = await pool.query(`
       SELECT status, last_seen, last_activity
