@@ -21,9 +21,17 @@ router.post('/request', async (req, res) => {
   const requesterId = req.user.userId;
   const tenantId = req.user.tenant_id;
 
+  // LOG EVERYTHING for debugging
+  console.log('🔍 Chat request received:');
+  console.log('  Request body:', JSON.stringify(req.body));
+  console.log('  recipientId:', recipientId, 'Type:', typeof recipientId);
+  console.log('  requesterId:', requesterId);
+  console.log('  tenantId:', tenantId);
+
   try {
     // Validate recipientId
     if (!recipientId) {
+      console.log('❌ Recipient ID is missing!');
       return res.status(400).json({ error: 'Recipient ID is required' });
     }
 

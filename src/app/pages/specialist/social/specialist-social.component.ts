@@ -164,9 +164,18 @@ export class SpecialistSocialComponent implements OnInit {
    * Start a chat with a user
    */
   startChat(userId: string): void {
+    console.log('🔍 startChat called with userId:', userId, 'Type:', typeof userId);
+
+    if (!userId) {
+      console.error('❌ userId is undefined or null!');
+      alert('Error: User ID is missing');
+      return;
+    }
+
     this.startingChatWith.set(userId);
 
     // Send chat request
+    console.log('📤 Sending chat request to userId:', userId);
     this.messagingService.sendChatRequest(userId, 'Hi! I would like to connect with you.').subscribe({
       next: (response) => {
         this.startingChatWith.set(null);
