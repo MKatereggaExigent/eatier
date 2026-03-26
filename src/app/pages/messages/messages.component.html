@@ -3,7 +3,12 @@
     <!-- Sidebar: Conversations List -->
     <div class="conversations-sidebar">
       <div class="sidebar-header">
-        <h2>Messages</h2>
+        <div class="header-top">
+          <button type="button" class="back-btn" (click)="router.navigate(['/dashboard/specialist/social'])" title="Back to Social">
+            ← Back
+          </button>
+          <h2>Messages</h2>
+        </div>
         <div class="header-tabs">
           <button 
             type="button"
@@ -38,6 +43,9 @@
                 <div class="empty-icon">💬</div>
                 <p>No conversations yet</p>
                 <small>Start chatting with other users</small>
+                <button type="button" class="start-chat-btn" (click)="router.navigate(['/dashboard/specialist/social'])">
+                  Discover People
+                </button>
               </div>
             } @else {
               <div class="conversation-list">

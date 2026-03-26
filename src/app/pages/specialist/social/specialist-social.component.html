@@ -84,20 +84,33 @@
                   <span>👥 {{ user.followerCount }} followers</span>
                 </div>
               </div>
-              <button 
-                type="button" 
-                class="follow-btn" 
-                [class.following]="user.isFollowing"
-                [disabled]="isFollowInProgress(user.id)"
-                (click)="toggleFollow(user.id, user.isFollowing)">
-                @if (isFollowInProgress(user.id)) {
-                  ...
-                } @else if (user.isFollowing) {
-                  Following
-                } @else {
-                  Follow
-                }
-              </button>
+              <div class="user-actions">
+                <button
+                  type="button"
+                  class="follow-btn"
+                  [class.following]="user.isFollowing"
+                  [disabled]="isFollowInProgress(user.id)"
+                  (click)="toggleFollow(user.id, user.isFollowing)">
+                  @if (isFollowInProgress(user.id)) {
+                    ...
+                  } @else if (user.isFollowing) {
+                    Following
+                  } @else {
+                    Follow
+                  }
+                </button>
+                <button
+                  type="button"
+                  class="chat-btn"
+                  [disabled]="isStartingChat(user.id)"
+                  (click)="startChat(user.id)">
+                  @if (isStartingChat(user.id)) {
+                    ...
+                  } @else {
+                    💬 Chat
+                  }
+                </button>
+              </div>
             </div>
           }
         </div>
@@ -124,9 +137,22 @@
                   <span>⭐ {{ user.reviewCount }} reviews</span>
                 </div>
               </div>
-              <button type="button" class="follow-btn following" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, true)">
-                @if (isFollowInProgress(user.id)) { ... } @else { Unfollow }
-              </button>
+              <div class="user-actions">
+                <button type="button" class="follow-btn following" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, true)">
+                  @if (isFollowInProgress(user.id)) { ... } @else { Unfollow }
+                </button>
+                <button
+                  type="button"
+                  class="chat-btn"
+                  [disabled]="isStartingChat(user.id)"
+                  (click)="startChat(user.id)">
+                  @if (isStartingChat(user.id)) {
+                    ...
+                  } @else {
+                    💬 Chat
+                  }
+                </button>
+              </div>
             </div>
           }
         </div>
@@ -152,9 +178,22 @@
                   <span>⭐ {{ user.reviewCount }} reviews</span>
                 </div>
               </div>
-              <button type="button" class="follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">
-                @if (isFollowInProgress(user.id)) { ... } @else if (user.isFollowing) { Following } @else { Follow Back }
-              </button>
+              <div class="user-actions">
+                <button type="button" class="follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">
+                  @if (isFollowInProgress(user.id)) { ... } @else if (user.isFollowing) { Following } @else { Follow Back }
+                </button>
+                <button
+                  type="button"
+                  class="chat-btn"
+                  [disabled]="isStartingChat(user.id)"
+                  (click)="startChat(user.id)">
+                  @if (isStartingChat(user.id)) {
+                    ...
+                  } @else {
+                    💬 Chat
+                  }
+                </button>
+              </div>
             </div>
           }
         </div>

@@ -1,9 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { SocialWidgetComponent } from '../../../shared/components/social-widget/social-widget.component';
 import { MessagingWidgetComponent } from '../../../shared/components/messaging-widget/messaging-widget.component';
+import { MessagingService } from '../../../core/services/messaging.service';
 
 interface UserToFollow {
   id: string;
@@ -33,16 +35,19 @@ interface ActivityItem {
 })
 export class SpecialistSocialComponent implements OnInit {
   private http = inject(HttpClient);
+  private router = inject(Router);
+  private messagingService = inject(MessagingService);
 
   loading = signal(true);
   activeTab = signal<'feed' | 'discover' | 'following' | 'followers'>('feed');
-  
+
   activityFeed = signal<ActivityItem[]>([]);
   discoverUsers = signal<UserToFollow[]>([]);
   following = signal<UserToFollow[]>([]);
   followers = signal<UserToFollow[]>([]);
-  
+
   followingInProgress = signal<Set<string>>(new Set());
+  startingChatWith = signal<string | null>(null); // Track which user we're starting a chat with
 
   ngOnInit(): void {
     this.loadActivityFeed();
@@ -59,7 +64,8 @@ export class SpecialistSocialComponent implements OnInit {
 
   loadActivityFeed(): void {
     this.loading.set(true);
-    this.http.get<any>(`${environment.apiUrl}/social/feed`).subscribe({
+    // Load only top 10 activities with pagination
+    this.http.get<any>(`${environment.apiUrl}/social/feed?limit=10&offset=0`).subscribe({
       next: (data) => { this.activityFeed.set(data.activities || []); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
@@ -67,7 +73,8 @@ export class SpecialistSocialComponent implements OnInit {
 
   loadDiscoverUsers(): void {
     this.loading.set(true);
-    this.http.get<any>(`${environment.apiUrl}/social/discover`).subscribe({
+    // Load with pagination (10 users at a time)
+    this.http.get<any>(`${environment.apiUrl}/social/discover?limit=10`).subscribe({
       next: (data) => { this.discoverUsers.set(data.users || []); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
@@ -151,6 +158,34 @@ export class SpecialistSocialComponent implements OnInit {
 
   isFollowInProgress(userId: string): boolean {
     return this.followingInProgress().has(userId);
+  }
+
+  /**
+   * Start a chat with a user
+   */
+  startChat(userId: string): void {
+    this.startingChatWith.set(userId);
+
+    // Send chat request
+    this.messagingService.sendChatRequest(userId, 'Hi! I would like to connect with you.').subscribe({
+      next: (response) => {
+        this.startingChatWith.set(null);
+        // Navigate to messages page
+        this.router.navigate(['/messages']);
+      },
+      error: (err) => {
+        console.error('Error starting chat:', err);
+        this.startingChatWith.set(null);
+        alert('Failed to start chat. Please try again.');
+      }
+    });
+  }
+
+  /**
+   * Check if we're starting a chat with this user
+   */
+  isStartingChat(userId: string): boolean {
+    return this.startingChatWith() === userId;
   }
 }
 

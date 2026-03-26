@@ -277,7 +277,9 @@ $border-medium: 2px solid $color-black;
   .user-avatar {
     width: 48px;
     height: 48px;
-    background: $color-black;
+    min-width: 48px; // Prevent shrinking
+    min-height: 48px; // Prevent shrinking
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); // Orange gradient instead of black
     display: flex;
     align-items: center;
     justify-content: center;
@@ -286,6 +288,10 @@ $border-medium: 2px solid $color-black;
     font-size: 1.25rem;
     font-weight: 700;
     flex-shrink: 0;
+    border-radius: 50%; // Make it circular
+    text-transform: uppercase; // Uppercase initials
+    line-height: 1; // Center text vertically
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); // Add subtle shadow
   }
 
   .user-info {
@@ -308,7 +314,15 @@ $border-medium: 2px solid $color-black;
     }
   }
 
-  .follow-btn {
+  .user-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .follow-btn,
+  .chat-btn {
     padding: 0.5rem 1.25rem;
     font-family: $font-sans;
     font-size: 0.6875rem;
@@ -317,6 +331,15 @@ $border-medium: 2px solid $color-black;
     letter-spacing: 0.05em;
     cursor: pointer;
     transition: all 0.15s ease;
+    white-space: nowrap;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .follow-btn {
     background: $color-black;
     border: 2px solid $color-black;
     color: $color-white;
@@ -324,11 +347,6 @@ $border-medium: 2px solid $color-black;
     &:hover:not(:disabled) {
       background: $color-dark-gray;
       border-color: $color-dark-gray;
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
 
     &.following {
@@ -340,6 +358,18 @@ $border-medium: 2px solid $color-black;
         border-color: $color-black;
         color: $color-black;
       }
+    }
+  }
+
+  .chat-btn {
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+    border: 2px solid #ff6b35;
+    color: $color-white;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #f7931e 0%, #ff6b35 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
     }
   }
 }

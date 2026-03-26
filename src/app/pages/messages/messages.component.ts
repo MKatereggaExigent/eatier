@@ -39,7 +39,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   constructor(
     private messagingService: MessagingService,
     private route: ActivatedRoute,
-    private router: Router,
+    public router: Router, // Make public so template can access it
     private websocketService: WebSocketService,
     private presenceService: PresenceService
   ) {
