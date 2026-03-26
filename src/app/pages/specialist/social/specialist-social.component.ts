@@ -170,13 +170,23 @@ export class SpecialistSocialComponent implements OnInit {
     this.messagingService.sendChatRequest(userId, 'Hi! I would like to connect with you.').subscribe({
       next: (response) => {
         this.startingChatWith.set(null);
+        console.log('✅ Chat request sent successfully:', response);
         // Navigate to messages page
         this.router.navigate(['/messages']);
       },
       error: (err) => {
-        console.error('Error starting chat:', err);
+        console.error('❌ Error starting chat:', err);
+        console.error('❌ Error details:', {
+          status: err.status,
+          statusText: err.statusText,
+          error: err.error,
+          message: err.message
+        });
         this.startingChatWith.set(null);
-        alert('Failed to start chat. Please try again.');
+
+        // Show specific error message
+        const errorMessage = err.error?.error || err.error?.message || err.message || 'Failed to start chat. Please try again.';
+        alert(errorMessage);
       }
     });
   }

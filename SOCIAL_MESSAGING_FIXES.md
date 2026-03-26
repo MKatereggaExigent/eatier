@@ -149,9 +149,33 @@ Fixed all reported issues with the Specialist Social page and Messaging system.
 
 ---
 
-## 🚀 **Deployment**
+## ⚠️ **IMPORTANT: Database Migration Required**
 
-To deploy these fixes:
+### **Issue: 400 Bad Request on `/api/messaging/request`**
+
+The messaging endpoint is returning a 400 error because the required database tables don't exist yet on production.
+
+**Console Error:**
+```
+/api/messaging/request:1  Failed to load resource: the server responded with a status of 400 ()
+Error starting chat: M
+```
+
+**Root Cause:**
+Migration `037_social_and_messaging_system.sql` hasn't been run on the production database.
+
+**Required Tables:**
+- `chat_requests` - Connection requests
+- `chat_conversations` - Conversation containers
+- `chat_participants` - Users in conversations
+- `chat_messages` - Messages
+- `user_follows` - Social connections
+
+---
+
+## 🚀 **Deployment Steps**
+
+### **Step 1: Deploy Frontend Changes**
 
 ```bash
 cd ~/eatier
@@ -159,17 +183,60 @@ npm run build
 ./scripts/deploy_to_caprover_v2.sh
 ```
 
+### **Step 2: Run Database Migrations on Production**
+
+SSH into your production server and run:
+
+```bash
+cd ~/eatier
+
+# Run all migrations (including 037 and 038)
+./run_all_migrations.sh --docker
+```
+
+**Or manually run the specific migrations:**
+
+```bash
+# Migration 037 - Social and Messaging System
+docker exec -i eatier-postgres psql -U itiyum_user -d itiyum_platform < backend/scripts/migrations/037_social_and_messaging_system.sql
+
+# Migration 038 - Presence and Enhanced Messaging
+docker exec -i eatier-postgres psql -U itiyum_user -d itiyum_platform < backend/scripts/migrations/038_presence_and_enhanced_messaging.sql
+```
+
+### **Step 3: Verify Tables Exist**
+
+```bash
+# Check if tables were created
+docker exec eatier-postgres psql -U itiyum_user -d itiyum_platform -c "\dt chat_requests"
+docker exec eatier-postgres psql -U itiyum_user -d itiyum_platform -c "\dt chat_conversations"
+docker exec eatier-postgres psql -U itiyum_user -d itiyum_platform -c "\dt user_follows"
+```
+
+### **Step 4: Restart Backend**
+
+```bash
+# Restart the backend container to ensure it picks up the new tables
+docker restart eatier-backend
+```
+
 ---
 
 ## ✅ **Summary**
 
-All reported issues have been fixed:
+### **Frontend Fixes (Completed):**
 - ✅ Avatar display (no more black squares)
 - ✅ Start Chat functionality added
 - ✅ Activity Feed pagination (top 10)
 - ✅ Discover pagination
 - ✅ Back navigation from Messages
 - ✅ Start New Chat button in Messages
+- ✅ Improved error handling with detailed error messages
 
-The social and messaging features are now fully functional! 🎉
+### **Backend Requirements (Action Needed):**
+- ⚠️ Run migration 037 on production database
+- ⚠️ Run migration 038 on production database
+- ⚠️ Restart backend container
+
+**After running migrations, the social and messaging features will be fully functional!** 🎉
 
