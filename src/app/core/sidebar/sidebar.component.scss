@@ -81,22 +81,24 @@ $space-lg: 1.5rem;
 
   // Tablet and mobile - slide in from left
   @media (max-width: 1023px) {
-    transform: translateX(-100%);
-    z-index: 1001;
+    transform: translateX(-100%); // Hide off-screen by default
+    z-index: 1021; // Above navbar (1020) but below toggle button (1025)
     padding-top: 64px; // Smaller navbar on tablet/mobile
     box-shadow: none;
+    width: 280px; // Slightly wider for better usability
+    max-width: 85vw; // Don't take full width, leave space for close gesture
 
     &.mobile-open {
-      transform: translateX(0);
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+      transform: translateX(0); // Slide in when open
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2); // Stronger shadow when visible
     }
   }
 
   // Ensure sidebar doesn't interfere when hidden on mobile
   @media (max-width: 1023px) {
     &:not(.mobile-open) {
-      pointer-events: none;
-      visibility: hidden;
+      pointer-events: none; // Prevent interactions when hidden
+      visibility: hidden; // Completely hide from screen readers too
     }
   }
 
