@@ -1,6 +1,7 @@
 import { Ad, AdServingService } from '../../../../core/services/ad-serving.service';
 import { Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { LucideAngularModule, Megaphone, Sparkles } from 'lucide-angular';
 import { Subscription, interval } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
@@ -8,11 +9,13 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-left-sidebar-ad',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, LucideAngularModule],
   templateUrl: './left-sidebar-ad.component.html',
   styleUrls: ['./left-sidebar-ad.component.scss']
 })
 export class LeftSidebarAdComponent implements OnInit, OnDestroy {
+  readonly Megaphone = Megaphone;
+  readonly Sparkles = Sparkles;
   @Input() placement: string = 'sidebar_left';
   @Input() autoRotate: boolean = true; // Enable auto-rotation for standard ads
   @Input() rotationInterval: number = 5000; // 5 seconds (fast rotation for standard)

@@ -2,6 +2,7 @@ import { Business, BusinessOwnerService } from '../../../core/services/business-
 import { BusinessInsightsResponse, InsightsService } from '../../../core/services/insights.service';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { LucideAngularModule, Calendar, CalendarDays, BarChart3, ClipboardList, CalendarRange, TrendingUp, TrendingDown, ArrowRight } from 'lucide-angular';
 import { Subject, catchError, finalize, forkJoin, of, switchMap, takeUntil } from 'rxjs';
 
 import { BusinessInsights } from '../../../shared/models/business-profile.model';
@@ -10,11 +11,20 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-business-insights',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './business-insights.component.html',
   styleUrls: ['./business-insights.component.scss']
 })
 export class BusinessInsightsComponent implements OnInit, OnDestroy {
+  // Lucide Icons
+  readonly Calendar = Calendar;
+  readonly CalendarDays = CalendarDays;
+  readonly BarChart3 = BarChart3;
+  readonly ClipboardList = ClipboardList;
+  readonly CalendarRange = CalendarRange;
+  readonly TrendingUp = TrendingUp;
+  readonly TrendingDown = TrendingDown;
+  readonly ArrowRight = ArrowRight;
   private fb = inject(FormBuilder);
   private businessOwnerService = inject(BusinessOwnerService);
   private insightsService = inject(InsightsService);
@@ -34,11 +44,11 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
 
   // Period options
   readonly periodOptions = [
-    { value: 'daily', label: 'Daily', icon: '📅' },
-    { value: 'weekly', label: 'Weekly', icon: '📆' },
-    { value: 'monthly', label: 'Monthly', icon: '📊' },
-    { value: 'yearly', label: 'Yearly', icon: '📋' },
-    { value: 'custom', label: 'Custom Range', icon: '🗓️' }
+    { value: 'daily', label: 'Daily', icon: this.Calendar },
+    { value: 'weekly', label: 'Weekly', icon: this.CalendarDays },
+    { value: 'monthly', label: 'Monthly', icon: this.BarChart3 },
+    { value: 'yearly', label: 'Yearly', icon: this.ClipboardList },
+    { value: 'custom', label: 'Custom Range', icon: this.CalendarRange }
   ];
 
 
@@ -199,8 +209,8 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
     return `${minutes}m ${remainingSeconds}s`;
   }
 
-  getGrowthIcon(growth: number): string {
-    return growth > 0 ? '📈' : growth < 0 ? '📉' : '➡️';
+  getGrowthIcon(growth: number): any {
+    return growth > 0 ? this.TrendingUp : growth < 0 ? this.TrendingDown : this.ArrowRight;
   }
 
   getGrowthClass(growth: number): string {
@@ -212,9 +222,9 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
     return this.periodOptions.find(p => p.value === period)?.label || 'Unknown';
   }
 
-  getPeriodIcon(): string {
+  getPeriodIcon(): any {
     const period = this.selectedPeriod();
-    return this.periodOptions.find(p => p.value === period)?.icon || '📊';
+    return this.periodOptions.find(p => p.value === period)?.icon || this.BarChart3;
   }
 
   getEngagementLevel(rate: number): { label: string; class: string } {

@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { LucideAngularModule, DollarSign, Package, Users, TrendingUp, TrendingDown, ArrowRight, CheckCircle, Clock, XCircle, AlertTriangle, Download, BarChart3 } from 'lucide-angular';
 import { Subject, takeUntil, catchError, of, finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { BusinessOwnerService } from '../../../core/services/business-owner.service';
@@ -58,7 +59,7 @@ export interface AnalyticsData {
 @Component({
   selector: 'app-business-analytics',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, LucideAngularModule],
   templateUrl: './business-analytics.component.html',
   styleUrl: './business-analytics.component.scss'
 })
@@ -67,6 +68,20 @@ export class BusinessAnalyticsComponent implements OnInit, OnDestroy {
   private businessOwnerService = inject(BusinessOwnerService);
   private currencyService = inject(CurrencyService);
   private destroy$ = new Subject<void>();
+
+  // Lucide Icons
+  readonly DollarSign = DollarSign;
+  readonly Package = Package;
+  readonly Users = Users;
+  readonly TrendingUp = TrendingUp;
+  readonly TrendingDown = TrendingDown;
+  readonly ArrowRight = ArrowRight;
+  readonly CheckCircle = CheckCircle;
+  readonly Clock = Clock;
+  readonly XCircle = XCircle;
+  readonly AlertTriangle = AlertTriangle;
+  readonly Download = Download;
+  readonly BarChart3 = BarChart3;
 
   // State
   loading = signal(true);
@@ -229,8 +244,8 @@ export class BusinessAnalyticsComponent implements OnInit, OnDestroy {
     return growth >= 0 ? 'positive' : 'negative';
   }
 
-  getGrowthIcon(growth: number): string {
-    return growth >= 0 ? '↑' : '↓';
+  getGrowthIcon(growth: number): any {
+    return growth >= 0 ? this.TrendingUp : this.TrendingDown;
   }
 
   exportData(): void {

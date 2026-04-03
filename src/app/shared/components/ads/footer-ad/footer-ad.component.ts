@@ -1,6 +1,7 @@
 import { Ad, AdServingService } from '../../../../core/services/ad-serving.service';
 import { Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { LucideAngularModule, Megaphone } from 'lucide-angular';
 import { Subscription, interval } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
@@ -8,11 +9,12 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-footer-ad',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, LucideAngularModule],
   templateUrl: './footer-ad.component.html',
   styleUrls: ['./footer-ad.component.scss']
 })
 export class FooterAdComponent implements OnInit, OnDestroy {
+  readonly Megaphone = Megaphone;
   @Input() placement: string = 'footer_banner';
   @Input() autoRotate: boolean = true;
   @Input() rotationInterval: number = 6000; // 6 seconds

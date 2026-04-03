@@ -1,6 +1,7 @@
 import { Ad, AdServingService } from '../../../../core/services/ad-serving.service';
 import { Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { LucideAngularModule, Megaphone } from 'lucide-angular';
 import { Subscription, interval } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
@@ -8,11 +9,12 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-header-ad',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, LucideAngularModule],
   templateUrl: './header-ad.component.html',
   styleUrls: ['./header-ad.component.scss']
 })
 export class HeaderAdComponent implements OnInit, OnDestroy {
+  readonly Megaphone = Megaphone;
   @Input() placement: string = 'homepage_banner';
   @Input() autoRotate: boolean = true;
   @Input() rotationInterval: number = 5000; // 5 seconds for flashy effect

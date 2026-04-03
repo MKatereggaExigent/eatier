@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule, DollarSign, Heart, Calendar, BookOpen, Home, UtensilsCrossed, Rocket, Globe } from 'lucide-angular';
 
 interface JobOpening {
   id: string;
@@ -14,11 +15,20 @@ interface JobOpening {
 @Component({
   selector: 'app-careers',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './careers.component.html',
   styleUrls: ['./careers.component.scss']
 })
 export class CareersComponent {
+  // Lucide Icons
+  readonly DollarSign = DollarSign;
+  readonly Heart = Heart;
+  readonly Calendar = Calendar;
+  readonly BookOpen = BookOpen;
+  readonly Home = Home;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Rocket = Rocket;
+  readonly Globe = Globe;
   jobOpenings = signal<JobOpening[]>([
     {
       id: '1',
@@ -93,14 +103,14 @@ export class CareersComponent {
   ]);
 
   benefits = [
-    { icon: '💰', title: 'Competitive Salary', description: 'Market-related compensation packages' },
-    { icon: '🏥', title: 'Medical Aid', description: 'Comprehensive health coverage' },
-    { icon: '🏖️', title: 'Paid Leave', description: '20 days annual leave plus public holidays' },
-    { icon: '📚', title: 'Learning Budget', description: 'Annual budget for courses and conferences' },
-    { icon: '🏠', title: 'Remote Flexibility', description: 'Hybrid and remote work options' },
-    { icon: '🍽️', title: 'Food Perks', description: 'Monthly credits on the Itiyum platform' },
-    { icon: '🚀', title: 'Growth Opportunities', description: 'Clear career progression paths' },
-    { icon: '🌍', title: 'Impact', description: 'Build solutions for Africa and beyond' }
+    { icon: this.DollarSign, title: 'Competitive Salary', description: 'Market-related compensation packages' },
+    { icon: this.Heart, title: 'Medical Aid', description: 'Comprehensive health coverage' },
+    { icon: this.Calendar, title: 'Paid Leave', description: '20 days annual leave plus public holidays' },
+    { icon: this.BookOpen, title: 'Learning Budget', description: 'Annual budget for courses and conferences' },
+    { icon: this.Home, title: 'Remote Flexibility', description: 'Hybrid and remote work options' },
+    { icon: this.UtensilsCrossed, title: 'Food Perks', description: 'Monthly credits on the Itiyum platform' },
+    { icon: this.Rocket, title: 'Growth Opportunities', description: 'Clear career progression paths' },
+    { icon: this.Globe, title: 'Impact', description: 'Build solutions for Africa and beyond' }
   ];
 
   values = [

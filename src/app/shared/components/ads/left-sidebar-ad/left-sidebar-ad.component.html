@@ -3,7 +3,7 @@
   @if (hasNoAds()) {
     <!-- Empty state - no ads available -->
     <div class="sidebar-ad-card empty-state">
-      <span class="ad-label">📢 Ad Space</span>
+      <span class="ad-label"><lucide-icon [img]="Megaphone" [size]="14"></lucide-icon> Ad Space</span>
       <div class="ad-image-wrapper gradient-bg">
         <div class="ad-overlay"></div>
       </div>
@@ -21,7 +21,7 @@
   } @else {
     @for (ad of ads(); track ad.id) {
       <div class="sidebar-ad-card">
-        <span class="ad-label">💎 Ad</span>
+        <span class="ad-label"><lucide-icon [img]="Sparkles" [size]="14"></lucide-icon> Ad</span>
 
         @if (ad.image_url) {
           <div class="ad-image-wrapper">
