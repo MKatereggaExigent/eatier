@@ -58,14 +58,16 @@
         <div class="trends-grid">
           @for (trend of industryTrends(); track trend.id) {
             <div class="trend-card" [class.positive]="trend.percentage_change > 0" [class.negative]="trend.percentage_change < 0">
-              <span class="trend-icon">{{ trend.icon }}</span>
+              <span class="trend-icon">
+                <lucide-icon [img]="getTrendIcon(trend.trend_type)" [size]="24"></lucide-icon>
+              </span>
               <div class="trend-info">
                 <span class="trend-name">{{ trend.trend_name }}</span>
                 <span class="trend-value">{{ trend.current_value }}{{ trend.unit === 'percent' ? '%' : (trend.unit === 'USD' ? '' : ' ' + trend.unit) }}</span>
               </div>
               <div class="trend-change">
                 <span class="change-indicator">
-                  {{ trend.percentage_change > 0 ? '↑' : '↓' }}
+                  <lucide-icon [img]="trend.percentage_change > 0 ? ArrowUp : ArrowDown" [size]="14"></lucide-icon>
                   {{ trend.percentage_change > 0 ? '+' : '' }}{{ trend.percentage_change | number:'1.1-1' }}%
                 </span>
               </div>
@@ -92,11 +94,12 @@
         </li>
         @for (category of categories(); track category.id) {
           <li>
-            <button 
+            <button
               [class.active]="selectedCategory() === category.name"
               (click)="onCategoryChange(category.name)"
             >
-              {{ category.icon }} {{ category.name }}
+              <lucide-icon [img]="getCategoryIcon(category.name)" [size]="16"></lucide-icon>
+              {{ category.name }}
               <span class="count">{{ category.post_count }}</span>
             </button>
           </li>

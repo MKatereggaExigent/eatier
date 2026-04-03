@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { LucideAngularModule, Search, BarChart3, BookOpen, Eye, Heart, Clock } from 'lucide-angular';
+import { LucideAngularModule, Search, BarChart3, BookOpen, Eye, Heart, Clock, ChefHat, Newspaper, Lightbulb, Star, Rocket, TrendingUp, Cpu, Leaf, Smartphone, Briefcase, Package, ArrowUp, ArrowDown, Users, DollarSign } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
 import { interval, Subscription } from 'rxjs';
 
@@ -76,6 +76,21 @@ export class BlogListComponent implements OnInit, OnDestroy {
   readonly Eye = Eye;
   readonly Heart = Heart;
   readonly Clock = Clock;
+  readonly ChefHat = ChefHat;
+  readonly Newspaper = Newspaper;
+  readonly Lightbulb = Lightbulb;
+  readonly Star = Star;
+  readonly Rocket = Rocket;
+  readonly TrendingUp = TrendingUp;
+  readonly Cpu = Cpu;
+  readonly Leaf = Leaf;
+  readonly Smartphone = Smartphone;
+  readonly Briefcase = Briefcase;
+  readonly Package = Package;
+  readonly ArrowUp = ArrowUp;
+  readonly ArrowDown = ArrowDown;
+  readonly Users = Users;
+  readonly DollarSign = DollarSign;
 
   posts = signal<BlogPost[]>([]);
   featuredPosts = signal<BlogPost[]>([]);
@@ -262,6 +277,62 @@ export class BlogListComponent implements OnInit, OnDestroy {
     // Hide the broken image - the CSS gradient background will show instead
     const img = event.target as HTMLImageElement;
     img.style.display = 'none';
+  }
+
+  // Helper method to get category icon
+  getCategoryIcon(categoryName: string) {
+    switch (categoryName?.toLowerCase()) {
+      case 'food & recipes':
+      case 'food and recipes':
+        return this.ChefHat;
+      case 'restaurant news':
+        return this.Newspaper;
+      case 'tips & guides':
+      case 'tips and guides':
+        return this.Lightbulb;
+      case 'success stories':
+        return this.Star;
+      case 'platform updates':
+        return this.Rocket;
+      case 'industry trends':
+        return this.TrendingUp;
+      case 'technology':
+        return this.Cpu;
+      case 'sustainability':
+        return this.Leaf;
+      case 'marketing':
+        return this.Smartphone;
+      case 'business growth':
+        return this.Briefcase;
+      default:
+        return this.BookOpen;
+    }
+  }
+
+  // Helper method to get trend icon
+  getTrendIcon(trendType: string) {
+    switch (trendType?.toLowerCase()) {
+      case 'food delivery':
+      case 'delivery':
+        return this.Package;
+      case 'ai':
+      case 'technology':
+      case 'ai adoption':
+        return this.Cpu;
+      case 'sustainability':
+      case 'green':
+        return this.Leaf;
+      case 'revenue':
+      case 'sales':
+      case 'check size':
+        return this.DollarSign;
+      case 'staff':
+      case 'turnover':
+      case 'workforce':
+        return this.Users;
+      default:
+        return this.TrendingUp;
+    }
   }
 }
 

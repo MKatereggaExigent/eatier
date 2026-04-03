@@ -102,7 +102,9 @@
       @for (category of helpCategories(); track category.id) {
         <div class="category-card" [id]="category.id">
           <div class="category-header">
-            <span class="category-icon">{{ category.icon }}</span>
+            <span class="category-icon">
+              <lucide-icon [img]="getCategoryIcon(category.icon)" [size]="32"></lucide-icon>
+            </span>
             <h3>{{ category.title }}</h3>
             <p>{{ category.description }}</p>
           </div>
@@ -111,7 +113,9 @@
             @for (article of category.articles; track article.id) {
               <details class="article-item">
                 <summary class="article-title">
-                  <span class="article-icon">{{ article.icon }}</span>
+                  <span class="article-icon">
+                    <lucide-icon [img]="getArticleIcon(article.icon)" [size]="20"></lucide-icon>
+                  </span>
                   {{ article.title }}
                 </summary>
                 <div class="article-content">

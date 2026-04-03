@@ -125,12 +125,12 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
       id: 'getting-started',
       title: 'Getting Started',
       description: 'Learn the basics of using Itiyum',
-      icon: '🚀',
+      icon: 'getting-started',
       articles: [
         {
           id: 'create-account',
           title: 'How to create an account',
-          icon: '👤',
+          icon: 'create-account',
           content: 'Creating an account on Itiyum is quick and easy. Follow these steps to get started.',
           steps: [
             'Click "Sign Up" in the top navigation',
@@ -147,7 +147,7 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
         {
           id: 'first-steps',
           title: 'Your first steps on Itiyum',
-          icon: '👋',
+          icon: 'first-steps',
           content: 'Welcome to Itiyum! Here\'s what you should do first to get the most out of the platform.',
           steps: [
             'Complete your profile with a photo and bio',
@@ -163,12 +163,12 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
       id: 'account-management',
       title: 'Account Management',
       description: 'Manage your account settings and preferences',
-      icon: '⚙️',
+      icon: 'account-management',
       articles: [
         {
           id: 'update-profile',
           title: 'Update your profile information',
-          icon: '✏️',
+          icon: 'update-profile',
           content: 'Keep your profile up to date with the latest information about yourself.',
           steps: [
             'Go to your profile page',
@@ -180,7 +180,7 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
         {
           id: 'change-password',
           title: 'Change your password',
-          icon: '🔒',
+          icon: 'change-password',
           content: 'Keep your account secure by regularly updating your password.',
           steps: [
             'Go to Account Settings',
@@ -193,7 +193,7 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
         {
           id: 'delete-account',
           title: 'Delete your account',
-          icon: '🗑️',
+          icon: 'delete-account',
           content: 'If you need to delete your account, here\'s how to do it safely.',
           steps: [
             'Go to Account Settings',
@@ -209,12 +209,12 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
       id: 'business-features',
       title: 'Business Features',
       description: 'Tools and features for restaurant owners',
-      icon: '🏪',
+      icon: 'business-features',
       articles: [
         {
           id: 'business-profile',
           title: 'Set up your business profile',
-          icon: '🏢',
+          icon: 'business-profile',
           content: 'Create a compelling business profile that attracts customers.',
           steps: [
             'Upgrade to a Business account',
@@ -227,7 +227,7 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
         {
           id: 'manage-reviews',
           title: 'Manage customer reviews',
-          icon: '⭐',
+          icon: 'manage-reviews',
           content: 'Learn how to respond to reviews and engage with customers.',
           steps: [
             'Monitor new reviews in your dashboard',
@@ -243,12 +243,12 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
       id: 'troubleshooting',
       title: 'Troubleshooting',
       description: 'Solutions to common problems',
-      icon: '🔧',
+      icon: 'troubleshooting',
       articles: [
         {
           id: 'login-issues',
           title: 'Can\'t log in to your account',
-          icon: '🚪',
+          icon: 'login-issues',
           content: 'Having trouble logging in? Here are some common solutions.',
           steps: [
             'Check your email and password are correct',
@@ -261,7 +261,7 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
         {
           id: 'app-not-loading',
           title: 'App not loading properly',
-          icon: '📱',
+          icon: 'app-not-loading',
           content: 'If the app isn\'t working correctly, try these troubleshooting steps.',
           steps: [
             'Check your internet connection',
@@ -274,6 +274,32 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
       ]
     }
   ]);
+
+  // Helper methods to get icons
+  getCategoryIcon(iconId: string) {
+    switch (iconId) {
+      case 'getting-started': return this.Rocket;
+      case 'account-management': return this.Settings;
+      case 'business-features': return this.Store;
+      case 'troubleshooting': return this.Wrench;
+      default: return this.HelpCircle;
+    }
+  }
+
+  getArticleIcon(iconId: string) {
+    switch (iconId) {
+      case 'create-account': return this.User;
+      case 'first-steps': return this.Hand;
+      case 'update-profile': return this.Edit;
+      case 'change-password': return this.Lock;
+      case 'delete-account': return this.Trash2;
+      case 'business-profile': return this.Building2;
+      case 'manage-reviews': return this.Star;
+      case 'login-issues': return this.DoorOpen;
+      case 'app-not-loading': return this.Smartphone;
+      default: return this.FileText;
+    }
+  }
 
   // Computed search results
   searchResults = computed(() => {
