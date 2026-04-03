@@ -144,14 +144,18 @@
   <section class="contact-support" aria-label="Contact Support">
     <div class="contact-card">
       <div class="contact-header">
-        <span class="contact-icon">🤝</span>
+        <span class="contact-icon">
+          <lucide-icon [img]="Handshake" [size]="40"></lucide-icon>
+        </span>
         <h2>Still Need Help?</h2>
         <p>Our support team is here to help you succeed</p>
       </div>
 
       <div class="contact-options">
         <div class="contact-option">
-          <span class="option-icon">📧</span>
+          <span class="option-icon">
+            <lucide-icon [img]="Mail" [size]="28"></lucide-icon>
+          </span>
           <div class="option-content">
             <h4>Email Support</h4>
             <p>Get detailed help via email</p>
@@ -160,7 +164,9 @@
         </div>
 
         <div class="contact-option">
-          <span class="option-icon">💬</span>
+          <span class="option-icon">
+            <lucide-icon [img]="MessageSquare" [size]="28"></lucide-icon>
+          </span>
           <div class="option-content">
             <h4>Live Chat</h4>
             <p>Chat with us in real-time</p>
@@ -171,7 +177,9 @@
         </div>
 
         <div class="contact-option">
-          <span class="option-icon">📞</span>
+          <span class="option-icon">
+            <lucide-icon [img]="Phone" [size]="28"></lucide-icon>
+          </span>
           <div class="option-content">
             <h4>Phone Support</h4>
             <p>Speak directly with our team</p>
@@ -205,25 +213,33 @@
     <h2 class="section-title">Community Resources</h2>
     <div class="resources-grid">
       <a routerLink="/community" class="resource-card">
-        <span class="resource-icon">🌟</span>
+        <span class="resource-icon">
+          <lucide-icon [img]="Star" [size]="32"></lucide-icon>
+        </span>
         <h3>Community Forum</h3>
         <p>Connect with other users and share experiences</p>
       </a>
 
       <a routerLink="/blog" class="resource-card">
-        <span class="resource-icon">📖</span>
+        <span class="resource-icon">
+          <lucide-icon [img]="BookOpen" [size]="32"></lucide-icon>
+        </span>
         <h3>Blog & Guides</h3>
         <p>Learn tips and best practices from our experts</p>
       </a>
 
       <a href="https://www.youtube.com/@Itiyum" target="_blank" rel="noopener noreferrer" class="resource-card">
-        <span class="resource-icon">🎥</span>
+        <span class="resource-icon">
+          <lucide-icon [img]="Video" [size]="32"></lucide-icon>
+        </span>
         <h3>Video Tutorials</h3>
         <p>Watch step-by-step guides and tutorials</p>
       </a>
 
       <a routerLink="/system-status" class="resource-card">
-        <span class="resource-icon">📊</span>
+        <span class="resource-icon">
+          <lucide-icon [img]="BarChart3" [size]="32"></lucide-icon>
+        </span>
         <h3>System Status</h3>
         <p>Check current system status and updates</p>
       </a>
@@ -336,7 +352,7 @@
           @for (message of chatMessages(); track message.id) {
             <div class="chat-message" [class]="message.sender">
               <div class="message-avatar">
-                {{ message.sender === 'user' ? '👤' : '🎧' }}
+                <lucide-icon [img]="message.sender === 'user' ? User : Headphones" [size]="20"></lucide-icon>
               </div>
               <div class="message-content">
                 <div class="message-text">{{ message.text }}</div>
@@ -360,15 +376,21 @@
             class="chat-send-btn"
             [disabled]="!chatInput.trim() || !isChatConnected()"
             aria-label="Send message">
-            📤
+            <lucide-icon [img]="Send" [size]="20"></lucide-icon>
           </button>
         </form>
 
         <div class="chat-status">
           @if (isChatConnected()) {
-            <span class="status-connected">🟢 Connected to support</span>
+            <span class="status-connected">
+              <lucide-icon [img]="Circle" [size]="12" class="status-dot-green"></lucide-icon>
+              Connected to support
+            </span>
           } @else {
-            <span class="status-connecting">🟡 Connecting...</span>
+            <span class="status-connecting">
+              <lucide-icon [img]="Circle" [size]="12" class="status-dot-yellow"></lucide-icon>
+              Connecting...
+            </span>
           }
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, computed, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LucideAngularModule, Rocket, User, Hand, Settings, Edit, Lock, Trash2, Store, Building2, Star, Wrench, DoorOpen, Smartphone, Search, Phone, HelpCircle, MessageSquare, FileText, Mail, Send } from 'lucide-angular';
+import { LucideAngularModule, Rocket, User, Hand, Settings, Edit, Lock, Trash2, Store, Building2, Star, Wrench, DoorOpen, Smartphone, Search, Phone, HelpCircle, MessageSquare, FileText, Mail, Send, Handshake, BookOpen, Video, BarChart3, Headphones, Circle } from 'lucide-angular';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -70,6 +70,12 @@ export class HelpCentreComponent implements OnInit, AfterViewInit {
   readonly Smartphone = Smartphone;
   readonly Mail = Mail;
   readonly Send = Send;
+  readonly Handshake = Handshake;
+  readonly BookOpen = BookOpen;
+  readonly Video = Video;
+  readonly BarChart3 = BarChart3;
+  readonly Headphones = Headphones;
+  readonly Circle = Circle;
 
   // State management
   searchQuery = signal('');
