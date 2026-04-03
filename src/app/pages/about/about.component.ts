@@ -4,7 +4,7 @@ import { BannerAdComponent } from '../../shared/components/ads/banner-ad/banner-
 import { CommonModule } from '@angular/common';
 import { PublicStatsService } from '../../core/services/public-stats.service';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Zap, Store, UtensilsCrossed, User, ChefHat, CheckCircle } from 'lucide-angular';
+import { LucideAngularModule, Zap, Store, UtensilsCrossed, User, ChefHat, CheckCircle, BookOpen, MessageCircle, GraduationCap, Handshake } from 'lucide-angular';
 
 interface UserGroup {
   id: string;
@@ -37,6 +37,10 @@ export class AboutComponent implements OnInit, OnDestroy {
 
   // Lucide Icons
   readonly CheckCircle = CheckCircle;
+  readonly BookOpen = BookOpen;
+  readonly MessageCircle = MessageCircle;
+  readonly GraduationCap = GraduationCap;
+  readonly Handshake = Handshake;
 
   // Stats will be populated from database
   stats = signal<Array<{ value: string; label: string }>>([
