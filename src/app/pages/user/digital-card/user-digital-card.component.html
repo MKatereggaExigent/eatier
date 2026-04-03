@@ -1,14 +1,14 @@
 <div class="user-digital-card-container">
   <!-- Header -->
   <div class="card-header">
-    <h1>💳 Digital Professional Card</h1>
+    <h1><lucide-icon [img]="CreditCard" [size]="32"></lucide-icon> Digital Professional Card</h1>
     <p>Create and customize your professional digital card with QR code</p>
   </div>
 
   <!-- Success Message -->
   @if (successMessage()) {
     <div class="success-message">
-      <span class="success-icon">✅</span>
+      <lucide-icon [img]="CheckCircle" [size]="20" class="success-icon"></lucide-icon>
       {{ successMessage() }}
     </div>
   }
@@ -16,7 +16,7 @@
   <div class="card-layout">
     <!-- Customization Panel -->
     <div class="customization-panel">
-      <h2>🎨 Customize Your Card</h2>
+      <h2><lucide-icon [img]="Palette" [size]="24"></lucide-icon> Customize Your Card</h2>
 
       <!-- Color Presets -->
       <div class="customization-section">
@@ -112,7 +112,7 @@
             <span class="loading-spinner"></span>
             Generating...
           } @else {
-            🔄 Regenerate QR
+            <lucide-icon [img]="RefreshCw" [size]="16"></lucide-icon> Regenerate QR
           }
         </button>
       </div>
@@ -120,7 +120,7 @@
 
     <!-- Card Preview -->
     <div class="card-preview">
-      <h2>📱 Preview</h2>
+      <h2><lucide-icon [img]="Smartphone" [size]="24"></lucide-icon> Preview</h2>
 
       @if (userProfile()) {
         <div class="professional-card" [ngStyle]="getPreviewStyle()" [class]="getLayoutClass()">
@@ -152,10 +152,10 @@
               @if (customizationForm.get('includeContact')?.value) {
                 <div class="contact-info">
                   @if (userProfile()!.email) {
-                    <div class="contact-item">✉️ {{ userProfile()!.email }}</div>
+                    <div class="contact-item"><lucide-icon [img]="Mail" [size]="16"></lucide-icon> {{ userProfile()!.email }}</div>
                   }
                   @if (userProfile()!.phone) {
-                    <div class="contact-item">📞 {{ userProfile()!.phone }}</div>
+                    <div class="contact-item"><lucide-icon [img]="Phone" [size]="16"></lucide-icon> {{ userProfile()!.phone }}</div>
                   }
                 </div>
               }
@@ -181,7 +181,7 @@
                   <h4>Certifications:</h4>
                   <div class="cert-list">
                     @for (cert of userProfile()!.certifications!.slice(0, 2); track cert) {
-                      <span class="cert-badge">🏆 {{ cert }}</span>
+                      <span class="cert-badge"><lucide-icon [img]="Trophy" [size]="14"></lucide-icon> {{ cert }}</span>
                     }
                   </div>
                 </div>
@@ -206,33 +206,33 @@
 
       <!-- Download Options -->
       <div class="download-options">
-        <h3>📥 Download & Share</h3>
+        <h3><lucide-icon [img]="Download" [size]="20"></lucide-icon> Download & Share</h3>
         <div class="download-buttons">
           <button type="button" class="download-btn" (click)="downloadCard('png')" [disabled]="isDownloading()">
             @if (isDownloading()) {
               <span class="loading-spinner"></span>
             } @else {
-              🖼️ PNG
+              <lucide-icon [img]="ImageIcon" [size]="16"></lucide-icon> PNG
             }
           </button>
           <button type="button" class="download-btn" (click)="downloadCard('pdf')" [disabled]="isDownloading()">
             @if (isDownloading()) {
               <span class="loading-spinner"></span>
             } @else {
-              📄 PDF
+              <lucide-icon [img]="FileText" [size]="16"></lucide-icon> PDF
             }
           </button>
           <button type="button" class="download-btn" (click)="downloadCard('svg')" [disabled]="isDownloading()">
             @if (isDownloading()) {
               <span class="loading-spinner"></span>
             } @else {
-              🎨 SVG
+              <lucide-icon [img]="Palette" [size]="16"></lucide-icon> SVG
             }
           </button>
         </div>
 
         <button type="button" class="share-btn" (click)="shareCard()">
-          📤 Share Card
+          <lucide-icon [img]="Share2" [size]="16"></lucide-icon> Share Card
         </button>
       </div>
     </div>

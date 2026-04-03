@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { LucideAngularModule, CreditCard, CheckCircle, Palette, RefreshCw, Smartphone, Mail, Trophy, Download, Image as ImageIcon, Phone, FileText, Share2 } from 'lucide-angular';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -8,12 +9,26 @@ import { UserProfile } from '../../../shared/models/user-profile.model';
 @Component({
   selector: 'app-user-digital-card',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './user-digital-card.component.html',
   styleUrls: ['./user-digital-card.component.scss']
 })
 export class UserDigitalCardComponent implements OnInit {
   private fb = inject(FormBuilder);
+
+  // Lucide Icons
+  readonly CreditCard = CreditCard;
+  readonly CheckCircle = CheckCircle;
+  readonly Palette = Palette;
+  readonly RefreshCw = RefreshCw;
+  readonly Smartphone = Smartphone;
+  readonly Mail = Mail;
+  readonly Trophy = Trophy;
+  readonly Download = Download;
+  readonly ImageIcon = ImageIcon;
+  readonly Phone = Phone;
+  readonly FileText = FileText;
+  readonly Share2 = Share2;
 
   // State management
   userProfile = signal<UserProfile | null>(null);
