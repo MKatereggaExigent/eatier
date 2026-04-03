@@ -3,7 +3,7 @@
   <div class="sidebar-header">
     <div class="business-info">
       <div class="business-avatar">
-        <span class="avatar-icon">🏪</span>
+        <lucide-icon [img]="Store" [size]="20" class="avatar-icon"></lucide-icon>
       </div>
       <div class="business-details">
         <h3 class="business-name">{{ businessName() }}</h3>
@@ -15,7 +15,7 @@
       class="sidebar-toggle"
       (click)="toggleSidebar()"
       [attr.aria-label]="isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
-      <span class="toggle-icon">{{ isCollapsed() ? '→' : '←' }}</span>
+      <lucide-icon [img]="isCollapsed() ? ChevronRight : ChevronLeft" [size]="16" class="toggle-icon"></lucide-icon>
     </button>
   </div>
 
@@ -30,7 +30,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Overview' + (isCollapsed() ? '' : ' - View business statistics and recent activity')">
-          <span class="nav-icon" aria-hidden="true">📊</span>
+          <lucide-icon [img]="BarChart3" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Overview</span>
           }
@@ -44,7 +44,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Site' + (isCollapsed() ? '' : ' - View the public Itiyum website')">
-          <span class="nav-icon" aria-hidden="true">🌐</span>
+          <lucide-icon [img]="Globe" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Site</span>
           }
@@ -59,7 +59,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Menu Management' + (isCollapsed() ? '' : ' - Manage your restaurant menu items')">
-          <span class="nav-icon" aria-hidden="true">🍽️</span>
+          <lucide-icon [img]="UtensilsCrossed" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Menu</span>
           }
@@ -74,7 +74,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Bookings' + (isCollapsed() ? '' : ' - Manage customer reservations and bookings')">
-          <span class="nav-icon" aria-hidden="true">📅</span>
+          <lucide-icon [img]="Calendar" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Bookings</span>
           }
@@ -89,7 +89,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Reviews' + (isCollapsed() ? '' : ' - View and respond to customer reviews')">
-          <span class="nav-icon" aria-hidden="true">⭐</span>
+          <lucide-icon [img]="Star" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Reviews</span>
             @if (unreadReviews() > 0) {
@@ -109,7 +109,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Business Profile' + (isCollapsed() ? '' : ' - Edit your restaurant information and photos')">
-          <span class="nav-icon" aria-hidden="true">🏪</span>
+          <lucide-icon [img]="Store" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Profile</span>
           }
@@ -124,7 +124,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Digital Card' + (isCollapsed() ? '' : ' - Create and customize your digital business card')">
-          <span class="nav-icon" aria-hidden="true">💳</span>
+          <lucide-icon [img]="CreditCard" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Digital Card</span>
           }
@@ -139,7 +139,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Insights' + (isCollapsed() ? '' : ' - View detailed analytics and performance metrics')">
-          <span class="nav-icon" aria-hidden="true">📈</span>
+          <lucide-icon [img]="TrendingUp" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Insights</span>
           }
@@ -154,7 +154,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Analytics' + (isCollapsed() ? '' : ' - Comprehensive business analytics dashboard')">
-          <span class="nav-icon" aria-hidden="true">📊</span>
+          <lucide-icon [img]="BarChart3" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Analytics</span>
           }
@@ -169,7 +169,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Manage My Ads' + (isCollapsed() ? '' : ' - Create and manage advertising campaigns')">
-          <span class="nav-icon" aria-hidden="true">📢</span>
+          <lucide-icon [img]="Megaphone" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Manage My Ads</span>
           }
@@ -184,7 +184,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Social' + (isCollapsed() ? '' : ' - Connect with followers and manage messages')">
-          <span class="nav-icon" aria-hidden="true">👥</span>
+          <lucide-icon [img]="Users" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Social</span>
           }
@@ -204,7 +204,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Account Settings' + (isCollapsed() ? '' : ' - Manage subscription and billing')">
-          <span class="nav-icon" aria-hidden="true">⚙️</span>
+          <lucide-icon [img]="Settings" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Settings</span>
           }
@@ -218,7 +218,7 @@
           class="nav-link"
           (click)="closeMobileSidebar()"
           [attr.aria-label]="'Navigate to Help & Support' + (isCollapsed() ? '' : ' - Get help and contact support')">
-          <span class="nav-icon" aria-hidden="true">❓</span>
+          <lucide-icon [img]="HelpCircle" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Help</span>
           }
@@ -237,7 +237,7 @@
           (click)="logout()"
           class="nav-link logout-btn"
           [attr.aria-label]="'Logout' + (isCollapsed() ? '' : ' - Sign out of your account')">
-          <span class="nav-icon" aria-hidden="true">🚪</span>
+          <lucide-icon [img]="LogOut" [size]="18" class="nav-icon" aria-hidden="true"></lucide-icon>
           @if (!isCollapsed()) {
             <span class="nav-text">Logout</span>
           }
@@ -251,7 +251,7 @@
     <div class="sidebar-footer">
       <div class="subscription-status" [class]="subscriptionStatus()">
         <div class="status-info">
-          <span class="status-icon">{{ getSubscriptionIcon() }}</span>
+          <lucide-icon [img]="getSubscriptionIcon()" [size]="16" class="status-icon"></lucide-icon>
           <div class="status-text">
             <p class="status-label">{{ subscriptionStatus() | titlecase }}</p>
             @if (subscriptionStatus() === 'trial' && trialDaysLeft() !== null) {

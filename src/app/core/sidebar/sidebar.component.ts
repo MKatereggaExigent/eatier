@@ -2,6 +2,7 @@ import { CommonModule, TitleCasePipe } from '@angular/common';
 import { Component, HostListener, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Subject, catchError, of, takeUntil } from 'rxjs';
+import { LucideAngularModule, BarChart3, Globe, UtensilsCrossed, Calendar, Star, Store, CreditCard, TrendingUp, Megaphone, Users, Settings, HelpCircle, LogOut, CheckCircle, Clock, AlertTriangle, Pause, FileText, ChevronRight, ChevronLeft } from 'lucide-angular';
 
 import { AuthService } from '../services/auth.service';
 import { BusinessOwner } from '../../shared/models/user.model';
@@ -10,7 +11,7 @@ import { BusinessOwnerService, BusinessSubscription } from '../services/business
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, TitleCasePipe],
+  imports: [CommonModule, RouterLink, RouterLinkActive, TitleCasePipe, LucideAngularModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
@@ -19,6 +20,28 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private businessOwnerService = inject(BusinessOwnerService);
   private destroy$ = new Subject<void>();
+
+  // Lucide Icons
+  readonly BarChart3 = BarChart3;
+  readonly Globe = Globe;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Calendar = Calendar;
+  readonly Star = Star;
+  readonly Store = Store;
+  readonly CreditCard = CreditCard;
+  readonly TrendingUp = TrendingUp;
+  readonly Megaphone = Megaphone;
+  readonly Users = Users;
+  readonly Settings = Settings;
+  readonly HelpCircle = HelpCircle;
+  readonly LogOut = LogOut;
+  readonly CheckCircle = CheckCircle;
+  readonly Clock = Clock;
+  readonly AlertTriangle = AlertTriangle;
+  readonly Pause = Pause;
+  readonly FileText = FileText;
+  readonly ChevronRight = ChevronRight;
+  readonly ChevronLeft = ChevronLeft;
 
   // State management
   isCollapsed = signal(false);
@@ -150,18 +173,18 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.isHovering.set(false);
   }
 
-  getSubscriptionIcon(): string {
+  getSubscriptionIcon(): any {
     switch (this.subscriptionStatus()) {
       case 'active':
-        return '✅';
+        return this.CheckCircle;
       case 'trial':
-        return '⏰';
+        return this.Clock;
       case 'expired':
-        return '⚠️';
+        return this.AlertTriangle;
       case 'inactive':
-        return '⏸️';
+        return this.Pause;
       default:
-        return '📋';
+        return this.FileText;
     }
   }
 
