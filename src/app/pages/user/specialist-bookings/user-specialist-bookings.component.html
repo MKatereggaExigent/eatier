@@ -3,15 +3,15 @@
   <header class="page-header">
     <div class="header-content">
       <h1>
-        <span class="header-icon">👨‍🍳</span>
+        <lucide-icon [img]="ChefHat" [size]="32" class="header-icon"></lucide-icon>
         My Specialist Bookings
       </h1>
       <p class="subtitle">View and manage your bookings with culinary specialists</p>
     </div>
-    
+
     @if (pendingReviewCount() > 0) {
       <div class="review-banner">
-        <span class="banner-icon">⭐</span>
+        <lucide-icon [img]="Star" [size]="20" class="banner-icon"></lucide-icon>
         <span>You have {{ pendingReviewCount() }} booking(s) waiting for your review!</span>
       </div>
     }
@@ -69,7 +69,7 @@
   <!-- Empty State -->
   @if (!loading() && currentBookings().length === 0) {
     <div class="empty-state">
-      <div class="empty-icon">📅</div>
+      <lucide-icon [img]="Calendar" [size]="64" class="empty-icon"></lucide-icon>
       <h3>No bookings found</h3>
       <p>
         @switch (activeTab()) {
@@ -105,33 +105,33 @@
 
           <div class="booking-details">
             <div class="detail-row">
-              <span class="detail-icon">📅</span>
+              <lucide-icon [img]="Calendar" [size]="18" class="detail-icon"></lucide-icon>
               <span class="detail-label">Date:</span>
               <span class="detail-value">{{ formatDate(booking.bookingDate) }}</span>
             </div>
             <div class="detail-row">
-              <span class="detail-icon">👥</span>
+              <lucide-icon [img]="Users" [size]="18" class="detail-icon"></lucide-icon>
               <span class="detail-label">Guests:</span>
               <span class="detail-value">{{ booking.guestCount }}</span>
             </div>
             <div class="detail-row">
-              <span class="detail-icon">🎉</span>
+              <lucide-icon [img]="PartyPopper" [size]="18" class="detail-icon"></lucide-icon>
               <span class="detail-label">Event:</span>
               <span class="detail-value">{{ booking.eventType || 'Not specified' }}</span>
             </div>
             <div class="detail-row">
-              <span class="detail-icon">📍</span>
+              <lucide-icon [img]="MapPin" [size]="18" class="detail-icon"></lucide-icon>
               <span class="detail-label">Location:</span>
               <span class="detail-value">{{ booking.eventCity || 'Not specified' }}</span>
             </div>
             <div class="detail-row">
-              <span class="detail-icon">💰</span>
+              <lucide-icon [img]="DollarSign" [size]="18" class="detail-icon"></lucide-icon>
               <span class="detail-label">Total:</span>
               <span class="detail-value price">{{ formatCurrency(booking.totalPrice) }}</span>
             </div>
             @if (booking.bookingReference) {
               <div class="detail-row">
-                <span class="detail-icon">🔖</span>
+                <lucide-icon [img]="Tag" [size]="18" class="detail-icon"></lucide-icon>
                 <span class="detail-label">Reference:</span>
                 <span class="detail-value reference">{{ booking.bookingReference }}</span>
               </div>
@@ -148,11 +148,11 @@
           <div class="booking-actions">
             @if (canReview(booking)) {
               <button type="button" class="action-btn primary" (click)="openTestimonialModal(booking)">
-                ⭐ Leave Review
+                <lucide-icon [img]="Star" [size]="16"></lucide-icon> Leave Review
               </button>
             }
             @if (booking.hasTestimonial) {
-              <span class="reviewed-badge">✅ Reviewed</span>
+              <span class="reviewed-badge"><lucide-icon [img]="CheckCircle" [size]="16"></lucide-icon> Reviewed</span>
             }
             @if (canCancel(booking)) {
               <button type="button" class="action-btn danger" (click)="openCancelModal(booking)">

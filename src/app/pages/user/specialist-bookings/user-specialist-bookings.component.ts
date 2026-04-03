@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { LucideAngularModule, ChefHat, Star, Calendar, DollarSign, CheckCircle, XCircle, Clock, RefreshCw, Users, PartyPopper, MapPin, Tag } from 'lucide-angular';
 import { Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 import { UserSpecialistBookingsService, SpecialistBooking, ReviewableBooking } from '../../../core/services/user-specialist-bookings.service';
@@ -10,7 +11,7 @@ import { CurrencyService } from '../../../core/services/currency.service';
 @Component({
   selector: 'app-user-specialist-bookings',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule],
   templateUrl: './user-specialist-bookings.component.html',
   styleUrls: ['./user-specialist-bookings.component.scss']
 })
@@ -18,6 +19,20 @@ export class UserSpecialistBookingsComponent implements OnInit, OnDestroy {
   private bookingsService = inject(UserSpecialistBookingsService);
   private currencyService = inject(CurrencyService);
   private destroy$ = new Subject<void>();
+
+  // Lucide Icons
+  readonly ChefHat = ChefHat;
+  readonly Star = Star;
+  readonly Calendar = Calendar;
+  readonly DollarSign = DollarSign;
+  readonly CheckCircle = CheckCircle;
+  readonly XCircle = XCircle;
+  readonly Clock = Clock;
+  readonly RefreshCw = RefreshCw;
+  readonly Users = Users;
+  readonly PartyPopper = PartyPopper;
+  readonly MapPin = MapPin;
+  readonly Tag = Tag;
 
   // State
   bookings = signal<SpecialistBooking[]>([]);

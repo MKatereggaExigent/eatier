@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { LucideAngularModule, Calendar, BarChart3, TrendingUp, ClipboardList, CalendarRange, Eye, Users, Phone, Smartphone, Image, Upload, Briefcase, Star, FileText, Globe } from 'lucide-angular';
+import { LucideAngularModule, Calendar, BarChart3, TrendingUp, ClipboardList, CalendarRange, Eye, Users, Phone, Smartphone, Image, Upload, Briefcase, Star, FileText, Globe, Monitor, Search, type LucideIconData } from 'lucide-angular';
 
 import { CommonModule } from '@angular/common';
 import { UserInsights } from '../../../shared/models/user-profile.model';
@@ -31,6 +31,8 @@ export class UserInsightsComponent implements OnInit {
   readonly Star = Star;
   readonly FileText = FileText;
   readonly Globe = Globe;
+  readonly Monitor = Monitor;
+  readonly Search = Search;
 
   // State management
   insights = signal<UserInsights | null>(null);
@@ -168,9 +170,9 @@ export class UserInsightsComponent implements OnInit {
     return this.periodOptions.find(p => p.value === period)?.label || 'Unknown';
   }
 
-  getPeriodIcon(): string {
+  getPeriodIcon(): any {
     const period = this.selectedPeriod();
-    return this.periodOptions.find(p => p.value === period)?.icon || '📊';
+    return this.periodOptions.find(p => p.value === period)?.icon || this.BarChart3;
   }
 
   getEngagementLevel(rate: number): { label: string; class: string } {
@@ -195,25 +197,25 @@ export class UserInsightsComponent implements OnInit {
     });
   }
 
-  getDeviceIcon(deviceType: string): string {
-    const icons: Record<string, string> = {
-      'Mobile': '📱',
-      'Desktop': '💻',
-      'Tablet': '📱'
+  getDeviceIcon(deviceType: string): any {
+    const icons: Record<string, any> = {
+      'Mobile': this.Smartphone,
+      'Desktop': this.Monitor,
+      'Tablet': this.Smartphone
     };
-    return icons[deviceType] || '📱';
+    return icons[deviceType] || this.Smartphone;
   }
 
-  getReferrerIcon(source: string): string {
-    const icons: Record<string, string> = {
-      'Google Search': '🔍',
-      'LinkedIn': '💼',
-      'Instagram': '📸',
-      'Facebook': '📘',
-      'Twitter': '🐦',
-      'Direct': '🌐'
+  getReferrerIcon(source: string): any {
+    const icons: Record<string, any> = {
+      'Google Search': this.Search,
+      'LinkedIn': this.Briefcase,
+      'Instagram': this.Image,
+      'Facebook': this.Globe,
+      'Twitter': this.Globe,
+      'Direct': this.Globe
     };
-    return icons[source] || '🌐';
+    return icons[source] || this.Globe;
   }
 
   getInquiryConversionRate(): number {

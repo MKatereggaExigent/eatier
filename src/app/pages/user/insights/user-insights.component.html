@@ -2,7 +2,7 @@
   <!-- Header -->
   <div class="insights-header">
     <div class="header-content">
-      <h1>{{ getPeriodIcon() }} User Insights</h1>
+      <h1><lucide-icon [img]="getPeriodIcon()" [size]="28"></lucide-icon> User Insights</h1>
       <p>Track your profile performance and professional growth</p>
     </div>
     
@@ -214,7 +214,7 @@
         <div class="referrers-list">
           @for (referrer of insights()!.engagement.topReferrers; track referrer; let i = $index) {
             <div class="referrer-item">
-              <span class="referrer-icon">{{ getReferrerIcon(referrer) }}</span>
+              <lucide-icon [img]="getReferrerIcon(referrer)" [size]="18" class="referrer-icon"></lucide-icon>
               <span class="referrer-name">{{ referrer }}</span>
               <span class="referrer-rank">#{{ i + 1 }}</span>
             </div>
@@ -252,7 +252,7 @@
           <div class="demo-list">
             @for (device of insights()!.demographics.deviceTypes; track device.type) {
               <div class="demo-item">
-                <span class="demo-icon">{{ getDeviceIcon(device.type) }}</span>
+                <lucide-icon [img]="getDeviceIcon(device.type)" [size]="18" class="demo-icon"></lucide-icon>
                 <span class="demo-label">{{ device.type }}</span>
                 <div class="demo-bar">
                   <div 
