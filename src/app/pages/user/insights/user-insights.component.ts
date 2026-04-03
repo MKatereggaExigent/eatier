@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { LucideAngularModule, Calendar, BarChart3, TrendingUp, ClipboardList, CalendarRange } from 'lucide-angular';
 
 import { CommonModule } from '@angular/common';
 import { UserInsights } from '../../../shared/models/user-profile.model';
@@ -7,12 +8,19 @@ import { UserInsights } from '../../../shared/models/user-profile.model';
 @Component({
   selector: 'app-user-insights',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './user-insights.component.html',
   styleUrls: ['./user-insights.component.scss']
 })
 export class UserInsightsComponent implements OnInit {
   private fb = inject(FormBuilder);
+
+  // Lucide Icons
+  readonly Calendar = Calendar;
+  readonly BarChart3 = BarChart3;
+  readonly TrendingUp = TrendingUp;
+  readonly ClipboardList = ClipboardList;
+  readonly CalendarRange = CalendarRange;
 
   // State management
   insights = signal<UserInsights | null>(null);
@@ -25,11 +33,11 @@ export class UserInsightsComponent implements OnInit {
 
   // Period options
   readonly periodOptions = [
-    { value: 'daily', label: 'Daily', icon: '📅' },
-    { value: 'monthly', label: 'Monthly', icon: '📊' },
-    { value: 'quarterly', label: 'Quarterly', icon: '📈' },
-    { value: 'yearly', label: 'Yearly', icon: '📋' },
-    { value: 'custom', label: 'Custom Range', icon: '🗓️' }
+    { value: 'daily', label: 'Daily', icon: this.Calendar },
+    { value: 'monthly', label: 'Monthly', icon: this.BarChart3 },
+    { value: 'quarterly', label: 'Quarterly', icon: this.TrendingUp },
+    { value: 'yearly', label: 'Yearly', icon: this.ClipboardList },
+    { value: 'custom', label: 'Custom Range', icon: this.CalendarRange }
   ];
 
 
