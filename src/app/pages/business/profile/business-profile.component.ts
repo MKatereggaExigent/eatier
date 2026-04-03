@@ -7,11 +7,12 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../../environments/environment';
+import { LucideAngularModule, CheckCircle, AlertTriangle, ClipboardList, MapPin, Info, Building2, Clock, Image, ParkingCircle, Dog, Car, Waves, Wifi, Snowflake, TreePine, Accessibility, LucideIconData } from 'lucide-angular';
 
 @Component({
   selector: 'app-business-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './business-profile.component.html',
   styleUrls: ['./business-profile.component.scss']
 })
@@ -72,6 +73,27 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
     'Restaurant', 'Cafe', 'Bar', 'Food Truck', 'Catering', 'Bakery',
     'Fast Food', 'Fine Dining', 'Buffet', 'Takeaway', 'Other'
   ];
+
+  // Lucide Icons
+  readonly CheckCircle = CheckCircle;
+  readonly AlertTriangle = AlertTriangle;
+  readonly ClipboardList = ClipboardList;
+  readonly MapPin = MapPin;
+  readonly Info = Info;
+  readonly Building2 = Building2;
+  readonly Clock = Clock;
+  readonly Image = Image;
+
+  readonly facilityIconsLucide: Record<string, LucideIconData> = {
+    parking: ParkingCircle,
+    petFriendly: Dog,
+    carWash: Car,
+    swimming: Waves,
+    wifi: Wifi,
+    airConditioning: Snowflake,
+    outdoorSeating: TreePine,
+    wheelchairAccessible: Accessibility
+  };
 
   readonly facilityIcons = {
     parking: '🅿️',
@@ -511,6 +533,10 @@ export class BusinessProfileComponent implements OnInit, OnDestroy {
       bio: 'Bio'
     };
     return labels[fieldName] || fieldName;
+  }
+
+  getFacilityIconLucide(facility: string): LucideIconData {
+    return this.facilityIconsLucide[facility] || Building2;
   }
 
   private markFormGroupTouched(): void {

@@ -32,6 +32,12 @@ $space-2xl: 3rem;
   margin: 0 auto;
   padding: $space-xl;
   min-height: 100vh;
+  color: #000000;
+
+  // Global text color override - make all text black
+  * {
+    color: #000000;
+  }
 }
 
 // Header Section

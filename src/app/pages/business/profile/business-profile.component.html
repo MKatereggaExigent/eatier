@@ -8,14 +8,14 @@
   <!-- Success/Error Messages -->
   @if (successMessage()) {
     <div class="success-message">
-      <span class="success-icon">✅</span>
+      <lucide-icon [img]="CheckCircle" [size]="20" class="success-icon"></lucide-icon>
       {{ successMessage() }}
     </div>
   }
 
   @if (errorMessage()) {
     <div class="error-message">
-      <span class="error-icon">⚠️</span>
+      <lucide-icon [img]="AlertTriangle" [size]="20" class="error-icon"></lucide-icon>
       {{ errorMessage() }}
     </div>
   }
@@ -28,7 +28,7 @@
       [class.active]="activeSection() === 'basic'"
       (click)="setActiveSection('basic')"
     >
-      📋 Basic Info
+      <lucide-icon [img]="ClipboardList" [size]="16"></lucide-icon> Basic Info
     </button>
     <button
       type="button"
@@ -36,7 +36,7 @@
       [class.active]="activeSection() === 'address'"
       (click)="setActiveSection('address')"
     >
-      📍 Address
+      <lucide-icon [img]="MapPin" [size]="16"></lucide-icon> Address
     </button>
     <button
       type="button"
@@ -44,7 +44,7 @@
       [class.active]="activeSection() === 'details'"
       (click)="setActiveSection('details')"
     >
-      ℹ️ Details
+      <lucide-icon [img]="Info" [size]="16"></lucide-icon> Details
     </button>
     <button
       type="button"
@@ -52,7 +52,7 @@
       [class.active]="activeSection() === 'facilities'"
       (click)="setActiveSection('facilities')"
     >
-      🏢 Facilities
+      <lucide-icon [img]="Building2" [size]="16"></lucide-icon> Facilities
     </button>
     <button
       type="button"
@@ -60,7 +60,7 @@
       [class.active]="activeSection() === 'hours'"
       (click)="setActiveSection('hours')"
     >
-      🕒 Hours
+      <lucide-icon [img]="Clock" [size]="16"></lucide-icon> Hours
     </button>
     <button
       type="button"
@@ -68,7 +68,7 @@
       [class.active]="activeSection() === 'media'"
       (click)="setActiveSection('media')"
     >
-      📸 Media
+      <lucide-icon [img]="Image" [size]="16"></lucide-icon> Media
     </button>
   </div>
 
@@ -293,7 +293,7 @@
                 [formControlName]="facility"
               />
               <div class="facility-content">
-                <span class="facility-icon">{{ getFacilityIcon(facility) }}</span>
+                <lucide-icon [img]="getFacilityIconLucide(facility)" [size]="24" class="facility-icon"></lucide-icon>
                 <span class="facility-label">{{ facility | titlecase }}</span>
               </div>
             </label>
@@ -411,7 +411,7 @@
                 hidden
               />
               <div class="upload-placeholder large">
-                <span class="upload-icon">🖼️</span>
+                <lucide-icon [img]="Image" [size]="48" class="upload-icon"></lucide-icon>
                 <span>Upload Background Image</span>
               </div>
             </label>
