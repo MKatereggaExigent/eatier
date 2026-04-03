@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
+import { LucideAngularModule, BarChart3, Globe, Users, Store, Calendar, FileText, Megaphone, TrendingUp, ClipboardList, Settings, Camera, Wallet, User, Heart, Star, Package, PartyPopper, CreditCard, Target, ChefHat, LogOut } from 'lucide-angular';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -7,20 +8,43 @@ import { CommonModule } from '@angular/common';
 interface NavigationItem {
   path: string;
   label: string;
-  icon: string;
+  icon: any; // Changed to any to support Lucide icon objects
   isAbsolute?: boolean; // Flag to indicate if path is absolute (e.g., /about)
 }
 
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterModule],
+  imports: [CommonModule, RouterOutlet, RouterModule, LucideAngularModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class UserDashboardComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+
+  // Lucide Icons
+  readonly BarChart3 = BarChart3;
+  readonly Globe = Globe;
+  readonly Users = Users;
+  readonly Store = Store;
+  readonly Calendar = Calendar;
+  readonly FileText = FileText;
+  readonly Megaphone = Megaphone;
+  readonly TrendingUp = TrendingUp;
+  readonly ClipboardList = ClipboardList;
+  readonly Settings = Settings;
+  readonly Camera = Camera;
+  readonly Wallet = Wallet;
+  readonly User = User;
+  readonly Heart = Heart;
+  readonly Star = Star;
+  readonly Package = Package;
+  readonly PartyPopper = PartyPopper;
+  readonly CreditCard = CreditCard;
+  readonly Target = Target;
+  readonly ChefHat = ChefHat;
+  readonly LogOut = LogOut;
 
   // Mobile menu state
   mobileMenuOpen = signal(false);
@@ -35,61 +59,61 @@ export class UserDashboardComponent {
     switch (role) {
       case 'itiyum_admin':
         return [
-          { path: 'overview', label: 'Overview', icon: '📊' },
-          { path: '/about', label: 'Site', icon: '🌐', isAbsolute: true },
-          { path: 'users', label: 'Users', icon: '👥' },
-          { path: 'businesses', label: 'Businesses', icon: '🏪' },
-          { path: 'bookings', label: 'Bookings', icon: '📅' },
-          { path: 'blog', label: 'Blog', icon: '📝' },
-          { path: 'ads', label: 'Manage My Ads', icon: '📢' },
-          { path: 'social', label: 'Social', icon: '👥' },
-          { path: 'analytics', label: 'Analytics', icon: '📈' },
-          { path: 'reports', label: 'Reports', icon: '📋' },
-          { path: 'settings', label: 'Settings', icon: '⚙️' }
+          { path: 'overview', label: 'Overview', icon: this.BarChart3 },
+          { path: '/about', label: 'Site', icon: this.Globe, isAbsolute: true },
+          { path: 'users', label: 'Users', icon: this.Users },
+          { path: 'businesses', label: 'Businesses', icon: this.Store },
+          { path: 'bookings', label: 'Bookings', icon: this.Calendar },
+          { path: 'blog', label: 'Blog', icon: this.FileText },
+          { path: 'ads', label: 'Manage My Ads', icon: this.Megaphone },
+          { path: 'social', label: 'Social', icon: this.Users },
+          { path: 'analytics', label: 'Analytics', icon: this.TrendingUp },
+          { path: 'reports', label: 'Reports', icon: this.ClipboardList },
+          { path: 'settings', label: 'Settings', icon: this.Settings }
         ];
 
       case 'specialist':
         return [
-          { path: 'overview', label: 'Overview', icon: '📊' },
-          { path: '/about', label: 'Site', icon: '🌐', isAbsolute: true },
-          { path: 'portfolio', label: 'Portfolio', icon: '📸' },
-          { path: 'availability', label: 'Availability', icon: '📅' },
-          { path: 'bookings', label: 'Bookings', icon: '📋' },
-          { path: 'wallet', label: 'Earnings', icon: '💰' },
-          { path: 'ads', label: 'Manage My Ads', icon: '📢' },
-          { path: 'social', label: 'Social', icon: '👥' },
-          { path: 'profile', label: 'Profile', icon: '👤' }
+          { path: 'overview', label: 'Overview', icon: this.BarChart3 },
+          { path: '/about', label: 'Site', icon: this.Globe, isAbsolute: true },
+          { path: 'portfolio', label: 'Portfolio', icon: this.Camera },
+          { path: 'availability', label: 'Availability', icon: this.Calendar },
+          { path: 'bookings', label: 'Bookings', icon: this.ClipboardList },
+          { path: 'wallet', label: 'Earnings', icon: this.Wallet },
+          { path: 'ads', label: 'Manage My Ads', icon: this.Megaphone },
+          { path: 'social', label: 'Social', icon: this.Users },
+          { path: 'profile', label: 'Profile', icon: this.User }
         ];
 
       case 'food_enthusiast':
         return [
-          { path: 'overview', label: 'Overview', icon: '📊' },
-          { path: '/about', label: 'Site', icon: '🌐', isAbsolute: true },
-          { path: 'profile', label: 'Profile', icon: '👤' },
-          { path: 'favorites', label: 'Favorites', icon: '❤️' },
-          { path: 'reviews', label: 'My Reviews', icon: '⭐' },
-          { path: 'ads', label: 'Manage My Ads', icon: '📢' },
-          { path: 'social', label: 'Social', icon: '👥' },
-          { path: 'insights', label: 'Insights', icon: '📈' },
-          { path: 'bookings', label: 'Bookings', icon: '📋' },
-          { path: 'specialist-bookings', label: 'Chef Bookings', icon: '👨‍🍳' }
+          { path: 'overview', label: 'Overview', icon: this.BarChart3 },
+          { path: '/about', label: 'Site', icon: this.Globe, isAbsolute: true },
+          { path: 'profile', label: 'Profile', icon: this.User },
+          { path: 'favorites', label: 'Favorites', icon: this.Heart },
+          { path: 'reviews', label: 'My Reviews', icon: this.Star },
+          { path: 'ads', label: 'Manage My Ads', icon: this.Megaphone },
+          { path: 'social', label: 'Social', icon: this.Users },
+          { path: 'insights', label: 'Insights', icon: this.TrendingUp },
+          { path: 'bookings', label: 'Bookings', icon: this.ClipboardList },
+          { path: 'specialist-bookings', label: 'Chef Bookings', icon: this.ChefHat }
         ];
 
       case 'normal_user':
       default:
         return [
-          { path: 'overview', label: 'Overview', icon: '📊' },
-          { path: '/about', label: 'Site', icon: '🌐', isAbsolute: true },
-          { path: 'favorites', label: 'Favorites', icon: '❤️' },
-          { path: 'orders', label: 'Order History', icon: '📦' },
-          { path: 'bookings', label: 'Bookings', icon: '📅' },
-          { path: 'specialist-bookings', label: 'Chef Bookings', icon: '👨‍🍳' },
-          { path: 'reviews', label: 'My Reviews', icon: '⭐' },
-          { path: 'promotions', label: 'Deals', icon: '🎉' },
-          { path: 'wallet', label: 'Wallet', icon: '💳' },
-          { path: 'social', label: 'Social', icon: '👥' },
-          { path: 'preferences', label: 'Preferences', icon: '🎯' },
-          { path: 'profile', label: 'Profile', icon: '👤' }
+          { path: 'overview', label: 'Overview', icon: this.BarChart3 },
+          { path: '/about', label: 'Site', icon: this.Globe, isAbsolute: true },
+          { path: 'favorites', label: 'Favorites', icon: this.Heart },
+          { path: 'orders', label: 'Order History', icon: this.Package },
+          { path: 'bookings', label: 'Bookings', icon: this.Calendar },
+          { path: 'specialist-bookings', label: 'Chef Bookings', icon: this.ChefHat },
+          { path: 'reviews', label: 'My Reviews', icon: this.Star },
+          { path: 'promotions', label: 'Deals', icon: this.PartyPopper },
+          { path: 'wallet', label: 'Wallet', icon: this.CreditCard },
+          { path: 'social', label: 'Social', icon: this.Users },
+          { path: 'preferences', label: 'Preferences', icon: this.Target },
+          { path: 'profile', label: 'Profile', icon: this.User }
         ];
     }
   });
