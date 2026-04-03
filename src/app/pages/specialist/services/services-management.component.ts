@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { LucideAngularModule, UtensilsCrossed, AlertTriangle, CheckCircle } from 'lucide-angular';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SpecialistService, SpecialistServiceItem, ServiceTypeOption } from '../../../core/services/specialist.service';
@@ -9,7 +10,7 @@ import { Specialist } from '../../../shared/models/user.model';
 @Component({
   selector: 'app-services-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, LucideAngularModule],
   templateUrl: './services-management.component.html',
   styleUrls: ['./services-management.component.scss']
 })
@@ -20,6 +21,11 @@ export class ServicesManagementComponent implements OnInit {
 
   currentUser = this.authService.currentUser;
   specialist = computed(() => this.currentUser() as Specialist);
+
+  // Lucide Icons
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly AlertTriangle = AlertTriangle;
+  readonly CheckCircle = CheckCircle;
 
   // State management
   loading = signal(false);

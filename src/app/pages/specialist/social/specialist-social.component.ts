@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { LucideAngularModule, Star, Heart, Calendar, Link, ClipboardList, User, Users, Newspaper, Search } from 'lucide-angular';
+import { LucideAngularModule, Star, Heart, Calendar, Link, ClipboardList, User, Users, Newspaper, Search, MessageCircle } from 'lucide-angular';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { SocialWidgetComponent } from '../../../shared/components/social-widget/social-widget.component';
@@ -45,6 +45,7 @@ export class SpecialistSocialComponent implements OnInit {
   readonly Users = Users;
   readonly Newspaper = Newspaper;
   readonly Search = Search;
+  readonly MessageCircle = MessageCircle;
   private http = inject(HttpClient);
   private router = inject(Router);
   private messagingService = inject(MessagingService);

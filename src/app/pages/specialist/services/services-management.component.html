@@ -4,7 +4,7 @@
     <div class="header-content">
       <div class="title-section">
         <h1 class="page-title">
-          <span class="title-icon">🍽️</span>
+          <lucide-icon [img]="UtensilsCrossed" [size]="32" class="title-icon"></lucide-icon>
           Manage Services
         </h1>
         <p class="page-subtitle">
@@ -26,13 +26,13 @@
   <!-- Success/Error Messages -->
   @if (successMessage()) {
     <div class="alert alert-success">
-      <span class="alert-icon">✓</span>
+      <lucide-icon [img]="CheckCircle" [size]="20" class="alert-icon"></lucide-icon>
       {{ successMessage() }}
     </div>
   }
   @if (error()) {
     <div class="alert alert-error">
-      <span class="alert-icon">⚠️</span>
+      <lucide-icon [img]="AlertTriangle" [size]="20" class="alert-icon"></lucide-icon>
       {{ error() }}
     </div>
   }
