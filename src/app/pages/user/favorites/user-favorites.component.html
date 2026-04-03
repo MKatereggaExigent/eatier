@@ -4,7 +4,7 @@
     <div class="header-content">
       <div class="title-section">
         <h1 class="page-title">
-          <span class="title-icon">❤️</span>
+          <lucide-icon [img]="Heart" [size]="32" class="title-icon"></lucide-icon>
           My Favorites
         </h1>
         <p class="page-subtitle">
@@ -61,7 +61,7 @@
           [class.active]="showFilters()"
           (click)="toggleFilters()"
           aria-label="Toggle filters">
-          <span class="btn-icon">🎛️</span>
+          <lucide-icon [img]="SlidersHorizontal" [size]="16" class="btn-icon"></lucide-icon>
           <span class="btn-text">Filters</span>
           @if (hasActiveFilters()) {
             <span class="filter-badge">{{ filteredFavorites().length }}</span>
@@ -177,7 +177,7 @@
   <section class="favorites-section">
     <div class="section-header">
       <h2 class="section-title">
-        <span class="title-icon">🍽️</span>
+        <lucide-icon [img]="UtensilsCrossed" [size]="20" class="title-icon"></lucide-icon>
         All Favorites
         <span class="count-badge">{{ filteredFavorites().length }}</span>
       </h2>
@@ -198,11 +198,10 @@
             Clear Filters
           </button>
         } @else {
-          <div class="empty-icon">❤️</div>
+          <lucide-icon [img]="Heart" [size]="48" class="empty-icon"></lucide-icon>
           <h3>No favorites yet</h3>
           <p>Start exploring restaurants and add them to your favorites!</p>
           <a routerLink="/restaurants" class="btn-primary">
-            <span class="btn-icon">🔍</span>
             Discover Restaurants
           </a>
         }
@@ -219,14 +218,14 @@
                   class="action-btn view-btn"
                   (click)="viewRestaurant(favorite.restaurant)"
                   aria-label="View restaurant details">
-                  <span class="btn-icon">👁️</span>
+                  <lucide-icon [img]="Eye" [size]="16" class="btn-icon"></lucide-icon>
                 </button>
                 <button
                   type="button"
                   class="action-btn reserve-btn"
                   (click)="makeReservation(favorite.restaurant)"
                   aria-label="Make reservation">
-                  <span class="btn-icon">📅</span>
+                  <lucide-icon [img]="Calendar" [size]="16" class="btn-icon"></lucide-icon>
                 </button>
               </div>
               @if ($any(favorite.restaurant).isOpen) {
@@ -266,7 +265,7 @@
 
               @if (favorite.notes) {
                 <div class="favorite-notes">
-                  <span class="notes-icon">📝</span>
+                  <lucide-icon [img]="FileText" [size]="14" class="notes-icon"></lucide-icon>
                   <span class="notes-text">{{ favorite.notes }}</span>
                 </div>
               }
@@ -285,14 +284,14 @@
                     class="action-btn edit-btn"
                     (click)="editNotes(favorite)"
                     aria-label="Edit notes">
-                    <span class="btn-icon">✏️</span>
+                    <lucide-icon [img]="Edit" [size]="16" class="btn-icon"></lucide-icon>
                   </button>
                   <button
                     type="button"
                     class="action-btn remove-btn"
                     (click)="removeFromFavorites(favorite)"
                     aria-label="Remove from favorites">
-                    <span class="btn-icon">🗑️</span>
+                    <lucide-icon [img]="Trash2" [size]="16" class="btn-icon"></lucide-icon>
                   </button>
                 </div>
               </div>

@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { LucideAngularModule, Heart, UtensilsCrossed, Eye, Calendar, FileText, Edit, Trash2, SlidersHorizontal } from 'lucide-angular';
 import { FavoritesService, FavoriteItem, FavoritesStats, FavoriteCollection, Restaurant } from '../../../services/favorites.service';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -27,7 +28,7 @@ interface FilterOptions {
 @Component({
   selector: 'app-user-favorites',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule],
   templateUrl: './user-favorites.component.html',
   styleUrls: ['./user-favorites.component.scss']
 })
@@ -36,6 +37,16 @@ export class UserFavoritesComponent implements OnInit {
   private authService = inject(AuthService);
 
   currentUser = this.authService.currentUser;
+
+  // Lucide Icons
+  readonly Heart = Heart;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Eye = Eye;
+  readonly Calendar = Calendar;
+  readonly FileText = FileText;
+  readonly Edit = Edit;
+  readonly Trash2 = Trash2;
+  readonly SlidersHorizontal = SlidersHorizontal;
 
   // State management
   isLoading = signal(false);
