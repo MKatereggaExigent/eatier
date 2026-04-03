@@ -2,7 +2,10 @@
   <!-- Header -->
   <div class="community-header">
     <div class="header-content">
-      <h1>🌟 Community</h1>
+      <h1>
+        <lucide-icon [img]="Star" [size]="32" style="display: inline-block; vertical-align: middle; margin-right: 8px;"></lucide-icon>
+        Community
+      </h1>
       <p>Connect with chefs, restaurants, and food lovers from around the world</p>
     </div>
   </div>
@@ -15,7 +18,7 @@
       [class.active]="activeTab() === 'feed'"
       (click)="setActiveTab('feed')"
     >
-      🏠 Feed
+      <lucide-icon [img]="Home" [size]="18"></lucide-icon> Feed
     </button>
     <button
       type="button"
@@ -23,7 +26,7 @@
       [class.active]="activeTab() === 'trending'"
       (click)="setActiveTab('trending')"
     >
-      🔥 Trending
+      <lucide-icon [img]="Flame" [size]="18"></lucide-icon> Trending
     </button>
     <button
       type="button"
@@ -31,7 +34,7 @@
       [class.active]="activeTab() === 'chefs'"
       (click)="setActiveTab('chefs')"
     >
-      👨‍🍳 Featured Chefs
+      <lucide-icon [img]="ChefHat" [size]="18"></lucide-icon> Featured Chefs
     </button>
     <button
       type="button"
@@ -194,7 +197,10 @@
       <div class="trending-section">
         <!-- Section Header -->
         <div class="section-header">
-          <h2>🔥 Trending Topics</h2>
+          <h2>
+            <lucide-icon [img]="Flame" [size]="24" style="display: inline-block; vertical-align: middle; margin-right: 8px;"></lucide-icon>
+            Trending Topics
+          </h2>
           <p class="section-subtitle">Discover what the culinary community is talking about</p>
         </div>
 
@@ -209,17 +215,21 @@
             @for (topic of trendingTopics().slice(0, 12); track topic.name; let i = $index) {
               <div class="trending-topic-card" [class.top-3]="i < 3">
                 <div class="rank-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
-                  {{ i < 3 ? '' : '#' + (i + 1) }}
-                  @if (i === 0) { 🥇 }
-                  @if (i === 1) { 🥈 }
-                  @if (i === 2) { 🥉 }
+                  @if (i < 3) {
+                    <lucide-icon [img]="Star" [size]="16"></lucide-icon>
+                  } @else {
+                    #{{ i + 1 }}
+                  }
                 </div>
                 <div class="topic-content">
                   <span class="topic-name">{{ topic.name }}</span>
                   <div class="topic-stats">
                     <span class="topic-count">{{ topic.count.toLocaleString() }} posts</span>
                     @if (i < 3) {
-                      <span class="trending-badge">🔥 Hot</span>
+                      <span class="trending-badge">
+                        <lucide-icon [img]="Flame" [size]="14" style="display: inline-block; vertical-align: middle;"></lucide-icon>
+                        Hot
+                      </span>
                     }
                   </div>
                 </div>
@@ -280,13 +290,18 @@
       <div class="chefs-section">
         <!-- Section Header -->
         <div class="section-header">
-          <h2>👨‍🍳 Featured Chefs</h2>
+          <h2>
+            <lucide-icon [img]="ChefHat" [size]="24" style="display: inline-block; vertical-align: middle; margin-right: 8px;"></lucide-icon>
+            Featured Chefs
+          </h2>
           <p class="section-subtitle">Meet the culinary experts in our community</p>
         </div>
 
         @if (featuredChefs().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">👨‍🍳</div>
+            <div class="empty-icon">
+              <lucide-icon [img]="ChefHat" [size]="48"></lucide-icon>
+            </div>
             <h3>No featured chefs yet</h3>
             <p>Our culinary experts will appear here soon. Are you a chef? Register as a specialist!</p>
             <button type="button" class="cta-btn" routerLink="/specialists">Become a Chef →</button>
@@ -299,7 +314,9 @@
               <div class="spotlight-content">
                 <div class="spotlight-avatar-wrapper">
                   <img [src]="featuredChefs()[0].avatar" [alt]="featuredChefs()[0].name" class="spotlight-avatar" title="{{ featuredChefs()[0].name }}" />
-                  <div class="verified-badge">✓</div>
+                  <div class="verified-badge">
+                    <lucide-icon [img]="Check" [size]="16"></lucide-icon>
+                  </div>
                 </div>
                 <div class="spotlight-info">
                   <h3>{{ featuredChefs()[0].name }}</h3>
@@ -321,7 +338,12 @@
                     [class.following]="featuredChefs()[0].isFollowing"
                     (click)="followChef(featuredChefs()[0])"
                   >
-                    {{ featuredChefs()[0].isFollowing ? '✓ Following' : '+ Follow Chef' }}
+                    @if (featuredChefs()[0].isFollowing) {
+                      <lucide-icon [img]="Check" [size]="16" style="display: inline-block; vertical-align: middle; margin-right: 4px;"></lucide-icon>
+                      Following
+                    } @else {
+                      + Follow Chef
+                    }
                   </button>
                 </div>
               </div>
@@ -336,7 +358,10 @@
                 <div class="chef-card" [class.verified]="i < 2">
                   <div class="card-header">
                     @if (i < 2) {
-                      <span class="chef-badge verified">✓ Verified</span>
+                      <span class="chef-badge verified">
+                        <lucide-icon [img]="Check" [size]="14" style="display: inline-block; vertical-align: middle; margin-right: 4px;"></lucide-icon>
+                        Verified
+                      </span>
                     }
                   </div>
                   <div class="avatar-wrapper">
@@ -357,7 +382,12 @@
                       [class.following]="chef.isFollowing"
                       (click)="followChef(chef)"
                     >
-                      {{ chef.isFollowing ? '✓ Following' : '+ Follow' }}
+                      @if (chef.isFollowing) {
+                        <lucide-icon [img]="Check" [size]="14" style="display: inline-block; vertical-align: middle; margin-right: 4px;"></lucide-icon>
+                        Following
+                      } @else {
+                        + Follow
+                      }
                     </button>
                   </div>
                 </div>
@@ -369,7 +399,9 @@
         <!-- Become a Chef CTA -->
         <div class="become-chef-cta">
           <div class="cta-content">
-            <div class="cta-icon">🍳</div>
+            <div class="cta-icon">
+              <lucide-icon [img]="ChefHat" [size]="48"></lucide-icon>
+            </div>
             <div class="cta-text">
               <h3>Are you a chef?</h3>
               <p>Join our community of culinary experts and share your passion with food lovers.</p>
@@ -392,7 +424,9 @@
         <!-- Login Required Message -->
         @if (!isAuthenticated()) {
           <div class="login-required-card">
-            <div class="login-icon">🔐</div>
+            <div class="login-icon">
+              <lucide-icon [img]="Lock" [size]="48"></lucide-icon>
+            </div>
             <h3>Login Required</h3>
             <p>You need to be logged in to create a post and share your culinary experiences with the community.</p>
             <a routerLink="/auth/login" class="login-btn">Log In to Continue</a>
@@ -406,7 +440,9 @@
             <!-- Success Message -->
             @if (postSuccessMessage()) {
               <div class="success-message">
-                <span class="success-icon">✓</span>
+                <span class="success-icon">
+                  <lucide-icon [img]="Check" [size]="20"></lucide-icon>
+                </span>
                 {{ postSuccessMessage() }}
               </div>
             }
@@ -415,7 +451,9 @@
               <!-- Content Section -->
               <div class="form-section">
                 <div class="section-label">
-                  <span class="label-icon">💭</span>
+                  <span class="label-icon">
+                    <lucide-icon [img]="MessageCircle" [size]="18"></lucide-icon>
+                  </span>
                   <span class="label-text">Your Message</span>
                 </div>
                 <div class="form-group">
@@ -456,7 +494,9 @@
               <!-- Images Section -->
               <div class="form-section">
                 <div class="section-label">
-                  <span class="label-icon">📸</span>
+                  <span class="label-icon">
+                    <lucide-icon [img]="Camera" [size]="18"></lucide-icon>
+                  </span>
                   <span class="label-text">Add Images</span>
                   <span class="optional-badge">Optional</span>
                 </div>
@@ -574,14 +614,21 @@
           <!-- Tips Sidebar -->
           <div class="tips-sidebar">
             <div class="tips-card">
-              <h4>💡 Posting Tips</h4>
+              <h4>
+                <lucide-icon [img]="Lightbulb" [size]="18" style="display: inline-block; vertical-align: middle; margin-right: 6px;"></lucide-icon>
+                Posting Tips
+              </h4>
               <ul class="tips-list">
                 <li>
-                  <span class="tip-icon">📝</span>
+                  <span class="tip-icon">
+                    <lucide-icon [img]="FileText" [size]="16"></lucide-icon>
+                  </span>
                   <span>Be descriptive - share the story behind your dish</span>
                 </li>
                 <li>
-                  <span class="tip-icon">📸</span>
+                  <span class="tip-icon">
+                    <lucide-icon [img]="Camera" [size]="16"></lucide-icon>
+                  </span>
                   <span>Add high-quality photos to attract more engagement</span>
                 </li>
                 <li>
@@ -600,7 +647,10 @@
             </div>
 
             <div class="guidelines-card">
-              <h4>📋 Community Guidelines</h4>
+              <h4>
+                <lucide-icon [img]="FileText" [size]="18" style="display: inline-block; vertical-align: middle; margin-right: 6px;"></lucide-icon>
+                Community Guidelines
+              </h4>
               <ul class="guidelines-list">
                 <li>Be respectful and constructive</li>
                 <li>Share original content when possible</li>

@@ -1,7 +1,7 @@
 import { CommunityService, FeaturedChef, CommunityPost as ServiceCommunityPost, TrendingTopic } from '../../core/services/community.service';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LucideAngularModule, PenSquare, Heart, MessageCircle, Share2, Star, BarChart3, TrendingUp, Tag, Trash2, Clock } from 'lucide-angular';
+import { LucideAngularModule, PenSquare, Heart, MessageCircle, Share2, Star, BarChart3, TrendingUp, Tag, Trash2, Clock, Home, Flame, ChefHat, Check, FileText, Camera, Lightbulb, Lock } from 'lucide-angular';
 
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -54,6 +54,14 @@ export class CommunityComponent implements OnInit {
   readonly Tag = Tag;
   readonly Trash2 = Trash2;
   readonly Clock = Clock;
+  readonly Home = Home;
+  readonly Flame = Flame;
+  readonly ChefHat = ChefHat;
+  readonly Check = Check;
+  readonly FileText = FileText;
+  readonly Camera = Camera;
+  readonly Lightbulb = Lightbulb;
+  readonly Lock = Lock;
   private fb = inject(FormBuilder);
   private communityService = inject(CommunityService);
   private authService = inject(AuthService);
