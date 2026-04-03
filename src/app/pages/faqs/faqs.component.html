@@ -4,7 +4,9 @@
     <div class="header-content">
       <div class="title-section">
         <h1 class="page-title">
-          <span class="title-icon">❓</span>
+          <span class="title-icon">
+            <lucide-icon [img]="HelpCircle" [size]="36"></lucide-icon>
+          </span>
           Frequently Asked Questions
         </h1>
         <p class="page-subtitle">
@@ -35,7 +37,9 @@
           (ngModelChange)="searchQuery.set($event)"
           class="search-input"
           aria-label="Search frequently asked questions">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">
+          <lucide-icon [img]="Search" [size]="20"></lucide-icon>
+        </span>
       </div>
 
       <div class="filter-section">
@@ -46,7 +50,9 @@
             [class.active]="selectedCategory() === 'all'"
             (click)="selectedCategory.set('all')"
             aria-label="Show all categories">
-            <span class="filter-icon">📋</span>
+            <span class="filter-icon">
+              <lucide-icon [img]="ClipboardList" [size]="18"></lucide-icon>
+            </span>
             <span class="filter-text">All</span>
           </button>
 
@@ -58,7 +64,9 @@
               [class]="category.color"
               (click)="selectedCategory.set(category.id)"
               [attr.aria-label]="'Filter by ' + category.name">
-              <span class="filter-icon">{{ category.icon }}</span>
+              <span class="filter-icon">
+                <lucide-icon [img]="getCategoryIcon(category.icon)" [size]="18"></lucide-icon>
+              </span>
               <span class="filter-text">{{ category.name }}</span>
             </button>
           }
@@ -84,7 +92,9 @@
         @for (category of faqCategories(); track category.id) {
           <div class="category-card" [class]="category.color">
             <div class="category-header">
-              <div class="category-icon">{{ category.icon }}</div>
+              <div class="category-icon">
+                <lucide-icon [img]="getCategoryIcon(category.icon)" [size]="28"></lucide-icon>
+              </div>
               <div class="category-info">
                 <h3 class="category-name">{{ category.name }}</h3>
                 <p class="category-description">{{ category.description }}</p>
@@ -110,7 +120,9 @@
   <section class="faqs-results" aria-label="FAQ Results">
     @if (filteredFAQs().length === 0) {
       <div class="empty-state">
-        <div class="empty-icon">🔍</div>
+        <div class="empty-icon">
+          <lucide-icon [img]="Search" [size]="48"></lucide-icon>
+        </div>
         <h3>No FAQs found</h3>
         @if (searchQuery()) {
           <p>No results found for "{{ searchQuery() }}". Try different keywords or browse categories.</p>
@@ -168,14 +180,14 @@
                         class="helpful-btn yes"
                         (click)="markHelpful(faq, true)"
                         aria-label="Mark as helpful">
-                        👍 Yes
+                        <lucide-icon [img]="ThumbsUp" [size]="16"></lucide-icon> Yes
                       </button>
                       <button
                         type="button"
                         class="helpful-btn no"
                         (click)="markHelpful(faq, false)"
                         aria-label="Mark as not helpful">
-                        👎 No
+                        <lucide-icon [img]="ThumbsDown" [size]="16"></lucide-icon> No
                       </button>
                     </div>
                   </div>
@@ -185,7 +197,7 @@
                     class="feedback-btn"
                     (click)="openFeedbackModal(faq)"
                     aria-label="Provide feedback on this FAQ">
-                    💬 Feedback
+                    <lucide-icon [img]="MessageCircle" [size]="16"></lucide-icon> Feedback
                   </button>
                 </div>
               </div>
@@ -204,22 +216,30 @@
         <p>Can't find what you're looking for? Our support team is here to help!</p>
         <div class="support-actions">
           <a href="/help" class="btn-primary" routerLink="/help">
-            <span class="btn-icon">💬</span>
+            <span class="btn-icon">
+              <lucide-icon [img]="MessageCircle" [size]="18"></lucide-icon>
+            </span>
             Contact Support
           </a>
           <a href="/feedback" class="btn-secondary" routerLink="/feedback">
-            <span class="btn-icon">📝</span>
+            <span class="btn-icon">
+              <lucide-icon [img]="FileText" [size]="18"></lucide-icon>
+            </span>
             Send Feedback
           </a>
         </div>
       </div>
       <div class="support-stats">
         <div class="stat-item">
-          <span class="stat-icon">⚡</span>
+          <span class="stat-icon">
+            <lucide-icon [img]="Zap" [size]="20"></lucide-icon>
+          </span>
           <span class="stat-text">Average response time: 2 hours</span>
         </div>
         <div class="stat-item">
-          <span class="stat-icon">🎯</span>
+          <span class="stat-icon">
+            <lucide-icon [img]="Target" [size]="20"></lucide-icon>
+          </span>
           <span class="stat-text">98% satisfaction rate</span>
         </div>
       </div>

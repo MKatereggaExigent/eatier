@@ -1,4 +1,5 @@
 import { Component, computed, signal } from '@angular/core';
+import { LucideAngularModule, HelpCircle, Search, ClipboardList, Rocket, Store, UtensilsCrossed, ChefHat, Wrench, Lock, MessageCircle, FileText, Zap, Target, ThumbsUp, ThumbsDown } from 'lucide-angular';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -37,9 +38,26 @@ interface FAQStats {
   standalone: true,
   templateUrl: './faqs.component.html',
   styleUrls: ['./faqs.component.scss'],
-  imports: [CommonModule, FormsModule, RouterModule]
+  imports: [CommonModule, FormsModule, RouterModule, LucideAngularModule]
 })
 export class FaqsComponent {
+  // Lucide Icons
+  readonly HelpCircle = HelpCircle;
+  readonly Search = Search;
+  readonly ClipboardList = ClipboardList;
+  readonly Rocket = Rocket;
+  readonly Store = Store;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly ChefHat = ChefHat;
+  readonly Wrench = Wrench;
+  readonly Lock = Lock;
+  readonly MessageCircle = MessageCircle;
+  readonly FileText = FileText;
+  readonly Zap = Zap;
+  readonly Target = Target;
+  readonly ThumbsUp = ThumbsUp;
+  readonly ThumbsDown = ThumbsDown;
+
   // State management
   searchQuery = signal('');
   selectedCategory = signal('all');
@@ -53,7 +71,7 @@ export class FaqsComponent {
       id: 'getting-started',
       name: 'Getting Started',
       description: 'Everything you need to know to begin your Itiyum journey',
-      icon: '🚀',
+      icon: 'rocket',
       color: 'category-getting-started',
       faqs: [
         {
@@ -102,7 +120,7 @@ export class FaqsComponent {
       id: 'business-owners',
       name: 'Business Owners',
       description: 'Restaurant and business management on Itiyum',
-      icon: '🏪',
+      icon: 'store',
       color: 'category-business',
       faqs: [
         {
@@ -161,7 +179,7 @@ export class FaqsComponent {
       id: 'food-enthusiasts',
       name: 'Food Enthusiasts',
       description: 'Advanced features for passionate food lovers',
-      icon: '🍽️',
+      icon: 'utensils-crossed',
       color: 'category-enthusiast',
       faqs: [
         {
@@ -210,7 +228,7 @@ export class FaqsComponent {
       id: 'specialists',
       name: 'Specialists',
       description: 'Professional chef and catering services',
-      icon: '👨‍🍳',
+      icon: 'chef-hat',
       color: 'category-specialist',
       faqs: [
         {
@@ -249,7 +267,7 @@ export class FaqsComponent {
       id: 'technical',
       name: 'Technical Support',
       description: 'Technical issues and troubleshooting',
-      icon: '🔧',
+      icon: 'wrench',
       color: 'category-technical',
       faqs: [
         {
@@ -288,7 +306,7 @@ export class FaqsComponent {
       id: 'privacy-security',
       name: 'Privacy & Security',
       description: 'Account security and privacy settings',
-      icon: '🔒',
+      icon: 'lock',
       color: 'category-security',
       faqs: [
         {
@@ -444,5 +462,17 @@ export class FaqsComponent {
 
   getCategoryById(categoryId: string): FAQCategory | undefined {
     return this.faqCategories().find(cat => cat.id === categoryId);
+  }
+
+  getCategoryIcon(iconId: string): any {
+    switch(iconId) {
+      case 'rocket': return this.Rocket;
+      case 'store': return this.Store;
+      case 'utensils-crossed': return this.UtensilsCrossed;
+      case 'chef-hat': return this.ChefHat;
+      case 'wrench': return this.Wrench;
+      case 'lock': return this.Lock;
+      default: return this.HelpCircle;
+    }
   }
 }
