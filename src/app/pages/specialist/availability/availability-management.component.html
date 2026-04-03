@@ -4,7 +4,7 @@
     <div class="header-content">
       <div class="title-section">
         <h1 class="page-title">
-          <span class="title-icon">📅</span>
+          <lucide-icon [img]="Calendar" [size]="28" class="title-icon"></lucide-icon>
           Availability Management
         </h1>
         <p class="page-subtitle">
@@ -33,37 +33,37 @@
       (click)="setActiveTab('weekly')"
       role="tab"
       [attr.aria-selected]="activeTab() === 'weekly'">
-      <span class="tab-icon">📋</span>
+      <lucide-icon [img]="ClipboardList" [size]="18" class="tab-icon"></lucide-icon>
       Weekly Schedule
     </button>
-    <button 
+    <button
       type="button"
       class="tab-btn"
       [class.active]="activeTab() === 'special'"
       (click)="setActiveTab('special')"
       role="tab"
       [attr.aria-selected]="activeTab() === 'special'">
-      <span class="tab-icon">🗓️</span>
+      <lucide-icon [img]="CalendarDays" [size]="18" class="tab-icon"></lucide-icon>
       Special Dates
     </button>
-    <button 
+    <button
       type="button"
       class="tab-btn"
       [class.active]="activeTab() === 'rules'"
       (click)="setActiveTab('rules')"
       role="tab"
       [attr.aria-selected]="activeTab() === 'rules'">
-      <span class="tab-icon">⚙️</span>
+      <lucide-icon [img]="SettingsIcon" [size]="18" class="tab-icon"></lucide-icon>
       Booking Rules
     </button>
-    <button 
+    <button
       type="button"
       class="tab-btn"
       [class.active]="activeTab() === 'calendar'"
       (click)="setActiveTab('calendar')"
       role="tab"
       [attr.aria-selected]="activeTab() === 'calendar'">
-      <span class="tab-icon">📆</span>
+      <lucide-icon [img]="Calendar" [size]="18" class="tab-icon"></lucide-icon>
       Calendar View
     </button>
   </nav>
@@ -125,20 +125,20 @@
                           class="time-input">
                       </div>
                       <div class="slot-actions">
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           class="toggle-availability-btn"
                           [class.available]="slot.isAvailable"
                           (click)="toggleTimeSlotAvailability(dayIndex, slot.id)"
                           [title]="slot.isAvailable ? 'Mark as unavailable' : 'Mark as available'">
-                          {{ slot.isAvailable ? '✅' : '❌' }}
+                          <lucide-icon [img]="slot.isAvailable ? CheckCircle : XCircle" [size]="16"></lucide-icon>
                         </button>
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           class="remove-slot-btn"
                           (click)="removeTimeSlot(dayIndex, slot.id)"
                           title="Remove time slot">
-                          🗑️
+                          <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
                         </button>
                       </div>
                     </div>
@@ -170,7 +170,7 @@
 
       @if (specialDates().length === 0) {
         <div class="empty-state">
-          <div class="empty-icon">📅</div>
+          <lucide-icon [img]="Calendar" [size]="48" class="empty-icon"></lucide-icon>
           <h3>No special dates set</h3>
           <p>Add holidays, special hours, or unavailable dates</p>
           <button type="button" class="add-btn primary" (click)="openSpecialDateModal()">
@@ -208,10 +208,10 @@
               </div>
               <div class="date-actions">
                 <button type="button" class="action-btn" (click)="openSpecialDateModal(specialDate)" title="Edit">
-                  ✏️
+                  <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
                 </button>
                 <button type="button" class="action-btn delete" (click)="deleteSpecialDate(specialDate.id)" title="Delete">
-                  🗑️
+                  <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
                 </button>
               </div>
             </div>
@@ -235,7 +235,7 @@
 
       @if (bookingRules().length === 0) {
         <div class="empty-state">
-          <div class="empty-icon">⚙️</div>
+          <lucide-icon [img]="SettingsIcon" [size]="48" class="empty-icon"></lucide-icon>
           <h3>No booking rules set</h3>
           <p>Add rules to control how clients can book your services</p>
           <button type="button" class="add-btn primary" (click)="openRuleModal()">
@@ -265,10 +265,10 @@
               </div>
               <div class="rule-actions">
                 <button type="button" class="action-btn" (click)="openRuleModal(rule)" title="Edit">
-                  ✏️
+                  <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
                 </button>
                 <button type="button" class="action-btn delete" (click)="deleteRule(rule.id)" title="Delete">
-                  🗑️
+                  <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
                 </button>
               </div>
             </div>
@@ -318,14 +318,14 @@
                 @if (day.specialDate) {
                   <div class="special-indicator" [class]="'type-' + day.specialDate.type">
                     @switch (day.specialDate.type) {
-                      @case ('unavailable') { ❌ }
-                      @case ('special_hours') { ⏰ }
-                      @case ('holiday') { 🎉 }
+                      @case ('unavailable') { <lucide-icon [img]="XCircle" [size]="12"></lucide-icon> }
+                      @case ('special_hours') { <lucide-icon [img]="Clock" [size]="12"></lucide-icon> }
+                      @case ('holiday') { <lucide-icon [img]="PartyPopper" [size]="12"></lucide-icon> }
                     }
                   </div>
                 }
                 @if (!day.weeklyAvailable && day.isCurrentMonth && !day.specialDate) {
-                  <div class="weekly-unavailable">🚫</div>
+                  <div class="weekly-unavailable"><lucide-icon [img]="XCircle" [size]="12"></lucide-icon></div>
                 }
               </div>
             }

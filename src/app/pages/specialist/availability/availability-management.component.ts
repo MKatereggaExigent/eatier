@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LucideAngularModule, Calendar, CalendarDays, Settings as SettingsIcon, Edit, Trash2, CheckCircle, XCircle, PartyPopper } from 'lucide-angular';
+import { LucideAngularModule, Calendar, CalendarDays, Settings as SettingsIcon, Edit, Trash2, CheckCircle, XCircle, PartyPopper, ClipboardList, Clock } from 'lucide-angular';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { Specialist } from '../../../shared/models/user.model';
@@ -54,6 +54,8 @@ export class AvailabilityManagementComponent {
   readonly CheckCircle = CheckCircle;
   readonly XCircle = XCircle;
   readonly PartyPopper = PartyPopper;
+  readonly ClipboardList = ClipboardList;
+  readonly Clock = Clock;
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
 
