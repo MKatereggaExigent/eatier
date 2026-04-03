@@ -17,7 +17,7 @@
           <span class="loading-spinner"></span>
           Exporting...
         } @else {
-          📄 Export PDF
+          <lucide-icon [img]="FileText" [size]="16"></lucide-icon> Export PDF
         }
       </button>
     </div>
@@ -34,7 +34,7 @@
           (click)="onPeriodChange(option.value)"
           [disabled]="isLoading()"
         >
-          {{ option.icon }} {{ option.label }}
+          <lucide-icon [img]="option.icon" [size]="16"></lucide-icon> {{ option.label }}
         </button>
       }
     </div>
@@ -78,7 +78,7 @@
       <h3>Profile Metrics</h3>
       <div class="metrics-grid">
         <div class="metric-card primary">
-          <div class="metric-icon">👁️</div>
+          <lucide-icon [img]="Eye" [size]="32" class="metric-icon"></lucide-icon>
           <div class="metric-content">
             <h4>{{ formatNumber(insights()!.metrics.profileViews) }}</h4>
             <p>Profile Views</p>
@@ -86,7 +86,7 @@
         </div>
 
         <div class="metric-card">
-          <div class="metric-icon">👥</div>
+          <lucide-icon [img]="Users" [size]="32" class="metric-icon"></lucide-icon>
           <div class="metric-content">
             <h4>{{ formatNumber(insights()!.metrics.uniqueVisitors) }}</h4>
             <p>Unique Visitors</p>
@@ -94,7 +94,7 @@
         </div>
 
         <div class="metric-card">
-          <div class="metric-icon">📞</div>
+          <lucide-icon [img]="Phone" [size]="32" class="metric-icon"></lucide-icon>
           <div class="metric-content">
             <h4>{{ formatNumber(insights()!.metrics.contactClicks) }}</h4>
             <p>Contact Clicks</p>
@@ -102,7 +102,7 @@
         </div>
 
         <div class="metric-card">
-          <div class="metric-icon">📱</div>
+          <lucide-icon [img]="Smartphone" [size]="32" class="metric-icon"></lucide-icon>
           <div class="metric-content">
             <h4>{{ formatNumber(insights()!.metrics.qrScans) }}</h4>
             <p>QR Code Scans</p>
@@ -110,7 +110,7 @@
         </div>
 
         <div class="metric-card">
-          <div class="metric-icon">🖼️</div>
+          <lucide-icon [img]="Image" [size]="32" class="metric-icon"></lucide-icon>
           <div class="metric-content">
             <h4>{{ formatNumber(insights()!.metrics.portfolioViews) }}</h4>
             <p>Portfolio Views</p>
@@ -118,7 +118,7 @@
         </div>
 
         <div class="metric-card">
-          <div class="metric-icon">📤</div>
+          <lucide-icon [img]="Upload" [size]="32" class="metric-icon"></lucide-icon>
           <div class="metric-content">
             <h4>{{ formatNumber(insights()!.metrics.businessCardShares) }}</h4>
             <p>Card Shares</p>
@@ -133,7 +133,7 @@
       <div class="professional-grid">
         <div class="professional-card">
           <div class="professional-header">
-            <h4>💼 Inquiries</h4>
+            <h4><lucide-icon [img]="Briefcase" [size]="18"></lucide-icon> Inquiries</h4>
             <span class="professional-value">{{ insights()!.professional.inquiries }}</span>
           </div>
           <div class="professional-detail">
@@ -143,7 +143,7 @@
 
         <div class="professional-card">
           <div class="professional-header">
-            <h4>⭐ Average Rating</h4>
+            <h4><lucide-icon [img]="Star" [size]="18"></lucide-icon> Average Rating</h4>
             <span class="professional-value">{{ insights()!.professional.averageRating }}/5</span>
           </div>
           <div class="professional-level" [class]="getRatingLevel(insights()!.professional.averageRating).class">
@@ -153,7 +153,7 @@
 
         <div class="professional-card">
           <div class="professional-header">
-            <h4>📝 Reviews</h4>
+            <h4><lucide-icon [img]="FileText" [size]="18"></lucide-icon> Reviews</h4>
             <span class="professional-value">{{ insights()!.professional.reviewsReceived }}</span>
           </div>
           <div class="professional-detail">
@@ -229,7 +229,7 @@
       <div class="demographics-grid">
         <!-- Top Countries -->
         <div class="demo-card">
-          <h4>🌍 Top Countries</h4>
+          <h4><lucide-icon [img]="Globe" [size]="18"></lucide-icon> Top Countries</h4>
           <div class="demo-list">
             @for (country of insights()!.demographics.topCountries; track country.country) {
               <div class="demo-item">
@@ -248,7 +248,7 @@
 
         <!-- Device Types -->
         <div class="demo-card">
-          <h4>📱 Device Types</h4>
+          <h4><lucide-icon [img]="Smartphone" [size]="18"></lucide-icon> Device Types</h4>
           <div class="demo-list">
             @for (device of insights()!.demographics.deviceTypes; track device.type) {
               <div class="demo-item">
@@ -268,7 +268,7 @@
 
         <!-- Age Groups -->
         <div class="demo-card">
-          <h4>👥 Age Groups</h4>
+          <h4><lucide-icon [img]="Users" [size]="18"></lucide-icon> Age Groups</h4>
           <div class="demo-list">
             @for (age of insights()!.demographics.ageGroups; track age.range) {
               <div class="demo-item">

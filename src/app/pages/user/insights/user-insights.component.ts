@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { LucideAngularModule, Calendar, BarChart3, TrendingUp, ClipboardList, CalendarRange } from 'lucide-angular';
+import { LucideAngularModule, Calendar, BarChart3, TrendingUp, ClipboardList, CalendarRange, Eye, Users, Phone, Smartphone, Image, Upload, Briefcase, Star, FileText, Globe } from 'lucide-angular';
 
 import { CommonModule } from '@angular/common';
 import { UserInsights } from '../../../shared/models/user-profile.model';
@@ -21,6 +21,16 @@ export class UserInsightsComponent implements OnInit {
   readonly TrendingUp = TrendingUp;
   readonly ClipboardList = ClipboardList;
   readonly CalendarRange = CalendarRange;
+  readonly Eye = Eye;
+  readonly Users = Users;
+  readonly Phone = Phone;
+  readonly Smartphone = Smartphone;
+  readonly Image = Image;
+  readonly Upload = Upload;
+  readonly Briefcase = Briefcase;
+  readonly Star = Star;
+  readonly FileText = FileText;
+  readonly Globe = Globe;
 
   // State management
   insights = signal<UserInsights | null>(null);
