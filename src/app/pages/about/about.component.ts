@@ -4,11 +4,12 @@ import { BannerAdComponent } from '../../shared/components/ads/banner-ad/banner-
 import { CommonModule } from '@angular/common';
 import { PublicStatsService } from '../../core/services/public-stats.service';
 import { RouterModule } from '@angular/router';
+import { LucideAngularModule, Zap, Store, UtensilsCrossed, User, ChefHat, CheckCircle } from 'lucide-angular';
 
 interface UserGroup {
   id: string;
   title: string;
-  icon: string;
+  icon: any; // Changed from string to any for Lucide icons
   description: string;
   features: string[];
   color: string;
@@ -24,7 +25,7 @@ interface CarouselSlide {
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, RouterModule, BannerAdComponent],
+  imports: [CommonModule, RouterModule, BannerAdComponent, LucideAngularModule],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss'
 })
@@ -33,6 +34,9 @@ export class AboutComponent implements OnInit, OnDestroy {
 
   currentSlide = signal<number>(0);
   private carouselInterval: any;
+
+  // Lucide Icons
+  readonly CheckCircle = CheckCircle;
 
   // Stats will be populated from database
   stats = signal<Array<{ value: string; label: string }>>([
@@ -147,7 +151,7 @@ export class AboutComponent implements OnInit, OnDestroy {
     {
       id: 'itiyum',
       title: 'Itiyum Admins',
-      icon: '⚡',
+      icon: Zap,
       description: 'Platform administrators with full control and oversight of the entire Itiyum ecosystem.',
       features: [
         'Complete platform oversight and management',
@@ -162,7 +166,7 @@ export class AboutComponent implements OnInit, OnDestroy {
     {
       id: 'business',
       title: 'Business Owners',
-      icon: '🏪',
+      icon: Store,
       description: 'Restaurants, cafes, and food businesses looking to digitize their operations and reach more customers.',
       features: [
         'Digital menu management with real-time updates',
@@ -177,7 +181,7 @@ export class AboutComponent implements OnInit, OnDestroy {
     {
       id: 'food_enthusiast',
       title: 'Food Enthusiasts',
-      icon: '🍽️',
+      icon: UtensilsCrossed,
       description: 'Passionate foodies who love exploring new cuisines, sharing reviews, and connecting with the culinary community.',
       features: [
         'Discover and explore local eateries',
@@ -192,7 +196,7 @@ export class AboutComponent implements OnInit, OnDestroy {
     {
       id: 'normal_user',
       title: 'Regular Users',
-      icon: '👤',
+      icon: User,
       description: 'Everyday users looking for great places to eat, make reservations, and enjoy seamless dining experiences.',
       features: [
         'Browse and search restaurants',
@@ -207,7 +211,7 @@ export class AboutComponent implements OnInit, OnDestroy {
     {
       id: 'specialist',
       title: 'Culinary Specialists',
-      icon: '👨‍🍳',
+      icon: ChefHat,
       description: 'Professional chefs, caterers, and food specialists offering their services for events and special occasions.',
       features: [
         'Showcase your culinary portfolio',

@@ -85,7 +85,9 @@
       @for (group of userGroups; track group.id) {
         <article class="user-group-card" [attr.data-group]="group.id">
           <div class="card-header" [style.background]="group.gradient">
-            <div class="icon-wrapper">{{ group.icon }}</div>
+            <div class="icon-wrapper">
+              <lucide-icon [img]="group.icon" [size]="40"></lucide-icon>
+            </div>
             <h3 class="card-title">{{ group.title }}</h3>
           </div>
 
@@ -97,7 +99,7 @@
               <ul class="features-list">
                 @for (feature of group.features; track feature) {
                   <li class="feature-item">
-                    <span class="feature-icon">✓</span>
+                    <lucide-icon [img]="CheckCircle" [size]="16" class="feature-icon"></lucide-icon>
                     <span>{{ feature }}</span>
                   </li>
                 }
