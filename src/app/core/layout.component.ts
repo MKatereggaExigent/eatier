@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { LucideAngularModule, Search, ShoppingCart, Bell, User as UserIcon, Key, UserPlus, Hand, LayoutDashboard, Settings, LogOut, MessageSquare, HelpCircle, Lock } from 'lucide-angular';
 
 import { AuthService } from './services/auth.service';
 import { CartService } from './services/cart.service';
@@ -38,10 +39,26 @@ interface NavItem {
     FooterAdComponent,
     LeftSidebarAdComponent,
     RightSidebarAdComponent,
-    CartDrawerComponent
+    CartDrawerComponent,
+    LucideAngularModule
   ]
 })
 export class LayoutComponent {
+  // Lucide Icons
+  readonly Search = Search;
+  readonly ShoppingCart = ShoppingCart;
+  readonly Bell = Bell;
+  readonly UserIcon = UserIcon;
+  readonly Key = Key;
+  readonly UserPlus = UserPlus;
+  readonly Hand = Hand;
+  readonly LayoutDashboard = LayoutDashboard;
+  readonly Settings = Settings;
+  readonly LogOut = LogOut;
+  readonly MessageSquare = MessageSquare;
+  readonly HelpCircle = HelpCircle;
+  readonly Lock = Lock;
+
   // Inject services
   private router = inject(Router);
   protected authService = inject(AuthService);
@@ -98,15 +115,15 @@ export class LayoutComponent {
     // Guest navigation (not logged in)
     if (!isAuthenticated || !user) {
       return [
-        { label: 'About', icon: '🏠', route: '/about' },
-        { label: 'Grow', icon: '📈', route: '/grow' },
-        { label: 'Restaurants', icon: '🍽️', route: '/restaurants' },
-        { label: 'Specialists', icon: '👨‍🍳', route: '/specialists' },
-        { label: 'Pricing', icon: '💳', route: '/pricing' },
-        { label: 'Blog', icon: '📝', route: '/blog' },
-        { label: 'Community', icon: '🌟', route: '/community' },
-        { label: 'FAQs', icon: '❓', route: '/faqs' },
-        { label: 'Help', icon: '💬', route: '/help' }
+        { label: 'About', icon: '', route: '/about' },
+        { label: 'Grow', icon: '', route: '/grow' },
+        { label: 'Restaurants', icon: '', route: '/restaurants' },
+        { label: 'Specialists', icon: '', route: '/specialists' },
+        { label: 'Pricing', icon: '', route: '/pricing' },
+        { label: 'Blog', icon: '', route: '/blog' },
+        { label: 'Community', icon: '', route: '/community' },
+        { label: 'FAQs', icon: '', route: '/faqs' },
+        { label: 'Help', icon: '', route: '/help' }
       ];
     }
 
@@ -116,53 +133,53 @@ export class LayoutComponent {
     switch (role) {
       case 'itiyum_admin':
         return [
-          { label: 'Dashboard', icon: '📊', route: '/admin' },
-          { label: 'Users', icon: '👥', route: '/admin/users' },
-          { label: 'Businesses', icon: '🏢', route: '/admin/businesses' },
-          { label: 'Analytics', icon: '📈', route: '/admin/analytics' },
-          { label: 'Reports', icon: '📋', route: '/admin/reports' },
-          { label: 'Settings', icon: '⚙️', route: '/admin/settings' }
+          { label: 'Dashboard', icon: '', route: '/admin' },
+          { label: 'Users', icon: '', route: '/admin/users' },
+          { label: 'Businesses', icon: '', route: '/admin/businesses' },
+          { label: 'Analytics', icon: '', route: '/admin/analytics' },
+          { label: 'Reports', icon: '', route: '/admin/reports' },
+          { label: 'Settings', icon: '', route: '/admin/settings' }
         ];
 
       case 'business_owner':
         return [
-          { label: 'Dashboard', icon: '📊', route: '/dashboard/business' },
-          { label: 'Restaurants', icon: '🍽️', route: '/restaurants' },
-          { label: 'Bookings', icon: '📅', route: '/dashboard/business/bookings' },
-          { label: 'Menu', icon: '📜', route: '/dashboard/business/menu' },
-          { label: 'Reviews', icon: '⭐', route: '/dashboard/business/reviews' },
-          { label: 'Analytics', icon: '📈', route: '/dashboard/business/analytics' }
+          { label: 'Dashboard', icon: '', route: '/dashboard/business' },
+          { label: 'Restaurants', icon: '', route: '/restaurants' },
+          { label: 'Bookings', icon: '', route: '/dashboard/business/bookings' },
+          { label: 'Menu', icon: '', route: '/dashboard/business/menu' },
+          { label: 'Reviews', icon: '', route: '/dashboard/business/reviews' },
+          { label: 'Analytics', icon: '', route: '/dashboard/business/analytics' }
         ];
 
       case 'specialist':
         return [
-          { label: 'Dashboard', icon: '📊', route: '/dashboard/specialist' },
-          { label: 'Restaurants', icon: '🍽️', route: '/restaurants' },
-          { label: 'My Bookings', icon: '📅', route: '/dashboard/specialist/bookings' },
-          { label: 'Portfolio', icon: '🎨', route: '/dashboard/specialist/portfolio' },
-          { label: 'Community', icon: '🌟', route: '/community' },
-          { label: 'Wallet', icon: '💰', route: '/dashboard/specialist/wallet' }
+          { label: 'Dashboard', icon: '', route: '/dashboard/specialist' },
+          { label: 'Restaurants', icon: '', route: '/restaurants' },
+          { label: 'My Bookings', icon: '', route: '/dashboard/specialist/bookings' },
+          { label: 'Portfolio', icon: '', route: '/dashboard/specialist/portfolio' },
+          { label: 'Community', icon: '', route: '/community' },
+          { label: 'Wallet', icon: '', route: '/dashboard/specialist/wallet' }
         ];
 
       case 'food_enthusiast':
         return [
-          { label: 'Dashboard', icon: '📊', route: '/dashboard/food-enthusiast' },
-          { label: 'Restaurants', icon: '🍽️', route: '/restaurants' },
-          { label: 'Specialists', icon: '👨‍🍳', route: '/specialists' },
-          { label: 'My Bookings', icon: '📅', route: '/dashboard/food-enthusiast/bookings' },
-          { label: 'Community', icon: '🌟', route: '/community' },
-          { label: 'Favorites', icon: '❤️', route: '/dashboard/food-enthusiast/favorites' }
+          { label: 'Dashboard', icon: '', route: '/dashboard/food-enthusiast' },
+          { label: 'Restaurants', icon: '', route: '/restaurants' },
+          { label: 'Specialists', icon: '', route: '/specialists' },
+          { label: 'My Bookings', icon: '', route: '/dashboard/food-enthusiast/bookings' },
+          { label: 'Community', icon: '', route: '/community' },
+          { label: 'Favorites', icon: '', route: '/dashboard/food-enthusiast/favorites' }
         ];
 
       case 'normal_user':
       default:
         return [
-          { label: 'Dashboard', icon: '📊', route: '/dashboard/user' },
-          { label: 'Restaurants', icon: '🍽️', route: '/restaurants' },
-          { label: 'Specialists', icon: '👨‍🍳', route: '/specialists' },
-          { label: 'My Bookings', icon: '📅', route: '/dashboard/user/bookings' },
-          { label: 'Favorites', icon: '❤️', route: '/dashboard/user/favorites' },
-          { label: 'Wallet', icon: '💰', route: '/dashboard/user/wallet' }
+          { label: 'Dashboard', icon: '', route: '/dashboard/user' },
+          { label: 'Restaurants', icon: '', route: '/restaurants' },
+          { label: 'Specialists', icon: '', route: '/specialists' },
+          { label: 'My Bookings', icon: '', route: '/dashboard/user/bookings' },
+          { label: 'Favorites', icon: '', route: '/dashboard/user/favorites' },
+          { label: 'Wallet', icon: '', route: '/dashboard/user/wallet' }
         ];
     }
   });
