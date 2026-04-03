@@ -3,7 +3,7 @@
   <header class="help-hero">
     <div class="hero-content">
       <h1 class="hero-title">
-        <span class="hero-icon">💬</span>
+        <lucide-icon [img]="MessageSquare" [size]="36" class="hero-icon"></lucide-icon>
         Help Centre
       </h1>
       <p class="hero-subtitle">
@@ -25,7 +25,7 @@
             class="search-btn"
             (click)="onSearch()"
             aria-label="Search">
-            🔍
+            <lucide-icon [img]="Search" [size]="20"></lucide-icon>
           </button>
         </div>
         @if (searchResults().length > 0 && searchQuery()) {
@@ -60,7 +60,7 @@
         class="action-card"
         (click)="openContactModal()"
         aria-label="Contact support team">
-        <span class="action-icon">📞</span>
+        <lucide-icon [img]="Phone" [size]="32" class="action-icon"></lucide-icon>
         <h3>Contact Support</h3>
         <p>Get direct help from our support team</p>
       </button>
@@ -69,7 +69,7 @@
         routerLink="/faqs"
         class="action-card"
         aria-label="View frequently asked questions">
-        <span class="action-icon">❓</span>
+        <lucide-icon [img]="HelpCircle" [size]="32" class="action-icon"></lucide-icon>
         <h3>FAQs</h3>
         <p>Find answers to common questions</p>
       </a>
@@ -79,7 +79,7 @@
         class="action-card"
         (click)="openLiveChatModal()"
         aria-label="Start live chat">
-        <span class="action-icon">💬</span>
+        <lucide-icon [img]="MessageSquare" [size]="32" class="action-icon"></lucide-icon>
         <h3>Live Chat</h3>
         <p>Chat with our support team in real-time</p>
       </button>
@@ -88,7 +88,7 @@
         routerLink="/feedback"
         class="action-card"
         aria-label="Submit feedback">
-        <span class="action-icon">📝</span>
+        <lucide-icon [img]="FileText" [size]="32" class="action-icon"></lucide-icon>
         <h3>Send Feedback</h3>
         <p>Help us improve <span class="itiyum-brand">Itiyum</span> with your suggestions</p>
       </a>

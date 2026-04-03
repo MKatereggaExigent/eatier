@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, computed, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LucideAngularModule, Rocket, User, Hand, Settings, Edit, Lock, Trash2, Store, Building2, Star, Wrench, DoorOpen, Smartphone, Search, Phone, HelpCircle, MessageSquare, FileText, Mail, Send } from 'lucide-angular';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -41,12 +42,34 @@ interface ChatMessage {
 @Component({
   selector: 'app-help-centre',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, FormsModule, LucideAngularModule],
   templateUrl: './help-centre.component.html',
   styleUrl: './help-centre.component.scss'
 })
 export class HelpCentreComponent implements OnInit, AfterViewInit {
   @ViewChild('chatMessagesContainer') chatMessagesRef!: ElementRef;
+
+  // Lucide Icons
+  readonly MessageSquare = MessageSquare;
+  readonly Search = Search;
+  readonly Phone = Phone;
+  readonly HelpCircle = HelpCircle;
+  readonly FileText = FileText;
+  readonly Rocket = Rocket;
+  readonly User = User;
+  readonly Hand = Hand;
+  readonly Settings = Settings;
+  readonly Edit = Edit;
+  readonly Lock = Lock;
+  readonly Trash2 = Trash2;
+  readonly Store = Store;
+  readonly Building2 = Building2;
+  readonly Star = Star;
+  readonly Wrench = Wrench;
+  readonly DoorOpen = DoorOpen;
+  readonly Smartphone = Smartphone;
+  readonly Mail = Mail;
+  readonly Send = Send;
 
   // State management
   searchQuery = signal('');
