@@ -3,6 +3,7 @@ import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { LucideAngularModule, AlertTriangle, PenLine, Heart, Calendar, Camera, Search, Star, User, Store, UtensilsCrossed, Wallet, Gift, Target, MessageSquare, RefreshCw, Newspaper } from 'lucide-angular';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService, UserStats, UserActivity, Favorite } from '../../../core/services/user.service';
@@ -43,7 +44,7 @@ interface Promotion {
 @Component({
   selector: 'app-user-overview',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss']
 })
@@ -54,6 +55,24 @@ export class UserOverviewComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   currentUser = this.authService.currentUser;
+
+  // Lucide Icons
+  readonly AlertTriangle = AlertTriangle;
+  readonly PenLine = PenLine;
+  readonly Heart = Heart;
+  readonly Calendar = Calendar;
+  readonly Camera = Camera;
+  readonly Search = Search;
+  readonly Star = Star;
+  readonly User = User;
+  readonly Store = Store;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Wallet = Wallet;
+  readonly Gift = Gift;
+  readonly Target = Target;
+  readonly MessageSquare = MessageSquare;
+  readonly RefreshCw = RefreshCw;
+  readonly Newspaper = Newspaper;
 
   // Loading states
   loading = signal<LoadingState>({
@@ -296,14 +315,14 @@ export class UserOverviewComponent implements OnInit, OnDestroy {
     });
   }
 
-  getActivityIcon(type: string): string {
+  getActivityIcon(type: string): any {
     const icons = {
-      review: '📝',
-      favorite: '❤️',
-      photo: '📸',
-      booking: '📅'
+      review: PenLine,
+      favorite: Heart,
+      photo: Camera,
+      booking: Calendar
     };
-    return icons[type as keyof typeof icons] || '📍';
+    return icons[type as keyof typeof icons] || Star;
   }
 
   getStarArray(rating: number): number[] {

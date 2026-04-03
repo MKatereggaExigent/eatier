@@ -13,7 +13,7 @@
       </div>
       <div class="header-actions">
         <a routerLink="/restaurants" class="btn-primary">
-          <span class="btn-icon">🔍</span>
+          <lucide-icon [img]="Search" [size]="18" class="btn-icon"></lucide-icon>
           Explore Restaurants
         </a>
       </div>
@@ -23,13 +23,13 @@
   <!-- Error Banner -->
   @if (hasErrors()) {
     <div class="error-banner" role="alert">
-      <span class="error-icon">⚠️</span>
+      <lucide-icon [img]="AlertTriangle" [size]="24" class="error-icon"></lucide-icon>
       <div class="error-content">
         <h3>Unable to load some data</h3>
         <p>Please check your connection and try again.</p>
       </div>
       <button type="button" class="retry-btn" (click)="refreshData()">
-        <span>🔄</span> Retry
+        <lucide-icon [img]="RefreshCw" [size]="16"></lucide-icon> Retry
       </button>
     </div>
   }
@@ -47,7 +47,7 @@
             </div>
           </div>
         } @else {
-          <div class="stat-icon">📝</div>
+          <lucide-icon [img]="PenLine" [size]="28" class="stat-icon"></lucide-icon>
           <div class="stat-content">
             <h3>{{ stats().totalReviews }}</h3>
             <p>Reviews Written</p>
@@ -66,7 +66,7 @@
             </div>
           </div>
         } @else {
-          <div class="stat-icon">❤️</div>
+          <lucide-icon [img]="Heart" [size]="28" class="stat-icon"></lucide-icon>
           <div class="stat-content">
             <h3>{{ stats().totalFavorites }}</h3>
             <p>Favorite Places</p>
@@ -85,7 +85,7 @@
             </div>
           </div>
         } @else {
-          <div class="stat-icon">📅</div>
+          <lucide-icon [img]="Calendar" [size]="28" class="stat-icon"></lucide-icon>
           <div class="stat-content">
             <h3>{{ stats().totalBookings }}</h3>
             <p>Bookings Made</p>
@@ -104,7 +104,7 @@
             </div>
           </div>
         } @else {
-          <div class="stat-icon">📸</div>
+          <lucide-icon [img]="Camera" [size]="28" class="stat-icon"></lucide-icon>
           <div class="stat-content">
             <h3>{{ stats().totalPhotos }}</h3>
             <p>Photos Shared</p>
@@ -183,10 +183,10 @@
         </div>
         <div class="social-actions">
           <a routerLink="../social" class="social-action-btn">
-            <span>📰</span> Activity Feed
+            <lucide-icon [img]="Newspaper" [size]="16"></lucide-icon> Activity Feed
           </a>
           <a routerLink="../social" class="social-action-btn">
-            <span>🔍</span> Discover Foodies
+            <lucide-icon [img]="Search" [size]="16"></lucide-icon> Discover Foodies
           </a>
         </div>
         <p class="benefit-hint">Connect with fellow food lovers!</p>
@@ -207,7 +207,7 @@
       <div class="card-content">
         <div class="action-grid">
           <a routerLink="/restaurants" class="action-card">
-            <div class="action-icon">🔍</div>
+            <lucide-icon [img]="Search" [size]="24" class="action-icon"></lucide-icon>
             <div class="action-info">
               <h3>Find Restaurants</h3>
               <p>Discover new places to eat</p>
@@ -215,7 +215,7 @@
           </a>
 
           <a routerLink="../reviews" class="action-card">
-            <div class="action-icon">✍️</div>
+            <lucide-icon [img]="PenLine" [size]="24" class="action-icon"></lucide-icon>
             <div class="action-info">
               <h3>Write a Review</h3>
               <p>Share your dining experience</p>
@@ -223,7 +223,7 @@
           </a>
 
           <a routerLink="../favorites" class="action-card">
-            <div class="action-icon">⭐</div>
+            <lucide-icon [img]="Star" [size]="24" class="action-icon"></lucide-icon>
             <div class="action-info">
               <h3>My Favorites</h3>
               <p>View saved restaurants</p>
@@ -231,7 +231,7 @@
           </a>
 
           <a routerLink="../bookings" class="action-card">
-            <div class="action-icon">📅</div>
+            <lucide-icon [img]="Calendar" [size]="24" class="action-icon"></lucide-icon>
             <div class="action-info">
               <h3>My Bookings</h3>
               <p>Manage reservations</p>
@@ -239,7 +239,7 @@
           </a>
 
           <a routerLink="../profile" class="action-card">
-            <div class="action-icon">👤</div>
+            <lucide-icon [img]="User" [size]="24" class="action-icon"></lucide-icon>
             <div class="action-info">
               <h3>Update Profile</h3>
               <p>Manage your preferences</p>
@@ -247,7 +247,7 @@
           </a>
 
           <a routerLink="/community" class="action-card">
-            <div class="action-icon">💬</div>
+            <lucide-icon [img]="MessageSquare" [size]="24" class="action-icon"></lucide-icon>
             <div class="action-info">
               <h3>Community</h3>
               <p>Join food discussions</p>
@@ -275,15 +275,15 @@
           </div>
         } @else if (errors().activity) {
           <div class="error-state" role="alert">
-            <span class="error-icon">⚠️</span>
+            <lucide-icon [img]="AlertTriangle" [size]="24" class="error-icon"></lucide-icon>
             <p>{{ errors().activity }}</p>
             <button type="button" class="retry-btn" (click)="refreshData()">
-              <span>🔄</span> Retry
+              <lucide-icon [img]="RefreshCw" [size]="16"></lucide-icon> Retry
             </button>
           </div>
         } @else if (recentActivity().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">📝</div>
+            <lucide-icon [img]="PenLine" [size]="48" class="empty-icon"></lucide-icon>
             <h3>No recent activity</h3>
             <p>Start exploring restaurants to see your activity here!</p>
             <a routerLink="/restaurants" class="btn-primary">Explore Restaurants</a>
@@ -292,7 +292,7 @@
           <div class="activity-list">
             @for (activity of recentActivity(); track activity.id) {
               <div class="activity-item">
-                <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
+                <lucide-icon [img]="getActivityIcon(activity.type)" [size]="20" class="activity-icon"></lucide-icon>
                 <div class="activity-content">
                   <p class="activity-action">
                     <strong>{{ activity.action }}</strong>
@@ -303,7 +303,7 @@
                   @if (activity.rating) {
                     <div class="activity-rating">
                       @for (star of getStarArray(activity.rating); track $index) {
-                        <span class="star" [class.filled]="star === 1">⭐</span>
+                        <lucide-icon [img]="Star" [size]="14" [class.filled]="star === 1" class="star"></lucide-icon>
                       }
                     </div>
                   }
@@ -320,7 +320,7 @@
     <section class="content-card favorites-card" aria-label="Your Favorites">
       <div class="card-header">
         <h2>
-          <span class="header-icon">❤️</span>
+          <lucide-icon [img]="Heart" [size]="20" class="header-icon"></lucide-icon>
           Your Favorites
         </h2>
         <a routerLink="../favorites" class="view-all-btn">View All</a>
@@ -334,7 +334,7 @@
           </div>
         } @else if (favoriteRestaurants().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">❤️</div>
+            <lucide-icon [img]="Heart" [size]="48" class="empty-icon"></lucide-icon>
             <h3>No favorites yet</h3>
             <p>Start adding your favorite restaurants!</p>
             <a routerLink="/restaurants" class="btn-primary">Find Restaurants</a>
@@ -343,7 +343,7 @@
           <div class="favorites-grid">
             @for (favorite of favoriteRestaurants(); track favorite.id) {
               <a [routerLink]="['/restaurants', favorite.business_id]" class="favorite-card">
-                <div class="favorite-icon">🏪</div>
+                <lucide-icon [img]="Store" [size]="24" class="favorite-icon"></lucide-icon>
                 <div class="favorite-info">
                   <h4>{{ favorite.business_name }}</h4>
                   @if (favorite.business_type) {
@@ -362,7 +362,7 @@
     <section class="content-card recommendations-card" aria-label="Recommendations">
       <div class="card-header">
         <h2>
-          <span class="header-icon">🎯</span>
+          <lucide-icon [img]="UtensilsCrossed" [size]="20" class="header-icon"></lucide-icon>
           Recommended for You
         </h2>
         <a routerLink="/restaurants" class="view-all-btn">Explore More</a>
@@ -376,7 +376,7 @@
           </div>
         } @else if (recommendedRestaurants().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">🎯</div>
+            <lucide-icon [img]="Target" [size]="48" class="empty-icon"></lucide-icon>
             <h3>No recommendations yet</h3>
             <p>Explore restaurants to get personalized suggestions!</p>
             <a routerLink="/restaurants" class="btn-primary">Discover Restaurants</a>
@@ -385,7 +385,7 @@
           <div class="recommendations-grid">
             @for (restaurant of recommendedRestaurants(); track restaurant.id) {
               <a [routerLink]="['/restaurants', restaurant.id]" class="recommendation-card">
-                <div class="recommendation-icon">🍽️</div>
+                <lucide-icon [img]="UtensilsCrossed" [size]="24" class="recommendation-icon"></lucide-icon>
                 <div class="recommendation-info">
                   <h4>{{ restaurant.business_name || restaurant.name }}</h4>
                   @if (restaurant.business_type || restaurant.cuisine) {
