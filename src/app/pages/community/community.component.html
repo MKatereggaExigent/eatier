@@ -39,7 +39,7 @@
       [class.active]="activeTab() === 'create'"
       (click)="setActiveTab('create')"
     >
-      ✍️ Create Post
+      <lucide-icon [img]="PenSquare" [size]="18"></lucide-icon> Create Post
     </button>
   </div>
 
@@ -73,11 +73,11 @@
       <div class="feed-section">
         @if (posts().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">📝</div>
+            <lucide-icon [img]="PenSquare" [size]="48" class="empty-icon"></lucide-icon>
             <h3>No posts yet</h3>
             <p>Be the first to share something with the community!</p>
             <button type="button" class="primary-btn" (click)="setActiveTab('create')">
-              ✍️ Create a Post
+              <lucide-icon [img]="PenSquare" [size]="18"></lucide-icon> Create a Post
             </button>
           </div>
         }
@@ -126,17 +126,17 @@
                   [class.liked]="post.isLiked"
                   (click)="toggleLike(post)"
                 >
-                  {{ post.isLiked ? '❤️' : '🤍' }} {{ post.likes }}
+                  <lucide-icon [img]="Heart" [size]="16" [class.filled]="post.isLiked"></lucide-icon> {{ post.likes }}
                 </button>
                 <button type="button" class="action-btn comment-btn">
-                  💬 {{ post.comments }}
+                  <lucide-icon [img]="MessageCircle" [size]="16"></lucide-icon> {{ post.comments }}
                 </button>
                 <button
                   type="button"
                   class="action-btn share-btn"
                   (click)="sharePost(post)"
                 >
-                  🔗 {{ post.shares }}
+                  <lucide-icon [img]="Share2" [size]="16"></lucide-icon> {{ post.shares }}
                 </button>
               </div>
             </div>
@@ -200,7 +200,7 @@
 
         @if (trendingTopics().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">📊</div>
+            <lucide-icon [img]="BarChart3" [size]="48" class="empty-icon"></lucide-icon>
             <h3>No trending topics yet</h3>
             <p>Start posting with hashtags to create trends!</p>
           </div>
@@ -231,13 +231,13 @@
 
         <!-- Popular Posts Section -->
         <div class="section-header popular-section">
-          <h2>📈 Popular Posts</h2>
+          <h2><lucide-icon [img]="TrendingUp" [size]="24"></lucide-icon> Popular Posts</h2>
           <p class="section-subtitle">Most engaged posts from the community</p>
         </div>
 
         @if (posts().length === 0) {
           <div class="empty-state small">
-            <div class="empty-icon">📝</div>
+            <lucide-icon [img]="PenSquare" [size]="32" class="empty-icon"></lucide-icon>
             <h3>No popular posts yet</h3>
             <p>Be the first to share something amazing!</p>
           </div>
@@ -246,7 +246,7 @@
             @for (post of posts().slice(0, 6); track post.id; let i = $index) {
               <div class="popular-post-card" [class.featured]="i === 0">
                 @if (i === 0) {
-                  <div class="featured-badge">⭐ Featured</div>
+                  <div class="featured-badge"><lucide-icon [img]="Star" [size]="14"></lucide-icon> Featured</div>
                 }
                 <div class="post-author-section">
                   <img [src]="post.authorAvatar" [alt]="post.authorName" class="post-avatar" title="{{ post.authorName }}" />
@@ -264,9 +264,9 @@
                   </div>
                 }
                 <div class="post-engagement">
-                  <span class="engagement-item">❤️ {{ post.likes }}</span>
-                  <span class="engagement-item">💬 {{ post.comments }}</span>
-                  <span class="engagement-item">🔗 {{ post.shares }}</span>
+                  <span class="engagement-item"><lucide-icon [img]="Heart" [size]="14"></lucide-icon> {{ post.likes }}</span>
+                  <span class="engagement-item"><lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon> {{ post.comments }}</span>
+                  <span class="engagement-item"><lucide-icon [img]="Share2" [size]="14"></lucide-icon> {{ post.shares }}</span>
                 </div>
               </div>
             }
@@ -295,7 +295,7 @@
           <!-- Top Chef Spotlight -->
           @if (featuredChefs().length > 0) {
             <div class="top-chef-spotlight">
-              <div class="spotlight-badge">⭐ Top Chef This Week</div>
+              <div class="spotlight-badge"><lucide-icon [img]="Star" [size]="16"></lucide-icon> Top Chef This Week</div>
               <div class="spotlight-content">
                 <div class="spotlight-avatar-wrapper">
                   <img [src]="featuredChefs()[0].avatar" [alt]="featuredChefs()[0].name" class="spotlight-avatar" title="{{ featuredChefs()[0].name }}" />
@@ -311,7 +311,7 @@
                     </div>
                     <div class="stat-divider"></div>
                     <div class="stat-item">
-                      <span class="stat-value">⭐</span>
+                      <lucide-icon [img]="Star" [size]="18" class="stat-value"></lucide-icon>
                       <span class="stat-label">Featured</span>
                     </div>
                   </div>
@@ -385,7 +385,7 @@
       <div class="create-post-section">
         <!-- Section Header -->
         <div class="section-header">
-          <h2>✍️ Create New Post</h2>
+          <h2><lucide-icon [img]="PenSquare" [size]="24"></lucide-icon> Create New Post</h2>
           <p class="section-subtitle">Share your culinary experiences with the community</p>
         </div>
 
@@ -429,7 +429,7 @@
 
                   <div class="textarea-footer">
                     <div class="character-counter" [class.exceeded]="isCharacterLimitExceeded()">
-                      <span class="counter-icon">📊</span>
+                      <lucide-icon [img]="BarChart3" [size]="14" class="counter-icon"></lucide-icon>
                       {{ getCharacterCount() }} / 1000
                       @if (isCharacterLimitExceeded()) {
                         <span class="error-text"> ({{ Math.abs(getRemainingCharacters()) }} over)</span>
@@ -530,7 +530,7 @@
               <!-- Tags Section -->
               <div class="form-section">
                 <div class="section-label">
-                  <span class="label-icon">🏷️</span>
+                  <lucide-icon [img]="Tag" [size]="16" class="label-icon"></lucide-icon>
                   <span class="label-text">Add Tags</span>
                   <span class="optional-badge">Optional</span>
                 </div>
@@ -554,7 +554,7 @@
                   (click)="postForm.reset(); selectedImages.set([])"
                   [disabled]="isSubmittingPost()"
                 >
-                  🗑️ Clear All
+                  <lucide-icon [img]="Trash2" [size]="16"></lucide-icon> Clear All
                 </button>
                 <button
                   type="submit"
@@ -562,9 +562,9 @@
                   [disabled]="postForm.invalid || isSubmittingPost()"
                 >
                   @if (isSubmittingPost()) {
-                    <span class="spinner">⏳</span> Posting...
+                    <lucide-icon [img]="Clock" [size]="16" class="spinner"></lucide-icon> Posting...
                   } @else {
-                    📝 Share Post
+                    <lucide-icon [img]="PenSquare" [size]="16"></lucide-icon> Share Post
                   }
                 </button>
               </div>
@@ -585,15 +585,15 @@
                   <span>Add high-quality photos to attract more engagement</span>
                 </li>
                 <li>
-                  <span class="tip-icon">🏷️</span>
+                  <lucide-icon [img]="Tag" [size]="16" class="tip-icon"></lucide-icon>
                   <span>Use relevant tags like #recipe, #cooking, #foodie</span>
                 </li>
                 <li>
-                  <span class="tip-icon">🤝</span>
+                  <lucide-icon [img]="MessageCircle" [size]="16" class="tip-icon"></lucide-icon>
                   <span>Ask questions to start conversations</span>
                 </li>
                 <li>
-                  <span class="tip-icon">⭐</span>
+                  <lucide-icon [img]="Star" [size]="16" class="tip-icon"></lucide-icon>
                   <span>Share recipes, tips, or restaurant recommendations</span>
                 </li>
               </ul>

@@ -1,6 +1,7 @@
 import { CommunityService, FeaturedChef, CommunityPost as ServiceCommunityPost, TrendingTopic } from '../../core/services/community.service';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LucideAngularModule, PenSquare, Heart, MessageCircle, Share2, Star, BarChart3, TrendingUp, Tag, Trash2, Clock } from 'lucide-angular';
 
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -37,11 +38,22 @@ interface CommunityComment {
 @Component({
   selector: 'app-community',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './community.component.html',
   styleUrls: ['./community.component.scss']
 })
 export class CommunityComponent implements OnInit {
+  // Lucide Icons
+  readonly PenSquare = PenSquare;
+  readonly Heart = Heart;
+  readonly MessageCircle = MessageCircle;
+  readonly Share2 = Share2;
+  readonly Star = Star;
+  readonly BarChart3 = BarChart3;
+  readonly TrendingUp = TrendingUp;
+  readonly Tag = Tag;
+  readonly Trash2 = Trash2;
+  readonly Clock = Clock;
   private fb = inject(FormBuilder);
   private communityService = inject(CommunityService);
   private authService = inject(AuthService);

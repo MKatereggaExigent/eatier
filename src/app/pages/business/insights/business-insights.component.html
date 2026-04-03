@@ -34,7 +34,7 @@
           (click)="onPeriodChange(option.value)"
           [disabled]="isLoading()"
         >
-          {{ option.icon }} {{ option.label }}
+          <lucide-icon [img]="option.icon" [size]="16"></lucide-icon> {{ option.label }}
         </button>
       }
     </div>
@@ -83,7 +83,7 @@
             <h4>{{ formatNumber(insights()!.metrics.totalViews) }}</h4>
             <p>Total Views</p>
             <span class="growth-indicator" [class]="getGrowthClass(insights()!.growth.viewsGrowth)">
-              {{ getGrowthIcon(insights()!.growth.viewsGrowth) }} {{ formatPercentage(insights()!.growth.viewsGrowth) }}
+              <lucide-icon [img]="getGrowthIcon(insights()!.growth.viewsGrowth)" [size]="14"></lucide-icon> {{ formatPercentage(insights()!.growth.viewsGrowth) }}
             </span>
           </div>
         </div>
@@ -94,7 +94,7 @@
             <h4>{{ formatNumber(insights()!.metrics.uniqueVisitors) }}</h4>
             <p>Unique Visitors</p>
             <span class="growth-indicator" [class]="getGrowthClass(insights()!.growth.customerGrowth)">
-              {{ getGrowthIcon(insights()!.growth.customerGrowth) }} {{ formatPercentage(insights()!.growth.customerGrowth) }}
+              <lucide-icon [img]="getGrowthIcon(insights()!.growth.customerGrowth)" [size]="14"></lucide-icon> {{ formatPercentage(insights()!.growth.customerGrowth) }}
             </span>
           </div>
         </div>
