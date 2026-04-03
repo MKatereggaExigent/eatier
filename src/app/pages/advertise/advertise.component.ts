@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { LucideAngularModule, Rocket, Star, Handshake, Target, TrendingUp, Globe, DollarSign, BarChart3, Zap, Wrench } from 'lucide-angular';
 
 import { AuthService } from '../../core/services/auth.service';
 import { BannerAdComponent } from '../../shared/components/ads/banner-ad/banner-ad.component';
@@ -15,13 +16,25 @@ interface CarouselSlide {
 @Component({
   selector: 'app-advertise',
   standalone: true,
-  imports: [CommonModule, RouterModule, BannerAdComponent, InlineAdComponent],
+  imports: [CommonModule, RouterModule, LucideAngularModule, BannerAdComponent, InlineAdComponent],
   templateUrl: './advertise.component.html',
   styleUrl: './advertise.component.scss'
 })
 export class AdvertiseComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
+
+  // Lucide Icons
+  readonly Rocket = Rocket;
+  readonly Star = Star;
+  readonly Handshake = Handshake;
+  readonly Target = Target;
+  readonly TrendingUp = TrendingUp;
+  readonly Globe = Globe;
+  readonly DollarSign = DollarSign;
+  readonly BarChart3 = BarChart3;
+  readonly Zap = Zap;
+  readonly Wrench = Wrench;
 
   isAuthenticated = this.authService.isAuthenticated;
   currentUser = this.authService.currentUser;
@@ -187,5 +200,26 @@ export class AdvertiseComponent implements OnInit, OnDestroy {
     } else if (user.role === 'specialist') {
       this.router.navigate(['/dashboard/specialist/ads/create']);
     }
+  }
+
+  getAdTypeIcon(adTypeId: string): any {
+    switch(adTypeId) {
+      case 'promoted': return this.Rocket;
+      case 'sponsored': return this.Star;
+      case 'in_partnership_with': return this.Handshake;
+      default: return this.Target;
+    }
+  }
+
+  getBenefitIcon(title: string): any {
+    const iconMap: Record<string, any> = {
+      'Targeted Reach': this.Target,
+      'Real-Time Analytics': this.BarChart3,
+      'Flexible Budgets': this.DollarSign,
+      'Global Audience': this.Globe,
+      'Instant Activation': this.Zap,
+      'Easy Management': this.Wrench
+    };
+    return iconMap[title] || this.Target;
   }
 }

@@ -86,7 +86,7 @@
       @for (adType of adTypes; track adType.id) {
         <article class="ad-type-card" [attr.data-type]="adType.id">
           <div class="card-icon" [style.background]="adType.gradient">
-            {{ adType.icon }}
+            <lucide-icon [img]="getAdTypeIcon(adType.id)" [size]="32" [color]="'white'"></lucide-icon>
           </div>
           <h3 class="card-title">{{ adType.title }}</h3>
           <p class="card-description">{{ adType.description }}</p>
@@ -122,7 +122,9 @@
 
     <div class="geo-targeting-content">
       <div class="geo-visual">
-        <div class="globe-icon">🌍</div>
+        <div class="globe-icon">
+          <lucide-icon [img]="Globe" [size]="80"></lucide-icon>
+        </div>
         <div class="targeting-stats">
           <div class="stat">
             <span class="stat-number">11</span>
@@ -235,7 +237,9 @@
     <div class="benefits-grid">
       @for (benefit of benefits; track benefit.title) {
         <article class="benefit-card">
-          <div class="benefit-icon">{{ benefit.icon }}</div>
+          <div class="benefit-icon">
+            <lucide-icon [img]="getBenefitIcon(benefit.title)" [size]="32"></lucide-icon>
+          </div>
           <h3 class="benefit-title">{{ benefit.title }}</h3>
           <p class="benefit-description">{{ benefit.description }}</p>
         </article>

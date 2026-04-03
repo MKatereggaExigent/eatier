@@ -15,7 +15,7 @@
           class="search-input"
         />
         <button (click)="onSearch()" class="search-btn">
-          🔍 Search
+          <lucide-icon [img]="Search" [size]="18"></lucide-icon> Search
         </button>
       </div>
     </div>
@@ -54,7 +54,7 @@
   @if (industryTrends().length > 0) {
     <section class="trends-section">
       <div class="trends-container">
-        <h3>📊 Industry Trends</h3>
+        <h3><lucide-icon [img]="BarChart3" [size]="20"></lucide-icon> Industry Trends</h3>
         <div class="trends-grid">
           @for (trend of industryTrends(); track trend.id) {
             <div class="trend-card" [class.positive]="trend.percentage_change > 0" [class.negative]="trend.percentage_change < 0">
@@ -82,11 +82,11 @@
       <h3>Categories</h3>
       <ul class="category-list">
         <li>
-          <button 
+          <button
             [class.active]="selectedCategory() === ''"
             (click)="onCategoryChange('')"
           >
-            📚 All Posts
+            <lucide-icon [img]="BookOpen" [size]="16"></lucide-icon> All Posts
             <span class="count">{{ totalPosts() }}</span>
           </button>
         </li>
@@ -192,9 +192,9 @@
                       <span class="date">{{ formatDate(post.published_at) }}</span>
                     </div>
                     <div class="post-stats">
-                      <span>👁️ {{ post.view_count }}</span>
-                      <span>❤️ {{ post.like_count }}</span>
-                      <span>⏱️ {{ getReadingTime(post.excerpt) }} min</span>
+                      <span><lucide-icon [img]="Eye" [size]="14"></lucide-icon> {{ post.view_count }}</span>
+                      <span><lucide-icon [img]="Heart" [size]="14"></lucide-icon> {{ post.like_count }}</span>
+                      <span><lucide-icon [img]="Clock" [size]="14"></lucide-icon> {{ getReadingTime(post.excerpt) }} min</span>
                     </div>
                   </div>
                 </a>

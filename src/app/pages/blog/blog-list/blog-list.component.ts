@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { LucideAngularModule, Search, BarChart3, BookOpen, Eye, Heart, Clock } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
 import { interval, Subscription } from 'rxjs';
 
@@ -59,7 +60,7 @@ interface IndustryTrend {
 @Component({
   selector: 'app-blog-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule],
   templateUrl: './blog-list.component.html',
   styleUrl: './blog-list.component.scss'
 })
@@ -67,6 +68,14 @@ export class BlogListComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   private refreshSubscription?: Subscription;
+
+  // Lucide Icons
+  readonly Search = Search;
+  readonly BarChart3 = BarChart3;
+  readonly BookOpen = BookOpen;
+  readonly Eye = Eye;
+  readonly Heart = Heart;
+  readonly Clock = Clock;
 
   posts = signal<BlogPost[]>([]);
   featuredPosts = signal<BlogPost[]>([]);

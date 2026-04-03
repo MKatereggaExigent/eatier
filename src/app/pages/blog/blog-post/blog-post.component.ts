@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { LucideAngularModule, Heart } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
 
 interface BlogPost {
@@ -38,7 +39,7 @@ interface RelatedPost {
 @Component({
   selector: 'app-blog-post',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './blog-post.component.html',
   styleUrl: './blog-post.component.scss'
 })
@@ -46,7 +47,10 @@ export class BlogPostComponent implements OnInit {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
-  
+
+  // Lucide Icons
+  readonly Heart = Heart;
+
   post = signal<BlogPost | null>(null);
   relatedPosts = signal<RelatedPost[]>([]);
   

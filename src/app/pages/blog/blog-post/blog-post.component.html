@@ -59,7 +59,7 @@
         <!-- Engagement Actions -->
         <div class="post-actions">
           <button (click)="toggleLike()" class="like-btn" [class.liked]="liked()">
-            {{ liked() ? '❤️' : '🤍' }} {{ likeCount() }} Likes
+            <lucide-icon [img]="Heart" [size]="18" [class.filled]="liked()"></lucide-icon> {{ likeCount() }} Likes
           </button>
           
           <div class="share-buttons">
