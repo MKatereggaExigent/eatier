@@ -30,7 +30,9 @@
           class="user-type-tab"
           [class.active]="selectedUserType() === type.id"
           (click)="selectUserType(type.id)">
-          <span class="tab-icon">{{ type.icon }}</span>
+          <span class="tab-icon">
+            <lucide-icon [img]="getUserTypeIcon(type.id)" [size]="24"></lucide-icon>
+          </span>
           <span class="tab-name">{{ type.name }}</span>
           <span class="tab-description">{{ type.description }}</span>
         </button>
@@ -41,7 +43,9 @@
   <!-- Error Message -->
   @if (error()) {
     <div class="error-banner">
-      <span class="error-icon">⚠️</span>
+      <span class="error-icon">
+        <lucide-icon [img]="AlertTriangle" [size]="20"></lucide-icon>
+      </span>
       {{ error() }}
     </div>
   }
@@ -88,7 +92,9 @@
             <ul class="plan-features">
               @for (feature of getFeaturesList(plan); track feature) {
                 <li class="feature-item">
-                  <span class="feature-check">✓</span>
+                  <span class="feature-check">
+                    <lucide-icon [img]="Check" [size]="16"></lucide-icon>
+                  </span>
                   {{ feature }}
                 </li>
               }
@@ -123,22 +129,30 @@
     <h2 class="section-title">Why Choose Itiyum?</h2>
     <div class="benefits-grid">
       <div class="benefit-card">
-        <span class="benefit-icon">🔒</span>
+        <span class="benefit-icon">
+          <lucide-icon [img]="Lock" [size]="32"></lucide-icon>
+        </span>
         <h3>Secure Payments</h3>
         <p>All transactions are processed securely through Paystack</p>
       </div>
       <div class="benefit-card">
-        <span class="benefit-icon">📱</span>
+        <span class="benefit-icon">
+          <lucide-icon [img]="Smartphone" [size]="32"></lucide-icon>
+        </span>
         <h3>Mobile Friendly</h3>
         <p>Access your dashboard from any device, anywhere</p>
       </div>
       <div class="benefit-card">
-        <span class="benefit-icon">📊</span>
+        <span class="benefit-icon">
+          <lucide-icon [img]="BarChart3" [size]="32"></lucide-icon>
+        </span>
         <h3>Real-time Analytics</h3>
         <p>Track your performance with detailed insights</p>
       </div>
       <div class="benefit-card">
-        <span class="benefit-icon">🎯</span>
+        <span class="benefit-icon">
+          <lucide-icon [img]="Target" [size]="32"></lucide-icon>
+        </span>
         <h3>Targeted Marketing</h3>
         <p>Reach the right customers with smart advertising</p>
       </div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { LucideAngularModule, Store, ChefHat, UtensilsCrossed, User, Check, Lock, Smartphone, BarChart3, Target, AlertTriangle } from 'lucide-angular';
 
 interface SubscriptionPlan {
   id: string;
@@ -24,13 +25,25 @@ interface SubscriptionPlan {
 @Component({
   selector: 'app-subscribe',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './subscribe.component.html',
   styleUrls: ['./subscribe.component.scss']
 })
 export class SubscribeComponent implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
+
+  // Lucide Icons
+  readonly Store = Store;
+  readonly ChefHat = ChefHat;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly User = User;
+  readonly Check = Check;
+  readonly Lock = Lock;
+  readonly Smartphone = Smartphone;
+  readonly BarChart3 = BarChart3;
+  readonly Target = Target;
+  readonly AlertTriangle = AlertTriangle;
 
   // State
   plans = signal<SubscriptionPlan[]>([]);
@@ -42,11 +55,22 @@ export class SubscribeComponent implements OnInit {
 
   // User types for tabs
   readonly userTypes = [
-    { id: 'business_owner', name: 'Business Owners', icon: '🏪', description: 'Restaurants & Food Businesses' },
-    { id: 'specialist', name: 'Specialists', icon: '👨‍🍳', description: 'Chefs, Caterers & Food Experts' },
-    { id: 'food_enthusiast', name: 'Food Enthusiasts', icon: '🍽️', description: 'Passionate Foodies' },
-    { id: 'normal_user', name: 'Regular Users', icon: '👤', description: 'Casual Diners' }
+    { id: 'business_owner', name: 'Business Owners', description: 'Restaurants & Food Businesses' },
+    { id: 'specialist', name: 'Specialists', description: 'Chefs, Caterers & Food Experts' },
+    { id: 'food_enthusiast', name: 'Food Enthusiasts', description: 'Passionate Foodies' },
+    { id: 'normal_user', name: 'Regular Users', description: 'Casual Diners' }
   ];
+
+  // Helper method to get icon for user type
+  getUserTypeIcon(userTypeId: string) {
+    switch (userTypeId) {
+      case 'business_owner': return this.Store;
+      case 'specialist': return this.ChefHat;
+      case 'food_enthusiast': return this.UtensilsCrossed;
+      case 'normal_user': return this.User;
+      default: return this.User;
+    }
+  }
 
   ngOnInit(): void {
     this.loadPlans();
