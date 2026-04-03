@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { LucideAngularModule, ChefHat, UtensilsCrossed, Calendar, Camera, AlertTriangle, DollarSign, Star, Users, TrendingUp, Clock, CheckCircle, XCircle, MessageSquare } from 'lucide-angular';
 import { SpecialistBooking, SpecialistEarning, SpecialistReview, SpecialistService } from '../../../core/services/specialist.service';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -42,11 +43,25 @@ interface Review {
 @Component({
   selector: 'app-specialist-overview',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './specialist-overview.component.html',
   styleUrls: ['./specialist-overview.component.scss']
 })
 export class SpecialistOverviewComponent implements OnInit {
+  // Lucide Icons
+  readonly ChefHat = ChefHat;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Calendar = Calendar;
+  readonly Camera = Camera;
+  readonly AlertTriangle = AlertTriangle;
+  readonly DollarSign = DollarSign;
+  readonly Star = Star;
+  readonly Users = Users;
+  readonly TrendingUp = TrendingUp;
+  readonly Clock = Clock;
+  readonly CheckCircle = CheckCircle;
+  readonly XCircle = XCircle;
+  readonly MessageSquare = MessageSquare;
   private authService = inject(AuthService);
   private specialistService = inject(SpecialistService);
 

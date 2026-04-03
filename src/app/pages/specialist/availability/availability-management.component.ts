@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { LucideAngularModule, Calendar, CalendarDays, Settings as SettingsIcon, Edit, Trash2, CheckCircle, XCircle, PartyPopper } from 'lucide-angular';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { Specialist } from '../../../shared/models/user.model';
@@ -39,11 +40,20 @@ interface BookingRule {
 @Component({
   selector: 'app-availability-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, LucideAngularModule],
   templateUrl: './availability-management.component.html',
   styleUrls: ['./availability-management.component.scss']
 })
 export class AvailabilityManagementComponent {
+  // Lucide Icons
+  readonly Calendar = Calendar;
+  readonly CalendarDays = CalendarDays;
+  readonly SettingsIcon = SettingsIcon;
+  readonly Edit = Edit;
+  readonly Trash2 = Trash2;
+  readonly CheckCircle = CheckCircle;
+  readonly XCircle = XCircle;
+  readonly PartyPopper = PartyPopper;
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
 

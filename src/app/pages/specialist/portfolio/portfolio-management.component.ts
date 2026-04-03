@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { LucideAngularModule, Camera, Image, Video, Star, Settings, Edit, Trash2, Play, Eye, Lock } from 'lucide-angular';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SpecialistService, PortfolioImage, PortfolioVideo, PortfolioTestimonial, PortfolioSettings } from '../../../core/services/specialist.service';
@@ -43,11 +44,22 @@ interface DisplayTestimonial {
 @Component({
   selector: 'app-portfolio-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, LucideAngularModule],
   templateUrl: './portfolio-management.component.html',
   styleUrls: ['./portfolio-management.component.scss']
 })
 export class PortfolioManagementComponent implements OnInit {
+  // Lucide Icons
+  readonly Camera = Camera;
+  readonly Image = Image;
+  readonly Video = Video;
+  readonly Star = Star;
+  readonly Settings = Settings;
+  readonly Edit = Edit;
+  readonly Trash2 = Trash2;
+  readonly Play = Play;
+  readonly Eye = Eye;
+  readonly Lock = Lock;
   private authService = inject(AuthService);
   private specialistService = inject(SpecialistService);
   private fb = inject(FormBuilder);

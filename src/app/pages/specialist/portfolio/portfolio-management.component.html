@@ -4,7 +4,7 @@
     <div class="header-content">
       <div class="title-section">
         <h1 class="page-title">
-          <span class="title-icon">📸</span>
+          <lucide-icon [img]="Camera" [size]="28" class="title-icon"></lucide-icon>
           Portfolio Management
         </h1>
         <p class="page-subtitle">
@@ -37,37 +37,37 @@
       (click)="setActiveTab('images')"
       role="tab"
       [attr.aria-selected]="activeTab() === 'images'">
-      <span class="tab-icon">🖼️</span>
+      <lucide-icon [img]="Image" [size]="18" class="tab-icon"></lucide-icon>
       Images
     </button>
-    <button 
+    <button
       type="button"
       class="tab-btn"
       [class.active]="activeTab() === 'videos'"
       (click)="setActiveTab('videos')"
       role="tab"
       [attr.aria-selected]="activeTab() === 'videos'">
-      <span class="tab-icon">🎥</span>
+      <lucide-icon [img]="Video" [size]="18" class="tab-icon"></lucide-icon>
       Videos
     </button>
-    <button 
+    <button
       type="button"
       class="tab-btn"
       [class.active]="activeTab() === 'testimonials'"
       (click)="setActiveTab('testimonials')"
       role="tab"
       [attr.aria-selected]="activeTab() === 'testimonials'">
-      <span class="tab-icon">⭐</span>
+      <lucide-icon [img]="Star" [size]="18" class="tab-icon"></lucide-icon>
       Testimonials
     </button>
-    <button 
+    <button
       type="button"
       class="tab-btn"
       [class.active]="activeTab() === 'settings'"
       (click)="setActiveTab('settings')"
       role="tab"
       [attr.aria-selected]="activeTab() === 'settings'">
-      <span class="tab-icon">⚙️</span>
+      <lucide-icon [img]="Settings" [size]="18" class="tab-icon"></lucide-icon>
       Settings
     </button>
   </nav>
@@ -104,15 +104,15 @@
                 <div class="image-overlay">
                   <div class="image-actions">
                     <button type="button" class="action-btn" (click)="openImageModal(image)" title="Edit">
-                      ✏️
+                      <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
                     </button>
                     @if (!image.isMain) {
                       <button type="button" class="action-btn" (click)="setMainImage(image.id)" title="Set as Main">
-                        ⭐
+                        <lucide-icon [img]="Star" [size]="16"></lucide-icon>
                       </button>
                     }
                     <button type="button" class="action-btn delete" (click)="deleteImage(image.id)" title="Delete">
-                      🗑️
+                      <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
                     </button>
                   </div>
                 </div>
@@ -161,13 +161,13 @@
                 <img [src]="video.thumbnail" [alt]="video.title" class="video-thumbnail">
                 <div class="video-duration">{{ formatDuration(video.duration) }}</div>
                 <div class="video-overlay">
-                  <div class="play-button">▶️</div>
+                  <lucide-icon [img]="Play" [size]="32" class="play-button"></lucide-icon>
                   <div class="video-actions">
                     <button type="button" class="action-btn" (click)="openVideoModal(video)" title="Edit">
-                      ✏️
+                      <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
                     </button>
                     <button type="button" class="action-btn delete" (click)="deleteVideo(video.id)" title="Delete">
-                      🗑️
+                      <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
                     </button>
                   </div>
                 </div>
@@ -217,7 +217,7 @@
                     <h4>{{ testimonial.clientName }}</h4>
                     <div class="rating">
                       @for (star of getStarArray(testimonial.rating); track $index) {
-                        <span class="star" [class.filled]="star">⭐</span>
+                        <lucide-icon [img]="Star" [size]="16" class="star" [class.filled]="star"></lucide-icon>
                       }
                     </div>
                   </div>
@@ -225,11 +225,11 @@
                 <div class="testimonial-actions">
                   <button type="button" class="action-btn" (click)="toggleTestimonialFeatured(testimonial.id)"
                           [title]="testimonial.isFeatured ? 'Remove from Featured' : 'Add to Featured'">
-                    {{ testimonial.isFeatured ? '⭐' : '☆' }}
+                    <lucide-icon [img]="Star" [size]="16" [class.filled]="testimonial.isFeatured"></lucide-icon>
                   </button>
                   <button type="button" class="action-btn" (click)="toggleTestimonialPublic(testimonial.id)"
                           [title]="testimonial.isPublic ? 'Hide' : 'Show'">
-                    {{ testimonial.isPublic ? '👁️' : '🔒' }}
+                    <lucide-icon [img]="testimonial.isPublic ? Eye : Lock" [size]="16"></lucide-icon>
                   </button>
                 </div>
               </div>

@@ -4,7 +4,7 @@
     <div class="header-content">
       <div class="welcome-section">
         <h1 class="page-title">
-          <span class="title-icon">👨‍🍳</span>
+          <lucide-icon [img]="ChefHat" [size]="32" class="title-icon"></lucide-icon>
           Welcome back, {{ currentUser()?.firstName || 'Specialist' }}!
         </h1>
         <p class="page-subtitle">
@@ -13,13 +13,13 @@
       </div>
       <div class="quick-actions">
         <button type="button" class="action-btn primary" routerLink="../services">
-          🍽️ Manage Services
+          <lucide-icon [img]="UtensilsCrossed" [size]="18"></lucide-icon> Manage Services
         </button>
         <button type="button" class="action-btn secondary" routerLink="../availability">
-          📅 Update Availability
+          <lucide-icon [img]="Calendar" [size]="18"></lucide-icon> Update Availability
         </button>
         <button type="button" class="action-btn secondary" routerLink="../portfolio">
-          📸 Manage Portfolio
+          <lucide-icon [img]="Camera" [size]="18"></lucide-icon> Manage Portfolio
         </button>
       </div>
     </div>
@@ -28,7 +28,7 @@
   <!-- Onboarding Prompt for No Services -->
   @if (showServicesOnboarding()) {
     <div class="onboarding-alert" role="alert">
-      <div class="onboarding-icon">⚠️</div>
+      <lucide-icon [img]="AlertTriangle" [size]="24" class="onboarding-icon"></lucide-icon>
       <div class="onboarding-content">
         <h3>Complete Your Profile</h3>
         <p>You haven't added any services yet. Clients won't be able to book you until you add at least one service.</p>
@@ -43,7 +43,7 @@
   <section class="metrics-section" aria-label="Business Metrics">
     <div class="metrics-grid">
       <div class="metric-card earnings">
-        <div class="metric-icon">💰</div>
+        <lucide-icon [img]="DollarSign" [size]="32" class="metric-icon"></lucide-icon>
         <div class="metric-content">
           <h3>{{ formatCurrency(businessMetrics().monthlyEarnings) }}</h3>
           <p>This Month</p>
@@ -54,7 +54,7 @@
       </div>
 
       <div class="metric-card bookings">
-        <div class="metric-icon">📅</div>
+        <lucide-icon [img]="Calendar" [size]="32" class="metric-icon"></lucide-icon>
         <div class="metric-content">
           <h3>{{ businessMetrics().upcomingBookings }}</h3>
           <p>Upcoming Bookings</p>
@@ -65,7 +65,7 @@
       </div>
 
       <div class="metric-card rating">
-        <div class="metric-icon">⭐</div>
+        <lucide-icon [img]="Star" [size]="32" class="metric-icon"></lucide-icon>
         <div class="metric-content">
           <h3>{{ businessMetrics().averageRating.toFixed(1) }}</h3>
           <p>Average Rating</p>
@@ -76,7 +76,7 @@
       </div>
 
       <div class="metric-card requests">
-        <div class="metric-icon">📨</div>
+        <lucide-icon [img]="MessageSquare" [size]="32" class="metric-icon"></lucide-icon>
         <div class="metric-content">
           <h3>{{ businessMetrics().pendingRequests }}</h3>
           <p>Pending Requests</p>
