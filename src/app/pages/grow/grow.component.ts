@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, inject, signal, computed } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { LucideAngularModule, Target, Star, Handshake, Globe, Calendar, MessageCircle, Bell, BarChart3, Mail } from 'lucide-angular';
 
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -18,7 +19,7 @@ interface AdType {
 @Component({
   selector: 'app-grow',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './grow.component.html',
   styleUrl: './grow.component.scss'
 })
@@ -27,6 +28,17 @@ export class GrowComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private publicStatsService = inject(PublicStatsService);
   private currencyService = inject(CurrencyService);
+
+  // Lucide Icons
+  readonly Target = Target;
+  readonly Star = Star;
+  readonly Handshake = Handshake;
+  readonly Globe = Globe;
+  readonly Calendar = Calendar;
+  readonly MessageCircle = MessageCircle;
+  readonly Bell = Bell;
+  readonly BarChart3 = BarChart3;
+  readonly Mail = Mail;
 
   isAuthenticated = this.authService.isAuthenticated;
   currentUser = this.authService.currentUser;
@@ -255,6 +267,20 @@ export class GrowComponent implements OnInit, OnDestroy {
     } else {
       this.router.navigate(['/dashboard/user']);
     }
+  }
+
+  getAdTypeIcon(adTypeId: string): any {
+    switch(adTypeId) {
+      case 'promoted': return this.Target;
+      case 'sponsored': return this.Star;
+      case 'partnership': return this.Handshake;
+      default: return this.Target;
+    }
+  }
+
+  getFeatureIcon(index: number): any {
+    const icons = [this.Calendar, this.MessageCircle, this.Bell, this.BarChart3];
+    return icons[index] || this.Calendar;
   }
 }
 

@@ -90,7 +90,9 @@
     <div class="ad-types-grid">
       @for (adType of adTypesWithPricing(); track adType.id) {
         <article class="ad-type-card">
-          <div class="card-icon">{{ adType.icon }}</div>
+          <div class="card-icon">
+            <lucide-icon [img]="getAdTypeIcon(adType.id)" [size]="32"></lucide-icon>
+          </div>
           <h3 class="card-title">{{ adType.title }}</h3>
           <p class="card-description">{{ adType.description }}</p>
           <ul class="card-features">
@@ -127,7 +129,9 @@
 
     <div class="geo-targeting-content">
       <div class="geo-visual">
-        <div class="globe-icon">🌍</div>
+        <div class="globe-icon">
+          <lucide-icon [img]="Globe" [size]="80"></lucide-icon>
+        </div>
         <div class="targeting-stats">
           <div class="stat">
             <span class="stat-number">11</span>
@@ -170,25 +174,33 @@
     <div class="bookings-content">
       <div class="booking-features">
         <div class="feature-card">
-          <div class="feature-icon">📅</div>
+          <div class="feature-icon">
+            <lucide-icon [img]="Calendar" [size]="28"></lucide-icon>
+          </div>
           <h3 class="feature-title">Smart Calendar</h3>
           <p class="feature-description">Set your availability and let customers book directly. Automatically sync with your schedule.</p>
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon">💬</div>
+          <div class="feature-icon">
+            <lucide-icon [img]="MessageCircle" [size]="28"></lucide-icon>
+          </div>
           <h3 class="feature-title">Instant Enquiries</h3>
           <p class="feature-description">Receive enquiries and quote requests directly. Auto-acknowledgement keeps customers informed.</p>
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon">🔔</div>
+          <div class="feature-icon">
+            <lucide-icon [img]="Bell" [size]="28"></lucide-icon>
+          </div>
           <h3 class="feature-title">Real-time Notifications</h3>
           <p class="feature-description">Get notified instantly when customers book or enquire. Never miss an opportunity.</p>
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon">📊</div>
+          <div class="feature-icon">
+            <lucide-icon [img]="BarChart3" [size]="28"></lucide-icon>
+          </div>
           <h3 class="feature-title">Booking Analytics</h3>
           <p class="feature-description">Track your booking performance, peak times, and customer preferences.</p>
         </div>
@@ -227,7 +239,9 @@
 
     <div class="enquiry-example">
       <div class="enquiry-card">
-        <div class="enquiry-icon">📧</div>
+        <div class="enquiry-icon">
+          <lucide-icon [img]="Mail" [size]="32"></lucide-icon>
+        </div>
         <h3 class="enquiry-title">Auto-Acknowledgement</h3>
         <div class="enquiry-message">
           <p class="message-greeting">Hi, Jess.</p>
