@@ -28,7 +28,7 @@
       [class.active]="activeSection() === 'basic'"
       (click)="setActiveSection('basic')"
     >
-      📋 Basic Info
+      <lucide-icon [img]="ClipboardList" [size]="18"></lucide-icon> Basic Info
     </button>
     <button
       type="button"
@@ -36,7 +36,7 @@
       [class.active]="activeSection() === 'professional'"
       (click)="setActiveSection('professional')"
     >
-      👨‍🍳 Professional
+      <lucide-icon [img]="ChefHat" [size]="18"></lucide-icon> Professional
     </button>
     <button
       type="button"
@@ -44,7 +44,7 @@
       [class.active]="activeSection() === 'media'"
       (click)="setActiveSection('media')"
     >
-      📸 Media
+      <lucide-icon [img]="Camera" [size]="18"></lucide-icon> Media
     </button>
     <button
       type="button"
@@ -52,7 +52,7 @@
       [class.active]="activeSection() === 'privacy'"
       (click)="setActiveSection('privacy')"
     >
-      🔒 Privacy
+      <lucide-icon [img]="Lock" [size]="18"></lucide-icon> Privacy
     </button>
   </div>
 

@@ -94,19 +94,19 @@ export class SpecialistListComponent implements OnInit {
 
   cuisineTypes = [
     { value: '', label: 'All Cuisines' },
-    { value: 'italian', label: '🍝 Italian' },
-    { value: 'french', label: '🥐 French' },
-    { value: 'japanese', label: '🍣 Japanese' },
-    { value: 'chinese', label: '🥡 Chinese' },
-    { value: 'indian', label: '🍛 Indian' },
-    { value: 'mexican', label: '🌮 Mexican' },
-    { value: 'thai', label: '🍜 Thai' },
-    { value: 'mediterranean', label: '🫒 Mediterranean' },
-    { value: 'african', label: '🍲 African' },
-    { value: 'american', label: '🍔 American' },
-    { value: 'fusion', label: '🍱 Fusion' },
-    { value: 'vegan', label: '🥗 Vegan' },
-    { value: 'vegetarian', label: '🥬 Vegetarian' }
+    { value: 'italian', label: 'Italian' },
+    { value: 'french', label: 'French' },
+    { value: 'japanese', label: 'Japanese' },
+    { value: 'chinese', label: 'Chinese' },
+    { value: 'indian', label: 'Indian' },
+    { value: 'mexican', label: 'Mexican' },
+    { value: 'thai', label: 'Thai' },
+    { value: 'mediterranean', label: 'Mediterranean' },
+    { value: 'african', label: 'African' },
+    { value: 'american', label: 'American' },
+    { value: 'fusion', label: 'Fusion' },
+    { value: 'vegan', label: 'Vegan' },
+    { value: 'vegetarian', label: 'Vegetarian' }
   ];
 
   priceRanges = [

@@ -1,5 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { LucideAngularModule, ChefHat, UtensilsCrossed, Calendar, Camera, AlertTriangle, DollarSign, Star, Users, TrendingUp, Clock, CheckCircle, XCircle, MessageSquare } from 'lucide-angular';
+import { LucideAngularModule, ChefHat, UtensilsCrossed, Calendar, Camera, AlertTriangle, DollarSign, Star, Users, TrendingUp, Clock, CheckCircle, XCircle, MessageSquare, Mail, Inbox, MapPin } from 'lucide-angular';
 import { SpecialistBooking, SpecialistEarning, SpecialistReview, SpecialistService } from '../../../core/services/specialist.service';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -62,6 +62,9 @@ export class SpecialistOverviewComponent implements OnInit {
   readonly CheckCircle = CheckCircle;
   readonly XCircle = XCircle;
   readonly MessageSquare = MessageSquare;
+  readonly Mail = Mail;
+  readonly Inbox = Inbox;
+  readonly MapPin = MapPin;
   private authService = inject(AuthService);
   private specialistService = inject(SpecialistService);
 

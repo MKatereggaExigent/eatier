@@ -94,7 +94,7 @@
     <section class="content-card requests-card" aria-label="Pending Booking Requests">
       <div class="card-header">
         <h2>
-          <span class="header-icon">📨</span>
+          <lucide-icon [img]="Mail" [size]="24" class="header-icon"></lucide-icon>
           Pending Requests
           @if (pendingRequests().length > 0) {
             <span class="count-badge">{{ pendingRequests().length }}</span>
@@ -108,7 +108,7 @@
       <div class="card-content">
         @if (pendingRequests().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">📭</div>
+            <lucide-icon [img]="Inbox" [size]="64" class="empty-icon"></lucide-icon>
             <h3>No pending requests</h3>
             <p>New booking requests will appear here</p>
           </div>
@@ -137,15 +137,15 @@
 
                 <div class="request-details">
                   <div class="detail-item">
-                    <span class="detail-icon">📅</span>
+                    <lucide-icon [img]="Calendar" [size]="16" class="detail-icon"></lucide-icon>
                     <span>{{ formatDate(request.eventDate) }}</span>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-icon">📍</span>
+                    <lucide-icon [img]="MapPin" [size]="16" class="detail-icon"></lucide-icon>
                     <span>{{ request.location }}</span>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-icon">👥</span>
+                    <lucide-icon [img]="Users" [size]="16" class="detail-icon"></lucide-icon>
                     <span>{{ request.guests }} guests</span>
                   </div>
                 </div>
@@ -173,7 +173,7 @@
     <section class="content-card bookings-card" aria-label="Upcoming Bookings">
       <div class="card-header">
         <h2>
-          <span class="header-icon">📅</span>
+          <lucide-icon [img]="Calendar" [size]="24" class="header-icon"></lucide-icon>
           Upcoming Bookings
         </h2>
         <button type="button" class="view-all-btn" (click)="viewAllBookings()">
@@ -184,7 +184,7 @@
       <div class="card-content">
         @if (upcomingBookings().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">📅</div>
+            <lucide-icon [img]="Calendar" [size]="64" class="empty-icon"></lucide-icon>
             <h3>No upcoming bookings</h3>
             <p>Your confirmed bookings will appear here</p>
           </div>
@@ -200,8 +200,8 @@
                   <h4>{{ booking.eventType }}</h4>
                   <p class="client-name">{{ booking.clientName }}</p>
                   <div class="booking-meta">
-                    <span class="location">📍 {{ booking.location }}</span>
-                    <span class="guests">👥 {{ booking.guests }} guests</span>
+                    <span class="location"><lucide-icon [img]="MapPin" [size]="14"></lucide-icon> {{ booking.location }}</span>
+                    <span class="guests"><lucide-icon [img]="Users" [size]="14"></lucide-icon> {{ booking.guests }} guests</span>
                   </div>
                 </div>
                 <div class="booking-amount">
@@ -218,7 +218,7 @@
     <section class="content-card earnings-card" aria-label="Recent Earnings">
       <div class="card-header">
         <h2>
-          <span class="header-icon">💰</span>
+          <lucide-icon [img]="DollarSign" [size]="24" class="header-icon"></lucide-icon>
           Recent Earnings
         </h2>
         <button type="button" class="view-all-btn" (click)="viewAllEarnings()">
@@ -229,7 +229,7 @@
       <div class="card-content">
         @if (recentEarnings().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">💰</div>
+            <lucide-icon [img]="DollarSign" [size]="64" class="empty-icon"></lucide-icon>
             <h3>No recent earnings</h3>
             <p>Your payment history will appear here</p>
           </div>
@@ -259,7 +259,7 @@
     <section class="content-card reviews-card" aria-label="Recent Reviews">
       <div class="card-header">
         <h2>
-          <span class="header-icon">⭐</span>
+          <lucide-icon [img]="Star" [size]="24" class="header-icon"></lucide-icon>
           Recent Reviews
         </h2>
         <button type="button" class="view-all-btn" (click)="viewAllReviews()">
@@ -270,7 +270,7 @@
       <div class="card-content">
         @if (recentReviews().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">⭐</div>
+            <lucide-icon [img]="Star" [size]="64" class="empty-icon"></lucide-icon>
             <h3>No reviews yet</h3>
             <p>Client reviews will appear here</p>
           </div>
@@ -291,7 +291,7 @@
                       <h4>{{ review.clientName }}</h4>
                       <div class="review-rating">
                         @for (star of getStarArray(review.rating); track $index) {
-                          <span class="star" [class.filled]="star">⭐</span>
+                          <lucide-icon [img]="Star" [size]="16" class="star" [class.filled]="star"></lucide-icon>
                         }
                       </div>
                     </div>
