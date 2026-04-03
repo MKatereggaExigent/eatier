@@ -155,7 +155,7 @@
 
       <!-- Top Menu Items -->
       <div class="top-items-section">
-        <h2>🏆 Top Performing Menu Items</h2>
+        <h2><lucide-icon [img]="Trophy" [size]="24"></lucide-icon> Top Performing Menu Items</h2>
         <div class="top-items-list">
           @for (item of analyticsData()!.topMenuItems; track item.id; let i = $index) {
             <div class="item-card">
@@ -180,7 +180,7 @@
 
       <!-- Customer Insights -->
       <div class="customer-section">
-        <h2>👥 Customer Insights</h2>
+        <h2><lucide-icon [img]="UserCircle" [size]="24"></lucide-icon> Customer Insights</h2>
         <div class="customer-grid">
           <div class="customer-card">
             <h3>New Customers</h3>
@@ -216,14 +216,12 @@
 
       <!-- Order Types Distribution -->
       <div class="order-types-section">
-        <h2>🚗 Order Types Distribution</h2>
+        <h2><lucide-icon [img]="Truck" [size]="24"></lucide-icon> Order Types Distribution</h2>
         <div class="order-types-grid">
           @for (type of analyticsData()!.ordersByType; track type.type) {
             <div class="order-type-card">
               <div class="type-icon">
-                @if (type.type === 'Delivery') { 🚗 }
-                @if (type.type === 'Pickup') { 🏪 }
-                @if (type.type === 'Dine-in') { 🍽️ }
+                <lucide-icon [img]="getOrderTypeIcon(type.type)" [size]="32"></lucide-icon>
               </div>
               <h3>{{ type.type }}</h3>
               <p class="type-count">{{ formatNumber(type.count) }} orders</p>
@@ -238,7 +236,7 @@
 
       <!-- Peak Hours -->
       <div class="peak-hours-section">
-        <h2>⏰ Peak Order Hours</h2>
+        <h2><lucide-icon [img]="Clock" [size]="24"></lucide-icon> Peak Order Hours</h2>
         <div class="peak-hours-chart">
           @for (hour of analyticsData()!.peakHours; track hour.hour) {
             <div class="hour-bar">
@@ -253,25 +251,25 @@
 
       <!-- Quick Actions -->
       <div class="actions-section">
-        <h2>🎯 Quick Actions</h2>
+        <h2><lucide-icon [img]="Target" [size]="24"></lucide-icon> Quick Actions</h2>
         <div class="actions-grid">
           <a routerLink="../menu" class="action-card">
-            <span class="action-icon">🍽️</span>
+            <lucide-icon [img]="UtensilsCrossed" [size]="32" class="action-icon"></lucide-icon>
             <h3>Manage Menu</h3>
             <p>Update your menu items based on performance</p>
           </a>
           <a routerLink="../ads/create" class="action-card">
-            <span class="action-icon">📢</span>
+            <lucide-icon [img]="Megaphone" [size]="32" class="action-icon"></lucide-icon>
             <h3>Create Ad Campaign</h3>
             <p>Promote your top-performing items</p>
           </a>
           <a routerLink="../insights" class="action-card">
-            <span class="action-icon">📈</span>
+            <lucide-icon [img]="BarChart3" [size]="32" class="action-icon"></lucide-icon>
             <h3>View Insights</h3>
             <p>Get detailed business insights</p>
           </a>
           <a routerLink="../reviews" class="action-card">
-            <span class="action-icon">⭐</span>
+            <lucide-icon [img]="Star" [size]="32" class="action-icon"></lucide-icon>
             <h3>Manage Reviews</h3>
             <p>Respond to customer feedback</p>
           </a>

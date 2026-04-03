@@ -4,6 +4,12 @@
   padding: 2rem;
   background: #f8f9fa;
   min-height: 100vh;
+  color: #000000;
+
+  // Global text color override - make all text black
+  * {
+    color: #000000;
+  }
 }
 
 // Header

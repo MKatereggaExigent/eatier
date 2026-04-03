@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { LucideAngularModule, DollarSign, Package, Users, TrendingUp, TrendingDown, ArrowRight, CheckCircle, Clock, XCircle, AlertTriangle, Download, BarChart3 } from 'lucide-angular';
+import { LucideAngularModule, DollarSign, Package, Users, TrendingUp, TrendingDown, ArrowRight, CheckCircle, Clock, XCircle, AlertTriangle, Download, BarChart3, Trophy, UserCircle, Truck, Store, UtensilsCrossed, Target, Megaphone, Star, LucideIconData } from 'lucide-angular';
 import { Subject, takeUntil, catchError, of, finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { BusinessOwnerService } from '../../../core/services/business-owner.service';
@@ -82,6 +82,14 @@ export class BusinessAnalyticsComponent implements OnInit, OnDestroy {
   readonly AlertTriangle = AlertTriangle;
   readonly Download = Download;
   readonly BarChart3 = BarChart3;
+  readonly Trophy = Trophy;
+  readonly UserCircle = UserCircle;
+  readonly Truck = Truck;
+  readonly Store = Store;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Target = Target;
+  readonly Megaphone = Megaphone;
+  readonly Star = Star;
 
   // State
   loading = signal(true);
@@ -291,6 +299,15 @@ export class BusinessAnalyticsComponent implements OnInit, OnDestroy {
     const data = this.analyticsData();
     if (!data || !data.peakHours.length) return 1;
     return Math.max(...data.peakHours.map(h => h.orders));
+  }
+
+  getOrderTypeIcon(type: string): LucideIconData {
+    const iconMap: Record<string, LucideIconData> = {
+      'Delivery': Truck,
+      'Pickup': Store,
+      'Dine-in': UtensilsCrossed
+    };
+    return iconMap[type] || Package;
   }
 
   // Expose Math for template
