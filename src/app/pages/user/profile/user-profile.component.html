@@ -1,21 +1,21 @@
 <div class="user-profile-container">
   <!-- Header -->
   <div class="profile-header">
-    <h1>👤 User Profile</h1>
+    <h1><lucide-icon [img]="User" [size]="28"></lucide-icon> User Profile</h1>
     <p>Manage your personal information and professional details</p>
   </div>
 
   <!-- Success/Error Messages -->
   @if (successMessage()) {
     <div class="success-message">
-      <span class="success-icon">✅</span>
+      <lucide-icon [img]="CheckCircle" [size]="20" class="success-icon"></lucide-icon>
       {{ successMessage() }}
     </div>
   }
 
   @if (errorMessage()) {
     <div class="error-message">
-      <span class="error-icon">⚠️</span>
+      <lucide-icon [img]="AlertTriangle" [size]="20" class="error-icon"></lucide-icon>
       {{ errorMessage() }}
     </div>
   }
@@ -363,7 +363,7 @@
                 hidden
               />
               <div class="upload-placeholder large">
-                <span class="upload-icon">🖼️</span>
+                <lucide-icon [img]="Image" [size]="32" class="upload-icon"></lucide-icon>
                 <span>Upload Background Photo</span>
               </div>
             </label>

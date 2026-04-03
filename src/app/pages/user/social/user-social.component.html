@@ -80,8 +80,8 @@
               <div class="user-info">
                 <h3>{{ user.firstName }} {{ user.lastName }}</h3>
                 <div class="user-stats">
-                  <span>⭐ {{ user.reviewCount }} reviews</span>
-                  <span>👥 {{ user.followerCount }} followers</span>
+                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.reviewCount }} reviews</span>
+                  <span><lucide-icon [img]="Users" [size]="14"></lucide-icon> {{ user.followerCount }} followers</span>
                 </div>
               </div>
               <button 
@@ -108,7 +108,7 @@
     @if (activeTab() === 'following') {
       @if (following().length === 0) {
         <div class="empty-state">
-          <span class="empty-icon">👤</span>
+          <lucide-icon [img]="User" [size]="48" class="empty-icon"></lucide-icon>
           <h2>Not following anyone</h2>
           <p>Discover and follow food lovers to see their activity!</p>
           <button type="button" class="action-btn" (click)="setActiveTab('discover')">Discover People</button>
@@ -121,7 +121,7 @@
               <div class="user-info">
                 <h3>{{ user.firstName }} {{ user.lastName }}</h3>
                 <div class="user-stats">
-                  <span>⭐ {{ user.reviewCount }} reviews</span>
+                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.reviewCount }} reviews</span>
                 </div>
               </div>
               <button type="button" class="follow-btn following" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, true)">
@@ -137,7 +137,7 @@
     @if (activeTab() === 'followers') {
       @if (followers().length === 0) {
         <div class="empty-state">
-          <span class="empty-icon">👥</span>
+          <lucide-icon [img]="Users" [size]="48" class="empty-icon"></lucide-icon>
           <h2>No followers yet</h2>
           <p>Share your reviews and favorites to attract followers!</p>
         </div>
@@ -149,7 +149,7 @@
               <div class="user-info">
                 <h3>{{ user.firstName }} {{ user.lastName }}</h3>
                 <div class="user-stats">
-                  <span>⭐ {{ user.reviewCount }} reviews</span>
+                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.reviewCount }} reviews</span>
                 </div>
               </div>
               <button type="button" class="follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">

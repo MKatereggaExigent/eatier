@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { LucideAngularModule, Star, Users, User } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
 import { SocialWidgetComponent } from '../../../shared/components/social-widget/social-widget.component';
 import { MessagingWidgetComponent } from '../../../shared/components/messaging-widget/messaging-widget.component';
@@ -27,21 +28,26 @@ interface ActivityItem {
 @Component({
   selector: 'app-user-social',
   standalone: true,
-  imports: [CommonModule, SocialWidgetComponent, MessagingWidgetComponent],
+  imports: [CommonModule, LucideAngularModule, SocialWidgetComponent, MessagingWidgetComponent],
   templateUrl: './user-social.component.html',
   styleUrls: ['./user-social.component.scss']
 })
 export class UserSocialComponent implements OnInit {
   private http = inject(HttpClient);
 
+  // Lucide Icons
+  readonly Star = Star;
+  readonly Users = Users;
+  readonly User = User;
+
   loading = signal(true);
   activeTab = signal<'feed' | 'discover' | 'following' | 'followers'>('feed');
-  
+
   activityFeed = signal<ActivityItem[]>([]);
   discoverUsers = signal<UserToFollow[]>([]);
   following = signal<UserToFollow[]>([]);
   followers = signal<UserToFollow[]>([]);
-  
+
   followingInProgress = signal<Set<string>>(new Set());
 
   ngOnInit(): void {

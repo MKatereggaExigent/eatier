@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LucideAngularModule, User, CheckCircle, AlertTriangle, Image } from 'lucide-angular';
 import { USER_PROFILE_CONSTRAINTS, UserProfile, UserProfileUpdateData } from '../../../shared/models/user-profile.model';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -9,7 +10,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss']
 })
@@ -17,6 +18,12 @@ export class UserProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private userService = inject(UserService);
+
+  // Lucide Icons
+  readonly User = User;
+  readonly CheckCircle = CheckCircle;
+  readonly AlertTriangle = AlertTriangle;
+  readonly Image = Image;
 
   // State management
   profileForm: FormGroup;
