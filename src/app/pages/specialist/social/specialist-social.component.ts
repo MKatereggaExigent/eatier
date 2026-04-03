@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { LucideAngularModule, Star, Heart, Calendar, Link, ClipboardList, User, Users, Newspaper, Search } from 'lucide-angular';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { SocialWidgetComponent } from '../../../shared/components/social-widget/social-widget.component';
@@ -29,11 +30,21 @@ interface ActivityItem {
 @Component({
   selector: 'app-specialist-social',
   standalone: true,
-  imports: [CommonModule, SocialWidgetComponent, MessagingWidgetComponent],
+  imports: [CommonModule, SocialWidgetComponent, MessagingWidgetComponent, LucideAngularModule],
   templateUrl: './specialist-social.component.html',
   styleUrls: ['./specialist-social.component.scss']
 })
 export class SpecialistSocialComponent implements OnInit {
+  // Lucide Icons
+  readonly Star = Star;
+  readonly Heart = Heart;
+  readonly Calendar = Calendar;
+  readonly Link = Link;
+  readonly ClipboardList = ClipboardList;
+  readonly User = User;
+  readonly Users = Users;
+  readonly Newspaper = Newspaper;
+  readonly Search = Search;
   private http = inject(HttpClient);
   private router = inject(Router);
   private messagingService = inject(MessagingService);
@@ -124,13 +135,13 @@ export class SpecialistSocialComponent implements OnInit {
     this.followers.update(users => users.map(u => u.id === userId ? { ...u, isFollowing } : u));
   }
 
-  getActivityIcon(type: string): string {
+  getActivityIcon(type: string): any {
     switch (type) {
-      case 'review': return '⭐';
-      case 'favorite': return '❤️';
-      case 'booking': return '📅';
-      case 'share': return '🔗';
-      default: return '📋';
+      case 'review': return this.Star;
+      case 'favorite': return this.Heart;
+      case 'booking': return this.Calendar;
+      case 'share': return this.Link;
+      default: return this.ClipboardList;
     }
   }
 

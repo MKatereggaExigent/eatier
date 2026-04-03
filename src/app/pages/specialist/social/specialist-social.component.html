@@ -38,7 +38,7 @@
     @if (activeTab() === 'feed') {
       @if (activityFeed().length === 0) {
         <div class="empty-state">
-          <span class="empty-icon">📰</span>
+          <lucide-icon [img]="Newspaper" [size]="48" class="empty-icon"></lucide-icon>
           <h2>No activity yet</h2>
           <p>Follow some food lovers to see their activity here!</p>
           <button type="button" class="action-btn" (click)="setActiveTab('discover')">Discover People</button>
@@ -47,7 +47,7 @@
         <div class="activity-list">
           @for (activity of activityFeed(); track activity.id) {
             <div class="activity-card">
-              <div class="activity-icon">{{ getActivityIcon(activity.activityType) }}</div>
+              <lucide-icon [img]="getActivityIcon(activity.activityType)" [size]="24" class="activity-icon"></lucide-icon>
               <div class="activity-content">
                 <div class="activity-header">
                   <span class="actor-name">{{ activity.actorName }}</span>
@@ -68,7 +68,7 @@
     @if (activeTab() === 'discover') {
       @if (discoverUsers().length === 0) {
         <div class="empty-state">
-          <span class="empty-icon">🔍</span>
+          <lucide-icon [img]="Search" [size]="48" class="empty-icon"></lucide-icon>
           <h2>No suggestions</h2>
           <p>Check back later for new food lovers to follow!</p>
         </div>
@@ -80,8 +80,8 @@
               <div class="user-info">
                 <h3>{{ user.firstName || '' }} {{ user.lastName || '' }}</h3>
                 <div class="user-stats">
-                  <span>⭐ {{ user.reviewCount }} reviews</span>
-                  <span>👥 {{ user.followerCount }} followers</span>
+                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.reviewCount }} reviews</span>
+                  <span><lucide-icon [img]="Users" [size]="14"></lucide-icon> {{ user.followerCount }} followers</span>
                 </div>
               </div>
               <div class="user-actions">
@@ -121,7 +121,7 @@
     @if (activeTab() === 'following') {
       @if (following().length === 0) {
         <div class="empty-state">
-          <span class="empty-icon">👤</span>
+          <lucide-icon [img]="User" [size]="48" class="empty-icon"></lucide-icon>
           <h2>Not following anyone</h2>
           <p>Discover and follow food lovers to see their activity!</p>
           <button type="button" class="action-btn" (click)="setActiveTab('discover')">Discover People</button>
@@ -134,7 +134,7 @@
               <div class="user-info">
                 <h3>{{ user.firstName || '' }} {{ user.lastName || '' }}</h3>
                 <div class="user-stats">
-                  <span>⭐ {{ user.reviewCount }} reviews</span>
+                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.reviewCount }} reviews</span>
                 </div>
               </div>
               <div class="user-actions">
@@ -163,7 +163,7 @@
     @if (activeTab() === 'followers') {
       @if (followers().length === 0) {
         <div class="empty-state">
-          <span class="empty-icon">👥</span>
+          <lucide-icon [img]="Users" [size]="48" class="empty-icon"></lucide-icon>
           <h2>No followers yet</h2>
           <p>Share your reviews and favorites to attract followers!</p>
         </div>
@@ -175,7 +175,7 @@
               <div class="user-info">
                 <h3>{{ user.firstName || '' }} {{ user.lastName || '' }}</h3>
                 <div class="user-stats">
-                  <span>⭐ {{ user.reviewCount }} reviews</span>
+                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.reviewCount }} reviews</span>
                 </div>
               </div>
               <div class="user-actions">
