@@ -12,7 +12,7 @@
     <div class="header-content">
       <div class="title-section">
         <h1 class="page-title">
-          <span class="title-icon">{{ isEditMode() ? '✏️' : '🚀' }}</span>
+          <lucide-icon [img]="isEditMode() ? Edit : Rocket" [size]="28" class="title-icon"></lucide-icon>
           {{ isEditMode() ? 'Edit Campaign' : 'Create New Campaign' }}
         </h1>
         <p class="page-subtitle">
@@ -806,7 +806,8 @@
               <span class="loading-spinner"></span>
               {{ isEditMode() ? 'Updating Campaign...' : 'Creating Campaign...' }}
             } @else {
-              {{ isEditMode() ? '✏️ Update Campaign' : '🚀 Launch Campaign' }}
+              <lucide-icon [img]="isEditMode() ? Edit : Rocket" [size]="16"></lucide-icon>
+              {{ isEditMode() ? 'Update Campaign' : 'Launch Campaign' }}
             }
           </button>
         }

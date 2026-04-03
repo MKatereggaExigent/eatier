@@ -28,6 +28,12 @@
 
 .ad-creation-container {
   font-family: var(--font-sans);
+  color: #000000;
+
+  // Global text color override - make all text black
+  * {
+    color: #000000;
+  }
   background-color: var(--color-white);
   min-height: 100vh;
   padding: 2rem;

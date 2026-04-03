@@ -7,6 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CurrencyService } from '../../../core/services/currency.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LucideAngularModule, Plus, CheckCircle, AlertTriangle, BarChart3, Circle, FileText, Pause, DollarSign, Eye, MousePointerClick, TrendingUp, Play, Edit, Trash2 } from 'lucide-angular';
 
 interface Campaign {
   id: string;
@@ -42,7 +43,7 @@ interface DashboardStats {
 @Component({
   selector: 'app-ad-management',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule],
   templateUrl: './ad-management.component.html',
   styleUrls: ['./ad-management.component.scss']
 })
@@ -72,6 +73,22 @@ export class AdManagementComponent implements OnInit {
   totalCampaigns = signal<number>(0);
   pageSize = signal<number>(20);
   hasMore = signal<boolean>(false);
+
+  // Lucide Icons
+  readonly Plus = Plus;
+  readonly CheckCircle = CheckCircle;
+  readonly AlertTriangle = AlertTriangle;
+  readonly BarChart3 = BarChart3;
+  readonly Circle = Circle;
+  readonly FileText = FileText;
+  readonly Pause = Pause;
+  readonly DollarSign = DollarSign;
+  readonly Eye = Eye;
+  readonly MousePointerClick = MousePointerClick;
+  readonly TrendingUp = TrendingUp;
+  readonly Play = Play;
+  readonly Edit = Edit;
+  readonly Trash2 = Trash2;
 
   // Computed
   filteredCampaigns = computed(() => {

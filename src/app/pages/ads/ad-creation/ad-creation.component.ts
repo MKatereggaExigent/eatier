@@ -20,6 +20,7 @@ import { CurrencyService, CurrencyInfo, Country } from '../../../core/services/c
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { LucideAngularModule, Edit, Rocket } from 'lucide-angular';
 
 interface StepValidation {
   isValid: boolean;
@@ -37,7 +38,7 @@ interface UploadedMedia {
 @Component({
   selector: 'app-ad-creation',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './ad-creation.component.html',
   styleUrls: ['./ad-creation.component.scss']
 })
@@ -52,6 +53,10 @@ export class AdCreationComponent implements OnInit {
 
   // Make Math available in template
   Math = Math;
+
+  // Lucide Icons
+  readonly Edit = Edit;
+  readonly Rocket = Rocket;
 
   // Edit mode signals
   isEditMode = signal(false);

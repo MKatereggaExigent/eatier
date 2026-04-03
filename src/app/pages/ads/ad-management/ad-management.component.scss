@@ -33,7 +33,18 @@
   min-height: 100vh;
   background: var(--color-white);
   font-family: var(--font-sans);
-  color: var(--color-black);
+  color: #000000;
+
+  // Global text color override - make all text black
+  * {
+    color: #000000;
+  }
+
+  // Status active icon color (green circle)
+  .status-active {
+    color: #22c55e !important;
+    fill: #22c55e !important;
+  }
 }
 
 // Page Header

@@ -6,7 +6,7 @@
       <p>Create, manage, and track your advertising campaigns</p>
     </div>
     <button class="btn-primary" (click)="openCreateCampaign()">
-      <span class="icon">➕</span>
+      <lucide-icon [img]="Plus" [size]="16" class="icon"></lucide-icon>
       Create Campaign
     </button>
   </div>
@@ -14,14 +14,14 @@
   <!-- Success/Error Messages -->
   @if (successMessage()) {
     <div class="alert alert-success">
-      <span class="icon">✅</span>
+      <lucide-icon [img]="CheckCircle" [size]="20" class="icon"></lucide-icon>
       {{ successMessage() }}
     </div>
   }
 
   @if (errorMessage()) {
     <div class="alert alert-error">
-      <span class="icon">⚠️</span>
+      <lucide-icon [img]="AlertTriangle" [size]="20" class="icon"></lucide-icon>
       {{ errorMessage() }}
     </div>
   }
@@ -29,7 +29,9 @@
   <!-- Statistics Grid -->
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-icon">📊</div>
+      <div class="stat-icon">
+        <lucide-icon [img]="BarChart3" [size]="28"></lucide-icon>
+      </div>
       <div class="stat-content">
         <div class="stat-label">Total Campaigns</div>
         <div class="stat-value">{{ statistics().total }}</div>
@@ -37,7 +39,9 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">🟢</div>
+      <div class="stat-icon">
+        <lucide-icon [img]="Circle" [size]="28" class="status-active"></lucide-icon>
+      </div>
       <div class="stat-content">
         <div class="stat-label">Active</div>
         <div class="stat-value">{{ statistics().active }}</div>
@@ -45,7 +49,9 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">📝</div>
+      <div class="stat-icon">
+        <lucide-icon [img]="FileText" [size]="28"></lucide-icon>
+      </div>
       <div class="stat-content">
         <div class="stat-label">Draft</div>
         <div class="stat-value">{{ statistics().draft }}</div>
@@ -53,7 +59,9 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">⏸️</div>
+      <div class="stat-icon">
+        <lucide-icon [img]="Pause" [size]="28"></lucide-icon>
+      </div>
       <div class="stat-content">
         <div class="stat-label">Paused</div>
         <div class="stat-value">{{ statistics().paused }}</div>
@@ -61,7 +69,9 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">💰</div>
+      <div class="stat-icon">
+        <lucide-icon [img]="DollarSign" [size]="28"></lucide-icon>
+      </div>
       <div class="stat-content">
         <div class="stat-label">Total Spend</div>
         <div class="stat-value">{{ formatCurrency(statistics().totalSpend) }}</div>
@@ -69,7 +79,9 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">👁️</div>
+      <div class="stat-icon">
+        <lucide-icon [img]="Eye" [size]="28"></lucide-icon>
+      </div>
       <div class="stat-content">
         <div class="stat-label">Impressions</div>
         <div class="stat-value">{{ formatNumber(statistics().totalImpressions) }}</div>
@@ -77,7 +89,9 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">🖱️</div>
+      <div class="stat-icon">
+        <lucide-icon [img]="MousePointerClick" [size]="28"></lucide-icon>
+      </div>
       <div class="stat-content">
         <div class="stat-label">Clicks</div>
         <div class="stat-value">{{ formatNumber(statistics().totalClicks) }}</div>
@@ -85,7 +99,9 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">📈</div>
+      <div class="stat-icon">
+        <lucide-icon [img]="TrendingUp" [size]="28"></lucide-icon>
+      </div>
       <div class="stat-content">
         <div class="stat-label">Avg CTR</div>
         <div class="stat-value">
@@ -193,28 +209,28 @@
               <td>
                 <div class="action-buttons">
                   <button class="btn-icon" (click)="viewCampaignDetails(campaign)" title="View Details">
-                    👁️
+                    <lucide-icon [img]="Eye" [size]="16"></lucide-icon>
                   </button>
                   @if (campaign.status === 'draft') {
                     <button class="btn-icon btn-success" (click)="startCampaign(campaign.id)" title="Start Campaign">
-                      ▶️
+                      <lucide-icon [img]="Play" [size]="16"></lucide-icon>
                     </button>
                     <button class="btn-icon" (click)="editCampaign(campaign)" title="Edit">
-                      ✏️
+                      <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
                     </button>
                   }
                   @if (campaign.status === 'active') {
                     <button class="btn-icon btn-warning" (click)="pauseCampaign(campaign.id)" title="Pause">
-                      ⏸️
+                      <lucide-icon [img]="Pause" [size]="16"></lucide-icon>
                     </button>
                   }
                   @if (campaign.status === 'paused') {
                     <button class="btn-icon btn-success" (click)="resumeCampaign(campaign.id)" title="Resume">
-                      ▶️
+                      <lucide-icon [img]="Play" [size]="16"></lucide-icon>
                     </button>
                   }
                   <button class="btn-icon btn-danger" (click)="confirmDeleteCampaign(campaign)" title="Delete">
-                    🗑️
+                    <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
                   </button>
                 </div>
               </td>
@@ -351,20 +367,20 @@
       <div class="modal-footer">
         @if (selectedCampaign()!.status === 'draft') {
           <button type="button" class="btn-success" (click)="startCampaign(selectedCampaign()!.id); closeDetailsModal()">
-            ▶️ Start Campaign
+            <lucide-icon [img]="Play" [size]="16"></lucide-icon> Start Campaign
           </button>
           <button type="button" class="btn-primary" (click)="editCampaign(selectedCampaign()!); closeDetailsModal()">
-            ✏️ Edit Campaign
+            <lucide-icon [img]="Edit" [size]="16"></lucide-icon> Edit Campaign
           </button>
         }
         @if (selectedCampaign()!.status === 'active') {
           <button type="button" class="btn-warning" (click)="pauseCampaign(selectedCampaign()!.id); closeDetailsModal()">
-            ⏸️ Pause Campaign
+            <lucide-icon [img]="Pause" [size]="16"></lucide-icon> Pause Campaign
           </button>
         }
         @if (selectedCampaign()!.status === 'paused') {
           <button type="button" class="btn-success" (click)="resumeCampaign(selectedCampaign()!.id); closeDetailsModal()">
-            ▶️ Resume Campaign
+            <lucide-icon [img]="Play" [size]="16"></lucide-icon> Resume Campaign
           </button>
         }
         <button type="button" class="btn-secondary" (click)="closeDetailsModal()">Close</button>
