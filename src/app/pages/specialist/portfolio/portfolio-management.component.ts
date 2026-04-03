@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LucideAngularModule, Camera, Image, Video, Star, Settings, Edit, Trash2, Play, Eye, Lock } from 'lucide-angular';
+import { LucideAngularModule, Camera, Image, Video, Star, Settings, Edit, Trash2, Play, Eye, Lock, Plus, X, MessageCircle } from 'lucide-angular';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SpecialistService, PortfolioImage, PortfolioVideo, PortfolioTestimonial, PortfolioSettings } from '../../../core/services/specialist.service';
@@ -60,6 +60,9 @@ export class PortfolioManagementComponent implements OnInit {
   readonly Play = Play;
   readonly Eye = Eye;
   readonly Lock = Lock;
+  readonly Plus = Plus;
+  readonly X = X;
+  readonly MessageCircle = MessageCircle;
   private authService = inject(AuthService);
   private specialistService = inject(SpecialistService);
   private fb = inject(FormBuilder);

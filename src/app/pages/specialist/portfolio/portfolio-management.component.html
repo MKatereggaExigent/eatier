@@ -78,14 +78,16 @@
       <div class="content-header">
         <h2>Portfolio Images</h2>
         <button type="button" class="add-btn primary" (click)="openImageModal()">
-          <span class="btn-icon">➕</span>
+          <lucide-icon [img]="Plus" [size]="16" class="btn-icon"></lucide-icon>
           Add Image
         </button>
       </div>
 
       @if (portfolioImages().length === 0) {
         <div class="empty-state">
-          <div class="empty-icon">📷</div>
+          <div class="empty-icon">
+            <lucide-icon [img]="Camera" [size]="64"></lucide-icon>
+          </div>
           <h3>No images in your portfolio</h3>
           <p>Start building your portfolio by adding your best work</p>
           <button type="button" class="add-btn primary" (click)="openImageModal()">
@@ -139,14 +141,16 @@
       <div class="content-header">
         <h2>Portfolio Videos</h2>
         <button type="button" class="add-btn primary" (click)="openVideoModal()">
-          <span class="btn-icon">➕</span>
+          <lucide-icon [img]="Plus" [size]="16" class="btn-icon"></lucide-icon>
           Add Video
         </button>
       </div>
 
       @if (portfolioVideos().length === 0) {
         <div class="empty-state">
-          <div class="empty-icon">🎬</div>
+          <div class="empty-icon">
+            <lucide-icon [img]="Video" [size]="64"></lucide-icon>
+          </div>
           <h3>No videos in your portfolio</h3>
           <p>Add cooking demonstrations or behind-the-scenes content</p>
           <button type="button" class="add-btn primary" (click)="openVideoModal()">
@@ -196,7 +200,9 @@
 
       @if (testimonials().length === 0) {
         <div class="empty-state">
-          <div class="empty-icon">💬</div>
+          <div class="empty-icon">
+            <lucide-icon [img]="MessageCircle" [size]="64"></lucide-icon>
+          </div>
           <h3>No testimonials yet</h3>
           <p>Testimonials will appear here when clients leave reviews after completing bookings with you</p>
         </div>
@@ -321,7 +327,9 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ selectedImage() ? 'Edit Image' : 'Add New Image' }}</h3>
-        <button type="button" class="close-btn" (click)="closeImageModal()">✕</button>
+        <button type="button" class="close-btn" (click)="closeImageModal()">
+          <lucide-icon [img]="X" [size]="18"></lucide-icon>
+        </button>
       </div>
       <form [formGroup]="imageForm" (ngSubmit)="saveImage()" class="modal-form">
         <div class="form-group">
@@ -380,7 +388,9 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ selectedVideo() ? 'Edit Video' : 'Add New Video' }}</h3>
-        <button type="button" class="close-btn" (click)="closeVideoModal()">✕</button>
+        <button type="button" class="close-btn" (click)="closeVideoModal()">
+          <lucide-icon [img]="X" [size]="18"></lucide-icon>
+        </button>
       </div>
       <form [formGroup]="videoForm" (ngSubmit)="saveVideo()" class="modal-form">
         <div class="form-group">
