@@ -97,10 +97,10 @@ export class MessagesComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.conversations.set(response.conversations);
-          
-          // Reload messages if a conversation is selected
+
+          // Reload messages smoothly if a conversation is selected
           if (this.selectedConversation()) {
-            this.loadMessages(this.selectedConversation()!.id);
+            this.loadMessagesSmooth(this.selectedConversation()!.id);
           }
         },
         error: (err) => console.error('Error polling conversations:', err)
@@ -167,13 +167,58 @@ export class MessagesComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.messages.set(response.messages);
         this.loadingMessages.set(false);
-        
+
         // Scroll to bottom
         setTimeout(() => this.scrollToBottom(), 100);
       },
       error: (err) => {
         console.error('Error loading messages:', err);
         this.loadingMessages.set(false);
+      }
+    });
+  }
+
+  /**
+   * Load messages smoothly without causing UI blink - used for polling
+   */
+  private loadMessagesSmooth(conversationId: string): void {
+    // Don't show loading spinner for polling updates
+    this.messagingService.getMessages(conversationId).subscribe({
+      next: (response) => {
+        const currentMessages = this.messages();
+        const newMessages = response.messages;
+
+        // Only update if there are new messages
+        if (newMessages.length > currentMessages.length) {
+          // Get the last message ID from current messages
+          const lastCurrentMessageId = currentMessages.length > 0
+            ? currentMessages[currentMessages.length - 1].id
+            : null;
+
+          // Find new messages that aren't already in the list
+          const messagesToAdd = newMessages.filter(msg => {
+            return !currentMessages.some(current => current.id === msg.id);
+          });
+
+          if (messagesToAdd.length > 0) {
+            // Append only new messages
+            this.messages.set([...currentMessages, ...messagesToAdd]);
+
+            // Scroll to bottom only if user is already near the bottom
+            setTimeout(() => {
+              const container = document.querySelector('.messages-container');
+              if (container) {
+                const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+                if (isNearBottom) {
+                  this.scrollToBottom();
+                }
+              }
+            }, 50);
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Error loading messages smoothly:', err);
       }
     });
   }
