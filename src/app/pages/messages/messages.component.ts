@@ -1,10 +1,11 @@
-import { Component, OnInit, OnDestroy, signal, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessagingService, ChatConversation, ChatMessage, ChatRequest } from '../../core/services/messaging.service';
 import { WebSocketService } from '../../core/services/websocket.service';
 import { PresenceService } from '../../core/services/presence.service';
+import { AuthService } from '../../core/services/auth.service';
 import { interval, Subscription, Subject } from 'rxjs';
 import { switchMap, debounceTime } from 'rxjs/operators';
 
@@ -31,6 +32,30 @@ export class MessagesComponent implements OnInit, OnDestroy {
   uploadingFile = signal<boolean>(false);
   selectedFile = signal<File | null>(null);
 
+  // Get current user from auth service
+  currentUser = this.authService.currentUser;
+
+  // Computed property to get the correct social route based on user role
+  socialRoute = computed(() => {
+    const user = this.currentUser();
+    if (!user) return '/dashboard/user/social';
+
+    switch (user.role) {
+      case 'specialist':
+        return '/dashboard/specialist/social';
+      case 'business_owner':
+        return '/dashboard/business/social';
+      case 'food_enthusiast':
+        return '/dashboard/food-enthusiast/social';
+      case 'normal_user':
+        return '/dashboard/user/social';
+      case 'itiyum_admin':
+        return '/admin/social';
+      default:
+        return '/dashboard/user/social';
+    }
+  });
+
   private pollingSubscription?: Subscription;
   private currentUserId: string = '';
   private typingSubject = new Subject<string>();
@@ -41,7 +66,8 @@ export class MessagesComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     public router: Router, // Make public so template can access it
     private websocketService: WebSocketService,
-    private presenceService: PresenceService
+    private presenceService: PresenceService,
+    private authService: AuthService
   ) {
     // Get current user ID from localStorage
     this.currentUserId = localStorage.getItem('userId') || '';

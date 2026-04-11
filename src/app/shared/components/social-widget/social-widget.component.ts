@@ -5,6 +5,7 @@ import { SocialService, UserProfile } from '../../../core/services/social.servic
 import { PresenceService, UserPresence } from '../../../core/services/presence.service';
 import { PokesService } from '../../../core/services/pokes.service';
 import { MessagingService } from '../../../core/services/messaging.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
@@ -32,6 +33,7 @@ export class SocialWidgetComponent implements OnInit, OnDestroy {
     private presenceService: PresenceService,
     private pokesService: PokesService,
     private messagingService: MessagingService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -130,10 +132,34 @@ export class SocialWidgetComponent implements OnInit, OnDestroy {
   startChat(userId: string): void {
     this.messagingService.sendChatRequest(userId).subscribe({
       next: () => {
-        this.router.navigate(['/dashboard/user/messages']);
+        // Navigate to messages page based on user role
+        this.router.navigate([this.getMessagesRoute()]);
       },
       error: (err) => console.error('Error starting chat:', err)
     });
+  }
+
+  /**
+   * Get the correct messages route based on user role
+   */
+  private getMessagesRoute(): string {
+    const user = this.authService.currentUser();
+    if (!user) return '/messages';
+
+    switch (user.role) {
+      case 'specialist':
+        return '/dashboard/specialist/messages';
+      case 'business_owner':
+        return '/dashboard/business/messages';
+      case 'food_enthusiast':
+        return '/dashboard/food-enthusiast/messages';
+      case 'normal_user':
+        return '/dashboard/user/messages';
+      case 'itiyum_admin':
+        return '/admin/messages';
+      default:
+        return '/messages';
+    }
   }
 
   /**

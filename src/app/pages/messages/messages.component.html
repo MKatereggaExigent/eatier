@@ -4,7 +4,7 @@
     <div class="conversations-sidebar">
       <div class="sidebar-header">
         <div class="header-top">
-          <button type="button" class="back-btn" (click)="router.navigate(['/dashboard/specialist/social'])" title="Back to Social">
+          <button type="button" class="back-btn" (click)="router.navigate([socialRoute()])" title="Back to Social">
             ← Back
           </button>
           <h2>Messages</h2>
@@ -43,7 +43,7 @@
                 <div class="empty-icon">💬</div>
                 <p>No conversations yet</p>
                 <small>Start chatting with other users</small>
-                <button type="button" class="start-chat-btn" (click)="router.navigate(['/dashboard/specialist/social'])">
+                <button type="button" class="start-chat-btn" (click)="router.navigate([socialRoute()])">
                   Discover People
                 </button>
               </div>
