@@ -192,5 +192,22 @@ export class SocialWidgetComponent implements OnInit, OnDestroy {
   getStatusLabel(status: string): string {
     return this.presenceService.getStatusLabel(status);
   }
+
+  /**
+   * Get user's full name with fallback for snake_case and camelCase API responses
+   */
+  getUserName(user: any): string {
+    const firstName = user.first_name || user.firstName || '';
+    const lastName = user.last_name || user.lastName || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+    return fullName || 'Unknown User';
+  }
+
+  /**
+   * Get user avatar URL
+   */
+  getUserAvatar(user: any): string {
+    return user.avatar_url || user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(this.getUserName(user))}&background=000000&color=ffffff`;
+  }
 }
 

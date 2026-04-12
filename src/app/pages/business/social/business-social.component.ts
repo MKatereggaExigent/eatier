@@ -7,10 +7,15 @@ import { MessagingWidgetComponent } from '../../../shared/components/messaging-w
 
 interface UserToFollow {
   id: string;
-  firstName: string;
-  lastName: string;
-  reviewCount: number;
-  followerCount: number;
+  // Support both snake_case (API response) and camelCase (legacy)
+  firstName?: string;
+  first_name?: string;
+  lastName?: string;
+  last_name?: string;
+  reviewCount?: number;
+  review_count?: number;
+  followerCount?: number;
+  follower_count?: number;
   isFollowing: boolean;
 }
 

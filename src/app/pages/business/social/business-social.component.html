@@ -76,12 +76,12 @@
         <div class="users-grid">
           @for (user of discoverUsers(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ user.firstName.charAt(0) || 'U' }}</div>
+              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
               <div class="user-info">
-                <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">
-                  <span>⭐ {{ user.reviewCount }} reviews</span>
-                  <span>👥 {{ user.followerCount }} followers</span>
+                  <span>⭐ {{ user.review_count || user.reviewCount || 0 }} reviews</span>
+                  <span>👥 {{ user.follower_count || user.followerCount || 0 }} followers</span>
                 </div>
               </div>
               <button 
@@ -117,11 +117,11 @@
         <div class="users-grid">
           @for (user of following(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ user.firstName.charAt(0) || 'U' }}</div>
+              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
               <div class="user-info">
-                <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">
-                  <span>⭐ {{ user.reviewCount }} reviews</span>
+                  <span>⭐ {{ user.review_count || user.reviewCount || 0 }} reviews</span>
                 </div>
               </div>
               <button type="button" class="follow-btn following" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, true)">
@@ -145,11 +145,11 @@
         <div class="users-grid">
           @for (user of followers(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ user.firstName.charAt(0) || 'U' }}</div>
+              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
               <div class="user-info">
-                <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">
-                  <span>⭐ {{ user.reviewCount }} reviews</span>
+                  <span>⭐ {{ user.review_count || user.reviewCount || 0 }} reviews</span>
                 </div>
               </div>
               <button type="button" class="follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">
