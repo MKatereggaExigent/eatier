@@ -35,6 +35,9 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
   selectedImageFile = signal<File | null>(null);
   imagePreviewUrl = signal<string | null>(null);
 
+  // Image fit mode - user preference for how images should display
+  imageFitMode = signal<'contain' | 'cover' | 'fill' | 'scale-down'>('contain');
+
   // Forms
   menuForm: FormGroup;
   accessForm: FormGroup;
@@ -158,6 +161,7 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadMenus();
+    this.loadImageFitPreference();
   }
 
   ngOnDestroy(): void {
@@ -610,5 +614,32 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
 
   toggleAdvancedOptions(): void {
     this.showAdvancedOptions.update(show => !show);
+  }
+
+  /**
+   * Get CSS class for image fit mode
+   */
+  getImageFitClass(): string {
+    const mode = this.imageFitMode();
+    return `fit-${mode}`;
+  }
+
+  /**
+   * Set image fit mode
+   */
+  setImageFitMode(mode: 'contain' | 'cover' | 'fill' | 'scale-down'): void {
+    this.imageFitMode.set(mode);
+    // Save preference to localStorage
+    localStorage.setItem('menu-image-fit-mode', mode);
+  }
+
+  /**
+   * Load image fit mode preference from localStorage
+   */
+  private loadImageFitPreference(): void {
+    const saved = localStorage.getItem('menu-image-fit-mode');
+    if (saved && ['contain', 'cover', 'fill', 'scale-down'].includes(saved)) {
+      this.imageFitMode.set(saved as any);
+    }
   }
 }

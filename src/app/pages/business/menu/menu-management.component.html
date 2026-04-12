@@ -65,6 +65,39 @@
       </div>
     }
 
+    <!-- Image Fit Mode Toggle -->
+    @if (menuItems().length > 0) {
+      <div class="image-fit-controls">
+        <label class="fit-label">Image Display:</label>
+        <div class="fit-buttons">
+          <button
+            type="button"
+            class="fit-btn"
+            [class.active]="imageFitMode() === 'contain'"
+            (click)="setImageFitMode('contain')"
+            title="Fit entire image (may show letterboxing)">
+            Fit
+          </button>
+          <button
+            type="button"
+            class="fit-btn"
+            [class.active]="imageFitMode() === 'cover'"
+            (click)="setImageFitMode('cover')"
+            title="Fill frame (may crop image)">
+            Fill
+          </button>
+          <button
+            type="button"
+            class="fit-btn"
+            [class.active]="imageFitMode() === 'fill'"
+            (click)="setImageFitMode('fill')"
+            title="Stretch to fill (may distort)">
+            Stretch
+          </button>
+        </div>
+      </div>
+    }
+
     <!-- Menu Items Grid -->
     @if (menuItems().length > 0) {
       <div class="menu-grid">
@@ -72,6 +105,7 @@
           <div class="menu-card" [class.inactive]="!item.is_active">
             <!-- Card Image -->
             <div class="card-image"
+                 [class]="'card-image ' + getImageFitClass()"
                  [style.background-image]="item.background_image ? 'url(' + item.background_image + ')' : 'url(https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop)'">
               <div class="image-overlay"></div>
             </div>
