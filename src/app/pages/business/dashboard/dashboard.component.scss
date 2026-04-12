@@ -2,92 +2,7 @@
 // BUSINESS DASHBOARD LAYOUT
 // Production Ready with Sidebar
 // ===================================
-
-// Mobile Sidebar Toggle Button
-.mobile-sidebar-toggle {
-  position: fixed;
-  top: 76px; // Just below the navbar (which is ~72px tall on desktop)
-  left: 16px;
-  z-index: 1025; // Above navbar (1020) and sidebar (1001) to always be clickable
-  width: 48px; // Larger touch target for mobile
-  height: 48px;
-  background: #ffffff;
-  border: 2px solid #000000; // Thicker border for visibility
-  border-radius: 8px; // More rounded for modern look
-  cursor: pointer;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); // More prominent shadow
-
-  // Ensure it's always visible and clickable
-  pointer-events: auto;
-  touch-action: manipulation; // Better touch support
-
-  &:hover {
-    background: #f7f7f7;
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-
-  .hamburger {
-    width: 24px; // Slightly larger for better visibility
-    height: 18px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    span {
-      display: block;
-      width: 100%;
-      height: 3px; // Thicker lines
-      background: #000000;
-      transition: all 0.3s ease;
-      border-radius: 2px;
-    }
-  }
-
-  // Show on tablet and mobile
-  @media (max-width: 1023px) {
-    display: flex;
-    top: 68px; // Adjust for smaller navbar on tablet
-  }
-
-  @media (max-width: 768px) {
-    top: 64px; // Adjust for even smaller navbar on mobile
-  }
-}
-
-// Mobile Overlay - appears when sidebar is open
-.mobile-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6); // Darker overlay
-  z-index: 1000; // Below toggle button (1025) but above content
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  backdrop-filter: blur(4px); // More blur for glassmorphic effect
-  -webkit-backdrop-filter: blur(4px); // Safari support
-  pointer-events: none; // Don't block clicks when hidden
-
-  &.visible {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto; // Allow clicks when visible (closes sidebar when clicking outside)
-  }
-
-  // Hide on desktop where sidebar is always visible
-  @media (min-width: 1024px) {
-    display: none;
-  }
-}
+// Mobile controls now handled entirely by SidebarComponent
 
 .dashboard {
   margin-left: 260px; // Account for sidebar width (260px)
@@ -116,14 +31,14 @@
 // RESPONSIVE ADJUSTMENTS
 // ===================================
 
-// Tablet and below - remove sidebar margin
+// Tablet and below - remove sidebar margin and account for mobile header
 @media (max-width: 1023px) {
   .dashboard {
     margin-left: 0;
     width: 100%;
     max-width: 100vw; // Prevent horizontal overflow
     padding: var(--space-6) var(--space-8);
-    padding-top: calc(64px + var(--space-6) + 60px); // Navbar + padding + mobile toggle button
+    padding-top: calc(64px + 56px + var(--space-6)); // Navbar + mobile header + padding
     overflow-x: hidden; // Prevent horizontal scroll
   }
 }
@@ -131,7 +46,7 @@
 @media (max-width: 768px) {
   .dashboard {
     padding: var(--space-4) var(--space-6);
-    padding-top: calc(60px + var(--space-4) + 60px); // Smaller navbar + padding + mobile toggle button
+    padding-top: calc(60px + 56px + var(--space-4)); // Smaller navbar + mobile header + padding
 
     h1 {
       font-size: var(--text-3xl);
@@ -142,7 +57,7 @@
 @media (max-width: 480px) {
   .dashboard {
     padding: var(--space-4);
-    padding-top: calc(60px + var(--space-4) + 60px); // Navbar + padding + mobile toggle button
+    padding-top: calc(60px + 56px + var(--space-4)); // Navbar + mobile header + padding
 
     h1 {
       font-size: var(--text-2xl);

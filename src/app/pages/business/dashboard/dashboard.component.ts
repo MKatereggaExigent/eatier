@@ -1,6 +1,5 @@
-import { Component, ViewChild, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../core/sidebar/sidebar.component';
 
 @Component({
@@ -8,24 +7,8 @@ import { SidebarComponent } from '../../../core/sidebar/sidebar.component';
   standalone: true,
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
-  imports: [SidebarComponent, RouterOutlet, CommonModule]
+  imports: [SidebarComponent, RouterOutlet]
 })
 export class DashboardComponent {
-  @ViewChild('sidebar') sidebar!: SidebarComponent;
-
-  isMobileSidebarOpen = signal(false);
-
-  toggleMobileSidebar(): void {
-    this.isMobileSidebarOpen.update(open => !open);
-    if (this.sidebar) {
-      this.sidebar.toggleMobileSidebar();
-    }
-  }
-
-  closeMobileSidebar(): void {
-    this.isMobileSidebarOpen.set(false);
-    if (this.sidebar) {
-      this.sidebar.closeMobileSidebar();
-    }
-  }
+  // Dashboard component - mobile controls are now handled entirely by SidebarComponent
 }
