@@ -49,11 +49,11 @@ $space-lg: 1.5rem;
   padding: 0 1rem;
   align-items: center;
   justify-content: space-between;
-  z-index: 1000;
+  z-index: 1000000; // CRITICAL: Must be above everything including navbar profile menu (999999)
 
   .menu-toggle {
-    width: 40px;
-    height: 40px;
+    width: 48px; // Increased from 40px to meet WCAG touch target minimum
+    height: 48px; // Increased from 40px to meet WCAG touch target minimum
     background: none;
     border: none;
     cursor: pointer;
@@ -61,6 +61,30 @@ $space-lg: 1.5rem;
     align-items: center;
     justify-content: center;
     transition: opacity 0.2s ease;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1); // Visual feedback on tap
+    position: relative; // Ensure proper stacking
+    z-index: 1; // Ensure it's above siblings
+    pointer-events: auto; // CRITICAL: Ensure button always receives touch events
+    touch-action: manipulation; // Optimize for touch, disable double-tap zoom
+    user-select: none; // Prevent text selection on touch
+    -webkit-user-select: none;
+    -webkit-touch-callout: none; // Disable iOS callout menu
+
+    // Increase touch target area without changing visual size
+    &::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      // Creates a larger invisible touch area
+    }
+
+    &:active {
+      opacity: 0.5; // Clear visual feedback on mobile tap
+      transform: scale(0.95); // Subtle press effect
+    }
 
     &:hover {
       opacity: 0.7;
