@@ -27,19 +27,19 @@
 }
 
 .ad-creation-container {
+  // Move all properties BEFORE nested rules to avoid SASS deprecation warnings
   font-family: var(--font-sans);
-  color: #000000;
-
-  // Global text color override - make all text black
-  * {
-    color: #000000;
-  }
   background-color: var(--color-white);
   min-height: 100vh;
   padding: 2rem;
   max-width: 1000px;
   margin: 0 auto;
-  color: var(--color-black);
+  color: #000000;
+
+  // Global text color override - make all text black (nested rule comes AFTER properties)
+  * {
+    color: #000000;
+  }
 
   // Loading Overlay for Edit Mode
   .loading-overlay {
