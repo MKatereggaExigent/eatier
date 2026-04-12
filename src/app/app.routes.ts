@@ -152,7 +152,9 @@ export const routes: Routes = [
             { path: 'reports', loadComponent: () => import('./pages/admin/reports/admin-reports.component').then(m => m.AdminReportsComponent) },
             { path: 'social', loadComponent: () => import('./pages/user/social/user-social.component').then(m => m.UserSocialComponent) },
             { path: 'settings', loadComponent: () => import('./pages/admin/settings/admin-settings.component').then(m => m.AdminSettingsComponent) },
-            { path: 'blog', loadComponent: () => import('./pages/admin/blog-management/blog-management.component').then(m => m.BlogManagementComponent) }
+            { path: 'blog', loadComponent: () => import('./pages/admin/blog-management/blog-management.component').then(m => m.BlogManagementComponent) },
+            { path: 'messages', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) },
+            { path: 'messages/:id', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) }
         ]
     },
 
@@ -176,7 +178,9 @@ export const routes: Routes = [
             { path: 'digital-card', loadComponent: () => import('./pages/business/digital-card/digital-card.component').then(m => m.DigitalCardComponent) },
             { path: 'analytics', loadComponent: () => import('./pages/business/analytics/business-analytics.component').then(m => m.BusinessAnalyticsComponent) },
             { path: 'accounts', loadComponent: () => import('./pages/business/accounts/accounts-center.component').then(m => m.AccountsCenterComponent) },
-            { path: 'social', loadComponent: () => import('./pages/business/social/business-social.component').then(m => m.BusinessSocialComponent) }
+            { path: 'social', loadComponent: () => import('./pages/business/social/business-social.component').then(m => m.BusinessSocialComponent) },
+            { path: 'messages', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) },
+            { path: 'messages/:id', loadComponent: () => import('./pages/messages/messages.component').then(m => m.MessagesComponent) }
         ]
     },
 
