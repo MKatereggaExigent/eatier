@@ -107,13 +107,7 @@ export class SocialWidgetComponent implements OnInit, OnDestroy {
     });
   }
 
-  getUserAvatar(user: UserProfile): string {
-    return user.profile_image_url || user.avatar || user.avatar_url || '/assets/images/default-avatar.png';
-  }
-
-  getUserName(user: UserProfile): string {
-    return `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
-  }
+  // Removed duplicate - using the enhanced versions below (lines 199-211)
 
   formatRole(role: string): string {
     const roleMap: { [key: string]: string } = {
@@ -196,18 +190,21 @@ export class SocialWidgetComponent implements OnInit, OnDestroy {
   /**
    * Get user's full name with fallback for snake_case and camelCase API responses
    */
-  getUserName(user: any): string {
+  getUserName(user: UserProfile | any): string {
+    if (!user) return 'Unknown User';
     const firstName = user.first_name || user.firstName || '';
     const lastName = user.last_name || user.lastName || '';
     const fullName = `${firstName} ${lastName}`.trim();
-    return fullName || 'Unknown User';
+    return fullName || user.email || 'Unknown User';
   }
 
   /**
-   * Get user avatar URL
+   * Get user avatar URL with fallback
    */
-  getUserAvatar(user: any): string {
-    return user.avatar_url || user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(this.getUserName(user))}&background=000000&color=ffffff`;
+  getUserAvatar(user: UserProfile | any): string {
+    if (!user) return '/assets/images/default-avatar.png';
+    return user.profile_image_url || user.avatar || user.avatar_url || user.avatarUrl ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(this.getUserName(user))}&background=000000&color=ffffff`;
   }
 }
 

@@ -76,12 +76,12 @@
         <div class="users-grid">
           @for (user of discoverUsers(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ user.firstName.charAt(0) || user.lastName.charAt(0) || 'U' }}</div>
+              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
               <div class="user-info">
-                <h3>{{ user.firstName || '' }} {{ user.lastName || '' }}</h3>
+                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">
-                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.reviewCount }} reviews</span>
-                  <span><lucide-icon [img]="Users" [size]="14"></lucide-icon> {{ user.followerCount }} followers</span>
+                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
+                  <span><lucide-icon [img]="Users" [size]="14"></lucide-icon> {{ user.follower_count || user.followerCount || 0 }} followers</span>
                 </div>
               </div>
               <div class="user-actions">
@@ -130,11 +130,11 @@
         <div class="users-grid">
           @for (user of following(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ user.firstName.charAt(0) || user.lastName.charAt(0) || 'U' }}</div>
+              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
               <div class="user-info">
-                <h3>{{ user.firstName || '' }} {{ user.lastName || '' }}</h3>
+                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">
-                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.reviewCount }} reviews</span>
+                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
                 </div>
               </div>
               <div class="user-actions">
@@ -171,11 +171,11 @@
         <div class="users-grid">
           @for (user of followers(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ user.firstName.charAt(0) || user.lastName.charAt(0) || 'U' }}</div>
+              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
               <div class="user-info">
-                <h3>{{ user.firstName || '' }} {{ user.lastName || '' }}</h3>
+                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">
-                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.reviewCount }} reviews</span>
+                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
                 </div>
               </div>
               <div class="user-actions">
