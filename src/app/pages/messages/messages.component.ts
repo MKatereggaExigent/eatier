@@ -32,30 +32,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
   uploadingFile = signal<boolean>(false);
   selectedFile = signal<File | null>(null);
 
-  // Get current user from auth service
-  currentUser = this.authService.currentUser;
-
-  // Computed property to get the correct social route based on user role
-  socialRoute = computed(() => {
-    const user = this.currentUser();
-    if (!user) return '/dashboard/user/social';
-
-    switch (user.role) {
-      case 'specialist':
-        return '/dashboard/specialist/social';
-      case 'business_owner':
-        return '/dashboard/business/social';
-      case 'food_enthusiast':
-        return '/dashboard/food-enthusiast/social';
-      case 'normal_user':
-        return '/dashboard/user/social';
-      case 'itiyum_admin':
-        return '/admin/social';
-      default:
-        return '/dashboard/user/social';
-    }
-  });
-
   private pollingSubscription?: Subscription;
   private currentUserId: string = '';
   private typingSubject = new Subject<string>();
@@ -79,6 +55,30 @@ export class MessagesComponent implements OnInit, OnDestroy {
       this.websocketService.stopTyping(conversationId);
     });
   }
+
+  // Get current user from auth service (computed property)
+  currentUser = computed(() => this.authService.currentUser());
+
+  // Computed property to get the correct social route based on user role
+  socialRoute = computed(() => {
+    const user = this.currentUser();
+    if (!user) return '/dashboard/user/social';
+
+    switch (user.role) {
+      case 'specialist':
+        return '/dashboard/specialist/social';
+      case 'business_owner':
+        return '/dashboard/business/social';
+      case 'food_enthusiast':
+        return '/dashboard/food-enthusiast/social';
+      case 'normal_user':
+        return '/dashboard/user/social';
+      case 'itiyum_admin':
+        return '/admin/social';
+      default:
+        return '/dashboard/user/social';
+    }
+  });
 
   ngOnInit(): void {
     this.loadConversations();
