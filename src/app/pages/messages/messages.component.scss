@@ -209,6 +209,13 @@
     object-fit: cover;
     border: 2px solid #e5e7eb;
     flex-shrink: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); // Fallback gradient
+    display: block; // Ensure image displays
+
+    // Ensure the image is always visible
+    &:not([src]) {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
   }
 
   .conversation-info {
