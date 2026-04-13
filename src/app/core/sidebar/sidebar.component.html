@@ -1,6 +1,12 @@
 <!-- Mobile Header -->
 <header class="mobile-header">
-  <button type="button" class="menu-toggle" (click)="toggleMobileSidebar()" aria-label="Toggle menu">
+  <button
+    type="button"
+    class="menu-toggle"
+    (click)="toggleMobileSidebar()"
+    (touchstart)="onTouchStart($event)"
+    (touchend)="onTouchEnd($event)"
+    aria-label="Toggle menu">
     <span class="hamburger" [class.open]="isMobileOpen()">
       <span></span>
       <span></span>

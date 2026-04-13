@@ -54,40 +54,48 @@ $space-lg: 1.5rem;
   .menu-toggle {
     width: 48px; // Increased from 40px to meet WCAG touch target minimum
     height: 48px; // Increased from 40px to meet WCAG touch target minimum
-    background: none;
+    background: transparent; // Explicitly transparent
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: opacity 0.2s ease;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1); // Visual feedback on tap
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.2); // Visible tap feedback
     position: relative; // Ensure proper stacking
-    z-index: 1; // Ensure it's above siblings
-    pointer-events: auto; // CRITICAL: Ensure button always receives touch events
-    touch-action: manipulation; // Optimize for touch, disable double-tap zoom
+    z-index: 10; // Higher z-index to ensure it's tappable
+    pointer-events: auto !important; // CRITICAL: Force button to receive touch events
+    touch-action: manipulation !important; // Optimize for touch, disable double-tap zoom
     user-select: none; // Prevent text selection on touch
     -webkit-user-select: none;
     -webkit-touch-callout: none; // Disable iOS callout menu
+    outline: none; // Remove focus outline
 
     // Increase touch target area without changing visual size
     &::before {
       content: '';
       position: absolute;
-      top: -4px;
-      left: -4px;
-      right: -4px;
-      bottom: -4px;
-      // Creates a larger invisible touch area
+      top: -8px; // Increased from -4px for even larger touch area
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+      pointer-events: auto; // Ensure pseudo-element also receives touches
+      // Creates a larger invisible touch area (64x64px total)
     }
 
     &:active {
       opacity: 0.5; // Clear visual feedback on mobile tap
       transform: scale(0.95); // Subtle press effect
+      background: rgba(0, 0, 0, 0.05); // Subtle background on press
     }
 
     &:hover {
       opacity: 0.7;
+    }
+
+    // Ensure hamburger lines are not blocking touches
+    * {
+      pointer-events: none; // Child elements don't intercept touches
     }
 
     .hamburger {

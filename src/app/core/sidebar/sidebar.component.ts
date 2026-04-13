@@ -157,10 +157,29 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   toggleMobileSidebar(): void {
     this.isMobileOpen.update(open => !open);
+    console.log('Mobile sidebar toggled:', this.isMobileOpen()); // Debug log
   }
 
   closeMobileSidebar(): void {
     this.isMobileOpen.set(false);
+  }
+
+  /**
+   * Handle touch start - prevent default to avoid double-tap zoom and ensure touch works
+   */
+  onTouchStart(event: TouchEvent): void {
+    event.preventDefault(); // Prevent default touch behaviors
+    console.log('Touch start detected on hamburger menu'); // Debug log
+  }
+
+  /**
+   * Handle touch end - toggle sidebar on touch release
+   */
+  onTouchEnd(event: TouchEvent): void {
+    event.preventDefault(); // Prevent click event from firing after touch
+    event.stopPropagation(); // Stop event from bubbling
+    console.log('Touch end detected - toggling sidebar'); // Debug log
+    this.toggleMobileSidebar();
   }
 
   onMouseEnter(): void {
