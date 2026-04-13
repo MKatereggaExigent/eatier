@@ -50,8 +50,7 @@
               <div class="activity-icon">{{ getActivityIcon(activity.activityType) }}</div>
               <div class="activity-content">
                 <div class="activity-header">
-                  <span class="actor-name">{{ activity.actorName }}</span>
-                  <span class="activity-text">{{ getActivityText(activity) }}</span>
+                  <span class="actor-name">{{ activity.actorName }}</span> <span class="activity-text">{{ getActivityText(activity) }}</span>
                 </div>
                 @if (activity.contentPreview) {
                   <p class="activity-preview">"{{ activity.contentPreview }}"</p>
@@ -61,6 +60,27 @@
             </div>
           }
         </div>
+
+        <!-- Pagination Controls -->
+        @if (activityFeed().length > 0) {
+          <div class="pagination">
+            <button
+              type="button"
+              class="pagination-btn"
+              [disabled]="activityPage() === 1"
+              (click)="previousActivityPage()">
+              ← Previous
+            </button>
+            <span class="pagination-info">Page {{ activityPage() }} of {{ totalActivityPages() }}</span>
+            <button
+              type="button"
+              class="pagination-btn"
+              [disabled]="activityPage() >= totalActivityPages()"
+              (click)="nextActivityPage()">
+              Next →
+            </button>
+          </div>
+        }
       }
     }
 

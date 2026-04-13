@@ -396,5 +396,64 @@ $border-medium: 2px solid $color-black;
   .user-card {
     border-right: none;
   }
+
+  .pagination {
+    gap: 1rem;
+
+    .pagination-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.8125rem;
+    }
+
+    .pagination-info {
+      font-size: 0.8125rem;
+    }
+  }
+}
+
+// ===================================
+// PAGINATION CONTROLS
+// ===================================
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem 0;
+  margin-top: 2rem;
+  border-top: 1px solid $color-light-gray;
+
+  .pagination-btn {
+    padding: 0.625rem 1.25rem;
+    font-family: $font-sans;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $color-black;
+    background: $color-white;
+    border: 2px solid $color-black;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: $color-black;
+      color: $color-white;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      border-color: $color-medium-gray;
+      color: $color-medium-gray;
+    }
+  }
+
+  .pagination-info {
+    font-family: $font-sans;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: $color-medium-gray;
+  }
 }
 

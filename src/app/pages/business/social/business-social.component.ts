@@ -45,13 +45,18 @@ export class BusinessSocialComponent implements OnInit {
 
   loading = signal(true);
   activeTab = signal<'feed' | 'discover' | 'following' | 'followers'>('feed');
-  
+
   activityFeed = signal<ActivityItem[]>([]);
   discoverUsers = signal<UserToFollow[]>([]);
   following = signal<UserToFollow[]>([]);
   followers = signal<UserToFollow[]>([]);
-  
+
   followingInProgress = signal<Set<string>>(new Set());
+
+  // Pagination
+  activityPage = signal(1);
+  activityLimit = 10;
+  totalActivityPages = signal(1);
 
   ngOnInit(): void {
     this.loadActivityFeed();
@@ -68,10 +73,40 @@ export class BusinessSocialComponent implements OnInit {
 
   loadActivityFeed(): void {
     this.loading.set(true);
-    this.http.get<any>(`${environment.apiUrl}/social/feed`).subscribe({
-      next: (data) => { this.activityFeed.set(data.activities || []); this.loading.set(false); },
+    const offset = (this.activityPage() - 1) * this.activityLimit;
+    this.http.get<any>(`${environment.apiUrl}/social/feed?limit=${this.activityLimit}&offset=${offset}`).subscribe({
+      next: (data) => {
+        this.activityFeed.set(data.activities || []);
+        const total = data.total || data.activities?.length || 0;
+        this.totalActivityPages.set(Math.ceil(total / this.activityLimit) || 1);
+        this.loading.set(false);
+      },
       error: () => this.loading.set(false)
     });
+  }
+
+  /**
+   * Go to next activity page
+   */
+  nextActivityPage(): void {
+    if (this.activityPage() < this.totalActivityPages()) {
+      this.activityPage.update(p => p + 1);
+      this.loadActivityFeed();
+      // Scroll to top of activity feed
+      document.querySelector('.activity-list')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  /**
+   * Go to previous activity page
+   */
+  previousActivityPage(): void {
+    if (this.activityPage() > 1) {
+      this.activityPage.update(p => p - 1);
+      this.loadActivityFeed();
+      // Scroll to top of activity feed
+      document.querySelector('.activity-list')?.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
   loadDiscoverUsers(): void {
