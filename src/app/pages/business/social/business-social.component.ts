@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { SocialWidgetComponent } from '../../../shared/components/social-widget/social-widget.component';
 import { MessagingWidgetComponent } from '../../../shared/components/messaging-widget/messaging-widget.component';
+import { AvatarUploadComponent } from '../../../shared/components/avatar-upload/avatar-upload.component';
+import { AvatarContextMenuDirective } from '../../../shared/directives/avatar-context-menu.directive';
 
 interface UserToFollow {
   id: string;
@@ -36,7 +38,7 @@ interface ActivityItem {
 @Component({
   selector: 'app-business-social',
   standalone: true,
-  imports: [CommonModule, SocialWidgetComponent, MessagingWidgetComponent],
+  imports: [CommonModule, SocialWidgetComponent, MessagingWidgetComponent, AvatarUploadComponent, AvatarContextMenuDirective],
   templateUrl: './business-social.component.html',
   styleUrls: ['./business-social.component.scss']
 })
@@ -57,6 +59,12 @@ export class BusinessSocialComponent implements OnInit {
   activityPage = signal(1);
   activityLimit = 10;
   totalActivityPages = signal(1);
+
+  // Avatar upload
+  showAvatarUpload = signal(false);
+
+  // Avatar upload
+  showAvatarUpload = signal(false);
 
   ngOnInit(): void {
     this.loadActivityFeed();
@@ -219,6 +227,29 @@ export class BusinessSocialComponent implements OnInit {
     const seed = user.id || this.getUserFullName(user);
     const encodedSeed = encodeURIComponent(seed);
     return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodedSeed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50`;
+  }
+
+  /**
+   * Open avatar upload modal
+   */
+  openAvatarUpload(): void {
+    this.showAvatarUpload.set(true);
+  }
+
+  /**
+   * Handle avatar uploaded successfully
+   */
+  onAvatarUploaded(avatarUrl: string): void {
+    console.log('Avatar uploaded:', avatarUrl);
+    // Reload data to show new avatar
+    this.loadData();
+  }
+
+  /**
+   * Close avatar upload modal
+   */
+  closeAvatarUpload(): void {
+    this.showAvatarUpload.set(false);
   }
 }
 

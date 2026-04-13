@@ -96,7 +96,13 @@
         <div class="users-grid">
           @for (user of discoverUsers(); track user.id) {
             <div class="user-card">
-              <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)" class="user-avatar-img" />
+              <img
+                [src]="getUserAvatarUrl(user)"
+                [alt]="getUserFullName(user)"
+                class="user-avatar-img"
+                appAvatarContextMenu
+                (uploadAvatar)="openAvatarUpload()"
+                (removeAvatar)="openAvatarUpload()" />
               <div class="user-info">
                 <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">
@@ -104,9 +110,9 @@
                   <span>👥 {{ user.follower_count || user.followerCount || 0 }} followers</span>
                 </div>
               </div>
-              <button 
-                type="button" 
-                class="follow-btn" 
+              <button
+                type="button"
+                class="follow-btn"
                 [class.following]="user.isFollowing"
                 [disabled]="isFollowInProgress(user.id)"
                 (click)="toggleFollow(user.id, user.isFollowing)">
@@ -137,7 +143,13 @@
         <div class="users-grid">
           @for (user of following(); track user.id) {
             <div class="user-card">
-              <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)" class="user-avatar-img" />
+              <img
+                [src]="getUserAvatarUrl(user)"
+                [alt]="getUserFullName(user)"
+                class="user-avatar-img"
+                appAvatarContextMenu
+                (uploadAvatar)="openAvatarUpload()"
+                (removeAvatar)="openAvatarUpload()" />
               <div class="user-info">
                 <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">
@@ -165,7 +177,13 @@
         <div class="users-grid">
           @for (user of followers(); track user.id) {
             <div class="user-card">
-              <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)" class="user-avatar-img" />
+              <img
+                [src]="getUserAvatarUrl(user)"
+                [alt]="getUserFullName(user)"
+                class="user-avatar-img"
+                appAvatarContextMenu
+                (uploadAvatar)="openAvatarUpload()"
+                (removeAvatar)="openAvatarUpload()" />
               <div class="user-info">
                 <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">
@@ -183,3 +201,12 @@
   }
 </div>
 
+
+
+<!-- Avatar Upload Modal -->
+@if (showAvatarUpload()) {
+  <app-avatar-upload
+    (avatarUploaded)="onAvatarUploaded($event)"
+    (closeModal)="closeAvatarUpload()">
+  </app-avatar-upload>
+}
