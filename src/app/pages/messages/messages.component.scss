@@ -485,17 +485,41 @@
     padding: 0.75rem 1rem;
     border-radius: 12px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    word-break: break-word; // Force break long words
+    overflow-wrap: break-word; // Modern standard
+    max-width: 70%; // Limit width
+    min-width: 0; // Allow flexbox to shrink
 
     p {
       margin: 0 0 0.25rem 0;
       font-size: 0.875rem;
       line-height: 1.5;
       word-wrap: break-word;
+      word-break: break-word; // Also apply to paragraphs
+      overflow-wrap: break-word;
     }
 
     .message-time {
       font-size: 0.625rem;
       color: #9ca3af;
+    }
+
+    // Ensure messages don't overflow on mobile
+    @media (max-width: 768px) {
+      max-width: 85%; // More space on mobile
+
+      p {
+        font-size: 0.8125rem; // Slightly smaller font
+      }
+    }
+
+    @media (max-width: 480px) {
+      max-width: 90%; // Even more space on small mobile
+      padding: 0.625rem 0.875rem; // Smaller padding
+
+      p {
+        font-size: 0.8125rem;
+      }
     }
   }
 }

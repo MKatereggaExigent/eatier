@@ -451,7 +451,16 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   getParticipantAvatar(conversation: ChatConversation): string {
     const participant = conversation.participants?.[0];
-    return participant?.profile_image_url || '/assets/images/default-avatar.png';
+
+    // If participant has uploaded avatar, use it
+    if (participant?.profile_image_url || participant?.avatar_url) {
+      return participant.profile_image_url || participant.avatar_url || '';
+    }
+
+    // Otherwise use beautiful DiceBear avatar
+    const seed = participant?.id || participant?.email || this.getParticipantName(conversation);
+    const encodedSeed = encodeURIComponent(seed);
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodedSeed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50`;
   }
 
   getRequesterName(request: ChatRequest): string {
@@ -460,7 +469,15 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   getRequesterAvatar(request: ChatRequest): string {
-    return request.profile_image_url || '/assets/images/default-avatar.png';
+    // If requester has uploaded avatar, use it
+    if (request.profile_image_url || request.avatar_url) {
+      return request.profile_image_url || request.avatar_url || '';
+    }
+
+    // Otherwise use beautiful DiceBear avatar
+    const seed = request.id || request.email || this.getRequesterName(request);
+    const encodedSeed = encodeURIComponent(seed);
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodedSeed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50`;
   }
 
   formatTimestamp(timestamp: string): string {
