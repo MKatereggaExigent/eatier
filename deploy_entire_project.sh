@@ -21,11 +21,14 @@ echo "📍 Server: $(hostname)"
 echo "📅 $(date)"
 echo ""
 
+# Auto-detect project directory based on where script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Step 1: Pull latest code
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "📥 STEP 1: Pulling latest code"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-cd ~/Documents/Github/eatier
+cd "$SCRIPT_DIR"
 git pull origin development-v2
 
 # Step 2: Rebuild and restart Docker containers
@@ -75,7 +78,7 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🏗️  STEP 6: Building frontend for production"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-cd ~/Documents/Github/eatier
+cd "$SCRIPT_DIR"
 npm run build
 
 # Step 7: Deploy frontend to CapRover
