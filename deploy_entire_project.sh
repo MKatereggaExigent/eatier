@@ -25,7 +25,7 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "📥 STEP 1: Pulling latest code"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-cd ~/eatier
+cd ~/Documents/Github/eatier
 git pull origin development-v2
 
 # Step 2: Rebuild and restart Docker containers
@@ -75,7 +75,7 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🏗️  STEP 6: Building frontend for production"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-cd ~/eatier
+cd ~/Documents/Github/eatier
 npm run build
 
 # Step 7: Deploy frontend to CapRover
