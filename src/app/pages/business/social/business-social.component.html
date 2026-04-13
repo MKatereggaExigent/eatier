@@ -76,7 +76,7 @@
         <div class="users-grid">
           @for (user of discoverUsers(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
+              <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)" class="user-avatar-img" />
               <div class="user-info">
                 <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">
@@ -117,7 +117,7 @@
         <div class="users-grid">
           @for (user of following(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
+              <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)" class="user-avatar-img" />
               <div class="user-info">
                 <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">
@@ -145,7 +145,7 @@
         <div class="users-grid">
           @for (user of followers(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
+              <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)" class="user-avatar-img" />
               <div class="user-info">
                 <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
                 <div class="user-stats">

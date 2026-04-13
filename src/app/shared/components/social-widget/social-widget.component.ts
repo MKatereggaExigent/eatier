@@ -199,12 +199,32 @@ export class SocialWidgetComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get user avatar URL with fallback
+   * Get user avatar URL with fallback to beautiful default avatars
    */
   getUserAvatar(user: UserProfile | any): string {
-    if (!user) return '/assets/images/default-avatar.png';
-    return user.profile_image_url || user.avatar || user.avatar_url || user.avatarUrl ||
-      `https://ui-avatars.com/api/?name=${encodeURIComponent(this.getUserName(user))}&background=000000&color=ffffff`;
+    if (!user) return this.getDefaultAvatar('default');
+
+    // If user has uploaded avatar, use it
+    if (user.profile_image_url || user.avatar || user.avatar_url || user.avatarUrl) {
+      return user.profile_image_url || user.avatar || user.avatar_url || user.avatarUrl;
+    }
+
+    // Otherwise use beautiful default avatar based on user ID or name
+    return this.getDefaultAvatar(user.id || user.email || this.getUserName(user));
+  }
+
+  /**
+   * Get beautiful default avatar using DiceBear API
+   * Creates unique, colorful avatars based on seed (user ID or name)
+   */
+  private getDefaultAvatar(seed: string): string {
+    // DiceBear Avatars - Beautiful, unique, SVG avatars
+    // Styles available: adventurer, avataaars, bottts, fun-emoji, identicon, initials, lorelei, micah, miniavs, personas
+    const style = 'avataaars'; // Fun, colorful human-like avatars (similar to Apple Memoji)
+    const encodedSeed = encodeURIComponent(seed);
+
+    // Options for more variety and coolness
+    return `https://api.dicebear.com/7.x/${style}/svg?seed=${encodedSeed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50`;
   }
 }
 

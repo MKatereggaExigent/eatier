@@ -17,6 +17,10 @@ interface UserToFollow {
   followerCount?: number;
   follower_count?: number;
   isFollowing: boolean;
+  // Avatar fields
+  profile_image_url?: string;
+  avatar_url?: string;
+  avatar?: string;
 }
 
 interface ActivityItem {
@@ -156,6 +160,30 @@ export class BusinessSocialComponent implements OnInit {
 
   isFollowInProgress(userId: string): boolean {
     return this.followingInProgress().has(userId);
+  }
+
+  /**
+   * Get user's full name
+   */
+  getUserFullName(user: UserToFollow): string {
+    const firstName = user.first_name || user.firstName || '';
+    const lastName = user.last_name || user.lastName || '';
+    return `${firstName} ${lastName}`.trim() || 'Unknown User';
+  }
+
+  /**
+   * Get beautiful avatar URL for user
+   */
+  getUserAvatarUrl(user: UserToFollow): string {
+    // If user has uploaded avatar, use it
+    if (user.profile_image_url || user.avatar_url) {
+      return user.profile_image_url || user.avatar_url || '';
+    }
+
+    // Otherwise use DiceBear beautiful default avatar
+    const seed = user.id || this.getUserFullName(user);
+    const encodedSeed = encodeURIComponent(seed);
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodedSeed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50`;
   }
 }
 

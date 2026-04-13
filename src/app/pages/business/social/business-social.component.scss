@@ -274,9 +274,11 @@ $border-medium: 2px solid $color-black;
     background: $color-bg-light;
   }
 
+  // Deprecated: Old letter-based avatar (kept for backwards compatibility)
   .user-avatar {
     width: 48px;
     height: 48px;
+    border-radius: 50%;
     background: $color-black;
     display: flex;
     align-items: center;
@@ -286,6 +288,24 @@ $border-medium: 2px solid $color-black;
     font-size: 1.25rem;
     font-weight: 700;
     flex-shrink: 0;
+  }
+
+  // New: Beautiful image-based avatars
+  .user-avatar-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); // Fallback gradient
+    border: 2px solid $color-white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
   }
 
   .user-info {
