@@ -63,9 +63,6 @@ export class BusinessSocialComponent implements OnInit {
   // Avatar upload
   showAvatarUpload = signal(false);
 
-  // Avatar upload
-  showAvatarUpload = signal(false);
-
   ngOnInit(): void {
     this.loadActivityFeed();
     this.loadDiscoverUsers();
@@ -241,8 +238,12 @@ export class BusinessSocialComponent implements OnInit {
    */
   onAvatarUploaded(avatarUrl: string): void {
     console.log('Avatar uploaded:', avatarUrl);
-    // Reload data to show new avatar
-    this.loadData();
+    // Reload current tab data to show new avatar
+    const currentTab = this.activeTab();
+    if (currentTab === 'feed') this.loadActivityFeed();
+    else if (currentTab === 'discover') this.loadDiscoverUsers();
+    else if (currentTab === 'following') this.loadFollowing();
+    else if (currentTab === 'followers') this.loadFollowers();
   }
 
   /**
