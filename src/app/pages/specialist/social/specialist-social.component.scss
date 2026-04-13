@@ -301,7 +301,7 @@ $border-medium: 2px solid $color-black;
       font-family: $font-sans;
       font-size: 0.9375rem;
       font-weight: 600;
-      color: $color-black;
+      color: $color-black !important; // Force black text - ensure visibility
       margin: 0 0 0.25rem 0;
     }
 
@@ -310,7 +310,11 @@ $border-medium: 2px solid $color-black;
       gap: 1rem;
       font-family: $font-sans;
       font-size: 0.75rem;
-      color: $color-medium-gray;
+      color: $color-medium-gray !important; // Force gray text - ensure visibility
+
+      span {
+        color: $color-medium-gray !important; // Also force on spans
+      }
     }
   }
 
