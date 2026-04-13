@@ -1,0 +1,77 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Upload Avatar</h2>
+      <button type="button" class="close-btn" (click)="close()" aria-label="Close">×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Preview -->
+      @if (previewUrl()) {
+        <div class="preview-container">
+          <img [src]="previewUrl()" alt="Avatar preview" class="avatar-preview" />
+        </div>
+      } @else {
+        <div class="preview-container placeholder">
+          <div class="placeholder-icon">📷</div>
+          <p>No image selected</p>
+        </div>
+      }
+
+      <!-- File Input (hidden) -->
+      <input 
+        type="file" 
+        id="avatarFileInput" 
+        accept="image/*" 
+        (change)="onFileSelected($event)"
+        style="display: none;">
+
+      <!-- Error Message -->
+      @if (error()) {
+        <div class="error-message">
+          {{ error() }}
+        </div>
+      }
+
+      <!-- Action Buttons -->
+      <div class="actions">
+        <button 
+          type="button" 
+          class="btn btn-select" 
+          (click)="triggerFileInput()"
+          [disabled]="uploading()">
+          📁 Select Photo
+        </button>
+
+        @if (selectedFile()) {
+          <button 
+            type="button" 
+            class="btn btn-upload" 
+            (click)="uploadAvatar()"
+            [disabled]="uploading()">
+            @if (uploading()) {
+              ⏳ Uploading...
+            } @else {
+              ✅ Upload
+            }
+          </button>
+        }
+
+        <button 
+          type="button" 
+          class="btn btn-remove" 
+          (click)="removeAvatar()"
+          [disabled]="uploading()">
+          🗑️ Remove Avatar
+        </button>
+      </div>
+
+      <!-- Info -->
+      <div class="info">
+        <p>• Maximum file size: 5MB</p>
+        <p>• Accepted formats: JPG, PNG, GIF, WebP</p>
+        <p>• Image will be resized to 200x200px</p>
+      </div>
+    </div>
+  </div>
+</div>

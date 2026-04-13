@@ -55,10 +55,13 @@
                     [class.active]="selectedConversation()?.id === conversation.id"
                     [class.unread]="conversation.unread_count > 0"
                     (click)="selectConversation(conversation)">
-                    <img 
-                      [src]="getParticipantAvatar(conversation)" 
+                    <img
+                      [src]="getParticipantAvatar(conversation)"
                       [alt]="getParticipantName(conversation)"
-                      class="conversation-avatar">
+                      class="conversation-avatar"
+                      appAvatarContextMenu
+                      (uploadAvatar)="openAvatarUpload()"
+                      (removeAvatar)="openAvatarUpload()">
                     <div class="conversation-info">
                       <div class="conversation-header">
                         <h4>{{ getParticipantName(conversation) }}</h4>
@@ -195,4 +198,12 @@
     </div>
   </div>
 </div>
+
+<!-- Avatar Upload Modal -->
+@if (showAvatarUpload()) {
+  <app-avatar-upload
+    (avatarUploaded)="onAvatarUploaded($event)"
+    (closeModal)="closeAvatarUpload()">
+  </app-avatar-upload>
+}
 

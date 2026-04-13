@@ -8,11 +8,13 @@ import { PresenceService } from '../../core/services/presence.service';
 import { AuthService } from '../../core/services/auth.service';
 import { interval, Subscription, Subject } from 'rxjs';
 import { switchMap, debounceTime } from 'rxjs/operators';
+import { AvatarUploadComponent } from '../../shared/components/avatar-upload/avatar-upload.component';
+import { AvatarContextMenuDirective } from '../../shared/directives/avatar-context-menu.directive';
 
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AvatarUploadComponent, AvatarContextMenuDirective],
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.scss']
 })
@@ -31,6 +33,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   typingUsers = signal<string[]>([]);
   uploadingFile = signal<boolean>(false);
   selectedFile = signal<File | null>(null);
+  showAvatarUpload = signal(false);
 
   private pollingSubscription?: Subscription;
   private currentUserId: string = '';
@@ -507,6 +510,30 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   setActiveView(view: 'conversations' | 'requests'): void {
     this.activeView.set(view);
+  }
+
+  /**
+   * Open avatar upload modal
+   */
+  openAvatarUpload(): void {
+    this.showAvatarUpload.set(true);
+  }
+
+  /**
+   * Handle avatar uploaded successfully
+   */
+  onAvatarUploaded(avatarUrl: string): void {
+    console.log('Avatar uploaded:', avatarUrl);
+    // Refresh conversations to show new avatar
+    this.loadConversations();
+    this.loadChatRequests();
+  }
+
+  /**
+   * Close avatar upload modal
+   */
+  closeAvatarUpload(): void {
+    this.showAvatarUpload.set(false);
   }
 }
 
