@@ -17,14 +17,17 @@ export interface ChatRequest {
   last_name?: string;
   email?: string;
   profile_image_url?: string;
+  avatar_url?: string; // Added for DiceBear avatar support
 }
 
 export interface ChatParticipant {
+  id?: string; // Added for DiceBear avatar seed
   user_id: string;
   first_name: string;
   last_name: string;
   email: string;
   profile_image_url?: string;
+  avatar_url?: string; // Added for DiceBear avatar support
 }
 
 export interface ChatMessage {
