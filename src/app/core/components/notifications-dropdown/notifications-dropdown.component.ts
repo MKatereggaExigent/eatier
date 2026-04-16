@@ -41,21 +41,23 @@ export class NotificationsDropdownComponent {
     }
   }
 
-  getTimeAgo(timestamp: string | Date): string {
+  getTimeAgo(timestamp?: string | Date): string {
+    if (!timestamp) return 'Recently';
+
     const now = new Date();
     const notificationTime = new Date(timestamp);
     const diffMs = now.getTime() - notificationTime.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins}m ago`;
-    
+
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
-    
+
     const diffDays = Math.floor(diffHours / 24);
     if (diffDays < 7) return `${diffDays}d ago`;
-    
+
     const diffWeeks = Math.floor(diffDays / 7);
     return `${diffWeeks}w ago`;
   }

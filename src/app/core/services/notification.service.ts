@@ -192,7 +192,9 @@ export class NotificationService {
     this.updateUnreadCount();
   }
 
-  getTimeAgo(timestamp: Date): string {
+  getTimeAgo(timestamp?: Date | string): string {
+    if (!timestamp) return 'Recently';
+
     const now = new Date();
     const diff = now.getTime() - new Date(timestamp).getTime();
     const seconds = Math.floor(diff / 1000);

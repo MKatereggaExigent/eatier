@@ -321,7 +321,7 @@ export class LayoutComponent {
     this.notificationService.deleteNotification(notificationId).subscribe();
   }
 
-  getTimeAgo(timestamp: Date): string {
+  getTimeAgo(timestamp?: Date | string): string {
     return this.notificationService.getTimeAgo(timestamp);
   }
 
