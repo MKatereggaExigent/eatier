@@ -19,8 +19,8 @@ export class DashboardComponent {
     const user = this.authService.currentUser();
     if (!user) return '?';
 
-    const firstName = user.first_name || '';
-    const lastName = user.last_name || '';
+    const firstName = user.firstName || '';
+    const lastName = user.lastName || '';
 
     if (firstName && lastName) {
       return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();

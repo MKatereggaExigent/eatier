@@ -263,7 +263,7 @@ $space-lg: 1.5rem;
 
   // Mobile - even smaller navbar
   @media (max-width: 768px) {
-    padding-top: calc(60px + 56px); // Mobile navbar + mobile header
+    padding-top: calc(60px + 2rem);
   }
 }
 
