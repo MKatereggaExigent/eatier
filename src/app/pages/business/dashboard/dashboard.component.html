@@ -1,8 +1,8 @@
 <div class="business-dashboard-wrapper">
   <!-- Mobile Header -->
   <header class="mobile-header">
-    <button type="button" class="menu-toggle" (click)="sidebar.toggleMobileSidebar()" aria-label="Toggle menu">
-      <span class="hamburger" [class.open]="sidebar.isMobileOpen()">
+    <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Toggle menu">
+      <span class="hamburger" [class.open]="isSidebarOpen()">
         <span></span>
         <span></span>
         <span></span>
@@ -15,8 +15,8 @@
   </header>
 
   <!-- Overlay for mobile -->
-  @if (sidebar.isMobileOpen()) {
-    <div class="nav-overlay" (click)="sidebar.closeMobileSidebar()"></div>
+  @if (isSidebarOpen()) {
+    <div class="nav-overlay" (click)="closeSidebar()"></div>
   }
 
   <app-sidebar></app-sidebar>

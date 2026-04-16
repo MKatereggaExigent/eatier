@@ -11,7 +11,7 @@ import { AuthService } from '../../../core/services/auth.service';
   imports: [SidebarComponent, RouterOutlet]
 })
 export class DashboardComponent {
-  @ViewChild(SidebarComponent) sidebar!: SidebarComponent;
+  @ViewChild(SidebarComponent) sidebar?: SidebarComponent;
 
   constructor(private authService: AuthService) {}
 
@@ -31,5 +31,21 @@ export class DashboardComponent {
     }
 
     return '?';
+  }
+
+  toggleSidebar(): void {
+    if (this.sidebar) {
+      this.sidebar.toggleMobileSidebar();
+    }
+  }
+
+  closeSidebar(): void {
+    if (this.sidebar) {
+      this.sidebar.closeMobileSidebar();
+    }
+  }
+
+  isSidebarOpen(): boolean {
+    return this.sidebar?.isMobileOpen() || false;
   }
 }
