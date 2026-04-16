@@ -1,6 +1,7 @@
-import { Component, ViewChild } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { SidebarComponent } from '../../../core/sidebar/sidebar.component';
+import { Component, signal, inject } from '@angular/core';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { LucideAngularModule, BarChart3, Globe, UtensilsCrossed, Calendar, Star, Store, CreditCard, TrendingUp, Megaphone, Users, Settings, LogOut } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -8,15 +9,40 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
-  imports: [SidebarComponent, RouterOutlet]
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, LucideAngularModule]
 })
 export class DashboardComponent {
-  @ViewChild(SidebarComponent) sidebar?: SidebarComponent;
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(private authService: AuthService) {}
+  // Icons
+  readonly BarChart3 = BarChart3;
+  readonly Globe = Globe;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Calendar = Calendar;
+  readonly Star = Star;
+  readonly Store = Store;
+  readonly CreditCard = CreditCard;
+  readonly TrendingUp = TrendingUp;
+  readonly Megaphone = Megaphone;
+  readonly Users = Users;
+  readonly Settings = Settings;
+  readonly LogOut = LogOut;
+
+  // State
+  mobileMenuOpen = signal(false);
+  currentUser = this.authService.currentUser;
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen.update(open => !open);
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
+  }
 
   getUserInitials(): string {
-    const user = this.authService.currentUser();
+    const user = this.currentUser();
     if (!user) return '?';
 
     const firstName = user.firstName || '';
@@ -33,19 +59,26 @@ export class DashboardComponent {
     return '?';
   }
 
-  toggleSidebar(): void {
-    if (this.sidebar) {
-      this.sidebar.toggleMobileSidebar();
+  getUserDisplayName(): string {
+    const user = this.currentUser();
+    if (!user) return 'User';
+
+    const firstName = user.firstName || '';
+    const lastName = user.lastName || '';
+
+    if (firstName && lastName) {
+      return `${firstName} ${lastName}`;
     }
+
+    if (user.email) {
+      return user.email.split('@')[0];
+    }
+
+    return 'User';
   }
 
-  closeSidebar(): void {
-    if (this.sidebar) {
-      this.sidebar.closeMobileSidebar();
-    }
-  }
-
-  isSidebarOpen(): boolean {
-    return this.sidebar?.isMobileOpen() || false;
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

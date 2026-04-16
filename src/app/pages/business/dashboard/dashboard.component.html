@@ -1,8 +1,8 @@
-<div class="business-dashboard-wrapper">
+<div class="business-dashboard-wrapper" [class.menu-open]="mobileMenuOpen()">
   <!-- Mobile Header -->
   <header class="mobile-header">
-    <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Toggle menu">
-      <span class="hamburger" [class.open]="isSidebarOpen()">
+    <button type="button" class="menu-toggle" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+      <span class="hamburger" [class.open]="mobileMenuOpen()">
         <span></span>
         <span></span>
         <span></span>
@@ -15,11 +15,101 @@
   </header>
 
   <!-- Overlay for mobile -->
-  @if (isSidebarOpen()) {
-    <div class="nav-overlay" (click)="closeSidebar()"></div>
+  @if (mobileMenuOpen()) {
+    <div class="nav-overlay" (click)="closeMobileMenu()"></div>
   }
 
-  <app-sidebar></app-sidebar>
+  <!-- Business Sidebar Navigation -->
+  <nav class="business-nav" [class.open]="mobileMenuOpen()">
+    <div class="nav-brand">
+      <h2>Business Dashboard</h2>
+      @if (currentUser()) {
+        <div class="user-info">
+          <div class="user-avatar">
+            {{ getUserInitials() }}
+          </div>
+          <span class="user-name">{{ getUserDisplayName() }}</span>
+          <span class="user-role">Business Owner</span>
+        </div>
+      }
+    </div>
+
+    <ul class="nav-links">
+      <li>
+        <a routerLink="/dashboard/business/overview" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+          <lucide-icon [img]="BarChart3" [size]="20" class="nav-icon"></lucide-icon>
+          <span class="nav-label">Overview</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/dashboard/business/site" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+          <lucide-icon [img]="Globe" [size]="20" class="nav-icon"></lucide-icon>
+          <span class="nav-label">Site</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/dashboard/business/menu" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+          <lucide-icon [img]="UtensilsCrossed" [size]="20" class="nav-icon"></lucide-icon>
+          <span class="nav-label">Menu</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/dashboard/business/bookings" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+          <lucide-icon [img]="Calendar" [size]="20" class="nav-icon"></lucide-icon>
+          <span class="nav-label">Bookings</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/dashboard/business/reviews" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+          <lucide-icon [img]="Star" [size]="20" class="nav-icon"></lucide-icon>
+          <span class="nav-label">Reviews</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/dashboard/business/orders" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+          <lucide-icon [img]="Store" [size]="20" class="nav-icon"></lucide-icon>
+          <span class="nav-label">Orders</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/dashboard/business/subscription" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+          <lucide-icon [img]="CreditCard" [size]="20" class="nav-icon"></lucide-icon>
+          <span class="nav-label">Subscription</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/dashboard/business/analytics" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+          <lucide-icon [img]="TrendingUp" [size]="20" class="nav-icon"></lucide-icon>
+          <span class="nav-label">Analytics</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/dashboard/business/ads" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+          <lucide-icon [img]="Megaphone" [size]="20" class="nav-icon"></lucide-icon>
+          <span class="nav-label">Ads</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/dashboard/business/social" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+          <lucide-icon [img]="Users" [size]="20" class="nav-icon"></lucide-icon>
+          <span class="nav-label">Social</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/dashboard/business/settings" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
+          <lucide-icon [img]="Settings" [size]="20" class="nav-icon"></lucide-icon>
+          <span class="nav-label">Settings</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="nav-footer">
+      <button type="button" class="logout-btn" (click)="logout()">
+        <lucide-icon [img]="LogOut" [size]="20" class="nav-icon"></lucide-icon>
+        <span class="nav-label">Logout</span>
+      </button>
+    </div>
+  </nav>
 
   <main class="dashboard">
     <h1><span class="itiyum-brand">Itiyum</span> for Business</h1>
