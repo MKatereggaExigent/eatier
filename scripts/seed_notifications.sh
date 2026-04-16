@@ -130,7 +130,7 @@ echo ""
 echo "📊 Verification Query:"
 echo "----------------------"
 $PSQL_CMD <<EOF
-SELECT 
+SELECT
     u.email,
     u.role,
     COUNT(n.id) as total_notifications,
@@ -138,7 +138,7 @@ SELECT
 FROM users u
 LEFT JOIN notifications n ON u.id = n.user_id
 GROUP BY u.email, u.role
-ORDER BY u.created_at DESC
+ORDER BY total_notifications DESC
 LIMIT 10;
 EOF
 
