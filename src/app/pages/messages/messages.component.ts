@@ -35,6 +35,16 @@ export class MessagesComponent implements OnInit, OnDestroy {
   selectedFile = signal<File | null>(null);
   showAvatarUpload = signal(false);
 
+  // Search
+  searchQuery = signal<string>('');
+  filteredConversations = signal<ChatConversation[]>([]);
+
+  // Pagination
+  conversationsPage = signal<number>(1);
+  conversationsLimit = signal<number>(20);
+  totalConversations = signal<number>(0);
+  totalPages = computed(() => Math.ceil(this.totalConversations() / this.conversationsLimit()));
+
   private pollingSubscription?: Subscription;
   private currentUserId: string = '';
   private typingSubject = new Subject<string>();
@@ -144,9 +154,14 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   loadConversations(): void {
     this.loading.set(true);
-    this.messagingService.getConversations().subscribe({
+    const limit = this.conversationsLimit();
+    const offset = (this.conversationsPage() - 1) * limit;
+
+    this.messagingService.getConversations(limit, offset).subscribe({
       next: (response) => {
         this.conversations.set(response.conversations);
+        this.filteredConversations.set(response.conversations);
+        this.totalConversations.set(response.total || response.conversations.length);
         this.loading.set(false);
       },
       error: (err) => {
@@ -163,6 +178,50 @@ export class MessagesComponent implements OnInit, OnDestroy {
       },
       error: (err) => console.error('Error loading chat requests:', err)
     });
+  }
+
+  // Search functionality
+  onSearchChange(): void {
+    const query = this.searchQuery().toLowerCase().trim();
+    const allConversations = this.conversations();
+
+    if (!query) {
+      this.filteredConversations.set(allConversations);
+      this.totalConversations.set(allConversations.length);
+      return;
+    }
+
+    const filtered = allConversations.filter(conv => {
+      // Search in participant names
+      const participantMatch = conv.participants?.some((p: any) => {
+        const fullName = `${p.first_name || ''} ${p.last_name || ''}`.toLowerCase();
+        return fullName.includes(query) || p.email?.toLowerCase().includes(query);
+      });
+
+      // Search in last message
+      const messageMatch = conv.last_message?.content?.toLowerCase().includes(query);
+
+      return participantMatch || messageMatch;
+    });
+
+    this.filteredConversations.set(filtered);
+    this.totalConversations.set(filtered.length);
+    this.conversationsPage.set(1); // Reset to first page
+  }
+
+  // Pagination methods
+  nextPage(): void {
+    if (this.conversationsPage() < this.totalPages()) {
+      this.conversationsPage.update(p => p + 1);
+      this.loadConversations();
+    }
+  }
+
+  previousPage(): void {
+    if (this.conversationsPage() > 1) {
+      this.conversationsPage.update(p => p - 1);
+      this.loadConversations();
+    }
   }
 
   selectConversation(conversation: ChatConversation): void {

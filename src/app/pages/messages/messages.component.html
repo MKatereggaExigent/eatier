@@ -10,14 +10,14 @@
           <h2>Messages</h2>
         </div>
         <div class="header-tabs">
-          <button 
+          <button
             type="button"
             class="tab-btn"
             [class.active]="activeView() === 'conversations'"
             (click)="setActiveView('conversations')">
             Chats
           </button>
-          <button 
+          <button
             type="button"
             class="tab-btn"
             [class.active]="activeView() === 'requests'"
@@ -27,6 +27,18 @@
               <span class="badge">{{ chatRequests().length }}</span>
             }
           </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search conversations..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event); onSearchChange()"
+          />
+          <span class="search-icon">🔍</span>
         </div>
       </div>
 
@@ -125,6 +137,29 @@
           }
         }
       </div>
+
+      <!-- Pagination -->
+      @if (activeView() === 'conversations' && totalConversations() > conversationsLimit()) {
+        <div class="pagination-container">
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="conversationsPage() === 1"
+            (click)="previousPage()">
+            ← Prev
+          </button>
+          <span class="pagination-info">
+            Page {{ conversationsPage() }} of {{ totalPages() }}
+          </span>
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="conversationsPage() >= totalPages()"
+            (click)="nextPage()">
+            Next →
+          </button>
+        </div>
+      }
     </div>
 
     <!-- Main: Chat View -->

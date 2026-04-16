@@ -37,18 +37,23 @@
   padding: var(--space-4) 0;
 }
 
-// 3-Column Grid Layout: Left Sidebar (3) | Main Content (6) | Right Sidebar (3)
-// Standard practice: Sidebars are part of the layout, not overlays
+// 3-Column Grid Layout: Left Sidebar (2) | Main Content (8) | Right Sidebar (2)
+// Adjusted for better main content space and responsive chat interface
 .content-grid {
   display: grid;
-  grid-template-columns: 3fr 6fr 3fr; // 25% : 50% : 25% ratio
+  grid-template-columns: 2fr 8fr 2fr; // 16.6% : 66.7% : 16.6% ratio (narrower sidebars)
   gap: var(--space-4);
   margin-top: var(--space-4); // Small gap after header ad (header ad is now in normal flow)
   padding: 0 var(--space-4);
-  max-width: 1600px;
+  max-width: 1800px; // Increased from 1600px for more room
   margin-left: auto;
   margin-right: auto;
   min-height: calc(100vh - 260px); // Account for navbar + header ad + footer ad
+
+  @media (min-width: 1400px) {
+    // On large screens, make sidebars even narrower for better main content space
+    grid-template-columns: 1.5fr 9fr 1.5fr; // 12.5% : 75% : 12.5% ratio
+  }
 
   @media (max-width: 1200px) {
     // On medium screens, hide sidebars and make content full width
