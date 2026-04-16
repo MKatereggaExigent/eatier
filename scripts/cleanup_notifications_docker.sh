@@ -9,7 +9,7 @@ set -e
 echo "🗑️  Cleaning up Test Notifications"
 echo "==================================="
 
-docker exec itiyum-postgres psql -U postgres -d itiyum_platform << 'EOF'
+docker exec itiyum-postgres psql -U itiyum_user -d itiyum_platform << 'EOF'
 
 -- Count before
 \echo 'Before cleanup:'

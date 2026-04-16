@@ -11,7 +11,7 @@ echo "🔔 Seeding Test Notifications via Docker"
 echo "=========================================="
 
 # Run the SQL script inside the PostgreSQL container
-docker exec itiyum-postgres psql -U postgres -d itiyum_platform << 'EOF'
+docker exec itiyum-postgres psql -U itiyum_user -d itiyum_platform << 'EOF'
 
 -- Clean up old test notifications (optional)
 -- DELETE FROM notifications WHERE message LIKE '%[TEST]%';
