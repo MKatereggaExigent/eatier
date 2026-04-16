@@ -295,18 +295,19 @@ router.get('/discover', authenticateToken, async (req, res) => {
     const tenantId = req.user.tenant_id;
     const { limit = 10 } = req.query;
 
-    // Find users with similar activity or popular users
+    // Find users with similar activity or popular users (ONLY from same tenant - multi-tenancy protection)
     const result = await pool.query(
       `SELECT u.id, u.first_name, u.last_name, u.avatar_url,
               (SELECT COUNT(*) FROM reviews r WHERE r.user_id = u.id) as review_count,
-              (SELECT COUNT(*) FROM user_follows uf WHERE uf.following_id = u.id) as follower_count
+              (SELECT COUNT(*) FROM user_follows uf WHERE uf.following_id = u.id AND uf.tenant_id = $3) as follower_count
        FROM users u
        WHERE u.id != $1
-         AND u.id NOT IN (SELECT following_id FROM user_follows WHERE follower_id = $1)
+         AND u.tenant_id = $3
+         AND u.id NOT IN (SELECT following_id FROM user_follows WHERE follower_id = $1 AND tenant_id = $3)
          AND u.account_status = 'active'
        ORDER BY follower_count DESC, review_count DESC
        LIMIT $2`,
-      [userId, parseInt(limit)]
+      [userId, parseInt(limit), tenantId]
     );
 
     res.json({
