@@ -261,6 +261,184 @@ async function notifyNewMessage({ userId, tenantId, senderName, senderId, conver
   });
 }
 
+/**
+ * Notify user they received a poke
+ */
+async function notifyPoke({ userId, tenantId, pokerName, pokerId, pokeMessage }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'social',
+    title: 'Poke Received',
+    message: pokeMessage ? `${pokerName} poked you: "${pokeMessage}"` : `${pokerName} poked you!`,
+    actionUrl: `/dashboard/social`,
+    metadata: {
+      poker_id: pokerId,
+      poker_name: pokerName,
+      poke_message: pokeMessage
+    }
+  });
+}
+
+/**
+ * Notify user their post was liked
+ */
+async function notifyPostLike({ userId, tenantId, likerName, likerId, postId }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'social',
+    title: 'Post Like',
+    message: `${likerName} liked your post`,
+    actionUrl: `/community/${postId}`,
+    metadata: {
+      liker_id: likerId,
+      liker_name: likerName,
+      post_id: postId
+    }
+  });
+}
+
+/**
+ * Notify user of a new comment on their post
+ */
+async function notifyPostComment({ userId, tenantId, commenterName, commenterId, commentText, postId }) {
+  const truncated = commentText.length > 50 ? commentText.substring(0, 50) + '...' : commentText;
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'social',
+    title: 'New Comment',
+    message: `${commenterName} commented: "${truncated}"`,
+    actionUrl: `/community/${postId}`,
+    metadata: {
+      commenter_id: commenterId,
+      commenter_name: commenterName,
+      post_id: postId
+    }
+  });
+}
+
+/**
+ * Notify user of a purchase confirmation
+ */
+async function notifyPurchaseConfirmed({ userId, tenantId, orderNumber, itemCount, totalAmount, currency, orderId }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'payment',
+    title: 'Purchase Complete',
+    message: `Your order #${orderNumber} (${itemCount} items) for ${currency} ${totalAmount} has been confirmed.`,
+    actionUrl: `/dashboard/orders/${orderId}`,
+    metadata: { orderNumber, itemCount, totalAmount, currency, orderId }
+  });
+}
+
+/**
+ * Notify user of a refund processed
+ */
+async function notifyRefundProcessed({ userId, tenantId, amount, currency, reason, orderId }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'payment',
+    title: 'Refund Processed',
+    message: `Your refund of ${currency} ${amount} has been processed. ${reason || ''}`,
+    actionUrl: `/dashboard/wallet`,
+    metadata: { amount, currency, reason, orderId }
+  });
+}
+
+/**
+ * Notify user their subscription is expiring soon
+ */
+async function notifySubscriptionExpiring({ userId, tenantId, daysRemaining, planName }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'subscription',
+    title: 'Subscription Expiring Soon',
+    message: `Your ${planName} subscription expires in ${daysRemaining} days. Renew now to keep your benefits!`,
+    actionUrl: '/dashboard/subscriptions',
+    metadata: { daysRemaining, planName }
+  });
+}
+
+/**
+ * Notify user their subscription was activated
+ */
+async function notifySubscriptionActivated({ userId, tenantId, planName, expiresAt }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'subscription',
+    title: 'Subscription Activated',
+    message: `Welcome to ${planName}! Your subscription is now active.`,
+    actionUrl: '/dashboard/subscriptions',
+    metadata: { planName, expiresAt }
+  });
+}
+
+/**
+ * Notify user their email was verified
+ */
+async function notifyEmailVerified({ userId, tenantId, email }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'email',
+    title: 'Email Verified',
+    message: `Your email address ${email} has been successfully verified.`,
+    actionUrl: '/dashboard/settings',
+    metadata: { email }
+  });
+}
+
+/**
+ * Notify user of a new login
+ */
+async function notifyNewLogin({ userId, tenantId, deviceInfo, location, ipAddress }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'security',
+    title: 'New Login Detected',
+    message: `New login from ${deviceInfo}${location ? ' in ' + location : ''}. Was this you?`,
+    actionUrl: '/dashboard/settings/security',
+    metadata: { deviceInfo, location, ipAddress }
+  });
+}
+
+/**
+ * Notify user of a promotional offer
+ */
+async function notifyPromotion({ userId, tenantId, title, description, discountPercent, promoCode, expiresAt }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'promo',
+    title: title || 'Special Offer',
+    message: description || `Get ${discountPercent}% off! Use code ${promoCode}`,
+    actionUrl: '/dashboard/promotions',
+    metadata: { discountPercent, promoCode, expiresAt }
+  });
+}
+
+/**
+ * Notify business owner of a new inquiry
+ */
+async function notifyNewInquiry({ userId, tenantId, customerName, inquiryType, inquiryId }) {
+  return createNotification({
+    userId,
+    tenantId,
+    type: 'inquiry',
+    title: 'New Inquiry',
+    message: `${customerName} sent you a new ${inquiryType} inquiry.`,
+    actionUrl: `/dashboard/inquiries/${inquiryId}`,
+    metadata: { customerName, inquiryType, inquiryId }
+  });
+}
+
 module.exports = {
   createNotification,
   notifyBookingConfirmed,
@@ -275,6 +453,17 @@ module.exports = {
   notifyUserFollowed,
   notifyChatRequest,
   notifyChatRequestAccepted,
-  notifyNewMessage
+  notifyNewMessage,
+  notifyPoke,
+  notifyPostLike,
+  notifyPostComment,
+  notifyPurchaseConfirmed,
+  notifyRefundProcessed,
+  notifySubscriptionExpiring,
+  notifySubscriptionActivated,
+  notifyEmailVerified,
+  notifyNewLogin,
+  notifyPromotion,
+  notifyNewInquiry
 };
 
