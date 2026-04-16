@@ -1,4 +1,5 @@
 import { AuthGuard, GuestGuard, RoleGuard } from './core/guards/auth.guard';
+import { RoleRedirectGuard } from './core/guards/role-redirect.guard';
 
 import { LayoutComponent } from './core/layout.component';
 import { Routes } from '@angular/router';
@@ -128,6 +129,21 @@ export const routes: Routes = [
             { path: 'register', redirectTo: '/register', pathMatch: 'full' },
             { path: 'forgot-password', redirectTo: '/forgot-password', pathMatch: 'full' },
             { path: 'reset-password', redirectTo: '/reset-password', pathMatch: 'full' }
+        ]
+    },
+
+    // Generic /dashboard/* routes - Redirect to role-specific routes
+    {
+        path: 'dashboard',
+        canActivate: [AuthGuard],
+        children: [
+            { path: 'social', canActivate: [RoleRedirectGuard], loadChildren: () => [] },
+            { path: 'messages', canActivate: [RoleRedirectGuard], loadChildren: () => [] },
+            { path: 'messages/:id', canActivate: [RoleRedirectGuard], loadChildren: () => [] },
+            { path: 'bookings', canActivate: [RoleRedirectGuard], loadChildren: () => [] },
+            { path: 'reviews', canActivate: [RoleRedirectGuard], loadChildren: () => [] },
+            { path: 'wallet', canActivate: [RoleRedirectGuard], loadChildren: () => [] },
+            { path: 'settings', canActivate: [RoleRedirectGuard], loadChildren: () => [] }
         ]
     },
 
