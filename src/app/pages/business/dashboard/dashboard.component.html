@@ -1,6 +1,28 @@
-<app-sidebar></app-sidebar>
+<div class="business-dashboard-wrapper">
+  <!-- Mobile Header -->
+  <header class="mobile-header">
+    <button type="button" class="menu-toggle" (click)="sidebar.toggleMobileSidebar()" aria-label="Toggle menu">
+      <span class="hamburger" [class.open]="sidebar.isMobileOpen()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </button>
+    <h2 class="mobile-title">Business Dashboard</h2>
+    <div class="mobile-user-avatar">
+      {{ getUserInitials() }}
+    </div>
+  </header>
 
-<main class="dashboard">
-  <h1><span class="itiyum-brand">Itiyum</span> for Business</h1>
-  <router-outlet></router-outlet>
-</main>
+  <!-- Overlay for mobile -->
+  @if (sidebar.isMobileOpen()) {
+    <div class="nav-overlay" (click)="sidebar.closeMobileSidebar()"></div>
+  }
+
+  <app-sidebar></app-sidebar>
+
+  <main class="dashboard">
+    <h1><span class="itiyum-brand">Itiyum</span> for Business</h1>
+    <router-outlet></router-outlet>
+  </main>
+</div>

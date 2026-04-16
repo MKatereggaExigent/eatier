@@ -2,7 +2,106 @@
 // BUSINESS DASHBOARD LAYOUT
 // Production Ready with Sidebar
 // ===================================
-// Mobile controls now handled entirely by SidebarComponent
+
+// Mobile Header (matching user dashboard style)
+.mobile-header {
+  display: none;
+  position: fixed;
+  top: 64px; // Below main navbar
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 1rem;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 998;
+
+  @media (max-width: 1024px) {
+    display: flex;
+  }
+
+  @media (max-width: 768px) {
+    top: 60px; // Adjusted for smaller navbar
+  }
+
+  .menu-toggle {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 24px;
+
+      span {
+        display: block;
+        height: 2px;
+        background: #374151;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+
+      &.open {
+        span:nth-child(1) {
+          transform: rotate(45deg) translateY(6px);
+        }
+        span:nth-child(2) {
+          opacity: 0;
+        }
+        span:nth-child(3) {
+          transform: rotate(-45deg) translateY(-6px);
+        }
+      }
+    }
+  }
+
+  .mobile-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+  }
+
+  .mobile-user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+}
+
+// Overlay for mobile sidebar
+.nav-overlay {
+  display: none;
+
+  @media (max-width: 1024px) {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    backdrop-filter: blur(2px);
+  }
+}
 
 .dashboard {
   margin-left: 260px; // Account for sidebar width (260px)

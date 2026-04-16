@@ -193,17 +193,19 @@ $space-lg: 1.5rem;
 .business-sidebar {
   position: fixed;
   left: 0;
-  top: 0; // Start from top, will be pushed down by padding
+  top: 0; // Start from top
   bottom: 0;
   width: 260px;
   background: $color-white;
-  border-right: 1px solid $color-black;
+  border-right: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
-  z-index: 900;
-  transition: width 0.2s ease, transform 0.3s ease;
-  overflow: hidden;
-  padding-top: 72px; // Account for navbar height (desktop)
+  z-index: 100;
+  transition: left 0.3s ease, padding-top 0.3s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: calc(72px + 2rem); // Account for navbar height + padding
+  box-sizing: border-box;
 
   &.collapsed {
     width: 64px;
@@ -232,25 +234,26 @@ $space-lg: 1.5rem;
     }
   }
 
-  // Tablet and mobile - slide in from left
-  @media (max-width: 1023px) {
-    transform: translateX(-100%); // Hide off-screen by default
-    z-index: 999; // Above overlay (998) below mobile header (1000)
-    padding-top: calc(64px + 56px); // Navbar + mobile header
-    box-shadow: none;
+  // Tablet and mobile - slide in from left (matching user dashboard)
+  @media (max-width: 1024px) {
+    position: fixed;
+    left: -280px; // Hidden by default (off-screen)
+    top: 0;
     width: 260px;
-    max-width: 85vw; // Don't take full width, leave space for close gesture
+    height: 100vh;
+    z-index: 999;
+    padding-top: calc(64px + 2rem); // Tablet navbar height + padding
+    transition: left 0.3s ease;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
 
     &.mobile-open {
-      transform: translateX(0); // Slide in when open
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2); // Stronger shadow when visible
+      left: 0; // Slide in when open
     }
+  }
 
-    // Ensure sidebar doesn't interfere when hidden on mobile
-    &:not(.mobile-open) {
-      pointer-events: none; // Prevent interactions when hidden
-      visibility: hidden; // Completely hide from screen readers too
-    }
+  @media (max-width: 768px) {
+    padding-top: calc(60px + 2rem); // Mobile navbar height + padding
+  }
 
     // Hide desktop-only elements
     .desktop-only {
