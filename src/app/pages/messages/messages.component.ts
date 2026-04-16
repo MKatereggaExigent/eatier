@@ -161,7 +161,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.conversations.set(response.conversations);
         this.filteredConversations.set(response.conversations);
-        this.totalConversations.set(response.total || response.conversations.length);
+        this.totalConversations.set(response.conversations.length);
         this.loading.set(false);
       },
       error: (err) => {
