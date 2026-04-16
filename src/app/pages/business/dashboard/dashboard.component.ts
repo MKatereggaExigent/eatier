@@ -1,19 +1,22 @@
 import { Component, signal, inject } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, BarChart3, Globe, UtensilsCrossed, Calendar, Star, Store, CreditCard, TrendingUp, Megaphone, Users, Settings, LogOut } from 'lucide-angular';
+import { LucideAngularModule, BarChart3, Globe, UtensilsCrossed, Calendar, Star, Store, CreditCard, TrendingUp, Megaphone, Users, Settings, LogOut, Bell } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { NotificationsDropdownComponent } from '../../../core/components/notifications-dropdown/notifications-dropdown.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, LucideAngularModule]
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, LucideAngularModule, NotificationsDropdownComponent]
 })
 export class DashboardComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private notificationService = inject(NotificationService);
 
   // Icons
   readonly BarChart3 = BarChart3;
@@ -28,10 +31,13 @@ export class DashboardComponent {
   readonly Users = Users;
   readonly Settings = Settings;
   readonly LogOut = LogOut;
+  readonly Bell = Bell;
 
   // State
   mobileMenuOpen = signal(false);
+  showNotifications = signal(false);
   currentUser = this.authService.currentUser;
+  unreadCount = this.notificationService.unreadCount;
 
   toggleMobileMenu(): void {
     this.mobileMenuOpen.update(open => !open);
@@ -39,6 +45,14 @@ export class DashboardComponent {
 
   closeMobileMenu(): void {
     this.mobileMenuOpen.set(false);
+  }
+
+  toggleNotifications(): void {
+    this.showNotifications.update(show => !show);
+  }
+
+  closeNotifications(): void {
+    this.showNotifications.set(false);
   }
 
   getUserInitials(): string {
