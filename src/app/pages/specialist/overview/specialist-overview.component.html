@@ -67,7 +67,7 @@
       <div class="metric-card rating">
         <lucide-icon [img]="Star" [size]="32" class="metric-icon"></lucide-icon>
         <div class="metric-content">
-          <h3>{{ businessMetrics().averageRating.toFixed(1) }}</h3>
+          <h3>{{ (businessMetrics().averageRating || 0).toFixed(1) }}</h3>
           <p>Average Rating</p>
           <div class="metric-change positive">
             {{ businessMetrics().totalReviews }} reviews
