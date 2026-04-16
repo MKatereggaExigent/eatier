@@ -16,17 +16,17 @@ router.post('/follow/:userId', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'You cannot follow yourself' });
     }
 
-    // Check if user exists IN THE SAME TENANT (multi-tenancy protection)
+    // Check if user exists (PUBLIC - allow cross-tenant follows for social networking)
     const userCheck = await pool.query(
-      `SELECT id FROM users WHERE id = $1 AND tenant_id = $2`,
-      [followingId, tenantId]
+      `SELECT id FROM users WHERE id = $1 AND account_status = 'active'`,
+      [followingId]
     );
 
     if (userCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found or not in your organization' });
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    // Create follow relationship
+    // Create follow relationship (use follower's tenant_id for data organization)
     await pool.query(
       `INSERT INTO user_follows (follower_id, following_id, tenant_id)
        VALUES ($1, $2, $3)
@@ -55,12 +55,11 @@ router.delete('/follow/:userId', authenticateToken, async (req, res) => {
   try {
     const followerId = req.user.userId;
     const followingId = req.params.userId;
-    const tenantId = req.user.tenant_id;
 
-    // Only delete follows within the same tenant (multi-tenancy protection)
+    // Delete follow relationship (PUBLIC - allow unfollowing anyone)
     await pool.query(
-      `DELETE FROM user_follows WHERE follower_id = $1 AND following_id = $2 AND tenant_id = $3`,
-      [followerId, followingId, tenantId]
+      `DELETE FROM user_follows WHERE follower_id = $1 AND following_id = $2`,
+      [followerId, followingId]
     );
 
     res.json({ message: 'Successfully unfollowed user' });
@@ -76,23 +75,22 @@ router.delete('/follow/:userId', authenticateToken, async (req, res) => {
 router.get('/followers', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const tenantId = req.user.tenant_id;
     const { limit = 20, offset = 0 } = req.query;
 
-    // Only show followers within the same tenant (multi-tenancy protection)
+    // Show all followers (PUBLIC - cross-tenant allowed)
     const result = await pool.query(
       `SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.role, uf.created_at as followed_at
        FROM user_follows uf
        JOIN users u ON uf.follower_id = u.id
-       WHERE uf.following_id = $1 AND uf.tenant_id = $2 AND u.tenant_id = $2
+       WHERE uf.following_id = $1
        ORDER BY uf.created_at DESC
-       LIMIT $3 OFFSET $4`,
-      [userId, tenantId, parseInt(limit), parseInt(offset)]
+       LIMIT $2 OFFSET $3`,
+      [userId, parseInt(limit), parseInt(offset)]
     );
 
     const countResult = await pool.query(
-      `SELECT COUNT(*) FROM user_follows WHERE following_id = $1 AND tenant_id = $2`,
-      [userId, tenantId]
+      `SELECT COUNT(*) FROM user_follows WHERE following_id = $1`,
+      [userId]
     );
 
     res.json({
@@ -123,23 +121,22 @@ router.get('/followers', authenticateToken, async (req, res) => {
 router.get('/following', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const tenantId = req.user.tenant_id;
     const { limit = 20, offset = 0 } = req.query;
 
-    // Only show users being followed within the same tenant (multi-tenancy protection)
+    // Show all users being followed (PUBLIC - cross-tenant allowed)
     const result = await pool.query(
       `SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.role, uf.created_at as followed_at
        FROM user_follows uf
        JOIN users u ON uf.following_id = u.id
-       WHERE uf.follower_id = $1 AND uf.tenant_id = $2 AND u.tenant_id = $2
+       WHERE uf.follower_id = $1
        ORDER BY uf.created_at DESC
-       LIMIT $3 OFFSET $4`,
-      [userId, tenantId, parseInt(limit), parseInt(offset)]
+       LIMIT $2 OFFSET $3`,
+      [userId, parseInt(limit), parseInt(offset)]
     );
 
     const countResult = await pool.query(
-      `SELECT COUNT(*) FROM user_follows WHERE follower_id = $1 AND tenant_id = $2`,
-      [userId, tenantId]
+      `SELECT COUNT(*) FROM user_follows WHERE follower_id = $1`,
+      [userId]
     );
 
     res.json({
@@ -295,19 +292,18 @@ router.get('/discover', authenticateToken, async (req, res) => {
     const tenantId = req.user.tenant_id;
     const { limit = 10 } = req.query;
 
-    // Find users with similar activity or popular users (ONLY from same tenant - multi-tenancy protection)
+    // Find users with similar activity or popular users (PUBLIC - cross-tenant allowed for social networking)
     const result = await pool.query(
-      `SELECT u.id, u.first_name, u.last_name, u.avatar_url,
+      `SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.role,
               (SELECT COUNT(*) FROM reviews r WHERE r.user_id = u.id) as review_count,
-              (SELECT COUNT(*) FROM user_follows uf WHERE uf.following_id = u.id AND uf.tenant_id = $3) as follower_count
+              (SELECT COUNT(*) FROM user_follows uf WHERE uf.following_id = u.id) as follower_count
        FROM users u
        WHERE u.id != $1
-         AND u.tenant_id = $3
-         AND u.id NOT IN (SELECT following_id FROM user_follows WHERE follower_id = $1 AND tenant_id = $3)
+         AND u.id NOT IN (SELECT following_id FROM user_follows WHERE follower_id = $1)
          AND u.account_status = 'active'
        ORDER BY follower_count DESC, review_count DESC
        LIMIT $2`,
-      [userId, parseInt(limit), tenantId]
+      [userId, parseInt(limit)]
     );
 
     res.json({
