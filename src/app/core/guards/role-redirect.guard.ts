@@ -30,7 +30,6 @@ export const RoleRedirectGuard = (route: ActivatedRouteSnapshot) => {
         targetRoute = '/dashboard/specialist/social';
         break;
       case 'business_owner':
-      case 'business':
         targetRoute = '/business/social';
         break;
       case 'food_enthusiast':
@@ -52,7 +51,6 @@ export const RoleRedirectGuard = (route: ActivatedRouteSnapshot) => {
         targetRoute = '/dashboard/specialist/messages';
         break;
       case 'business_owner':
-      case 'business':
         targetRoute = '/business/messages';
         break;
       case 'food_enthusiast':
@@ -74,7 +72,6 @@ export const RoleRedirectGuard = (route: ActivatedRouteSnapshot) => {
         targetRoute = '/dashboard/specialist/bookings';
         break;
       case 'business_owner':
-      case 'business':
         targetRoute = '/business/bookings';
         break;
       case 'food_enthusiast':
@@ -93,7 +90,6 @@ export const RoleRedirectGuard = (route: ActivatedRouteSnapshot) => {
     // Redirect /dashboard/reviews to role-specific reviews page
     switch (role) {
       case 'business_owner':
-      case 'business':
         targetRoute = '/business/reviews';
         break;
       case 'specialist':
@@ -109,7 +105,6 @@ export const RoleRedirectGuard = (route: ActivatedRouteSnapshot) => {
         targetRoute = '/dashboard/specialist/wallet';
         break;
       case 'business_owner':
-      case 'business':
         targetRoute = '/business/wallet';
         break;
       case 'food_enthusiast':
@@ -128,7 +123,6 @@ export const RoleRedirectGuard = (route: ActivatedRouteSnapshot) => {
         targetRoute = '/dashboard/specialist/settings';
         break;
       case 'business_owner':
-      case 'business':
         targetRoute = '/business/accounts';
         break;
       case 'food_enthusiast':
