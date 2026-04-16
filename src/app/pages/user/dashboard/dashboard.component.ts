@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
-import { LucideAngularModule, BarChart3, Globe, Users, Store, Calendar, FileText, Megaphone, TrendingUp, ClipboardList, Settings, Camera, Wallet, User, Heart, Star, Package, PartyPopper, CreditCard, Target, ChefHat, LogOut } from 'lucide-angular';
+import { LucideAngularModule, BarChart3, Globe, Users, Store, Calendar, FileText, Megaphone, TrendingUp, ClipboardList, Settings, Camera, Wallet, User, Heart, Star, Package, PartyPopper, CreditCard, Target, ChefHat, LogOut, MessageCircle } from 'lucide-angular';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -45,6 +45,7 @@ export class UserDashboardComponent {
   readonly Target = Target;
   readonly ChefHat = ChefHat;
   readonly LogOut = LogOut;
+  readonly MessageCircle = MessageCircle;
 
   // Mobile menu state
   mobileMenuOpen = signal(false);
@@ -82,6 +83,7 @@ export class UserDashboardComponent {
           { path: 'wallet', label: 'Earnings', icon: this.Wallet },
           { path: 'ads', label: 'Manage My Ads', icon: this.Megaphone },
           { path: 'social', label: 'Social', icon: this.Users },
+          { path: 'messages', label: 'Messages', icon: this.MessageCircle },
           { path: 'profile', label: 'Profile', icon: this.User }
         ];
 
@@ -94,6 +96,7 @@ export class UserDashboardComponent {
           { path: 'reviews', label: 'My Reviews', icon: this.Star },
           { path: 'ads', label: 'Manage My Ads', icon: this.Megaphone },
           { path: 'social', label: 'Social', icon: this.Users },
+          { path: 'messages', label: 'Messages', icon: this.MessageCircle },
           { path: 'insights', label: 'Insights', icon: this.TrendingUp },
           { path: 'bookings', label: 'Bookings', icon: this.ClipboardList },
           { path: 'specialist-bookings', label: 'Chef Bookings', icon: this.ChefHat }
@@ -112,6 +115,7 @@ export class UserDashboardComponent {
           { path: 'promotions', label: 'Deals', icon: this.PartyPopper },
           { path: 'wallet', label: 'Wallet', icon: this.CreditCard },
           { path: 'social', label: 'Social', icon: this.Users },
+          { path: 'messages', label: 'Messages', icon: this.MessageCircle },
           { path: 'preferences', label: 'Preferences', icon: this.Target },
           { path: 'profile', label: 'Profile', icon: this.User }
         ];
