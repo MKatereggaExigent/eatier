@@ -12,6 +12,15 @@
  */
 
 const { Pool } = require('pg');
+const {
+  getSocialRoute,
+  getMessagesRoute,
+  getBookingsRoute,
+  getReviewsRoute,
+  getWalletRoute,
+  getSettingsRoute
+} = require('../utils/roleBasedRoutes');
+
 require('dotenv').config({ path: require('path').join(__dirname, '../.env.local') });
 
 const pool = new Pool({
@@ -29,7 +38,7 @@ const notificationTemplates = [
     type: 'message',
     title: 'New Message',
     getMessage: (userName) => `You have a new message from a customer.`,
-    action_url: '/messages',
+    action_url: '{messagesRoute}',
     icon: '💬',
     read: false
   },
@@ -37,7 +46,7 @@ const notificationTemplates = [
     type: 'message',
     title: 'Chat Request',
     getMessage: (userName) => `Sarah wants to connect with you. Accept the chat request!`,
-    action_url: '/messages',
+    action_url: '{messagesRoute}',
     icon: '💬',
     read: false
   },
@@ -47,7 +56,7 @@ const notificationTemplates = [
     type: 'social',
     title: 'New Follower',
     getMessage: (userName) => `John Smith started following you!`,
-    action_url: '/dashboard/social',
+    action_url: '{socialRoute}',
     icon: '👥',
     read: false
   },
@@ -55,7 +64,7 @@ const notificationTemplates = [
     type: 'social',
     title: 'Poke Received',
     getMessage: (userName) => `Emily poked you! Say hi back!`,
-    action_url: '/dashboard/social',
+    action_url: '{socialRoute}',
     icon: '👋',
     read: false
   },
@@ -81,7 +90,7 @@ const notificationTemplates = [
     type: 'booking',
     title: 'Booking Confirmed',
     getMessage: (userName) => `Your table reservation has been confirmed for tomorrow at 7:00 PM.`,
-    action_url: '/dashboard/bookings',
+    action_url: '{bookingsRoute}',
     icon: '📅',
     read: false
   },
@@ -89,7 +98,7 @@ const notificationTemplates = [
     type: 'booking',
     title: 'New Booking Request',
     getMessage: (userName) => `You have a new booking request for 4 people on Friday.`,
-    action_url: '/dashboard/bookings',
+    action_url: '{bookingsRoute}',
     icon: '📅',
     read: false
   },
@@ -97,7 +106,7 @@ const notificationTemplates = [
     type: 'booking',
     title: 'Booking Reminder',
     getMessage: (userName) => `Reminder: Your reservation at The Savory Kitchen is in 2 hours.`,
-    action_url: '/dashboard/bookings',
+    action_url: '{bookingsRoute}',
     icon: '⏰',
     read: true
   },
@@ -107,7 +116,7 @@ const notificationTemplates = [
     type: 'review',
     title: 'New Review',
     getMessage: (userName) => `Someone left a 5-star review for your restaurant!`,
-    action_url: '/dashboard/reviews',
+    action_url: '{reviewsRoute}',
     icon: '⭐',
     read: false
   },
@@ -115,7 +124,7 @@ const notificationTemplates = [
     type: 'review',
     title: 'Review Response',
     getMessage: (userName) => `The restaurant owner responded to your review.`,
-    action_url: '/dashboard/reviews',
+    action_url: '{reviewsRoute}',
     icon: '⭐',
     read: true
   },
@@ -125,7 +134,7 @@ const notificationTemplates = [
     type: 'payment',
     title: 'Payment Successful',
     getMessage: (userName) => `Your payment of $45.00 has been processed successfully.`,
-    action_url: '/dashboard/wallet',
+    action_url: '{walletRoute}',
     icon: '✅',
     read: true
   },
@@ -133,7 +142,7 @@ const notificationTemplates = [
     type: 'payment',
     title: 'Purchase Complete',
     getMessage: (userName) => `Your order #12345 has been confirmed. Thank you!`,
-    action_url: '/dashboard/orders',
+    action_url: '{walletRoute}',
     icon: '🛍️',
     read: false
   },
@@ -141,7 +150,7 @@ const notificationTemplates = [
     type: 'payment',
     title: 'Refund Processed',
     getMessage: (userName) => `Your refund of $25.00 has been processed to your wallet.`,
-    action_url: '/dashboard/wallet',
+    action_url: '{walletRoute}',
     icon: '💰',
     read: true
   },
@@ -169,7 +178,7 @@ const notificationTemplates = [
     type: 'email',
     title: 'Email Verified',
     getMessage: (userName) => `Your email address has been successfully verified.`,
-    action_url: '/dashboard/settings',
+    action_url: '{settingsRoute}',
     icon: '✉️',
     read: true
   },
@@ -179,7 +188,7 @@ const notificationTemplates = [
     type: 'info',
     title: 'Profile Updated',
     getMessage: (userName) => `Your profile has been successfully updated.`,
-    action_url: '/dashboard/settings',
+    action_url: '{settingsRoute}',
     icon: 'ℹ️',
     read: true
   },
@@ -187,7 +196,7 @@ const notificationTemplates = [
     type: 'security',
     title: 'New Login Detected',
     getMessage: (userName) => `New login from Chrome on Mac. Was this you?`,
-    action_url: '/dashboard/settings/security',
+    action_url: '{settingsRoute}/security',
     icon: '🔐',
     read: false
   },
@@ -197,7 +206,7 @@ const notificationTemplates = [
     type: 'promo',
     title: 'Special Offer',
     getMessage: (userName) => `Get 20% off your next booking! Limited time offer.`,
-    action_url: '/dashboard/promotions',
+    action_url: '/promotions',
     icon: '🎁',
     read: false
   },
@@ -207,7 +216,7 @@ const notificationTemplates = [
     type: 'inquiry',
     title: 'New Inquiry',
     getMessage: (userName) => `You have a new inquiry from a potential customer.`,
-    action_url: '/dashboard/inquiries',
+    action_url: '/business/inquiries',
     icon: '📧',
     read: false
   }
@@ -272,6 +281,22 @@ async function seedNotifications() {
         const hoursAgo = getTimeOffset(i);
         const timestamp = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
 
+        // Resolve action URL based on user role
+        let actionUrl = template.action_url;
+        if (actionUrl.includes('{socialRoute}')) {
+          actionUrl = getSocialRoute(user.role);
+        } else if (actionUrl.includes('{messagesRoute}')) {
+          actionUrl = getMessagesRoute(user.role);
+        } else if (actionUrl.includes('{bookingsRoute}')) {
+          actionUrl = getBookingsRoute(user.role);
+        } else if (actionUrl.includes('{reviewsRoute}')) {
+          actionUrl = getReviewsRoute(user.role);
+        } else if (actionUrl.includes('{walletRoute}')) {
+          actionUrl = getWalletRoute(user.role);
+        } else if (actionUrl.includes('{settingsRoute}')) {
+          actionUrl = getSettingsRoute(user.role);
+        }
+
         const result = await client.query(`
           INSERT INTO notifications (
             tenant_id,
@@ -292,7 +317,7 @@ async function seedNotifications() {
           template.getMessage(user.display_name || user.email),
           template.read,
           timestamp,
-          JSON.stringify({ action_url: template.action_url })
+          JSON.stringify({ action_url: actionUrl })
         ]);
 
         notificationsCreated++;

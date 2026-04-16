@@ -1,4 +1,12 @@
 const pool = require('../config/database');
+const {
+  getSocialRoute,
+  getMessagesRoute,
+  getBookingsRoute,
+  getReviewsRoute,
+  getWalletRoute,
+  getSettingsRoute
+} = require('./roleBasedRoutes');
 
 /**
  * Notification Helper
@@ -17,11 +25,37 @@ const pool = require('../config/database');
  * @param {Object} [params.metadata] - Optional additional data
  * @returns {Promise<Object>} Created notification
  */
-async function createNotification({ userId, tenantId, type, title, message, actionUrl, metadata = {} }) {
+async function createNotification({ userId, tenantId, type, title, message, actionUrl, metadata = {}, resolveRoute = true }) {
   try {
+    let finalActionUrl = actionUrl;
+
+    // If resolveRoute is true and actionUrl contains a placeholder, resolve it based on user role
+    if (resolveRoute && actionUrl) {
+      // Get user role
+      const userResult = await pool.query('SELECT role FROM users WHERE id = $1', [userId]);
+      if (userResult.rows.length > 0) {
+        const userRole = userResult.rows[0].role;
+
+        // Resolve route based on type and user role
+        if (actionUrl.includes('{socialRoute}')) {
+          finalActionUrl = getSocialRoute(userRole);
+        } else if (actionUrl.includes('{messagesRoute}')) {
+          finalActionUrl = actionUrl.replace('{messagesRoute}', getMessagesRoute(userRole));
+        } else if (actionUrl.includes('{bookingsRoute}')) {
+          finalActionUrl = actionUrl.replace('{bookingsRoute}', getBookingsRoute(userRole));
+        } else if (actionUrl.includes('{reviewsRoute}')) {
+          finalActionUrl = actionUrl.replace('{reviewsRoute}', getReviewsRoute(userRole));
+        } else if (actionUrl.includes('{walletRoute}')) {
+          finalActionUrl = getWalletRoute(userRole);
+        } else if (actionUrl.includes('{settingsRoute}')) {
+          finalActionUrl = actionUrl.replace('{settingsRoute}', getSettingsRoute(userRole));
+        }
+      }
+    }
+
     const data = { ...metadata };
-    if (actionUrl) {
-      data.action_url = actionUrl;
+    if (finalActionUrl) {
+      data.action_url = finalActionUrl;
     }
 
     const result = await pool.query(`

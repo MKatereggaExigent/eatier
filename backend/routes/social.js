@@ -16,14 +16,14 @@ router.post('/follow/:userId', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'You cannot follow yourself' });
     }
 
-    // Check if user exists
+    // Check if user exists IN THE SAME TENANT (multi-tenancy protection)
     const userCheck = await pool.query(
-      `SELECT id FROM users WHERE id = $1`,
-      [followingId]
+      `SELECT id FROM users WHERE id = $1 AND tenant_id = $2`,
+      [followingId, tenantId]
     );
 
     if (userCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'User not found or not in your organization' });
     }
 
     // Create follow relationship
@@ -55,10 +55,12 @@ router.delete('/follow/:userId', authenticateToken, async (req, res) => {
   try {
     const followerId = req.user.userId;
     const followingId = req.params.userId;
+    const tenantId = req.user.tenant_id;
 
+    // Only delete follows within the same tenant (multi-tenancy protection)
     await pool.query(
-      `DELETE FROM user_follows WHERE follower_id = $1 AND following_id = $2`,
-      [followerId, followingId]
+      `DELETE FROM user_follows WHERE follower_id = $1 AND following_id = $2 AND tenant_id = $3`,
+      [followerId, followingId, tenantId]
     );
 
     res.json({ message: 'Successfully unfollowed user' });
@@ -74,21 +76,23 @@ router.delete('/follow/:userId', authenticateToken, async (req, res) => {
 router.get('/followers', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
+    const tenantId = req.user.tenant_id;
     const { limit = 20, offset = 0 } = req.query;
 
+    // Only show followers within the same tenant (multi-tenancy protection)
     const result = await pool.query(
       `SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.role, uf.created_at as followed_at
        FROM user_follows uf
        JOIN users u ON uf.follower_id = u.id
-       WHERE uf.following_id = $1
+       WHERE uf.following_id = $1 AND uf.tenant_id = $2 AND u.tenant_id = $2
        ORDER BY uf.created_at DESC
-       LIMIT $2 OFFSET $3`,
-      [userId, parseInt(limit), parseInt(offset)]
+       LIMIT $3 OFFSET $4`,
+      [userId, tenantId, parseInt(limit), parseInt(offset)]
     );
 
     const countResult = await pool.query(
-      `SELECT COUNT(*) FROM user_follows WHERE following_id = $1`,
-      [userId]
+      `SELECT COUNT(*) FROM user_follows WHERE following_id = $1 AND tenant_id = $2`,
+      [userId, tenantId]
     );
 
     res.json({
@@ -119,21 +123,23 @@ router.get('/followers', authenticateToken, async (req, res) => {
 router.get('/following', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
+    const tenantId = req.user.tenant_id;
     const { limit = 20, offset = 0 } = req.query;
 
+    // Only show users being followed within the same tenant (multi-tenancy protection)
     const result = await pool.query(
       `SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.role, uf.created_at as followed_at
        FROM user_follows uf
        JOIN users u ON uf.following_id = u.id
-       WHERE uf.follower_id = $1
+       WHERE uf.follower_id = $1 AND uf.tenant_id = $2 AND u.tenant_id = $2
        ORDER BY uf.created_at DESC
-       LIMIT $2 OFFSET $3`,
-      [userId, parseInt(limit), parseInt(offset)]
+       LIMIT $3 OFFSET $4`,
+      [userId, tenantId, parseInt(limit), parseInt(offset)]
     );
 
     const countResult = await pool.query(
-      `SELECT COUNT(*) FROM user_follows WHERE follower_id = $1`,
-      [userId]
+      `SELECT COUNT(*) FROM user_follows WHERE follower_id = $1 AND tenant_id = $2`,
+      [userId, tenantId]
     );
 
     res.json({

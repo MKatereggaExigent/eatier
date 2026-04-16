@@ -155,12 +155,14 @@ router.patch('/request/:requestId', async (req, res) => {
 // ============================================
 router.get('/requests', async (req, res) => {
   const userId = req.user.userId;
+  const tenantId = req.user.tenant_id;
   const type = req.query.type || 'received'; // 'received' or 'sent'
 
   try {
     const column = type === 'received' ? 'recipient_id' : 'requester_id';
     const otherColumn = type === 'received' ? 'requester_id' : 'recipient_id';
 
+    // Multi-tenancy protection: only show requests within the same tenant
     const result = await pool.query(`
       SELECT
         cr.*,
@@ -170,9 +172,9 @@ router.get('/requests', async (req, res) => {
         COALESCE(u.avatar_url, u.profile_photo) as profile_image_url
       FROM chat_requests cr
       JOIN users u ON cr.${otherColumn} = u.id
-      WHERE cr.${column} = $1 AND cr.status = 'pending'
+      WHERE cr.${column} = $1 AND cr.status = 'pending' AND u.tenant_id = $2
       ORDER BY cr.created_at DESC
-    `, [userId]);
+    `, [userId, tenantId]);
 
     res.json({ requests: result.rows });
 
@@ -188,10 +190,12 @@ router.get('/requests', async (req, res) => {
 // ============================================
 router.get('/conversations', async (req, res) => {
   const userId = req.user.userId;
+  const tenantId = req.user.tenant_id;
   const limit = parseInt(req.query.limit) || 50;
   const offset = parseInt(req.query.offset) || 0;
 
   try {
+    // Multi-tenancy protection: only show conversations where all participants are in the same tenant
     const result = await pool.query(`
       SELECT
         c.*,
@@ -209,7 +213,7 @@ router.get('/conversations', async (req, res) => {
           ))
           FROM chat_participants cp2
           JOIN users u ON cp2.user_id = u.id
-          WHERE cp2.conversation_id = c.id AND cp2.user_id != $1
+          WHERE cp2.conversation_id = c.id AND cp2.user_id != $1 AND u.tenant_id = $4
         ) as participants,
         (
           SELECT json_build_object(
@@ -225,10 +229,10 @@ router.get('/conversations', async (req, res) => {
         ) as last_message
       FROM chat_conversations c
       JOIN chat_participants cp ON c.id = cp.conversation_id
-      WHERE cp.user_id = $1 AND c.is_active = true
+      WHERE cp.user_id = $1 AND c.is_active = true AND c.tenant_id = $4
       ORDER BY c.last_message_at DESC
       LIMIT $2 OFFSET $3
-    `, [userId, limit, offset]);
+    `, [userId, limit, offset, tenantId]);
 
     res.json({ conversations: result.rows });
 
