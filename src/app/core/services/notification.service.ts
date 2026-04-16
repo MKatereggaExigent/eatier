@@ -9,10 +9,20 @@ export interface Notification {
   type: 'info' | 'success' | 'warning' | 'error' | 'booking' | 'review' | 'message';
   title: string;
   message: string;
-  timestamp: Date;
+  timestamp?: Date;
+  created_at?: string;
   read: boolean;
+  is_read?: boolean;
+  read_at?: string;
   actionUrl?: string;
   icon?: string;
+  data?: {
+    action_url?: string;
+    icon?: string;
+    [key: string]: any;
+  };
+  user_id?: string;
+  tenant_id?: string;
 }
 
 @Injectable({
