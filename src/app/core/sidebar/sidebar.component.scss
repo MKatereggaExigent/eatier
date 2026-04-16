@@ -237,33 +237,26 @@ $space-lg: 1.5rem;
   // Tablet and mobile - slide in from left (matching user dashboard)
   @media (max-width: 1024px) {
     position: fixed;
-    left: -280px; // Hidden by default (off-screen)
+    left: -280px;
     top: 0;
     width: 260px;
     height: 100vh;
     z-index: 999;
-    padding-top: calc(64px + 2rem); // Tablet navbar height + padding
+    padding-top: 96px;
     transition: left 0.3s ease;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
 
     &.mobile-open {
-      left: 0; // Slide in when open
+      left: 0;
     }
-  }
 
-  @media (max-width: 768px) {
-    padding-top: calc(60px + 2rem); // Mobile navbar height + padding
-  }
-
-    // Hide desktop-only elements
     .desktop-only {
       display: none !important;
     }
   }
 
-  // Mobile - even smaller navbar
   @media (max-width: 768px) {
-    padding-top: calc(60px + 2rem);
+    padding-top: 92px;
   }
 }
 
