@@ -39,20 +39,20 @@ export class NotificationService {
     this.isInitialized = true;
     this.isLoading.set(true);
 
-    // Try API first, fall back to mock data
-    this.http.get<Notification[]>(`${this.apiUrl}/notifications`)
+    // Load notifications from API (user-specific only)
+    this.http.get<{ notifications: Notification[] }>(`${this.apiUrl}/notifications`)
       .pipe(
-        tap(notifications => {
-          this.notifications.set(notifications);
+        tap(response => {
+          this.notifications.set(response.notifications || []);
           this.updateUnreadCount();
           this.isLoading.set(false);
         }),
         catchError(error => {
-          console.error('Error loading notifications, using mock data:', error);
+          console.error('Error loading notifications:', error);
           this.isLoading.set(false);
-          // Use mock notifications for demo
-          this.loadMockNotifications();
-          return of([]);
+          // Return empty array - no mock data (user must be authenticated)
+          this.notifications.set([]);
+          return of({ notifications: [] });
         })
       )
       .subscribe();

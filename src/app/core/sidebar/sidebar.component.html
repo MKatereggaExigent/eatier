@@ -36,13 +36,29 @@
         <p class="business-type">{{ businessType() }}</p>
       </div>
     </div>
-    <button
-      type="button"
-      class="sidebar-toggle desktop-only"
-      (click)="toggleSidebar()"
-      [attr.aria-label]="isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
-      <lucide-icon [img]="isCollapsed() ? ChevronRight : ChevronLeft" [size]="16" class="toggle-icon"></lucide-icon>
-    </button>
+    <div class="sidebar-header-actions">
+      <!-- Notification Bell -->
+      <button
+        type="button"
+        class="icon-btn notifications-btn"
+        (click)="toggleNotifications($event)"
+        title="Notifications"
+        aria-label="Notifications">
+        <lucide-icon [img]="Bell" [size]="18" class="notification-icon"></lucide-icon>
+        @if (unreadCount() > 0) {
+          <span class="notification-badge">{{ unreadCount() }}</span>
+        }
+      </button>
+
+      <!-- Sidebar Toggle -->
+      <button
+        type="button"
+        class="sidebar-toggle desktop-only"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
+        <lucide-icon [img]="isCollapsed() ? ChevronRight : ChevronLeft" [size]="16" class="toggle-icon"></lucide-icon>
+      </button>
+    </div>
   </div>
 
   <!-- Navigation Menu -->
@@ -294,3 +310,11 @@
     </div>
   }
 </aside>
+
+<!-- Notifications Dropdown (overlay next to sidebar) -->
+@if (showNotifications()) {
+  <app-notifications-dropdown
+    [style.left.px]="isCollapsed() ? 64 : 260"
+    (close)="showNotifications.set(false)">
+  </app-notifications-dropdown>
+}

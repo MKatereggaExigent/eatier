@@ -14,7 +14,7 @@ const { authenticateToken } = require('../middleware/auth');
  */
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const tenantId = req.user.tenant_id;
 
     // Query user-specific notifications from database
@@ -59,7 +59,7 @@ router.get('/', authenticateToken, async (req, res) => {
 router.patch('/:id/read', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const tenantId = req.user.tenant_id;
 
     // Update notification in database (only if it belongs to this user and tenant)
@@ -88,7 +88,7 @@ router.patch('/:id/read', authenticateToken, async (req, res) => {
  */
 router.patch('/read-all', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const tenantId = req.user.tenant_id;
 
     // Mark all notifications as read in database
@@ -113,7 +113,7 @@ router.patch('/read-all', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const tenantId = req.user.tenant_id;
 
     // Delete notification from database (only if it belongs to this user and tenant)

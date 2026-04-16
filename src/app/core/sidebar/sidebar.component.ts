@@ -2,16 +2,18 @@ import { CommonModule, TitleCasePipe } from '@angular/common';
 import { Component, HostListener, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Subject, catchError, of, takeUntil } from 'rxjs';
-import { LucideAngularModule, BarChart3, Globe, UtensilsCrossed, Calendar, Star, Store, CreditCard, TrendingUp, Megaphone, Users, Settings, HelpCircle, LogOut, CheckCircle, Clock, AlertTriangle, Pause, FileText, ChevronRight, ChevronLeft } from 'lucide-angular';
+import { LucideAngularModule, BarChart3, Globe, UtensilsCrossed, Calendar, Star, Store, CreditCard, TrendingUp, Megaphone, Users, Settings, HelpCircle, LogOut, CheckCircle, Clock, AlertTriangle, Pause, FileText, ChevronRight, ChevronLeft, Bell } from 'lucide-angular';
 
 import { AuthService } from '../services/auth.service';
 import { BusinessOwner } from '../../shared/models/user.model';
 import { BusinessOwnerService, BusinessSubscription } from '../services/business-owner.service';
+import { NotificationService } from '../services/notification.service';
+import { NotificationsDropdownComponent } from '../components/notifications-dropdown/notifications-dropdown.component';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, TitleCasePipe, LucideAngularModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive, TitleCasePipe, LucideAngularModule, NotificationsDropdownComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
@@ -19,6 +21,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
   private businessOwnerService = inject(BusinessOwnerService);
+  private notificationService = inject(NotificationService);
   private destroy$ = new Subject<void>();
 
   // Lucide Icons
@@ -42,12 +45,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
   readonly FileText = FileText;
   readonly ChevronRight = ChevronRight;
   readonly ChevronLeft = ChevronLeft;
+  readonly Bell = Bell;
 
   // State management
   isCollapsed = signal(false);
   isMobileOpen = signal(false);
   currentUser = this.authService.currentUser;
   isHovering = signal(false);
+
+  // Notifications
+  showNotifications = signal(false);
+  unreadCount = this.notificationService.unreadCount;
 
   // Business information
   businessName = signal('My Restaurant');
@@ -205,6 +213,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
       default:
         return this.FileText;
     }
+  }
+
+  // Notification methods
+  toggleNotifications(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.showNotifications.update(show => !show);
   }
 
   // Logout method
