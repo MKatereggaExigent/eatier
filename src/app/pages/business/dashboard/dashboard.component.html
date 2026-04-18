@@ -122,8 +122,9 @@
 
   <!-- Notifications Dropdown -->
   @if (showNotifications()) {
+    <div class="notifications-dropdown-overlay" (click)="closeNotifications()"></div>
     <app-notifications-dropdown
-      [style.left.px]="260"
+      class="notifications-dropdown-positioned"
       (close)="closeNotifications()">
     </app-notifications-dropdown>
   }

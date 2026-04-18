@@ -392,6 +392,35 @@ $border-thick: 3px solid $color-black;
   }
 }
 
+// Notifications dropdown positioning
+.notifications-dropdown-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 999;
+}
+
+.notifications-dropdown-positioned {
+  position: fixed;
+  top: 72px;
+  left: 280px;
+  z-index: 1001;
+
+  @media (max-width: 1024px) {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 64px;
+  }
+
+  @media (max-width: 768px) {
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    top: 60px;
+    max-width: calc(100vw - 2rem);
+  }
+}
+
 // Animation keyframes
 @keyframes fadeIn {
   from {
