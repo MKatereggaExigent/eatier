@@ -210,6 +210,7 @@ export const routes: Routes = [
             { path: '', redirectTo: 'overview', pathMatch: 'full' },
             { path: 'overview', loadComponent: () => import('./pages/business/overview/overview.component').then(m => m.OverviewComponent) },
             { path: 'profile', loadComponent: () => import('./pages/business/profile/business-profile.component').then(m => m.BusinessProfileComponent) },
+            { path: 'notifications', loadComponent: () => import('./pages/business/notifications/notifications.component').then(m => m.NotificationsComponent) },
             { path: 'menu', loadComponent: () => import('./pages/business/menu/menu-management.component').then(m => m.MenuManagementComponent) },
             { path: 'bookings', loadComponent: () => import('./pages/business/bookings/business-bookings.component').then(m => m.BusinessBookingsComponent) },
             { path: 'reviews', loadComponent: () => import('./pages/business/reviews/business-reviews.component').then(m => m.BusinessReviewsComponent) },

@@ -1,17 +1,16 @@
-import { Component, signal, inject, OnInit, HostListener } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, BarChart3, Globe, UtensilsCrossed, Calendar, Star, Store, CreditCard, TrendingUp, Megaphone, Users, Settings, LogOut, Bell } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import { NotificationsDropdownComponent } from '../../../core/components/notifications-dropdown/notifications-dropdown.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, LucideAngularModule, NotificationsDropdownComponent]
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, LucideAngularModule]
 })
 export class DashboardComponent implements OnInit {
   private authService = inject(AuthService);
@@ -35,7 +34,6 @@ export class DashboardComponent implements OnInit {
 
   // State
   mobileMenuOpen = signal(false);
-  showNotifications = signal(false);
   currentUser = this.authService.currentUser;
   unreadCount = this.notificationService.unreadCount;
 
@@ -50,19 +48,6 @@ export class DashboardComponent implements OnInit {
 
   closeMobileMenu(): void {
     this.mobileMenuOpen.set(false);
-  }
-
-  toggleNotifications(event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
-    console.log('Toggle notifications clicked! Current state:', this.showNotifications());
-    this.showNotifications.update(show => !show);
-    console.log('New state:', this.showNotifications());
-  }
-
-  closeNotifications(): void {
-    this.showNotifications.set(false);
   }
 
   getUserInitials(): string {

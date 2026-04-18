@@ -48,13 +48,13 @@
         </a>
       </li>
       <li>
-        <button type="button" class="nav-link" (click)="toggleNotifications($event)">
+        <a routerLink="/dashboard/business/notifications" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
           <lucide-icon [img]="Bell" [size]="20" class="nav-icon"></lucide-icon>
           <span class="nav-label">Notifications</span>
           @if (unreadCount() > 0) {
             <span class="notification-badge">{{ unreadCount() }}</span>
           }
-        </button>
+        </a>
       </li>
       <li>
         <a routerLink="/dashboard/business/menu" routerLinkActive="active" class="nav-link" (click)="closeMobileMenu()">
@@ -119,15 +119,6 @@
       </button>
     </div>
   </nav>
-
-  <!-- Notifications Dropdown -->
-  @if (showNotifications()) {
-    <div class="notifications-dropdown-overlay" (click)="closeNotifications()"></div>
-    <app-notifications-dropdown
-      class="notifications-dropdown-positioned"
-      (close)="closeNotifications()">
-    </app-notifications-dropdown>
-  }
 
   <main class="dashboard">
     <h1><span class="itiyum-brand">Itiyum</span> for Business</h1>

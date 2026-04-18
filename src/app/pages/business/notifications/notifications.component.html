@@ -1,0 +1,60 @@
+<div class="notifications-page">
+  <div class="page-header">
+    <h1>Notifications</h1>
+    @if (unreadCount() > 0) {
+      <button class="btn-mark-all" (click)="markAllAsRead()">
+        Mark all as read ({{ unreadCount() }})
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading notifications...</p>
+    </div>
+  } @else if (notifications().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">🔔</div>
+      <h2>No notifications yet</h2>
+      <p>You'll see notifications here when you have new activity</p>
+    </div>
+  } @else {
+    <div class="notifications-list">
+      @for (notification of notifications(); track notification.id) {
+        <div 
+          class="notification-card"
+          [class.unread]="!notification.read"
+          (click)="navigateToNotification(notification)">
+          
+          <div class="notification-icon">
+            {{ notification.data?.icon || '🔔' }}
+          </div>
+          
+          <div class="notification-content">
+            <h3 class="notification-title">{{ notification.title }}</h3>
+            <p class="notification-message">{{ notification.message }}</p>
+            <span class="notification-time">{{ getTimeAgo(notification.created_at || notification.timestamp || '') }}</span>
+          </div>
+          
+          <div class="notification-actions">
+            @if (!notification.read) {
+              <button 
+                class="btn-icon" 
+                (click)="markAsRead(notification); $event.stopPropagation()"
+                title="Mark as read">
+                ✓
+              </button>
+            }
+            <button 
+              class="btn-icon btn-delete" 
+              (click)="deleteNotification(notification.id); $event.stopPropagation()"
+              title="Delete">
+              🗑️
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
