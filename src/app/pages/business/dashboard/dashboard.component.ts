@@ -44,18 +44,6 @@ export class DashboardComponent implements OnInit {
     this.notificationService.loadNotifications();
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
-    // Close notifications when clicking outside
-    const target = event.target as HTMLElement;
-    const notificationButton = target.closest('.nav-button');
-    const dropdown = target.closest('app-notifications-dropdown');
-
-    if (!notificationButton && !dropdown && this.showNotifications()) {
-      this.showNotifications.set(false);
-    }
-  }
-
   toggleMobileMenu(): void {
     this.mobileMenuOpen.update(open => !open);
   }
@@ -64,8 +52,13 @@ export class DashboardComponent implements OnInit {
     this.mobileMenuOpen.set(false);
   }
 
-  toggleNotifications(): void {
+  toggleNotifications(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    console.log('Toggle notifications clicked! Current state:', this.showNotifications());
     this.showNotifications.update(show => !show);
+    console.log('New state:', this.showNotifications());
   }
 
   closeNotifications(): void {
