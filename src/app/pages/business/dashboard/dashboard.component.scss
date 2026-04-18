@@ -252,24 +252,24 @@ $border-thick: 3px solid $color-black;
       }
 
       .nav-button {
-        width: 100%;
-        background: none;
-        border: none;
-        cursor: pointer;
+        // Inherits all nav-link styles, just add button-specific overrides
+        text-align: left;
         position: relative;
 
         .notification-badge {
-          position: absolute;
-          top: 0.75rem;
-          right: 1rem;
+          position: static;
+          margin-left: auto;
           background: #ef4444;
           color: white;
           font-size: 0.625rem;
           font-weight: 700;
           padding: 0.125rem 0.375rem;
           border-radius: 10px;
-          min-width: 16px;
+          min-width: 18px;
           text-align: center;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
         }
       }
     }

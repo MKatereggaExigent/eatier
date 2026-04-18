@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit, HostListener } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, BarChart3, Globe, UtensilsCrossed, Calendar, Star, Store, CreditCard, TrendingUp, Megaphone, Users, Settings, LogOut, Bell } from 'lucide-angular';
@@ -13,7 +13,7 @@ import { NotificationsDropdownComponent } from '../../../core/components/notific
   styleUrl: './dashboard.component.scss',
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, LucideAngularModule, NotificationsDropdownComponent]
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private notificationService = inject(NotificationService);
@@ -38,6 +38,23 @@ export class DashboardComponent {
   showNotifications = signal(false);
   currentUser = this.authService.currentUser;
   unreadCount = this.notificationService.unreadCount;
+
+  ngOnInit(): void {
+    // Load notifications when component initializes
+    this.notificationService.loadNotifications();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    // Close notifications when clicking outside
+    const target = event.target as HTMLElement;
+    const notificationButton = target.closest('.nav-button');
+    const dropdown = target.closest('app-notifications-dropdown');
+
+    if (!notificationButton && !dropdown && this.showNotifications()) {
+      this.showNotifications.set(false);
+    }
+  }
 
   toggleMobileMenu(): void {
     this.mobileMenuOpen.update(open => !open);
