@@ -38,7 +38,7 @@
         <div class="stat-card">
           <div class="stat-icon">⭐</div>
           <div class="stat-content">
-            <div class="stat-number">{{ reviewStats.averageRating.toFixed(1) }}</div>
+            <div class="stat-number">{{ (reviewStats.averageRating || 0).toFixed(1) }}</div>
             <div class="stat-label">Average Rating</div>
           </div>
         </div>

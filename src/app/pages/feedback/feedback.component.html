@@ -483,7 +483,7 @@
         <div class="stat-card">
           <span class="stat-icon">⭐</span>
           <div class="stat-content">
-            <h3>{{ communityStats().averageRating.toFixed(1) }}</h3>
+            <h3>{{ (communityStats().averageRating || 0).toFixed(1) }}</h3>
             <p>Average User Rating</p>
           </div>
         </div>
