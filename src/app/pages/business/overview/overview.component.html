@@ -60,7 +60,7 @@
           </div>
         } @else {
           <div class="stat-content">
-            <span class="stat-number">{{ (stats().averageRating || 0).toFixed(1) }}</span>
+            <span class="stat-number">{{ +(stats().averageRating || 0) | number:'1.1-1' }}</span>
             <span class="stat-label">Average Rating</span>
             <span class="stat-info">{{ stats().totalReviews }} reviews</span>
           </div>

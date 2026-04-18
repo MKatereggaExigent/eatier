@@ -18,7 +18,7 @@
       <div class="stat-card">
         <div class="stat-icon">⭐</div>
         <div class="stat-content">
-          <h3>{{ (reviewStats().averageRating || 0).toFixed(1) }}</h3>
+          <h3>{{ +(reviewStats().averageRating || 0) | number:'1.1-1' }}</h3>
           <p>Average Rating</p>
           <div class="stat-change" [class]="getRatingChangeClass()">
             {{ getRatingChangeText() }}
