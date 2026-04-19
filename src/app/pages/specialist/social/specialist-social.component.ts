@@ -204,15 +204,22 @@ export class SpecialistSocialComponent implements OnInit {
     this.messagingService.sendChatRequest(userId, 'Hi! I would like to connect with you.').subscribe({
       next: (response: any) => {
         this.startingChatWith.set(null);
-        console.log('✅ Chat request sent successfully:', response);
+        console.log('✅ Chat request response:', response);
 
-        // Show success message with auto-follow info
-        if (response.autoFollowed) {
-          alert('Chat request sent! You are now following this user.');
+        if (response.alreadyConnected && response.conversationId) {
+          // Conversation already exists - navigate to it
+          console.log('💬 Opening existing conversation:', response.conversationId);
+          this.router.navigate(['/messages'], {
+            queryParams: { conversation: response.conversationId }
+          });
+        } else {
+          // New chat request sent
+          if (response.autoFollowed) {
+            alert('Chat request sent! You are now following this user.');
+          }
+          // Navigate to messages page
+          this.router.navigate(['/messages']);
         }
-
-        // Navigate to messages page
-        this.router.navigate(['/messages']);
       },
       error: (err) => {
         console.error('❌ Error starting chat:', err);

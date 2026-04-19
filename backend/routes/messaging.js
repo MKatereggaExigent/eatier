@@ -50,7 +50,29 @@ router.post('/request', async (req, res) => {
       return res.status(404).json({ error: 'Recipient not found' });
     }
 
-    // Check if request already exists
+    // Check if a conversation already exists between these users
+    const existingConversation = await pool.query(`
+      SELECT DISTINCT c.id, c.conversation_type
+      FROM chat_conversations c
+      INNER JOIN chat_participants cp1 ON c.id = cp1.conversation_id
+      INNER JOIN chat_participants cp2 ON c.id = cp2.conversation_id
+      WHERE cp1.user_id = $1
+        AND cp2.user_id = $2
+        AND c.conversation_type = 'direct'
+      LIMIT 1
+    `, [requesterId, recipientId]);
+
+    if (existingConversation.rows.length > 0) {
+      // Conversation already exists - return it instead of error
+      console.log('✅ Conversation already exists:', existingConversation.rows[0].id);
+      return res.json({
+        message: 'Conversation already exists',
+        conversationId: existingConversation.rows[0].id,
+        alreadyConnected: true
+      });
+    }
+
+    // Check if request already exists (only if no conversation exists)
     const existingRequest = await pool.query(
       'SELECT id, status FROM chat_requests WHERE requester_id = $1 AND recipient_id = $2',
       [requesterId, recipientId]
@@ -61,9 +83,7 @@ router.post('/request', async (req, res) => {
       if (status === 'pending') {
         return res.status(400).json({ error: 'Chat request already pending' });
       }
-      if (status === 'accepted') {
-        return res.status(400).json({ error: 'Already connected with this user' });
-      }
+      // If request was accepted but no conversation exists (edge case), allow creating new request
     }
 
     // Auto-follow: If not already following, create follow relationship
