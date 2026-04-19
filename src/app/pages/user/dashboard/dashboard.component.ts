@@ -91,6 +91,7 @@ export class UserDashboardComponent {
         return [
           { path: 'overview', label: 'Overview', icon: this.BarChart3 },
           { path: '/about', label: 'Site', icon: this.Globe, isAbsolute: true },
+          { path: 'orders', label: 'Order History', icon: this.Package },
           { path: 'profile', label: 'Profile', icon: this.User },
           { path: 'favorites', label: 'Favorites', icon: this.Heart },
           { path: 'reviews', label: 'My Reviews', icon: this.Star },

@@ -238,6 +238,7 @@ export const routes: Routes = [
         children: [
             { path: '', redirectTo: 'overview', pathMatch: 'full' },
             { path: 'overview', loadComponent: () => import('./pages/food-enthusiast/overview/food-enthusiast-overview.component').then(m => m.FoodEnthusiastOverviewComponent) },
+            { path: 'orders', loadComponent: () => import('./pages/user/orders/user-orders.component').then(m => m.UserOrdersComponent) },
             { path: 'bookings', loadComponent: () => import('./pages/food-enthusiast/bookings/food-enthusiast-bookings.component').then(m => m.FoodEnthusiastBookingsComponent) },
             { path: 'specialist-bookings', loadComponent: () => import('./pages/user/specialist-bookings/user-specialist-bookings.component').then(m => m.UserSpecialistBookingsComponent) },
             { path: 'reviews', loadComponent: () => import('./pages/food-enthusiast/reviews/food-enthusiast-reviews.component').then(m => m.FoodEnthusiastReviewsComponent) },
