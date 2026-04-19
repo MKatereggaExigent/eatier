@@ -263,6 +263,14 @@ router.put('/items/:itemId', async (req, res) => {
     const { itemId } = req.params;
     const { quantity, specialInstructions } = req.body;
 
+    console.log('📝 PUT /items/:itemId - Request details:', {
+      itemId,
+      quantity,
+      quantityType: typeof quantity,
+      specialInstructions,
+      body: req.body
+    });
+
     if (quantity !== undefined && quantity < 1) {
       return res.status(400).json({ error: 'Quantity must be at least 1. Use DELETE to remove items.' });
     }
@@ -329,8 +337,15 @@ router.put('/items/:itemId', async (req, res) => {
     });
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('Error updating cart item:', error);
-    res.status(500).json({ error: 'Failed to update cart item' });
+    console.error('❌ Error updating cart item (PUT):', error);
+    console.error('   Error code:', error.code);
+    console.error('   Error detail:', error.detail);
+    console.error('   SQL state:', error.severity);
+    res.status(500).json({
+      error: 'Failed to update cart item',
+      details: error.message,
+      code: error.code
+    });
   } finally {
     client.release();
   }
