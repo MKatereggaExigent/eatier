@@ -183,12 +183,10 @@
               <span>Subtotal</span>
               <span>{{ formatPrice(checkoutSummary()!.pricing.subtotal) }}</span>
             </div>
-            @if (checkoutSummary()!.pricing.deliveryFee > 0) {
-              <div class="summary-row">
-                <span>Delivery Fee</span>
-                <span>{{ formatPrice(checkoutSummary()!.pricing.deliveryFee) }}</span>
-              </div>
-            }
+            <div class="summary-row">
+              <span>Delivery Fee</span>
+              <span>{{ formatPrice(checkoutSummary()!.pricing.deliveryFee) }}</span>
+            </div>
             @if (checkoutSummary()!.pricing.taxAmount > 0) {
               <div class="summary-row">
                 <span>Tax</span>

@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { CartService } from '../../../core/services/cart.service';
+import { CurrencyService } from '../../../core/services/currency.service';
 
 interface OrderItem {
   id: string;
@@ -52,6 +53,7 @@ export class UserOrdersComponent implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
   private cartService = inject(CartService);
+  protected currencyService = inject(CurrencyService);
 
   loading = signal(true);
   orders = signal<Order[]>([]);

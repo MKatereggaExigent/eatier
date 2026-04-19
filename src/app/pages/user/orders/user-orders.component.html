@@ -49,7 +49,7 @@
             </div>
             <div class="meta-item">
               <span class="meta-label">Total</span>
-              <span class="meta-value amount">${{ order.totalAmount.toFixed(2) }}</span>
+              <span class="meta-value amount">{{ currencyService.formatAmount(order.totalAmount) }}</span>
             </div>
           </div>
 
@@ -116,7 +116,7 @@
             @for (item of selectedOrder()!.items; track item.id) {
               <div class="item-row">
                 <span class="item-name">{{ item.quantity }}× {{ item.name }}</span>
-                <span class="item-price">${{ item.totalPrice.toFixed(2) }}</span>
+                <span class="item-price">{{ currencyService.formatAmount(item.totalPrice) }}</span>
               </div>
             }
           </div>
@@ -125,23 +125,23 @@
         <div class="modal-section totals">
           <div class="total-row">
             <span>Subtotal</span>
-            <span>${{ selectedOrder()!.subtotal.toFixed(2) }}</span>
+            <span>{{ currencyService.formatAmount(selectedOrder()!.subtotal) }}</span>
           </div>
           @if (selectedOrder()!.discount > 0) {
             <div class="total-row discount">
               <span>Discount</span>
-              <span>−${{ selectedOrder()!.discount.toFixed(2) }}</span>
+              <span>−{{ currencyService.formatAmount(selectedOrder()!.discount) }}</span>
             </div>
           }
           @if (selectedOrder()!.deliveryFee > 0) {
             <div class="total-row">
               <span>Delivery Fee</span>
-              <span>${{ selectedOrder()!.deliveryFee.toFixed(2) }}</span>
+              <span>{{ currencyService.formatAmount(selectedOrder()!.deliveryFee) }}</span>
             </div>
           }
           <div class="total-row grand-total">
             <span>Total</span>
-            <span>${{ selectedOrder()!.totalAmount.toFixed(2) }}</span>
+            <span>{{ currencyService.formatAmount(selectedOrder()!.totalAmount) }}</span>
           </div>
         </div>
       </div>
