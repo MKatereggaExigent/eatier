@@ -185,7 +185,15 @@ export class SpecialistSocialComponent implements OnInit {
 
     if (!userId) {
       console.error('❌ userId is undefined or null!');
-      alert('Error: User ID is missing');
+      alert('Error: User ID is missing. Please refresh and try again.');
+      return;
+    }
+
+    // Verify UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      console.error('❌ Invalid UUID format for userId:', userId);
+      alert('Error: Invalid user ID format. Please refresh the page.');
       return;
     }
 
@@ -194,9 +202,15 @@ export class SpecialistSocialComponent implements OnInit {
     // Send chat request
     console.log('📤 Sending chat request to userId:', userId);
     this.messagingService.sendChatRequest(userId, 'Hi! I would like to connect with you.').subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.startingChatWith.set(null);
         console.log('✅ Chat request sent successfully:', response);
+
+        // Show success message with auto-follow info
+        if (response.autoFollowed) {
+          alert('Chat request sent! You are now following this user.');
+        }
+
         // Navigate to messages page
         this.router.navigate(['/messages']);
       },
@@ -206,13 +220,14 @@ export class SpecialistSocialComponent implements OnInit {
           status: err.status,
           statusText: err.statusText,
           error: err.error,
-          message: err.message
+          message: err.message,
+          sentUserId: userId
         });
         this.startingChatWith.set(null);
 
         // Show specific error message
         const errorMessage = err.error?.error || err.error?.message || err.message || 'Failed to start chat. Please try again.';
-        alert(errorMessage);
+        alert(`Error: ${errorMessage}`);
       }
     });
   }

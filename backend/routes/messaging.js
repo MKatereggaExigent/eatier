@@ -66,6 +66,20 @@ router.post('/request', async (req, res) => {
       }
     }
 
+    // Auto-follow: If not already following, create follow relationship
+    const followCheck = await pool.query(
+      'SELECT id FROM user_follows WHERE follower_id = $1 AND following_id = $2',
+      [requesterId, recipientId]
+    );
+
+    if (followCheck.rows.length === 0) {
+      console.log('📌 Auto-following user:', recipientId);
+      await pool.query(
+        'INSERT INTO user_follows (follower_id, following_id, tenant_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
+        [requesterId, recipientId, tenantId]
+      );
+    }
+
     // Create chat request
     const result = await pool.query(`
       INSERT INTO chat_requests (tenant_id, requester_id, recipient_id, message, status)
@@ -75,7 +89,8 @@ router.post('/request', async (req, res) => {
 
     res.json({
       message: 'Chat request sent successfully',
-      request: result.rows[0]
+      request: result.rows[0],
+      autoFollowed: followCheck.rows.length === 0
     });
 
   } catch (error) {

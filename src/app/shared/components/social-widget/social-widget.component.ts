@@ -124,12 +124,47 @@ export class SocialWidgetComponent implements OnInit, OnDestroy {
    * Start a chat with a user
    */
   startChat(userId: string): void {
-    this.messagingService.sendChatRequest(userId).subscribe({
-      next: () => {
+    console.log('🔍 Social Widget: startChat called with userId:', userId);
+
+    if (!userId) {
+      console.error('❌ userId is undefined or null!');
+      alert('Error: User ID is missing. Please refresh and try again.');
+      return;
+    }
+
+    // Verify UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      console.error('❌ Invalid UUID format for userId:', userId);
+      alert('Error: Invalid user ID format. Please refresh the page.');
+      return;
+    }
+
+    console.log('📤 Sending chat request to userId:', userId);
+
+    this.messagingService.sendChatRequest(userId, 'Hi! I would like to connect.').subscribe({
+      next: (response: any) => {
+        console.log('✅ Chat request sent successfully:', response);
+
+        // Show success message with auto-follow info
+        if (response.autoFollowed) {
+          alert('Chat request sent! You are now following this user.');
+        }
+
         // Navigate to messages page based on user role
         this.router.navigate([this.getMessagesRoute()]);
       },
-      error: (err) => console.error('Error starting chat:', err)
+      error: (err) => {
+        console.error('❌ Error starting chat:', err);
+        console.error('❌ Error details:', {
+          status: err.status,
+          error: err.error,
+          sentUserId: userId
+        });
+
+        const errorMessage = err.error?.error || err.error?.message || 'Failed to start chat';
+        alert(`Error: ${errorMessage}. Please try again.`);
+      }
     });
   }
 
