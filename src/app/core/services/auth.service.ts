@@ -276,8 +276,15 @@ export class AuthService {
 
   private handleAuthSuccess(response: AuthResponse): void {
     console.log('🔑 Auth Success - Storing token and user data');
-    console.log('🔑 Access Token:', response.accessToken?.substring(0, 20) + '...');
-    console.log('🔑 User:', response.user.email);
+
+    // Safely log token (check if it exists and is a string)
+    if (response.accessToken && typeof response.accessToken === 'string') {
+      console.log('🔑 Access Token:', response.accessToken.substring(0, 20) + '...');
+    } else {
+      console.warn('⚠️  Access token is missing or invalid');
+    }
+
+    console.log('🔑 User:', response.user?.email || 'Unknown');
 
     // Store access token (backend also sets HTTP-only cookie)
     localStorage.setItem(this.TOKEN_KEY, response.accessToken);
@@ -301,7 +308,10 @@ export class AuthService {
     // Update current user state
     this.setCurrentUser(transformedUser);
 
-    console.log('🔑 Token stored in localStorage:', localStorage.getItem(this.TOKEN_KEY)?.substring(0, 20) + '...');
+    const storedToken = localStorage.getItem(this.TOKEN_KEY);
+    if (storedToken && typeof storedToken === 'string') {
+      console.log('🔑 Token stored in localStorage:', storedToken.substring(0, 20) + '...');
+    }
     console.log('🔑 User ID stored:', transformedUser.id);
     console.log('🔑 User Email stored:', transformedUser.email);
   }
