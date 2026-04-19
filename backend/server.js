@@ -163,6 +163,7 @@ const checkoutRoutes = require('./routes/checkout');
 const businessAnalyticsRoutes = require('./routes/business-analytics');
 const systemStatusRoutes = require('./routes/system-status');
 const avatarRoutes = require('./routes/avatar');
+const monitoringRoutes = require('./routes/monitoring');
 
 // Static file serving for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -220,6 +221,7 @@ app.use('/api/premium-listings', premiumListingsRoutes); // Premium listing purc
 app.use('/api/business', businessAnalyticsRoutes); // Business analytics dashboard
 app.use('/api/system-status', systemStatusRoutes); // Public system status and health
 app.use('/api/users', avatarRoutes); // Avatar upload and management
+app.use('/api/monitoring', monitoringRoutes); // System monitoring and API usage tracking
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

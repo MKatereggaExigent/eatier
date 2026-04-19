@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-// TODO: Replace with actual Google Maps API key from environment variable
+// Google Maps API configuration
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE';
 
 // Delivery fee configuration
@@ -8,6 +8,38 @@ const BASE_DELIVERY_FEE = 2000; // 2000 UGX base fee
 const PRICE_PER_KM = 500; // 500 UGX per kilometer
 const MIN_DELIVERY_FEE = 2000; // Minimum delivery fee
 const MAX_DELIVERY_FEE = 15000; // Maximum delivery fee
+
+// Rate limiting to stay within free tier (40,000 requests/month)
+const DAILY_REQUEST_LIMIT = 1300; // ~40,000/month ÷ 30 days
+let requestCount = 0;
+let lastResetDate = new Date().toDateString();
+
+/**
+ * Check if we're within daily API request limits
+ * Prevents exceeding Google Maps free tier
+ */
+function checkRateLimit() {
+  const today = new Date().toDateString();
+
+  // Reset counter at midnight
+  if (today !== lastResetDate) {
+    console.log(`📊 Resetting API request counter. Yesterday: ${requestCount} requests`);
+    requestCount = 0;
+    lastResetDate = today;
+  }
+
+  // Check if over limit
+  if (requestCount >= DAILY_REQUEST_LIMIT) {
+    console.error('⚠️  DAILY GOOGLE MAPS API LIMIT REACHED!');
+    console.error(`   Used ${requestCount}/${DAILY_REQUEST_LIMIT} requests today`);
+    console.error('   Returning fallback values to prevent charges');
+    throw new Error('Daily API limit reached');
+  }
+
+  requestCount++;
+  const percentUsed = ((requestCount / DAILY_REQUEST_LIMIT) * 100).toFixed(1);
+  console.log(`📊 Google Maps API: ${requestCount}/${DAILY_REQUEST_LIMIT} requests today (${percentUsed}%)`);
+}
 
 /**
  * Calculate distance between two addresses using Google Maps Distance Matrix API
@@ -31,6 +63,9 @@ async function calculateDeliveryFee(origin, destination) {
         error: 'API key not configured'
       };
     }
+
+    // Check rate limit BEFORE making API call
+    checkRateLimit();
 
     // Call Google Maps Distance Matrix API
     const response = await axios.get('https://maps.googleapis.com/maps/api/distancematrix/json', {
