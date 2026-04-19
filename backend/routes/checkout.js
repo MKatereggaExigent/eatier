@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
+const { calculateDeliveryFee, formatAddress } = require('../services/distanceCalculator');
 
 // Apply authentication to all routes
 router.use(authenticateToken);
@@ -56,8 +57,39 @@ router.get('/:cartId/summary', async (req, res) => {
       ORDER BY is_default DESC, created_at DESC
     `, [userId, tenantId]);
 
-    // Calculate delivery fee based on order type
-    const deliveryFee = cart.order_type === 'delivery' ? 5000 : 0; // 5000 UGX default delivery fee
+    // Calculate delivery fee based on distance (if delivery order)
+    let deliveryFee = 0;
+    let deliveryInfo = null;
+
+    if (cart.order_type === 'delivery') {
+      // Get user's delivery address from profile or use a default
+      const userResult = await pool.query(
+        'SELECT address, city, state, postal_code FROM users WHERE id = $1',
+        [userId]
+      );
+
+      const userAddress = userResult.rows[0] || {};
+      const deliveryAddress = formatAddress({
+        street: userAddress.address,
+        city: userAddress.city || 'Kampala',
+        state: userAddress.state || 'Central Region',
+        postalCode: userAddress.postal_code,
+        country: 'Uganda'
+      });
+
+      const restaurantAddress = formatAddress(cart.business_address || 'Kampala, Uganda');
+
+      console.log('📦 Calculating delivery fee for:', {
+        from: restaurantAddress,
+        to: deliveryAddress
+      });
+
+      deliveryInfo = await calculateDeliveryFee(restaurantAddress, deliveryAddress);
+      deliveryFee = deliveryInfo.deliveryFee;
+
+      console.log('💰 Delivery fee calculated:', deliveryFee, 'UGX');
+    }
+
     const taxRate = 0.18; // 18% VAT
     const subtotal = parseFloat(cart.subtotal) || 0;
     const taxAmount = subtotal * taxRate;
@@ -83,7 +115,8 @@ router.get('/:cartId/summary', async (req, res) => {
         deliveryFee,
         discountAmount,
         promotionCode: cart.promotion_code,
-        totalAmount
+        totalAmount,
+        deliveryInfo: deliveryInfo // Distance, duration, etc.
       },
       savedAddresses: addressesResult.rows.map(addr => ({
         id: addr.id,
@@ -148,11 +181,38 @@ router.post('/:cartId', async (req, res) => {
       return res.status(400).json({ error: 'Delivery address is required for delivery orders' });
     }
 
+    // Calculate delivery fee based on distance (if delivery order)
+    let deliveryFee = 0;
+    let deliveryInfo = null;
+
+    if (cart.order_type === 'delivery') {
+      // Get restaurant address from business profile
+      const businessResult = await client.query(
+        'SELECT address, city, state FROM business_profiles WHERE user_id = $1',
+        [cart.business_id]
+      );
+
+      const restaurantAddress = formatAddress(
+        businessResult.rows[0] || { city: 'Kampala', country: 'Uganda' }
+      );
+
+      const customerAddress = formatAddress(deliveryAddress);
+
+      console.log('📦 Calculating delivery fee for order:', {
+        from: restaurantAddress,
+        to: customerAddress
+      });
+
+      deliveryInfo = await calculateDeliveryFee(restaurantAddress, customerAddress);
+      deliveryFee = deliveryInfo.deliveryFee;
+
+      console.log('💰 Final delivery fee:', deliveryFee, 'UGX');
+    }
+
     // Calculate final pricing
     const subtotal = parseFloat(cart.subtotal) || 0;
     const taxRate = 0.18;
     const taxAmount = subtotal * taxRate;
-    const deliveryFee = cart.order_type === 'delivery' ? 5000 : 0;
     const discountAmount = parseFloat(cart.discount_amount) || 0;
     const totalAmount = subtotal + taxAmount + deliveryFee - discountAmount;
 
