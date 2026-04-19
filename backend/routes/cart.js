@@ -291,7 +291,7 @@ router.put('/items/:itemId', async (req, res) => {
 
     if (quantity !== undefined) {
       updates.push(`quantity = $${paramCount}, total_price = unit_price * $${paramCount}`);
-      values.push(quantity);
+      values.push(parseInt(quantity, 10)); // Ensure integer type
       paramCount++;
     }
 

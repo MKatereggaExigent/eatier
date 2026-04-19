@@ -62,32 +62,12 @@ router.get('/:cartId/summary', async (req, res) => {
     let deliveryInfo = null;
 
     if (cart.order_type === 'delivery') {
-      // Get user's delivery address from profile or use a default
-      const userResult = await pool.query(
-        'SELECT address, city, state, postal_code FROM users WHERE id = $1',
-        [userId]
-      );
+      // Use default delivery fee for now (distance calculation requires valid addresses)
+      // TODO: Implement proper address fields in database
+      deliveryFee = 5000; // Default 5,000 UGX delivery fee
 
-      const userAddress = userResult.rows[0] || {};
-      const deliveryAddress = formatAddress({
-        street: userAddress.address,
-        city: userAddress.city || 'Kampala',
-        state: userAddress.state || 'Central Region',
-        postalCode: userAddress.postal_code,
-        country: 'Uganda'
-      });
-
-      const restaurantAddress = formatAddress(cart.business_address || 'Kampala, Uganda');
-
-      console.log('📦 Calculating delivery fee for:', {
-        from: restaurantAddress,
-        to: deliveryAddress
-      });
-
-      deliveryInfo = await calculateDeliveryFee(restaurantAddress, deliveryAddress);
-      deliveryFee = deliveryInfo.deliveryFee;
-
-      console.log('💰 Delivery fee calculated:', deliveryFee, 'UGX');
+      console.log('💰 Using default delivery fee:', deliveryFee, 'UGX');
+      console.log('⚠️  Distance-based calculation requires address fields in database');
     }
 
     const taxRate = 0.18; // 18% VAT
@@ -186,27 +166,11 @@ router.post('/:cartId', async (req, res) => {
     let deliveryInfo = null;
 
     if (cart.order_type === 'delivery') {
-      // Get restaurant address from business profile
-      const businessResult = await client.query(
-        'SELECT address, city, state FROM business_profiles WHERE user_id = $1',
-        [cart.business_id]
-      );
+      // Use default delivery fee for now (distance calculation requires valid addresses)
+      deliveryFee = 5000; // Default 5,000 UGX delivery fee
 
-      const restaurantAddress = formatAddress(
-        businessResult.rows[0] || { city: 'Kampala', country: 'Uganda' }
-      );
-
-      const customerAddress = formatAddress(deliveryAddress);
-
-      console.log('📦 Calculating delivery fee for order:', {
-        from: restaurantAddress,
-        to: customerAddress
-      });
-
-      deliveryInfo = await calculateDeliveryFee(restaurantAddress, customerAddress);
-      deliveryFee = deliveryInfo.deliveryFee;
-
-      console.log('💰 Final delivery fee:', deliveryFee, 'UGX');
+      console.log('💰 Using default delivery fee:', deliveryFee, 'UGX');
+      console.log('⚠️  Distance-based calculation requires address fields in database');
     }
 
     // Calculate final pricing
