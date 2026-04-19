@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs');
+const { detectCurrency } = require('./middleware/currencyMiddleware');
 
 // Load environment variables only in development
 // Production (Vercel) provides env vars directly
@@ -85,6 +86,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Cookie parsing middleware
 app.use(cookieParser());
+
+// Currency detection middleware (must be after body parser)
+app.use(detectCurrency);
 
 // Logging middleware
 app.use(morgan('combined'));
