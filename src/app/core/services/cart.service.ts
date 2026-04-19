@@ -308,7 +308,15 @@ export class CartService {
   // Helper Methods
   // ============================================================================
   incrementQuantity(item: CartItem): void {
-    this.updateCartItem(item.id, { quantity: item.quantity + 1 }).subscribe();
+    console.log('🔼 Incrementing quantity for item:', item.id, 'from', item.quantity, 'to', item.quantity + 1);
+    this.updateCartItem(item.id, { quantity: item.quantity + 1 }).subscribe({
+      next: () => console.log('✅ Successfully incremented quantity'),
+      error: (err) => {
+        console.error('❌ Error incrementing quantity:', err);
+        console.error('   Item ID:', item.id);
+        console.error('   Target quantity:', item.quantity + 1);
+      }
+    });
   }
 
   decrementQuantity(item: CartItem): void {
