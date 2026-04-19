@@ -155,13 +155,26 @@ export class CheckoutComponent implements OnInit {
     this.cartService.checkout(this.cartId, request).subscribe({
       next: (response) => {
         this.submitting.set(false);
-        // Navigate to order confirmation
-        this.router.navigate(['/order-confirmation', response.order.id], {
-          queryParams: { orderNumber: response.order.orderNumber }
-        });
+        console.log('Checkout response:', response);
+
+        // Handle response - check if order exists
+        if (response && response.order && response.order.id) {
+          // Navigate to order confirmation
+          this.router.navigate(['/order-confirmation', response.order.id], {
+            queryParams: { orderNumber: response.order.orderNumber }
+          });
+        } else if (response && response.error) {
+          // Handle error response
+          this.error.set(response.error);
+        } else {
+          // Unknown response format
+          console.error('Unexpected response format:', response);
+          this.error.set('Order placed but confirmation unavailable. Please check your orders.');
+        }
       },
       error: (err) => {
         this.submitting.set(false);
+        console.error('Checkout error:', err);
         this.error.set(err.error?.error || 'Failed to place order');
       }
     });
