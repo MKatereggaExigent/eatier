@@ -33,6 +33,9 @@ const app = express();
 const server = require('http').createServer(app);
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy - needed for proper IP detection behind nginx/load balancer
+app.set('trust proxy', true);
+
 // Initialize WebSocket (will be started when server starts)
 const { initializeWebSocket } = require('./websocket/socketHandler');
 
