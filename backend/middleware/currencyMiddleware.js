@@ -27,6 +27,9 @@ function detectCurrency(req, res, next) {
       ip: cleanIP
     };
 
+    // Log for debugging
+    console.log(`💱 User currency detected: ${currencyInfo.currency} (${currencyInfo.country}) from IP: ${cleanIP}`);
+
     // Also allow override from header (for testing)
     const currencyOverride = req.headers['x-currency'];
     if (currencyOverride) {
