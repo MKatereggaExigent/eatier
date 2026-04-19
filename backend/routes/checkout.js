@@ -166,11 +166,11 @@ router.post('/:cartId', async (req, res) => {
     let deliveryInfo = null;
 
     if (cart.order_type === 'delivery') {
-      // Use default delivery fee for now (distance calculation requires valid addresses)
-      deliveryFee = 5000; // Default 5,000 UGX delivery fee
+      // Delivery fee is 0 until user provides delivery address
+      deliveryFee = 0;
 
-      console.log('💰 Using default delivery fee:', deliveryFee, 'UGX');
-      console.log('⚠️  Distance-based calculation requires address fields in database');
+      console.log('💰 Delivery fee: 0 UGX (address not provided yet)');
+      console.log('ℹ️  Delivery fee will be calculated when user provides delivery address');
     }
 
     // Calculate final pricing
