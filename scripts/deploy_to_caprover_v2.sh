@@ -102,7 +102,7 @@ echo "✅ Tarball created at: ~/itiyum-frontend.tar.gz"
 # Step 6: Deploy to CapRover
 echo ""
 echo "🚀 Deploying to CapRover..."
-caprover deploy --caproverName "$CAPROVER_NAME" --caproverApp "$CAPROVER_APP" --tarFile ~/itiyum-frontend.tar.gz
+caprover deploy --caproverName "$CAPROVER_NAME" --caproverApp "$CAPROVER_APP" --caproverUrl "https://captain.apps.datasqan.com" --caproverPassword "Micho#25" --tarFile ~/itiyum-frontend.tar.gz
 
 echo ""
 echo "✅ Frontend deployment complete!"
