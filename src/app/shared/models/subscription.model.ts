@@ -41,7 +41,7 @@ export interface PlanFeatures {
   whiteLabel: boolean;
   dedicatedManager: boolean;
   customIntegrations: boolean;
-  advertisingCredits: number; // in dollars
+  advertisingCredits: number; // in ZAR
   seoOptimization: boolean;
   socialMediaIntegration: boolean;
   onlineOrdering: boolean;

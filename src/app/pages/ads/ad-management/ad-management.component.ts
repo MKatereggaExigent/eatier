@@ -303,7 +303,7 @@ export class AdManagementComponent implements OnInit {
     return icons[status] || '📝';
   }
 
-  formatCurrency(amount: number, currency: string = 'USD'): string {
+  formatCurrency(amount: number, currency: string = 'ZAR'): string {
     return this.currencyService.formatAmount(amount, currency);
   }
 

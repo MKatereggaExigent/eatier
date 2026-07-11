@@ -162,7 +162,7 @@ export class AdvertiseComponent implements OnInit, OnDestroy {
     {
       icon: '💰',
       title: 'Flexible Budgets',
-      description: 'Start from just $5/€5/£5 with no long-term commitments. Set daily limits and pause anytime'
+      description: 'Start from just R5 with no long-term commitments. Set daily limits and pause anytime'
     },
     {
       icon: '🌍',

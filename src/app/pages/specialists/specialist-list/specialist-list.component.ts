@@ -120,10 +120,10 @@ export class SpecialistListComponent implements OnInit {
 
   priceRanges = [
     { value: '', label: 'Any Price', min: 0, max: 0 },
-    { value: 'budget', label: '$ Budget (Under R1000)', min: 0, max: 1000 },
-    { value: 'moderate', label: '$$ Moderate (R1000-R3000)', min: 1000, max: 3000 },
-    { value: 'premium', label: '$$$ Premium (R3000-R5000)', min: 3000, max: 5000 },
-    { value: 'luxury', label: '$$$$ Luxury (R5000+)', min: 5000, max: 0 }
+    { value: 'budget', label: 'R Budget (Under R1,000)', min: 0, max: 1000 },
+    { value: 'moderate', label: 'R Moderate (R1,000-R3,000)', min: 1000, max: 3000 },
+    { value: 'premium', label: 'R Premium (R3,000-R5,000)', min: 3000, max: 5000 },
+    { value: 'luxury', label: 'R Luxury (R5,000+)', min: 5000, max: 0 }
   ];
 
   ngOnInit(): void {

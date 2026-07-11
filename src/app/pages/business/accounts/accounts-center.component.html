@@ -128,10 +128,10 @@
         <div class="current-plan-details">
           <div class="current-plan-name">{{ subscription()?.plan ? (subscription()?.plan | titlecase) : 'Free' }} Plan</div>
           @if (subscription()?.status === 'active' && subscription()?.price) {
-            <div class="current-plan-price">${{ subscription()?.price }}/{{ subscription()?.billingCycle }}</div>
+            <div class="current-plan-price">R{{ subscription()?.price }}/{{ subscription()?.billingCycle }}</div>
           }
           @if (!subscription() || subscription()?.plan === 'free') {
-            <div class="current-plan-price free">$0/month</div>
+            <div class="current-plan-price free">R0/month</div>
           }
         </div>
       </div>
@@ -158,7 +158,7 @@
 
             <h3 class="plan-name">{{ plan.name }}</h3>
             <div class="plan-pricing">
-              <span class="price">${{ getPlanPrice(plan) }}</span>
+              <span class="price">R{{ getPlanPrice(plan) }}</span>
               <span class="period">/{{ billingCycle() === 'yearly' ? 'year' : 'month' }}</span>
             </div>
 

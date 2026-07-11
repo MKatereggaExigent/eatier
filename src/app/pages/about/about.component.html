@@ -16,7 +16,7 @@
           <p class="hero-subtitle">{{ slide.subtitle }}</p>
           <div class="hero-actions">
             @if (slide.isAd && slide.ad) {
-              <a class="btn-primary" [href]="slide.ad.cta_url" target="_blank" rel="noopener" (click)="onAdClick(slide.ad!)">{{ slide.ad.cta_text || 'Learn More' }}</a>
+              <a class="btn-primary" [href]="slide.ad.cta_url" (click)="onAdClick(slide.ad!)">{{ slide.ad.cta_text || 'Learn More' }}</a>
               <span class="ad-by">{{ slide.ad.advertiser_name }}</span>
             } @else {
               <a class="btn-primary" routerLink="/register">Get Started</a>

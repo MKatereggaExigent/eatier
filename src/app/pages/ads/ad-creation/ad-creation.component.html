@@ -124,7 +124,7 @@
                   <div class="tier-card" [class.selected]="selectedTier()?.id === tier.id" (click)="selectTier(tier)">
                     <div class="tier-top">
                       <span class="tier-badge" [class]="tier.name">{{ tier.displayName }}</span>
-                      <span class="tier-price">${{ tier.basePriceDaily }}/day</span>
+                      <span class="tier-price">R{{ tier.basePriceDaily }}/day</span>
                     </div>
                     <p class="tier-desc">{{ tier.description }}</p>
                     <div class="tier-features">
@@ -437,8 +437,8 @@
             </div>
             <div class="budget-breakdown">
               <h3 class="bb-title">Budget Breakdown</h3>
-              <div class="bb-row"><span>Total Budget:</span><strong>${{ budgetForm.get('totalBudget')?.value || 0 }}</strong></div>
-              <div class="bb-row"><span>Daily Spend:</span><strong>${{ budgetForm.get('dailyBudget')?.value || 0 }}</strong></div>
+              <div class="bb-row"><span>Total Budget:</span><strong>R{{ budgetForm.get('totalBudget')?.value || 0 }}</strong></div>
+              <div class="bb-row"><span>Daily Spend:</span><strong>R{{ budgetForm.get('dailyBudget')?.value || 0 }}</strong></div>
               <div class="bb-row"><span>Estimated Duration:</span><strong>{{ Math.ceil((budgetForm.get('totalBudget')?.value || 0) / (budgetForm.get('dailyBudget')?.value || 1)) }} days</strong></div>
             </div>
           </form>

@@ -111,10 +111,10 @@
                 </div>
                 <div class="service-pricing">
                   <div class="price">
-                    <span class="amount">${{ service.basePrice }}</span>
+                    <span class="amount">R{{ service.basePrice }}</span>
                     <span class="per">base</span>
                     @if (service.pricePerPerson > 0) {
-                      <span class="plus">+ ${{ service.pricePerPerson }}/person</span>
+                      <span class="plus">+ R{{ service.pricePerPerson }}/person</span>
                     }
                   </div>
                   <button class="btn-primary" (click)="selectService(service)">
@@ -203,7 +203,7 @@
             @if (selectedService()) {
               <div class="selected-service">
                 <strong>{{ selectedService()!.name }}</strong>
-                <span class="price">Est. ${{ calculatePrice() }}</span>
+                <span class="price">Est. R{{ calculatePrice() }}</span>
               </div>
             }
 

@@ -208,7 +208,7 @@ router.post('/campaigns', async (req, res) => {
       RETURNING *
     `, [
       userId, title, description, type, 'draft',
-      totalBudget, dailyBudget, 0, totalBudget, currency || 'USD',
+      totalBudget, dailyBudget, 0, totalBudget, currency || 'ZAR',
       targetLocations, targetAgeMin, targetAgeMax, targetGender, targetInterests,
       headline, bodyText, callToAction, mediaUrls, destinationUrl,
       startDate, endDate, false

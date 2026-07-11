@@ -1928,7 +1928,7 @@ router.post('/reports/financial', async (req, res) => {
         { key: 'id', label: 'Transaction ID' },
         { key: 'date', label: 'Date' },
         { key: 'description', label: 'Description' },
-        { key: 'amount', label: 'Amount (USD)' },
+        { key: 'amount', label: 'Amount (ZAR)' },
         { key: 'status', label: 'Status' },
         { key: 'tenant_name', label: 'Tenant' }
       ];
@@ -2066,7 +2066,7 @@ router.post('/reports/analytics', async (req, res) => {
         { key: 'total_bookings', label: 'Total Bookings' },
         { key: 'completed_bookings', label: 'Completed Bookings' },
         { key: 'cancelled_bookings', label: 'Cancelled Bookings' },
-        { key: 'revenue', label: 'Revenue (USD)' }
+        { key: 'revenue', label: 'Revenue (ZAR)' }
       ];
 
       const csv = convertToCSV(mergedData, columns);

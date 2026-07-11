@@ -89,7 +89,7 @@ export class AdManagementService {
         dailyBudget: parseFloat(c.daily_budget) || 0,
         spentAmount: parseFloat(c.spent) || 0,  // Fixed: database column is 'spent', not 'spent_amount'
         remainingAmount: parseFloat(c.remaining_amount) || parseFloat(c.total_budget) || parseFloat(c.budget) || 0,
-        currency: c.currency || 'USD',
+        currency: c.currency || 'ZAR',
         billingCycle: c.billing_cycle || 'daily',
         minimumSpend: parseFloat(c.minimum_spend || 5)
       },

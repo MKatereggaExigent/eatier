@@ -58,7 +58,7 @@ export class AdminSettingsComponent implements OnInit {
   subscriptionStatus = signal<string>('');
   defaultLanguage = signal<string>('en');
   defaultTimezone = signal<string>('UTC');
-  defaultCurrency = signal<string>('USD');
+  defaultCurrency = signal<string>('ZAR');
   maintenanceMode = signal<boolean>(false);
   allowRegistrations = signal<boolean>(true);
 
@@ -122,7 +122,7 @@ export class AdminSettingsComponent implements OnInit {
         this.subscriptionStatus.set(response.settings.general.subscription_status || '');
         this.defaultLanguage.set(response.settings.general.default_language || 'en');
         this.defaultTimezone.set(response.settings.general.default_timezone || 'UTC');
-        this.defaultCurrency.set(response.settings.general.default_currency || 'USD');
+        this.defaultCurrency.set(response.settings.general.default_currency || 'ZAR');
         this.maintenanceMode.set(response.settings.general.maintenance_mode || false);
         this.allowRegistrations.set(response.settings.general.allow_registrations !== false);
 

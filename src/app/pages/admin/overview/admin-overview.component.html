@@ -147,7 +147,7 @@
               <span class="card-label">Total Revenue</span>
             </div>
             <div class="card-body">
-              <h3 class="card-value">${{ formatCurrency(platformStats().totalRevenue) }}</h3>
+              <h3 class="card-value">R{{ formatCurrency(platformStats().totalRevenue) }}</h3>
               <div class="card-breakdown">
                 <span class="breakdown-item">All-time earnings</span>
               </div>
@@ -168,7 +168,7 @@
               <span class="card-label">MRR</span>
             </div>
             <div class="card-body">
-              <h3 class="card-value">${{ formatCurrency(platformStats().monthlySubscriptionRevenue) }}</h3>
+              <h3 class="card-value">R{{ formatCurrency(platformStats().monthlySubscriptionRevenue) }}</h3>
               <div class="card-breakdown">
                 <span class="breakdown-item">Monthly recurring</span>
               </div>
@@ -187,7 +187,7 @@
               <span class="card-label">Commission Revenue</span>
             </div>
             <div class="card-body">
-              <h3 class="card-value">${{ formatCurrency(platformStats().commissionRevenue) }}</h3>
+              <h3 class="card-value">R{{ formatCurrency(platformStats().commissionRevenue) }}</h3>
               <div class="card-breakdown">
                 <span class="breakdown-item">{{ platformStats().completedBookings }} completed bookings</span>
               </div>
@@ -212,7 +212,7 @@
               <span class="card-label">Ad Revenue</span>
             </div>
             <div class="card-body">
-              <h3 class="card-value">${{ formatCurrency(platformStats().adRevenue) }}</h3>
+              <h3 class="card-value">R{{ formatCurrency(platformStats().adRevenue) }}</h3>
               <div class="card-breakdown">
                 <span class="breakdown-item">{{ platformStats().activeCampaigns }} active campaigns</span>
               </div>
@@ -228,7 +228,7 @@
               <div class="revenue-bar-item">
                 <div class="bar-label">
                   <span class="bar-name">Subscriptions</span>
-                  <span class="bar-value">${{ formatCurrency(platformStats().subscriptionRevenue) }}</span>
+                  <span class="bar-value">R{{ formatCurrency(platformStats().subscriptionRevenue) }}</span>
                 </div>
                 <div class="bar-track">
                   <div class="bar-fill subscription" [style.width.%]="subscriptionRevenuePercent()"></div>
@@ -239,7 +239,7 @@
               <div class="revenue-bar-item">
                 <div class="bar-label">
                   <span class="bar-name">Commissions</span>
-                  <span class="bar-value">${{ formatCurrency(platformStats().commissionRevenue) }}</span>
+                  <span class="bar-value">R{{ formatCurrency(platformStats().commissionRevenue) }}</span>
                 </div>
                 <div class="bar-track">
                   <div class="bar-fill commission" [style.width.%]="commissionRevenuePercent()"></div>
@@ -250,7 +250,7 @@
               <div class="revenue-bar-item">
                 <div class="bar-label">
                   <span class="bar-name">Advertising</span>
-                  <span class="bar-value">${{ formatCurrency(platformStats().adRevenue) }}</span>
+                  <span class="bar-value">R{{ formatCurrency(platformStats().adRevenue) }}</span>
                 </div>
                 <div class="bar-track">
                   <div class="bar-fill ads" [style.width.%]="adRevenuePercent()"></div>
@@ -325,7 +325,7 @@
               <span class="card-label">ARPU</span>
             </div>
             <div class="card-body">
-              <h3 class="card-value">${{ formatCurrency(avgRevenuePerBusiness()) }}</h3>
+              <h3 class="card-value">R{{ formatCurrency(avgRevenuePerBusiness()) }}</h3>
               <div class="card-breakdown">
                 <span class="breakdown-item">Per active business</span>
               </div>
@@ -491,7 +491,7 @@
               <span class="card-label">Commission Earned</span>
             </div>
             <div class="card-body">
-              <h3 class="card-value">${{ formatCurrency(platformStats().commissionRevenue) }}</h3>
+              <h3 class="card-value">R{{ formatCurrency(platformStats().commissionRevenue) }}</h3>
               <div class="card-breakdown">
                 <span class="breakdown-item">From {{ platformStats().completedBookings }} completed</span>
               </div>

@@ -476,7 +476,7 @@ CREATE TABLE ad_space_tiers (
     base_price_daily DECIMAL(10, 2) NOT NULL DEFAULT 5.00,
     base_price_weekly DECIMAL(10, 2) NOT NULL DEFAULT 30.00,
     base_price_monthly DECIMAL(10, 2) NOT NULL DEFAULT 100.00,
-    currency VARCHAR(10) DEFAULT 'USD',
+    currency VARCHAR(10) DEFAULT 'ZAR',
     max_width INTEGER DEFAULT 728,
     max_height INTEGER DEFAULT 90,
     supports_video BOOLEAN DEFAULT false,

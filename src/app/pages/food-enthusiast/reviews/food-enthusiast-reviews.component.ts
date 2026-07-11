@@ -512,7 +512,7 @@ export class FoodEnthusiastReviewsComponent implements OnInit {
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'ZAR'
     }).format(amount);
   }
 

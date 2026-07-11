@@ -65,7 +65,7 @@ router.get('/:cartId/summary', async (req, res) => {
       // Delivery fee is 0 until user provides delivery address
       deliveryFee = 0;
 
-      console.log('💰 Delivery fee: 0 UGX (no address provided yet)');
+      console.log('💰 Delivery fee: 0 ZAR (no address provided yet)');
       console.log('ℹ️  Delivery fee will be calculated when user provides delivery address');
     }
 

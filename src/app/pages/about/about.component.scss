@@ -171,6 +171,39 @@ $orange: #ff8c00;
   }
 }
 
+/* Ad slides: light background, dark text */
+.hero-slide.ad-slide {
+  .hero-overlay {
+    background: linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(248,250,252,0.88) 100%) !important;
+  }
+
+  .hero-text {
+    .hero-label.sponsored {
+      color: #ff8c00;
+      background: rgba(255, 140, 0, 0.12);
+    }
+
+    .hero-title {
+      color: #1E293B;
+      text-shadow: none;
+    }
+
+    .hero-subtitle {
+      color: #475569;
+    }
+
+    .hero-actions {
+      .btn-primary {
+        color: #fff;
+      }
+
+      .ad-by {
+        color: #94A3B8;
+      }
+    }
+  }
+}
+
 /* Counter */
 .hero-counter {
   position: absolute;

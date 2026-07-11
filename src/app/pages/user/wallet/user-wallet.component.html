@@ -27,7 +27,7 @@
           </div>
           @if (wallet()?.nextTier) {
             <div class="tier-banner-progress">
-              <div class="tier-progress-text">Spend ${{ wallet()!.nextTier!.spendToReach.toFixed(0) }} more to reach {{ wallet()!.nextTier!.name | titlecase }}</div>
+              <div class="tier-progress-text">Spend R{{ wallet()!.nextTier!.spendToReach.toFixed(0) }} more to reach {{ wallet()!.nextTier!.name | titlecase }}</div>
               <div class="progress-bar">
                 <div class="progress-fill" [style.width.%]="wallet()!.tierProgress"></div>
               </div>
@@ -41,17 +41,17 @@
         <div class="stats-grid">
           <div class="stat-card">
             <lucide-icon [img]="DollarSign" class="stat-icon"></lucide-icon>
-            <div class="stat-value">${{ wallet()?.totalCashbackEarned?.toFixed(2) || '0.00' }}</div>
+            <div class="stat-value">R{{ wallet()?.totalCashbackEarned?.toFixed(2) || '0.00' }}</div>
             <div class="stat-label">Total Earnings</div>
           </div>
           <div class="stat-card">
             <lucide-icon [img]="TrendingUp" class="stat-icon"></lucide-icon>
-            <div class="stat-value">${{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</div>
+            <div class="stat-value">R{{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</div>
             <div class="stat-label">Available for Payout</div>
           </div>
           <div class="stat-card">
             <lucide-icon [img]="RefreshCw" class="stat-icon"></lucide-icon>
-            <div class="stat-value">${{ wallet()?.pendingCashback?.toFixed(2) || '0.00' }}</div>
+            <div class="stat-value">R{{ wallet()?.pendingCashback?.toFixed(2) || '0.00' }}</div>
             <div class="stat-label">Pending</div>
           </div>
         </div>
@@ -77,9 +77,9 @@
                 <lucide-icon [img]="DollarSign" class="card-icon orange"></lucide-icon>
                 <span class="card-label">Available Balance</span>
               </div>
-              <div class="card-amount">${{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</div>
+              <div class="card-amount">R{{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</div>
               @if (wallet()?.pendingCashback && wallet()!.pendingCashback > 0) {
-                <div class="card-pending">+${{ wallet()!.pendingCashback.toFixed(2) }} pending</div>
+                <div class="card-pending">+R{{ wallet()!.pendingCashback.toFixed(2) }} pending</div>
               }
               @if (wallet()?.cashbackBalance && wallet()!.cashbackBalance >= 50) {
                 <button type="button" class="btn-primary btn-sm" (click)="redeemCashback(wallet()!.cashbackBalance)" [disabled]="redeeming()">
@@ -87,7 +87,7 @@
                 </button>
               }
               @if (wallet()?.cashbackBalance && wallet()!.cashbackBalance < 50) {
-                <div class="payout-hint">Minimum $50 for payout</div>
+                <div class="payout-hint">Minimum R50 for payout</div>
               }
             </div>
 
@@ -105,7 +105,7 @@
                 <lucide-icon [img]="TrendingUp" class="card-icon orange"></lucide-icon>
                 <span class="card-label">This Month</span>
               </div>
-              <div class="card-amount">${{ wallet()?.totalEarned?.toFixed(2) || '0.00' }}</div>
+              <div class="card-amount">R{{ wallet()?.totalEarned?.toFixed(2) || '0.00' }}</div>
             </div>
 
             <div class="balance-card">
@@ -113,7 +113,7 @@
                 <lucide-icon [img]="ArrowUpRight" class="card-icon orange"></lucide-icon>
                 <span class="card-label">Total Payouts</span>
               </div>
-              <div class="card-amount">${{ wallet()?.totalRedeemed?.toFixed(2) || '0.00' }}</div>
+              <div class="card-amount">R{{ wallet()?.totalRedeemed?.toFixed(2) || '0.00' }}</div>
             </div>
           </div>
 
@@ -139,7 +139,7 @@
               <div class="earn-card">
                 <lucide-icon [img]="Users" class="earn-icon"></lucide-icon>
                 <h3>Referrals</h3>
-                <p>Earn $10 per specialist referral</p>
+                <p>Earn R10 per specialist referral</p>
               </div>
             </div>
           </section>
@@ -151,9 +151,9 @@
                 <lucide-icon [img]="DollarSign" class="card-icon orange"></lucide-icon>
                 <span class="card-label">Cashback Balance</span>
               </div>
-              <div class="card-amount">${{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</div>
+              <div class="card-amount">R{{ wallet()?.cashbackBalance?.toFixed(2) || '0.00' }}</div>
               @if (wallet()?.pendingCashback && wallet()!.pendingCashback > 0) {
-                <div class="card-pending">+${{ wallet()!.pendingCashback.toFixed(2) }} pending</div>
+                <div class="card-pending">+R{{ wallet()!.pendingCashback.toFixed(2) }} pending</div>
               }
               @if (wallet()?.cashbackBalance && wallet()!.cashbackBalance >= 5) {
                 <button type="button" class="btn-primary btn-sm" (click)="redeemCashback(wallet()!.cashbackBalance)" [disabled]="redeeming()">
@@ -171,7 +171,7 @@
               @if (wallet()?.pendingPoints && wallet()!.pendingPoints > 0) {
                 <div class="card-pending">+{{ wallet()!.pendingPoints }} pending</div>
               }
-              <div class="card-hint">100 pts = $1.00</div>
+              <div class="card-hint">100 pts = R1.00</div>
             </div>
 
             <div class="balance-card">
@@ -179,7 +179,7 @@
                 <lucide-icon [img]="TrendingUp" class="card-icon orange"></lucide-icon>
                 <span class="card-label">Total Earned</span>
               </div>
-              <div class="card-amount">${{ wallet()?.totalEarned?.toFixed(2) || '0.00' }}</div>
+              <div class="card-amount">R{{ wallet()?.totalEarned?.toFixed(2) || '0.00' }}</div>
             </div>
 
             <div class="balance-card">
@@ -187,7 +187,7 @@
                 <lucide-icon [img]="ArrowUpRight" class="card-icon orange"></lucide-icon>
                 <span class="card-label">Total Redeemed</span>
               </div>
-              <div class="card-amount">${{ wallet()?.totalRedeemed?.toFixed(2) || '0.00' }}</div>
+              <div class="card-amount">R{{ wallet()?.totalRedeemed?.toFixed(2) || '0.00' }}</div>
             </div>
           </div>
 
@@ -201,11 +201,11 @@
               <div class="conversion-body">
                 <div class="conversion-input-group">
                   <label>Points to convert</label>
-                  <input type="number" [ngModel]="pointsToConvert()" (ngModelChange)="pointsToConvert.set($event)" min="100" [max]="wallet()!.loyaltyPoints" step="100">
+                  <input type="number" [ngModel]="pointsToConvert()" (ngModelChange)="pointsToConvert.set(Revent)" min="100" [max]="wallet()!.loyaltyPoints" step="100">
                 </div>
                 <div class="conversion-result">
                   <span class="result-label">You'll receive</span>
-                  <span class="result-amount">${{ cashbackValue() }}</span>
+                  <span class="result-amount">R{{ cashbackValue() }}</span>
                 </div>
                 <button type="button" class="btn-primary" (click)="convertPoints()" [disabled]="converting() || pointsToConvert() < 100">
                   <lucide-icon [img]="RefreshCw" class="btn-icon"></lucide-icon>
@@ -237,7 +237,7 @@
               <div class="earn-card">
                 <lucide-icon [img]="Users" class="earn-icon"></lucide-icon>
                 <h3>Refer Friends</h3>
-                <p>Get $5 for each friend who signs up</p>
+                <p>Get R5 for each friend who signs up</p>
               </div>
             </div>
           </section>
@@ -284,7 +284,7 @@
               <lucide-icon [img]="Gift" class="referral-header-icon"></lucide-icon>
               <h3>Share & Earn</h3>
             </div>
-            <p class="referral-subtitle">Invite friends and earn $5 for each friend who places their first order.</p>
+            <p class="referral-subtitle">Invite friends and earn R5 for each friend who places their first order.</p>
 
             <div class="referral-code-box">
               <span class="code-label">Your Referral Code</span>
@@ -319,7 +319,7 @@
               <div class="referral-stat">
                 <lucide-icon [img]="DollarSign" class="referral-stat-icon"></lucide-icon>
                 <div>
-                  <div class="referral-stat-value">${{ (referralInfo()?.referralEarnings || wallet()?.referralEarnings || 0).toFixed(2) }}</div>
+                  <div class="referral-stat-value">R{{ (referralInfo()?.referralEarnings || wallet()?.referralEarnings || 0).toFixed(2) }}</div>
                   <div class="referral-stat-label">Total Earned</div>
                 </div>
               </div>
@@ -338,7 +338,7 @@
                     </div>
                     <div class="referral-status">
                       @if (ref.credited) {
-                        <span class="badge badge-success">+${{ ref.reward.toFixed(2) }}</span>
+                        <span class="badge badge-success">+R{{ ref.reward.toFixed(2) }}</span>
                       } @else {
                         <span class="badge badge-pending">Pending</span>
                       }
@@ -357,7 +357,7 @@
           <div class="current-tier-card">
             <lucide-icon [img]="Award" class="current-tier-icon"></lucide-icon>
             <div class="current-tier-badge" [class]="'tier-' + wallet()!.tier">{{ wallet()!.tier | titlecase }}</div>
-            <p>Your current membership tier based on ${{ wallet()?.lifetimeSpend?.toFixed(0) || 0 }} lifetime spend</p>
+            <p>Your current membership tier based on R{{ wallet()?.lifetimeSpend?.toFixed(0) || 0 }} lifetime spend</p>
           </div>
 
           <div class="tiers-grid">
@@ -368,7 +368,7 @@
                 <li>1x points multiplier</li>
                 <li>Standard support</li>
               </ul>
-              <div class="tier-requirement">$0 – $499 spend</div>
+              <div class="tier-requirement">R0 – R499 spend</div>
             </div>
 
             <div class="tier-card" [class.current]="wallet()?.tier === 'silver'">
@@ -378,7 +378,7 @@
                 <li>1.5x points multiplier</li>
                 <li>Exclusive deals</li>
               </ul>
-              <div class="tier-requirement">$500+ spend</div>
+              <div class="tier-requirement">R500+ spend</div>
             </div>
 
             <div class="tier-card" [class.current]="wallet()?.tier === 'gold'">
@@ -389,7 +389,7 @@
                 <li>Free delivery</li>
                 <li>Priority support</li>
               </ul>
-              <div class="tier-requirement">$2,000+ spend</div>
+              <div class="tier-requirement">R2,000+ spend</div>
             </div>
 
             <div class="tier-card" [class.current]="wallet()?.tier === 'platinum'">
@@ -401,7 +401,7 @@
                 <li>Priority support</li>
                 <li>VIP exclusive deals</li>
               </ul>
-              <div class="tier-requirement">$5,000+ spend</div>
+              <div class="tier-requirement">R5,000+ spend</div>
             </div>
           </div>
         </section>

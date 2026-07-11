@@ -360,7 +360,7 @@ export class AdCreationComponent implements OnInit {
     this.budgetForm.patchValue({
       totalBudget: campaign.budget?.totalBudget || 100,
       dailyBudget: campaign.budget?.dailyBudget || 10,
-      currency: campaign.budget?.currency || 'USD',
+      currency: campaign.budget?.currency || 'ZAR',
       billingCycle: campaign.budget?.billingCycle || 'daily'
     });
 

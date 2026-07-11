@@ -303,7 +303,7 @@ router.post('/my-ads', async (req, res) => {
 
     if (!totalBudget || totalBudget < 5) {
       return res.status(400).json({
-        error: 'Minimum budget is $5',
+        error: 'Minimum budget is R5',
         minimumBudget: 5
       });
     }
@@ -382,7 +382,7 @@ router.post('/my-ads', async (req, res) => {
       callToAction || 'Learn More', ctaType || 'learn_more', ctaUrl || null, ctaPhone || null,
       mediaUrls || [], videoUrls || [],
       targetRegions || [], targetLocations || [], targetCities || [],
-      currency || 'USD', totalBudget, dailyBudgetValue, totalBudget,
+      currency || 'ZAR', totalBudget, dailyBudgetValue, totalBudget,
       costPerClick, costPerImpression,
       startDate || new Date(), endDate || null,
       priorityScore
@@ -541,7 +541,7 @@ router.put('/my-ads/:adId', async (req, res) => {
     }
     if (totalBudget !== undefined) {
       if (totalBudget < 5) {
-        return res.status(400).json({ error: 'Minimum budget is $5 / €5 / £5' });
+        return res.status(400).json({ error: 'Minimum budget is R5' });
       }
       updates.push(`total_budget = $${++paramCount}`);
       params.push(totalBudget);

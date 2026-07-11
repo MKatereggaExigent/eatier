@@ -162,7 +162,7 @@ export class NotificationService {
         id: '3',
         type: 'success',
         title: 'Payment Successful',
-        message: 'Your payment of $45.00 has been processed successfully.',
+        message: 'Your payment of R45.00 has been processed successfully.',
         timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
         read: true,
         icon: '✅'

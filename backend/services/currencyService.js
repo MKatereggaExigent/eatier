@@ -1,8 +1,8 @@
 const geoip = require('geoip-lite');
 const axios = require('axios');
 
-// Base currency is UGX (Ugandan Shillings) - all prices in DB are in UGX
-const BASE_CURRENCY = 'UGX';
+// Base currency is ZAR (South African Rand) - all prices in DB are in ZAR
+const BASE_CURRENCY = 'ZAR';
 
 // Exchange rates cache (refreshed every hour)
 let exchangeRates = {};
@@ -96,18 +96,18 @@ async function updateExchangeRates() {
     console.error('❌ Failed to fetch exchange rates:', error.message);
     console.log('   Using fallback rates');
     
-    // Fallback rates (approximate, updated 2024)
+    // Fallback rates (approximate, ZAR base)
     exchangeRates = {
-      UGX: 1,
-      USD: 0.00027,   // 1 UGX = 0.00027 USD
-      ZAR: 0.0050,    // 1 UGX = 0.0050 ZAR
-      KES: 0.034,     // 1 UGX = 0.034 KES
-      TZS: 0.69,      // 1 UGX = 0.69 TZS
-      RWF: 0.35,      // 1 UGX = 0.35 RWF
-      EUR: 0.00025,   // 1 UGX = 0.00025 EUR
-      GBP: 0.00021,   // 1 UGX = 0.00021 GBP
-      NGN: 0.38,      // 1 UGX = 0.38 NGN
-      GHS: 0.0033,    // 1 UGX = 0.0033 GHS
+      ZAR: 1,
+      USD: 0.054,     // 1 ZAR = 0.054 USD
+      UGX: 200,       // 1 ZAR = 200 UGX
+      KES: 6.8,       // 1 ZAR = 6.8 KES
+      TZS: 138,       // 1 ZAR = 138 TZS
+      RWF: 70,        // 1 ZAR = 70 RWF
+      EUR: 0.049,     // 1 ZAR = 0.049 EUR
+      GBP: 0.042,     // 1 ZAR = 0.042 GBP
+      NGN: 76,        // 1 ZAR = 76 NGN
+      GHS: 0.66,      // 1 ZAR = 0.66 GHS
     };
     
     lastRatesUpdate = Date.now();

@@ -593,11 +593,11 @@ export class AdminOverviewComponent implements OnInit {
     // Create CSV content
     const csvContent = [
       ['Metric', 'Value'],
-      ['Total Revenue', `$${stats.totalRevenue.toFixed(2)}`],
-      ['Subscription Revenue', `$${stats.subscriptionRevenue.toFixed(2)}`],
-      ['Commission Revenue', `$${stats.commissionRevenue.toFixed(2)}`],
-      ['Ad Revenue', `$${stats.adRevenue.toFixed(2)}`],
-      ['Monthly Recurring Revenue', `$${stats.monthlySubscriptionRevenue.toFixed(2)}`],
+      ['Total Revenue', `R${stats.totalRevenue.toFixed(2)}`],
+      ['Subscription Revenue', `R${stats.subscriptionRevenue.toFixed(2)}`],
+      ['Commission Revenue', `R${stats.commissionRevenue.toFixed(2)}`],
+      ['Ad Revenue', `R${stats.adRevenue.toFixed(2)}`],
+      ['Monthly Recurring Revenue', `R${stats.monthlySubscriptionRevenue.toFixed(2)}`],
       [''],
       ['Total Users', stats.totalUsers.toString()],
       ['Business Owners', stats.businessOwners.toString()],
@@ -724,12 +724,12 @@ export class AdminOverviewComponent implements OnInit {
   formatCurrency(amount: number): string {
     // For large amounts, show no decimals. For small amounts, show 2 decimals
     const decimals = amount >= 1000 ? 0 : 2;
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-ZA', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'ZAR',
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals
-    }).format(amount).replace('$', '');
+    }).format(amount).replace('R', '');
   }
 
   formatNumber(num: number): string {

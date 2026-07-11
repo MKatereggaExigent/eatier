@@ -97,7 +97,7 @@ export class FaqsComponent {
         {
           id: 'gs-3',
           question: 'Is Itiyum free to use?',
-          answer: 'Yes! Itiyum is free for Normal Users and Food Enthusiasts. Business Owners have a free trial period, then subscription plans starting at $29/month. Specialists can list their services for free with optional premium features available.',
+          answer: 'Yes! Itiyum is free for Normal Users and Food Enthusiasts. Business Owners have a free trial period, then subscription plans starting at R29/month. Specialists can list their services for free with optional premium features available.',
           category: 'getting-started',
           tags: ['pricing', 'free', 'subscription'],
           helpfulVotes: 156,
@@ -166,7 +166,7 @@ export class FaqsComponent {
         {
           id: 'bo-5',
           question: 'What are the subscription plans and pricing?',
-          answer: 'We offer three plans:<br><br><strong>Starter ($29/month):</strong> Basic listing, menu management, customer reviews<br><strong>Professional ($79/month):</strong> Advanced analytics, online booking, promotional tools<br><strong>Enterprise ($149/month):</strong> Multi-location support, API access, dedicated support<br><br>All plans include a 14-day free trial.',
+          answer: 'We offer three plans:<br><br><strong>Basic (R29/month):</strong> Basic listing, menu management, customer reviews<br><strong>Professional (R79/month):</strong> Advanced analytics, online booking, promotional tools<br><strong>Enterprise (R199/month):</strong> Multi-location support, API access, dedicated support<br><br>All plans include a 14-day free trial.',
           category: 'business-owners',
           tags: ['pricing', 'subscription', 'plans', 'features'],
           helpfulVotes: 187,
