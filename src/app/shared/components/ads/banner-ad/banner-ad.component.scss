@@ -1,27 +1,28 @@
 .banner-ad-container {
   width: 100%;
-  margin: 2rem 0;
+  margin: 0;
   position: relative;
 }
 
 .banner-ad {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
   overflow: hidden;
   position: relative;
   min-height: 200px;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.1);
   }
 
   &.has-image {
-    background: #000;
+    background: #fff;
   }
 }
 
@@ -38,7 +39,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.7;
+    opacity: 0.15;
   }
 }
 
@@ -46,7 +47,7 @@
   position: relative;
   z-index: 1;
   padding: 2rem 3rem;
-  color: #fff;
+  color: #CBD5E1;
   max-width: 1400px;
   width: 100%;
 
@@ -57,43 +58,44 @@
     margin-bottom: 1rem;
 
     .ad-label {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
+      background: rgba(255, 140, 0, 0.1);
       padding: 0.25rem 0.75rem;
       border-radius: 20px;
       font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      color: #ff8c00;
     }
 
     .ad-business {
       font-size: 0.875rem;
       font-weight: 500;
-      opacity: 0.9;
+      color: #CBD5E1;
     }
   }
 
   .ad-title {
+    font-family: 'Playfair Display', 'Georgia', serif;
     font-size: 2rem;
     font-weight: 700;
     margin: 0 0 0.75rem 0;
     line-height: 1.2;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    color: #CBD5E1;
   }
 
   .ad-description {
+    font-family: 'Inter', sans-serif;
     font-size: 1.125rem;
     line-height: 1.6;
     margin: 0 0 1.5rem 0;
-    opacity: 0.95;
+    color: #CBD5E1;
     max-width: 1200px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   .ad-cta {
-    background: #fff;
-    color: #667eea;
+    background: #ff8c00;
+    color: #fff;
     border: none;
     padding: 0.875rem 2rem;
     border-radius: 8px;
@@ -104,12 +106,11 @@
     align-items: center;
     gap: 0.5rem;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
     &:hover {
-      background: #f8f9fa;
+      background: #e67e00;
       transform: translateX(4px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 6px 20px rgba(255, 140, 0, 0.3);
     }
 
     &:active {
@@ -136,10 +137,9 @@
   z-index: 2;
 
   .control-btn {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #fff;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    color: #CBD5E1;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -150,7 +150,9 @@
     transition: all 0.3s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background: #F1F5F9;
+      border-color: #D1D9E6;
+      color: #CBD5E1;
       transform: scale(1.1);
     }
 
@@ -167,20 +169,20 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.4);
+      background: #E2E8F0;
       border: none;
       cursor: pointer;
       transition: all 0.3s ease;
       padding: 0;
 
       &.active {
-        background: #fff;
+        background: #ff8c00;
         width: 24px;
         border-radius: 4px;
       }
 
       &:hover:not(.active) {
-        background: rgba(255, 255, 255, 0.6);
+        background: #CBD5E1;
       }
     }
   }
@@ -189,8 +191,8 @@
 .banner-ad-placeholder {
   min-height: 200px;
   background: #fafafa;
-  border: 1px dashed #e0e0e0;
-  border-radius: 12px;
+  border: 1px dashed #E2E8F0;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,7 +202,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #a0a0a0;
+    color: #CBD5E1;
   }
 }
 
@@ -232,4 +234,3 @@
     }
   }
 }
-

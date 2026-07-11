@@ -8,23 +8,20 @@
 
 .header-ad {
   position: relative;
-  height: 150px; // Increased height for better spacing
+  height: 150px;
   cursor: pointer;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.85); // Semi-transparent
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #E2E8F0;
   border-radius: 0 0 12px 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.1);
   }
 
-  // Fade animation
   &.transitioning {
     .ad-content {
       opacity: 0;
@@ -42,9 +39,7 @@
   z-index: 0;
 
   &.gradient-bg {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    background-size: 200% 200%;
-    animation: gradientShift 8s ease infinite;
+    background: linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%);
   }
 
   .ad-image,
@@ -52,6 +47,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    opacity: 0.15;
     animation: kenBurns 20s ease-in-out infinite alternate;
   }
 
@@ -61,22 +57,22 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.3) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.7) 100%);
   }
 }
 
 .ad-content {
   position: relative;
   z-index: 1;
-  padding: 2rem 3rem; // Increased vertical padding
-  color: #fff;
+  padding: 2rem 3rem;
+  color: #CBD5E1;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  max-width: 1200px; // Fixed maximum width for entire content
-  margin: 0 auto; // Center the content
+  max-width: 1200px;
+  margin: 0 auto;
   width: 100%;
 
   .ad-header {
@@ -87,46 +83,41 @@
     animation: slideInFromLeft 0.6s ease-out;
 
     .ad-label {
-      background: rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(10px);
+      background: rgba(255, 140, 0, 0.1);
       padding: 0.25rem 0.75rem;
       border-radius: 20px;
       font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
-      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+      color: #ff8c00;
       animation: pulse 2s ease-in-out infinite;
     }
 
     .ad-business {
       font-size: 0.8rem;
       font-weight: 600;
-      opacity: 0.95;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      color: #CBD5E1;
     }
   }
 
   .ad-title {
+    font-family: 'Playfair Display', 'Georgia', serif;
     font-size: 1.5rem;
     font-weight: 800;
     margin: 0 0 0.4rem 0;
     line-height: 1.2;
-    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+    color: #CBD5E1;
     animation: slideInFromLeft 0.6s ease-out 0.1s backwards;
-    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
 
   .ad-description {
+    font-family: 'Inter', sans-serif;
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 0 0 0.8rem 0;
-    opacity: 0.95;
-    max-width: 800px; // Fixed width for description
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    color: #CBD5E1;
+    max-width: 800px;
     animation: slideInFromLeft 0.6s ease-out 0.2s backwards;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -135,8 +126,8 @@
   }
 
   .ad-cta {
-    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-    color: #667eea;
+    background: #ff8c00;
+    color: #fff;
     border: none;
     padding: 0.6rem 1.5rem;
     border-radius: 25px;
@@ -147,16 +138,15 @@
     align-items: center;
     gap: 0.5rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
     animation: slideInFromLeft 0.6s ease-out 0.3s backwards;
     align-self: flex-start;
-    white-space: nowrap; // Prevent button text wrapping
-    width: auto; // Override any width inheritance
+    white-space: nowrap;
+    width: auto;
 
     &:hover {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      background: #e67e00;
       transform: translateX(5px) scale(1.05);
-      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
+      box-shadow: 0 6px 20px rgba(255, 140, 0, 0.3);
     }
 
     &:active {
@@ -184,10 +174,9 @@
   animation: fadeIn 0.6s ease-out 0.4s backwards;
 
   .control-btn {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #fff;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    color: #CBD5E1;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -196,12 +185,12 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.35);
+      background: #F1F5F9;
+      border-color: #D1D9E6;
+      color: #CBD5E1;
       transform: scale(1.1);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
     &:active {
@@ -218,7 +207,7 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.4);
+      background: #E2E8F0;
       border: none;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -227,12 +216,11 @@
       &.active {
         width: 24px;
         border-radius: 4px;
-        background: #fff;
-        box-shadow: 0 2px 8px rgba(255, 255, 255, 0.5);
+        background: #ff8c00;
       }
 
       &:hover:not(.active) {
-        background: rgba(255, 255, 255, 0.7);
+        background: #CBD5E1;
         transform: scale(1.3);
       }
     }
@@ -240,12 +228,6 @@
 }
 
 // Animations
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
 @keyframes kenBurns {
   0% { transform: scale(1) translateX(0); }
   100% { transform: scale(1.1) translateX(-5%); }
@@ -275,20 +257,20 @@
 // Responsive
 @media (max-width: 768px) {
   .header-ad {
-    height: 180px; // Increased mobile height for better spacing
+    height: 180px;
   }
 
   .ad-content {
-    padding: 1.5rem 1.5rem; // Increased vertical padding
+    padding: 1.5rem 1.5rem;
 
     .ad-title {
       font-size: 1.2rem;
-      white-space: normal; // Allow wrapping on mobile
+      white-space: normal;
     }
 
     .ad-description {
       font-size: 0.8rem;
-      -webkit-line-clamp: 2; // Allow 2 lines on mobile
+      -webkit-line-clamp: 2;
     }
 
     .ad-cta {
@@ -313,4 +295,3 @@
     }
   }
 }
-
