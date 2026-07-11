@@ -22,6 +22,7 @@ router.get('/placements/:placement', async (req, res) => {
     // Frontend adapts to whatever tiers are available in the database
     // Ads are ordered by tier priority (featured > premium > standard > basic)
     const placementMap = {
+      'sidebar_ad': { position: 'sidebar', page_location: 'all_pages' },
       'sidebar_left': { position: 'sidebar', page_location: 'all_pages' },
       'sidebar_right': { position: 'sidebar', page_location: 'all_pages' },
       'header_banner': { position: 'header', page_location: 'homepage' },
