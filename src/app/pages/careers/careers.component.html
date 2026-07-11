@@ -1,35 +1,66 @@
 <div class="careers-page">
-  <!-- Hero Section -->
-  <section class="careers-hero">
-    <div class="hero-content">
-      <h1>Join the Itiyum Team</h1>
+  <!-- Full-bleed Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-text">
+      <span class="hero-label">Careers</span>
+      <h1 class="hero-title">Join the Itiyum Team</h1>
       <p class="hero-subtitle">Help us connect food lovers with amazing culinary experiences across Africa</p>
-      <div class="hero-stats">
-        <div class="stat">
-          <span class="stat-number">50+</span>
-          <span class="stat-label">Team Members</span>
-        </div>
-        <div class="stat">
-          <span class="stat-number">3</span>
-          <span class="stat-label">Countries</span>
-        </div>
-        <div class="stat">
-          <span class="stat-number">1000+</span>
-          <span class="stat-label">Restaurant Partners</span>
-        </div>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <section class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <span class="stat-value">50+</span>
+        <span class="stat-label">Team Members</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">3</span>
+        <span class="stat-label">Countries</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">1000+</span>
+        <span class="stat-label">Restaurant Partners</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">10+</span>
+        <span class="stat-label">Open Roles</span>
       </div>
     </div>
   </section>
 
-  <!-- Why Join Us Section -->
-  <section class="why-join-section">
-    <div class="section-container">
-      <h2 class="section-title">Why Join Itiyum?</h2>
-      <p class="section-subtitle">We're building Africa's leading food and hospitality platform</p>
-      
+  <!-- Why Join Us -->
+  <section class="values-section">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="tag">Why Join</span>
+        <h2 class="section-title">Why Itiyum?</h2>
+        <p class="section-sub">We're building Africa's leading food and hospitality platform</p>
+      </div>
       <div class="values-grid">
-        @for (value of values; track value.title) {
-          <div class="value-card">
+        @for (value of values; track value.title; let i = $index) {
+          <div class="card value-card" [style.animation-delay]="i * 0.08 + 's'">
+            <div class="value-icon" style="background: {{ value.color }};">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                @switch (value.icon) {
+                  @case ('zap') {
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  }
+                  @case ('users') {
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  }
+                  @case ('star') {
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  }
+                  @case ('globe') {
+                    <circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  }
+                }
+              </svg>
+            </div>
             <h3>{{ value.title }}</h3>
             <p>{{ value.description }}</p>
           </div>
@@ -38,14 +69,20 @@
     </div>
   </section>
 
-  <!-- Benefits Section -->
+  <!-- Benefits & Perks -->
   <section class="benefits-section">
-    <div class="section-container">
-      <h2 class="section-title">Benefits & Perks</h2>
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="tag">Perks</span>
+        <h2 class="section-title">Benefits & Perks</h2>
+        <p class="section-sub">What you get when you join the Itiyum team</p>
+      </div>
       <div class="benefits-grid">
-        @for (benefit of benefits; track benefit.title) {
-          <div class="benefit-card">
-            <lucide-icon [img]="benefit.icon" [size]="32" class="benefit-icon"></lucide-icon>
+        @for (benefit of benefits; track benefit.title; let i = $index) {
+          <div class="card benefit-card" [style.animation-delay]="i * 0.06 + 's'">
+            <div class="card-icon" style="background: {{ benefit.color }};">
+              <lucide-icon [img]="benefit.icon" [size]="22"></lucide-icon>
+            </div>
             <h3>{{ benefit.title }}</h3>
             <p>{{ benefit.description }}</p>
           </div>
@@ -54,39 +91,45 @@
     </div>
   </section>
 
-  <!-- Open Positions Section -->
+  <!-- Open Positions -->
   <section class="positions-section">
-    <div class="section-container">
-      <h2 class="section-title">Open Positions</h2>
-      <p class="section-subtitle">Find your next opportunity with us</p>
-      
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="tag">Openings</span>
+        <h2 class="section-title">Open Positions</h2>
+        <p class="section-sub">Find your next opportunity with us</p>
+      </div>
       <div class="jobs-list">
-        @for (job of jobOpenings(); track job.id) {
-          <div class="job-card">
+        @for (job of jobOpenings(); track job.id; let i = $index) {
+          <div class="card job-card" [style.animation-delay]="i * 0.08 + 's'">
             <div class="job-header">
-              <div class="job-title-section">
+              <div class="job-title-row">
                 <h3>{{ job.title }}</h3>
-                <div class="job-meta">
-                  <span class="job-department">{{ job.department }}</span>
-                  <span class="job-type">{{ job.type }}</span>
-                  <span class="job-location">📍 {{ job.location }}</span>
-                </div>
+                <span class="job-type-badge {{ job.type === 'Full-time' ? 'fulltime' : job.type === 'Internship' ? 'internship' : 'contract' }}">{{ job.type }}</span>
+              </div>
+              <div class="job-meta">
+                <span class="job-meta-item">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                  {{ job.department }}
+                </span>
+                <span class="job-meta-item">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {{ job.location }}
+                </span>
               </div>
             </div>
-            
-            <p class="job-description">{{ job.description }}</p>
-            
-            <div class="job-requirements">
-              <h4>Requirements:</h4>
+            <p class="job-desc">{{ job.description }}</p>
+            <div class="job-reqs">
+              <h4>Requirements</h4>
               <ul>
                 @for (req of job.requirements; track req) {
                   <li>{{ req }}</li>
                 }
               </ul>
             </div>
-            
-            <div class="job-actions">
-              <a href="mailto:careers@itiyum.com?subject=Application for {{ job.title }}" class="apply-button">
+            <div class="job-action">
+              <a href="mailto:careers@itiyum.com?subject=Application for {{ job.title }}" class="btn-primary">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 Apply Now
               </a>
             </div>
@@ -96,45 +139,65 @@
     </div>
   </section>
 
-  <!-- No Perfect Match Section -->
-  <section class="general-application-section">
-    <div class="section-container">
-      <div class="general-app-card">
+  <!-- General Application -->
+  <section class="general-section">
+    <div class="section-inner">
+      <div class="card general-card">
+        <div class="general-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
         <h2>Don't see the perfect role?</h2>
         <p>We're always looking for talented individuals. Send us your CV and let us know how you can contribute to Itiyum's mission.</p>
-        <a href="mailto:careers@itiyum.com?subject=General Application" class="primary-button">
+        <a href="mailto:careers@itiyum.com?subject=General Application" class="btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           Send General Application
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Culture Section -->
+  <!-- Culture -->
   <section class="culture-section">
-    <div class="section-container">
-      <h2 class="section-title">Our Culture</h2>
-      <div class="culture-content">
-        <div class="culture-text">
-          <h3>Building Together</h3>
-          <p>At Itiyum, we believe in creating an inclusive environment where everyone can thrive. We celebrate South Africa's diversity and bring together people from different backgrounds, cultures, and experiences.</p>
-          
-          <h3>Innovation First</h3>
-          <p>We encourage experimentation and learning. Whether you're a developer, marketer, or support specialist, you'll have the freedom to try new approaches and make an impact.</p>
-          
-          <h3>Work-Life Balance</h3>
-          <p>We understand the importance of balance. With flexible work arrangements and generous leave policies, we support our team members in all aspects of their lives.</p>
-        </div>
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="tag">Culture</span>
+        <h2 class="section-title">Our Culture</h2>
+        <p class="section-sub">What it's like to work at Itiyum</p>
+      </div>
+      <div class="culture-grid">
+        @for (item of cultureItems; track item.title; let i = $index) {
+          <div class="card culture-card" [style.animation-delay]="i * 0.1 + 's'">
+            <div class="culture-icon" style="background: {{ item.color }};">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                @switch (item.icon) {
+                  @case ('heart') {
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                  }
+                  @case ('lightbulb') {
+                    <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>
+                  }
+                  @case ('sun') {
+                    <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                  }
+                }
+              </svg>
+            </div>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+          </div>
+        }
       </div>
     </div>
   </section>
 
-  <!-- Contact Section -->
-  <section class="careers-contact-section">
-    <div class="section-container">
-      <h2>Questions About Careers?</h2>
-      <p>Reach out to our HR team at <a href="mailto:careers@itiyum.com">careers@itiyum.com</a></p>
-      <p>Follow us on <a href="https://www.linkedin.com/company/itiyum" target="_blank" rel="noopener noreferrer">LinkedIn</a> for updates on new positions</p>
+  <!-- Contact -->
+  <section class="contact-section">
+    <div class="section-inner">
+      <div class="card contact-card">
+        <h2>Questions About Careers?</h2>
+        <p>Reach out to our HR team at <a href="mailto:careers@itiyum.com">careers@itiyum.com</a></p>
+        <p class="contact-social">Follow us on <a href="https://www.linkedin.com/company/itiyum" target="_blank" rel="noopener noreferrer">LinkedIn</a> for updates on new positions</p>
+      </div>
     </div>
   </section>
 </div>
-

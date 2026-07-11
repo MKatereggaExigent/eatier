@@ -1,7 +1,9 @@
 <div class="blog-management">
   <header class="page-header">
     <div class="header-content">
-      <h1>📝 Blog Management</h1>
+        <h1>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Blog Management</h1>
       <button (click)="openNewPostEditor()" class="btn-primary">
         + New Post
       </button>
@@ -39,7 +41,9 @@
         (keyup.enter)="onSearch()"
         placeholder="Search posts..."
       />
-      <button (click)="onSearch()">🔍</button>
+      <button (click)="onSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
     </div>
     
     <select [(ngModel)]="filterStatus" (change)="onFilterChange()">
@@ -84,7 +88,9 @@
               <td class="title-cell">
                 <div class="post-title">
                   @if (post.is_featured) {
-                    <span class="featured-badge">⭐</span>
+                    <span class="featured-badge">
+                      <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </span>
                   }
                   {{ post.title }}
                 </div>
@@ -99,11 +105,19 @@
               <td>{{ post.view_count }}</td>
               <td>{{ formatDate(post.created_at) }}</td>
               <td class="actions-cell">
-                <button (click)="openEditPostEditor(post)" class="btn-icon" title="Edit">✏️</button>
-                <button (click)="togglePublish(post)" class="btn-icon" title="Toggle Publish">
-                  {{ post.status === 'published' ? '📤' : '📥' }}
+                <button (click)="openEditPostEditor(post)" class="btn-icon" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                 </button>
-                <button (click)="deletePost(post)" class="btn-icon danger" title="Delete">🗑️</button>
+                <button (click)="togglePublish(post)" class="btn-icon" title="Toggle Publish">
+                  @if (post.status === 'published') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  } @else {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  }
+                </button>
+                <button (click)="deletePost(post)" class="btn-icon danger" title="Delete">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
               </td>
             </tr>
           }

@@ -1,5 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { LucideAngularModule, ChefHat, UtensilsCrossed, Calendar, Camera, AlertTriangle, DollarSign, Star, Users, TrendingUp, Clock, CheckCircle, XCircle, MessageSquare, Mail, Inbox, MapPin } from 'lucide-angular';
+import { LucideAngularModule, ChefHat, UtensilsCrossed, Calendar, Camera, AlertTriangle, DollarSign, Star, Users, TrendingUp, Clock, CheckCircle, XCircle, MessageSquare, Mail, Inbox, MapPin, Sun, RefreshCw, Eye } from 'lucide-angular';
 import { SpecialistBooking, SpecialistEarning, SpecialistReview, SpecialistService } from '../../../core/services/specialist.service';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -65,6 +65,9 @@ export class SpecialistOverviewComponent implements OnInit {
   readonly Mail = Mail;
   readonly Inbox = Inbox;
   readonly MapPin = MapPin;
+  readonly Sun = Sun;
+  readonly RefreshCw = RefreshCw;
+  readonly Eye = Eye;
   private authService = inject(AuthService);
   private specialistService = inject(SpecialistService);
 
@@ -79,6 +82,13 @@ export class SpecialistOverviewComponent implements OnInit {
 
   // Error states
   error = signal<string | null>(null);
+  errors = signal<Record<string, string | null>>({
+    bookings: null,
+    reviews: null,
+    earnings: null
+  });
+
+  hasErrors = computed(() => this.error() !== null);
 
   // Business metrics - initialized with zeros, will be populated from API
   businessMetrics = signal({
@@ -122,6 +132,7 @@ export class SpecialistOverviewComponent implements OnInit {
   loadData(): void {
     this.loading.set(true);
     this.error.set(null);
+    this.errors.set({ bookings: null, reviews: null, earnings: null });
 
     // Load overview statistics
     this.specialistService.getOverview().subscribe({
@@ -169,6 +180,7 @@ export class SpecialistOverviewComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading pending bookings:', err);
+        this.errors.update(e => ({ ...e, bookings: 'Failed to load pending requests' }));
         this.loadingBookings.set(false);
       }
     });
@@ -193,6 +205,7 @@ export class SpecialistOverviewComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading upcoming bookings:', err);
+        this.errors.update(e => ({ ...e, bookings: 'Failed to load upcoming bookings' }));
       }
     });
 
@@ -213,6 +226,7 @@ export class SpecialistOverviewComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading reviews:', err);
+        this.errors.update(e => ({ ...e, reviews: 'Failed to load reviews' }));
         this.loadingReviews.set(false);
       }
     });
@@ -234,6 +248,7 @@ export class SpecialistOverviewComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading earnings:', err);
+        this.errors.update(e => ({ ...e, earnings: 'Failed to load earnings' }));
         this.loadingEarnings.set(false);
       }
     });
@@ -394,5 +409,9 @@ export class SpecialistOverviewComponent implements OnInit {
   viewAllReviews(): void {
     console.log('Navigate to reviews page');
     // TODO: Navigate to reviews page
+  }
+
+  refreshData(): void {
+    this.loadData();
   }
 }

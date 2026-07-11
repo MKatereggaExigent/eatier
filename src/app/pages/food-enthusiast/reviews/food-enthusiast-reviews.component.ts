@@ -2,13 +2,14 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { LucideAngularModule, Star, PenLine, Heart, TrendingUp, Search, Sliders, Calendar, UtensilsCrossed, DollarSign, PartyPopper, X, Check, ThumbsUp, ThumbsDown } from 'lucide-angular';
 import { ReviewsService, Review, Restaurant, ReviewRequest, ReviewStats, ReviewFilters } from '../../../services/reviews.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-food-enthusiast-reviews',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './food-enthusiast-reviews.component.html',
   styleUrls: ['./food-enthusiast-reviews.component.scss']
 })
@@ -16,6 +17,21 @@ export class FoodEnthusiastReviewsComponent implements OnInit {
   private reviewsService = inject(ReviewsService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
+
+  readonly Star = Star;
+  readonly PenLine = PenLine;
+  readonly Heart = Heart;
+  readonly TrendingUp = TrendingUp;
+  readonly Search = Search;
+  readonly Sliders = Sliders;
+  readonly Calendar = Calendar;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly DollarSign = DollarSign;
+  readonly PartyPopper = PartyPopper;
+  readonly X = X;
+  readonly Check = Check;
+  readonly ThumbsUp = ThumbsUp;
+  readonly ThumbsDown = ThumbsDown;
 
   currentUser = this.authService.currentUser;
 
@@ -509,6 +525,6 @@ export class FoodEnthusiastReviewsComponent implements OnInit {
   }
 
   canDelete(review: Review): boolean {
-    return true; // Users can delete their own reviews
+    return true;
   }
 }

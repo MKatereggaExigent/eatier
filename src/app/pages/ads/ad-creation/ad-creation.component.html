@@ -1,810 +1,526 @@
-<div class="ad-creation-container" role="main" [attr.aria-label]="isEditMode() ? 'Edit Ad Campaign' : 'Create New Ad Campaign'">
+<div class="ad-creation-page">
   <!-- Loading Overlay for Edit Mode -->
   @if (isLoadingCampaign()) {
     <div class="loading-overlay">
-      <div class="loading-spinner"></div>
+      <div class="spinner"></div>
       <p>Loading campaign data...</p>
     </div>
   }
 
   <!-- Header -->
-  <header class="creation-header">
-    <div class="header-content">
-      <div class="title-section">
-        <h1 class="page-title">
-          <lucide-icon [img]="isEditMode() ? Edit : Rocket" [size]="28" class="title-icon"></lucide-icon>
-          {{ isEditMode() ? 'Edit Campaign' : 'Create New Campaign' }}
-        </h1>
-        <p class="page-subtitle">
-          {{ getStepTitle(currentStep()) }} - Step {{ currentStep() }} of {{ totalSteps() }}
-        </p>
+  <section class="section ad-header">
+    <div class="section-inner">
+      <div class="header-flex">
+        <div class="header-text">
+          <span class="tag">{{ isEditMode() ? 'Edit Campaign' : 'New Campaign' }}</span>
+          <h1 class="section-title">
+            <lucide-icon [img]="isEditMode() ? Edit : Rocket" [size]="28" class="title-icon"></lucide-icon>
+            {{ isEditMode() ? 'Edit Campaign' : 'Create New Campaign' }}
+          </h1>
+          <p class="header-subtitle">{{ getStepTitle(currentStep()) }} - Step {{ currentStep() }} of {{ totalSteps() }}</p>
+        </div>
+        <button type="button" class="btn btn-secondary" (click)="cancelCreation()">Cancel</button>
       </div>
 
-      <div class="header-actions">
-        <button
-          type="button"
-          class="btn-secondary cancel-btn"
-          (click)="cancelCreation()">
-          Cancel
-        </button>
-      </div>
-    </div>
-
-    <!-- Progress Bar -->
-    <div class="progress-container">
-      <div class="progress-bar">
-        <div
-          class="progress-fill"
-          [style.width.%]="getProgressPercentage()">
+      <!-- Progress Steps -->
+      <div class="progress-track">
+        <div class="progress-bar-bg">
+          <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+        </div>
+        <div class="step-dots">
+          @for (step of [1, 2, 3, 4, 5, 6]; track step) {
+            <div class="step-dot" [class.active]="step === currentStep()" [class.done]="step < currentStep()" (click)="goToStep(step)">
+              <span class="dot-num">{{ step }}</span>
+              <span class="dot-label">{{ getStepTitle(step) }}</span>
+            </div>
+          }
         </div>
       </div>
-      <div class="progress-steps">
-        @for (step of [1, 2, 3, 4, 5, 6]; track step) {
-          <div
-            class="progress-step"
-            [class.active]="step === currentStep()"
-            [class.completed]="step < currentStep()"
-            (click)="goToStep(step)">
-            <span class="step-number">{{ step }}</span>
-            <span class="step-label">{{ getStepTitle(step) }}</span>
-          </div>
-        }
-      </div>
     </div>
-  </header>
+  </section>
 
   <!-- Step Content -->
-  <div class="step-content">
-    <!-- Step 1: Basic Information -->
-    @if (currentStep() === 1) {
-      <div class="step-panel" id="basic-info-panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Basic Information</h2>
-          <p class="panel-description">Tell us about your campaign and what you want to achieve</p>
-        </div>
-
-        <form [formGroup]="basicInfoForm" class="step-form">
-          <div class="form-group">
-            <label for="title" class="form-label">Campaign Title *</label>
-            <input
-              type="text"
-              id="title"
-              formControlName="title"
-              class="form-input"
-              placeholder="e.g., Summer Menu Promotion"
-              maxlength="100">
-            <div class="form-help">Choose a descriptive name for your campaign</div>
+  <section class="section ad-body">
+    <div class="section-inner">
+      <!-- Step 1: Basic Information -->
+      @if (currentStep() === 1) {
+        <div class="form-card">
+          <div class="card-head">
+            <h2 class="card-title">Basic Information</h2>
+            <p class="card-desc">Tell us about your campaign and what you want to achieve</p>
           </div>
-
-          <div class="form-group">
-            <label for="description" class="form-label">Campaign Description *</label>
-            <textarea
-              id="description"
-              formControlName="description"
-              class="form-textarea"
-              placeholder="Describe what you're promoting and why people should be interested..."
-              maxlength="500"
-              rows="4">
-            </textarea>
-            <div class="form-help">Explain what makes your offering special</div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Ad Type *</label>
-            <div class="ad-type-options">
-              @for (adType of adTypes; track adType.value) {
-                <div class="ad-type-card">
-                  <input
-                    type="radio"
-                    [id]="'type-' + adType.value"
-                    formControlName="type"
-                    [value]="adType.value"
-                    class="ad-type-radio">
-                  <label [for]="'type-' + adType.value" class="ad-type-label">
-                    <div class="ad-type-header">
-                      <h3 class="ad-type-title">{{ adType.label }}</h3>
-                      <span class="ad-type-price">From ${{ adType.minBudget }}/day</span>
-                    </div>
-                    <p class="ad-type-description">{{ adType.description }}</p>
-                  </label>
-                </div>
-              }
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="category" class="form-label">Business Category *</label>
-            <select id="category" formControlName="category" class="form-select">
-              <option value="">Select a category</option>
-              <option value="restaurant">Restaurant</option>
-              <option value="cafe">Cafe</option>
-              <option value="bar">Bar</option>
-              <option value="catering">Catering</option>
-              <option value="food-truck">Food Truck</option>
-              <option value="bakery">Bakery</option>
-              <option value="chef-services">Chef Services</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Campaign Objectives *</label>
-            <div class="checkbox-group">
-              @for (objective of objectiveOptions; track objective.value) {
-                <label class="checkbox-item" [class.selected]="isObjectiveSelected(objective.value)">
-                  <input
-                    type="checkbox"
-                    [checked]="isObjectiveSelected(objective.value)"
-                    (change)="toggleObjective(objective.value)"
-                    class="checkbox-input">
-                  <span class="checkbox-label">{{ objective.label }}</span>
-                </label>
-              }
-            </div>
-          </div>
-        </form>
-      </div>
-    }
-
-    <!-- Step 2: Ad Tier & Placement -->
-    @if (currentStep() === 2) {
-      <div class="step-panel" id="tier-placement-panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Ad Tier & Placement</h2>
-          <p class="panel-description">Choose where your ad will appear and its priority level</p>
-        </div>
-
-        <form [formGroup]="tierPlacementForm" class="step-form">
-          <!-- Ad Tiers -->
-          <div class="form-section">
-            <h3 class="section-title">Select Ad Tier</h3>
-            <p class="section-description">Higher tiers get more visibility and faster rotation</p>
-
-            <div class="tier-cards">
-              @for (tier of adTiers(); track tier.id) {
-                <div
-                  class="tier-card"
-                  [class.selected]="selectedTier()?.id === tier.id"
-                  (click)="selectTier(tier)">
-                  <div class="tier-header">
-                    <span class="tier-badge" [class]="tier.name">{{ tier.displayName }}</span>
-                    <span class="tier-price">${{ tier.basePriceDaily }}/day</span>
-                  </div>
-                  <div class="tier-body">
-                    <p class="tier-description">{{ tier.description }}</p>
-                    <div class="tier-features">
-                      <div class="tier-feature">Priority: {{ tier.priorityWeight }}%</div>
-                      <div class="tier-feature">Rotation: {{ tier.rotationSpeedSeconds }}s</div>
-                      @if (tier.supportsVideo) {
-                        <div class="tier-feature">✓ Video Ads</div>
-                      }
-                      @if (tier.supportsAnimation) {
-                        <div class="tier-feature">✓ Animated Ads</div>
-                      }
-                    </div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- Ad Placements -->
-          @if (selectedTier()) {
-            <div class="form-section">
-              <h3 class="section-title">Select Placement</h3>
-              <p class="section-description">Choose where your ad will be displayed</p>
-
-              <div class="placement-cards">
-                @for (placement of adPlacements(); track placement.id) {
-                  <div
-                    class="placement-card"
-                    [class.selected]="selectedPlacement()?.id === placement.id"
-                    (click)="selectPlacement(placement)">
-                    <div class="placement-header">
-                      <span class="placement-name">{{ placement.displayName }}</span>
-                      <span class="placement-price">${{ placement.priceDaily }}/day</span>
-                    </div>
-                    <div class="placement-body">
-                      <p class="placement-description">{{ placement.description }}</p>
-                      <div class="placement-details">
-                        <span class="placement-size">{{ placement.width }}x{{ placement.height }}px</span>
-                        <span class="placement-location">{{ placement.pageLocation }}</span>
-                      </div>
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-
-          <!-- Selected Summary -->
-          @if (selectedTier() && selectedPlacement()) {
-            <div class="selection-summary">
-              <h4>Your Selection</h4>
-              <div class="summary-row">
-                <span>Tier:</span>
-                <strong>{{ selectedTier()?.displayName }}</strong>
-              </div>
-              <div class="summary-row">
-                <span>Placement:</span>
-                <strong>{{ selectedPlacement()?.displayName }}</strong>
-              </div>
-              <div class="summary-row total">
-                <span>Daily Cost:</span>
-                <strong>${{ (selectedTier()?.basePriceDaily || 0) + (selectedPlacement()?.priceDaily || 0) }}</strong>
-              </div>
-            </div>
-          }
-        </form>
-      </div>
-    }
-
-    <!-- Step 3: Targeting & Audience -->
-    @if (currentStep() === 3) {
-      <div class="step-panel" id="targeting-panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Targeting & Audience</h2>
-          <p class="panel-description">Define who should see your ads</p>
-        </div>
-
-        <form [formGroup]="targetingForm" class="step-form">
-          <!-- Geographic Targeting -->
-          <div class="form-section">
-            <h3 class="section-title">Geographic Targeting</h3>
-
+          <form [formGroup]="basicInfoForm" class="card-form">
             <div class="form-group">
-              <label for="region" class="form-label">Region *</label>
-              <select id="region" formControlName="region" class="form-select">
-                @for (region of regions; track region.value) {
-                  <option [value]="region.value">{{ region.label }}</option>
+              <label for="title" class="form-label">Campaign Title *</label>
+              <input type="text" id="title" formControlName="title" class="form-input" placeholder="e.g., Summer Menu Promotion" maxlength="100">
+              <span class="form-hint">Choose a descriptive name for your campaign</span>
+            </div>
+            <div class="form-group">
+              <label for="description" class="form-label">Campaign Description *</label>
+              <textarea id="description" formControlName="description" class="form-textarea" placeholder="Describe what you're promoting and why people should be interested..." maxlength="500" rows="4"></textarea>
+              <span class="form-hint">Explain what makes your offering special</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ad Type *</label>
+              <div class="radio-card-group">
+                @for (adType of adTypes; track adType.value) {
+                  <label class="radio-card" [class.selected]="basicInfoForm.get('type')?.value === adType.value">
+                    <input type="radio" [id]="'type-' + adType.value" formControlName="type" [value]="adType.value" class="radio-card-input">
+                    <div class="radio-card-body">
+                      <div class="radio-card-top">
+                        <span class="radio-card-title">{{ adType.label }}</span>
+                        <span class="radio-card-price">From ${{ adType.minBudget }}/day</span>
+                      </div>
+                      <p class="radio-card-desc">{{ adType.description }}</p>
+                    </div>
+                  </label>
                 }
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="category" class="form-label">Business Category *</label>
+              <select id="category" formControlName="category" class="form-select">
+                <option value="">Select a category</option>
+                <option value="restaurant">Restaurant</option>
+                <option value="cafe">Cafe</option>
+                <option value="bar">Bar</option>
+                <option value="catering">Catering</option>
+                <option value="food-truck">Food Truck</option>
+                <option value="bakery">Bakery</option>
+                <option value="chef-services">Chef Services</option>
+                <option value="other">Other</option>
               </select>
             </div>
-
             <div class="form-group">
-              <label class="form-label">Countries *</label>
-              <div class="multi-select-grid">
-                @for (country of availableCountries(); track country.id) {
-                  <label class="multi-select-item" [class.selected]="isCountrySelected(country)">
-                    <input
-                      type="checkbox"
-                      [checked]="isCountrySelected(country)"
-                      (change)="toggleCountry(country)"
-                      class="multi-select-input">
-                    <span class="multi-select-label">{{ country.name }}</span>
-                  </label>
+              <label class="form-label">Campaign Objectives *</label>
+              <div class="chip-group">
+                @for (objective of objectiveOptions; track objective.value) {
+                  <button type="button" class="chip" [class.selected]="isObjectiveSelected(objective.value)" (click)="toggleObjective(objective.value)">
+                    @if (isObjectiveSelected(objective.value)) {
+                      <lucide-icon [img]="Check" [size]="14"></lucide-icon>
+                    }
+                    {{ objective.label }}
+                  </button>
                 }
               </div>
-              <div class="form-help">Click to select multiple countries</div>
             </div>
+          </form>
+        </div>
+      }
 
-            <div class="form-group">
-              <label class="form-label">Cities (Optional)</label>
-              @if (availableCities().length > 0) {
-                <div class="multi-select-grid">
-                  @for (city of availableCities(); track city.id) {
-                    <label class="multi-select-item" [class.selected]="isCitySelected(city)">
-                      <input
-                        type="checkbox"
-                        [checked]="isCitySelected(city)"
-                        (change)="toggleCity(city)"
-                        class="multi-select-input">
-                      <span class="multi-select-label">{{ city.name }}</span>
-                    </label>
+      <!-- Step 2: Ad Tier & Placement -->
+      @if (currentStep() === 2) {
+        <div class="form-card">
+          <div class="card-head">
+            <h2 class="card-title">Ad Tier & Placement</h2>
+            <p class="card-desc">Choose where your ad will appear and its priority level</p>
+          </div>
+          <form [formGroup]="tierPlacementForm" class="card-form">
+            <div class="form-section">
+              <h3 class="sec-title">Select Ad Tier</h3>
+              <p class="sec-desc">Higher tiers get more visibility and faster rotation</p>
+              <div class="tier-grid">
+                @for (tier of adTiers(); track tier.id) {
+                  <div class="tier-card" [class.selected]="selectedTier()?.id === tier.id" (click)="selectTier(tier)">
+                    <div class="tier-top">
+                      <span class="tier-badge" [class]="tier.name">{{ tier.displayName }}</span>
+                      <span class="tier-price">${{ tier.basePriceDaily }}/day</span>
+                    </div>
+                    <p class="tier-desc">{{ tier.description }}</p>
+                    <div class="tier-features">
+                      <span class="tf">Priority: {{ tier.priorityWeight }}%</span>
+                      <span class="tf">Rotation: {{ tier.rotationSpeedSeconds }}s</span>
+                      @if (tier.supportsVideo) { <span class="tf">Video Ads</span> }
+                      @if (tier.supportsAnimation) { <span class="tf">Animated Ads</span> }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+            @if (selectedTier()) {
+              <div class="form-section">
+                <h3 class="sec-title">Select Placement</h3>
+                <p class="sec-desc">Choose where your ad will be displayed</p>
+                <div class="placement-grid">
+                  @for (placement of adPlacements(); track placement.id) {
+                    <div class="placement-card" [class.selected]="selectedPlacement()?.id === placement.id" (click)="selectPlacement(placement)">
+                      <div class="placement-top">
+                        <span class="placement-name">{{ placement.displayName }}</span>
+                        <span class="placement-price">${{ placement.priceDaily }}/day</span>
+                      </div>
+                      <p class="placement-desc">{{ placement.description }}</p>
+                      <div class="placement-meta">
+                        <span>{{ placement.width }}x{{ placement.height }}px</span>
+                        <span>{{ placement.pageLocation }}</span>
+                      </div>
+                    </div>
                   }
                 </div>
-              } @else {
-                <div class="form-help-notice">Select countries first to see available cities</div>
-              }
-              <div class="form-help">Leave empty to target entire countries</div>
-            </div>
+              </div>
+            }
+            @if (selectedTier() && selectedPlacement()) {
+              <div class="summary-box">
+                <h4>Your Selection</h4>
+                <div class="sb-row"><span>Tier:</span><strong>{{ selectedTier()?.displayName }}</strong></div>
+                <div class="sb-row"><span>Placement:</span><strong>{{ selectedPlacement()?.displayName }}</strong></div>
+                <div class="sb-row sb-total"><span>Daily Cost:</span><strong>${{ (selectedTier()?.basePriceDaily || 0) + (selectedPlacement()?.priceDaily || 0) }}</strong></div>
+              </div>
+            }
+          </form>
+        </div>
+      }
 
-            <div class="form-group">
-              <label for="radius" class="form-label">Radius (km)</label>
-              <input
-                type="range"
-                id="radius"
-                formControlName="radius"
-                min="5"
-                max="100"
-                class="form-range">
-              <div class="range-value">{{ targetingForm.get('radius')?.value }} km</div>
-            </div>
+      <!-- Step 3: Targeting & Audience -->
+      @if (currentStep() === 3) {
+        <div class="form-card">
+          <div class="card-head">
+            <h2 class="card-title">Targeting & Audience</h2>
+            <p class="card-desc">Define who should see your ads</p>
           </div>
-
-          <!-- Demographic Targeting -->
-          <div class="form-section">
-            <h3 class="section-title">Demographic Targeting</h3>
-
-            <div class="form-row">
+          <form [formGroup]="targetingForm" class="card-form">
+            <div class="form-section">
+              <h3 class="sec-title">Geographic Targeting</h3>
               <div class="form-group">
-                <label for="ageMin" class="form-label">Age Range</label>
-                <div class="age-range-inputs">
-                  <input
-                    type="number"
-                    id="ageMin"
-                    formControlName="ageMin"
-                    min="13"
-                    max="100"
-                    class="form-input age-input"
-                    placeholder="Min">
-                  <span class="age-separator">to</span>
-                  <input
-                    type="number"
-                    id="ageMax"
-                    formControlName="ageMax"
-                    min="13"
-                    max="100"
-                    class="form-input age-input"
-                    placeholder="Max">
+                <label for="region" class="form-label">Region *</label>
+                <select id="region" formControlName="region" class="form-select">
+                  @for (region of regions; track region.value) {
+                    <option [value]="region.value">{{ region.label }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Countries *</label>
+                <div class="chip-group">
+                  @for (country of availableCountries(); track country.id) {
+                    <button type="button" class="chip" [class.selected]="isCountrySelected(country)" (click)="toggleCountry(country)">
+                      @if (isCountrySelected(country)) { <lucide-icon [img]="Check" [size]="14"></lucide-icon> }
+                      {{ country.name }}
+                    </button>
+                  }
+                </div>
+                <span class="form-hint">Click to select multiple countries</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cities <span class="opt">(Optional)</span></label>
+                @if (availableCities().length > 0) {
+                  <div class="chip-group">
+                    @for (city of availableCities(); track city.id) {
+                      <button type="button" class="chip" [class.selected]="isCitySelected(city)" (click)="toggleCity(city)">
+                        @if (isCitySelected(city)) { <lucide-icon [img]="Check" [size]="14"></lucide-icon> }
+                        {{ city.name }}
+                      </button>
+                    }
+                  </div>
+                } @else {
+                  <div class="notice">Select countries first to see available cities</div>
+                }
+                <span class="form-hint">Leave empty to target entire countries</span>
+              </div>
+              <div class="form-group">
+                <label for="radius" class="form-label">Radius (km)</label>
+                <input type="range" id="radius" formControlName="radius" min="5" max="100" class="form-range">
+                <div class="range-val">{{ targetingForm.get('radius')?.value }} km</div>
+              </div>
+            </div>
+            <div class="form-section">
+              <h3 class="sec-title">Demographic Targeting</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="ageMin" class="form-label">Age Range</label>
+                  <div class="age-row">
+                    <input type="number" id="ageMin" formControlName="ageMin" min="13" max="100" class="form-input age-inp" placeholder="Min">
+                    <span class="age-sep">to</span>
+                    <input type="number" id="ageMax" formControlName="ageMax" min="13" max="100" class="form-input age-inp" placeholder="Max">
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Gender</label>
+                <div class="chip-group">
+                  <button type="button" class="chip" [class.selected]="targetingForm.get('gender')?.value === 'all'" (click)="targetingForm.patchValue({ gender: 'all' })">All Genders</button>
+                  <button type="button" class="chip" [class.selected]="targetingForm.get('gender')?.value === 'male'" (click)="targetingForm.patchValue({ gender: 'male' })">Male</button>
+                  <button type="button" class="chip" [class.selected]="targetingForm.get('gender')?.value === 'female'" (click)="targetingForm.patchValue({ gender: 'female' })">Female</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">User Types *</label>
+                <div class="chip-group">
+                  @for (userType of userTypeOptions; track userType.value) {
+                    <button type="button" class="chip" [class.selected]="isUserTypeSelected(userType.value)" (click)="toggleUserType(userType.value)">
+                      @if (isUserTypeSelected(userType.value)) { <lucide-icon [img]="Check" [size]="14"></lucide-icon> }
+                      {{ userType.label }}
+                    </button>
+                  }
                 </div>
               </div>
             </div>
-
-            <div class="form-group">
-              <label class="form-label">Gender</label>
-              <div class="radio-group">
-                <label class="radio-item">
-                  <input type="radio" value="all" formControlName="gender" class="radio-input">
-                  <span class="radio-label">All Genders</span>
-                </label>
-                <label class="radio-item">
-                  <input type="radio" value="male" formControlName="gender" class="radio-input">
-                  <span class="radio-label">Male</span>
-                </label>
-                <label class="radio-item">
-                  <input type="radio" value="female" formControlName="gender" class="radio-input">
-                  <span class="radio-label">Female</span>
-                </label>
+            <div class="form-section">
+              <h3 class="sec-title">Interest & Keyword Targeting</h3>
+              <div class="form-group">
+                <label for="interests" class="form-label">Interests</label>
+                <input type="text" id="interests" class="form-input" placeholder="e.g., fine dining, local cuisine, food photography" (keydown.enter)="$event.preventDefault()">
+                <span class="form-hint">Press Enter to add interests</span>
+              </div>
+              <div class="form-group">
+                <label for="keywords" class="form-label">Keywords</label>
+                <input type="text" id="keywords" class="form-input" placeholder="e.g., restaurant, food, dining" (keydown.enter)="$event.preventDefault()">
+                <span class="form-hint">Keywords that describe your business</span>
+              </div>
+              <div class="form-group">
+                <label for="excludedKeywords" class="form-label">Excluded Keywords</label>
+                <input type="text" id="excludedKeywords" class="form-input" placeholder="e.g., fast food, delivery" (keydown.enter)="$event.preventDefault()">
+                <span class="form-hint">Keywords to avoid targeting</span>
               </div>
             </div>
-
-            <div class="form-group">
-              <label class="form-label">User Types *</label>
-              <div class="multi-select-grid">
-                @for (userType of userTypeOptions; track userType.value) {
-                  <label class="multi-select-item" [class.selected]="isUserTypeSelected(userType.value)">
-                    <input
-                      type="checkbox"
-                      [checked]="isUserTypeSelected(userType.value)"
-                      (change)="toggleUserType(userType.value)"
-                      class="multi-select-input">
-                    <span class="multi-select-label">{{ userType.label }}</span>
-                  </label>
-                }
-              </div>
-            </div>
-          </div>
-
-          <!-- Interest Targeting -->
-          <div class="form-section">
-            <h3 class="section-title">Interest & Keyword Targeting</h3>
-
-            <div class="form-group">
-              <label for="interests" class="form-label">Interests</label>
-              <input
-                type="text"
-                id="interests"
-                class="form-input"
-                placeholder="e.g., fine dining, local cuisine, food photography"
-                (keydown.enter)="$event.preventDefault()">
-              <div class="form-help">Press Enter to add interests</div>
-            </div>
-
-            <div class="form-group">
-              <label for="keywords" class="form-label">Keywords</label>
-              <input
-                type="text"
-                id="keywords"
-                class="form-input"
-                placeholder="e.g., restaurant, food, dining"
-                (keydown.enter)="$event.preventDefault()">
-              <div class="form-help">Keywords that describe your business</div>
-            </div>
-
-            <div class="form-group">
-              <label for="excludedKeywords" class="form-label">Excluded Keywords</label>
-              <input
-                type="text"
-                id="excludedKeywords"
-                class="form-input"
-                placeholder="e.g., fast food, delivery"
-                (keydown.enter)="$event.preventDefault()">
-              <div class="form-help">Keywords to avoid targeting</div>
-            </div>
-          </div>
-        </form>
-      </div>
-    }
-
-    <!-- Step 4: Ad Content & Creative -->
-    @if (currentStep() === 4) {
-      <div class="step-panel" id="content-panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Ad Content & Creative</h2>
-          <p class="panel-description">Create compelling content that attracts customers</p>
+          </form>
         </div>
+      }
 
-        <form [formGroup]="contentForm" class="step-form">
-          <div class="form-group">
-            <label for="headline" class="form-label">Headline *</label>
-            <input
-              type="text"
-              id="headline"
-              formControlName="headline"
-              class="form-input"
-              placeholder="e.g., Taste Summer at Our Restaurant"
-              maxlength="100">
-            <div class="form-help">Make it catchy and attention-grabbing</div>
+      <!-- Step 4: Ad Content & Creative -->
+      @if (currentStep() === 4) {
+        <div class="form-card">
+          <div class="card-head">
+            <h2 class="card-title">Ad Content & Creative</h2>
+            <p class="card-desc">Create compelling content that attracts customers</p>
           </div>
-
-          <div class="form-group">
-            <label for="adDescription" class="form-label">Description *</label>
-            <textarea
-              id="adDescription"
-              formControlName="description"
-              class="form-textarea"
-              placeholder="Fresh seasonal ingredients, expertly crafted dishes..."
-              maxlength="300"
-              rows="3">
-            </textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="subheading" class="form-label">Subheading (Optional)</label>
-            <input
-              type="text"
-              id="subheading"
-              formControlName="subheading"
-              class="form-input"
-              placeholder="e.g., Limited time offer"
-              maxlength="150">
-          </div>
-
-          <!-- Call to Action -->
-          <div class="form-section">
-            <h3 class="section-title">Call to Action</h3>
-
+          <form [formGroup]="contentForm" class="card-form">
             <div class="form-group">
-              <label for="ctaType" class="form-label">Action Type *</label>
-              <select id="ctaType" formControlName="ctaType" class="form-select">
-                @for (cta of ctaTypes; track cta.value) {
-                  <option [value]="cta.value">{{ cta.label }}</option>
+              <label for="headline" class="form-label">Headline *</label>
+              <input type="text" id="headline" formControlName="headline" class="form-input" placeholder="e.g., Taste Summer at Our Restaurant" maxlength="100">
+              <span class="form-hint">Make it catchy and attention-grabbing</span>
+            </div>
+            <div class="form-group">
+              <label for="adDescription" class="form-label">Description *</label>
+              <textarea id="adDescription" formControlName="description" class="form-textarea" placeholder="Fresh seasonal ingredients, expertly crafted dishes..." maxlength="300" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="subheading" class="form-label">Subheading <span class="opt">(Optional)</span></label>
+              <input type="text" id="subheading" formControlName="subheading" class="form-input" placeholder="e.g., Limited time offer" maxlength="150">
+            </div>
+            <div class="form-section">
+              <h3 class="sec-title">Call to Action</h3>
+              <div class="form-group">
+                <label for="ctaType" class="form-label">Action Type *</label>
+                <select id="ctaType" formControlName="ctaType" class="form-select">
+                  @for (cta of ctaTypes; track cta.value) {
+                    <option [value]="cta.value">{{ cta.label }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ctaText" class="form-label">Button Text *</label>
+                <input type="text" id="ctaText" formControlName="ctaText" class="form-input" placeholder="Book Now">
+              </div>
+              @if (contentForm.get('ctaType')?.value === 'visit_website') {
+                <div class="form-group">
+                  <label for="ctaUrl" class="form-label">Website URL</label>
+                  <input type="url" id="ctaUrl" formControlName="ctaUrl" class="form-input" placeholder="https://your-website.com">
+                </div>
+              }
+              @if (contentForm.get('ctaType')?.value === 'call_now') {
+                <div class="form-group">
+                  <label for="ctaPhone" class="form-label">Phone Number</label>
+                  <input type="tel" id="ctaPhone" formControlName="ctaPhone" class="form-input" placeholder="+1 (555) 123-4567">
+                </div>
+              }
+              @if (contentForm.get('ctaType')?.value === 'email_now') {
+                <div class="form-group">
+                  <label for="ctaEmail" class="form-label">Email Address</label>
+                  <input type="email" id="ctaEmail" formControlName="ctaEmail" class="form-input" placeholder="contact@restaurant.com">
+                </div>
+              }
+            </div>
+            <div class="form-section">
+              <h3 class="sec-title">Images & Videos</h3>
+              <div class="upload-grid">
+                <div class="upload-zone">
+                  <div class="upload-placeholder">
+                    <lucide-icon [img]="Image" [size]="36" class="upload-ico"></lucide-icon>
+                    <h4>Upload Images</h4>
+                    <p>Add photos that showcase your business</p>
+                    <label class="upload-label">
+                      <input type="file" accept="image/*" multiple class="upload-input" (change)="onImageUpload($event)">
+                      <span class="upload-btn">Choose Images</span>
+                    </label>
+                  </div>
+                  @if (uploadedImages().length > 0) {
+                    <div class="uploaded-grid">
+                      @for (image of uploadedImages(); track image.id) {
+                        <div class="uploaded-item">
+                          <img [src]="image.url" [alt]="image.name" class="up-preview">
+                          <button type="button" class="up-remove" (click)="removeImage(image.id)" title="Remove image">
+                            <lucide-icon [img]="X" [size]="12"></lucide-icon>
+                          </button>
+                          <span class="up-name">{{ image.name }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+                <div class="upload-zone">
+                  <div class="upload-placeholder">
+                    <lucide-icon [img]="Video" [size]="36" class="upload-ico"></lucide-icon>
+                    <h4>Upload Videos</h4>
+                    <p>Add videos to make your ad more engaging</p>
+                    <label class="upload-label">
+                      <input type="file" accept="video/*" multiple class="upload-input" (change)="onVideoUpload($event)">
+                      <span class="upload-btn">Choose Videos</span>
+                    </label>
+                  </div>
+                  @if (uploadedVideos().length > 0) {
+                    <div class="uploaded-grid">
+                      @for (video of uploadedVideos(); track video.id) {
+                        <div class="uploaded-item">
+                          <video [src]="video.url" class="up-preview" controls></video>
+                          <button type="button" class="up-remove" (click)="removeVideo(video.id)" title="Remove video">
+                            <lucide-icon [img]="X" [size]="12"></lucide-icon>
+                          </button>
+                          <span class="up-name">{{ video.name }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      }
+
+      <!-- Step 5: Budget & Pricing -->
+      @if (currentStep() === 5) {
+        <div class="form-card">
+          <div class="card-head">
+            <h2 class="card-title">Budget & Pricing</h2>
+            <p class="card-desc">Set your advertising budget and payment preferences</p>
+          </div>
+          <form [formGroup]="budgetForm" class="card-form">
+            <div class="info-box">
+              <div class="info-body">
+                <h3>Budget Recommendations</h3>
+                <p>Start with a modest budget and increase based on performance. Minimum spend is ${{ selectedAdType()?.minBudget || 5 }}/day for {{ selectedAdType()?.label || 'this' }} ads.</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="currency" class="form-label">Currency *</label>
+              <select id="currency" formControlName="currency" class="form-select">
+                @for (currency of currencies; track currency.value) {
+                  <option [value]="currency.value">{{ currency.symbol }} {{ currency.label }}</option>
                 }
               </select>
             </div>
-
-            <div class="form-group">
-              <label for="ctaText" class="form-label">Button Text *</label>
-              <input
-                type="text"
-                id="ctaText"
-                formControlName="ctaText"
-                class="form-input"
-                placeholder="Book Now">
-            </div>
-
-            <!-- Conditional CTA fields -->
-            @if (contentForm.get('ctaType')?.value === 'visit_website') {
+            <div class="form-row">
               <div class="form-group">
-                <label for="ctaUrl" class="form-label">Website URL</label>
-                <input
-                  type="url"
-                  id="ctaUrl"
-                  formControlName="ctaUrl"
-                  class="form-input"
-                  placeholder="https://your-website.com">
-              </div>
-            }
-
-            @if (contentForm.get('ctaType')?.value === 'call_now') {
-              <div class="form-group">
-                <label for="ctaPhone" class="form-label">Phone Number</label>
-                <input
-                  type="tel"
-                  id="ctaPhone"
-                  formControlName="ctaPhone"
-                  class="form-input"
-                  placeholder="+1 (555) 123-4567">
-              </div>
-            }
-
-            @if (contentForm.get('ctaType')?.value === 'email_now') {
-              <div class="form-group">
-                <label for="ctaEmail" class="form-label">Email Address</label>
-                <input
-                  type="email"
-                  id="ctaEmail"
-                  formControlName="ctaEmail"
-                  class="form-input"
-                  placeholder="contact@restaurant.com">
-              </div>
-            }
-          </div>
-
-          <!-- Media Upload -->
-          <div class="form-section">
-            <h3 class="section-title">Images & Videos</h3>
-
-            <div class="upload-section">
-              <div class="upload-area">
-                <div class="upload-placeholder">
-                  <span class="upload-icon">📸</span>
-                  <h4>Upload Images</h4>
-                  <p>Add photos that showcase your business</p>
-                  <label class="upload-label">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      class="upload-input"
-                      title="Choose images to upload"
-                      (change)="onImageUpload($event)">
-                    <span class="upload-btn">Choose Images</span>
-                  </label>
+                <label for="totalBudget" class="form-label">Total Campaign Budget *</label>
+                <div class="input-symbol">
+                  <span class="isym">$</span>
+                  <input type="number" id="totalBudget" formControlName="totalBudget" class="form-input inp-sym" min="5" step="5" placeholder="100">
                 </div>
-
-                <!-- Display uploaded images -->
-                @if (uploadedImages().length > 0) {
-                  <div class="uploaded-media-grid">
-                    @for (image of uploadedImages(); track image.id) {
-                      <div class="uploaded-media-item">
-                        <img [src]="image.url" [alt]="image.name" class="uploaded-preview">
-                        <button type="button" class="remove-media-btn" (click)="removeImage(image.id)" title="Remove image">✕</button>
-                        <span class="media-name">{{ image.name }}</span>
-                      </div>
-                    }
-                  </div>
-                }
+                <span class="form-hint">Total amount you want to spend on this campaign</span>
               </div>
-
-              <div class="upload-area">
-                <div class="upload-placeholder">
-                  <span class="upload-icon">🎥</span>
-                  <h4>Upload Videos</h4>
-                  <p>Add videos to make your ad more engaging</p>
-                  <label class="upload-label">
-                    <input
-                      type="file"
-                      accept="video/*"
-                      multiple
-                      class="upload-input"
-                      title="Choose videos to upload"
-                      (change)="onVideoUpload($event)">
-                    <span class="upload-btn">Choose Videos</span>
-                  </label>
+              <div class="form-group">
+                <label for="dailyBudget" class="form-label">Daily Budget *</label>
+                <div class="input-symbol">
+                  <span class="isym">$</span>
+                  <input type="number" id="dailyBudget" formControlName="dailyBudget" class="form-input inp-sym" min="5" step="1" placeholder="10">
                 </div>
-
-                <!-- Display uploaded videos -->
-                @if (uploadedVideos().length > 0) {
-                  <div class="uploaded-media-grid">
-                    @for (video of uploadedVideos(); track video.id) {
-                      <div class="uploaded-media-item">
-                        <video [src]="video.url" class="uploaded-preview" controls></video>
-                        <button type="button" class="remove-media-btn" (click)="removeVideo(video.id)" title="Remove video">✕</button>
-                        <span class="media-name">{{ video.name }}</span>
-                      </div>
-                    }
-                  </div>
-                }
+                <span class="form-hint">Maximum amount to spend per day</span>
               </div>
             </div>
-          </div>
-        </form>
-      </div>
-    }
-
-    <!-- Step 5: Budget & Pricing -->
-    @if (currentStep() === 5) {
-      <div class="step-panel" id="budget-panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Budget & Pricing</h2>
-          <p class="panel-description">Set your advertising budget and payment preferences</p>
-        </div>
-
-        <form [formGroup]="budgetForm" class="step-form">
-          <div class="budget-info-card">
-            <div class="info-icon">💡</div>
-            <div class="info-content">
-              <h3>Budget Recommendations</h3>
-              <p>Start with a modest budget and increase based on performance. Minimum spend is ${{ selectedAdType()?.minBudget || 5 }}/day for {{ selectedAdType()?.label || 'this' }} ads.</p>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="currency" class="form-label">Currency *</label>
-            <select id="currency" formControlName="currency" class="form-select">
-              @for (currency of currencies; track currency.value) {
-                <option [value]="currency.value">{{ currency.symbol }} {{ currency.label }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="totalBudget" class="form-label">Total Campaign Budget *</label>
-            <div class="budget-input-group">
-              <span class="budget-symbol">$</span>
-              <input
-                type="number"
-                id="totalBudget"
-                formControlName="totalBudget"
-                class="form-input budget-input"
-                min="5"
-                step="5"
-                placeholder="100">
-            </div>
-            <div class="form-help">Total amount you want to spend on this campaign</div>
-          </div>
-
-          <div class="form-group">
-            <label for="dailyBudget" class="form-label">Daily Budget *</label>
-            <div class="budget-input-group">
-              <span class="budget-symbol">$</span>
-              <input
-                type="number"
-                id="dailyBudget"
-                formControlName="dailyBudget"
-                class="form-input budget-input"
-                min="5"
-                step="1"
-                placeholder="10">
-            </div>
-            <div class="form-help">Maximum amount to spend per day</div>
-          </div>
-
-          <div class="form-group">
-            <label for="billingCycle" class="form-label">Billing Cycle *</label>
-            <select id="billingCycle" formControlName="billingCycle" class="form-select">
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-          </div>
-
-          <!-- Budget Breakdown -->
-          <div class="budget-breakdown">
-            <h3 class="breakdown-title">Budget Breakdown</h3>
-            <div class="breakdown-item">
-              <span class="breakdown-label">Total Budget:</span>
-              <span class="breakdown-value">${{ budgetForm.get('totalBudget')?.value || 0 }}</span>
-            </div>
-            <div class="breakdown-item">
-              <span class="breakdown-label">Daily Spend:</span>
-              <span class="breakdown-value">${{ budgetForm.get('dailyBudget')?.value || 0 }}</span>
-            </div>
-            <div class="breakdown-item">
-              <span class="breakdown-label">Estimated Duration:</span>
-              <span class="breakdown-value">
-                {{ Math.ceil((budgetForm.get('totalBudget')?.value || 0) / (budgetForm.get('dailyBudget')?.value || 1)) }} days
-              </span>
-            </div>
-          </div>
-        </form>
-      </div>
-    }
-
-    <!-- Step 6: Schedule & Launch -->
-    @if (currentStep() === 6) {
-      <div class="step-panel" id="schedule-panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Schedule & Launch</h2>
-          <p class="panel-description">Choose when your campaign should run</p>
-        </div>
-
-        <form [formGroup]="scheduleForm" class="step-form">
-          <div class="form-group">
-            <label for="startDate" class="form-label">Start Date *</label>
-            <input
-              type="date"
-              id="startDate"
-              formControlName="startDate"
-              [min]="getTodayDate()"
-              class="form-input">
-            <div class="form-help">When should your campaign begin?</div>
-          </div>
-
-          <div class="form-group">
-            <label class="checkbox-item">
-              <input
-                type="checkbox"
-                formControlName="runContinuously"
-                class="checkbox-input">
-              <span class="checkbox-label">Run campaign continuously</span>
-            </label>
-            <div class="form-help">Campaign will run until you pause it or budget is exhausted</div>
-          </div>
-
-          @if (!scheduleForm.get('runContinuously')?.value) {
             <div class="form-group">
-              <label for="endDate" class="form-label">End Date</label>
-              <input
-                type="date"
-                id="endDate"
-                formControlName="endDate"
-                [min]="scheduleForm.get('startDate')?.value || getTodayDate()"
-                class="form-input">
-              <div class="form-help">Leave empty to run until budget is exhausted</div>
+              <label for="billingCycle" class="form-label">Billing Cycle *</label>
+              <select id="billingCycle" formControlName="billingCycle" class="form-select">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
             </div>
-          }
+            <div class="budget-breakdown">
+              <h3 class="bb-title">Budget Breakdown</h3>
+              <div class="bb-row"><span>Total Budget:</span><strong>${{ budgetForm.get('totalBudget')?.value || 0 }}</strong></div>
+              <div class="bb-row"><span>Daily Spend:</span><strong>${{ budgetForm.get('dailyBudget')?.value || 0 }}</strong></div>
+              <div class="bb-row"><span>Estimated Duration:</span><strong>{{ Math.ceil((budgetForm.get('totalBudget')?.value || 0) / (budgetForm.get('dailyBudget')?.value || 1)) }} days</strong></div>
+            </div>
+          </form>
+        </div>
+      }
 
-          <div class="form-group">
-            <label for="timezone" class="form-label">Timezone *</label>
-            <select id="timezone" formControlName="timezone" class="form-select">
-              <option value="UTC">UTC (Coordinated Universal Time)</option>
-              <option value="EAT">EAT (East Africa Time)</option>
-              <option value="EST">EST (Eastern Standard Time)</option>
-              <option value="PST">PST (Pacific Standard Time)</option>
-              <option value="GMT">GMT (Greenwich Mean Time)</option>
-            </select>
+      <!-- Step 6: Schedule & Launch -->
+      @if (currentStep() === 6) {
+        <div class="form-card">
+          <div class="card-head">
+            <h2 class="card-title">Schedule & Launch</h2>
+            <p class="card-desc">Choose when your campaign should run</p>
           </div>
-
-          <!-- Campaign Summary -->
-          <div class="campaign-summary">
-            <h3 class="summary-title">Campaign Summary</h3>
-            <div class="summary-grid">
-              <div class="summary-item">
-                <span class="summary-label">Campaign Name:</span>
-                <span class="summary-value">{{ basicInfoForm.get('title')?.value || 'Untitled Campaign' }}</span>
+          <form [formGroup]="scheduleForm" class="card-form">
+            <div class="form-group">
+              <label for="startDate" class="form-label">Start Date *</label>
+              <input type="date" id="startDate" formControlName="startDate" [min]="getTodayDate()" class="form-input">
+              <span class="form-hint">When should your campaign begin?</span>
+            </div>
+            <div class="form-group">
+              <label class="chip" [class.selected]="scheduleForm.get('runContinuously')?.value">
+                <input type="checkbox" formControlName="runContinuously" class="chip-input" hidden>
+                @if (scheduleForm.get('runContinuously')?.value) { <lucide-icon [img]="Check" [size]="14"></lucide-icon> }
+                Run campaign continuously
+              </label>
+              <span class="form-hint">Campaign will run until you pause it or budget is exhausted</span>
+            </div>
+            @if (!scheduleForm.get('runContinuously')?.value) {
+              <div class="form-group">
+                <label for="endDate" class="form-label">End Date</label>
+                <input type="date" id="endDate" formControlName="endDate" [min]="scheduleForm.get('startDate')?.value || getTodayDate()" class="form-input">
+                <span class="form-hint">Leave empty to run until budget is exhausted</span>
               </div>
-              <div class="summary-item">
-                <span class="summary-label">Ad Type:</span>
-                <span class="summary-value">{{ selectedAdType()?.label || 'Not selected' }}</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label">Total Budget:</span>
-                <span class="summary-value">${{ budgetForm.get('totalBudget')?.value || 0 }}</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label">Daily Budget:</span>
-                <span class="summary-value">${{ budgetForm.get('dailyBudget')?.value || 0 }}</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label">Target Countries:</span>
-                <span class="summary-value">{{ (targetingForm.get('countries')?.value || []).join(', ') || 'Not selected' }}</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label">Start Date:</span>
-                <span class="summary-value">{{ scheduleForm.get('startDate')?.value || 'Not set' }}</span>
+            }
+            <div class="form-group">
+              <label for="timezone" class="form-label">Timezone *</label>
+              <select id="timezone" formControlName="timezone" class="form-select">
+                <option value="UTC">UTC (Coordinated Universal Time)</option>
+                <option value="EAT">EAT (East Africa Time)</option>
+                <option value="EST">EST (Eastern Standard Time)</option>
+                <option value="PST">PST (Pacific Standard Time)</option>
+                <option value="GMT">GMT (Greenwich Mean Time)</option>
+              </select>
+            </div>
+            <div class="summary-card">
+              <h3 class="summary-title">Campaign Summary</h3>
+              <div class="summary-grid">
+                <div class="si"><span class="si-label">Campaign Name:</span><span class="si-val">{{ basicInfoForm.get('title')?.value || 'Untitled Campaign' }}</span></div>
+                <div class="si"><span class="si-label">Ad Type:</span><span class="si-val">{{ selectedAdType()?.label || 'Not selected' }}</span></div>
+                <div class="si"><span class="si-label">Total Budget:</span><span class="si-val">${{ budgetForm.get('totalBudget')?.value || 0 }}</span></div>
+                <div class="si"><span class="si-label">Daily Budget:</span><span class="si-val">${{ budgetForm.get('dailyBudget')?.value || 0 }}</span></div>
+                <div class="si"><span class="si-label">Target Countries:</span><span class="si-val">{{ (targetingForm.get('countries')?.value || []).join(', ') || 'Not selected' }}</span></div>
+                <div class="si"><span class="si-label">Start Date:</span><span class="si-val">{{ scheduleForm.get('startDate')?.value || 'Not set' }}</span></div>
               </div>
             </div>
-          </div>
-        </form>
-      </div>
-    }
-  </div>
+          </form>
+        </div>
+      }
+    </div>
+  </section>
 
   <!-- Navigation Footer -->
-  <footer class="navigation-footer">
-    <div class="footer-content">
-      <div class="nav-buttons">
+  <section class="section ad-footer">
+    <div class="section-inner">
+      <div class="nav-row">
         @if (currentStep() > 1) {
-          <button
-            type="button"
-            class="btn-secondary prev-btn"
-            (click)="previousStep()">
-            ← Previous
+          <button type="button" class="btn btn-secondary" (click)="previousStep()">
+            <lucide-icon [img]="ChevronLeft" [size]="16"></lucide-icon>
+            Previous
           </button>
         }
-
         @if (currentStep() < totalSteps()) {
-          <button
-            type="button"
-            class="btn-primary next-btn"
-            [disabled]="!canProceedToNext()"
-            (click)="nextStep()">
-            Next →
+          <button type="button" class="btn btn-primary" [disabled]="!canProceedToNext()" (click)="nextStep()" style="margin-left: auto;">
+            Next
+            <lucide-icon [img]="ChevronRight" [size]="16"></lucide-icon>
           </button>
         }
-
         @if (currentStep() === totalSteps()) {
-          <button
-            type="button"
-            class="btn-primary launch-btn"
-            [disabled]="!canProceedToNext() || isSubmitting()"
-            (click)="submitCampaign()">
+          <button type="button" class="btn btn-primary launch-btn" [disabled]="!canProceedToNext() || isSubmitting()" (click)="submitCampaign()" style="margin-left: auto;">
             @if (isSubmitting()) {
-              <span class="loading-spinner"></span>
-              {{ isEditMode() ? 'Updating Campaign...' : 'Creating Campaign...' }}
+              <span class="btn-spinner"></span>
+              {{ isEditMode() ? 'Updating...' : 'Creating...' }}
             } @else {
               <lucide-icon [img]="isEditMode() ? Edit : Rocket" [size]="16"></lucide-icon>
               {{ isEditMode() ? 'Update Campaign' : 'Launch Campaign' }}
@@ -812,10 +528,8 @@
           </button>
         }
       </div>
-
-      <!-- Validation Errors -->
       @if (!canProceedToNext() && (stepValidation()[currentStep()].errors.length || 0) > 0) {
-        <div class="validation-errors">
+        <div class="validation-box">
           <h4>Please fix the following issues:</h4>
           <ul>
             @for (error of stepValidation()[currentStep()].errors || []; track error) {
@@ -825,5 +539,5 @@
         </div>
       }
     </div>
-  </footer>
+  </section>
 </div>

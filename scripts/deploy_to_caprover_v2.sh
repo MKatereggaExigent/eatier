@@ -9,8 +9,8 @@ set -e
 # Configuration
 CAPROVER_NAME="aidoc-server"
 CAPROVER_APP="itiyum"
-BACKEND_HOST="itiyum-backend"
-BACKEND_PORT="3001"
+BACKEND_HOST="172.17.0.1"
+BACKEND_PORT="3002"
 
 echo ""
 echo "🚀 Itiyum CapRover Frontend Deployment"
@@ -48,6 +48,8 @@ cat > nginx.conf << EOF
 server {
     listen 80;
     server_name localhost;
+
+    client_max_body_size 50m;
 
     root /usr/share/nginx/html;
     index index.html index.htm;

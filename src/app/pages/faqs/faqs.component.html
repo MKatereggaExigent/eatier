@@ -1,246 +1,182 @@
 <div class="faqs-page" role="main" aria-label="Frequently Asked Questions">
-  <!-- Header Section -->
-  <header class="faqs-header">
-    <div class="header-content">
-      <div class="title-section">
-        <h1 class="page-title">
-          <span class="title-icon">
-            <lucide-icon [img]="HelpCircle" [size]="36"></lucide-icon>
-          </span>
-          Frequently Asked Questions
-        </h1>
-        <p class="page-subtitle">
-          Find answers to common questions about using <span class="itiyum-brand">Itiyum</span>
-        </p>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-label">FAQ</span>
+      <h1 class="hero-title">Frequently Asked Questions</h1>
+      <p class="hero-subtitle">Find answers to common questions about using <strong>Itiyum</strong></p>
+
+      <div class="search-bar">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search FAQs..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="searchQuery.set($event)"
+          aria-label="Search frequently asked questions">
+        @if (searchQuery()) {
+          <button type="button" class="clear-search" (click)="clearSearch()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        }
       </div>
-      <div class="header-stats">
+    </div>
+
+    <div class="hero-stats">
+      <div class="stats-bar">
         <div class="stat-item">
-          <span class="stat-number">{{ faqStats().totalFAQs }}</span>
+          <span class="stat-value">{{ faqStats().totalFAQs }}</span>
           <span class="stat-label">FAQs</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">{{ faqStats().totalCategories }}</span>
+          <span class="stat-value">{{ faqStats().totalCategories }}</span>
           <span class="stat-label">Categories</span>
         </div>
       </div>
     </div>
-  </header>
+  </section>
 
-  <!-- Search and Filter Section -->
-  <section class="search-section" aria-label="Search and Filter FAQs">
-    <div class="search-container">
-      <div class="search-box">
-        <input
-          type="text"
-          placeholder="Search FAQs..."
-          [(ngModel)]="searchQuery"
-          (ngModelChange)="searchQuery.set($event)"
-          class="search-input"
-          aria-label="Search frequently asked questions">
-        <span class="search-icon">
-          <lucide-icon [img]="Search" [size]="20"></lucide-icon>
-        </span>
-      </div>
-
-      <div class="filter-section">
-        <div class="category-filters">
-          <button
-            type="button"
-            class="category-filter"
-            [class.active]="selectedCategory() === 'all'"
-            (click)="selectedCategory.set('all')"
-            aria-label="Show all categories">
-            <span class="filter-icon">
-              <lucide-icon [img]="ClipboardList" [size]="18"></lucide-icon>
-            </span>
-            <span class="filter-text">All</span>
-          </button>
-
-          @for (category of faqCategories(); track category.id) {
-            <button
-              type="button"
-              class="category-filter"
-              [class.active]="selectedCategory() === category.id"
-              [class]="category.color"
-              (click)="selectedCategory.set(category.id)"
-              [attr.aria-label]="'Filter by ' + category.name">
-              <span class="filter-icon">
-                <lucide-icon [img]="getCategoryIcon(category.icon)" [size]="18"></lucide-icon>
-              </span>
-              <span class="filter-text">{{ category.name }}</span>
-            </button>
-          }
-        </div>
-
-        @if (searchQuery() || selectedCategory() !== 'all') {
-          <button
-            type="button"
-            class="clear-filters-btn"
-            (click)="clearSearch()"
-            aria-label="Clear all filters">
-            Clear Filters
+  <!-- Category Filters -->
+  <section class="filters-bar">
+    <div class="filters-inner">
+      <div class="category-filters">
+        <button type="button" class="filter-btn" [class.active]="selectedCategory() === 'all'" (click)="selectedCategory.set('all')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          All
+        </button>
+        @for (category of faqCategories(); track category.id) {
+          <button type="button" class="filter-btn" [class.active]="selectedCategory() === category.id" (click)="selectedCategory.set(category.id)">
+            <lucide-icon [img]="getCategoryIcon(category.icon)" [size]="14"></lucide-icon>
+            {{ category.name }}
           </button>
         }
       </div>
+      @if (searchQuery() || selectedCategory() !== 'all') {
+        <button type="button" class="clear-filters" (click)="clearSearch()">Clear Filters</button>
+      }
     </div>
   </section>
 
-  <!-- FAQ Categories Overview -->
+  <!-- Categories Overview -->
   @if (selectedCategory() === 'all' && !searchQuery()) {
-    <section class="categories-overview" aria-label="FAQ Categories">
-      <div class="categories-grid">
-        @for (category of faqCategories(); track category.id) {
-          <div class="category-card" [class]="category.color">
-            <div class="category-header">
-              <div class="category-icon">
-                <lucide-icon [img]="getCategoryIcon(category.icon)" [size]="28"></lucide-icon>
+    <section class="categories-section">
+      <div class="section-inner">
+        <div class="section-header">
+          <span class="tag">Browse Topics</span>
+          <h2 class="section-title">Explore by Category</h2>
+        </div>
+        <div class="categories-grid">
+          @for (category of faqCategories(); track category.id) {
+            <div class="card category-card" (click)="selectedCategory.set(category.id)">
+              <div class="category-icon" style="background: #8FC9A3;">
+                <lucide-icon [img]="getCategoryIcon(category.icon)" [size]="22"></lucide-icon>
               </div>
-              <div class="category-info">
-                <h3 class="category-name">{{ category.name }}</h3>
-                <p class="category-description">{{ category.description }}</p>
+              <h3>{{ category.name }}</h3>
+              <p>{{ category.description }}</p>
+              <div class="category-footer">
+                <span class="count">{{ category.faqs.length }} {{ category.faqs.length === 1 ? 'FAQ' : 'FAQs' }}</span>
+                <span class="view-link">View &rarr;</span>
               </div>
             </div>
-            <div class="category-stats">
-              <span class="faq-count">{{ category.faqs.length }} FAQs</span>
-              <button
-                type="button"
-                class="view-category-btn"
-                (click)="selectedCategory.set(category.id)"
-                [attr.aria-label]="'View ' + category.name + ' FAQs'">
-                View FAQs →
-              </button>
-            </div>
-          </div>
-        }
+          }
+        </div>
       </div>
     </section>
   }
 
   <!-- FAQ Results -->
-  <section class="faqs-results" aria-label="FAQ Results">
-    @if (filteredFAQs().length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">
-          <lucide-icon [img]="Search" [size]="48"></lucide-icon>
+  <section class="faqs-results">
+    <div class="section-inner">
+      @if (filteredFAQs().length === 0) {
+        <div class="empty-state card">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <h3>No FAQs found</h3>
+          @if (searchQuery()) {
+            <p>No results for "{{ searchQuery() }}". Try different keywords or browse categories.</p>
+          } @else {
+            <p>No FAQs available in this category.</p>
+          }
+          <button type="button" class="btn-outline" (click)="clearSearch()">Clear Search</button>
         </div>
-        <h3>No FAQs found</h3>
-        @if (searchQuery()) {
-          <p>No results found for "{{ searchQuery() }}". Try different keywords or browse categories.</p>
-        } @else {
-          <p>No FAQs available in this category.</p>
-        }
-        <button type="button" class="btn-secondary" (click)="clearSearch()">
-          Clear Search
-        </button>
-      </div>
-    } @else {
-      <div class="faqs-list">
-        @for (faq of filteredFAQs(); track faq.id) {
-          <article class="faq-item" [class.expanded]="isFAQExpanded(faq.id)">
-            <button
-              type="button"
-              class="faq-question"
-              (click)="toggleFAQ(faq.id)"
-              [attr.aria-expanded]="isFAQExpanded(faq.id)"
-              [attr.aria-controls]="'faq-answer-' + faq.id">
-              <span class="question-text">{{ faq.question }}</span>
-              <span class="expand-icon" [class.rotated]="isFAQExpanded(faq.id)">▼</span>
-            </button>
-
-            <div
-              class="faq-answer"
-              [id]="'faq-answer-' + faq.id"
-              [attr.aria-hidden]="!isFAQExpanded(faq.id)">
-              <div class="answer-content">
-                <div class="answer-text" [innerHTML]="faq.answer"></div>
-
-                <div class="faq-meta">
-                  <div class="faq-tags">
-                    @for (tag of faq.tags; track tag) {
-                      <span class="tag">{{ tag }}</span>
-                    }
-                  </div>
-
-                  <div class="faq-stats">
-                    <span class="last-updated">
-                      Updated {{ formatDate(faq.lastUpdated) }}
-                    </span>
-                    <span class="helpfulness">
-                      {{ getHelpfulnessPercentage(faq) }}% found helpful
-                    </span>
-                  </div>
-                </div>
-
-                <div class="faq-actions">
-                  <div class="helpful-section">
-                    <span class="helpful-label">Was this helpful?</span>
-                    <div class="helpful-buttons">
-                      <button
-                        type="button"
-                        class="helpful-btn yes"
-                        (click)="markHelpful(faq, true)"
-                        aria-label="Mark as helpful">
-                        <lucide-icon [img]="ThumbsUp" [size]="16"></lucide-icon> Yes
-                      </button>
-                      <button
-                        type="button"
-                        class="helpful-btn no"
-                        (click)="markHelpful(faq, false)"
-                        aria-label="Mark as not helpful">
-                        <lucide-icon [img]="ThumbsDown" [size]="16"></lucide-icon> No
-                      </button>
+      } @else {
+        <div class="faqs-list">
+          @for (faq of filteredFAQs(); track faq.id; let i = $index) {
+            <article class="faq-item card" [class.expanded]="isFAQExpanded(faq.id)" [style.animation-delay]="i * 0.04 + 's'">
+              <button type="button" class="faq-question" (click)="toggleFAQ(faq.id)" [attr.aria-expanded]="isFAQExpanded(faq.id)" [attr.aria-controls]="'faq-answer-' + faq.id">
+                <span class="question-text">{{ faq.question }}</span>
+                <svg class="chevron" [class.rotated]="isFAQExpanded(faq.id)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="faq-answer" [id]="'faq-answer-' + faq.id" [attr.aria-hidden]="!isFAQExpanded(faq.id)">
+                <div class="answer-inner">
+                  <div class="answer-text" [innerHTML]="faq.answer"></div>
+                  <div class="faq-meta">
+                    <div class="tags">
+                      @for (tag of faq.tags; track tag) {
+                        <span class="tag-chip">{{ tag }}</span>
+                      }
+                    </div>
+                    <div class="meta-right">
+                      <span>Updated {{ formatDate(faq.lastUpdated) }}</span>
+                      <span class="helpful-pct">{{ getHelpfulnessPercentage(faq) }}% found helpful</span>
                     </div>
                   </div>
-
-                  <button
-                    type="button"
-                    class="feedback-btn"
-                    (click)="openFeedbackModal(faq)"
-                    aria-label="Provide feedback on this FAQ">
-                    <lucide-icon [img]="MessageCircle" [size]="16"></lucide-icon> Feedback
-                  </button>
+                  <div class="faq-actions">
+                    <div class="helpful-group">
+                      <span class="helpful-label">Was this helpful?</span>
+                      <button type="button" class="helpful-btn" (click)="markHelpful(faq, true)" aria-label="Mark as helpful">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+                        Yes
+                      </button>
+                      <button type="button" class="helpful-btn" (click)="markHelpful(faq, false)" aria-label="Mark as not helpful">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z"/></svg>
+                        No
+                      </button>
+                    </div>
+                    <button type="button" class="feedback-btn" (click)="openFeedbackModal(faq)" aria-label="Provide feedback">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      Feedback
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </article>
-        }
-      </div>
-    }
+            </article>
+          }
+        </div>
+      }
+    </div>
   </section>
 
-  <!-- Contact Support Section -->
-  <section class="contact-support" aria-label="Contact Support">
-    <div class="support-card">
-      <div class="support-content">
+  <!-- Contact Support -->
+  <section class="contact-section">
+    <div class="section-inner">
+      <div class="card contact-card">
         <h3>Still need help?</h3>
         <p>Can't find what you're looking for? Our support team is here to help!</p>
-        <div class="support-actions">
-          <a href="/help" class="btn-primary" routerLink="/help">
-            <span class="btn-icon">
-              <lucide-icon [img]="MessageCircle" [size]="18"></lucide-icon>
-            </span>
+        <div class="contact-actions">
+          <a routerLink="/help" class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             Contact Support
           </a>
-          <a href="/feedback" class="btn-secondary" routerLink="/feedback">
-            <span class="btn-icon">
-              <lucide-icon [img]="FileText" [size]="18"></lucide-icon>
-            </span>
+          <a routerLink="/feedback" class="btn-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             Send Feedback
           </a>
         </div>
-      </div>
-      <div class="support-stats">
-        <div class="stat-item">
-          <span class="stat-icon">
-            <lucide-icon [img]="Zap" [size]="20"></lucide-icon>
-          </span>
-          <span class="stat-text">Average response time: 2 hours</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">
-            <lucide-icon [img]="Target" [size]="20"></lucide-icon>
-          </span>
-          <span class="stat-text">98% satisfaction rate</span>
+        <div class="contact-metrics">
+          <div class="metric">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Avg response: 2 hours
+          </div>
+          <div class="metric">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            98% satisfaction rate
+          </div>
         </div>
       </div>
     </div>
@@ -253,21 +189,15 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Provide Feedback</h3>
-        <button type="button" class="modal-close" (click)="closeFeedbackModal()">×</button>
+        <button type="button" class="modal-close" (click)="closeFeedbackModal()">&times;</button>
       </div>
       <div class="modal-body">
         <p><strong>FAQ:</strong> {{ selectedFAQForFeedback()?.question }}</p>
-        <textarea
-          placeholder="How can we improve this FAQ? Your feedback helps us provide better answers."
-          rows="4"
-          class="feedback-textarea"
-          #feedbackText></textarea>
+        <textarea placeholder="How can we improve this FAQ?" rows="4" #feedbackText></textarea>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn-secondary" (click)="closeFeedbackModal()">Cancel</button>
-        <button type="button" class="btn-primary" (click)="submitFeedback(feedbackText.value)">
-          Submit Feedback
-        </button>
+        <button type="button" class="btn-outline" (click)="closeFeedbackModal()">Cancel</button>
+        <button type="button" class="btn-primary" (click)="submitFeedback(feedbackText.value)">Submit Feedback</button>
       </div>
     </div>
   </div>

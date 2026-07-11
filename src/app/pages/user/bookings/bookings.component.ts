@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subject, of } from 'rxjs';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { LucideAngularModule, Calendar, Clock, Users, X, Search } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
 
@@ -37,7 +38,7 @@ interface Booking {
 @Component({
   selector: 'app-bookings',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule],
   templateUrl: './bookings.component.html',
   styleUrls: ['./bookings.component.scss']
 })
@@ -47,6 +48,12 @@ export class BookingsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   currentUser = this.authService.currentUser;
+
+  readonly Calendar = Calendar;
+  readonly Clock = Clock;
+  readonly Users = Users;
+  readonly X = X;
+  readonly Search = Search;
 
   // State
   bookings = signal<Booking[]>([]);

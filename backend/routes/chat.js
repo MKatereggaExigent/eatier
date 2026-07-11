@@ -75,10 +75,14 @@ router.post('/public', rateLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Invalid message' });
     }
 
+    // Get conversation history for follow-up context (sent from frontend)
+    const conversationHistory = req.body.conversationHistory || [];
+
     // Generate AI response with PUBLIC context only (no database access)
     const aiResponse = await chatService.generatePublicResponse(
       sanitizedMessage,
-      pageContext || {}
+      pageContext || {},
+      conversationHistory
     );
 
     res.json({

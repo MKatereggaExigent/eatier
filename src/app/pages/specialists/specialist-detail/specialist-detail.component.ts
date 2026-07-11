@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { InsightsService } from '../../../core/services/insights.service';
 import { environment } from '../../../../environments/environment';
+import { LucideAngularModule, AlertTriangle, ArrowLeft, CalendarCheck, Share2, UtensilsCrossed, Users, Clock, Star, PenLine, CheckCircle, X, Calendar, ChevronLeft, ChevronRight } from 'lucide-angular';
 
 interface CalendarDay {
   date: string;
@@ -27,7 +28,7 @@ interface CalendarDay {
 @Component({
   selector: 'app-specialist-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './specialist-detail.component.html',
   styleUrls: ['./specialist-detail.component.scss']
 })
@@ -39,6 +40,23 @@ export class SpecialistDetailComponent implements OnInit {
   private insightsService = inject(InsightsService);
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
+
+  // Lucide Icons
+  readonly AlertTriangle = AlertTriangle;
+  readonly ArrowLeft = ArrowLeft;
+  readonly CalendarCheck = CalendarCheck;
+  readonly Share2 = Share2;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Users = Users;
+  readonly Clock = Clock;
+  readonly Star = Star;
+  readonly PenLine = PenLine;
+  readonly CheckCircle = CheckCircle;
+  readonly X = X;
+  readonly Calendar = Calendar;
+  readonly ChevronLeft = ChevronLeft;
+  readonly ChevronRight = ChevronRight;
+  readonly Math = Math;
 
   specialist = signal<SpecialistDetail | null>(null);
   loading = signal(true);
@@ -347,7 +365,7 @@ export class SpecialistDetailComponent implements OnInit {
   }
 
   getDefaultAvatar(name: string): string {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=4ecdc4&color=fff&size=200`;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=F97316&color=fff&size=200`;
   }
 
   calculatePrice(): number {

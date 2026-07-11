@@ -1,322 +1,312 @@
-<div class="register-container">
-  <div class="register-card">
-    <div class="register-header">
-      <h1>Join <span class="itiyum-brand">Itiyum</span></h1>
-      <p>Create your account and start your culinary journey</p>
+<div class="auth-page">
+  <div class="auth-brand">
+    <div class="brand-bg">
+      <div class="bg-blob bg-blob-1"></div>
+      <div class="bg-blob bg-blob-2"></div>
+      <div class="bg-blob bg-blob-3"></div>
     </div>
-
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form" autocomplete="off">
-      <!-- Error Message -->
-      @if (errorMessage()) {
-        <div class="error-message">
-          <span class="error-icon">⚠️</span>
-          {{ errorMessage() }}
+    <div class="brand-content">
+      <a routerLink="/" class="brand-logo">
+        <img src="assets/images/itiyum-logo.jpeg" alt="Itiyum" />
+      </a>
+      <h2 class="brand-title">Join Itiyum</h2>
+      <p class="brand-subtitle">Create your account and start your culinary journey with thousands of food lovers.</p>
+      <div class="brand-features">
+        <div class="feature-item">
+          <div class="feature-icon" style="background: #F5D760;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M4 16v-2a8 8 0 0 1 8-8h2"/><path d="M18 8h4v4"/><polyline points="14 10 22 2"/><path d="M4 22l6-6"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/></svg></div>
+          <span>List your restaurant</span>
         </div>
-      }
-
-      <!-- Role Selection -->
-      <div class="form-section">
-        <h3>I want to join as:</h3>
-        <div class="role-selection">
-          @for (role of [UserRole.NORMAL_USER, UserRole.BUSINESS, UserRole.FOOD_ENTHUSIAST, UserRole.SPECIALIST]; track role) {
-            <label class="role-option" [class.selected]="selectedRole() === role">
-              <input type="radio" formControlName="role" [value]="role" />
-              <div class="role-content">
-                <span class="role-icon">{{ getRoleIcon(role) }}</span>
-                <div class="role-info">
-                  <h4>{{ role === UserRole.EATIER ? 'Itiyum Admin' :
-                          role === UserRole.BUSINESS ? 'Restaurant Owner' :
-                          role === UserRole.FOOD_ENTHUSIAST ? 'Food Enthusiast' :
-                          role === UserRole.NORMAL_USER ? 'Normal User' : 'Specialist' }}</h4>
-                  <p>{{ getRoleDescription(role) }}</p>
-                </div>
-              </div>
-            </label>
-          }
+        <div class="feature-item">
+          <div class="feature-icon" style="background: #8FC9A3;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <span>Showcase your skills</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" style="background: #FFB88C;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M15 11h.01M8 9h.01M11 5h.01"/><path d="M3 3l18 18"/><path d="M3 3l9 18 9-18z"/></svg></div>
+          <span>Discover new flavours</span>
         </div>
       </div>
+      <a routerLink="/" class="back-home-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Back to Home
+      </a>
+    </div>
+  </div>
 
-      <!-- Personal Information -->
-      <div class="form-section">
-        <h3>Personal Information</h3>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="firstName">First Name *</label>
-            <input
-              id="firstName"
-              type="text"
-              formControlName="firstName"
-              placeholder="Enter your first name"
-              [class.error]="getFieldError('firstName')"
-            />
-            @if (getFieldError('firstName')) {
-              <span class="field-error">{{ getFieldError('firstName') }}</span>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="lastName">Last Name *</label>
-            <input
-              id="lastName"
-              type="text"
-              formControlName="lastName"
-              placeholder="Enter your last name"
-              [class.error]="getFieldError('lastName')"
-            />
-            @if (getFieldError('lastName')) {
-              <span class="field-error">{{ getFieldError('lastName') }}</span>
-            }
-          </div>
+  <div class="auth-form-wrapper">
+    <div class="auth-form-container scrollable">
+      <div class="form-card">
+        <div class="form-header">
+          <h1 class="form-title">Create Account</h1>
+          <p class="form-subtitle">Already have an account? <a routerLink="/login">Sign in</a></p>
         </div>
 
-        <div class="form-group">
-          <label for="email">Email Address *</label>
-          <input
-            id="email"
-            type="email"
-            formControlName="email"
-            placeholder="Enter your email"
-            [class.error]="getFieldError('email')"
-            autocomplete="email"
-          />
-          @if (getFieldError('email')) {
-            <span class="field-error">{{ getFieldError('email') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <input
-            id="phone"
-            type="tel"
-            formControlName="phone"
-            placeholder="Enter your phone number"
-            [class.error]="getFieldError('phone')"
-            autocomplete="tel"
-          />
-          @if (getFieldError('phone')) {
-            <span class="field-error">{{ getFieldError('phone') }}</span>
-          }
-        </div>
-      </div>
-
-      <!-- Role-specific fields -->
-      @if (selectedRole() === UserRole.BUSINESS) {
-        <div class="form-section">
-          <h3>Business Information</h3>
-          <div class="form-group">
-            <label for="businessName">Business Name *</label>
-            <input
-              id="businessName"
-              type="text"
-              formControlName="businessName"
-              placeholder="Enter your restaurant name"
-              [class.error]="getFieldError('businessName')"
-            />
-            @if (getFieldError('businessName')) {
-              <span class="field-error">{{ getFieldError('businessName') }}</span>
-            }
+        @if (errorMessage()) {
+          <div class="error-message">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {{ errorMessage() }}
           </div>
+        }
 
-          <div class="form-group">
-            <label for="businessType">Business Type *</label>
-            <select
-              id="businessType"
-              formControlName="businessType"
-              [class.error]="getFieldError('businessType')"
-            >
-              <option value="">Select business type</option>
-              <option value="restaurant">Restaurant</option>
-              <option value="cafe">Café</option>
-              <option value="bar">Bar</option>
-              <option value="bakery">Bakery</option>
-              <option value="food_truck">Food Truck</option>
-              <option value="catering">Catering Service</option>
-              <option value="other">Other</option>
-            </select>
-            @if (getFieldError('businessType')) {
-              <span class="field-error">{{ getFieldError('businessType') }}</span>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="businessAddress">Business Address *</label>
-            <input
-              id="businessAddress"
-              type="text"
-              formControlName="businessAddress"
-              placeholder="Start typing your address..."
-              [class.error]="getFieldError('businessAddress')"
-              (input)="onAddressInput($any($event.target).value)"
-            />
-            @if (addressSuggestions().length > 0) {
-              <div class="address-suggestions">
-                @for (suggestion of addressSuggestions(); track suggestion.place_id) {
-                  <div class="suggestion-item" (click)="selectAddress(suggestion)">
-                    <span class="suggestion-icon">📍</span>
-                    <div class="suggestion-text">
-                      <div class="suggestion-main">{{ suggestion.structured_formatting.main_text }}</div>
-                      <div class="suggestion-secondary">{{ suggestion.structured_formatting.secondary_text }}</div>
-                    </div>
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form" autocomplete="off">
+          <!-- Role Selection -->
+          <div class="form-section">
+            <h3>I want to join as</h3>
+            <div class="role-selection">
+              @for (role of [UserRole.NORMAL_USER, UserRole.BUSINESS, UserRole.FOOD_ENTHUSIAST, UserRole.SPECIALIST]; track role) {
+                <label class="role-option" [class.selected]="selectedRole() === role">
+                  <input type="radio" formControlName="role" [value]="role" />
+                  <span class="role-icon">{{ getRoleIcon(role) }}</span>
+                  <div class="role-info">
+                    <h4>{{ role === UserRole.BUSINESS ? 'Restaurant Owner' :
+                            role === UserRole.FOOD_ENTHUSIAST ? 'Food Enthusiast' :
+                            role === UserRole.NORMAL_USER ? 'Normal User' : 'Specialist' }}</h4>
+                    <p>{{ getRoleDescription(role) }}</p>
                   </div>
-                }
-              </div>
-            }
-            @if (getFieldError('businessAddress')) {
-              <span class="field-error">{{ getFieldError('businessAddress') }}</span>
-            }
-            <small class="field-hint">We'll use Google Maps to verify your location</small>
-          </div>
-
-          <div class="form-group">
-            <label for="businessCountry">Country *</label>
-            <input
-              id="businessCountry"
-              type="text"
-              formControlName="businessCountry"
-              placeholder="Enter country or select from address above"
-              [class.error]="getFieldError('businessCountry')"
-            />
-            @if (getFieldError('businessCountry')) {
-              <span class="field-error">{{ getFieldError('businessCountry') }}</span>
-            }
-            <small class="field-hint">This will be auto-filled when you select an address above</small>
-          </div>
-        </div>
-      }
-
-      @if (selectedRole() === UserRole.SPECIALIST) {
-        <div class="form-section">
-          <h3>Professional Information</h3>
-          <div class="form-group">
-            <label for="experience">Years of Experience *</label>
-            <input
-              id="experience"
-              type="number"
-              formControlName="experience"
-              placeholder="Enter years of experience"
-              min="0"
-              [class.error]="getFieldError('experience')"
-            />
-            @if (getFieldError('experience')) {
-              <span class="field-error">{{ getFieldError('experience') }}</span>
-            }
-          </div>
-
-          @if (selectedRole() === UserRole.SPECIALIST) {
-            <div class="form-group">
-              <label for="specialties">Specialties *</label>
-              <input
-                id="specialties"
-                type="text"
-                formControlName="specialties"
-                placeholder="e.g., Italian, French, Pastry (comma-separated)"
-                [class.error]="getFieldError('specialties')"
-              />
-              @if (getFieldError('specialties')) {
-                <span class="field-error">{{ getFieldError('specialties') }}</span>
+                </label>
               }
             </div>
-          }
-        </div>
-      }
+          </div>
 
-      <!-- Password Section -->
-      <div class="form-section">
-        <h3>Security</h3>
-        <div class="form-group">
-          <label for="password">Password *</label>
-          <div class="password-input">
-            <input
-              id="password"
-              [type]="showPassword() ? 'text' : 'password'"
-              formControlName="password"
-              placeholder="Create a strong password"
-              [class.error]="getFieldError('password')"
-              autocomplete="new-password"
-            />
-            <button
-              type="button"
-              class="password-toggle"
-              (click)="togglePasswordVisibility('password')"
-            >
-              {{ showPassword() ? '👁️' : '👁️‍🗨️' }}
-            </button>
-          </div>
-          @if (getFieldError('password')) {
-            <span class="field-error">{{ getFieldError('password') }}</span>
-          }
-          <div class="password-requirements">
-            <small>Password must be at least 8 characters long</small>
-          </div>
-        </div>
+          <!-- Personal Information -->
+          <div class="form-section">
+            <h3>Personal Information</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name *</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  <input id="firstName" type="text" formControlName="firstName" placeholder="John" [class.error]="getFieldError('firstName')" />
+                </div>
+                @if (getFieldError('firstName')) { <span class="field-error">{{ getFieldError('firstName') }}</span> }
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name *</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  <input id="lastName" type="text" formControlName="lastName" placeholder="Doe" [class.error]="getFieldError('lastName')" />
+                </div>
+                @if (getFieldError('lastName')) { <span class="field-error">{{ getFieldError('lastName') }}</span> }
+              </div>
+            </div>
 
-        <div class="form-group">
-          <label for="confirmPassword">Confirm Password *</label>
-          <div class="password-input">
-            <input
-              id="confirmPassword"
-              [type]="showConfirmPassword() ? 'text' : 'password'"
-              formControlName="confirmPassword"
-              placeholder="Confirm your password"
-              [class.error]="getFieldError('confirmPassword')"
-              autocomplete="new-password"
-            />
-            <button
-              type="button"
-              class="password-toggle"
-              (click)="togglePasswordVisibility('confirmPassword')"
-            >
-              {{ showConfirmPassword() ? '👁️' : '👁️‍🗨️' }}
-            </button>
+            <div class="form-group">
+              <label for="email">Email Address *</label>
+              <div class="input-wrapper">
+                <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <input id="email" type="email" formControlName="email" placeholder="john@example.com" [class.error]="getFieldError('email')" autocomplete="email" />
+              </div>
+              @if (getFieldError('email')) { <span class="field-error">{{ getFieldError('email') }}</span> }
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <div class="input-wrapper">
+                <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                <input id="phone" type="tel" formControlName="phone" placeholder="+27 12 345 6789" [class.error]="getFieldError('phone')" autocomplete="tel" />
+              </div>
+              @if (getFieldError('phone')) { <span class="field-error">{{ getFieldError('phone') }}</span> }
+            </div>
           </div>
-          @if (getFieldError('confirmPassword')) {
-            <span class="field-error">{{ getFieldError('confirmPassword') }}</span>
+
+          <!-- Business Info -->
+          @if (selectedRole() === UserRole.BUSINESS) {
+            <div class="form-section">
+              <h3>Business Information</h3>
+              <div class="form-group">
+                <label for="businessName">Business Name *</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                  </svg>
+                  <input id="businessName" type="text" formControlName="businessName" placeholder="My Restaurant" [class.error]="getFieldError('businessName')" />
+                </div>
+                @if (getFieldError('businessName')) { <span class="field-error">{{ getFieldError('businessName') }}</span> }
+              </div>
+
+              <div class="form-group">
+                <label for="businessType">Business Type *</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 21V9"/>
+                  </svg>
+                  <select id="businessType" formControlName="businessType" [class.error]="getFieldError('businessType')">
+                    <option value="">Select business type</option>
+                    <option value="restaurant">Restaurant</option>
+                    <option value="cafe">Café</option>
+                    <option value="bar">Bar</option>
+                    <option value="bakery">Bakery</option>
+                    <option value="food_truck">Food Truck</option>
+                    <option value="catering">Catering Service</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                @if (getFieldError('businessType')) { <span class="field-error">{{ getFieldError('businessType') }}</span> }
+              </div>
+
+              <div class="form-group">
+                <label for="businessAddress">Business Address *</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  <input id="businessAddress" type="text" formControlName="businessAddress" placeholder="Start typing your address..." [class.error]="getFieldError('businessAddress')" (input)="onAddressInput($any($event.target).value)" />
+                </div>
+                @if (addressSuggestions().length > 0) {
+                  <div class="address-suggestions">
+                    @for (suggestion of addressSuggestions(); track suggestion.place_id) {
+                      <div class="suggestion-item" (click)="selectAddress(suggestion)">
+                        <span class="suggestion-icon">📍</span>
+                        <div class="suggestion-text">
+                          <div class="suggestion-main">{{ suggestion.structured_formatting.main_text }}</div>
+                          <div class="suggestion-secondary">{{ suggestion.structured_formatting.secondary_text }}</div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+                @if (getFieldError('businessAddress')) { <span class="field-error">{{ getFieldError('businessAddress') }}</span> }
+                <small class="field-hint">We'll use Google Maps to verify your location</small>
+              </div>
+
+              <div class="form-group">
+                <label for="businessCountry">Country *</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+                  <input id="businessCountry" type="text" formControlName="businessCountry" placeholder="South Africa" [class.error]="getFieldError('businessCountry')" />
+                </div>
+                @if (getFieldError('businessCountry')) { <span class="field-error">{{ getFieldError('businessCountry') }}</span> }
+                <small class="field-hint">Auto-filled when you select an address above</small>
+              </div>
+            </div>
           }
-        </div>
+
+          <!-- Specialist Info -->
+          @if (selectedRole() === UserRole.SPECIALIST) {
+            <div class="form-section">
+              <h3>Professional Information</h3>
+              <div class="form-group">
+                <label for="experience">Years of Experience *</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                  <input id="experience" type="number" formControlName="experience" placeholder="5" min="0" [class.error]="getFieldError('experience')" />
+                </div>
+                @if (getFieldError('experience')) { <span class="field-error">{{ getFieldError('experience') }}</span> }
+              </div>
+
+              <div class="form-group">
+                <label for="specialties">Specialties *</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                  </svg>
+                  <input id="specialties" type="text" formControlName="specialties" placeholder="Italian, French, Pastry (comma-separated)" [class.error]="getFieldError('specialties')" />
+                </div>
+                @if (getFieldError('specialties')) { <span class="field-error">{{ getFieldError('specialties') }}</span> }
+              </div>
+            </div>
+          }
+
+          <!-- Password -->
+          <div class="form-section">
+            <h3>Security</h3>
+            <div class="form-group">
+              <label for="password">Password *</label>
+              <div class="input-wrapper">
+                <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input id="password" [type]="showPassword() ? 'text' : 'password'" formControlName="password" placeholder="Create a strong password" [class.error]="getFieldError('password')" autocomplete="new-password" />
+                <button type="button" class="password-toggle" (click)="togglePasswordVisibility('password')" [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+                  @if (showPassword()) {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  } @else {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+              @if (getFieldError('password')) { <span class="field-error">{{ getFieldError('password') }}</span> }
+              <div class="password-requirements">
+                <small>Password must be at least 8 characters long</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Confirm Password *</label>
+              <div class="input-wrapper">
+                <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input id="confirmPassword" [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" placeholder="Confirm your password" [class.error]="getFieldError('confirmPassword')" autocomplete="new-password" />
+                <button type="button" class="password-toggle" (click)="togglePasswordVisibility('confirmPassword')" [attr.aria-label]="showConfirmPassword() ? 'Hide password' : 'Show password'">
+                  @if (showConfirmPassword()) {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  } @else {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+              @if (getFieldError('confirmPassword')) { <span class="field-error">{{ getFieldError('confirmPassword') }}</span> }
+            </div>
+          </div>
+
+          <!-- Terms -->
+          <div class="form-section">
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="agreeToTerms" />
+                <span class="checkmark"></span>
+                I agree to the <a href="/legal/terms" target="_blank">Terms of Service</a> and <a href="/legal/privacy" target="_blank">Privacy Policy</a> *
+              </label>
+              @if (getFieldError('agreeToTerms')) { <span class="field-error">{{ getFieldError('agreeToTerms') }}</span> }
+
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="agreeToMarketing" />
+                <span class="checkmark"></span>
+                Send me marketing emails and updates about new features
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="isLoading() || registerForm.invalid">
+            @if (isLoading()) {
+              <span class="btn-spinner"></span>
+              Creating Account...
+            } @else {
+              Create Account
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+              </svg>
+            }
+          </button>
+        </form>
       </div>
-
-      <!-- Terms and Conditions -->
-      <div class="form-section">
-        <div class="checkbox-group">
-          <label class="checkbox-label">
-            <input type="checkbox" formControlName="agreeToTerms" />
-            <span class="checkmark"></span>
-            I agree to the <a href="/legal/terms" target="_blank">Terms of Service</a> and
-            <a href="/legal/privacy" target="_blank">Privacy Policy</a> *
-          </label>
-          @if (getFieldError('agreeToTerms')) {
-            <span class="field-error">{{ getFieldError('agreeToTerms') }}</span>
-          }
-
-          <label class="checkbox-label">
-            <input type="checkbox" formControlName="agreeToMarketing" />
-            <span class="checkmark"></span>
-            I would like to receive marketing emails and updates about new features
-          </label>
-        </div>
-      </div>
-
-      <!-- Submit Button -->
-      <button
-        type="submit"
-        class="register-button"
-        [disabled]="isLoading() || registerForm.invalid"
-      >
-        @if (isLoading()) {
-          <span class="loading-spinner"></span>
-          Creating Account...
-        } @else {
-          Create Account
-        }
-      </button>
-    </form>
-
-    <!-- Login Link -->
-    <div class="login-link">
-      <p>Already have an account?
-        <a routerLink="/auth/login">Sign in here</a>
-      </p>
     </div>
   </div>
 </div>

@@ -4,13 +4,15 @@ import { PublicSpecialistService, SpecialistListItem } from '../../../core/servi
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { LucideAngularModule, User } from 'lucide-angular';
+import { BannerAdComponent } from '../../../shared/components/ads/banner-ad/banner-ad.component';
 
 export type ViewMode = 'grid' | 'list' | 'gallery';
 
 @Component({
   selector: 'app-specialist-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule, BannerAdComponent],
   templateUrl: './specialist-list.component.html',
   styleUrls: ['./specialist-list.component.scss']
 })
@@ -60,6 +62,13 @@ export class SpecialistListComponent implements OnInit {
   selectedCountry = signal('');
   selectedCuisine = signal('');
   selectedPriceRange = signal('');
+
+  readonly User = User;
+  imageErrors = signal<Set<string>>(new Set());
+
+  onImageError(id: string): void {
+    this.imageErrors.update(s => new Set(s).add(id));
+  }
 
   stats = signal({
     totalSpecialists: 0,

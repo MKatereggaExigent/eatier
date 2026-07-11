@@ -15,7 +15,6 @@ import { UserInsights } from '../../../shared/models/user-profile.model';
 export class UserInsightsComponent implements OnInit {
   private fb = inject(FormBuilder);
 
-  // Lucide Icons
   readonly Calendar = Calendar;
   readonly BarChart3 = BarChart3;
   readonly TrendingUp = TrendingUp;
@@ -34,16 +33,13 @@ export class UserInsightsComponent implements OnInit {
   readonly Monitor = Monitor;
   readonly Search = Search;
 
-  // State management
   insights = signal<UserInsights | null>(null);
   isLoading = signal<boolean>(false);
   selectedPeriod = signal<string>('monthly');
   isExporting = signal<boolean>(false);
 
-  // Form for custom date range
   dateRangeForm: FormGroup;
 
-  // Period options
   readonly periodOptions = [
     { value: 'daily', label: 'Daily', icon: this.Calendar },
     { value: 'monthly', label: 'Monthly', icon: this.BarChart3 },
@@ -51,8 +47,6 @@ export class UserInsightsComponent implements OnInit {
     { value: 'yearly', label: 'Yearly', icon: this.ClipboardList },
     { value: 'custom', label: 'Custom Range', icon: this.CalendarRange }
   ];
-
-
 
   constructor() {
     this.dateRangeForm = this.fb.group({
@@ -68,13 +62,11 @@ export class UserInsightsComponent implements OnInit {
   loadInsights(): void {
     this.isLoading.set(true);
 
-    // TODO: Replace with actual API call when analytics endpoint is available
     setTimeout(() => {
-      // Create empty insights structure - data will be populated when analytics API is available
       const emptyInsights: UserInsights = {
         userId: '',
         period: {
-          start: new Date(new Date().setDate(1)), // First day of current month
+          start: new Date(new Date().setDate(1)),
           end: new Date(),
           type: this.selectedPeriod() as 'daily' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
         },
@@ -128,30 +120,23 @@ export class UserInsightsComponent implements OnInit {
   exportToPDF(): void {
     this.isExporting.set(true);
 
-    // Mock PDF export
     setTimeout(() => {
       const insights = this.insights();
       if (insights) {
         const filename = `user-insights-${insights.period.type}-${Date.now()}.pdf`;
         console.log(`Exporting insights to ${filename}`);
-
-        // Create a mock download
         const link = document.createElement('a');
         link.href = '#';
         link.download = filename;
         link.click();
       }
-
       this.isExporting.set(false);
     }, 2000);
   }
 
   formatNumber(num: number): string {
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
-    } else if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
-    }
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
     return num.toString();
   }
 
@@ -221,14 +206,11 @@ export class UserInsightsComponent implements OnInit {
   getInquiryConversionRate(): number {
     const insights = this.insights();
     if (!insights) return 0;
-
     const { inquiries, bookingRequests } = insights.professional;
     return inquiries > 0 ? (bookingRequests / inquiries) * 100 : 0;
   }
 
   getProfileCompletionScore(): number {
-    // Mock calculation based on profile completeness
-    // In real app, this would be calculated based on filled fields
     return 85;
   }
 

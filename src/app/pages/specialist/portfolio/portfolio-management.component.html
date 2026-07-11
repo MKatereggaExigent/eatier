@@ -1,324 +1,300 @@
-<div class="portfolio-management" role="main" aria-label="Portfolio Management">
-  <!-- Header Section -->
-  <header class="portfolio-header">
-    <div class="header-content">
-      <div class="title-section">
-        <h1 class="page-title">
-          <lucide-icon [img]="Camera" [size]="28" class="title-icon"></lucide-icon>
-          Portfolio Management
-        </h1>
-        <p class="page-subtitle">
-          Showcase your work and build your professional reputation
-        </p>
-      </div>
-      <div class="header-stats">
-        <div class="stat-item">
-          <span class="stat-number">{{ portfolioImages().length }}</span>
-          <span class="stat-label">Images</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number">{{ portfolioVideos().length }}</span>
-          <span class="stat-label">Videos</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number">{{ testimonials().length }}</span>
-          <span class="stat-label">Reviews</span>
-        </div>
-      </div>
+<div class="section">
+  <div class="section-inner">
+    <div class="tag">
+      <lucide-icon [img]="Camera" [size]="14"></lucide-icon>
+      <span>Portfolio</span>
     </div>
-  </header>
 
-  <!-- Navigation Tabs -->
-  <nav class="portfolio-tabs" role="tablist">
-    <button 
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'images'"
-      (click)="setActiveTab('images')"
-      role="tab"
-      [attr.aria-selected]="activeTab() === 'images'">
-      <lucide-icon [img]="Image" [size]="18" class="tab-icon"></lucide-icon>
-      Images
-    </button>
-    <button
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'videos'"
-      (click)="setActiveTab('videos')"
-      role="tab"
-      [attr.aria-selected]="activeTab() === 'videos'">
-      <lucide-icon [img]="Video" [size]="18" class="tab-icon"></lucide-icon>
-      Videos
-    </button>
-    <button
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'testimonials'"
-      (click)="setActiveTab('testimonials')"
-      role="tab"
-      [attr.aria-selected]="activeTab() === 'testimonials'">
-      <lucide-icon [img]="Star" [size]="18" class="tab-icon"></lucide-icon>
-      Testimonials
-    </button>
-    <button
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'settings'"
-      (click)="setActiveTab('settings')"
-      role="tab"
-      [attr.aria-selected]="activeTab() === 'settings'">
-      <lucide-icon [img]="Settings" [size]="18" class="tab-icon"></lucide-icon>
-      Settings
-    </button>
-  </nav>
-
-  <!-- Images Tab -->
-  @if (activeTab() === 'images') {
-    <section class="tab-content images-tab" role="tabpanel">
-      <div class="content-header">
-        <h2>Portfolio Images</h2>
-        <button type="button" class="add-btn primary" (click)="openImageModal()">
-          <lucide-icon [img]="Plus" [size]="16" class="btn-icon"></lucide-icon>
-          Add Image
-        </button>
-      </div>
-
-      @if (portfolioImages().length === 0) {
-        <div class="empty-state">
-          <div class="empty-icon">
-            <lucide-icon [img]="Camera" [size]="64"></lucide-icon>
+    <div class="portfolio-management" role="main" aria-label="Portfolio Management">
+      <!-- Header Card -->
+      <header class="header-card">
+        <div class="header-content">
+          <div class="title-section">
+            <h1 class="page-title">
+              <lucide-icon [img]="Camera" [size]="28" class="title-icon"></lucide-icon>
+              Portfolio Management
+            </h1>
+            <p class="page-subtitle">
+              Showcase your work and build your professional reputation
+            </p>
           </div>
-          <h3>No images in your portfolio</h3>
-          <p>Start building your portfolio by adding your best work</p>
-          <button type="button" class="add-btn primary" (click)="openImageModal()">
-            Add Your First Image
-          </button>
+          <div class="header-stats">
+            <div class="stat-item">
+              <lucide-icon [img]="Image" [size]="20" class="stat-icon"></lucide-icon>
+              <div class="stat-content">
+                <span class="stat-number">{{ portfolioImages().length }}</span>
+                <span class="stat-label">Images</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <lucide-icon [img]="Video" [size]="20" class="stat-icon"></lucide-icon>
+              <div class="stat-content">
+                <span class="stat-number">{{ portfolioVideos().length }}</span>
+                <span class="stat-label">Videos</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <lucide-icon [img]="MessageCircle" [size]="20" class="stat-icon"></lucide-icon>
+              <div class="stat-content">
+                <span class="stat-number">{{ testimonials().length }}</span>
+                <span class="stat-label">Reviews</span>
+              </div>
+            </div>
+          </div>
         </div>
-      } @else {
-        <div class="images-grid">
-          @for (image of portfolioImages(); track image.id) {
-            <div class="image-card" [class.main-image]="image.isMain">
-              <div class="image-container">
-                <img [src]="image.url" [alt]="image.title" class="portfolio-image">
-                @if (image.isMain) {
-                  <div class="main-badge">Main Image</div>
-                }
-                <div class="image-overlay">
-                  <div class="image-actions">
-                    <button type="button" class="action-btn" (click)="openImageModal(image)" title="Edit">
-                      <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
-                    </button>
-                    @if (!image.isMain) {
-                      <button type="button" class="action-btn" (click)="setMainImage(image.id)" title="Set as Main">
-                        <lucide-icon [img]="Star" [size]="16"></lucide-icon>
-                      </button>
+      </header>
+
+      <!-- Navigation Tabs -->
+      <nav class="tabs-group" role="tablist">
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'images'" (click)="setActiveTab('images')" role="tab" [attr.aria-selected]="activeTab() === 'images'">
+          <lucide-icon [img]="Image" [size]="18" class="tab-icon"></lucide-icon>
+          Images
+        </button>
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'videos'" (click)="setActiveTab('videos')" role="tab" [attr.aria-selected]="activeTab() === 'videos'">
+          <lucide-icon [img]="Video" [size]="18" class="tab-icon"></lucide-icon>
+          Videos
+        </button>
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'testimonials'" (click)="setActiveTab('testimonials')" role="tab" [attr.aria-selected]="activeTab() === 'testimonials'">
+          <lucide-icon [img]="Star" [size]="18" class="tab-icon"></lucide-icon>
+          Testimonials
+        </button>
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'settings'" (click)="setActiveTab('settings')" role="tab" [attr.aria-selected]="activeTab() === 'settings'">
+          <lucide-icon [img]="Settings" [size]="18" class="tab-icon"></lucide-icon>
+          Settings
+        </button>
+      </nav>
+
+      <!-- Images Tab -->
+      @if (activeTab() === 'images') {
+        <section class="tab-content images-tab" role="tabpanel">
+          <div class="content-header">
+            <h2>Portfolio Images</h2>
+            <button type="button" class="btn-primary" (click)="openImageModal()">
+              <lucide-icon [img]="Plus" [size]="16"></lucide-icon>
+              Add Image
+            </button>
+          </div>
+
+          @if (portfolioImages().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="Camera" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No images in your portfolio</h3>
+              <p>Start building your portfolio by adding your best work</p>
+              <button type="button" class="btn-primary" (click)="openImageModal()">
+                Add Your First Image
+              </button>
+            </div>
+          } @else {
+            <div class="images-grid">
+              @for (image of portfolioImages(); track image.id) {
+                <div class="image-card" [class.main-image]="image.isMain">
+                  <div class="image-container">
+                    <img [src]="image.url" [alt]="image.title" class="portfolio-image">
+                    @if (image.isMain) {
+                      <div class="main-badge">Main Image</div>
                     }
-                    <button type="button" class="action-btn delete" (click)="deleteImage(image.id)" title="Delete">
-                      <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="image-info">
-                <h4>{{ image.title }}</h4>
-                <p class="image-description">{{ image.description }}</p>
-                <div class="image-meta">
-                  <span class="category">{{ image.category }}</span>
-                  <span class="event-type">{{ image.eventType }}</span>
-                  <span class="upload-date">{{ formatDate(image.uploadDate) }}</span>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      }
-    </section>
-  }
-
-  <!-- Videos Tab -->
-  @if (activeTab() === 'videos') {
-    <section class="tab-content videos-tab" role="tabpanel">
-      <div class="content-header">
-        <h2>Portfolio Videos</h2>
-        <button type="button" class="add-btn primary" (click)="openVideoModal()">
-          <lucide-icon [img]="Plus" [size]="16" class="btn-icon"></lucide-icon>
-          Add Video
-        </button>
-      </div>
-
-      @if (portfolioVideos().length === 0) {
-        <div class="empty-state">
-          <div class="empty-icon">
-            <lucide-icon [img]="Video" [size]="64"></lucide-icon>
-          </div>
-          <h3>No videos in your portfolio</h3>
-          <p>Add cooking demonstrations or behind-the-scenes content</p>
-          <button type="button" class="add-btn primary" (click)="openVideoModal()">
-            Add Your First Video
-          </button>
-        </div>
-      } @else {
-        <div class="videos-grid">
-          @for (video of portfolioVideos(); track video.id) {
-            <div class="video-card">
-              <div class="video-container">
-                <img [src]="video.thumbnail" [alt]="video.title" class="video-thumbnail">
-                <div class="video-duration">{{ formatDuration(video.duration) }}</div>
-                <div class="video-overlay">
-                  <lucide-icon [img]="Play" [size]="32" class="play-button"></lucide-icon>
-                  <div class="video-actions">
-                    <button type="button" class="action-btn" (click)="openVideoModal(video)" title="Edit">
-                      <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
-                    </button>
-                    <button type="button" class="action-btn delete" (click)="deleteVideo(video.id)" title="Delete">
-                      <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="video-info">
-                <h4>{{ video.title }}</h4>
-                <p class="video-description">{{ video.description }}</p>
-                <div class="video-meta">
-                  <span class="upload-date">{{ formatDate(video.uploadDate) }}</span>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      }
-    </section>
-  }
-
-  <!-- Testimonials Tab -->
-  @if (activeTab() === 'testimonials') {
-    <section class="tab-content testimonials-tab" role="tabpanel">
-      <div class="content-header">
-        <h2>Client Testimonials</h2>
-        <p class="header-note">Testimonials are submitted by clients after completed bookings</p>
-      </div>
-
-      @if (testimonials().length === 0) {
-        <div class="empty-state">
-          <div class="empty-icon">
-            <lucide-icon [img]="MessageCircle" [size]="64"></lucide-icon>
-          </div>
-          <h3>No testimonials yet</h3>
-          <p>Testimonials will appear here when clients leave reviews after completing bookings with you</p>
-        </div>
-      } @else {
-        <div class="testimonials-list">
-          @for (testimonial of testimonials(); track testimonial.id) {
-            <div class="testimonial-card" [class.featured]="testimonial.isFeatured">
-              <div class="testimonial-header">
-                <div class="client-info">
-                  @if (testimonial.clientAvatar) {
-                    <img [src]="testimonial.clientAvatar" [alt]="testimonial.clientName" class="client-avatar">
-                  } @else {
-                    <div class="client-avatar-placeholder">
-                      {{ testimonial.clientName.charAt(0) }}
+                    <div class="image-overlay">
+                      <div class="image-actions">
+                        <button type="button" class="action-btn" (click)="openImageModal(image)" title="Edit">
+                          <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
+                        </button>
+                        @if (!image.isMain) {
+                          <button type="button" class="action-btn" (click)="setMainImage(image.id)" title="Set as Main">
+                            <lucide-icon [img]="Star" [size]="16"></lucide-icon>
+                          </button>
+                        }
+                        <button type="button" class="action-btn delete" (click)="deleteImage(image.id)" title="Delete">
+                          <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
+                        </button>
+                      </div>
                     </div>
-                  }
-                  <div class="client-details">
-                    <h4>{{ testimonial.clientName }}</h4>
-                    <div class="rating">
-                      @for (star of getStarArray(testimonial.rating); track $index) {
-                        <lucide-icon [img]="Star" [size]="16" class="star" [class.filled]="star"></lucide-icon>
+                  </div>
+                  <div class="image-info">
+                    <h4>{{ image.title }}</h4>
+                    <p class="image-description">{{ image.description }}</p>
+                    <div class="image-meta">
+                      <span class="category">{{ image.category }}</span>
+                      <span class="event-type">{{ image.eventType }}</span>
+                      <span class="upload-date">{{ formatDate(image.uploadDate) }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </section>
+      }
+
+      <!-- Videos Tab -->
+      @if (activeTab() === 'videos') {
+        <section class="tab-content videos-tab" role="tabpanel">
+          <div class="content-header">
+            <h2>Portfolio Videos</h2>
+            <button type="button" class="btn-primary" (click)="openVideoModal()">
+              <lucide-icon [img]="Plus" [size]="16"></lucide-icon>
+              Add Video
+            </button>
+          </div>
+
+          @if (portfolioVideos().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="Video" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No videos in your portfolio</h3>
+              <p>Add cooking demonstrations or behind-the-scenes content</p>
+              <button type="button" class="btn-primary" (click)="openVideoModal()">
+                Add Your First Video
+              </button>
+            </div>
+          } @else {
+            <div class="videos-grid">
+              @for (video of portfolioVideos(); track video.id) {
+                <div class="video-card">
+                  <div class="video-container">
+                    <img [src]="video.thumbnail" [alt]="video.title" class="video-thumbnail">
+                    <div class="video-duration">{{ formatDuration(video.duration) }}</div>
+                    <div class="video-overlay">
+                      <lucide-icon [img]="Play" [size]="32" class="play-button"></lucide-icon>
+                      <div class="video-actions">
+                        <button type="button" class="action-btn" (click)="openVideoModal(video)" title="Edit">
+                          <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
+                        </button>
+                        <button type="button" class="action-btn delete" (click)="deleteVideo(video.id)" title="Delete">
+                          <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="video-info">
+                    <h4>{{ video.title }}</h4>
+                    <p class="video-description">{{ video.description }}</p>
+                    <div class="video-meta">
+                      <span class="upload-date">{{ formatDate(video.uploadDate) }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </section>
+      }
+
+      <!-- Testimonials Tab -->
+      @if (activeTab() === 'testimonials') {
+        <section class="tab-content testimonials-tab" role="tabpanel">
+          <div class="content-header">
+            <h2>Client Testimonials</h2>
+            <p class="content-description">Testimonials are submitted by clients after completed bookings</p>
+          </div>
+
+          @if (testimonials().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="MessageCircle" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No testimonials yet</h3>
+              <p>Testimonials will appear here when clients leave reviews after completing bookings with you</p>
+            </div>
+          } @else {
+            <div class="testimonials-list">
+              @for (testimonial of testimonials(); track testimonial.id) {
+                <div class="testimonial-card" [class.featured]="testimonial.isFeatured">
+                  <div class="testimonial-header">
+                    <div class="client-info">
+                      @if (testimonial.clientAvatar) {
+                        <img [src]="testimonial.clientAvatar" [alt]="testimonial.clientName" class="client-avatar">
+                      } @else {
+                        <div class="client-avatar-placeholder">
+                          {{ testimonial.clientName.charAt(0) }}
+                        </div>
+                      }
+                      <div class="client-details">
+                        <h4>{{ testimonial.clientName }}</h4>
+                        <div class="rating">
+                          @for (star of getStarArray(testimonial.rating); track $index) {
+                            <lucide-icon [img]="Star" [size]="16" class="star" [class.filled]="star"></lucide-icon>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                    <div class="testimonial-actions">
+                      <button type="button" class="action-btn" (click)="toggleTestimonialFeatured(testimonial.id)" [title]="testimonial.isFeatured ? 'Remove from Featured' : 'Add to Featured'">
+                        <lucide-icon [img]="Star" [size]="16" [class.filled]="testimonial.isFeatured"></lucide-icon>
+                      </button>
+                      <button type="button" class="action-btn" (click)="toggleTestimonialPublic(testimonial.id)" [title]="testimonial.isPublic ? 'Hide' : 'Show'">
+                        <lucide-icon [img]="testimonial.isPublic ? Eye : Lock" [size]="16"></lucide-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="testimonial-content">
+                    <p>{{ testimonial.review }}</p>
+                    <div class="testimonial-meta">
+                      <span class="event-type">{{ testimonial.eventType }}</span>
+                      <span class="event-date">{{ formatDate(testimonial.eventDate) }}</span>
+                      @if (testimonial.isFeatured) {
+                        <span class="featured-badge">Featured</span>
+                      }
+                      @if (!testimonial.isPublic) {
+                        <span class="private-badge">Hidden</span>
                       }
                     </div>
                   </div>
                 </div>
-                <div class="testimonial-actions">
-                  <button type="button" class="action-btn" (click)="toggleTestimonialFeatured(testimonial.id)"
-                          [title]="testimonial.isFeatured ? 'Remove from Featured' : 'Add to Featured'">
-                    <lucide-icon [img]="Star" [size]="16" [class.filled]="testimonial.isFeatured"></lucide-icon>
-                  </button>
-                  <button type="button" class="action-btn" (click)="toggleTestimonialPublic(testimonial.id)"
-                          [title]="testimonial.isPublic ? 'Hide' : 'Show'">
-                    <lucide-icon [img]="testimonial.isPublic ? Eye : Lock" [size]="16"></lucide-icon>
-                  </button>
-                </div>
-              </div>
-              <div class="testimonial-content">
-                <p>{{ testimonial.review }}</p>
-                <div class="testimonial-meta">
-                  <span class="event-type">{{ testimonial.eventType }}</span>
-                  <span class="event-date">{{ formatDate(testimonial.eventDate) }}</span>
-                  @if (testimonial.isFeatured) {
-                    <span class="featured-badge">Featured</span>
-                  }
-                  @if (!testimonial.isPublic) {
-                    <span class="private-badge">Hidden</span>
-                  }
-                </div>
-              </div>
+              }
             </div>
           }
-        </div>
+        </section>
       }
-    </section>
-  }
 
-  <!-- Settings Tab -->
-  @if (activeTab() === 'settings') {
-    <section class="tab-content settings-tab" role="tabpanel">
-      <div class="content-header">
-        <h2>Portfolio Settings</h2>
-      </div>
+      <!-- Settings Tab -->
+      @if (activeTab() === 'settings') {
+        <section class="tab-content settings-tab" role="tabpanel">
+          <div class="content-header">
+            <h2>Portfolio Settings</h2>
+          </div>
 
-      <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()" class="settings-form">
-        <div class="form-section">
-          <h3>Portfolio Information</h3>
-          <div class="form-group">
-            <label for="portfolioTitle">Portfolio Title</label>
-            <input 
-              type="text" 
-              id="portfolioTitle" 
-              formControlName="portfolioTitle"
-              class="form-input"
-              placeholder="e.g., Executive Chef Portfolio">
-          </div>
-          <div class="form-group">
-            <label for="portfolioDescription">Portfolio Description</label>
-            <textarea 
-              id="portfolioDescription" 
-              formControlName="portfolioDescription"
-              class="form-textarea"
-              rows="4"
-              placeholder="Describe your expertise and specialties..."></textarea>
-          </div>
-        </div>
+          <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()" class="settings-form">
+            <div class="settings-card">
+              <h3>Portfolio Information</h3>
+              <div class="form-group">
+                <label for="portfolioTitle">Portfolio Title</label>
+                <input type="text" id="portfolioTitle" formControlName="portfolioTitle" class="form-control" placeholder="e.g., Executive Chef Portfolio">
+              </div>
+              <div class="form-group">
+                <label for="portfolioDescription">Portfolio Description</label>
+                <textarea id="portfolioDescription" formControlName="portfolioDescription" class="form-control" rows="4" placeholder="Describe your expertise and specialties..."></textarea>
+              </div>
+            </div>
 
-        <div class="form-section">
-          <h3>Privacy & Display Settings</h3>
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="showContactInfo" class="form-checkbox">
-              <span class="checkbox-text">Show contact information on portfolio</span>
-            </label>
-          </div>
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="allowDownloads" class="form-checkbox">
-              <span class="checkbox-text">Allow visitors to download images</span>
-            </label>
-          </div>
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="watermarkImages" class="form-checkbox">
-              <span class="checkbox-text">Add watermark to images</span>
-            </label>
-          </div>
-        </div>
+            <div class="settings-card">
+              <h3>Privacy & Display Settings</h3>
+              <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" formControlName="showContactInfo" class="form-checkbox">
+                  <span class="checkbox-text">Show contact information on portfolio</span>
+                </label>
+              </div>
+              <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" formControlName="allowDownloads" class="form-checkbox">
+                  <span class="checkbox-text">Allow visitors to download images</span>
+                </label>
+              </div>
+              <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" formControlName="watermarkImages" class="form-checkbox">
+                  <span class="checkbox-text">Add watermark to images</span>
+                </label>
+              </div>
+            </div>
 
-        <div class="form-actions">
-          <button type="submit" class="save-btn primary" [disabled]="settingsForm.invalid || saving()">
-            {{ saving() ? 'Saving...' : 'Save Settings' }}
-          </button>
-        </div>
-      </form>
-    </section>
-  }
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" [disabled]="settingsForm.invalid || saving()">
+                {{ saving() ? 'Saving...' : 'Save Settings' }}
+              </button>
+            </div>
+          </form>
+        </section>
+      }
+    </div>
+  </div>
 </div>
 
 <!-- Image Modal -->
@@ -326,7 +302,7 @@
   <div class="modal-overlay" (click)="closeImageModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>{{ selectedImage() ? 'Edit Image' : 'Add New Image' }}</h3>
+        <h2>{{ selectedImage() ? 'Edit Image' : 'Add New Image' }}</h2>
         <button type="button" class="close-btn" (click)="closeImageModal()">
           <lucide-icon [img]="X" [size]="18"></lucide-icon>
         </button>
@@ -334,16 +310,16 @@
       <form [formGroup]="imageForm" (ngSubmit)="saveImage()" class="modal-form">
         <div class="form-group">
           <label for="imageTitle">Title</label>
-          <input type="text" id="imageTitle" formControlName="title" class="form-input">
+          <input type="text" id="imageTitle" formControlName="title" class="form-control">
         </div>
         <div class="form-group">
           <label for="imageDescription">Description</label>
-          <textarea id="imageDescription" formControlName="description" class="form-textarea" rows="3"></textarea>
+          <textarea id="imageDescription" formControlName="description" class="form-control" rows="3"></textarea>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label for="imageCategory">Category</label>
-            <select id="imageCategory" formControlName="category" class="form-select">
+            <select id="imageCategory" formControlName="category" class="form-control">
               <option value="">Select Category</option>
               <option value="Appetizers">Appetizers</option>
               <option value="Main Course">Main Course</option>
@@ -354,7 +330,7 @@
           </div>
           <div class="form-group">
             <label for="imageEventType">Event Type</label>
-            <select id="imageEventType" formControlName="eventType" class="form-select">
+            <select id="imageEventType" formControlName="eventType" class="form-control">
               <option value="">Select Event Type</option>
               <option value="Private Dinner">Private Dinner</option>
               <option value="Corporate Event">Corporate Event</option>
@@ -367,13 +343,12 @@
         @if (!selectedImage()) {
           <div class="form-group">
             <label for="imageUrl">Image URL</label>
-            <input type="url" id="imageUrl" formControlName="url" class="form-input"
-                   placeholder="https://example.com/image.jpg">
+            <input type="url" id="imageUrl" formControlName="url" class="form-control" placeholder="https://example.com/image.jpg">
           </div>
         }
-        <div class="modal-actions">
-          <button type="button" class="cancel-btn" (click)="closeImageModal()">Cancel</button>
-          <button type="submit" class="save-btn primary" [disabled]="imageForm.invalid || saving()">
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeImageModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="imageForm.invalid || saving()">
             {{ saving() ? 'Saving...' : (selectedImage() ? 'Update' : 'Add') + ' Image' }}
           </button>
         </div>
@@ -387,7 +362,7 @@
   <div class="modal-overlay" (click)="closeVideoModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>{{ selectedVideo() ? 'Edit Video' : 'Add New Video' }}</h3>
+        <h2>{{ selectedVideo() ? 'Edit Video' : 'Add New Video' }}</h2>
         <button type="button" class="close-btn" (click)="closeVideoModal()">
           <lucide-icon [img]="X" [size]="18"></lucide-icon>
         </button>
@@ -395,27 +370,25 @@
       <form [formGroup]="videoForm" (ngSubmit)="saveVideo()" class="modal-form">
         <div class="form-group">
           <label for="videoTitle">Title</label>
-          <input type="text" id="videoTitle" formControlName="title" class="form-input">
+          <input type="text" id="videoTitle" formControlName="title" class="form-control">
         </div>
         <div class="form-group">
           <label for="videoDescription">Description</label>
-          <textarea id="videoDescription" formControlName="description" class="form-textarea" rows="3"></textarea>
+          <textarea id="videoDescription" formControlName="description" class="form-control" rows="3"></textarea>
         </div>
         @if (!selectedVideo()) {
           <div class="form-group">
             <label for="videoUrl">Video URL</label>
-            <input type="url" id="videoUrl" formControlName="url" class="form-input"
-                   placeholder="https://example.com/video.mp4">
+            <input type="url" id="videoUrl" formControlName="url" class="form-control" placeholder="https://example.com/video.mp4">
           </div>
           <div class="form-group">
             <label for="thumbnailUrl">Thumbnail URL (optional)</label>
-            <input type="url" id="thumbnailUrl" formControlName="thumbnailUrl" class="form-input"
-                   placeholder="https://example.com/thumbnail.jpg">
+            <input type="url" id="thumbnailUrl" formControlName="thumbnailUrl" class="form-control" placeholder="https://example.com/thumbnail.jpg">
           </div>
         }
-        <div class="modal-actions">
-          <button type="button" class="cancel-btn" (click)="closeVideoModal()">Cancel</button>
-          <button type="submit" class="save-btn primary" [disabled]="videoForm.invalid || saving()">
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeVideoModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="videoForm.invalid || saving()">
             {{ saving() ? 'Saving...' : (selectedVideo() ? 'Update' : 'Add') + ' Video' }}
           </button>
         </div>
@@ -423,5 +396,3 @@
     </div>
   </div>
 }
-
-

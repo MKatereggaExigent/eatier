@@ -1,31 +1,33 @@
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 
-import { BannerAdComponent } from '../../shared/components/ads/banner-ad/banner-ad.component';
 import { CommonModule } from '@angular/common';
 import { PublicStatsService } from '../../core/services/public-stats.service';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Zap, Store, UtensilsCrossed, User, ChefHat, CheckCircle, BookOpen, MessageCircle, GraduationCap, Handshake } from 'lucide-angular';
+import { LucideAngularModule, Zap, Store, UtensilsCrossed, User, ChefHat, CheckCircle, Shield, BookOpen, MessageCircle, GraduationCap, Handshake, Calendar, BarChart3, Megaphone, Globe, Heart, Target, Award, AlertTriangle, XCircle, MessageSquare, Mail, Phone, MapPin, Send, Star } from 'lucide-angular';
 
 interface UserGroup {
   id: string;
   title: string;
-  icon: any; // Changed from string to any for Lucide icons
+  icon: any;
   description: string;
   features: string[];
   color: string;
-  gradient: string;
+  colorDark: string;
+  glassBg: string;
 }
 
 interface CarouselSlide {
   image: string;
+  label: string;
   title: string;
-  category: 'restaurant' | 'cuisine' | 'people';
+  subtitle: string;
+  overlay: string;
 }
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, RouterModule, BannerAdComponent, LucideAngularModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss'
 })
@@ -37,10 +39,28 @@ export class AboutComponent implements OnInit, OnDestroy {
 
   // Lucide Icons
   readonly CheckCircle = CheckCircle;
+  readonly Shield = Shield;
+  readonly Star = Star;
   readonly BookOpen = BookOpen;
   readonly MessageCircle = MessageCircle;
   readonly GraduationCap = GraduationCap;
   readonly Handshake = Handshake;
+  readonly Store = Store;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Calendar = Calendar;
+  readonly BarChart3 = BarChart3;
+  readonly Megaphone = Megaphone;
+  readonly Globe = Globe;
+  readonly Heart = Heart;
+  readonly Target = Target;
+  readonly Award = Award;
+  readonly AlertTriangle = AlertTriangle;
+  readonly XCircle = XCircle;
+  readonly MessageSquare = MessageSquare;
+  readonly Mail = Mail;
+  readonly Phone = Phone;
+  readonly MapPin = MapPin;
+  readonly Send = Send;
 
   // Stats will be populated from database
   stats = signal<Array<{ value: string; label: string }>>([
@@ -53,33 +73,45 @@ export class AboutComponent implements OnInit, OnDestroy {
   carouselSlides: CarouselSlide[] = [
     {
       image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&h=900&fit=crop',
-      title: 'Discover Amazing Restaurants',
-      category: 'restaurant'
+      label: 'For Restaurants',
+      title: 'Digitise your restaurant',
+      subtitle: 'Manage menus, accept bookings, connect with customers, and grow your online presence — all from one platform.',
+      overlay: 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(15,23,42,0.4) 50%, rgba(0,0,0,0.6) 100%)'
     },
     {
       image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1600&h=900&fit=crop',
-      title: 'Explore Delicious Cuisines',
-      category: 'cuisine'
+      label: 'For Food Lovers',
+      title: 'Discover your next meal',
+      subtitle: 'Browse local restaurants, read honest reviews, and find dishes you\'ll love — curated just for you.',
+      overlay: 'linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(30,41,59,0.35) 50%, rgba(0,0,0,0.55) 100%)'
     },
     {
       image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&h=900&fit=crop',
-      title: 'Connect with Food Lovers',
-      category: 'people'
+      label: 'For Professionals',
+      title: 'Showcase your craft',
+      subtitle: 'Chefs, caterers, and culinary specialists — build your portfolio, set your rates, and get booked by clients.',
+      overlay: 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(15,23,42,0.3) 50%, rgba(0,0,0,0.6) 100%)'
     },
     {
       image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1600&h=900&fit=crop',
-      title: 'Experience Fine Dining',
-      category: 'restaurant'
+      label: 'For Businesses',
+      title: 'Grow your brand',
+      subtitle: 'Run targeted ad campaigns, get detailed analytics, and turn casual diners into loyal regulars.',
+      overlay: 'linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(15,23,42,0.35) 50%, rgba(0,0,0,0.55) 100%)'
     },
     {
       image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1600&h=900&fit=crop',
-      title: 'Savor Every Flavor',
-      category: 'cuisine'
+      label: 'For Enthusiasts',
+      title: 'Savour every flavour',
+      subtitle: 'Write reviews, create collections, earn badges, and become a trusted voice in your local food scene.',
+      overlay: 'linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(30,41,59,0.3) 50%, rgba(0,0,0,0.55) 100%)'
     },
     {
       image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1600&h=900&fit=crop',
-      title: 'Join the Community',
-      category: 'people'
+      label: 'Community',
+      title: 'Join the table',
+      subtitle: 'Connect with thousands of food lovers, share experiences, and be part of a growing culinary community.',
+      overlay: 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(15,23,42,0.35) 50%, rgba(0,0,0,0.6) 100%)'
     }
   ];
 
@@ -164,8 +196,9 @@ export class AboutComponent implements OnInit, OnDestroy {
         'Content moderation and quality control',
         'System configuration and settings'
       ],
-      color: '#2d3748',
-      gradient: 'linear-gradient(135deg, #2d3748 0%, #1a202c 100%)'
+      color: '#89C4D9',
+      colorDark: '#3F8DB0',
+      glassBg: 'linear-gradient(135deg, rgba(137,196,217,0.3) 0%, rgba(63,141,176,0.15) 100%)'
     },
     {
       id: 'business',
@@ -179,8 +212,9 @@ export class AboutComponent implements OnInit, OnDestroy {
         'Advertising and promotional campaigns',
         'Review management and reputation building'
       ],
-      color: '#4a5568',
-      gradient: 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)'
+      color: '#8FC9A3',
+      colorDark: '#4A9E65',
+      glassBg: 'linear-gradient(135deg, rgba(143,201,163,0.3) 0%, rgba(74,158,101,0.15) 100%)'
     },
     {
       id: 'food_enthusiast',
@@ -194,8 +228,9 @@ export class AboutComponent implements OnInit, OnDestroy {
         'Connect with other food lovers',
         'Get personalized recommendations'
       ],
-      color: '#718096',
-      gradient: 'linear-gradient(135deg, #718096 0%, #4a5568 100%)'
+      color: '#FFB88C',
+      colorDark: '#D97C46',
+      glassBg: 'linear-gradient(135deg, rgba(255,184,140,0.3) 0%, rgba(217,124,70,0.15) 100%)'
     },
     {
       id: 'normal_user',
@@ -209,8 +244,9 @@ export class AboutComponent implements OnInit, OnDestroy {
         'Read reviews and ratings',
         'Save favorite places'
       ],
-      color: '#a0aec0',
-      gradient: 'linear-gradient(135deg, #a0aec0 0%, #718096 100%)'
+      color: '#F5D760',
+      colorDark: '#C4A830',
+      glassBg: 'linear-gradient(135deg, rgba(245,215,96,0.3) 0%, rgba(196,168,48,0.15) 100%)'
     },
     {
       id: 'specialist',
@@ -224,8 +260,9 @@ export class AboutComponent implements OnInit, OnDestroy {
         'Build your professional reputation',
         'Connect with clients for events'
       ],
-      color: '#cbd5e0',
-      gradient: 'linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%)'
+      color: '#F0B5BA',
+      colorDark: '#C77A82',
+      glassBg: 'linear-gradient(135deg, rgba(240,181,186,0.3) 0%, rgba(199,122,130,0.15) 100%)'
     }
   ];
 }

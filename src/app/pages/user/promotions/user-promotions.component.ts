@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { LucideAngularModule, Gift, Users, UserPlus, Award, Clock, Copy, Check, Percent } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
 
 interface Promotion {
@@ -22,12 +23,21 @@ interface Promotion {
 @Component({
   selector: 'app-user-promotions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './user-promotions.component.html',
   styleUrls: ['./user-promotions.component.scss']
 })
 export class UserPromotionsComponent implements OnInit {
   private http = inject(HttpClient);
+
+  readonly Gift = Gift;
+  readonly Users = Users;
+  readonly UserPlus = UserPlus;
+  readonly Award = Award;
+  readonly Clock = Clock;
+  readonly Copy = Copy;
+  readonly Check = Check;
+  readonly Percent = Percent;
 
   loading = signal(true);
   promotions = signal<Promotion[]>([]);
@@ -88,11 +98,21 @@ export class UserPromotionsComponent implements OnInit {
 
   getTargetLabel(targetType: string): string {
     switch (targetType) {
-      case 'all_members': return '👥 All Members';
-      case 'new_members': return '🆕 New Members';
-      case 'loyal_members': return '⭐ Loyal Members';
-      case 'inactive_members': return '💤 Welcome Back';
-      default: return '🎁 Exclusive';
+      case 'all_members': return 'All Members';
+      case 'new_members': return 'New Members';
+      case 'loyal_members': return 'Loyal Members';
+      case 'inactive_members': return 'Welcome Back';
+      default: return 'Exclusive';
+    }
+  }
+
+  getTargetIcon(targetType: string): any {
+    switch (targetType) {
+      case 'all_members': return this.Users;
+      case 'new_members': return this.UserPlus;
+      case 'loyal_members': return this.Award;
+      case 'inactive_members': return this.Clock;
+      default: return this.Gift;
     }
   }
 

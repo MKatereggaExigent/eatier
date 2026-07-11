@@ -1,129 +1,285 @@
 <div class="social-container">
+  <!-- Page Header -->
   <div class="page-header">
-    <h1>Social</h1>
-    <p>Connect with fellow food lovers and discover new favorites</p>
+    <div class="header-content">
+      <h1>
+        <lucide-icon [img]="Users" [size]="18"></lucide-icon>
+        Social Hub
+      </h1>
+      <p>Connect with your community, share moments, and grow your network</p>
+    </div>
+    <div class="header-actions">
+      <button class="notif-btn" (click)="toggleNotifications()" (focusout)="closeNotifications()" aria-label="Notifications">
+        <lucide-icon [img]="Bell" [size]="16"></lucide-icon>
+      </button>
+      <button class="avatar-btn" (click)="openAvatarUpload()" aria-label="Change avatar">
+        <img [src]="getCurrentUserAvatar()" alt="Your avatar" class="header-avatar">
+      </button>
+    </div>
   </div>
 
-  <!-- Social and Messaging Widgets -->
-  <section class="widgets-section" aria-label="Social and Messaging">
-    <div class="widgets-grid">
-      <app-social-widget></app-social-widget>
-      <app-messaging-widget></app-messaging-widget>
+  <!-- Notifications Dropdown -->
+  @if (showNotifications()) {
+    <div class="notif-dropdown">
+      <div class="notif-header">
+        <h3>Notifications</h3>
+        <button class="notif-close" (click)="closeNotifications()">&times;</button>
+      </div>
+      <div class="notif-list">
+        <div class="notif-empty">
+          <lucide-icon [img]="Bell" [size]="24"></lucide-icon>
+          <p>No notifications yet</p>
+          <span>Activity from your network will appear here</span>
+        </div>
+      </div>
     </div>
-  </section>
+  }
+
+  <!-- Stats Row -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-accent followers-accent"></div>
+      <div class="stat-content">
+        <div class="stat-icon-wrap followers-icon">
+          <lucide-icon [img]="Users" [size]="18"></lucide-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ followers().length }}</span>
+          <span class="stat-label">Followers</span>
+        </div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-accent following-accent"></div>
+      <div class="stat-content">
+        <div class="stat-icon-wrap following-icon">
+          <lucide-icon [img]="UserCheck" [size]="18"></lucide-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ following().length }}</span>
+          <span class="stat-label">Following</span>
+        </div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-accent activity-accent"></div>
+      <div class="stat-content">
+        <div class="stat-icon-wrap activity-icon">
+          <lucide-icon [img]="MessageSquare" [size]="18"></lucide-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ activityFeed().length }}</span>
+          <span class="stat-label">Activities</span>
+        </div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-accent discover-accent"></div>
+      <div class="stat-content">
+        <div class="stat-icon-wrap discover-icon">
+          <lucide-icon [img]="AtSign" [size]="18"></lucide-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ discoverUsers().length }}</span>
+          <span class="stat-label">Discover</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Widgets Row -->
+  <div class="widgets-section">
+    <app-social-widget></app-social-widget>
+    <app-messaging-widget></app-messaging-widget>
+  </div>
+
+  <!-- Stories Bar -->
+  <div class="glass-card stories-section">
+    <div class="section-header">
+      <lucide-icon [img]="Camera" [size]="16" class="section-icon"></lucide-icon>
+      <h2>Stories</h2>
+    </div>
+    <div class="stories-track">
+      <div class="story-item create-story" (click)="openAvatarUpload()" role="button" tabindex="0">
+        <div class="story-ring create-ring">
+          <div class="create-avatar">
+            <lucide-icon [img]="Plus" [size]="22"></lucide-icon>
+          </div>
+        </div>
+        <span class="story-name">Your Story</span>
+      </div>
+      @for (user of stories(); track user.id) {
+        <div class="story-item" role="button" tabindex="0">
+          <div class="story-ring">
+            <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)" class="story-avatar-img">
+          </div>
+          <span class="story-name">{{ user.first_name || user.firstName || 'User' }}</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Search Bar (shown on discover/following/followers tabs) -->
+  @if (activeTab() !== 'feed') {
+    <div class="search-bar glass-card">
+      <lucide-icon [img]="Search" [size]="16" class="search-icon"></lucide-icon>
+      <input type="text" placeholder="Search people..." (input)="searchQuery.set($any($event.target).value)" class="search-input">
+      @if (searchQuery()) {
+        <button class="search-clear" (click)="searchQuery.set('')">&times;</button>
+      }
+    </div>
+  }
 
   <!-- Tabs -->
-  <div class="tabs">
-    <button type="button" class="tab" [class.active]="activeTab() === 'feed'" (click)="setActiveTab('feed')">
+  <div class="tabs" role="tablist">
+    <button type="button" class="tab" [class.active]="activeTab() === 'feed'" (click)="setActiveTab('feed')" role="tab">
+      <lucide-icon [img]="MessageSquare" [size]="14"></lucide-icon>
       Activity Feed
     </button>
-    <button type="button" class="tab" [class.active]="activeTab() === 'discover'" (click)="setActiveTab('discover')">
+    <button type="button" class="tab" [class.active]="activeTab() === 'discover'" (click)="setActiveTab('discover')" role="tab">
+      <lucide-icon [img]="Search" [size]="14"></lucide-icon>
       Discover
     </button>
-    <button type="button" class="tab" [class.active]="activeTab() === 'following'" (click)="setActiveTab('following')">
+    <button type="button" class="tab" [class.active]="activeTab() === 'following'" (click)="setActiveTab('following')" role="tab">
+      <lucide-icon [img]="UserCheck" [size]="14"></lucide-icon>
       Following
     </button>
-    <button type="button" class="tab" [class.active]="activeTab() === 'followers'" (click)="setActiveTab('followers')">
+    <button type="button" class="tab" [class.active]="activeTab() === 'followers'" (click)="setActiveTab('followers')" role="tab">
+      <lucide-icon [img]="Users" [size]="14"></lucide-icon>
       Followers
     </button>
   </div>
 
+  <!-- Loading State -->
   @if (loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
       <p>Loading...</p>
     </div>
-  } @else {
-    <!-- Activity Feed -->
+  }
+
+  <!-- Tab Content -->
+  @if (!loading()) {
+    <!-- Activity Feed (Facebook/Instagram style) -->
     @if (activeTab() === 'feed') {
       @if (activityFeed().length === 0) {
         <div class="empty-state">
-          <span class="empty-icon">📰</span>
-          <h2>No activity yet</h2>
+          <lucide-icon [img]="MessageSquare" [size]="36" class="empty-icon"></lucide-icon>
+          <h3>No activity yet</h3>
           <p>Follow some food lovers to see their activity here!</p>
-          <button type="button" class="action-btn" (click)="setActiveTab('discover')">Discover People</button>
+          <button class="action-btn" (click)="setActiveTab('discover')">
+            <lucide-icon [img]="UserPlus" [size]="14"></lucide-icon>
+            Discover People
+          </button>
         </div>
       } @else {
         <div class="activity-list">
           @for (activity of activityFeed(); track activity.id) {
-            <div class="activity-card">
-              <div class="activity-icon">{{ getActivityIcon(activity.activityType) }}</div>
-              <div class="activity-content">
-                <div class="activity-header">
-                  <span class="actor-name">{{ activity.actorName }}</span> <span class="activity-text">{{ getActivityText(activity) }}</span>
+            <div class="activity-card glass-card-hover">
+              <div class="activity-header-row">
+                <div class="activity-avatar-wrap">
+                  <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + enc(activity.actorName) + '&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50'" alt="" class="activity-avatar">
                 </div>
-                @if (activity.contentPreview) {
-                  <p class="activity-preview">"{{ activity.contentPreview }}"</p>
-                }
-                <span class="activity-time">{{ formatDate(activity.createdAt) }}</span>
+                <div class="activity-meta">
+                  <span class="actor-name">{{ activity.actorName }}</span>
+                  <span class="activity-desc">{{ getActivityText(activity) }}</span>
+                  <span class="activity-time">{{ formatDate(activity.createdAt) }}</span>
+                </div>
+                <div class="activity-type-badge">
+                  <span class="type-emoji">
+                    @switch (activity.activityType) {
+                      @case ('review') { <lucide-icon [img]="Star" [size]="20"></lucide-icon> }
+                      @case ('favorite') { <lucide-icon [img]="Heart" [size]="20"></lucide-icon> }
+                      @case ('booking') { <lucide-icon [img]="Calendar" [size]="20"></lucide-icon> }
+                      @case ('share') { <lucide-icon [img]="Share2" [size]="20"></lucide-icon> }
+                      @default { <lucide-icon [img]="FileText" [size]="20"></lucide-icon> }
+                    }
+                  </span>
+                </div>
+              </div>
+              @if (activity.contentPreview) {
+                <div class="activity-body">
+                  <p class="activity-quote">"{{ activity.contentPreview }}"</p>
+                </div>
+              }
+              <div class="activity-actions">
+                <button class="action-btn-sm like-btn" [class.liked]="isLiked(activity.id)" (click)="toggleLike(activity.id)">
+                  <lucide-icon [img]="Heart" [size]="14" class="heart-icon" [class.liked]="isLiked(activity.id)"></lucide-icon>
+                  <span>{{ isLiked(activity.id) ? 'Liked' : 'Like' }}</span>
+                </button>
+                <button class="action-btn-sm comment-btn">
+                  <lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon>
+                  <span>Comment</span>
+                </button>
+                <button class="action-btn-sm share-btn" [attr.data-share]="activity.id" (click)="shareActivity(activity)">
+                  <lucide-icon [img]="Share2" [size]="14"></lucide-icon>
+                  <span>Share</span>
+                </button>
               </div>
             </div>
           }
         </div>
 
-        <!-- Pagination Controls -->
+        <!-- Pagination -->
         @if (activityFeed().length > 0) {
           <div class="pagination">
-            <button
-              type="button"
-              class="pagination-btn"
-              [disabled]="activityPage() === 1"
-              (click)="previousActivityPage()">
-              ← Previous
+            <button type="button" class="pagination-btn" [disabled]="activityPage() === 1" (click)="previousActivityPage()">
+              <lucide-icon [img]="ChevronLeft" [size]="16"></lucide-icon>
+              Previous
             </button>
             <span class="pagination-info">Page {{ activityPage() }} of {{ totalActivityPages() }}</span>
-            <button
-              type="button"
-              class="pagination-btn"
-              [disabled]="activityPage() >= totalActivityPages()"
-              (click)="nextActivityPage()">
-              Next →
+            <button type="button" class="pagination-btn" [disabled]="activityPage() >= totalActivityPages()" (click)="nextActivityPage()">
+              Next
+              <lucide-icon [img]="ChevronRight" [size]="16"></lucide-icon>
             </button>
           </div>
         }
       }
     }
 
-    <!-- Discover Users -->
+    <!-- Discover Users (Instagram-style grid) -->
     @if (activeTab() === 'discover') {
-      @if (discoverUsers().length === 0) {
+      @if (filteredDiscover().length === 0) {
         <div class="empty-state">
-          <span class="empty-icon">🔍</span>
-          <h2>No suggestions</h2>
-          <p>Check back later for new food lovers to follow!</p>
+          <lucide-icon [img]="Search" [size]="36" class="empty-icon"></lucide-icon>
+          <h3>{{ searchQuery() ? 'No results found' : 'No suggestions' }}</h3>
+          <p>{{ searchQuery() ? 'Try a different search term' : 'Check back later for new food lovers to follow!' }}</p>
         </div>
       } @else {
         <div class="users-grid">
-          @for (user of discoverUsers(); track user.id) {
-            <div class="user-card">
-              <img
-                [src]="getUserAvatarUrl(user)"
-                [alt]="getUserFullName(user)"
-                class="user-avatar-img"
-                appAvatarContextMenu
-                (uploadAvatar)="openAvatarUpload()"
-                (removeAvatar)="openAvatarUpload()" />
-              <div class="user-info">
-                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
-                <div class="user-stats">
-                  <span>⭐ {{ user.review_count || user.reviewCount || 0 }} reviews</span>
-                  <span>👥 {{ user.follower_count || user.followerCount || 0 }} followers</span>
+          @for (user of filteredDiscover(); track user.id) {
+            <div class="user-card glass-card-hover">
+              <div class="user-card-top">
+                <div class="user-avatar-ring">
+                  <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)" class="user-avatar-img" appAvatarContextMenu (uploadAvatar)="openAvatarUpload()" (removeAvatar)="openAvatarUpload()">
                 </div>
               </div>
-              <button
-                type="button"
-                class="follow-btn"
-                [class.following]="user.isFollowing"
-                [disabled]="isFollowInProgress(user.id)"
-                (click)="toggleFollow(user.id, user.isFollowing)">
-                @if (isFollowInProgress(user.id)) {
-                  ...
-                } @else if (user.isFollowing) {
-                  Following
-                } @else {
-                  Follow
-                }
-              </button>
+              <div class="user-card-body">
+                <h3 class="user-name">{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
+                <div class="user-stats">
+                  <span class="user-stat">
+                    <lucide-icon [img]="Star" [size]="14"></lucide-icon>
+                    {{ user.review_count || user.reviewCount || 0 }} reviews
+                  </span>
+                </div>
+              </div>
+              <div class="user-card-actions">
+                <button type="button" class="card-btn follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">
+                  @if (isFollowInProgress(user.id)) {
+                    <span class="btn-spinner"></span>
+                  } @else if (user.isFollowing) {
+                    <lucide-icon [img]="UserCheck" [size]="14"></lucide-icon>
+                    Following
+                  } @else {
+                    <lucide-icon [img]="UserPlus" [size]="14"></lucide-icon>
+                    Follow
+                  }
+                </button>
+                <button type="button" class="card-btn msg-btn" (click)="messageUser(user.id, getUserFullName(user))">
+                  <lucide-icon [img]="Send" [size]="14"></lucide-icon>
+                  Message
+                </button>
+              </div>
             </div>
           }
         </div>
@@ -132,33 +288,50 @@
 
     <!-- Following -->
     @if (activeTab() === 'following') {
-      @if (following().length === 0) {
+      @if (filteredFollowing().length === 0) {
         <div class="empty-state">
-          <span class="empty-icon">👤</span>
-          <h2>Not following anyone</h2>
-          <p>Discover and follow food lovers to see their activity!</p>
-          <button type="button" class="action-btn" (click)="setActiveTab('discover')">Discover People</button>
+          <lucide-icon [img]="UserCheck" [size]="36" class="empty-icon"></lucide-icon>
+          <h3>{{ searchQuery() ? 'No results found' : 'Not following anyone' }}</h3>
+          <p>{{ searchQuery() ? 'Try a different search term' : 'Discover and follow food lovers to see their activity!' }}</p>
+          @if (!searchQuery()) {
+            <button class="action-btn" (click)="setActiveTab('discover')">
+              <lucide-icon [img]="UserPlus" [size]="14"></lucide-icon>
+              Discover People
+            </button>
+          }
         </div>
       } @else {
         <div class="users-grid">
-          @for (user of following(); track user.id) {
-            <div class="user-card">
-              <img
-                [src]="getUserAvatarUrl(user)"
-                [alt]="getUserFullName(user)"
-                class="user-avatar-img"
-                appAvatarContextMenu
-                (uploadAvatar)="openAvatarUpload()"
-                (removeAvatar)="openAvatarUpload()" />
-              <div class="user-info">
-                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
-                <div class="user-stats">
-                  <span>⭐ {{ user.review_count || user.reviewCount || 0 }} reviews</span>
+          @for (user of filteredFollowing(); track user.id) {
+            <div class="user-card glass-card-hover">
+              <div class="user-card-top">
+                <div class="user-avatar-ring">
+                  <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)" class="user-avatar-img" appAvatarContextMenu (uploadAvatar)="openAvatarUpload()" (removeAvatar)="openAvatarUpload()">
                 </div>
               </div>
-              <button type="button" class="follow-btn following" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, true)">
-                @if (isFollowInProgress(user.id)) { ... } @else { Unfollow }
-              </button>
+              <div class="user-card-body">
+                <h3 class="user-name">{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
+                <div class="user-stats">
+                  <span class="user-stat">
+                    <lucide-icon [img]="Star" [size]="14"></lucide-icon>
+                    {{ user.review_count || user.reviewCount || 0 }} reviews
+                  </span>
+                </div>
+              </div>
+              <div class="user-card-actions">
+                <button type="button" class="card-btn msg-btn" (click)="messageUser(user.id, getUserFullName(user))">
+                  <lucide-icon [img]="Send" [size]="14"></lucide-icon>
+                  Message
+                </button>
+                <button type="button" class="card-btn unfollow-btn" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, true)">
+                  @if (isFollowInProgress(user.id)) {
+                    <span class="btn-spinner"></span>
+                  } @else {
+                    <lucide-icon [img]="UserMinus" [size]="14"></lucide-icon>
+                    Unfollow
+                  }
+                </button>
+              </div>
             </div>
           }
         </div>
@@ -167,32 +340,47 @@
 
     <!-- Followers -->
     @if (activeTab() === 'followers') {
-      @if (followers().length === 0) {
+      @if (filteredFollowers().length === 0) {
         <div class="empty-state">
-          <span class="empty-icon">👥</span>
-          <h2>No followers yet</h2>
-          <p>Share your reviews and favorites to attract followers!</p>
+          <lucide-icon [img]="Users" [size]="36" class="empty-icon"></lucide-icon>
+          <h3>{{ searchQuery() ? 'No results found' : 'No followers yet' }}</h3>
+          <p>{{ searchQuery() ? 'Try a different search term' : 'Share your reviews and favorites to attract followers!' }}</p>
         </div>
       } @else {
         <div class="users-grid">
-          @for (user of followers(); track user.id) {
-            <div class="user-card">
-              <img
-                [src]="getUserAvatarUrl(user)"
-                [alt]="getUserFullName(user)"
-                class="user-avatar-img"
-                appAvatarContextMenu
-                (uploadAvatar)="openAvatarUpload()"
-                (removeAvatar)="openAvatarUpload()" />
-              <div class="user-info">
-                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
-                <div class="user-stats">
-                  <span>⭐ {{ user.review_count || user.reviewCount || 0 }} reviews</span>
+          @for (user of filteredFollowers(); track user.id) {
+            <div class="user-card glass-card-hover">
+              <div class="user-card-top">
+                <div class="user-avatar-ring">
+                  <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)" class="user-avatar-img" appAvatarContextMenu (uploadAvatar)="openAvatarUpload()" (removeAvatar)="openAvatarUpload()">
                 </div>
               </div>
-              <button type="button" class="follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">
-                @if (isFollowInProgress(user.id)) { ... } @else if (user.isFollowing) { Following } @else { Follow Back }
-              </button>
+              <div class="user-card-body">
+                <h3 class="user-name">{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
+                <div class="user-stats">
+                  <span class="user-stat">
+                    <lucide-icon [img]="Star" [size]="14"></lucide-icon>
+                    {{ user.review_count || user.reviewCount || 0 }} reviews
+                  </span>
+                </div>
+              </div>
+              <div class="user-card-actions">
+                <button type="button" class="card-btn msg-btn" (click)="messageUser(user.id, getUserFullName(user))">
+                  <lucide-icon [img]="Send" [size]="14"></lucide-icon>
+                  Message
+                </button>
+                <button type="button" class="card-btn follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">
+                  @if (isFollowInProgress(user.id)) {
+                    <span class="btn-spinner"></span>
+                  } @else if (user.isFollowing) {
+                    <lucide-icon [img]="UserCheck" [size]="14"></lucide-icon>
+                    Following
+                  } @else {
+                    <lucide-icon [img]="UserPlus" [size]="14"></lucide-icon>
+                    Follow Back
+                  }
+                </button>
+              </div>
             </div>
           }
         </div>
@@ -201,12 +389,7 @@
   }
 </div>
 
-
-
 <!-- Avatar Upload Modal -->
 @if (showAvatarUpload()) {
-  <app-avatar-upload
-    (avatarUploaded)="onAvatarUploaded($event)"
-    (closeModal)="closeAvatarUpload()">
-  </app-avatar-upload>
+  <app-avatar-upload (avatarUploaded)="onAvatarUploaded($event)" (closeModal)="closeAvatarUpload()"></app-avatar-upload>
 }

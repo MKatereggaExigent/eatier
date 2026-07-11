@@ -1,984 +1,839 @@
-// ===================================
-// USER REVIEWS - NYT EDITORIAL STYLE
-// ===================================
+@use 'sass:color';
 
-.user-reviews {
-  padding: 48px 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  min-height: calc(100vh - 200px);
-  background: #ffffff;
+$black: #0F172A;
+$orange: #F97316;
+$border-color: #E2E8F0;
+$text-muted: #64748B;
+$bg-light: #F8FAFC;
+$white: #FFFFFF;
+$font-serif: 'Playfair Display', Georgia, serif;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+.section {
+  padding: 2rem 1rem;
+  background: $white;
+
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 }
 
-// ===================================
-// HEADER SECTION
-// ===================================
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 
-.reviews-header {
-  margin-bottom: 48px;
-  border-bottom: 3px solid #000000;
-  padding-bottom: 24px;
+  .section-title {
+    font-family: $font-serif;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: $black;
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+  }
 
-  .header-content {
+  .tag {
+    font-family: $font-sans;
+    font-size: 1rem;
+    color: $text-muted;
+    margin: 0;
+  }
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: $black;
+  color: $white;
+  border: 1px solid $black;
+  border-radius: 8px;
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: color.adjust($black, $lightness: 20%);
+    border-color: color.adjust($black, $lightness: 20%);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: $white;
+  color: $black;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: $black;
+  }
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: $text-muted;
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.5rem 0;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $black;
+  }
+}
+
+.btn-icon {
+  background: none;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0.375rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $black;
+    color: $black;
+  }
+
+  &-danger:hover {
+    border-color: #DC2626;
+    color: #DC2626;
+  }
+}
+
+// Stats grid
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: 20px;
+  padding: 1.5rem;
+  text-align: center;
+
+  .stat-value {
+    font-family: $font-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: $black;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-label {
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $text-muted;
+  }
+
+  .rating-stars {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 24px;
+    justify-content: center;
+    gap: 2px;
+    margin-top: 0.5rem;
 
-    .title-section {
-      flex: 1;
+    .star-icon {
+      color: $border-color;
 
-      .page-title {
-        font-family: Georgia, 'Times New Roman', serif;
-        font-size: 42px;
-        font-weight: 700;
-        color: #000000;
-        margin: 0 0 8px 0;
-        letter-spacing: -0.02em;
-        line-height: 1.1;
-      }
-
-      .page-subtitle {
-        font-family: Georgia, 'Times New Roman', serif;
-        font-size: 16px;
-        font-style: italic;
-        color: #666666;
-        margin: 0;
-      }
-    }
-
-    .header-actions {
-      .btn-primary {
-        background: #000000;
-        color: #ffffff;
-        border: 1px solid #000000;
-        padding: 12px 24px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: #ffffff;
-          color: #000000;
-        }
+      &.filled {
+        color: $orange;
       }
     }
   }
 }
 
-// ===================================
-// STATS OVERVIEW
-// ===================================
-
-.stats-overview {
-  margin-bottom: 48px;
-  padding-bottom: 48px;
-  border-bottom: 1px solid #e5e5e5;
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0;
-    border: 1px solid #000000;
-  }
-
-  .stat-card {
-    padding: 32px 24px;
-    text-align: center;
-    border-right: 1px solid #000000;
-
-    &:last-child {
-      border-right: none;
-    }
-
-    .stat-value {
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 48px;
-      font-weight: 700;
-      color: #000000;
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-
-    .stat-label {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #666666;
-    }
-
-    .rating-stars {
-      display: flex;
-      justify-content: center;
-      gap: 2px;
-      margin-top: 8px;
-
-      .star {
-        font-size: 14px;
-        color: #d4d4d4;
-
-        &.filled {
-          color: #000000;
-        }
-      }
-    }
-  }
-}
-
-// ===================================
-// FILTERS SECTION
-// ===================================
-
+// Filters
 .filters-section {
-  margin-bottom: 48px;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
-  .filters-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+.search-box {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
 
-    .search-box {
-      .search-input {
-        width: 100%;
-        padding: 14px 16px;
-        border: 1px solid #000000;
-        background: #ffffff;
-        font-family: Georgia, 'Times New Roman', serif;
-        font-size: 15px;
-        color: #000000;
-        transition: box-shadow 0.2s ease;
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-muted;
+    pointer-events: none;
+  }
 
-        &:focus {
-          outline: none;
-          box-shadow: inset 0 0 0 1px #000000;
-        }
+  .search-input {
+    width: 100%;
+    padding: 0.625rem 0.875rem 0.625rem 2.5rem;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-family: $font-sans;
+    font-size: 0.875rem;
+    color: $black;
+    background: $white;
+    transition: border-color 0.2s ease;
 
-        &::placeholder {
-          color: #999999;
-          font-style: italic;
-        }
-      }
+    &:focus {
+      outline: none;
+      border-color: $black;
     }
 
-    .filter-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-
-      .filter-select {
-        padding: 10px 32px 10px 12px;
-        border: 1px solid #000000;
-        background: #ffffff;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        font-size: 12px;
-        color: #000000;
-        cursor: pointer;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-
-        &:focus {
-          outline: none;
-          box-shadow: inset 0 0 0 1px #000000;
-        }
-      }
-
-      .btn-clear {
-        background: transparent;
-        color: #666666;
-        border: none;
-        padding: 10px 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        font-size: 12px;
-        text-decoration: underline;
-        cursor: pointer;
-        transition: color 0.2s ease;
-
-        &:hover {
-          color: #000000;
-        }
-      }
+    &::placeholder {
+      color: $text-muted;
     }
   }
 }
 
-// ===================================
-// REVIEWS LIST
-// ===================================
+.filter-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
-.reviews-list {
-  .loading-state,
-  .empty-state {
-    text-align: center;
-    padding: 80px 24px;
-    border: 1px solid #e5e5e5;
+.filter-select {
+  padding: 0.625rem 2rem 0.625rem 0.75rem;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  background: $white;
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  color: $black;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
 
-    .loading-spinner {
-      width: 32px;
-      height: 32px;
-      border: 2px solid #e5e5e5;
-      border-left: 2px solid #000000;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 24px;
-    }
-
-    h3 {
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 24px;
-      font-weight: 700;
-      color: #000000;
-      margin: 0 0 12px 0;
-    }
-
-    p {
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 15px;
-      color: #666666;
-      margin: 0 0 24px 0;
-    }
-
-    .btn-secondary,
-    .btn-primary {
-      background: #000000;
-      color: #ffffff;
-      border: 1px solid #000000;
-      padding: 12px 24px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      transition: all 0.2s ease;
-
-      &:hover {
-        background: #ffffff;
-        color: #000000;
-      }
-    }
-  }
-
-  .reviews-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
+  &:focus {
+    outline: none;
+    border-color: $black;
   }
 }
 
-// ===================================
-// ANIMATIONS
-// ===================================
+// Loading state
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid $border-color;
+    border-top-color: $orange;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-family: $font-sans;
+    color: $text-muted;
+    margin: 0;
+  }
+}
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-// ===================================
-// REVIEW CARDS
-// ===================================
+// Empty state
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  border: 1px dashed $border-color;
+  border-radius: 20px;
 
-.review-card {
-  border-top: 1px solid #000000;
-  padding: 32px 0;
-  transition: background 0.2s ease;
-
-  &:last-child {
-    border-bottom: 1px solid #000000;
+  .empty-icon {
+    color: $border-color;
+    margin-bottom: 1rem;
   }
+
+  h3 {
+    font-family: $font-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $black;
+    margin: 0 0 0.5rem;
+  }
+
+  p {
+    font-family: $font-sans;
+    font-size: 0.9375rem;
+    color: $text-muted;
+    margin: 0 0 1.5rem;
+    max-width: 400px;
+  }
+}
+
+// Reviews list
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// Review card
+.review-card {
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: 20px;
+  padding: 1.5rem;
+  transition: box-shadow 0.2s ease;
 
   &:hover {
-    background: #fafafa;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
+}
 
-  .review-header {
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $border-color;
+  gap: 1rem;
+}
+
+.restaurant-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  flex: 1;
+
+  .restaurant-avatar {
+    width: 48px;
+    height: 48px;
+    background: $bg-light;
+    border: 1px solid $border-color;
+    border-radius: 12px;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 24px;
-    margin-bottom: 20px;
-
-    .restaurant-info {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex: 1;
-
-      .restaurant-avatar {
-        width: 48px;
-        height: 48px;
-        background: #000000;
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: Georgia, 'Times New Roman', serif;
-        font-size: 20px;
-        font-weight: 700;
-        flex-shrink: 0;
-      }
-
-      .restaurant-details {
-        flex: 1;
-
-        .restaurant-name {
-          font-family: Georgia, 'Times New Roman', serif;
-          font-size: 20px;
-          font-weight: 700;
-          color: #000000;
-          margin: 0 0 4px 0;
-        }
-
-        .review-meta {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          font-size: 12px;
-          color: #666666;
-
-          .visit-date,
-          .business-type {
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-          }
-
-          .business-type::before {
-            content: '·';
-            margin-right: 12px;
-          }
-        }
-      }
-    }
-
-    .review-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-
-      .status-badge {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 6px 12px;
-        border: 1px solid;
-
-        &.status-published {
-          color: #15803d;
-          border-color: #15803d;
-          background: #f0fdf4;
-        }
-
-        &.status-draft {
-          color: #b45309;
-          border-color: #b45309;
-          background: #fffbeb;
-        }
-
-        &.status-flagged {
-          color: #dc2626;
-          border-color: #dc2626;
-          background: #fef2f2;
-        }
-
-        &.status-archived {
-          color: #666666;
-          border-color: #666666;
-          background: #f5f5f5;
-        }
-      }
-
-      .action-menu {
-        display: flex;
-        gap: 8px;
-
-        .action-btn {
-          background: transparent;
-          border: none;
-          padding: 6px 12px;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          font-size: 12px;
-          color: #666666;
-          cursor: pointer;
-          text-decoration: underline;
-          transition: color 0.2s ease;
-
-          &:hover {
-            color: #000000;
-          }
-
-          &.delete:hover {
-            color: #dc2626;
-          }
-        }
-      }
-    }
-  }
-
-  .review-content {
-    .review-rating {
-      margin-bottom: 16px;
-
-      .overall-rating {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        .star {
-          font-size: 16px;
-          color: #d4d4d4;
-
-          &.filled {
-            color: #000000;
-          }
-        }
-
-        .rating-value {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          font-size: 13px;
-          font-weight: 600;
-          color: #666666;
-          margin-left: 4px;
-        }
-      }
-    }
-
-    .review-title {
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 18px;
-      font-weight: 700;
-      color: #000000;
-      margin: 0 0 12px 0;
-      line-height: 1.3;
-    }
-
-    .review-text {
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 15px;
-      color: #333333;
-      line-height: 1.7;
-      margin: 0 0 20px 0;
-    }
-
-    .review-photos {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      overflow-x: auto;
-
-      .review-photo {
-        width: 120px;
-        height: 90px;
-        object-fit: cover;
-        border: 1px solid #e5e5e5;
-        flex-shrink: 0;
-      }
-    }
-  }
-
-  .review-footer {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding-top: 16px;
-    border-top: 1px solid #e5e5e5;
+    justify-content: center;
+    font-family: $font-sans;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: $black;
+    flex-shrink: 0;
+  }
 
-    .review-stats {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 12px;
+  .restaurant-details {
+    min-width: 0;
+    flex: 1;
 
-      .helpful-votes {
-        color: #000000;
-        font-weight: 600;
-      }
-
-      .recommend {
-        color: #15803d;
-        font-weight: 600;
-
-        &::before {
-          content: '✓ ';
-        }
-      }
+    h3 {
+      font-family: $font-sans;
+      font-size: 1rem;
+      font-weight: 600;
+      color: $black;
+      margin: 0 0 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .review-dates {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 12px;
-      color: #999999;
-
-      .created-date {
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
+    .review-meta {
+      display: flex;
+      gap: 0.75rem;
+      font-family: $font-sans;
+      font-size: 0.8125rem;
+      color: $text-muted;
     }
   }
 }
 
-// ===================================
-// MODAL STYLES
-// ===================================
+.review-actions-top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
 
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-family: $font-sans;
+  font-size: 0.6875rem;
+  font-weight: 600;
+
+  &.status-published {
+    background: #F0FDF4;
+    color: #16A34A;
+  }
+
+  &.status-draft {
+    background: #FFF7ED;
+    color: #EA580C;
+  }
+
+  &.status-flagged {
+    background: #FEF2F2;
+    color: #DC2626;
+  }
+
+  &.status-archived {
+    background: $bg-light;
+    color: $text-muted;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.review-content {
+  margin-bottom: 1rem;
+}
+
+.review-rating {
+  margin-bottom: 0.75rem;
+
+  .stars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+
+    .star-icon {
+      color: $border-color;
+
+      &.filled {
+        color: $orange;
+      }
+    }
+
+    .rating-value {
+      font-family: $font-sans;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: $text-muted;
+      margin-left: 0.5rem;
+    }
+  }
+}
+
+.review-title {
+  font-family: $font-sans;
+  font-size: 1rem;
+  font-weight: 600;
+  color: $black;
+  margin: 0 0 0.5rem;
+  line-height: 1.3;
+}
+
+.review-text {
+  font-family: $font-sans;
+  font-size: 0.9375rem;
+  color: $black;
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
+.review-photos {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+
+  .review-photo {
+    width: 100px;
+    height: 75px;
+    object-fit: cover;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+}
+
+.review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid $border-color;
+  gap: 1rem;
+
+  .review-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-family: $font-sans;
+    font-size: 0.8125rem;
+
+    .helpful-votes {
+      color: $text-muted;
+      font-weight: 500;
+    }
+
+    .recommend-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      color: #16A34A;
+      font-weight: 600;
+    }
+  }
+
+  .review-date {
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+// Modal
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 24px;
+  padding: 1rem;
+}
 
-  .modal-content {
-    background: #ffffff;
-    border: 1px solid #000000;
-    max-width: 480px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
+.modal-content {
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
 
-    &.large {
-      max-width: 720px;
+  &.large {
+    max-width: 720px;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid $border-color;
+
+    h2 {
+      font-family: $font-sans;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: $black;
+      margin: 0;
     }
 
-    .modal-header {
-      padding: 24px 24px 20px;
-      border-bottom: 3px solid #000000;
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: $text-muted;
+      padding: 4px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+      flex-shrink: 0;
 
-      h3 {
-        font-family: Georgia, 'Times New Roman', serif;
-        font-size: 24px;
-        font-weight: 700;
-        color: #000000;
-        margin: 0;
-      }
-
-      .modal-close {
-        background: none;
-        border: none;
-        font-size: 28px;
-        font-weight: 300;
-        color: #000000;
-        cursor: pointer;
-        padding: 0;
-        line-height: 1;
-        transition: opacity 0.2s ease;
-
-        &:hover {
-          opacity: 0.6;
-        }
-      }
-    }
-
-    .modal-body {
-      padding: 24px;
-
-      p {
-        font-family: Georgia, 'Times New Roman', serif;
-        font-size: 15px;
-        color: #333333;
-        line-height: 1.7;
-        margin: 0 0 16px 0;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
-
-      .warning-text {
-        color: #dc2626;
-        font-weight: 600;
-        font-size: 14px;
-      }
-
-      .note {
-        background: #f5f5f5;
-        color: #666666;
-        padding: 16px;
-        border-left: 3px solid #000000;
-        font-size: 14px;
-        font-style: italic;
-      }
-    }
-
-    .modal-footer {
-      padding: 20px 24px 24px;
-      border-top: 1px solid #e5e5e5;
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-
-      .btn-secondary,
-      .btn-primary,
-      .btn-danger {
-        padding: 12px 24px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .btn-secondary {
-        background: #ffffff;
-        color: #000000;
-        border: 1px solid #000000;
-
-        &:hover {
-          background: #f5f5f5;
-        }
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-      }
-
-      .btn-primary {
-        background: #000000;
-        color: #ffffff;
-        border: 1px solid #000000;
-
-        &:hover {
-          background: #333333;
-        }
-      }
-
-      .btn-danger {
-        background: #dc2626;
-        color: #ffffff;
-        border: 1px solid #dc2626;
-
-        &:hover {
-          background: #b91c1c;
-          border-color: #b91c1c;
-        }
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
+      &:hover {
+        background: $bg-light;
+        color: $black;
       }
     }
   }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .modal-warning {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+
+    .warning-icon {
+      color: #DC2626;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    p {
+      font-family: $font-sans;
+      margin: 0 0 0.5rem;
+      color: $black;
+      line-height: 1.6;
+
+      strong {
+        color: $black;
+      }
+    }
+
+    .warning-text {
+      color: #DC2626;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    border-top: 1px solid $border-color;
+    background: $bg-light;
+    border-radius: 0 0 20px 20px;
+  }
 }
 
-// ===================================
-// REVIEW FORM STYLES
-// ===================================
-
+// Form styles
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 
   label {
     display: block;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
+    font-family: $font-sans;
+    font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #333;
-    margin-bottom: 8px;
+    color: $text-muted;
+    margin-bottom: 0.5rem;
   }
 
   .form-input,
   .form-textarea,
   .form-select {
     width: 100%;
-    padding: 12px 16px;
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 15px;
-    border: 1px solid #d1d1d1;
-    border-radius: 4px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    background-color: #fff;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-family: $font-sans;
+    font-size: 0.875rem;
+    color: $black;
+    background: $white;
+    transition: border-color 0.2s ease;
 
     &:focus {
       outline: none;
-      border-color: #000;
-      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+      border-color: $black;
     }
 
     &::placeholder {
-      color: #999;
-    }
-  }
-
-  .form-select {
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 40px;
-
-    option {
-      padding: 8px;
+      color: $text-muted;
     }
   }
 
   .form-textarea {
     resize: vertical;
-    min-height: 120px;
+    min-height: 100px;
   }
 
-  .loading-text {
-    padding: 12px 16px;
-    color: #666;
-    font-style: italic;
-    font-size: 14px;
-    background: #f5f5f5;
-    border: 1px solid #d1d1d1;
-    border-radius: 4px;
+  .form-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 2.5rem;
   }
 
-  .ratings-section {
-    margin-bottom: 24px;
-
-    .section-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #333;
-      margin-bottom: 4px;
-    }
-
-    .section-hint {
-      font-size: 13px;
-      color: #666;
-      margin: 0 0 16px 0;
-      font-style: italic;
-    }
-
-    .weight {
-      font-weight: 400;
-      font-size: 11px;
-      color: #888;
-      text-transform: none;
-    }
-  }
-
-  .calculated-rating {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    background: linear-gradient(135deg, #f8f6f0 0%, #f0ede4 100%);
+  .loading-placeholder {
+    padding: 0.75rem 0.875rem;
+    background: $bg-light;
+    border: 1px solid $border-color;
     border-radius: 8px;
-    margin-top: 16px;
-    border: 1px solid #e0ddd4;
-
-    .label {
-      font-weight: 600;
-      font-size: 14px;
-      color: #333;
-    }
-
-    .rating-value {
-      font-size: 18px;
-      font-weight: 700;
-      color: #888;
-      font-family: Georgia, 'Times New Roman', serif;
-
-      &.has-rating {
-        color: #333;
-      }
-    }
-
-    .rating-stars {
-      display: flex;
-      gap: 2px;
-
-      .star {
-        font-size: 18px;
-        color: #ddd;
-
-        &.filled {
-          color: #f4c150;
-        }
-      }
-    }
-  }
-}
-
-.business-search-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-
-  input {
-    flex: 1;
-  }
-
-  .clear-business {
-    position: absolute;
-    right: 12px;
-    background: none;
-    border: none;
-    font-size: 16px;
-    color: #666;
-    cursor: pointer;
-    padding: 4px;
-
-    &:hover {
-      color: #000;
-    }
-  }
-}
-
-.search-loading {
-  font-size: 13px;
-  color: #666;
-  font-style: italic;
-  padding: 8px 0;
-}
-
-.business-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: #fff;
-  border: 1px solid #d1d1d1;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-  .business-option {
-    padding: 12px 16px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #f0f0f0;
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    &:hover {
-      background: #f5f5f5;
-    }
-
-    .business-name {
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 15px;
-      color: #000;
-    }
-
-    .business-type {
-      font-size: 12px;
-      color: #666;
-      text-transform: capitalize;
-    }
+    color: $text-muted;
+    font-size: 0.875rem;
+    font-style: italic;
   }
 }
 
 .business-display {
-  padding: 12px 16px;
-  background: #f5f5f5;
-  border: 1px solid #d1d1d1;
-  border-radius: 4px;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 15px;
-  color: #333;
+  padding: 0.75rem 0.875rem;
+  background: $bg-light;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  color: $black;
 }
 
-.rating-group {
-  .star-rating {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.ratings-section {
+  margin-bottom: 1.5rem;
 
-    .rating-label {
-      margin-left: 12px;
-      font-size: 14px;
-      color: #666;
-    }
-  }
-}
-
-.star-btn {
-  background: none;
-  border: none;
-  font-size: 28px;
-  color: #d1d1d1;
-  cursor: pointer;
-  padding: 2px;
-  transition: color 0.15s ease, transform 0.15s ease;
-
-  &.filled {
-    color: #f59e0b;
+  .section-label {
+    display: block;
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-muted;
+    margin-bottom: 0.25rem;
   }
 
-  &:hover {
-    transform: scale(1.1);
-  }
-
-  &.small {
-    font-size: 18px;
+  .section-hint {
+    font-family: $font-sans;
+    font-size: 0.8125rem;
+    color: $text-muted;
+    margin: 0 0 1rem;
   }
 }
 
-.detailed-ratings-grid {
+.ratings-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  padding: 16px;
-  background: #f9f9f9;
-  border: 1px solid #e5e5e5;
-  border-radius: 4px;
-  margin-bottom: 20px;
+  gap: 1rem;
+  padding: 1rem;
+  background: $bg-light;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
 
-  .rating-item {
+.rating-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  label {
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-muted;
+    margin-bottom: 0;
+
+    .weight {
+      font-weight: 400;
+      font-size: 0.6875rem;
+      color: $text-muted;
+    }
+  }
+}
+
+.mini-stars {
+  display: flex;
+  gap: 2px;
+
+  .star-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    color: $border-color;
+    transition: color 0.15s ease;
     display: flex;
-    flex-direction: column;
-    gap: 6px;
 
-    label {
-      font-size: 12px;
-      font-weight: 500;
-      color: #666;
-      margin-bottom: 0;
+    lucide-icon {
+      display: flex;
     }
 
-    .mini-star-rating {
-      display: flex;
-      gap: 2px;
+    &:hover lucide-icon,
+    lucide-icon.filled {
+      color: $orange;
+    }
+  }
+}
+
+.calculated-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+
+  .calc-label {
+    font-family: $font-sans;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: $black;
+  }
+
+  .calc-value {
+    font-family: $font-sans;
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text-muted;
+
+    &.active {
+      color: $black;
+    }
+  }
+
+  .calc-stars {
+    display: flex;
+    gap: 2px;
+
+    lucide-icon {
+      color: $border-color;
+
+      &.filled {
+        color: $orange;
+      }
     }
   }
 }
 
 .form-row {
   display: flex;
-  gap: 20px;
+  gap: 1rem;
   align-items: flex-start;
 
   .form-group {
@@ -988,58 +843,95 @@
   .checkbox-group {
     display: flex;
     align-items: center;
-    padding-top: 28px;
+    padding-top: 1.5rem;
+  }
+}
 
-    label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 400;
-      text-transform: none;
-      letter-spacing: 0;
-      cursor: pointer;
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: $black;
+  cursor: pointer;
 
-      input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-      }
-    }
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: $black;
   }
 }
 
 .error-message {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  padding: 12px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  margin-top: 16px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #DC2626;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  font-family: $font-sans;
 }
 
-// ===================================
-// RESPONSIVE DESIGN
-// ===================================
-
-@media (max-width: 1024px) {
-  .user-reviews {
-    padding: 32px 16px;
+// Responsive
+@media (max-width: 768px) {
+  .section {
+    padding: 1.5rem 1rem;
   }
 
-  .reviews-header .header-content {
+  .page-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+
+    .section-title {
+      font-size: 1.75rem;
+    }
   }
 
-  .stats-overview .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 
-  .detailed-ratings-grid {
-    grid-template-columns: 1fr 1fr;
+  .stat-card .stat-value {
+    font-size: 2rem;
+  }
+
+  .filters-section {
+    flex-direction: column;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .filter-controls {
+    width: 100%;
+
+    .filter-select {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  .review-header {
+    flex-direction: column;
+  }
+
+  .review-actions-top {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .review-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ratings-grid {
+    grid-template-columns: 1fr;
   }
 
   .form-row {
@@ -1050,76 +942,8 @@
       padding-top: 0;
     }
   }
-}
 
-@media (max-width: 768px) {
-  .user-reviews {
-    padding: 24px 16px;
-  }
-
-  .reviews-header .header-content .title-section .page-title {
-    font-size: 32px;
-  }
-
-  .stats-overview .stats-grid {
-    grid-template-columns: 1fr;
-    border: none;
-
-    .stat-card {
-      border: 1px solid #000000;
-      border-right: 1px solid #000000;
-      margin-bottom: -1px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  .filters-section .filters-container .filter-controls {
-    flex-direction: column;
-    align-items: stretch;
-
-    .filter-select {
-      width: 100%;
-    }
-  }
-
-  .review-card {
-    .review-header {
-      flex-direction: column;
-      gap: 16px;
-
-      .review-actions {
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-between;
-      }
-    }
-
-    .review-footer {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-    }
-  }
-
-  .modal-overlay {
-    padding: 16px;
-
-    .modal-content {
-      max-width: 100%;
-
-      .modal-footer {
-        flex-direction: column;
-
-        .btn-secondary,
-        .btn-primary,
-        .btn-danger {
-          width: 100%;
-          text-align: center;
-        }
-      }
-    }
+  .modal-content.large {
+    max-width: 100%;
   }
 }

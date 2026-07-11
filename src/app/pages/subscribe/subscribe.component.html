@@ -1,20 +1,22 @@
 <div class="pricing-page">
-  <!-- Hero Section -->
-  <section class="hero-section">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
     <div class="hero-content">
+      <span class="hero-label">Pricing</span>
       <h1 class="hero-title">Choose Your Perfect Plan</h1>
       <p class="hero-subtitle">
         Unlock the full potential of Itiyum with a plan tailored to your needs.
         From casual diners to restaurant owners, we have something for everyone.
       </p>
 
-      <!-- Billing Toggle -->
       <div class="billing-toggle">
-        <span [class.active]="billingCycle() === 'monthly'">Monthly</span>
-        <button class="toggle-switch" (click)="toggleBillingCycle()" [class.yearly]="billingCycle() === 'yearly'">
+        <span class="toggle-label" [class.active]="billingCycle() === 'monthly'">Monthly</span>
+        <button class="toggle-switch" (click)="toggleBillingCycle()" [class.yearly]="billingCycle() === 'yearly'" role="switch" [attr.aria-checked]="billingCycle() === 'yearly'">
           <span class="toggle-knob"></span>
         </button>
-        <span [class.active]="billingCycle() === 'yearly'">
+        <span class="toggle-label" [class.active]="billingCycle() === 'yearly'">
           Yearly
           <span class="save-badge">Save up to 17%</span>
         </span>
@@ -25,55 +27,50 @@
   <!-- User Type Tabs -->
   <section class="user-type-section">
     <div class="user-type-tabs">
-      @for (type of userTypes; track type.id) {
-        <button
-          class="user-type-tab"
-          [class.active]="selectedUserType() === type.id"
-          (click)="selectUserType(type.id)">
-          <span class="tab-icon">
+      @for (type of userTypes; track type.id; let i = $index) {
+        <button class="user-type-tab" [class.active]="selectedUserType() === type.id" (click)="selectUserType(type.id)" [style.--tab-delay]="i * 0.1 + 's'">
+          <span class="tab-icon-wrap">
             <lucide-icon [img]="getUserTypeIcon(type.id)" [size]="24"></lucide-icon>
           </span>
           <span class="tab-name">{{ type.name }}</span>
-          <span class="tab-description">{{ type.description }}</span>
+          <span class="tab-desc">{{ type.description }}</span>
         </button>
       }
     </div>
   </section>
 
-  <!-- Error Message -->
+  <!-- Error -->
   @if (error()) {
     <div class="error-banner">
-      <span class="error-icon">
-        <lucide-icon [img]="AlertTriangle" [size]="20"></lucide-icon>
-      </span>
-      {{ error() }}
+      <lucide-icon [img]="AlertTriangle" [size]="18"></lucide-icon>
+      <span>{{ error() }}</span>
     </div>
   }
 
-  <!-- Loading State -->
+  <!-- Loading -->
   @if (loading()) {
-    <section class="loading-section">
-      <div class="loading-spinner"></div>
+    <div class="loading-state">
+      <div class="spinner"></div>
       <p>Loading plans...</p>
-    </section>
+    </div>
   }
 
-  <!-- Plans Grid -->
+  <!-- Plans -->
   @if (!loading()) {
     <section class="plans-section">
       <div class="plans-grid">
-        @for (plan of filteredPlans; track plan.id) {
-          <div class="plan-card" [class.popular]="plan.is_popular" [class.free]="getPrice(plan) === 0">
+        @for (plan of filteredPlans; track plan.id; let i = $index) {
+          <div class="plan-card" [class.popular]="plan.is_popular" [class.free]="getPrice(plan) === 0" [style.--card-delay]="i * 0.12 + 's'">
             @if (plan.is_popular) {
               <div class="popular-badge">Most Popular</div>
             }
 
             <div class="plan-header">
               <h3 class="plan-name">{{ plan.name }}</h3>
-              <p class="plan-description">{{ plan.description }}</p>
+              <p class="plan-desc">{{ plan.description }}</p>
             </div>
 
-            <div class="plan-pricing">
+            <div class="plan-price">
               @if (getPrice(plan) === 0) {
                 <span class="price-amount">Free</span>
                 <span class="price-period">Forever</span>
@@ -81,8 +78,8 @@
                 <span class="price-amount">{{ formatCurrency(getPrice(plan)) }}</span>
                 <span class="price-period">/{{ billingCycle() === 'yearly' ? 'year' : 'month' }}</span>
                 @if (billingCycle() === 'yearly' && getSavingsPercent(plan) > 0) {
-                  <div class="yearly-savings">
-                    <span class="monthly-equivalent">{{ formatCurrency(getMonthlyEquivalent(plan)) }}/mo</span>
+                  <div class="yearly-info">
+                    <span class="monthly-eq">{{ formatCurrency(getMonthlyEquivalent(plan)) }}/mo</span>
                     <span class="savings-badge">Save {{ getSavingsPercent(plan) }}%</span>
                   </div>
                 }
@@ -92,22 +89,17 @@
             <ul class="plan-features">
               @for (feature of getFeaturesList(plan); track feature) {
                 <li class="feature-item">
-                  <span class="feature-check">
-                    <lucide-icon [img]="Check" [size]="16"></lucide-icon>
+                  <span class="feature-icon">
+                    <lucide-icon [img]="Check" [size]="15"></lucide-icon>
                   </span>
                   {{ feature }}
                 </li>
               }
             </ul>
 
-            <button
-              class="subscribe-btn"
-              [class.processing]="processingPlanId() === plan.id"
-              [disabled]="processingPlanId() !== null"
-              (click)="subscribeToPlan(plan)">
+            <button class="subscribe-btn" [class.processing]="processingPlanId() === plan.id" [disabled]="processingPlanId() !== null" (click)="subscribeToPlan(plan)">
               @if (processingPlanId() === plan.id) {
-                <span class="btn-spinner"></span>
-                Processing...
+                <span class="btn-spinner"></span> Processing...
               } @else if (getPrice(plan) === 0) {
                 Get Started Free
               } @else {
@@ -116,7 +108,7 @@
             </button>
 
             @if (plan.trial_days > 0) {
-              <p class="trial-note">{{ plan.trial_days }}-day free trial included</p>
+              <p class="trial-note">{{ plan.trial_days }}-day free trial &middot; No credit card required</p>
             }
           </div>
         }
@@ -124,68 +116,74 @@
     </section>
   }
 
-  <!-- Features Comparison -->
-  <section class="comparison-section">
-    <h2 class="section-title">Why Choose Itiyum?</h2>
-    <div class="benefits-grid">
-      <div class="benefit-card">
-        <span class="benefit-icon">
-          <lucide-icon [img]="Lock" [size]="32"></lucide-icon>
-        </span>
-        <h3>Secure Payments</h3>
-        <p>All transactions are processed securely through Paystack</p>
-      </div>
-      <div class="benefit-card">
-        <span class="benefit-icon">
-          <lucide-icon [img]="Smartphone" [size]="32"></lucide-icon>
-        </span>
-        <h3>Mobile Friendly</h3>
-        <p>Access your dashboard from any device, anywhere</p>
-      </div>
-      <div class="benefit-card">
-        <span class="benefit-icon">
-          <lucide-icon [img]="BarChart3" [size]="32"></lucide-icon>
-        </span>
-        <h3>Real-time Analytics</h3>
-        <p>Track your performance with detailed insights</p>
-      </div>
-      <div class="benefit-card">
-        <span class="benefit-icon">
-          <lucide-icon [img]="Target" [size]="32"></lucide-icon>
-        </span>
-        <h3>Targeted Marketing</h3>
-        <p>Reach the right customers with smart advertising</p>
+  <!-- Benefits -->
+  <section class="benefits-section">
+    <div class="benefits-inner">
+      <h2 class="section-title">Why Choose Itiyum?</h2>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon-wrap">
+            <lucide-icon [img]="Lock" [size]="28"></lucide-icon>
+          </div>
+          <h3>Secure Payments</h3>
+          <p>All transactions are processed securely through Paystack</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon-wrap">
+            <lucide-icon [img]="Smartphone" [size]="28"></lucide-icon>
+          </div>
+          <h3>Mobile Friendly</h3>
+          <p>Access your dashboard from any device, anywhere</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon-wrap">
+            <lucide-icon [img]="BarChart3" [size]="28"></lucide-icon>
+          </div>
+          <h3>Real-time Analytics</h3>
+          <p>Track your performance with detailed insights</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon-wrap">
+            <lucide-icon [img]="Target" [size]="28"></lucide-icon>
+          </div>
+          <h3>Targeted Marketing</h3>
+          <p>Reach the right customers with smart advertising</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- FAQ Section -->
+  <!-- FAQ -->
   <section class="faq-section">
-    <h2 class="section-title">Frequently Asked Questions</h2>
-    <div class="faq-grid">
-      <div class="faq-item">
-        <h4>Can I change my plan later?</h4>
-        <p>Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
-      </div>
-      <div class="faq-item">
-        <h4>What payment methods do you accept?</h4>
-        <p>We accept all major credit/debit cards, bank transfers, and mobile money through Paystack.</p>
-      </div>
-      <div class="faq-item">
-        <h4>Is there a contract or commitment?</h4>
-        <p>No long-term contracts. You can cancel your subscription at any time.</p>
-      </div>
-      <div class="faq-item">
-        <h4>Do you offer refunds?</h4>
-        <p>We offer a 14-day money-back guarantee if you're not satisfied with your subscription.</p>
+    <div class="faq-inner">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4>Can I change my plan later?</h4>
+          <p>Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
+        </div>
+        <div class="faq-item">
+          <h4>What payment methods do you accept?</h4>
+          <p>We accept all major credit/debit cards, bank transfers, and mobile money through Paystack.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Is there a contract or commitment?</h4>
+          <p>No long-term contracts. You can cancel your subscription at any time.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Do you offer refunds?</h4>
+          <p>We offer a 14-day money-back guarantee if you're not satisfied with your subscription.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- CTA Section -->
+  <!-- CTA -->
   <section class="cta-section">
-    <h2>Ready to Get Started?</h2>
-    <p>Join thousands of restaurants and food lovers on Itiyum today.</p>
-    <button class="cta-btn" (click)="selectUserType('business_owner')">View Business Plans</button>
+    <div class="cta-inner">
+      <h2>Ready to Get Started?</h2>
+      <p>Join thousands of restaurants and food lovers on Itiyum today.</p>
+      <button class="cta-btn" (click)="selectUserType('business_owner')">View Business Plans</button>
+    </div>
   </section>
 </div>

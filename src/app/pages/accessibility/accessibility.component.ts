@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Mail } from 'lucide-angular';
+import { LucideAngularModule, Mail, Phone } from 'lucide-angular';
 
 @Component({
   selector: 'app-accessibility',
@@ -11,6 +11,7 @@ import { LucideAngularModule, Mail } from 'lucide-angular';
 })
 export class AccessibilityComponent {
   readonly Mail = Mail;
+  readonly Phone = Phone;
   lastUpdated = 'March 14, 2026';
 }
 

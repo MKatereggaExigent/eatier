@@ -1,73 +1,56 @@
-<div class="reviews-dashboard" role="main" aria-label="Food Enthusiast Reviews Dashboard">
-  <!-- Header Section -->
-  <header class="dashboard-header">
-    <div class="header-content">
-      <div class="title-section">
-        <h1 class="page-title">
-          <span class="title-icon">⭐</span>
-          My Reviews
-        </h1>
-        <p class="page-subtitle">
-          Share your dining experiences and help others discover great restaurants
-        </p>
-      </div>
+<div class="section">
+  <div class="section-inner">
+    <div class="tag">
+      <lucide-icon [img]="Star" [size]="16"></lucide-icon>
+      <span>Reviews</span>
+    </div>
+    <h2 class="section-title">My Reviews</h2>
+    <p class="section-subtitle">Share your dining experiences and help others discover great restaurants</p>
 
-      <div class="header-actions">
-        <button
-          type="button"
-          class="btn-primary new-review-btn"
-          (click)="openNewReviewModal()"
-          aria-label="Write new review">
-          <span class="btn-icon">✍️</span>
-          Write Review
-        </button>
-      </div>
+    <div class="header-actions">
+      <button type="button" class="btn-primary" (click)="openNewReviewModal()" aria-label="Write new review">
+        <lucide-icon [img]="PenLine" [size]="16"></lucide-icon>
+        Write Review
+      </button>
     </div>
 
-    <!-- Stats Cards -->
     @if (stats(); as reviewStats) {
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-icon">📝</div>
+          <lucide-icon [img]="PenLine" [size]="24"></lucide-icon>
           <div class="stat-content">
-            <div class="stat-number">{{ reviewStats.totalReviews }}</div>
-            <div class="stat-label">Total Reviews</div>
+            <span class="stat-value">{{ reviewStats.totalReviews }}</span>
+            <span class="stat-label">Total Reviews</span>
           </div>
         </div>
-
         <div class="stat-card">
-          <div class="stat-icon">⭐</div>
+          <lucide-icon [img]="Star" [size]="24"></lucide-icon>
           <div class="stat-content">
-            <div class="stat-number">{{ +(reviewStats.averageRating || 0) | number:'1.1-1' }}</div>
-            <div class="stat-label">Average Rating</div>
+            <span class="stat-value">{{ +(reviewStats.averageRating || 0) | number:'1.1-1' }}</span>
+            <span class="stat-label">Average Rating</span>
           </div>
         </div>
-
         <div class="stat-card">
-          <div class="stat-icon">👍</div>
+          <lucide-icon [img]="Heart" [size]="24"></lucide-icon>
           <div class="stat-content">
-            <div class="stat-number">{{ reviewStats.helpfulVotes }}</div>
-            <div class="stat-label">Helpful Votes</div>
+            <span class="stat-value">{{ reviewStats.helpfulVotes }}</span>
+            <span class="stat-label">Helpful Votes</span>
           </div>
         </div>
-
         <div class="stat-card">
-          <div class="stat-icon">🔥</div>
+          <lucide-icon [img]="TrendingUp" [size]="24"></lucide-icon>
           <div class="stat-content">
-            <div class="stat-number">{{ reviewStats.reviewStreak }}</div>
-            <div class="stat-label">Day Streak</div>
+            <span class="stat-value">{{ reviewStats.reviewStreak }}</span>
+            <span class="stat-label">Day Streak</span>
           </div>
         </div>
       </div>
     }
-  </header>
 
-  <!-- Controls Section -->
-  <section class="controls-section">
-    <div class="controls-content">
-      <!-- Search and Filter Toggle -->
-      <div class="search-controls">
-        <div class="search-input-wrapper">
+    <div class="controls-section">
+      <div class="controls-row">
+        <div class="search-wrapper">
+          <lucide-icon [img]="Search" [size]="16" class="search-icon"></lucide-icon>
           <input
             type="text"
             class="search-input"
@@ -75,314 +58,231 @@
             [value]="searchQuery()"
             (input)="onSearchInput($event)"
             aria-label="Search reviews">
-          <span class="search-icon">🔍</span>
+        </div>
+        <div class="filter-actions">
+          <button type="button" class="btn-filter" (click)="toggleFilters()" [class.active]="showFilters()">
+            <lucide-icon [img]="Sliders" [size]="14"></lucide-icon>
+            Filters
+            @if (hasActiveFilters()) {
+              <span class="filter-count">{{ filteredReviews().length }}</span>
+            }
+          </button>
+          @if (hasActiveFilters()) {
+            <button type="button" class="btn-clear" (click)="clearFilters()">Clear</button>
+          }
         </div>
       </div>
 
-      <!-- Filter Controls -->
-      <div class="filter-controls">
-        <button
-          type="button"
-          class="filter-toggle-btn"
-          (click)="toggleFilters()"
-          [class.active]="showFilters()">
-          <span class="btn-icon">🔽</span>
-          Filters
-          @if (hasActiveFilters()) {
-            <span class="filter-badge">{{ filteredReviews().length }}</span>
-          }
-        </button>
-
-        @if (hasActiveFilters()) {
-          <button
-            type="button"
-            class="clear-filters-btn"
-            (click)="clearFilters()">
-            Clear Filters
-          </button>
-        }
-      </div>
+      @if (showFilters()) {
+        <div class="filter-panel">
+          <div class="filter-grid">
+            <div class="filter-group">
+              <label class="filter-label">Status</label>
+              <select class="filter-select" [value]="filters().status" (change)="onFilterChange('status', $event)">
+                @for (option of statusOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Rating</label>
+              <select class="filter-select" [value]="filters().rating" (change)="onFilterChange('rating', $event)">
+                @for (option of ratingOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Time Range</label>
+              <select class="filter-select" [value]="filters().timeRange" (change)="onFilterChange('timeRange', $event)">
+                @for (option of timeRangeOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Cuisine</label>
+              <select class="filter-select" [value]="filters().cuisine" (change)="onFilterChange('cuisine', $event)">
+                <option value="all">All Cuisines</option>
+                @for (cuisine of availableCuisines(); track cuisine) {
+                  <option [value]="cuisine">{{ cuisine }}</option>
+                }
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Sort By</label>
+              <select class="filter-select" [value]="filters().sortBy" (change)="onFilterChange('sortBy', $event)">
+                @for (option of sortOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+      }
     </div>
 
-    <!-- Filter Panel -->
-    @if (showFilters()) {
-      <div class="filter-panel">
-        <div class="filter-grid">
-          <!-- Status Filter -->
-          <div class="filter-group">
-            <label class="filter-label">Status</label>
-            <select
-              class="filter-select"
-              [value]="filters().status"
-              (change)="onFilterChange('status', $event)">
-              @for (option of statusOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Rating Filter -->
-          <div class="filter-group">
-            <label class="filter-label">Rating</label>
-            <select
-              class="filter-select"
-              [value]="filters().rating"
-              (change)="onFilterChange('rating', $event)">
-              @for (option of ratingOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Time Range Filter -->
-          <div class="filter-group">
-            <label class="filter-label">Time Range</label>
-            <select
-              class="filter-select"
-              [value]="filters().timeRange"
-              (change)="onFilterChange('timeRange', $event)">
-              @for (option of timeRangeOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Cuisine Filter -->
-          <div class="filter-group">
-            <label class="filter-label">Cuisine</label>
-            <select
-              class="filter-select"
-              [value]="filters().cuisine"
-              (change)="onFilterChange('cuisine', $event)">
-              <option value="all">All Cuisines</option>
-              @for (cuisine of availableCuisines(); track cuisine) {
-                <option [value]="cuisine">{{ cuisine }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Sort Filter -->
-          <div class="filter-group">
-            <label class="filter-label">Sort By</label>
-            <select
-              class="filter-select"
-              [value]="filters().sortBy"
-              (change)="onFilterChange('sortBy', $event)">
-              @for (option of sortOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </div>
+    <section class="reviews-section">
+      @if (isLoading()) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading your reviews...</p>
         </div>
-      </div>
-    }
-  </section>
-
-  <!-- Reviews List -->
-  <section class="reviews-section">
-    @if (isLoading()) {
-      <div class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>Loading your reviews...</p>
-      </div>
-    } @else if (filteredReviews().length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">⭐</div>
-        <h3>No reviews found</h3>
-        @if (hasActiveFilters()) {
-          <p>Try adjusting your filters or search terms.</p>
-          <button type="button" class="btn-secondary" (click)="clearFilters()">
-            Clear Filters
-          </button>
-        } @else {
-          <p>You haven't written any restaurant reviews yet.</p>
-          <button type="button" class="btn-primary" (click)="openNewReviewModal()">
-            Write Your First Review
-          </button>
-        }
-      </div>
-    } @else {
-      <div class="reviews-grid">
-        @for (review of filteredReviews(); track review.id) {
-          <div class="review-card" [class]="'status-' + review.status">
-            <!-- Review Header -->
-            <div class="review-header">
-              <div class="restaurant-info">
-                <img
-                  [src]="review.restaurant.imageUrl"
-                  [alt]="review.restaurant.name"
-                  class="restaurant-image"
-                  loading="lazy">
-                <div class="restaurant-details">
-                  <h3 class="restaurant-name">{{ review.restaurant.name }}</h3>
-                  <p class="restaurant-cuisine">{{ review.restaurant.cuisineTypes.join(', ') }}</p>
-                  <p class="restaurant-location">{{ review.restaurant.address }}, {{ review.restaurant.city }}</p>
+      } @else if (filteredReviews().length === 0) {
+        <div class="empty-state">
+          <lucide-icon [img]="Star" [size]="48" class="empty-icon"></lucide-icon>
+          <h3>No reviews found</h3>
+          @if (hasActiveFilters()) {
+            <p>Try adjusting your filters or search terms.</p>
+            <button type="button" class="btn-secondary" (click)="clearFilters()">Clear Filters</button>
+          } @else {
+            <p>You haven't written any restaurant reviews yet.</p>
+            <button type="button" class="btn-primary" (click)="openNewReviewModal()">Write Your First Review</button>
+          }
+        </div>
+      } @else {
+        <div class="reviews-list">
+          @for (review of filteredReviews(); track review.id) {
+            <div class="review-card" [class]="'status-' + review.status">
+              <div class="review-header">
+                <div class="restaurant-info">
+                  <img [src]="review.restaurant.imageUrl" [alt]="review.restaurant.name" class="restaurant-image" loading="lazy">
+                  <div class="restaurant-details">
+                    <h3 class="restaurant-name">{{ review.restaurant.name }}</h3>
+                    <p class="restaurant-cuisine">{{ review.restaurant.cuisineTypes.join(', ') }}</p>
+                    <p class="restaurant-location">{{ review.restaurant.address }}, {{ review.restaurant.city }}</p>
+                  </div>
+                </div>
+                <div class="review-rating">
+                  <div class="rating-badge" [class]="getRatingColor(review.overallRating)">
+                    <span class="rating-number">{{ review.overallRating }}</span>
+                    <div class="rating-stars">
+                      @for (filled of getStarArray(review.overallRating); track $index) {
+                        <lucide-icon [img]="Star" [size]="12" [class.star-filled]="filled" [class.star-empty]="!filled"></lucide-icon>
+                      }
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div class="review-rating">
-                <div class="overall-rating" [class]="getRatingColor(review.overallRating)">
-                  <span class="rating-number">{{ review.overallRating }}</span>
-                  <div class="rating-stars">
-                    @for (filled of getStarArray(review.overallRating); track $index) {
-                      <span class="star" [class.filled]="filled">⭐</span>
+              <div class="review-content">
+                @if (review.title) {
+                  <h4 class="review-title">{{ review.title }}</h4>
+                }
+                <p class="review-text">{{ review.content }}</p>
+
+                @if (review.foodRating || review.serviceRating || review.ambianceRating || review.valueRating) {
+                  <div class="detail-ratings">
+                    @if (review.foodRating) {
+                      <div class="detail-rating-item">
+                        <span class="detail-rating-label">Food</span>
+                        <span class="detail-rating-value">{{ review.foodRating }}/5</span>
+                      </div>
+                    }
+                    @if (review.serviceRating) {
+                      <div class="detail-rating-item">
+                        <span class="detail-rating-label">Service</span>
+                        <span class="detail-rating-value">{{ review.serviceRating }}/5</span>
+                      </div>
+                    }
+                    @if (review.ambianceRating) {
+                      <div class="detail-rating-item">
+                        <span class="detail-rating-label">Ambiance</span>
+                        <span class="detail-rating-value">{{ review.ambianceRating }}/5</span>
+                      </div>
+                    }
+                    @if (review.valueRating) {
+                      <div class="detail-rating-item">
+                        <span class="detail-rating-label">Value</span>
+                        <span class="detail-rating-value">{{ review.valueRating }}/5</span>
+                      </div>
                     }
                   </div>
-                </div>
-              </div>
-            </div>
+                }
 
-            <!-- Review Content -->
-            <div class="review-content">
-              @if (review.title) {
-                <h4 class="review-title">{{ review.title }}</h4>
-              }
-
-              <p class="review-text">{{ review.content }}</p>
-
-              <!-- Detailed Ratings -->
-              @if (review.foodRating || review.serviceRating || review.ambianceRating || review.valueRating) {
-                <div class="detailed-ratings">
-                  @if (review.foodRating) {
-                    <div class="rating-item">
-                      <span class="rating-label">Food</span>
-                      <span class="rating-value">{{ review.foodRating }}/5</span>
-                    </div>
+                <div class="review-details">
+                  @if (review.visitDate) {
+                    <span class="detail-chip">
+                      <lucide-icon [img]="Calendar" [size]="12"></lucide-icon>
+                      Visited {{ formatDate(review.visitDate) }}
+                    </span>
                   }
-                  @if (review.serviceRating) {
-                    <div class="rating-item">
-                      <span class="rating-label">Service</span>
-                      <span class="rating-value">{{ review.serviceRating }}/5</span>
-                    </div>
+                  @if (review.dishesOrdered.length > 0) {
+                    <span class="detail-chip">
+                      <lucide-icon [img]="UtensilsCrossed" [size]="12"></lucide-icon>
+                      {{ review.dishesOrdered.join(', ') }}
+                    </span>
                   }
-                  @if (review.ambianceRating) {
-                    <div class="rating-item">
-                      <span class="rating-label">Ambiance</span>
-                      <span class="rating-value">{{ review.ambianceRating }}/5</span>
-                    </div>
+                  @if (review.pricePaid) {
+                    <span class="detail-chip">
+                      <lucide-icon [img]="DollarSign" [size]="12"></lucide-icon>
+                      {{ formatCurrency(review.pricePaid) }}
+                    </span>
                   }
-                  @if (review.valueRating) {
-                    <div class="rating-item">
-                      <span class="rating-label">Value</span>
-                      <span class="rating-value">{{ review.valueRating }}/5</span>
-                    </div>
+                  @if (review.occasion) {
+                    <span class="detail-chip">
+                      <lucide-icon [img]="PartyPopper" [size]="12"></lucide-icon>
+                      {{ review.occasion }}
+                    </span>
                   }
                 </div>
-              }
 
-              <!-- Review Details -->
-              <div class="review-details">
-                @if (review.visitDate) {
-                  <div class="detail-item">
-                    <span class="detail-icon">📅</span>
-                    <span class="detail-text">Visited {{ formatDate(review.visitDate) }}</span>
-                  </div>
-                }
-
-                @if (review.dishesOrdered.length > 0) {
-                  <div class="detail-item">
-                    <span class="detail-icon">🍽️</span>
-                    <span class="detail-text">{{ review.dishesOrdered.join(', ') }}</span>
-                  </div>
-                }
-
-                @if (review.pricePaid) {
-                  <div class="detail-item">
-                    <span class="detail-icon">💰</span>
-                    <span class="detail-text">{{ formatCurrency(review.pricePaid) }}</span>
-                  </div>
-                }
-
-                @if (review.occasion) {
-                  <div class="detail-item">
-                    <span class="detail-icon">🎉</span>
-                    <span class="detail-text">{{ review.occasion }}</span>
+                @if (review.wouldRecommend !== undefined) {
+                  <div class="recommendation-badge" [class.positive]="review.wouldRecommend" [class.negative]="!review.wouldRecommend">
+                    <lucide-icon [img]="review.wouldRecommend ? ThumbsUp : ThumbsDown" [size]="14"></lucide-icon>
+                    <span>{{ review.wouldRecommend ? 'Would recommend' : 'Would not recommend' }}</span>
                   </div>
                 }
               </div>
 
-              <!-- Recommendation -->
-              @if (review.wouldRecommend !== undefined) {
-                <div class="recommendation" [class.positive]="review.wouldRecommend" [class.negative]="!review.wouldRecommend">
-                  <span class="recommendation-icon">{{ review.wouldRecommend ? '👍' : '👎' }}</span>
-                  <span class="recommendation-text">
-                    {{ review.wouldRecommend ? 'Would recommend' : 'Would not recommend' }}
-                  </span>
+              <div class="review-footer">
+                <div class="review-meta">
+                  <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+                  <span class="status-badge" [class]="'status-' + review.status">{{ review.status | titlecase }}</span>
+                  @if (review.isVerifiedVisit) {
+                    <span class="verified-badge">
+                      <lucide-icon [img]="Check" [size]="12"></lucide-icon>
+                      Verified Visit
+                    </span>
+                  }
                 </div>
-              }
-            </div>
-
-            <!-- Review Footer -->
-            <div class="review-footer">
-              <div class="review-meta">
-                <span class="review-date">{{ formatDate(review.createdAt) }}</span>
-                <span class="review-status" [class]="'status-' + review.status">{{ review.status | titlecase }}</span>
-                @if (review.isVerifiedVisit) {
-                  <span class="verified-badge">✓ Verified Visit</span>
-                }
-              </div>
-
-              <div class="review-stats">
                 @if (review.totalVotes > 0) {
-                  <span class="helpful-votes">
-                    {{ review.helpfulVotes }}/{{ review.totalVotes }} found helpful
-                  </span>
+                  <span class="helpful-count">{{ review.helpfulVotes }}/{{ review.totalVotes }} found helpful</span>
+                }
+              </div>
+
+              <div class="review-actions">
+                <button type="button" class="btn-secondary" (click)="openReviewDetails(review)">View Details</button>
+                @if (canEdit(review)) {
+                  <button type="button" class="btn-primary" (click)="openEditReview(review)">Edit Review</button>
+                }
+                @if (canDelete(review)) {
+                  <button type="button" class="btn-secondary btn-danger-text" (click)="openDeleteConfirm(review)">Delete</button>
                 }
               </div>
             </div>
-
-            <!-- Review Actions -->
-            <div class="review-actions">
-              <button
-                type="button"
-                class="btn-secondary"
-                (click)="openReviewDetails(review)">
-                View Details
-              </button>
-
-              @if (canEdit(review)) {
-                <button
-                  type="button"
-                  class="btn-primary"
-                  (click)="openEditReview(review)">
-                  Edit Review
-                </button>
-              }
-
-              @if (canDelete(review)) {
-                <button
-                  type="button"
-                  class="btn-danger"
-                  (click)="openDeleteConfirm(review)">
-                  Delete
-                </button>
-              }
-            </div>
-          </div>
-        }
-      </div>
-    }
-  </section>
+          }
+        </div>
+      }
+    </section>
+  </div>
 </div>
 
-<!-- New Review Modal -->
 @if (showNewReviewModal()) {
   <div class="modal-overlay" (click)="closeNewReviewModal()">
-    <div class="modal-content new-review-modal" (click)="$event.stopPropagation()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Write a New Review</h3>
-        <button type="button" class="modal-close" (click)="closeNewReviewModal()">✕</button>
+        <button type="button" class="modal-close" (click)="closeNewReviewModal()">
+          <lucide-icon [img]="X" [size]="18"></lucide-icon>
+        </button>
       </div>
 
       <form [formGroup]="reviewForm" (ngSubmit)="createReview()" class="review-form">
         <div class="form-grid">
-          <!-- Restaurant Selection -->
           <div class="form-group full-width">
             <label for="restaurant">Restaurant *</label>
-            <select
-              id="restaurant"
-              formControlName="restaurantId"
-              class="form-control"
+            <select id="restaurant" formControlName="restaurantId" class="form-control"
               [class.is-invalid]="reviewForm.get('restaurantId')?.invalid && reviewForm.get('restaurantId')?.touched"
               (change)="onRestaurantChange()">
               <option value="">Select a restaurant</option>
@@ -395,7 +295,6 @@
             }
           </div>
 
-          <!-- Overall Rating -->
           <div class="form-group">
             <label for="overallRating">Overall Rating *</label>
             <select id="overallRating" formControlName="overallRating" class="form-control">
@@ -405,7 +304,6 @@
             </select>
           </div>
 
-          <!-- Detailed Ratings -->
           <div class="form-group">
             <label for="foodRating">Food Rating</label>
             <select id="foodRating" formControlName="foodRating" class="form-control">
@@ -446,27 +344,16 @@
             </select>
           </div>
 
-          <!-- Review Title -->
           <div class="form-group full-width">
             <label for="title">Review Title</label>
-            <input
-              type="text"
-              id="title"
-              formControlName="title"
-              class="form-control"
-              placeholder="Give your review a catchy title">
+            <input type="text" id="title" formControlName="title" class="form-control" placeholder="Give your review a catchy title">
           </div>
 
-          <!-- Review Content -->
           <div class="form-group full-width">
             <label for="content">Review Content *</label>
-            <textarea
-              id="content"
-              formControlName="content"
-              class="form-control"
+            <textarea id="content" formControlName="content" class="form-control"
               [class.is-invalid]="reviewForm.get('content')?.invalid && reviewForm.get('content')?.touched"
-              rows="6"
-              placeholder="Share your dining experience... (minimum 50 characters)"></textarea>
+              rows="6" placeholder="Share your dining experience... (minimum 50 characters)"></textarea>
             @if (reviewForm.get('content')?.invalid && reviewForm.get('content')?.touched) {
               @if (reviewForm.get('content')?.errors?.['required']) {
                 <span class="error-message">Review content is required</span>
@@ -476,15 +363,9 @@
             }
           </div>
 
-          <!-- Visit Details -->
           <div class="form-group">
             <label for="visitDate">Visit Date</label>
-            <input
-              type="date"
-              id="visitDate"
-              formControlName="visitDate"
-              class="form-control"
-              [max]="getTodayDate()">
+            <input type="date" id="visitDate" formControlName="visitDate" class="form-control" [max]="getTodayDate()">
           </div>
 
           <div class="form-group">
@@ -498,44 +379,22 @@
 
           <div class="form-group">
             <label for="pricePaid">Amount Paid</label>
-            <input
-              type="number"
-              id="pricePaid"
-              formControlName="pricePaid"
-              class="form-control"
-              placeholder="0.00"
-              min="0"
-              step="0.01">
+            <input type="number" id="pricePaid" formControlName="pricePaid" class="form-control" placeholder="0.00" min="0" step="0.01">
           </div>
 
           <div class="form-group">
             <label for="occasion">Occasion</label>
-            <input
-              type="text"
-              id="occasion"
-              formControlName="occasion"
-              class="form-control"
-              placeholder="Birthday, Date Night, etc.">
+            <input type="text" id="occasion" formControlName="occasion" class="form-control" placeholder="Birthday, Date Night, etc.">
           </div>
 
-          <!-- Dishes Ordered -->
           <div class="form-group full-width">
             <label for="dishesOrdered">Dishes Ordered</label>
-            <input
-              type="text"
-              id="dishesOrdered"
-              formControlName="dishesOrdered"
-              class="form-control"
-              placeholder="Separate multiple dishes with commas">
+            <input type="text" id="dishesOrdered" formControlName="dishesOrdered" class="form-control" placeholder="Separate multiple dishes with commas">
           </div>
 
-          <!-- Recommendation -->
           <div class="form-group full-width">
             <label class="checkbox-label">
-              <input
-                type="checkbox"
-                formControlName="wouldRecommend"
-                class="checkbox-input">
+              <input type="checkbox" formControlName="wouldRecommend" class="checkbox-input">
               <span class="checkbox-text">I would recommend this restaurant</span>
             </label>
           </div>
@@ -559,16 +418,10 @@
         }
 
         <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="closeNewReviewModal()">
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="btn-primary"
-            (click)="markFormTouched()"
-            [disabled]="isLoading()">
+          <button type="button" class="btn-secondary" (click)="closeNewReviewModal()">Cancel</button>
+          <button type="submit" class="btn-primary" (click)="markFormTouched()" [disabled]="isLoading()">
             @if (isLoading()) {
-              <span class="loading-spinner small"></span>
+              <span class="spinner-small"></span>
               Publishing...
             } @else {
               Publish Review

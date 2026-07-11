@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { LucideAngularModule, Sliders, UtensilsCrossed, Heart, DollarSign, MapPin, Bell, Save } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -19,13 +20,21 @@ interface UserPreferences {
 @Component({
   selector: 'app-user-preferences',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './user-preferences.component.html',
   styleUrls: ['./user-preferences.component.scss']
 })
 export class UserPreferencesComponent implements OnInit {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+
+  readonly Sliders = Sliders;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Heart = Heart;
+  readonly DollarSign = DollarSign;
+  readonly MapPin = MapPin;
+  readonly Bell = Bell;
+  readonly Save = Save;
 
   loading = signal(true);
   saving = signal(false);
@@ -128,4 +137,3 @@ export class UserPreferencesComponent implements OnInit {
     return this.preferences().dietaryRestrictions.includes(restriction);
   }
 }
-

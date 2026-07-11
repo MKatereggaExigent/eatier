@@ -1,26 +1,35 @@
 // ===================================
-// BUSINESS BOOKINGS - NYT EDITORIAL DESIGN
+// BUSINESS BOOKINGS - CLEAN WHITE GLASSMORPHIC
 // ===================================
 
-// Typography
-$font-serif: Georgia, 'Times New Roman', serif;
-$font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 $font-mono: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
 
-// Colors
-$color-black: #000;
-$color-white: #fff;
-$color-gray-100: #f7f7f7;
-$color-gray-200: #e5e5e5;
-$color-gray-400: #999;
-$color-gray-600: #666;
-$color-gray-800: #333;
-$color-success: #0a7c42;
-$color-error: #c41e3a;
-$color-warning: #b8860b;
-$color-info: #1a5f7a;
+$pastel-green: #a8e6cf;
+$pastel-green-dark: #3d8b6e;
+$pastel-red: #ffb3b3;
+$pastel-red-dark: #c0392b;
+$pastel-yellow: #fff3b0;
+$pastel-yellow-dark: #b8860b;
+$pastel-blue: #a8d8ea;
+$pastel-blue-dark: #2471a3;
 
-// Spacing
+$color-text: #111827;
+$color-text-secondary: #374151;
+$color-text-muted: #6b7280;
+
+$glass-bg: rgba(255, 255, 255, 0.6);
+$glass-bg-strong: rgba(255, 255, 255, 0.75);
+$glass-border: rgba(0, 0, 0, 0.06);
+$glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+$glass-blur: blur(16px);
+
+$radius-sm: 0.5rem;
+$radius-md: 0.75rem;
+$radius-lg: 1rem;
+$radius-xl: 1.25rem;
+
 $space-xs: 0.25rem;
 $space-sm: 0.5rem;
 $space-md: 1rem;
@@ -33,118 +42,189 @@ $space-2xl: 3rem;
   margin: 0 auto;
   padding: $space-xl;
   min-height: 100vh;
+  background: #ffffff;
 }
 
+// ===================================
+// PAGE HEADER
+// ===================================
 .page-header {
   margin-bottom: $space-2xl;
-  padding-bottom: $space-xl;
-  border-bottom: 1px solid $color-black;
+  padding: $space-xl;
+  background: $glass-bg-strong;
+  backdrop-filter: $glass-blur;
+  -webkit-backdrop-filter: $glass-blur;
+  border: 1px solid $glass-border;
+  border-radius: $radius-xl;
+  box-shadow: $glass-shadow;
 
   .header-content {
     h1 {
-      font-family: $font-serif;
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: $color-black;
+      font-family: $font-heading;
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: $color-text;
       margin: 0 0 $space-sm;
       line-height: 1.2;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: $space-sm;
+
+      .icon {
+        width: 24px;
+        height: 24px;
+        color: $pastel-blue-dark;
+      }
+
+      &:before {
+        content: '';
+        display: inline-block;
+        width: 5px;
+        height: 24px;
+        background: linear-gradient(180deg, $pastel-blue, $pastel-green);
+        border-radius: 3px;
+      }
     }
 
     p {
-      font-family: $font-sans;
-      color: $color-gray-600;
-      font-size: 1rem;
+      font-family: $font-body;
+      color: $color-text-muted;
+      font-size: 0.9375rem;
       margin: 0;
     }
   }
 }
 
-// Alerts
+// ===================================
+// ALERTS
+// ===================================
 .alert {
   padding: $space-md $space-lg;
   margin-bottom: $space-lg;
   display: flex;
   align-items: center;
   gap: $space-md;
-  font-family: $font-sans;
+  font-family: $font-body;
   font-weight: 500;
-  border: 2px solid;
+  border-radius: $radius-lg;
+  backdrop-filter: $glass-blur;
+  -webkit-backdrop-filter: $glass-blur;
 
   .alert-icon {
     font-size: 1rem;
+
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
   }
 }
 
 .alert-success {
-  background: $color-white;
-  border-color: $color-success;
-  color: $color-success;
+  background: rgba($pastel-green, 0.15);
+  border: 1px solid rgba($pastel-green, 0.3);
+  border-left: 4px solid $pastel-green-dark;
+  color: $pastel-green-dark;
 }
 
 .alert-error {
-  background: $color-white;
-  border-color: $color-error;
-  color: $color-error;
+  background: rgba($pastel-red, 0.15);
+  border: 1px solid rgba($pastel-red, 0.3);
+  border-left: 4px solid $pastel-red-dark;
+  color: $pastel-red-dark;
 }
 
-// Statistics Grid
+// ===================================
+// STATISTICS GRID
+// ===================================
 .statistics-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0;
+  gap: $space-lg;
   margin-bottom: $space-2xl;
-  border: 1px solid $color-black;
 }
 
 .stat-card {
-  background: $color-white;
-  padding: $space-lg;
+  background: $glass-bg-strong;
+  backdrop-filter: $glass-blur;
+  -webkit-backdrop-filter: $glass-blur;
+  padding: $space-xl;
+  border-radius: $radius-xl;
+  border: 1px solid $glass-border;
+  box-shadow: $glass-shadow;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid $color-black;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 
-  &:last-child {
-    border-right: none;
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: $radius-xl $radius-xl 0 0;
+    opacity: 0.9;
   }
 
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $glass-shadow, 0 8px 30px rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  &:nth-child(1):before { background: linear-gradient(90deg, $pastel-blue, #88c8de); }
+  &:nth-child(2):before { background: linear-gradient(90deg, $pastel-yellow, #f0e080); }
+  &:nth-child(3):before { background: linear-gradient(90deg, $pastel-green, #88d6af); }
+  &:nth-child(4):before { background: linear-gradient(90deg, $pastel-red, #ff9999); }
+
   .stat-icon {
-    display: none; // Hide emoji icons for cleaner look
+    display: none;
   }
 
   .stat-content {
     .stat-value {
-      font-family: $font-serif;
+      font-family: $font-heading;
       font-size: 2.5rem;
-      font-weight: 700;
-      color: $color-black;
+      font-weight: 800;
+      color: $color-text;
       line-height: 1;
       margin-bottom: $space-sm;
+      letter-spacing: -0.03em;
     }
 
     .stat-label {
-      font-family: $font-sans;
-      font-size: 0.75rem;
-      color: $color-gray-600;
-      font-weight: 600;
+      font-family: $font-body;
+      font-size: 0.8rem;
+      color: $color-text-muted;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
     }
   }
 }
 
-// Remove colored left borders
 .stat-pending,
 .stat-confirmed,
 .stat-today {
   border-left: none;
 }
 
-// Filters Section
+// ===================================
+// FILTERS SECTION
+// ===================================
 .filters-section {
-  background: $color-white;
-  border: 1px solid $color-black;
+  background: $glass-bg-strong;
+  backdrop-filter: $glass-blur;
+  -webkit-backdrop-filter: $glass-blur;
+  border: 1px solid $glass-border;
+  border-radius: $radius-xl;
   padding: $space-lg;
   margin-bottom: $space-xl;
+  box-shadow: $glass-shadow;
 }
 
 .filters-row {
@@ -160,25 +240,30 @@ $space-2xl: 3rem;
   gap: $space-sm;
 
   label {
-    font-family: $font-sans;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: $color-gray-600;
+    font-family: $font-body;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: $color-text-secondary;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.06em;
   }
 
   .filter-select,
   .filter-input {
-    font-family: $font-sans;
+    font-family: $font-body;
     padding: $space-sm $space-md;
-    border: 1px solid $color-black;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: $radius-md;
     font-size: 0.875rem;
-    background: $color-white;
+    background: rgba(255, 255, 255, 0.9);
+    color: $color-text;
+    transition: all 0.2s ease;
 
     &:focus {
-      outline: 2px solid $color-black;
-      outline-offset: -2px;
+      outline: none;
+      border-color: rgba($pastel-blue, 0.5);
+      box-shadow: 0 0 0 3px rgba($pastel-blue, 0.15);
+      background: #ffffff;
     }
   }
 
@@ -188,60 +273,81 @@ $space-2xl: 3rem;
 }
 
 .btn-clear-filters {
-  font-family: $font-sans;
+  font-family: $font-body;
   padding: $space-sm $space-md;
-  background: $color-white;
-  border: 1px solid $color-black;
-  font-weight: 500;
+  background: rgba($pastel-blue, 0.15);
+  border: 1px solid rgba($pastel-blue, 0.3);
+  border-radius: $radius-md;
+  font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
-  color: $color-black;
-  transition: background-color 0.2s;
+  color: $pastel-blue-dark;
+  transition: all 0.25s ease;
 
   &:hover {
-    background: $color-gray-100;
+    background: rgba($pastel-blue, 0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($pastel-blue, 0.15);
   }
 }
 
-// Bookings Table
+// ===================================
+// BOOKINGS TABLE
+// ===================================
 .bookings-table-container {
-  border: 1px solid $color-black;
+  background: $glass-bg-strong;
+  backdrop-filter: $glass-blur;
+  -webkit-backdrop-filter: $glass-blur;
+  border: 1px solid $glass-border;
+  border-radius: $radius-xl;
+  box-shadow: $glass-shadow;
+  overflow: hidden;
 }
 
 .loading-state,
 .empty-state {
   text-align: center;
-  padding: $space-2xl;
-  background: $color-white;
+  padding: $space-2xl * 1.5;
 
   .spinner {
-    width: 32px;
-    height: 32px;
-    border: 2px solid $color-gray-200;
-    border-top: 2px solid $color-black;
+    width: 44px;
+    height: 44px;
+    border: 3px solid rgba($pastel-blue, 0.2);
+    border-top-color: $pastel-blue-dark;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin 0.8s linear infinite;
     margin: 0 auto $space-md;
   }
 
   .empty-icon {
-    font-size: 2rem;
-    margin-bottom: $space-md;
-    opacity: 0.5;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto $space-lg;
+    background: rgba($pastel-blue, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $pastel-blue-dark;
+
+    .icon {
+      width: 36px;
+      height: 36px;
+    }
   }
 
   h3 {
-    font-family: $font-serif;
+    font-family: $font-heading;
     font-size: 1.25rem;
     font-weight: 700;
-    color: $color-black;
+    color: $color-text;
     margin: 0 0 $space-sm;
   }
 
   p {
-    font-family: $font-sans;
-    color: $color-gray-600;
-    font-size: 0.875rem;
+    font-family: $font-body;
+    color: $color-text-muted;
+    font-size: 0.9375rem;
     margin: 0;
   }
 }
@@ -249,29 +355,30 @@ $space-2xl: 3rem;
 .bookings-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: $font-sans;
+  font-family: $font-body;
 
   thead {
-    background: $color-gray-100;
-    border-bottom: 2px solid $color-black;
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.06);
 
     th {
-      padding: $space-md;
+      padding: $space-md $space-lg;
       text-align: left;
       font-size: 0.75rem;
-      font-weight: 600;
-      color: $color-black;
+      font-weight: 700;
+      color: $color-text-secondary;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.06em;
     }
   }
 
   tbody {
     tr {
-      border-bottom: 1px solid $color-gray-200;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      transition: background-color 0.2s ease;
 
       &:hover {
-        background: $color-gray-100;
+        background: rgba(0, 0, 0, 0.02);
       }
 
       &:last-child {
@@ -279,9 +386,9 @@ $space-2xl: 3rem;
       }
 
       td {
-        padding: $space-md;
+        padding: $space-md $space-lg;
         font-size: 0.875rem;
-        color: $color-black;
+        color: $color-text;
       }
     }
   }
@@ -289,162 +396,191 @@ $space-2xl: 3rem;
 
 .booking-datetime {
   .booking-date {
-    font-family: $font-serif;
+    font-family: $font-heading;
     font-weight: 700;
-    color: $color-black;
+    color: $color-text;
     margin-bottom: $space-xs;
+    font-size: 0.9375rem;
   }
 
   .booking-time {
-    font-family: $font-sans;
-    font-size: 0.75rem;
-    color: $color-gray-600;
+    font-family: $font-body;
+    font-size: 0.8125rem;
+    color: $color-text-muted;
+    font-weight: 500;
   }
 }
 
 .customer-info {
   .customer-name {
-    font-family: $font-serif;
+    font-family: $font-heading;
     font-weight: 700;
-    color: $color-black;
+    color: $color-text;
   }
 }
 
 .contact-info {
   .contact-email {
-    font-family: $font-sans;
-    font-size: 0.75rem;
-    color: $color-gray-600;
+    font-family: $font-body;
+    font-size: 0.8125rem;
+    color: $color-text-muted;
     margin-bottom: $space-xs;
   }
 
   .contact-phone {
-    font-family: $font-sans;
-    font-size: 0.75rem;
-    color: $color-gray-600;
+    font-family: $font-body;
+    font-size: 0.8125rem;
+    color: $color-text-muted;
   }
 }
 
 .party-size {
-  font-family: $font-sans;
-  font-weight: 600;
+  font-family: $font-body;
+  font-weight: 700;
+  color: $color-text;
 
   .party-icon {
-    display: none; // Hide emoji for cleaner look
+    display: none;
   }
 }
 
-// Status Badges
+// ===================================
+// STATUS BADGES
+// ===================================
 .status-badge {
-  font-family: $font-sans;
+  font-family: $font-body;
   display: inline-block;
-  padding: $space-xs $space-sm;
+  padding: 4px 12px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border: 1px solid;
+  letter-spacing: 0.04em;
+  border-radius: 20px;
+  border: none;
 }
 
 .status-pending {
-  background: $color-white;
-  color: $color-warning;
-  border-color: $color-warning;
+  background: rgba($pastel-yellow, 0.45);
+  color: $pastel-yellow-dark;
+  border: 1px solid rgba($pastel-yellow, 0.5);
 }
 
 .status-confirmed {
-  background: $color-white;
-  color: $color-success;
-  border-color: $color-success;
+  background: rgba($pastel-green, 0.4);
+  color: $pastel-green-dark;
+  border: 1px solid rgba($pastel-green, 0.5);
 }
 
 .status-completed {
-  background: $color-gray-100;
-  color: $color-black;
-  border-color: $color-black;
+  background: rgba($pastel-blue, 0.35);
+  color: $pastel-blue-dark;
+  border: 1px solid rgba($pastel-blue, 0.45);
 }
 
 .status-cancelled {
-  background: $color-white;
-  color: $color-error;
-  border-color: $color-error;
+  background: rgba($pastel-red, 0.35);
+  color: $pastel-red-dark;
+  border: 1px solid rgba($pastel-red, 0.45);
 }
 
-// Buttons
+// ===================================
+// BUTTONS
+// ===================================
 .btn-view-details {
-  font-family: $font-sans;
+  font-family: $font-body;
   padding: $space-sm $space-md;
-  background: $color-black;
-  color: $color-white;
-  border: 1px solid $color-black;
-  font-weight: 500;
-  font-size: 0.75rem;
+  background: rgba($pastel-blue, 0.2);
+  color: $pastel-blue-dark;
+  border: 1px solid rgba($pastel-blue, 0.35);
+  border-radius: $radius-md;
+  font-weight: 600;
+  font-size: 0.8125rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.25s ease;
 
   &:hover {
-    background: $color-gray-800;
+    background: rgba($pastel-blue, 0.35);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($pastel-blue, 0.2);
   }
 }
 
-// Pagination
+// ===================================
+// PAGINATION
+// ===================================
 .pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $space-md;
-  border-top: 1px solid $color-black;
-  background: $color-white;
+  padding: $space-md $space-lg;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .btn-pagination {
-  font-family: $font-sans;
+  font-family: $font-body;
   padding: $space-sm $space-md;
-  background: $color-white;
-  border: 1px solid $color-black;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: $radius-md;
+  font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
-  color: $color-black;
-  transition: background-color 0.2s;
+  color: $color-text;
+  transition: all 0.25s ease;
 
   &:hover:not(:disabled) {
-    background: $color-gray-100;
+    background: rgba($pastel-blue, 0.15);
+    border-color: rgba($pastel-blue, 0.3);
+    color: $pastel-blue-dark;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($pastel-blue, 0.1);
   }
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.35;
     cursor: not-allowed;
   }
 }
 
 .pagination-info {
-  font-family: $font-sans;
+  font-family: $font-body;
   font-size: 0.875rem;
-  color: $color-gray-600;
+  color: $color-text-muted;
+  font-weight: 500;
 }
 
-// Modal
+// ===================================
+// MODAL
+// ===================================
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
 }
 
 .modal-content {
-  background: $color-white;
-  border: 2px solid $color-black;
+  background: $glass-bg-strong;
+  backdrop-filter: $glass-blur;
+  -webkit-backdrop-filter: $glass-blur;
+  border: 1px solid $glass-border;
+  border-radius: $radius-xl;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   max-width: 600px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
 }
 
 .modal-header {
@@ -452,28 +588,38 @@ $space-2xl: 3rem;
   justify-content: space-between;
   align-items: center;
   padding: $space-lg $space-xl;
-  border-bottom: 2px solid $color-black;
+  border-bottom: 1px solid $glass-border;
 
   h2 {
-    font-family: $font-serif;
+    font-family: $font-heading;
     font-size: 1.5rem;
-    font-weight: 700;
-    color: $color-black;
+    font-weight: 800;
+    color: $color-text;
     margin: 0;
+    letter-spacing: -0.02em;
   }
 
   .btn-close {
-    background: transparent;
-    border: 1px solid $color-black;
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: $radius-sm;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    color: $color-black;
-    transition: background-color 0.2s;
+    color: $color-text-secondary;
+    transition: all 0.2s ease;
+
+    .icon {
+      width: 18px;
+      height: 18px;
+    }
 
     &:hover {
-      background: $color-gray-100;
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.12);
     }
   }
 }
@@ -485,7 +631,7 @@ $space-2xl: 3rem;
 .detail-section {
   margin-bottom: $space-xl;
   padding-bottom: $space-lg;
-  border-bottom: 1px solid $color-gray-200;
+  border-bottom: 1px solid $glass-border;
 
   &:last-child {
     margin-bottom: 0;
@@ -494,10 +640,10 @@ $space-2xl: 3rem;
   }
 
   h3 {
-    font-family: $font-serif;
+    font-family: $font-heading;
     font-size: 1.125rem;
     font-weight: 700;
-    color: $color-black;
+    color: $color-text;
     margin: 0 0 $space-md;
   }
 }
@@ -510,30 +656,31 @@ $space-2xl: 3rem;
 
 .detail-item {
   label {
-    font-family: $font-sans;
+    font-family: $font-body;
     display: block;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: $color-gray-600;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: $color-text-muted;
     margin-bottom: $space-xs;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.06em;
   }
 
   div {
-    font-family: $font-sans;
-    font-size: 0.875rem;
-    color: $color-black;
+    font-family: $font-body;
+    font-size: 0.9375rem;
+    color: $color-text;
     font-weight: 500;
   }
 }
 
 .special-requests {
-  font-family: $font-sans;
-  background: $color-gray-100;
+  font-family: $font-body;
+  background: rgba($pastel-yellow, 0.1);
   padding: $space-md;
-  border: 1px solid $color-gray-200;
-  color: $color-gray-800;
+  border: 1px solid rgba($pastel-yellow, 0.2);
+  border-radius: $radius-md;
+  color: $color-text-secondary;
   line-height: 1.6;
   font-size: 0.875rem;
 }
@@ -545,74 +692,90 @@ $space-2xl: 3rem;
 }
 
 .btn-status {
-  font-family: $font-sans;
+  font-family: $font-body;
   padding: $space-sm $space-lg;
   border: 1px solid;
-  font-weight: 500;
+  border-radius: $radius-md;
+  font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.25s ease;
   display: flex;
   align-items: center;
   gap: $space-sm;
+
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .btn-confirm {
-  background: $color-white;
-  color: $color-success;
-  border-color: $color-success;
+  background: rgba($pastel-green, 0.2);
+  color: $pastel-green-dark;
+  border-color: rgba($pastel-green, 0.35);
 
   &:hover {
-    background: rgba($color-success, 0.1);
+    background: rgba($pastel-green, 0.35);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($pastel-green, 0.2);
   }
 }
 
 .btn-complete {
-  background: $color-black;
-  color: $color-white;
-  border-color: $color-black;
+  background: rgba($pastel-blue, 0.2);
+  color: $pastel-blue-dark;
+  border-color: rgba($pastel-blue, 0.35);
 
   &:hover {
-    background: $color-gray-800;
+    background: rgba($pastel-blue, 0.35);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($pastel-blue, 0.2);
   }
 }
 
 .btn-cancel {
-  background: $color-white;
-  color: $color-error;
-  border-color: $color-error;
+  background: rgba($pastel-red, 0.2);
+  color: $pastel-red-dark;
+  border-color: rgba($pastel-red, 0.35);
 
   &:hover {
-    background: rgba($color-error, 0.1);
+    background: rgba($pastel-red, 0.35);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($pastel-red, 0.2);
   }
 }
 
-// Animations
+// ===================================
+// ANIMATIONS
+// ===================================
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  100% {
-    transform: rotate(360deg);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-// Responsive
+// ===================================
+// RESPONSIVE
+// ===================================
 @media (max-width: 1024px) {
   .statistics-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .stat-card {
-    border-bottom: 1px solid $color-black;
-
-    &:nth-child(2n) {
-      border-right: none;
-    }
-
-    &:nth-last-child(-n+2) {
-      border-bottom: none;
-    }
   }
 
   .filters-row {
@@ -626,20 +789,11 @@ $space-2xl: 3rem;
   }
 
   .page-header .header-content h1 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 
   .statistics-grid {
     grid-template-columns: 1fr;
-  }
-
-  .stat-card {
-    border-right: none;
-    border-bottom: 1px solid $color-black;
-
-    &:last-child {
-      border-bottom: none;
-    }
   }
 
   .filters-row {
@@ -650,18 +804,6 @@ $space-2xl: 3rem;
   .bookings-table-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-
-    // Scroll hint
-    &::before {
-      content: 'Swipe to see more →';
-      display: block;
-      padding: $space-sm $space-md;
-      background: $color-gray-100;
-      border-bottom: 1px solid $color-gray-200;
-      font-size: 0.75rem;
-      color: $color-gray-600;
-      text-align: center;
-    }
   }
 
   .bookings-table {
@@ -693,17 +835,15 @@ $space-2xl: 3rem;
   }
 }
 
-// Small mobile breakpoint
 @media (max-width: 480px) {
   .bookings-management-container {
     padding: $space-sm;
   }
 
   .page-header .header-content h1 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
 
-  // Ensure touch targets are at least 44px
   button, a, .btn, [role="button"] {
     min-height: 44px;
     min-width: 44px;
@@ -711,6 +851,6 @@ $space-2xl: 3rem;
 
   input, select {
     min-height: 44px;
-    font-size: 16px; // Prevents iOS zoom
+    font-size: 16px;
   }
 }

@@ -1,212 +1,232 @@
-<div class="bookings-page">
-  <!-- Header -->
-  <header class="page-header">
-    <div class="header-content">
-      <h1>My Bookings</h1>
-      <p>Manage your restaurant reservations</p>
+<div class="section">
+  <div class="section-inner">
+    <div class="page-header">
+      <div class="header-text">
+        <h1 class="section-title">My Bookings</h1>
+        <p class="tag">Manage your restaurant reservations</p>
+      </div>
+      <a routerLink="/restaurants" class="btn-primary">Find Restaurants</a>
     </div>
-    <a routerLink="/restaurants" class="btn-header">Find Restaurants</a>
-  </header>
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <button
-      type="button"
-      class="tab"
-      [class.active]="activeTab() === 'upcoming'"
-      (click)="setActiveTab('upcoming')">
-      Upcoming ({{ upcomingBookings().length }})
-    </button>
-    <button
-      type="button"
-      class="tab"
-      [class.active]="activeTab() === 'past'"
-      (click)="setActiveTab('past')">
-      Past ({{ pastBookings().length }})
-    </button>
-    <button
-      type="button"
-      class="tab"
-      [class.active]="activeTab() === 'cancelled'"
-      (click)="setActiveTab('cancelled')">
-      Cancelled ({{ cancelledBookings().length }})
-    </button>
-  </div>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button
+        type="button"
+        class="tab"
+        [class.active]="activeTab() === 'upcoming'"
+        (click)="setActiveTab('upcoming')">
+        Upcoming ({{ upcomingBookings().length }})
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [class.active]="activeTab() === 'past'"
+        (click)="setActiveTab('past')">
+        Past ({{ pastBookings().length }})
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [class.active]="activeTab() === 'cancelled'"
+        (click)="setActiveTab('cancelled')">
+        Cancelled ({{ cancelledBookings().length }})
+      </button>
+    </div>
 
-  <!-- Content -->
-  <div class="bookings-content">
-    @if (loading()) {
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading bookings...</p>
-      </div>
-    } @else if (error()) {
-      <div class="error-state">
-        <p>{{ error() }}</p>
-        <button type="button" class="btn-retry" (click)="loadBookings()">Try Again</button>
-      </div>
-    } @else if (currentBookings().length === 0) {
-      <div class="empty-state">
-        <h3>No {{ activeTab() }} bookings</h3>
-        <p>@if (activeTab() === 'upcoming') {
-          You don't have any upcoming reservations.
-        } @else if (activeTab() === 'past') {
-          You haven't completed any reservations yet.
-        } @else {
-          You don't have any cancelled bookings.
-        }</p>
-        @if (activeTab() === 'upcoming') {
-          <a routerLink="/restaurants" class="btn-primary">Find a Restaurant</a>
-        }
-      </div>
-    } @else {
-      <div class="bookings-list">
-        @for (booking of currentBookings(); track booking.id) {
-          <div class="booking-card">
-            <div class="booking-header">
-              <div class="restaurant-info">
-                <div class="restaurant-avatar">{{ (booking.business_name || 'R').charAt(0) }}</div>
-                <div class="restaurant-details">
-                  <h3>{{ booking.business_name }}</h3>
-                  <span class="booking-ref">Ref: {{ booking.booking_reference }}</span>
+    <!-- Content -->
+    <div class="bookings-content">
+      @if (loading()) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading bookings...</p>
+        </div>
+      } @else if (error()) {
+        <div class="error-state">
+          <p>{{ error() }}</p>
+          <button type="button" class="btn-primary" (click)="loadBookings()">Try Again</button>
+        </div>
+      } @else if (currentBookings().length === 0) {
+        <div class="empty-state">
+          <lucide-icon [img]="Search" [size]="48" class="empty-icon"></lucide-icon>
+          <h3>No {{ activeTab() }} bookings</h3>
+          <p>@if (activeTab() === 'upcoming') {
+            You don't have any upcoming reservations.
+          } @else if (activeTab() === 'past') {
+            You haven't completed any reservations yet.
+          } @else {
+            You don't have any cancelled bookings.
+          }</p>
+          @if (activeTab() === 'upcoming') {
+            <a routerLink="/restaurants" class="btn-primary">Find a Restaurant</a>
+          }
+        </div>
+      } @else {
+        <div class="bookings-list">
+          @for (booking of currentBookings(); track booking.id) {
+            <div class="booking-card">
+              <div class="booking-header">
+                <div class="restaurant-info">
+                  <div class="restaurant-avatar">{{ (booking.business_name || 'R').charAt(0) }}</div>
+                  <div class="restaurant-details">
+                    <h3>{{ booking.business_name }}</h3>
+                    <span class="booking-ref">Ref: {{ booking.booking_reference }}</span>
+                  </div>
+                </div>
+                <span class="status-badge" [class]="getStatusClass(booking.status)">
+                  {{ getStatusLabel(booking.status) }}
+                </span>
+              </div>
+
+              <div class="booking-details">
+                <div class="detail-item">
+                  <span class="detail-icon">
+                    <lucide-icon [img]="Calendar" [size]="16"></lucide-icon>
+                  </span>
+                  <div class="detail-text">
+                    <span class="label">Date</span>
+                    <span class="value">{{ formatDate(booking.booking_date) }}</span>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-icon">
+                    <lucide-icon [img]="Clock" [size]="16"></lucide-icon>
+                  </span>
+                  <div class="detail-text">
+                    <span class="label">Time</span>
+                    <span class="value">{{ formatTime(booking.booking_time) }}</span>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-icon">
+                    <lucide-icon [img]="Users" [size]="16"></lucide-icon>
+                  </span>
+                  <div class="detail-text">
+                    <span class="label">Party Size</span>
+                    <span class="value">{{ booking.party_size }} guests</span>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-text">
+                    <span class="label">Tier</span>
+                    <span class="value tier-value">{{ getTierLabel(booking.booking_tier) }}</span>
+                  </span>
                 </div>
               </div>
-              <span class="status-badge" [class]="getStatusClass(booking.status)">
-                {{ getStatusLabel(booking.status) }}
-              </span>
+
+              @if (booking.special_requests) {
+                <div class="extra-info">
+                  <span class="extra-label">Special Requests</span>
+                  <p>{{ booking.special_requests }}</p>
+                </div>
+              }
+
+              @if (booking.occasion) {
+                <div class="extra-info">
+                  <span class="extra-label">Occasion</span>
+                  <span class="extra-value">{{ booking.occasion }}</span>
+                </div>
+              }
+
+              <div class="booking-footer">
+                <div class="contact-info">
+                  <span class="contact-item">
+                    <span class="contact-label">Phone</span>
+                    {{ booking.business_phone || 'N/A' }}
+                  </span>
+                  <span class="contact-item">
+                    <span class="contact-label">Email</span>
+                    {{ booking.business_email || 'N/A' }}
+                  </span>
+                </div>
+                <div class="actions">
+                  @if (canCancel(booking)) {
+                    <button type="button" class="btn-secondary" (click)="openCancelModal(booking)">
+                      Cancel Booking
+                    </button>
+                  }
+                </div>
+              </div>
             </div>
+          }
+        </div>
 
-            <div class="booking-details">
-              <div class="detail-item">
-                <span class="label">Date</span>
-                <span class="value">{{ formatDate(booking.booking_date) }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">Time</span>
-                <span class="value">{{ formatTime(booking.booking_time) }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">Party Size</span>
-                <span class="value">{{ booking.party_size }} guests</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">Tier</span>
-                <span class="value tier-badge">{{ getTierLabel(booking.booking_tier) }}</span>
-              </div>
+        <!-- Pagination -->
+        @if (totalPages() > 1) {
+          <div class="pagination">
+            <div class="pagination-info">
+              Showing {{ (currentPage() - 1) * itemsPerPage() + 1 }} &ndash; {{ currentPage() * itemsPerPage() > totalItems() ? totalItems() : currentPage() * itemsPerPage() }} of {{ totalItems() }} bookings
             </div>
+            <div class="pagination-controls">
+              <button
+                type="button"
+                class="pagination-btn"
+                [disabled]="currentPage() === 1"
+                (click)="previousPage()">
+                Previous
+              </button>
 
-            @if (booking.special_requests) {
-              <div class="special-requests">
-                <span class="label">Special Requests</span>
-                <p>{{ booking.special_requests }}</p>
-              </div>
-            }
-
-            @if (booking.occasion) {
-              <div class="occasion">
-                <span class="label">Occasion</span>
-                <span class="value">{{ booking.occasion }}</span>
-              </div>
-            }
-
-            <div class="booking-footer">
-              <div class="contact-info">
-                <span class="contact-item">
-                  <span class="contact-label">Phone</span>
-                  {{ booking.business_phone || 'N/A' }}
-                </span>
-                <span class="contact-item">
-                  <span class="contact-label">Email</span>
-                  {{ booking.business_email || 'N/A' }}
-                </span>
-              </div>
-              <div class="actions">
-                @if (canCancel(booking)) {
-                  <button type="button" class="btn-cancel" (click)="openCancelModal(booking)">
-                    Cancel Booking
-                  </button>
+              <div class="page-numbers">
+                @for (page of pageNumbers(); track $index) {
+                  @if (page === '...') {
+                    <span class="page-ellipsis">...</span>
+                  } @else {
+                    <button
+                      type="button"
+                      class="page-number"
+                      [class.active]="page === currentPage()"
+                      (click)="goToPage(page)">
+                      {{ page }}
+                    </button>
+                  }
                 }
               </div>
+
+              <button
+                type="button"
+                class="pagination-btn"
+                [disabled]="currentPage() === totalPages()"
+                (click)="nextPage()">
+                Next
+              </button>
+            </div>
+            <div class="items-per-page">
+              <label>Show:</label>
+              <select [value]="itemsPerPage()" (change)="setItemsPerPage(+$any($event.target).value)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
             </div>
           </div>
         }
-      </div>
+      }
+    </div>
 
-      <!-- Pagination -->
-      @if (totalPages() > 1) {
-        <div class="pagination">
-          <div class="pagination-info">
-            Showing {{ (currentPage() - 1) * itemsPerPage() + 1 }} - {{ currentPage() * itemsPerPage() > totalItems() ? totalItems() : currentPage() * itemsPerPage() }} of {{ totalItems() }} bookings
-          </div>
-          <div class="pagination-controls">
-            <button
-              type="button"
-              class="pagination-btn"
-              [disabled]="currentPage() === 1"
-              (click)="previousPage()">
-              ← Previous
-            </button>
-
-            <div class="page-numbers">
-              @for (page of pageNumbers(); track $index) {
-                @if (page === '...') {
-                  <span class="page-ellipsis">...</span>
-                } @else {
-                  <button
-                    type="button"
-                    class="page-number"
-                    [class.active]="page === currentPage()"
-                    (click)="goToPage(page)">
-                    {{ page }}
-                  </button>
-                }
-              }
-            </div>
-
-            <button
-              type="button"
-              class="pagination-btn"
-              [disabled]="currentPage() === totalPages()"
-              (click)="nextPage()">
-              Next →
+    <!-- Cancel Modal -->
+    @if (showCancelModal()) {
+      <div class="modal-overlay" (click)="closeCancelModal()">
+        <div class="modal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Cancel Booking</h2>
+            <button type="button" class="close-btn" (click)="closeCancelModal()">
+              <lucide-icon [img]="X" [size]="20"></lucide-icon>
             </button>
           </div>
-          <div class="items-per-page">
-            <label>Show:</label>
-            <select [value]="itemsPerPage()" (change)="setItemsPerPage(+$any($event.target).value)">
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="50">50</option>
-            </select>
+          <div class="modal-body">
+            <p>Are you sure you want to cancel your booking at <strong>{{ selectedBooking()?.business_name }}</strong>?</p>
+            <p class="booking-info">{{ formatDate(selectedBooking()?.booking_date || '') }} at {{ formatTime(selectedBooking()?.booking_time || '') }}</p>
+            <label for="reason">Reason for cancellation (optional)</label>
+            <textarea id="reason" [(ngModel)]="cancellationReason" placeholder="Enter reason..."></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="closeCancelModal()">Keep Booking</button>
+            <button type="button" class="btn-primary" (click)="confirmCancellation()" [disabled]="cancelling()">
+              {{ cancelling() ? 'Cancelling...' : 'Confirm Cancellation' }}
+            </button>
           </div>
         </div>
-      }
+      </div>
     }
   </div>
-
-  <!-- Cancel Modal -->
-  @if (showCancelModal()) {
-    <div class="modal-overlay" (click)="closeCancelModal()">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>Cancel Booking</h2>
-          <button type="button" class="close-btn" (click)="closeCancelModal()">×</button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to cancel your booking at <strong>{{ selectedBooking()?.business_name }}</strong>?</p>
-          <p class="booking-info">{{ formatDate(selectedBooking()?.booking_date || '') }} at {{ formatTime(selectedBooking()?.booking_time || '') }}</p>
-          <label for="reason">Reason for cancellation (optional)</label>
-          <textarea id="reason" [(ngModel)]="cancellationReason" placeholder="Enter reason..."></textarea>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="closeCancelModal()">Keep Booking</button>
-          <button type="button" class="btn-danger" (click)="confirmCancellation()" [disabled]="cancelling()">
-            {{ cancelling() ? 'Cancelling...' : 'Confirm Cancellation' }}
-          </button>
-        </div>
-      </div>
-    </div>
-  }
 </div>
-

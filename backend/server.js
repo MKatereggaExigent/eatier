@@ -84,7 +84,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Cookie parsing middleware
@@ -213,6 +213,8 @@ app.use('/api/member-promotions', memberPromotionsRoutes); // Member-only promot
 app.use('/api/booking-incentives', bookingIncentivesRoutes); // Booking discounts/cashback
 app.use('/api/wallet', userWalletRoutes); // User wallet/cashback
 app.use('/api/social', socialRoutes); // Social features (follow, activity feed)
+app.use('/api/posts', require('./routes/posts')); // User posts, likes, comments
+app.use('/api/stories', require('./routes/stories')); // Stories with 24h expiry
 app.use('/api/messaging', messagingRoutes); // User-to-user messaging (Erlang-style actor model)
 app.use('/api/presence', presenceRoutes); // Real-time user presence tracking
 app.use('/api/pokes', pokesRoutes); // Poke/nudge feature

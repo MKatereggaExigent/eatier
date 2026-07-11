@@ -4,7 +4,7 @@
     <div class="header-content">
       <div class="welcome-section">
         <h1 class="page-title">
-          <span class="title-icon">👋</span>
+          <lucide-icon [img]="Sun" [size]="28" class="title-icon"></lucide-icon>
           Welcome back, {{ currentUser()?.firstName || 'User' }}!
         </h1>
         <p class="page-subtitle">
@@ -261,7 +261,7 @@
     <section class="content-card activity-card" aria-label="Recent Activity">
       <div class="card-header">
         <h2>
-          <span class="header-icon">🕐</span>
+          <lucide-icon [img]="Clock" [size]="20" class="header-icon"></lucide-icon>
           Recent Activity
         </h2>
         <a routerLink="../reviews" class="view-all-btn">View All</a>

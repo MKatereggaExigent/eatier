@@ -1,60 +1,61 @@
-// ===================================
-// USER OVERVIEW - NYT EDITORIAL DESIGN
-// Clean, Typographic, Professional
-// ===================================
+@use 'sass:color';
 
-// Design Variables
-$color-black: #121212;
-$color-dark-gray: #333333;
-$color-medium-gray: #666666;
-$color-light-gray: #999999;
-$color-border: #e0e0e0;
-$color-border-dark: #cccccc;
-$color-bg-light: #f7f7f7;
-$color-white: #ffffff;
-$color-accent: #ff8c00;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-serif: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+$orange: #F97316;
+$orange-light: rgba($orange, 0.08);
+$black: #0F172A;
+$border-color: #E2E8F0;
+$bg-white: #FFFFFF;
+$bg-muted: #F8FAFC;
 
-$font-serif: 'Noto Serif', Georgia, 'Times New Roman', serif;
-$font-sans: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$color-text: #0F172A;
+$color-text-secondary: #475569;
+$color-text-muted: #94A3B8;
 
-$border-thin: 1px solid $color-border;
-$border-medium: 2px solid $color-black;
-$border-thick: 3px solid $color-black;
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 20px;
 
-// Minimal animations
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .user-overview {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px clamp(16px, 3vw, 48px);
   min-height: 100vh;
-  background: $color-white;
-  color: $color-black;
-  padding: 2rem clamp(1rem, 3vw, 3rem);
-  font-family: $font-sans;
+  background: $bg-white;
   animation: fadeIn 0.3s ease-out;
 }
 
 // ===================================
-// HEADER SECTION - NYT Editorial
+// HEADER
 // ===================================
-
 .overview-header {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: $border-thick;
+  margin-bottom: 32px;
+  padding: 32px;
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
 
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 1.5rem;
+    gap: 24px;
     flex-wrap: wrap;
   }
 
@@ -64,25 +65,25 @@ $border-thick: 3px solid $color-black;
 
     .page-title {
       font-family: $font-serif;
-      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-size: clamp(1.5rem, 3.5vw, 2rem);
       font-weight: 700;
-      color: $color-black;
-      margin: 0 0 0.5rem 0;
-      letter-spacing: -0.02em;
+      color: $color-text;
+      margin: 0 0 8px;
+      line-height: 1.2;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 12px;
 
       .title-icon {
-        font-size: clamp(1.5rem, 3vw, 2rem);
+        color: $orange;
+        flex-shrink: 0;
       }
     }
 
     .page-subtitle {
-      font-family: $font-serif;
-      font-size: 1rem;
-      font-style: italic;
-      color: $color-medium-gray;
+      font-family: $font-sans;
+      font-size: 0.9375rem;
+      color: $color-text-muted;
       margin: 0;
     }
   }
@@ -91,48 +92,44 @@ $border-thick: 3px solid $color-black;
     .btn-primary {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      background: $color-black;
-      color: $color-white;
-      padding: 0.625rem 1.25rem;
-      border: none;
+      gap: 8px;
+      background: $black;
+      color: #fff;
+      padding: 10px 20px;
+      border: 1px solid $black;
+      border-radius: $radius-md;
       font-family: $font-sans;
-      font-size: 0.8125rem;
+      font-size: 0.875rem;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
       text-decoration: none;
       cursor: pointer;
-      transition: background-color 0.15s ease;
+      transition: all 0.2s;
 
       &:hover {
-        background: $color-dark-gray;
-      }
-
-      .btn-icon {
-        font-size: 1rem;
+        background: color.adjust($black, $lightness: 20%);
+        border-color: color.adjust($black, $lightness: 20%);
       }
     }
   }
 }
 
 // ===================================
-// ERROR BANNER - NYT Editorial
+// ERROR BANNER
 // ===================================
-
 .error-banner {
-  margin-bottom: 1.5rem;
-  padding: 1rem 1.5rem;
-  background: $color-white;
-  border: $border-thin;
-  border-left: 3px solid $color-black;
+  margin-bottom: 24px;
+  padding: 16px 24px;
+  background: $bg-white;
+  border: 1px solid #FECACA;
+  border-left: 4px solid #EF4444;
+  border-radius: $radius-md;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 16px;
 
   .error-icon {
-    font-size: 1.5rem;
     flex-shrink: 0;
+    color: #EF4444;
   }
 
   .error-content {
@@ -142,13 +139,13 @@ $border-thick: 3px solid $color-black;
       font-family: $font-sans;
       font-size: 0.875rem;
       font-weight: 600;
-      color: $color-black;
-      margin: 0 0 0.25rem 0;
+      color: $color-text;
+      margin: 0 0 4px;
     }
 
     p {
       font-size: 0.8125rem;
-      color: $color-medium-gray;
+      color: $color-text-secondary;
       margin: 0;
     }
   }
@@ -156,39 +153,34 @@ $border-thick: 3px solid $color-black;
   .retry-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
-    padding: 0.5rem 1rem;
-    background: $color-white;
-    border: $border-medium;
+    gap: 6px;
+    padding: 8px 16px;
+    background: $bg-white;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
     font-family: $font-sans;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: $color-black;
+    color: $black;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.2s;
 
     &:hover {
-      background: $color-black;
-      color: $color-white;
+      border-color: $black;
     }
   }
 }
 
 // ===================================
-// STATS SECTION - NYT Editorial
+// STATS SECTION
 // ===================================
-
 .stats-section {
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0;
-    border: $border-thin;
-    border-top: $border-medium;
+    gap: 16px;
 
     @media (max-width: 1024px) {
       grid-template-columns: repeat(2, 1fr);
@@ -200,38 +192,21 @@ $border-thick: 3px solid $color-black;
   }
 
   .stat-card {
-    background: $color-white;
-    padding: 1.5rem;
+    background: $bg-white;
+    border: 1px solid $border-color;
+    border-radius: $radius-xl;
+    padding: 24px;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    border-right: $border-thin;
-    border-bottom: $border-thin;
-    transition: background-color 0.15s ease;
-
-    &:nth-child(4n) {
-      border-right: none;
-    }
-
-    @media (max-width: 1024px) {
-      &:nth-child(2n) {
-        border-right: none;
-      }
-      &:nth-child(4n) {
-        border-right: $border-thin;
-      }
-    }
-
-    @media (max-width: 480px) {
-      border-right: none;
-    }
+    gap: 16px;
+    transition: box-shadow 0.2s;
 
     &:hover {
-      background: $color-bg-light;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
     }
 
     .stat-icon {
-      font-size: 2rem;
+      color: $orange;
       flex-shrink: 0;
     }
 
@@ -239,50 +214,46 @@ $border-thick: 3px solid $color-black;
       flex: 1;
 
       h3 {
-        font-family: $font-serif;
-        font-size: 2rem;
+        font-family: $font-sans;
+        font-size: 1.75rem;
         font-weight: 700;
-        color: $color-black;
+        color: $color-text;
         line-height: 1;
-        margin: 0 0 0.25rem 0;
+        margin: 0 0 4px;
       }
 
       p {
         font-family: $font-sans;
         font-size: 0.8125rem;
         font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: $color-dark-gray;
-        margin: 0 0 0.25rem 0;
+        color: $color-text-secondary;
+        margin: 0 0 2px;
       }
 
       .stat-description {
         font-size: 0.75rem;
-        color: $color-medium-gray;
+        color: $color-text-muted;
       }
     }
   }
 }
 
-
-
 // ===================================
-// SKELETON LOADING STATES - NYT Editorial
+// SKELETON LOADING
 // ===================================
-
 .stat-skeleton {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 16px;
   width: 100%;
 
   .skeleton-icon,
   .skeleton-number,
   .skeleton-label {
-    background: linear-gradient(90deg, $color-bg-light 25%, $color-border 50%, $color-bg-light 75%);
+    background: linear-gradient(90deg, $bg-muted 25%, $border-color 50%, $bg-muted 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
+    border-radius: 4px;
   }
 
   .skeleton-icon {
@@ -306,25 +277,17 @@ $border-thick: 3px solid $color-black;
   }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
 // ===================================
-// MEMBER BENEFITS SECTION - NYT Editorial
+// MEMBER BENEFITS
 // ===================================
-
 .member-benefits-section {
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 }
 
 .benefits-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  border: $border-thin;
-  border-top: $border-medium;
+  gap: 16px;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -336,115 +299,91 @@ $border-thick: 3px solid $color-black;
 }
 
 .benefit-card {
-  background: $color-white;
-  padding: 1.25rem;
-  border-right: $border-thin;
-  border-bottom: $border-thin;
-  transition: background-color 0.15s ease;
-
-  &:nth-child(3n) {
-    border-right: none;
-  }
-
-  @media (max-width: 1024px) {
-    &:nth-child(2n) {
-      border-right: none;
-    }
-    &:nth-child(3n) {
-      border-right: $border-thin;
-    }
-  }
-
-  @media (max-width: 640px) {
-    border-right: none;
-  }
-
-  &:hover {
-    background: $color-bg-light;
-  }
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
+  padding: 24px;
 
   .benefit-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: $border-thin;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid $border-color;
 
     .benefit-icon {
-      font-size: 1.25rem;
+      color: $orange;
+      flex-shrink: 0;
     }
 
     h3 {
       flex: 1;
-      font-family: $font-serif;
+      font-family: $font-sans;
       font-size: 1rem;
       font-weight: 600;
-      color: $color-black;
+      color: $color-text;
       margin: 0;
     }
 
     .view-link {
       font-family: $font-sans;
-      font-size: 0.6875rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: $color-medium-gray;
+      color: $color-text-muted;
       text-decoration: none;
+      transition: color 0.2s;
 
-      &:hover {
-        color: $color-black;
-      }
+      &:hover { color: $color-text; }
     }
   }
 
   .benefit-loading {
     display: flex;
     justify-content: center;
-    padding: 1rem;
+    padding: 16px;
   }
 
   .loading-spinner-small {
     width: 20px;
     height: 20px;
-    border: 2px solid $color-border;
-    border-top-color: $color-black;
+    border: 2px solid $border-color;
+    border-top-color: $black;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
 
   .benefit-hint, .benefit-empty {
     font-size: 0.8125rem;
-    color: $color-medium-gray;
-    margin: 0.75rem 0 0 0;
+    color: $color-text-muted;
+    margin: 12px 0 0;
   }
 }
 
 .wallet-card {
   .wallet-balances {
     display: flex;
-    gap: 2rem;
+    gap: 32px;
 
     .balance-item {
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 4px;
 
       .balance-label {
         font-family: $font-sans;
-        font-size: 0.6875rem;
+        font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        color: $color-medium-gray;
+        color: $color-text-muted;
       }
 
       .balance-value {
-        font-family: $font-serif;
+        font-family: $font-sans;
         font-size: 1.5rem;
         font-weight: 700;
-        color: $color-black;
+        color: $color-text;
       }
     }
   }
@@ -454,16 +393,17 @@ $border-thick: 3px solid $color-black;
   .promo-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 8px;
   }
 
   .promo-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0.75rem;
-    background: $color-bg-light;
-    border: $border-thin;
+    gap: 12px;
+    padding: 8px 12px;
+    background: $bg-muted;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
 
     .promo-discount {
       font-family: $font-sans;
@@ -471,15 +411,16 @@ $border-thick: 3px solid $color-black;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: $color-white;
-      background: $color-black;
-      padding: 0.25rem 0.5rem;
+      color: #fff;
+      background: $black;
+      padding: 4px 8px;
+      border-radius: 4px;
     }
 
     .promo-title {
       flex: 1;
       font-size: 0.8125rem;
-      color: $color-dark-gray;
+      color: $color-text-secondary;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -489,17 +430,19 @@ $border-thick: 3px solid $color-black;
       font-family: 'Courier New', monospace;
       font-size: 0.6875rem;
       font-weight: 600;
-      color: $color-black;
-      background: $color-white;
-      border: 1px dashed $color-dark-gray;
-      padding: 0.25rem 0.5rem;
+      color: $black;
+      background: $bg-white;
+      border: 1px dashed $border-color;
+      border-radius: 4px;
+      padding: 4px 8px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s;
 
       &:hover {
-        background: $color-black;
-        color: $color-white;
+        background: $black;
+        color: #fff;
         border-style: solid;
+        border-color: $black;
       }
     }
   }
@@ -508,7 +451,7 @@ $border-thick: 3px solid $color-black;
 .social-card {
   .social-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 8px;
   }
 
   .social-action-btn {
@@ -516,33 +459,32 @@ $border-thick: 3px solid $color-black;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    background: $color-bg-light;
-    border: $border-thin;
+    gap: 8px;
+    padding: 12px;
+    background: $bg-white;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
     text-decoration: none;
-    color: $color-dark-gray;
+    color: $color-text-secondary;
     font-family: $font-sans;
     font-size: 0.8125rem;
     font-weight: 500;
-    transition: all 0.15s ease;
+    transition: all 0.2s;
 
     &:hover {
-      background: $color-black;
-      color: $color-white;
-      border-color: $color-black;
+      border-color: $black;
+      color: $black;
     }
   }
 }
 
 // ===================================
-// CONTENT GRID - NYT Editorial
+// CONTENT GRID
 // ===================================
-
 .content-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  gap: 24px;
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
@@ -550,100 +492,94 @@ $border-thick: 3px solid $color-black;
 }
 
 // ===================================
-// CONTENT CARDS - NYT Editorial
+// CONTENT CARDS
 // ===================================
-
 .content-card {
-  background: $color-white;
-  border: $border-thin;
-  border-top: $border-medium;
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
   overflow: hidden;
-  transition: background-color 0.15s ease;
 
   .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.25rem;
-    border-bottom: $border-thin;
-    background: $color-bg-light;
+    padding: 20px 24px;
+    border-bottom: 1px solid $border-color;
 
     h2 {
-      font-family: $font-serif;
+      font-family: $font-sans;
       font-size: 1.125rem;
       font-weight: 600;
-      color: $color-black;
+      color: $color-text;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 8px;
       margin: 0;
 
       .header-icon {
-        font-size: 1.125rem;
+        color: $orange;
       }
     }
 
     .view-all-btn {
       font-family: $font-sans;
-      font-size: 0.6875rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: $color-medium-gray;
+      color: $color-text-muted;
       text-decoration: none;
-      transition: color 0.15s ease;
+      transition: color 0.2s;
 
-      &:hover {
-        color: $color-black;
-      }
+      &:hover { color: $color-text; }
     }
   }
 
   .card-content {
-    padding: 1.25rem;
+    padding: 20px 24px;
   }
 }
 
-// Quick Actions Card (full width) - NYT Editorial
+// Quick Actions
 .quick-actions-card {
   grid-column: 1 / -1;
 
   .action-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0;
-    border: $border-thin;
+    gap: 12px;
   }
 
   .action-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: $color-white;
-    border-right: $border-thin;
-    border-bottom: $border-thin;
+    gap: 16px;
+    padding: 16px;
+    background: $bg-white;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
     text-decoration: none;
-    transition: background-color 0.15s ease;
+    transition: all 0.2s;
 
     &:hover {
-      background: $color-bg-light;
+      border-color: $black;
 
       .action-icon {
-        background: $color-black;
+        background: $orange-light;
+        color: $orange;
       }
     }
 
     .action-icon {
-      font-size: 1.5rem;
       width: 44px;
       height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: $color-bg-light;
-      border: $border-thin;
-      transition: background-color 0.15s ease;
+      background: $bg-muted;
+      border: 1px solid $border-color;
+      border-radius: $radius-sm;
+      color: $color-text-muted;
+      transition: all 0.2s;
     }
 
     .action-info {
@@ -653,47 +589,34 @@ $border-thick: 3px solid $color-black;
         font-family: $font-sans;
         font-size: 0.875rem;
         font-weight: 600;
-        color: $color-black;
-        margin: 0 0 0.125rem 0;
+        color: $color-text;
+        margin: 0 0 2px;
       }
 
       p {
         font-size: 0.75rem;
-        color: $color-medium-gray;
+        color: $color-text-muted;
         margin: 0;
       }
     }
   }
 }
 
-
-// ===================================
-// ACTIVITY CARD - NYT Editorial
-// ===================================
-
+// Activity
 .activity-card {
   .activity-list {
     display: flex;
     flex-direction: column;
-    gap: 0;
   }
 
   .activity-item {
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
-    padding: 1rem;
-    background: $color-white;
-    border-bottom: $border-thin;
-    transition: background-color 0.15s ease;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid $border-color;
 
-    &:last-child {
-      border-bottom: none;
-    }
-
-    &:hover {
-      background: $color-bg-light;
-    }
+    &:last-child { border-bottom: none; }
 
     .activity-icon {
       width: 36px;
@@ -701,9 +624,9 @@ $border-thick: 3px solid $color-black;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: $color-bg-light;
-      border: $border-thin;
-      font-size: 1.125rem;
+      background: $orange-light;
+      color: $orange;
+      border-radius: $radius-sm;
       flex-shrink: 0;
     }
 
@@ -712,76 +635,61 @@ $border-thick: 3px solid $color-black;
 
       .activity-action {
         font-size: 0.875rem;
-        color: $color-dark-gray;
-        margin: 0 0 0.25rem 0;
+        color: $color-text-secondary;
+        margin: 0 0 4px;
 
-        strong {
-          color: $color-black;
-        }
+        strong { color: $color-text; }
 
-        .activity-location {
-          color: $color-medium-gray;
-        }
+        .activity-location { color: $color-text-muted; }
       }
 
       .activity-rating {
         display: flex;
-        gap: 0.125rem;
-        margin-bottom: 0.25rem;
+        gap: 2px;
+        margin-bottom: 4px;
 
         .star {
-          font-size: 0.8125rem;
-          opacity: 0.3;
+          opacity: 0.2;
+          color: $orange;
 
-          &.filled {
-            opacity: 1;
-          }
+          &.filled { opacity: 1; }
         }
       }
 
       .activity-date {
         font-family: $font-sans;
-        font-size: 0.6875rem;
+        font-size: 0.75rem;
         font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: $color-light-gray;
+        color: $color-text-muted;
       }
     }
   }
 }
 
-// ===================================
-// FAVORITES CARD - NYT Editorial
-// ===================================
-
+// Favorites
 .favorites-card {
   .favorites-grid {
     display: flex;
     flex-direction: column;
-    gap: 0;
   }
 
   .favorite-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: $color-white;
-    border-bottom: $border-thin;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid $border-color;
     text-decoration: none;
-    transition: background-color 0.15s ease;
+    transition: all 0.2s;
 
-    &:last-child {
-      border-bottom: none;
-    }
+    &:last-child { border-bottom: none; }
 
     &:hover {
-      background: $color-bg-light;
-
-      .favorite-arrow {
-        color: $color-black;
+      .favorite-icon {
+        background: $orange-light;
+        color: $orange;
       }
+      .favorite-arrow { color: $color-text; }
     }
 
     .favorite-icon {
@@ -790,9 +698,11 @@ $border-thick: 3px solid $color-black;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: $color-bg-light;
-      border: $border-thin;
-      font-size: 1.25rem;
+      background: $bg-muted;
+      border: 1px solid $border-color;
+      border-radius: $radius-sm;
+      color: $color-text-muted;
+      transition: all 0.2s;
     }
 
     .favorite-info {
@@ -802,56 +712,49 @@ $border-thick: 3px solid $color-black;
         font-family: $font-sans;
         font-size: 0.875rem;
         font-weight: 600;
-        color: $color-black;
-        margin: 0 0 0.125rem 0;
+        color: $color-text;
+        margin: 0 0 2px;
       }
 
       .cuisine {
         font-size: 0.75rem;
-        color: $color-medium-gray;
+        color: $color-text-muted;
         margin: 0;
       }
     }
 
     .favorite-arrow {
       font-size: 1.125rem;
-      color: $color-light-gray;
-      transition: color 0.15s ease;
+      color: $color-text-muted;
+      transition: color 0.2s;
     }
   }
 }
 
-// ===================================
-// RECOMMENDATIONS CARD - NYT Editorial
-// ===================================
-
+// Recommendations
 .recommendations-card {
   .recommendations-grid {
     display: flex;
     flex-direction: column;
-    gap: 0;
   }
 
   .recommendation-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: $color-white;
-    border-bottom: $border-thin;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid $border-color;
     text-decoration: none;
-    transition: background-color 0.15s ease;
+    transition: all 0.2s;
 
-    &:last-child {
-      border-bottom: none;
-    }
+    &:last-child { border-bottom: none; }
 
     &:hover {
-      background: $color-bg-light;
-
-      .recommendation-arrow {
-        color: $color-black;
+      .recommendation-icon {
+        background: $orange-light;
+        color: $orange;
       }
+      .recommendation-arrow { color: $color-text; }
     }
 
     .recommendation-icon {
@@ -860,9 +763,11 @@ $border-thick: 3px solid $color-black;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: $color-bg-light;
-      border: $border-thin;
-      font-size: 1.25rem;
+      background: $bg-muted;
+      border: 1px solid $border-color;
+      border-radius: $radius-sm;
+      color: $color-text-muted;
+      transition: all 0.2s;
     }
 
     .recommendation-info {
@@ -872,43 +777,41 @@ $border-thick: 3px solid $color-black;
         font-family: $font-sans;
         font-size: 0.875rem;
         font-weight: 600;
-        color: $color-black;
-        margin: 0 0 0.125rem 0;
+        color: $color-text;
+        margin: 0 0 2px;
       }
 
       .cuisine {
         font-size: 0.75rem;
-        color: $color-medium-gray;
+        color: $color-text-muted;
         margin: 0;
       }
     }
 
     .recommendation-arrow {
       font-size: 1.125rem;
-      color: $color-light-gray;
-      transition: color 0.15s ease;
+      color: $color-text-muted;
+      transition: color 0.2s;
     }
   }
 }
 
-
 // ===================================
-// LOADING & EMPTY STATES - NYT Editorial
+// LOADING & EMPTY STATES
 // ===================================
-
 .loading-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2.5rem;
-  gap: 1rem;
+  padding: 40px;
+  gap: 16px;
 
   .loading-spinner {
     width: 32px;
     height: 32px;
-    border: 2px solid $color-border;
-    border-top-color: $color-black;
+    border: 2px solid $border-color;
+    border-top-color: $orange;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -916,7 +819,7 @@ $border-thick: 3px solid $color-black;
   p {
     font-family: $font-sans;
     font-size: 0.8125rem;
-    color: $color-medium-gray;
+    color: $color-text-muted;
   }
 }
 
@@ -925,38 +828,33 @@ $border-thick: 3px solid $color-black;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  gap: 0.75rem;
+  padding: 32px;
+  gap: 12px;
   text-align: center;
 
-  .error-icon {
-    font-size: 1.5rem;
-  }
+  .error-icon { color: #EF4444; }
 
   p {
     font-size: 0.875rem;
-    color: $color-dark-gray;
+    color: $color-text-secondary;
   }
 
   .retry-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
-    padding: 0.5rem 1rem;
-    background: $color-white;
-    border: $border-medium;
+    gap: 6px;
+    padding: 8px 16px;
+    background: $bg-white;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
     font-family: $font-sans;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: $color-black;
+    color: $black;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.2s;
 
-    &:hover {
-      background: $color-bg-light;
-    }
+    &:hover { border-color: $black; }
   }
 }
 
@@ -965,72 +863,66 @@ $border-thick: 3px solid $color-black;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2.5rem;
+  padding: 40px;
   text-align: center;
 
   .empty-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
+    color: $color-text-muted;
+    margin-bottom: 16px;
     opacity: 0.5;
   }
 
   h3 {
-    font-family: $font-serif;
+    font-family: $font-sans;
     font-size: 1.125rem;
     font-weight: 600;
-    color: $color-black;
-    margin: 0 0 0.5rem 0;
+    color: $color-text;
+    margin: 0 0 8px;
   }
 
   p {
     font-size: 0.875rem;
-    color: $color-medium-gray;
-    margin: 0 0 1.25rem 0;
+    color: $color-text-muted;
+    margin: 0 0 20px;
   }
 
   .btn-primary {
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
-    background: $color-black;
-    color: $color-white;
-    padding: 0.75rem 1.5rem;
+    gap: 6px;
+    background: $black;
+    color: #fff;
+    padding: 10px 24px;
+    border: 1px solid $black;
+    border-radius: $radius-md;
     text-decoration: none;
     font-family: $font-sans;
     font-weight: 600;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    transition: all 0.15s ease;
+    font-size: 0.875rem;
+    transition: all 0.2s;
 
     &:hover {
-      background: $color-dark-gray;
+      background: color.adjust($black, $lightness: 20%);
+      border-color: color.adjust($black, $lightness: 20%);
     }
   }
 }
 
 // ===================================
-// ANIMATIONS - Minimal for NYT Editorial
+// RESPONSIVE
 // ===================================
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-// ===================================
-// RESPONSIVE ADJUSTMENTS - NYT Editorial
-// ===================================
-
 @media (max-width: 768px) {
   .user-overview {
-    padding: 1rem;
+    padding: 16px;
   }
 
   .overview-header {
+    padding: 24px;
+
     .header-content {
       flex-direction: column;
       align-items: flex-start;
-      gap: 1rem;
+      gap: 16px;
 
       .header-actions {
         width: 100%;
@@ -1044,33 +936,11 @@ $border-thick: 3px solid $color-black;
   }
 
   .content-card {
-    .card-header {
-      padding: 1rem;
-    }
-
-    .card-content {
-      padding: 1rem;
-    }
+    .card-header { padding: 16px 20px; }
+    .card-content { padding: 16px 20px; }
   }
 
   .quick-actions-card {
-    .action-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-}
-
-// Widgets Section
-.widgets-section {
-  margin: 2rem 0;
-
-  .widgets-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 1.5rem;
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
+    .action-grid { grid-template-columns: 1fr; }
   }
 }

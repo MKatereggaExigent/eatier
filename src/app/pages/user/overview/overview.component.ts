@@ -3,7 +3,7 @@ import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { LucideAngularModule, AlertTriangle, PenLine, Heart, Calendar, Camera, Search, Star, User, Store, UtensilsCrossed, Wallet, Gift, Target, MessageSquare, RefreshCw, Newspaper, CreditCard, PartyPopper, Users, Zap } from 'lucide-angular';
+import { LucideAngularModule, AlertTriangle, PenLine, Heart, Calendar, Camera, Search, Star, User, Store, UtensilsCrossed, Wallet, Gift, Target, MessageSquare, RefreshCw, Newspaper, CreditCard, PartyPopper, Users, Zap, Sun, Clock } from 'lucide-angular';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService, UserStats, UserActivity, Favorite } from '../../../core/services/user.service';
@@ -77,6 +77,8 @@ export class UserOverviewComponent implements OnInit, OnDestroy {
   readonly PartyPopper = PartyPopper;
   readonly Users = Users;
   readonly Zap = Zap;
+  readonly Sun = Sun;
+  readonly Clock = Clock;
 
   // Loading states
   loading = signal<LoadingState>({

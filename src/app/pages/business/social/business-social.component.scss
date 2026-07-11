@@ -1,459 +1,781 @@
-// ===================================
-// NYT Editorial Design System Variables
-// ===================================
-$font-serif: 'Georgia', 'Times New Roman', serif;
-$font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+@use 'sass:color';
 
-$color-black: #1a1a1a;
-$color-dark-gray: #333;
-$color-medium-gray: #666;
-$color-light-gray: #999;
-$color-border: #e0e0e0;
-$color-bg-light: #f8f8f8;
-$color-white: #fff;
+$orange: #F97316;
+$black: #0F172A;
+$border-color: #E2E8F0;
+$bg-white: #FFFFFF;
+$bg-muted: #F8FAFC;
+$text-muted: #64748B;
+$text-secondary: #475569;
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-xl: 20px;
 
-$border-thin: 1px solid $color-border;
-$border-medium: 2px solid $color-black;
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-// ===================================
-// CONTAINER
-// ===================================
 .social-container {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  background: $color-white;
+  padding: 48px 24px;
+  background: $bg-white;
+  min-height: 100vh;
+  animation: fadeIn 0.3s ease-out;
 }
 
-// ===================================
-// PAGE HEADER - NYT Editorial
-// ===================================
 .page-header {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: $border-medium;
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
 
-  h1 {
-    font-family: $font-serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: $color-black;
-    margin: 0 0 0.5rem 0;
-    letter-spacing: -0.02em;
+  .header-content {
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: $black;
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      lucide-icon { color: $orange; }
+    }
+
+    p {
+      font-size: 15px;
+      color: $text-muted;
+      margin: 0;
+    }
   }
 
-  p {
-    font-family: $font-sans;
-    font-size: 1rem;
-    color: $color-medium-gray;
-    margin: 0;
+  .header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-shrink: 0;
+
+    .notif-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $bg-white;
+      border: 1px solid $border-color;
+      border-radius: 50%;
+      color: $text-muted;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { border-color: $orange; color: $orange; }
+    }
+
+    .avatar-btn {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 2px solid $border-color;
+      border-radius: 50%;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.2s;
+      background: none;
+
+      &:hover { border-color: $orange; }
+
+      .header-avatar {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+    }
   }
 }
 
-// ===================================
-// WIDGETS SECTION
-// ===================================
+.notif-dropdown {
+  position: absolute;
+  top: 100px;
+  right: 24px;
+  width: 340px;
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.1);
+  z-index: 100;
+  overflow: hidden;
+
+  .notif-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid $border-color;
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: $black;
+      margin: 0;
+    }
+
+    .notif-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: $text-muted;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      &:hover { color: $black; }
+    }
+  }
+
+  .notif-list {
+    .notif-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px;
+      text-align: center;
+      color: $text-muted;
+
+      p {
+        font-size: 15px;
+        font-weight: 600;
+        color: $text-secondary;
+        margin: 16px 0 4px;
+      }
+
+      span { font-size: 13px; }
+    }
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.stat-card {
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+
+  &:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+
+  .stat-content {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .stat-icon-wrap {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: $radius-md;
+      flex-shrink: 0;
+      background: rgba($orange, 0.1);
+      color: $orange;
+    }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+
+      .stat-value {
+        font-size: 26px;
+        font-weight: 800;
+        color: $black;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+      }
+
+      .stat-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: $text-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
 .widgets-section {
-  margin-bottom: 2rem;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 
-  .widgets-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.glass-card {
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
+  padding: 20px 24px;
+  transition: box-shadow 0.2s;
+
+  &:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+}
+
+.stories-section {
+  margin-bottom: 20px;
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+
+    .section-icon { color: $orange; }
+
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: $black;
+      margin: 0;
+    }
+  }
+
+  .stories-track {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 4px 0;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar { display: none; }
+
+    .story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+
+      &:hover { transform: translateY(-2px); }
+
+      .story-ring {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        padding: 3px;
+        background: linear-gradient(135deg, $orange, #ffd700);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .story-avatar-img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid white;
+          background: $bg-muted;
+        }
+
+        &.create-ring { background: linear-gradient(135deg, $orange, #ffd700); }
+      }
+
+      .create-avatar {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: rgba($orange, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+        color: $orange;
+      }
+
+      .story-name {
+        font-size: 12px;
+        color: $text-muted;
+        font-weight: 500;
+        max-width: 72px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: center;
+      }
+    }
   }
 }
 
-// ===================================
-// TABS - NYT Editorial
-// ===================================
+.search-bar {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .search-icon {
+    color: $text-muted;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    background: none;
+    font-size: 15px;
+    color: $black;
+    outline: none;
+
+    &::placeholder { color: $text-muted; }
+  }
+
+  .search-clear {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: $text-muted;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+
+    &:hover { color: $black; }
+  }
+}
+
 .tabs {
   display: flex;
-  gap: 0;
-  margin-bottom: 2rem;
-  border: $border-thin;
-  border-top: $border-medium;
+  gap: 4px;
+  margin-bottom: 24px;
+  background: $bg-muted;
+  border-radius: 12px;
+  padding: 4px;
   flex-wrap: wrap;
 
   .tab {
     flex: 1;
-    min-width: 150px;
-    padding: 1rem 1.5rem;
-    background: $color-white;
+    min-width: 140px;
+    padding: 10px 16px;
+    background: none;
     border: none;
-    border-right: $border-thin;
-    font-family: $font-sans;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: $color-medium-gray;
+    border-radius: 10px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: $text-muted;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
-    &:last-child {
-      border-right: none;
-    }
-
-    &:hover {
-      background: $color-bg-light;
-      color: $color-black;
-    }
+    &:hover { color: $black; }
 
     &.active {
-      background: $color-black;
-      color: $color-white;
+      background: $bg-white;
+      color: $black;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
   }
 }
 
-// ===================================
-// LOADING & EMPTY STATES - NYT Editorial
-// ===================================
-.loading-state,
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 4rem 2rem;
+.loading-state {
   text-align: center;
-  background: $color-bg-light;
-  border: $border-thin;
+  padding: 64px 24px;
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
 
   .spinner {
-    width: 32px;
-    height: 32px;
-    border: 2px solid $color-border;
-    border-top-color: $color-black;
+    width: 36px;
+    height: 36px;
+    border: 2px solid $border-color;
+    border-top-color: $orange;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
   }
+
+  p { color: $text-muted; font-size: 14px; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
 
   .empty-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    opacity: 0.6;
+    margin-bottom: 16px;
+    color: $text-muted;
+    opacity: 0.4;
   }
 
-  h2 {
-    font-family: $font-serif;
-    font-size: 1.5rem;
+  h3 {
+    font-size: 18px;
     font-weight: 600;
-    color: $color-black;
-    margin: 0 0 0.5rem 0;
+    color: $black;
+    margin: 0 0 8px;
   }
 
   p {
-    font-size: 0.9375rem;
-    color: $color-medium-gray;
-    margin: 0 0 1.5rem 0;
+    margin: 0 0 20px;
+    color: $text-muted;
+    font-size: 14px;
   }
 
   .action-btn {
-    padding: 0.75rem 1.5rem;
-    background: $color-black;
-    color: $color-white;
+    padding: 10px 24px;
+    background: $black;
+    color: white;
     border: none;
-    font-family: $font-sans;
-    font-size: 0.75rem;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 
-    &:hover {
-      background: $color-dark-gray;
-    }
+    &:hover { background: color.adjust($black, $lightness: 20%); }
   }
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-// ===================================
-// ACTIVITY LIST - NYT Editorial
-// ===================================
 .activity-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  border: $border-thin;
-  border-top: $border-medium;
+  gap: 16px;
 }
 
 .activity-card {
-  display: flex;
-  gap: 1rem;
-  padding: 1.25rem;
-  background: $color-white;
-  border-bottom: $border-thin;
-  transition: background-color 0.15s ease;
+  padding: 20px;
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
+  transition: box-shadow 0.2s;
 
-  &:last-child {
-    border-bottom: none;
-  }
+  &:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
 
-  &:hover {
-    background: $color-bg-light;
-  }
-
-  .activity-icon {
-    width: 40px;
-    height: 40px;
-    background: $color-bg-light;
-    border: $border-thin;
+  .activity-header-row {
     display: flex;
+    gap: 12px;
     align-items: center;
-    justify-content: center;
-    font-size: 1.125rem;
-    flex-shrink: 0;
+
+    .activity-avatar-wrap {
+      flex-shrink: 0;
+
+      .activity-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid $border-color;
+        background: $bg-muted;
+      }
+    }
+
+    .activity-meta {
+      flex: 1;
+
+      .actor-name {
+        font-weight: 700;
+        color: $black;
+        font-size: 15px;
+        display: block;
+      }
+
+      .activity-desc {
+        color: $text-muted;
+        font-size: 13px;
+        display: block;
+        margin: 2px 0;
+      }
+
+      .activity-time {
+        color: $text-muted;
+        font-size: 12px;
+        font-weight: 500;
+      }
+    }
+
+    .activity-type-badge {
+      flex-shrink: 0;
+
+      .type-emoji {
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: rgba($orange, 0.1);
+        border-radius: $radius-md;
+      }
+    }
   }
 
-  .activity-content {
-    flex: 1;
+  .activity-body {
+    margin-top: 12px;
+    padding: 12px;
+    background: $bg-muted;
+    border-radius: $radius-md;
+    border-left: 3px solid $orange;
 
-    .activity-header {
-      margin-bottom: 0.375rem;
-    }
-
-    .actor-name {
-      font-family: $font-sans;
-      font-weight: 600;
-      color: $color-black;
-    }
-
-    .activity-text {
-      color: $color-medium-gray;
-    }
-
-    .activity-preview {
-      font-family: $font-serif;
+    .activity-quote {
       font-style: italic;
-      color: $color-dark-gray;
-      margin: 0.5rem 0;
-      font-size: 0.9375rem;
-      padding-left: 1rem;
-      border-left: 2px solid $color-border;
+      color: $text-secondary;
+      font-size: 15px;
+      margin: 0;
+      line-height: 1.5;
     }
+  }
 
-    .activity-time {
-      font-family: $font-sans;
-      font-size: 0.6875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: $color-light-gray;
+  .activity-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid $border-color;
+
+    .action-btn-sm {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: $bg-muted;
+      border: 1px solid $border-color;
+      border-radius: $radius-md;
+      font-size: 13px;
+      font-weight: 500;
+      color: $text-muted;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: $orange;
+        color: $black;
+      }
+
+      &.like-btn {
+        &:hover { color: $orange; border-color: $orange; }
+        &.liked { color: $orange; background: rgba($orange, 0.1); border-color: $orange; }
+      }
     }
   }
 }
 
-// ===================================
-// USERS GRID - NYT Editorial
-// ===================================
 .users-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 0;
-  border: $border-thin;
-  border-top: $border-medium;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
 }
 
 .user-card {
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.25rem;
-  background: $color-white;
-  border-bottom: $border-thin;
-  border-right: $border-thin;
-  transition: background-color 0.15s ease;
+  flex-direction: column;
 
-  &:hover {
-    background: $color-bg-light;
-  }
+  &:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
 
-  // Deprecated: Old letter-based avatar (kept for backwards compatibility)
-  .user-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: $color-black;
+  .user-card-top {
+    padding: 32px 24px 16px;
     display: flex;
-    align-items: center;
     justify-content: center;
-    color: $color-white;
-    font-family: $font-serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
 
-  // New: Beautiful image-based avatars
-  .user-avatar-img {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); // Fallback gradient
-    border: 2px solid $color-white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    .user-avatar-ring {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, $orange, #ffd700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-    &:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      .user-avatar-img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid white;
+        background: $bg-muted;
+        cursor: pointer;
+        transition: transform 0.2s;
+
+        &:hover { transform: scale(1.05); }
+      }
     }
   }
 
-  .user-info {
-    flex: 1;
+  .user-card-body {
+    padding: 0 24px 16px;
+    text-align: center;
 
-    h3 {
-      font-family: $font-sans;
-      font-size: 0.9375rem;
-      font-weight: 600;
-      color: $color-black !important; // Force black text - ensure visibility
-      margin: 0 0 0.25rem 0;
+    .user-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: $black;
+      margin: 0 0 8px;
     }
 
     .user-stats {
       display: flex;
-      gap: 1rem;
-      font-family: $font-sans;
-      font-size: 0.75rem;
-      color: $color-medium-gray !important; // Force gray text - ensure visibility
+      justify-content: center;
+      gap: 16px;
 
-      span {
-        color: $color-medium-gray !important; // Also force on spans
+      .user-stat {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 13px;
+        color: $text-muted;
       }
     }
   }
 
-  .follow-btn {
-    padding: 0.5rem 1.25rem;
-    font-family: $font-sans;
-    font-size: 0.6875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    background: $color-black;
-    border: 2px solid $color-black;
-    color: $color-white;
+  .user-card-actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px 24px 20px;
 
-    &:hover:not(:disabled) {
-      background: $color-dark-gray;
-      border-color: $color-dark-gray;
+    .card-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid $border-color;
+
+      .btn-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(0,0,0,0.1);
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
     }
 
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    .follow-btn {
+      background: $black;
+      color: white;
+      border-color: $black;
 
-    &.following {
-      background: $color-white;
-      border: 2px solid $color-border;
-      color: $color-medium-gray;
+      &:hover:not(:disabled) { background: color.adjust($black, $lightness: 20%); border-color: color.adjust($black, $lightness: 20%); }
 
-      &:hover:not(:disabled) {
-        border-color: $color-black;
-        color: $color-black;
+      &.following {
+        background: $bg-white;
+        color: $black;
+        border-color: $border-color;
+
+        &:hover:not(:disabled) { border-color: #ef4444; color: #ef4444; }
       }
     }
-  }
-}
 
-// ===================================
-// RESPONSIVE - NYT Editorial
-// ===================================
-@media (max-width: 768px) {
-  .social-container {
-    padding: 1rem;
-  }
+    .msg-btn {
+      background: $bg-white;
+      color: $text-secondary;
+      border-color: $border-color;
 
-  .page-header h1 {
-    font-size: 2rem;
-  }
-
-  .tabs {
-    .tab {
-      min-width: auto;
-      flex: 1 1 45%;
-      padding: 0.75rem 1rem;
-      font-size: 0.6875rem;
-    }
-  }
-
-  .users-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .user-card {
-    border-right: none;
-  }
-
-  .pagination {
-    gap: 1rem;
-
-    .pagination-btn {
-      padding: 0.5rem 1rem;
-      font-size: 0.8125rem;
+      &:hover:not(:disabled) { border-color: $orange; color: $orange; }
     }
 
-    .pagination-info {
-      font-size: 0.8125rem;
+    .unfollow-btn {
+      background: $bg-white;
+      color: #ef4444;
+      border-color: $border-color;
+
+      &:hover:not(:disabled) { background: rgba(#ef4444, 0.06); border-color: #ef4444; }
     }
   }
 }
 
-// ===================================
-// PAGINATION CONTROLS
-// ===================================
 .pagination {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
-  padding: 2rem 0;
-  margin-top: 2rem;
-  border-top: 1px solid $color-light-gray;
+  gap: 20px;
+  padding: 24px 0;
+  margin-top: 20px;
 
   .pagination-btn {
-    padding: 0.625rem 1.25rem;
-    font-family: $font-sans;
-    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    font-size: 14px;
     font-weight: 600;
-    color: $color-black;
-    background: $color-white;
-    border: 2px solid $color-black;
-    border-radius: 4px;
+    color: $black;
+    background: $bg-white;
+    border: 1px solid $border-color;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
 
-    &:hover:not(:disabled) {
-      background: $color-black;
-      color: $color-white;
-      transform: translateY(-1px);
-    }
-
-    &:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-      border-color: $color-medium-gray;
-      color: $color-medium-gray;
-    }
+    &:hover:not(:disabled) { border-color: $orange; color: $orange; }
+    &:disabled { opacity: 0.3; cursor: not-allowed; }
   }
 
   .pagination-info {
-    font-family: $font-sans;
-    font-size: 0.875rem;
+    font-size: 14px;
     font-weight: 500;
-    color: $color-medium-gray;
+    color: $text-muted;
   }
 }
 
+@media (max-width: 768px) {
+  .social-container { padding: 24px 16px; }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    .header-content h1 { font-size: 22px; }
+    .header-actions { width: 100%; justify-content: flex-end; }
+  }
+
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+  .stat-card .stat-content {
+    .stat-value { font-size: 20px; }
+  }
+
+  .tabs .tab { min-width: auto; font-size: 13px; padding: 8px 12px; }
+
+  .users-grid { grid-template-columns: 1fr; }
+
+  .activity-card .activity-actions .action-btn-sm {
+    padding: 8px;
+    font-size: 12px;
+  }
+}

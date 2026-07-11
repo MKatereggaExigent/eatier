@@ -239,10 +239,15 @@ export class ChatbotComponent implements OnInit, OnDestroy {
           'Content-Type': 'application/json'
         });
 
+        // Include last 10 messages for conversation memory
+        // Exclude the current message since it's sent separately as "message"
+        const recentMessages = this.messages().slice(-11, -1);
+
         response = await firstValueFrom(
           this.http.post<ChatResponse>(`${this.apiUrl}/public`, {
             message,
-            pageContext
+            pageContext,
+            conversationHistory: recentMessages
           }, { headers })
         );
       }

@@ -1,15 +1,21 @@
 <div class="accessibility-page">
-  <!-- Hero Section -->
-  <section class="accessibility-hero">
-    <div class="hero-content">
-      <h1>Accessibility Statement</h1>
-      <p class="last-updated">Last Updated: {{ lastUpdated }}</p>
+  <!-- Full-bleed Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-text">
+      <span class="hero-label">Accessibility</span>
+      <h1 class="hero-title">Accessibility Statement</h1>
+      <p class="hero-subtitle">Itiyum is committed to ensuring digital accessibility for everyone</p>
+      <div class="hero-meta">
+        <span class="updated-badge">Last Updated: {{ lastUpdated }}</span>
+      </div>
     </div>
   </section>
 
-  <!-- Content Container -->
-  <div class="accessibility-container">
-    <aside class="table-of-contents">
+  <!-- Content -->
+  <div class="accessibility-layout">
+    <aside class="toc">
       <h3>Table of Contents</h3>
       <ul>
         <li><a href="#commitment">Our Commitment</a></li>
@@ -21,124 +27,128 @@
       </ul>
     </aside>
 
-    <main class="accessibility-content">
-      <section id="commitment" class="content-section">
+    <main class="content">
+      <section id="commitment" class="card content-section">
         <h2>Our Commitment to Accessibility</h2>
         <p>Itiyum is committed to ensuring digital accessibility for people with disabilities. We are continually improving the user experience for everyone and applying the relevant accessibility standards to ensure we provide equal access to all of our users.</p>
-        
         <p>We believe that everyone should be able to discover restaurants, book culinary specialists, and enjoy food experiences regardless of their abilities. Accessibility is not just a legal requirement—it's the right thing to do.</p>
       </section>
 
-      <section id="standards" class="content-section">
+      <section id="standards" class="card content-section">
         <h2>Accessibility Standards</h2>
         <p>Itiyum strives to conform to the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA. These guidelines explain how to make web content more accessible for people with disabilities and user-friendly for everyone.</p>
-        
         <p>Our platform aims to meet the following standards:</p>
         <ul>
-          <li><strong>WCAG 2.1 Level AA</strong> - International web accessibility standard</li>
-          <li><strong>Section 508</strong> - U.S. federal accessibility requirements</li>
-          <li><strong>EN 301 549</strong> - European accessibility standard</li>
-          <li><strong>South African National Standard (SANS) 1186</strong> - Accessibility guidelines for South Africa</li>
+          <li><strong>WCAG 2.1 Level AA</strong> — International web accessibility standard</li>
+          <li><strong>Section 508</strong> — U.S. federal accessibility requirements</li>
+          <li><strong>EN 301 549</strong> — European accessibility standard</li>
+          <li><strong>SANS 1186</strong> — Accessibility guidelines for South Africa</li>
         </ul>
       </section>
 
-      <section id="features" class="content-section">
+      <section id="features" class="card content-section">
         <h2>Accessibility Features</h2>
         <p>We have implemented the following features to improve accessibility:</p>
 
-        <h3>Keyboard Navigation</h3>
-        <ul>
-          <li>Full keyboard navigation support throughout the platform</li>
-          <li>Logical tab order for all interactive elements</li>
-          <li>Visible focus indicators</li>
-          <li>Skip navigation links to bypass repetitive content</li>
-        </ul>
-
-        <h3>Screen Reader Compatibility</h3>
-        <ul>
-          <li>Semantic HTML markup for proper content structure</li>
-          <li>ARIA labels and landmarks for better navigation</li>
-          <li>Alternative text for all images and icons</li>
-          <li>Descriptive link text and button labels</li>
-        </ul>
-
-        <h3>Visual Design</h3>
-        <ul>
-          <li>High contrast color schemes meeting WCAG AA standards</li>
-          <li>Resizable text up to 200% without loss of functionality</li>
-          <li>Clear and readable fonts</li>
-          <li>Consistent layout and navigation</li>
-        </ul>
-
-        <h3>Content</h3>
-        <ul>
-          <li>Clear and simple language</li>
-          <li>Headings and labels that describe topic or purpose</li>
-          <li>Error messages that are clear and helpful</li>
-          <li>Form fields with proper labels and instructions</li>
-        </ul>
-
-        <h3>Multimedia</h3>
-        <ul>
-          <li>Captions for video content (where applicable)</li>
-          <li>Transcripts for audio content</li>
-          <li>Controls for media playback</li>
-        </ul>
+        <div class="feature-grid">
+          <div class="feature-block">
+            <h3>Keyboard Navigation</h3>
+            <ul>
+              <li>Full keyboard navigation support throughout the platform</li>
+              <li>Logical tab order for all interactive elements</li>
+              <li>Visible focus indicators</li>
+              <li>Skip navigation links to bypass repetitive content</li>
+            </ul>
+          </div>
+          <div class="feature-block">
+            <h3>Screen Reader Compatibility</h3>
+            <ul>
+              <li>Semantic HTML markup for proper content structure</li>
+              <li>ARIA labels and landmarks for better navigation</li>
+              <li>Alternative text for all images and icons</li>
+              <li>Descriptive link text and button labels</li>
+            </ul>
+          </div>
+          <div class="feature-block">
+            <h3>Visual Design</h3>
+            <ul>
+              <li>High contrast color schemes meeting WCAG AA standards</li>
+              <li>Resizable text up to 200% without loss of functionality</li>
+              <li>Clear and readable fonts</li>
+              <li>Consistent layout and navigation</li>
+            </ul>
+          </div>
+          <div class="feature-block">
+            <h3>Content</h3>
+            <ul>
+              <li>Clear and simple language</li>
+              <li>Headings and labels that describe topic or purpose</li>
+              <li>Error messages that are clear and helpful</li>
+              <li>Form fields with proper labels and instructions</li>
+            </ul>
+          </div>
+          <div class="feature-block">
+            <h3>Multimedia</h3>
+            <ul>
+              <li>Captions for video content (where applicable)</li>
+              <li>Transcripts for audio content</li>
+              <li>Controls for media playback</li>
+            </ul>
+          </div>
+        </div>
       </section>
 
-      <section id="limitations" class="content-section">
+      <section id="limitations" class="card content-section">
         <h2>Known Limitations</h2>
         <p>Despite our best efforts to ensure accessibility, there may be some limitations. Below are known issues we are working to address:</p>
-        
         <ul>
           <li>Some third-party content (e.g., restaurant-uploaded images) may not have alternative text</li>
           <li>Certain interactive maps may have limited keyboard navigation</li>
           <li>Some PDF documents may not be fully accessible</li>
           <li>Legacy content is being progressively updated to meet current standards</li>
         </ul>
-
         <p>We are actively working to resolve these issues and improve the overall accessibility of our platform.</p>
       </section>
 
-      <section id="feedback" class="content-section">
+      <section id="feedback" class="card content-section">
         <h2>Feedback and Assistance</h2>
         <p>We welcome your feedback on the accessibility of Itiyum. If you encounter any accessibility barriers or have suggestions for improvement, please let us know:</p>
-        
         <div class="contact-methods">
           <div class="contact-method">
-            <h3>📧 Email</h3>
-            <p><a href="mailto:accessibility@itiyum.com">accessibility@itiyum.com</a></p>
+            <div class="method-icon" style="background: #89C4D9;">
+              <lucide-icon [img]="Mail" [size]="20"></lucide-icon>
+            </div>
+            <h3>Email</h3>
+            <a href="mailto:accessibility@itiyum.com">accessibility@itiyum.com</a>
           </div>
-
           <div class="contact-method">
-            <h3>📞 Phone</h3>
+            <div class="method-icon" style="background: #8FC9A3;">
+              <lucide-icon [img]="Phone" [size]="20"></lucide-icon>
+            </div>
+            <h3>Phone</h3>
             <p>+27 (0) 21 123 4567</p>
-            <p class="small-text">Monday - Friday, 9:00 AM - 5:00 PM SAST</p>
+            <span class="method-note">Mon–Fri, 9:00 AM – 5:00 PM SAST</span>
           </div>
-
           <div class="contact-method">
-            <h3><lucide-icon [img]="Mail" [size]="20"></lucide-icon> Mail</h3>
-            <p>Itiyum Accessibility Team<br>
-            123 Long Street<br>
-            Cape Town, 8001<br>
-            South Africa</p>
+            <div class="method-icon" style="background: #F5D760;">
+              <lucide-icon [img]="Mail" [size]="20"></lucide-icon>
+            </div>
+            <h3>Mail</h3>
+            <p>Itiyum Accessibility Team<br>123 Long Street<br>Cape Town, 8001<br>South Africa</p>
           </div>
         </div>
-
-        <p>We aim to respond to accessibility feedback within 5 business days.</p>
+        <p class="response-note">We aim to respond to accessibility feedback within 5 business days.</p>
       </section>
 
-      <section id="contact" class="content-section">
+      <section id="contact" class="card content-section">
         <h2>Technical Specifications</h2>
         <p>Itiyum relies on the following technologies to work with the particular combination of web browser and any assistive technologies or plugins installed on your computer:</p>
-        
         <ul>
           <li>HTML5</li>
           <li>CSS3</li>
           <li>JavaScript (Angular framework)</li>
           <li>ARIA (Accessible Rich Internet Applications)</li>
         </ul>
-
         <p>These technologies are relied upon for conformance with the accessibility standards used.</p>
 
         <h3>Compatible Browsers and Assistive Technologies</h3>
@@ -150,17 +160,10 @@
           <li>TalkBack (Android)</li>
           <li>ZoomText</li>
         </ul>
-
-        <p>Itiyum is tested with the latest versions of:</p>
-        <ul>
-          <li>Google Chrome</li>
-          <li>Mozilla Firefox</li>
-          <li>Apple Safari</li>
-          <li>Microsoft Edge</li>
-        </ul>
+        <p>Itiyum is tested with the latest versions of Google Chrome, Mozilla Firefox, Apple Safari, and Microsoft Edge.</p>
       </section>
 
-      <section class="content-section">
+      <section class="card content-section">
         <h2>Continuous Improvement</h2>
         <p>Accessibility is an ongoing effort. We regularly:</p>
         <ul>
@@ -169,10 +172,8 @@
           <li>Engage with users with disabilities to understand their needs</li>
           <li>Update our platform based on user feedback and evolving standards</li>
         </ul>
-
         <p>This accessibility statement was last reviewed on <strong>{{ lastUpdated }}</strong>.</p>
       </section>
     </main>
   </div>
 </div>
-

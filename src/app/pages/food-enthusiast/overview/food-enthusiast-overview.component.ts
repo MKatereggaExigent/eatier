@@ -9,6 +9,7 @@ import { FoodEnthusiast } from '../../../shared/models/user.model';
 import { Router, RouterModule } from '@angular/router';
 import { UserService } from '../../../core/services/user.service';
 import { environment } from '../../../../environments/environment';
+import { LucideAngularModule, Sun, UtensilsCrossed, Target, PenLine, Store, Users, Star, TrendingUp, MapPin, Calendar, DollarSign, Bookmark, Heart, Globe, Lock, ChefHat, PartyPopper, Zap } from 'lucide-angular';
 
 interface RestaurantRecommendation {
   id: string;
@@ -57,7 +58,7 @@ interface CulinaryEvent {
 @Component({
   selector: 'app-food-enthusiast-overview',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './food-enthusiast-overview.component.html',
   styleUrls: ['./food-enthusiast-overview.component.scss']
 })
@@ -67,6 +68,25 @@ export class FoodEnthusiastOverviewComponent implements OnInit {
   private userService = inject(UserService);
   private currencyService = inject(CurrencyService);
   private http = inject(HttpClient);
+
+  readonly Sun = Sun;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Target = Target;
+  readonly PenLine = PenLine;
+  readonly Store = Store;
+  readonly Users = Users;
+  readonly Star = Star;
+  readonly TrendingUp = TrendingUp;
+  readonly MapPin = MapPin;
+  readonly Calendar = Calendar;
+  readonly DollarSign = DollarSign;
+  readonly Bookmark = Bookmark;
+  readonly Heart = Heart;
+  readonly Globe = Globe;
+  readonly Lock = Lock;
+  readonly ChefHat = ChefHat;
+  readonly PartyPopper = PartyPopper;
+  readonly Zap = Zap;
 
   currentUser = this.authService.currentUser;
   foodEnthusiast = computed(() => this.currentUser() as FoodEnthusiast);
@@ -220,7 +240,6 @@ export class FoodEnthusiastOverviewComponent implements OnInit {
   // Action methods
   bookmarkRestaurant(restaurantId: string): void {
     console.log('Bookmarking restaurant:', restaurantId);
-    // TODO: Implement bookmark functionality via favorites API
   }
 
   bookmarkEvent(eventId: string): void {
@@ -232,28 +251,22 @@ export class FoodEnthusiastOverviewComponent implements OnInit {
   }
 
   viewRestaurant(restaurantId: string): void {
-    // Navigate to restaurant detail page
     this.router.navigate(['/restaurants', restaurantId]);
   }
 
   viewAllRecommendations(): void {
-    // Navigate to public restaurants page (can show all restaurants)
     this.router.navigate(['/restaurants']);
   }
 
   viewAllTrending(): void {
-    // Navigate to public restaurants page (can add trending filter later)
     this.router.navigate(['/restaurants']);
   }
 
   viewAllReviews(): void {
-    // Navigate to food enthusiast reviews page
     this.router.navigate(['/dashboard/food-enthusiast/reviews']);
   }
 
   viewAllEvents(): void {
-    // Navigate to public restaurants page (events can be added later)
-    // For now, navigate to favorites where users can see bookmarked items
     this.router.navigate(['/dashboard/food-enthusiast/favorites']);
   }
 
@@ -267,7 +280,6 @@ export class FoodEnthusiastOverviewComponent implements OnInit {
   }
 
   formatCurrency(amount: number): string {
-    // Use CurrencyService for dynamic currency formatting
     return this.currencyService?.formatAmount(amount) || `$${amount.toFixed(2)}`;
   }
 
@@ -275,14 +287,14 @@ export class FoodEnthusiastOverviewComponent implements OnInit {
     return Array(5).fill(false).map((_, i) => i < Math.floor(rating));
   }
 
-  getEventTypeIcon(type: string): string {
-    const icons = {
-      tasting: '🍷',
-      workshop: '👨‍🍳',
-      festival: '🎉',
-      popup: '⭐'
+  getEventTypeIcon(type: string): any {
+    const icons: Record<string, any> = {
+      tasting: this.UtensilsCrossed,
+      workshop: this.ChefHat,
+      festival: this.PartyPopper,
+      popup: this.Star
     };
-    return icons[type as keyof typeof icons] || '🍽️';
+    return icons[type] || this.UtensilsCrossed;
   }
 
   getEventTypeLabel(type: string): string {

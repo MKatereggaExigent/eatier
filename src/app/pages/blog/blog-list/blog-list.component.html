@@ -1,233 +1,243 @@
 <div class="blog-page">
-  <!-- Hero Section -->
-  <section class="blog-hero">
+  <!-- ========== HERO CAROUSEL ========== -->
+  <section class="hero" (mouseenter)="stopCarousel()" (mouseleave)="startCarousel()">
+    @for (slide of carouselSlides; track slide.image; let i = $index) {
+      <div class="hero-slide" [class.active]="currentSlide() === i">
+        <div class="hero-bg" [style.background-image]="'url(' + slide.image + ')'"></div>
+        <div class="hero-overlay" [style.background]="slide.overlay"></div>
+      </div>
+    }
+
     <div class="hero-content">
-      <h1>Itiyum Blog</h1>
-      <p>Discover food trends, restaurant tips, and culinary inspiration</p>
-      
-      <!-- Search Bar -->
-      <div class="search-container">
-        <input 
-          type="text" 
-          [(ngModel)]="searchQuery"
-          (keyup.enter)="onSearch()"
-          placeholder="Search articles..."
-          class="search-input"
-        />
-        <button (click)="onSearch()" class="search-btn">
-          <lucide-icon [img]="Search" [size]="18"></lucide-icon> Search
-        </button>
+      <span class="hero-label">Our Journal</span>
+      <h1 class="hero-title">Itiyum Blog</h1>
+      <p class="hero-subtitle">Food trends, restaurant insights, and culinary inspiration from around the world</p>
+      <div class="search-bar">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search articles..." class="search-input" />
+        @if (searchQuery()) {
+          <button class="clear-search" (click)="searchQuery.set(''); onSearch()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        }
+      </div>
+    </div>
+
+    <button class="hero-arrow left" (click)="prevSlide()" aria-label="Previous">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <button class="hero-arrow right" (click)="nextSlide()" aria-label="Next">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+
+    <div class="hero-indicators">
+      @for (slide of carouselSlides; track slide.image; let i = $index) {
+        <button class="hero-dot" [class.active]="currentSlide() === i" (click)="goToSlide(i)" [attr.aria-label]="'Slide ' + (i + 1)"></button>
+      }
+    </div>
+
+    <div class="hero-stats">
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-value">{{ totalPosts() }}</span>
+          <span class="stat-label">Articles</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ categories().length }}</span>
+          <span class="stat-label">Categories</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">5</span>
+          <span class="stat-label">Authors</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">12K</span>
+          <span class="stat-label">Readers</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Real-Time Industry News Ticker -->
-  @if (newsItems().length > 0) {
-    <section class="news-ticker-section">
-      <div class="ticker-header">
-        <span class="ticker-label">📡 Industry News</span>
-        <span class="ticker-live">LIVE</span>
-      </div>
-      <div class="news-ticker">
-        <div class="ticker-content">
-          @for (news of newsItems(); track news.id; let i = $index) {
-            <div
-              class="ticker-item"
-              [class.active]="i === currentNewsIndex()"
-              [class.breaking]="news.is_breaking"
-              (click)="trackNewsClick(news.id, news.source_url)"
-            >
-              @if (news.is_breaking) {
-                <span class="breaking-badge">BREAKING</span>
-              }
-              <span class="news-category">{{ news.category }}</span>
-              <span class="news-title">{{ news.title }}</span>
-              <span class="news-time">{{ getTimeAgo(news.published_at) }}</span>
+  <!-- ========== CATEGORY CARDS ========== -->
+  @if (categories().length > 0) {
+    <section class="categories-section">
+      <div class="categories-grid">
+        @for (cat of categories(); track cat.id) {
+          <button class="category-card" (click)="onCategoryChange(cat.name)" [class.active]="selectedCategory() === cat.name">
+            <div class="cat-icon-wrap">
+              <lucide-icon [img]="getCategoryIcon(cat.name)" [size]="22"></lucide-icon>
             </div>
-          }
-        </div>
-      </div>
-    </section>
-  }
-
-  <!-- Industry Trends Stats -->
-  @if (industryTrends().length > 0) {
-    <section class="trends-section">
-      <div class="trends-container">
-        <h3><lucide-icon [img]="BarChart3" [size]="20"></lucide-icon> Industry Trends</h3>
-        <div class="trends-grid">
-          @for (trend of industryTrends(); track trend.id) {
-            <div class="trend-card" [class.positive]="trend.percentage_change > 0" [class.negative]="trend.percentage_change < 0">
-              <span class="trend-icon">
-                <lucide-icon [img]="getTrendIcon(trend.trend_type)" [size]="24"></lucide-icon>
-              </span>
-              <div class="trend-info">
-                <span class="trend-name">{{ trend.trend_name }}</span>
-                <span class="trend-value">{{ trend.current_value }}{{ trend.unit === 'percent' ? '%' : (trend.unit === 'USD' ? '' : ' ' + trend.unit) }}</span>
-              </div>
-              <div class="trend-change">
-                <span class="change-indicator">
-                  <lucide-icon [img]="trend.percentage_change > 0 ? ArrowUp : ArrowDown" [size]="14"></lucide-icon>
-                  {{ trend.percentage_change > 0 ? '+' : '' }}{{ trend.percentage_change | number:'1.1-1' }}%
-                </span>
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-    </section>
-  }
-
-  <div class="blog-container">
-    <!-- Categories Sidebar -->
-    <aside class="categories-sidebar">
-      <h3>Categories</h3>
-      <ul class="category-list">
-        <li>
-          <button
-            [class.active]="selectedCategory() === ''"
-            (click)="onCategoryChange('')"
-          >
-            <lucide-icon [img]="BookOpen" [size]="16"></lucide-icon> All Posts
-            <span class="count">{{ totalPosts() }}</span>
+            <span class="cat-name">{{ cat.name }}</span>
+            <span class="cat-count">{{ cat.post_count }}</span>
           </button>
-        </li>
-        @for (category of categories(); track category.id) {
-          <li>
-            <button
-              [class.active]="selectedCategory() === category.name"
-              (click)="onCategoryChange(category.name)"
-            >
-              <lucide-icon [img]="getCategoryIcon(category.name)" [size]="16"></lucide-icon>
-              {{ category.name }}
-              <span class="count">{{ category.post_count }}</span>
-            </button>
-          </li>
         }
-      </ul>
-    </aside>
+        <button class="category-card all-card" [class.active]="selectedCategory() === ''" (click)="onCategoryChange('')">
+          <div class="cat-icon-wrap">
+            <lucide-icon [img]="BookOpen" [size]="22"></lucide-icon>
+          </div>
+          <span class="cat-name">All Posts</span>
+          <span class="cat-count">{{ totalPosts() }}</span>
+        </button>
+      </div>
+    </section>
+  }
 
-    <!-- Main Content -->
-    <main class="blog-content">
-      <!-- Featured Posts -->
-      @if (featuredPosts().length > 0 && !selectedCategory() && currentPage() === 1) {
-        <section class="featured-section">
-          <h2>✨ Featured Articles</h2>
-          <div class="featured-grid">
-            @for (post of featuredPosts(); track post.id) {
-              <a [routerLink]="['/blog', post.slug]" class="featured-card">
-                <div class="featured-image">
-                  @if (post.featured_image) {
-                    <img [src]="post.featured_image" [alt]="post.title" (error)="onImageError($event)" />
-                  }
-                  <span class="featured-badge">Featured</span>
+  <div class="blog-layout">
+    <!-- ========== FEATURED POSTS ========== -->
+    @if (featuredPosts().length > 0 && !selectedCategory() && currentPage() === 1) {
+      <section class="featured-section">
+        <div class="featured-grid">
+          @for (post of featuredPosts(); track post.id; let i = $index) {
+            <a [routerLink]="['/blog', post.slug]" class="featured-card" [class.large]="i === 0" [style.--card-delay]="i * 0.12 + 's'">
+              <div class="featured-img">
+                <img [src]="post.featured_image || 'assets/images/placeholder-blog.jpg'" [alt]="post.title" (error)="onImageError($event)" />
+                <span class="featured-cat">{{ post.category }}</span>
+              </div>
+              <div class="featured-body">
+                <span class="featured-badge">Featured</span>
+                <h3>{{ post.title }}</h3>
+                <p>{{ post.excerpt }}</p>
+                <div class="featured-author">
+                  <div class="fa-avatar">
+                    @if (post.author_avatar) {
+                      <img [src]="post.author_avatar" [alt]="post.author_name" />
+                    } @else {
+                      <span class="fa-fallback">{{ (post.author_name || 'I').charAt(0) }}</span>
+                    }
+                  </div>
+                  <span class="fa-name">{{ post.author_name || 'Itiyum Team' }}</span>
+                  <span class="fa-dot">&middot;</span>
+                  <span class="fa-date">{{ formatDate(post.published_at) }}</span>
+                  <span class="fa-dot">&middot;</span>
+                  <span class="fa-read">{{ getReadingTime(post.excerpt) }} min</span>
                 </div>
-                <div class="featured-content">
-                  <span class="category-tag">{{ post.category }}</span>
+              </div>
+            </a>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- ========== NEWS TICKER ========== -->
+    @if (newsItems().length > 0) {
+      <section class="news-ticker">
+        <div class="ticker-card">
+          <div class="ticker-header">
+            <lucide-icon [img]="Newspaper" [size]="16"></lucide-icon>
+            <span>Industry News</span>
+          </div>
+          <div class="ticker-track">
+            @for (news of newsItems(); track news.id; let i = $index) {
+              <div class="ticker-item" [class.active]="i === currentNewsIndex()" (click)="trackNewsClick(news.id, news.source_url)">
+                @if (news.is_breaking) { <span class="ticker-breaking">Breaking</span> }
+                <span class="ticker-text">{{ news.title }}</span>
+                <span class="ticker-time">{{ getTimeAgo(news.published_at) }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- ========== TRENDS ========== -->
+    @if (industryTrends().length > 0) {
+      <section class="trends-section">
+        <div class="trends-inner">
+          <span class="trends-label">Industry Trends</span>
+          @for (trend of industryTrends(); track trend.id) {
+            <div class="trend-chip" [class.up]="trend.percentage_change >= 0" [class.down]="trend.percentage_change < 0">
+              <lucide-icon [img]="getTrendIcon(trend.trend_type)" [size]="15"></lucide-icon>
+              <span class="tc-name">{{ trend.trend_name }}</span>
+              <span class="tc-val">{{ trend.current_value }}{{ trend.unit === 'percent' ? '%' : '' }}</span>
+              <span class="tc-change">
+                <lucide-icon [img]="trend.percentage_change >= 0 ? ArrowUp : ArrowDown" [size]="11"></lucide-icon>
+                {{ trend.percentage_change >= 0 ? '+' : '' }}{{ trend.percentage_change | number:'1.0-1' }}%
+              </span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="main-content">
+      <div class="section-header">
+        <h2>@if (selectedCategory()) { {{ selectedCategory() }} } @else { Latest Articles }</h2>
+        @if (totalPosts() > 0) {
+          <span class="section-count">{{ totalPosts() }} article{{ totalPosts() !== 1 ? 's' : '' }}</span>
+        }
+      </div>
+
+      @if (loading()) {
+        <div class="state-msg">
+          <div class="spinner"></div>
+          <p>Loading articles...</p>
+        </div>
+      } @else if (error()) {
+        <div class="state-msg error">
+          <lucide-icon [img]="BarChart3" [size]="40"></lucide-icon>
+          <h3>Something went wrong</h3>
+          <p>{{ error() }}</p>
+          <button class="retry-btn" (click)="loadPosts()">Try Again</button>
+        </div>
+      } @else {
+        @if (posts().length === 0) {
+          <div class="state-msg empty">
+            <lucide-icon [img]="BookOpen" [size]="40"></lucide-icon>
+            <h3>No articles found</h3>
+            <p>Check back later for new content.</p>
+          </div>
+        } @else {
+          <div class="posts-grid">
+            @for (post of posts(); track post.id; let i = $index) {
+              <a [routerLink]="['/blog', post.slug]" class="post-card" [style.--card-delay]="i * 0.07 + 's'">
+                <div class="post-img-wrap">
+                  <img [src]="post.featured_image || 'assets/images/placeholder-blog.jpg'" [alt]="post.title" (error)="onImageError($event)" class="post-img" />
+                  <span class="post-cat">{{ post.category }}</span>
+                </div>
+                <div class="post-body">
                   <h3>{{ post.title }}</h3>
                   <p>{{ post.excerpt }}</p>
-                  <div class="meta">
-                    <span>{{ formatDate(post.published_at) }}</span>
-                    <span>{{ getReadingTime(post.excerpt) }} min read</span>
+                  <div class="post-footer">
+                    <div class="post-author">
+                      <div class="pa-avatar">
+                        @if (post.author_avatar) {
+                          <img [src]="post.author_avatar" [alt]="post.author_name" />
+                        } @else {
+                          <span class="pa-fallback">{{ (post.author_name || 'I').charAt(0) }}</span>
+                        }
+                      </div>
+                      <span class="pa-name">{{ post.author_name || 'Itiyum Team' }}</span>
+                    </div>
+                    <div class="post-meta">
+                      <span>{{ formatDate(post.published_at) }}</span>
+                      <span class="meta-dot">&middot;</span>
+                      <span>{{ getReadingTime(post.excerpt) }} min read</span>
+                    </div>
                   </div>
                 </div>
               </a>
             }
           </div>
-        </section>
-      }
 
-      <!-- Loading State -->
-      @if (loading()) {
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading articles...</p>
-        </div>
-      }
-
-      <!-- Error State -->
-      @if (error()) {
-        <div class="error-state">
-          <p>{{ error() }}</p>
-          <button (click)="loadPosts()">Try Again</button>
-        </div>
-      }
-
-      <!-- Posts Grid -->
-      @if (!loading() && !error()) {
-        <section class="posts-section">
-          <h2>
-            @if (selectedCategory()) {
-              {{ selectedCategory() }}
-            } @else {
-              Latest Articles
-            }
-          </h2>
-          
-          @if (posts().length === 0) {
-            <div class="empty-state">
-              <p>No articles found. Check back later!</p>
-            </div>
-          } @else {
-            <div class="posts-grid">
-              @for (post of posts(); track post.id) {
-                <a [routerLink]="['/blog', post.slug]" class="post-card">
-                  <div class="post-image">
-                    @if (post.featured_image) {
-                      <img [src]="post.featured_image" [alt]="post.title" (error)="onImageError($event)" />
-                    }
-                  </div>
-                  <div class="post-content">
-                    <span class="category-tag">{{ post.category }}</span>
-                    <h3>{{ post.title }}</h3>
-                    <p>{{ post.excerpt }}</p>
-                    <div class="post-meta">
-                      <div class="author">
-                        <div class="author-avatar">
-                          @if (post.author_avatar) {
-                            <img [src]="post.author_avatar" [alt]="post.author_name" (error)="onImageError($event)" />
-                          } @else {
-                            <span class="avatar-fallback">{{ (post.author_name || 'A').charAt(0).toUpperCase() }}</span>
-                          }
-                        </div>
-                        <span>{{ post.author_name || 'Itiyum Team' }}</span>
-                      </div>
-                      <span class="date">{{ formatDate(post.published_at) }}</span>
-                    </div>
-                    <div class="post-stats">
-                      <span><lucide-icon [img]="Eye" [size]="14"></lucide-icon> {{ post.view_count }}</span>
-                      <span><lucide-icon [img]="Heart" [size]="14"></lucide-icon> {{ post.like_count }}</span>
-                      <span><lucide-icon [img]="Clock" [size]="14"></lucide-icon> {{ getReadingTime(post.excerpt) }} min</span>
-                    </div>
-                  </div>
-                </a>
-              }
+          <!-- Pagination -->
+          @if (totalPages() > 1) {
+            <div class="pagination-bar">
+              <button class="page-arrow" [disabled]="currentPage() === 1" (click)="onPageChange(currentPage() - 1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <div class="page-nums">
+                @for (page of [].constructor(totalPages()); track $index) {
+                  <button class="page-num" [class.active]="currentPage() === $index + 1" (click)="onPageChange($index + 1)">{{ $index + 1 }}</button>
+                }
+              </div>
+              <button class="page-arrow" [disabled]="currentPage() === totalPages()" (click)="onPageChange(currentPage() + 1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
             </div>
           }
-        </section>
-
-        <!-- Pagination -->
-        @if (totalPages() > 1) {
-          <div class="pagination">
-            <button 
-              [disabled]="currentPage() === 1"
-              (click)="onPageChange(currentPage() - 1)"
-            >
-              ← Previous
-            </button>
-            <span class="page-info">
-              Page {{ currentPage() }} of {{ totalPages() }}
-            </span>
-            <button 
-              [disabled]="currentPage() === totalPages()"
-              (click)="onPageChange(currentPage() + 1)"
-            >
-              Next →
-            </button>
-          </div>
         }
       }
     </main>
   </div>
 </div>
-

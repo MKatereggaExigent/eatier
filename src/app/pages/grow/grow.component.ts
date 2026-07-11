@@ -54,17 +54,17 @@ export class GrowComponent implements OnInit, OnDestroy {
     {
       image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&h=900&fit=crop',
       title: 'Reach Your Target Audience',
-      category: 'advertising'
+      overlay: 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(15,23,42,0.4) 50%, rgba(0,0,0,0.6) 100%)'
     },
     {
       image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&h=900&fit=crop',
       title: 'Track Your Success',
-      category: 'analytics'
+      overlay: 'linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(30,41,59,0.35) 50%, rgba(0,0,0,0.55) 100%)'
     },
     {
       image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1600&h=900&fit=crop',
       title: 'Grow Your Business',
-      category: 'success'
+      overlay: 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(15,23,42,0.3) 50%, rgba(0,0,0,0.6) 100%)'
     }
   ];
 
@@ -127,7 +127,7 @@ export class GrowComponent implements OnInit, OnDestroy {
   });
 
   regions = [
-    { name: 'East Africa', countries: ['Kenya', 'Ethiopia', 'Tanzania', 'Uganda'] },
+    { name: 'Southern Africa', countries: ['South Africa', 'Botswana', 'Namibia', 'Zimbabwe'] },
     { name: 'West Africa', countries: ['Nigeria', 'Ghana', 'Senegal', 'Ivory Coast'] },
     { name: 'MENA', countries: ['UAE', 'Saudi Arabia', 'Egypt', 'Morocco'] },
     { name: 'Europe', countries: ['UK', 'France', 'Germany', 'Spain'] }
@@ -281,6 +281,11 @@ export class GrowComponent implements OnInit, OnDestroy {
   getFeatureIcon(index: number): any {
     const icons = [this.Calendar, this.MessageCircle, this.Bell, this.BarChart3];
     return icons[index] || this.Calendar;
+  }
+
+  getAccentColor(index: number): string {
+    const colors = ['#89C4D9', '#8FC9A3', '#FFB88C', '#F5D760', '#F0B5BA'];
+    return colors[index % colors.length];
   }
 }
 

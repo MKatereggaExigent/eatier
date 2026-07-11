@@ -28,28 +28,12 @@ export class ContactComponent {
 
   offices = [
     {
-      city: 'Cape Town',
-      country: 'South Africa',
-      address: '123 Long Street, Cape Town, 8001',
-      phone: '+27 (0) 21 123 4567',
-      email: 'capetown@itiyum.com',
-      hours: 'Monday - Friday: 9:00 AM - 6:00 PM SAST'
-    },
-    {
       city: 'Johannesburg',
       country: 'South Africa',
       address: '456 Nelson Mandela Square, Sandton, 2196',
-      phone: '+27 (0) 11 234 5678',
+      phone: '065 287 7664',
       email: 'johannesburg@itiyum.com',
       hours: 'Monday - Friday: 9:00 AM - 6:00 PM SAST'
-    },
-    {
-      city: 'Nairobi',
-      country: 'Kenya',
-      address: 'Westlands Business Park, Nairobi',
-      phone: '+254 20 123 4567',
-      email: 'nairobi@itiyum.com',
-      hours: 'Monday - Friday: 9:00 AM - 6:00 PM EAT'
     }
   ];
 

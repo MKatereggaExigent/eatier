@@ -4,7 +4,9 @@
     <div class="header-content">
       <div class="title-section">
         <h1 class="page-title">
-          <span class="title-icon">👥</span>
+          <span class="title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
           User Management
         </h1>
         <p class="page-subtitle">
@@ -16,7 +18,9 @@
     <!-- Stats Cards -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon">👥</div>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ userStats().total }}</div>
           <div class="stat-label">Total Users</div>
@@ -24,7 +28,9 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">✅</div>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ userStats().active }}</div>
           <div class="stat-label">Active Users</div>
@@ -32,7 +38,9 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🏪</div>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ userStats().businesses }}</div>
           <div class="stat-label">Businesses</div>
@@ -40,7 +48,9 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🍽️</div>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ userStats().foodEnthusiasts }}</div>
           <div class="stat-label">Food Enthusiasts</div>
@@ -48,7 +58,9 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">👨‍🍳</div>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ userStats().specialists }}</div>
           <div class="stat-label">Specialists</div>
@@ -56,7 +68,9 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🔐</div>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
         <div class="stat-content">
           <div class="stat-number">{{ userStats().verified }}</div>
           <div class="stat-label">Verified</div>
@@ -78,7 +92,9 @@
             [value]="searchQuery()"
             (input)="onSearchInput($event)"
             aria-label="Search users">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </span>
         </div>
       </div>
 
@@ -148,7 +164,9 @@
           class="filter-toggle-btn"
           (click)="toggleFilters()"
           [class.active]="showFilters()">
-          <span class="btn-icon">🔽</span>
+          <span class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
           Filters
           @if (hasActiveFilters()) {
             <span class="filter-badge">{{ filteredUsers().length }}</span>
@@ -235,7 +253,9 @@
       </div>
     } @else if (filteredUsers().length === 0) {
       <div class="empty-state">
-        <div class="empty-icon">👥</div>
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
         <h3>No users found</h3>
         @if (hasActiveFilters()) {
           <p>Try adjusting your filters or search terms.</p>
@@ -305,7 +325,15 @@
                 <!-- Role -->
                 <td class="user-role">
                   <div class="role-badge" [class]="'role-' + user.role">
-                    <span class="role-icon">{{ getRoleIcon(user.role) }}</span>
+                    <span class="role-icon">
+                      @if (user.role === 'food_enthusiast') {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                      } @else if (user.role === 'itiyum' || user.role === 'business') {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+                      } @else {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      }
+                    </span>
                     <span class="role-text">{{ getRoleLabel(user.role) }}</span>
                   </div>
                 </td>
@@ -321,12 +349,16 @@
                 <td class="user-verification">
                   <div class="verification-status">
                     <div class="verification-item" [class.verified]="user.emailVerified">
-                      <span class="verification-icon">📧</span>
-                      <span class="verification-text">{{ user.emailVerified ? 'Verified' : 'Unverified' }}</span>
+                    <span class="verification-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    </span>
+                    <span class="verification-text">{{ user.emailVerified ? 'Verified' : 'Unverified' }}</span>
                     </div>
                     @if (user.phone) {
                       <div class="verification-item" [class.verified]="user.phoneVerified">
-                        <span class="verification-icon">📱</span>
+                        <span class="verification-icon">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                        </span>
                         <span class="verification-text">{{ user.phoneVerified ? 'Verified' : 'Unverified' }}</span>
                       </div>
                     }
@@ -355,7 +387,7 @@
                       class="btn-action view-btn"
                       (click)="viewUserDetails(user)"
                       title="View Details">
-                      👁️
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>
 
                     <button
@@ -363,7 +395,7 @@
                       class="btn-action role-btn"
                       (click)="openEditRoleModal(user)"
                       title="Change Role">
-                      🔑
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.78 7.78 5.5 5.5 0 0 1 7.78-7.78zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
                     </button>
 
                     @if (user.status === 'active') {
@@ -372,7 +404,7 @@
                         class="btn-action suspend-btn"
                         (click)="suspendUser(user)"
                         title="Suspend User">
-                        ⏸️
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
                       </button>
                     } @else if (user.status === 'frozen' || user.status === 'pending_deletion') {
                       <button
@@ -380,7 +412,7 @@
                         class="btn-action activate-btn"
                         (click)="activateUser(user)"
                         title="Activate User">
-                        ▶️
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                       </button>
                     }
 
@@ -389,7 +421,7 @@
                       class="btn-action delete-btn"
                       (click)="deleteUser(user)"
                       title="Delete User">
-                      🗑️
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                     </button>
                   </div>
                 </td>
@@ -418,10 +450,14 @@
                 <h3 class="user-name">{{ user.firstName }} {{ user.lastName }}</h3>
                 <p class="user-email">{{ user.email }}</p>
                 @if (user.tenantName) {
-                  <p class="tenant-name">🏢 {{ user.tenantName }}</p>
+                  <p class="tenant-name">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+                    {{ user.tenantName }}</p>
                 }
                 @if (user.businessName) {
-                  <p class="business-name">🏪 {{ user.businessName }}</p>
+                  <p class="business-name">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+                    {{ user.businessName }}</p>
                 }
               </div>
             </div>
@@ -431,7 +467,15 @@
               <div class="card-detail">
                 <span class="detail-label">Role</span>
                 <div class="role-badge" [class]="'role-' + user.role">
-                  <span class="role-icon">{{ getRoleIcon(user.role) }}</span>
+                  <span class="role-icon">
+                    @if (user.role === 'food_enthusiast') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                    } @else if (user.role === 'itiyum' || user.role === 'business') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    }
+                  </span>
                   <span class="role-text">{{ getRoleLabel(user.role) }}</span>
                 </div>
               </div>
@@ -447,11 +491,23 @@
                 <span class="detail-label">Verification</span>
                 <div class="verification-badges">
                   <span class="verification-badge" [class.verified]="user.emailVerified">
-                    📧 {{ user.emailVerified ? 'Email ✓' : 'Email ✗' }}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    {{ user.emailVerified ? 'Email' : 'Email' }}
+                    @if (user.emailVerified) {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="20 6 9 17 4 12"/></svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    }
                   </span>
                   @if (user.phone) {
                     <span class="verification-badge" [class.verified]="user.phoneVerified">
-                      📱 {{ user.phoneVerified ? 'Phone ✓' : 'Phone ✗' }}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                      {{ user.phoneVerified ? 'Phone' : 'Phone' }}
+                      @if (user.phoneVerified) {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="20 6 9 17 4 12"/></svg>
+                      } @else {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      }
                     </span>
                   }
                 </div>
@@ -477,14 +533,18 @@
                 <div class="card-stats">
                   @if (user.totalBookings !== undefined) {
                     <div class="stat-item">
-                      <span class="stat-icon">📅</span>
+                      <span class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      </span>
                       <span class="stat-value">{{ user.totalBookings }}</span>
                       <span class="stat-label">Bookings</span>
                     </div>
                   }
                   @if (user.totalReviews !== undefined) {
                     <div class="stat-item">
-                      <span class="stat-icon">⭐</span>
+                      <span class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      </span>
                       <span class="stat-value">{{ user.totalReviews }}</span>
                       <span class="stat-label">Reviews</span>
                     </div>
@@ -500,7 +560,8 @@
                 class="btn-card view-btn"
                 (click)="viewUserDetails(user)"
                 title="View Details">
-                👁️ View
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                View
               </button>
 
               <button
@@ -508,7 +569,8 @@
                 class="btn-card role-btn"
                 (click)="openEditRoleModal(user)"
                 title="Change Role">
-                🔑 Role
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.78 7.78 5.5 5.5 0 0 1 7.78-7.78zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                Role
               </button>
 
               @if (user.status === 'active') {
@@ -517,7 +579,8 @@
                   class="btn-card suspend-btn"
                   (click)="suspendUser(user)"
                   title="Suspend User">
-                  ⏸️ Suspend
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                  Suspend
                 </button>
               } @else if (user.status === 'frozen' || user.status === 'pending_deletion') {
                 <button
@@ -525,7 +588,8 @@
                   class="btn-card activate-btn"
                   (click)="activateUser(user)"
                   title="Activate User">
-                  ▶️ Activate
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Activate
                 </button>
               }
 
@@ -534,7 +598,8 @@
                 class="btn-card delete-btn"
                 (click)="deleteUser(user)"
                 title="Delete User">
-                🗑️ Delete
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                Delete
               </button>
             </div>
           </div>
@@ -579,7 +644,14 @@
               <div class="detail-item">
                 <label>Role</label>
                 <span class="role-badge" [class]="'role-' + selectedUser()!.role">
-                  {{ getRoleIcon(selectedUser()!.role) }} {{ getRoleLabel(selectedUser()!.role) }}
+                  @if (selectedUser()!.role === 'food_enthusiast') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                  } @else if (selectedUser()!.role === 'itiyum' || selectedUser()!.role === 'business') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+                  } @else {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  }
+                  {{ getRoleLabel(selectedUser()!.role) }}
                 </span>
               </div>
 
@@ -654,7 +726,9 @@
 
       <div class="modal-body">
         <div class="delete-warning">
-          <div class="warning-icon">⚠️</div>
+          <div class="warning-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
           <div class="warning-content">
             <h4>Delete User Account</h4>
             <p>Are you sure you want to delete <strong>{{ selectedUser()!.firstName }} {{ selectedUser()!.lastName }}</strong>?</p>

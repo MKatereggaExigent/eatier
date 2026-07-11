@@ -1,204 +1,193 @@
-<div class="social-container">
-  <div class="page-header">
-    <h1>Social</h1>
-    <p>Connect with fellow food lovers and discover new favorites</p>
-  </div>
-
-  <!-- Social and Messaging Widgets -->
-  <section class="widgets-section" aria-label="Social and Messaging">
-    <div class="widgets-grid">
-      <app-social-widget></app-social-widget>
-      <app-messaging-widget></app-messaging-widget>
+<div class="section">
+  <div class="section-inner">
+    <div class="tag">
+      <lucide-icon [img]="Heart" [size]="14"></lucide-icon>
+      <span>Social</span>
     </div>
-  </section>
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <button type="button" class="tab" [class.active]="activeTab() === 'feed'" (click)="setActiveTab('feed')">
-      Activity Feed
-    </button>
-    <button type="button" class="tab" [class.active]="activeTab() === 'discover'" (click)="setActiveTab('discover')">
-      Discover
-    </button>
-    <button type="button" class="tab" [class.active]="activeTab() === 'following'" (click)="setActiveTab('following')">
-      Following
-    </button>
-    <button type="button" class="tab" [class.active]="activeTab() === 'followers'" (click)="setActiveTab('followers')">
-      Followers
-    </button>
-  </div>
+    <div class="social-page" role="main" aria-label="Social">
+      <!-- Header Card -->
+      <header class="header-card">
+        <div class="header-content">
+          <div class="title-section">
+            <h1 class="page-title">
+              <lucide-icon [img]="Users" [size]="28" class="title-icon"></lucide-icon>
+              Social
+            </h1>
+            <p class="page-subtitle">
+              Connect with fellow food lovers and discover new favorites
+            </p>
+          </div>
+        </div>
+      </header>
 
-  @if (loading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading...</p>
+      <!-- Social and Messaging Widgets -->
+      <section class="widgets-section" aria-label="Social and Messaging">
+        <div class="widgets-grid">
+          <app-social-widget></app-social-widget>
+          <app-messaging-widget></app-messaging-widget>
+        </div>
+      </section>
+
+      <!-- Navigation Tabs -->
+      <nav class="tabs-group" role="tablist">
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'feed'" (click)="setActiveTab('feed')" role="tab" [attr.aria-selected]="activeTab() === 'feed'">
+          <lucide-icon [img]="Newspaper" [size]="18"></lucide-icon>
+          Activity Feed
+        </button>
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'discover'" (click)="setActiveTab('discover')" role="tab" [attr.aria-selected]="activeTab() === 'discover'">
+          <lucide-icon [img]="Search" [size]="18"></lucide-icon>
+          Discover
+        </button>
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'following'" (click)="setActiveTab('following')" role="tab" [attr.aria-selected]="activeTab() === 'following'">
+          <lucide-icon [img]="User" [size]="18"></lucide-icon>
+          Following
+        </button>
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'followers'" (click)="setActiveTab('followers')" role="tab" [attr.aria-selected]="activeTab() === 'followers'">
+          <lucide-icon [img]="Users" [size]="18"></lucide-icon>
+          Followers
+        </button>
+      </nav>
+
+      @if (loading()) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading...</p>
+        </div>
+      } @else {
+        <!-- Activity Feed -->
+        @if (activeTab() === 'feed') {
+          @if (activityFeed().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="Newspaper" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No activity yet</h3>
+              <p>Follow some food lovers to see their activity here!</p>
+              <button type="button" class="btn-primary" (click)="setActiveTab('discover')">Discover People</button>
+            </div>
+          } @else {
+            <div class="activity-list">
+              @for (activity of activityFeed(); track activity.id) {
+                <div class="activity-card">
+                  <div class="activity-icon-wrap">
+                    <lucide-icon [img]="getActivityIcon(activity.activityType)" [size]="20"></lucide-icon>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-header">
+                      <span class="actor-name">{{ activity.actorName }}</span>
+                      <span class="activity-text">{{ getActivityText(activity) }}</span>
+                    </div>
+                    @if (activity.contentPreview) {
+                      <p class="activity-preview">"{{ activity.contentPreview }}"</p>
+                    }
+                    <span class="activity-time">{{ formatDate(activity.createdAt) }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+
+        <!-- Discover Users -->
+        @if (activeTab() === 'discover') {
+          @if (discoverUsers().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="Search" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No suggestions</h3>
+              <p>Check back later for new food lovers to follow!</p>
+            </div>
+          } @else {
+            <div class="users-grid">
+              @for (user of discoverUsers(); track user.id) {
+                <div class="user-card">
+                  <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
+                  <div class="user-info">
+                    <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
+                    <div class="user-stats">
+                      <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
+                      <span><lucide-icon [img]="Users" [size]="14"></lucide-icon> {{ user.follower_count || user.followerCount || 0 }} followers</span>
+                    </div>
+                  </div>
+                  <div class="user-actions">
+                    <button type="button" class="follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">
+                      @if (isFollowInProgress(user.id)) { ... } @else if (user.isFollowing) { Following } @else { Follow }
+                    </button>
+                    <button type="button" class="chat-btn" [disabled]="isStartingChat(user.id)" (click)="startChat(user.id)">
+                      @if (isStartingChat(user.id)) { ... } @else { <lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon> Chat }
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+
+        <!-- Following -->
+        @if (activeTab() === 'following') {
+          @if (following().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="User" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>Not following anyone</h3>
+              <p>Discover and follow food lovers to see their activity!</p>
+              <button type="button" class="btn-primary" (click)="setActiveTab('discover')">Discover People</button>
+            </div>
+          } @else {
+            <div class="users-grid">
+              @for (user of following(); track user.id) {
+                <div class="user-card">
+                  <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
+                  <div class="user-info">
+                    <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
+                    <div class="user-stats">
+                      <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
+                    </div>
+                  </div>
+                  <div class="user-actions">
+                    <button type="button" class="follow-btn following" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, true)">
+                      @if (isFollowInProgress(user.id)) { ... } @else { Unfollow }
+                    </button>
+                    <button type="button" class="chat-btn" [disabled]="isStartingChat(user.id)" (click)="startChat(user.id)">
+                      @if (isStartingChat(user.id)) { ... } @else { <lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon> Chat }
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+
+        <!-- Followers -->
+        @if (activeTab() === 'followers') {
+          @if (followers().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="Users" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No followers yet</h3>
+              <p>Share your reviews and favorites to attract followers!</p>
+            </div>
+          } @else {
+            <div class="users-grid">
+              @for (user of followers(); track user.id) {
+                <div class="user-card">
+                  <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
+                  <div class="user-info">
+                    <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
+                    <div class="user-stats">
+                      <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
+                    </div>
+                  </div>
+                  <div class="user-actions">
+                    <button type="button" class="follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">
+                      @if (isFollowInProgress(user.id)) { ... } @else if (user.isFollowing) { Following } @else { Follow Back }
+                    </button>
+                    <button type="button" class="chat-btn" [disabled]="isStartingChat(user.id)" (click)="startChat(user.id)">
+                      @if (isStartingChat(user.id)) { ... } @else { <lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon> Chat }
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+      }
     </div>
-  } @else {
-    <!-- Activity Feed -->
-    @if (activeTab() === 'feed') {
-      @if (activityFeed().length === 0) {
-        <div class="empty-state">
-          <lucide-icon [img]="Newspaper" [size]="48" class="empty-icon"></lucide-icon>
-          <h2>No activity yet</h2>
-          <p>Follow some food lovers to see their activity here!</p>
-          <button type="button" class="action-btn" (click)="setActiveTab('discover')">Discover People</button>
-        </div>
-      } @else {
-        <div class="activity-list">
-          @for (activity of activityFeed(); track activity.id) {
-            <div class="activity-card">
-              <lucide-icon [img]="getActivityIcon(activity.activityType)" [size]="24" class="activity-icon"></lucide-icon>
-              <div class="activity-content">
-                <div class="activity-header">
-                  <span class="actor-name">{{ activity.actorName }}</span>
-                  <span class="activity-text">{{ getActivityText(activity) }}</span>
-                </div>
-                @if (activity.contentPreview) {
-                  <p class="activity-preview">"{{ activity.contentPreview }}"</p>
-                }
-                <span class="activity-time">{{ formatDate(activity.createdAt) }}</span>
-              </div>
-            </div>
-          }
-        </div>
-      }
-    }
-
-    <!-- Discover Users -->
-    @if (activeTab() === 'discover') {
-      @if (discoverUsers().length === 0) {
-        <div class="empty-state">
-          <lucide-icon [img]="Search" [size]="48" class="empty-icon"></lucide-icon>
-          <h2>No suggestions</h2>
-          <p>Check back later for new food lovers to follow!</p>
-        </div>
-      } @else {
-        <div class="users-grid">
-          @for (user of discoverUsers(); track user.id) {
-            <div class="user-card">
-              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
-              <div class="user-info">
-                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
-                <div class="user-stats">
-                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
-                  <span><lucide-icon [img]="Users" [size]="14"></lucide-icon> {{ user.follower_count || user.followerCount || 0 }} followers</span>
-                </div>
-              </div>
-              <div class="user-actions">
-                <button
-                  type="button"
-                  class="follow-btn"
-                  [class.following]="user.isFollowing"
-                  [disabled]="isFollowInProgress(user.id)"
-                  (click)="toggleFollow(user.id, user.isFollowing)">
-                  @if (isFollowInProgress(user.id)) {
-                    ...
-                  } @else if (user.isFollowing) {
-                    Following
-                  } @else {
-                    Follow
-                  }
-                </button>
-                <button
-                  type="button"
-                  class="chat-btn"
-                  [disabled]="isStartingChat(user.id)"
-                  (click)="startChat(user.id)">
-                  @if (isStartingChat(user.id)) {
-                    ...
-                  } @else {
-                    <lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon> Chat
-                  }
-                </button>
-              </div>
-            </div>
-          }
-        </div>
-      }
-    }
-
-    <!-- Following -->
-    @if (activeTab() === 'following') {
-      @if (following().length === 0) {
-        <div class="empty-state">
-          <lucide-icon [img]="User" [size]="48" class="empty-icon"></lucide-icon>
-          <h2>Not following anyone</h2>
-          <p>Discover and follow food lovers to see their activity!</p>
-          <button type="button" class="action-btn" (click)="setActiveTab('discover')">Discover People</button>
-        </div>
-      } @else {
-        <div class="users-grid">
-          @for (user of following(); track user.id) {
-            <div class="user-card">
-              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
-              <div class="user-info">
-                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
-                <div class="user-stats">
-                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
-                </div>
-              </div>
-              <div class="user-actions">
-                <button type="button" class="follow-btn following" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, true)">
-                  @if (isFollowInProgress(user.id)) { ... } @else { Unfollow }
-                </button>
-                <button
-                  type="button"
-                  class="chat-btn"
-                  [disabled]="isStartingChat(user.id)"
-                  (click)="startChat(user.id)">
-                  @if (isStartingChat(user.id)) {
-                    ...
-                  } @else {
-                    <lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon> Chat
-                  }
-                </button>
-              </div>
-            </div>
-          }
-        </div>
-      }
-    }
-
-    <!-- Followers -->
-    @if (activeTab() === 'followers') {
-      @if (followers().length === 0) {
-        <div class="empty-state">
-          <lucide-icon [img]="Users" [size]="48" class="empty-icon"></lucide-icon>
-          <h2>No followers yet</h2>
-          <p>Share your reviews and favorites to attract followers!</p>
-        </div>
-      } @else {
-        <div class="users-grid">
-          @for (user of followers(); track user.id) {
-            <div class="user-card">
-              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
-              <div class="user-info">
-                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
-                <div class="user-stats">
-                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
-                </div>
-              </div>
-              <div class="user-actions">
-                <button type="button" class="follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">
-                  @if (isFollowInProgress(user.id)) { ... } @else if (user.isFollowing) { Following } @else { Follow Back }
-                </button>
-                <button
-                  type="button"
-                  class="chat-btn"
-                  [disabled]="isStartingChat(user.id)"
-                  (click)="startChat(user.id)">
-                  @if (isStartingChat(user.id)) {
-                    ...
-                  } @else {
-                    💬 Chat
-                  }
-                </button>
-              </div>
-            </div>
-          }
-        </div>
-      }
-    }
-  }
+  </div>
 </div>
-

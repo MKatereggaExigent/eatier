@@ -7,7 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CurrencyService } from '../../../core/services/currency.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Plus, CheckCircle, AlertTriangle, BarChart3, Circle, FileText, Pause, DollarSign, Eye, MousePointerClick, TrendingUp, Play, Edit, Trash2 } from 'lucide-angular';
+import { LucideAngularModule, Plus, CheckCircle, AlertTriangle, BarChart3, Circle, FileText, Pause, DollarSign, Eye, MousePointerClick, TrendingUp, Play, Edit, Trash2, Megaphone } from 'lucide-angular';
 
 interface Campaign {
   id: string;
@@ -89,6 +89,7 @@ export class AdManagementComponent implements OnInit {
   readonly Play = Play;
   readonly Edit = Edit;
   readonly Trash2 = Trash2;
+  readonly Megaphone = Megaphone;
 
   // Computed
   filteredCampaigns = computed(() => {

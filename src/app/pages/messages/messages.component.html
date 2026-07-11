@@ -1,244 +1,202 @@
 <div class="messages-page">
-  <div class="messages-container-wrapper">
-    <!-- Sidebar: Conversations List -->
-    <div class="conversations-sidebar">
-      <div class="sidebar-header">
-        <div class="header-top">
-          <button type="button" class="back-btn" (click)="router.navigate([socialRoute()])" title="Back to Social">
-            ← Back
-          </button>
-          <h2>Messages</h2>
+  <section class="msg-header">
+    <div class="section-inner">
+      <div class="header-flex">
+        <div class="header-left">
+          <span class="tag">Messaging</span>
+          <h2 class="section-title">Your Conversations</h2>
         </div>
-        <div class="header-tabs">
-          <button
-            type="button"
-            class="tab-btn"
-            [class.active]="activeView() === 'conversations'"
-            (click)="setActiveView('conversations')">
+        <button type="button" class="back-btn" (click)="router.navigate([socialRoute()])">
+          <lucide-icon [img]="ChevronLeft" [size]="16"></lucide-icon>
+          Back
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="msg-controls">
+    <div class="section-inner">
+      <div class="controls-row">
+        <div class="tabs-group">
+          <button type="button" class="tab-btn" [class.active]="activeView() === 'conversations'" (click)="setActiveView('conversations')">
             Chats
           </button>
-          <button
-            type="button"
-            class="tab-btn"
-            [class.active]="activeView() === 'requests'"
-            (click)="setActiveView('requests')">
+          <button type="button" class="tab-btn" [class.active]="activeView() === 'requests'" (click)="setActiveView('requests')">
             Requests
             @if (chatRequests().length > 0) {
-              <span class="badge">{{ chatRequests().length }}</span>
+              <span class="req-badge">{{ chatRequests().length }}</span>
             }
           </button>
         </div>
-
-        <!-- Search Bar -->
-        <div class="search-container">
-          <input
-            type="text"
-            class="search-input"
-            placeholder="Search conversations..."
-            [ngModel]="searchQuery()"
-            (ngModelChange)="searchQuery.set($event); onSearchChange()"
-          />
-          <span class="search-icon">🔍</span>
+        <div class="search-wrap">
+          <lucide-icon [img]="Search" [size]="15" class="search-ico"></lucide-icon>
+          <input type="text" placeholder="Search conversations..." [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event); onSearchChange()" />
         </div>
       </div>
-
-      <div class="sidebar-content">
-        @if (loading()) {
-          <div class="loading-state">
-            <div class="spinner"></div>
-            <p>Loading...</p>
-          </div>
-        } @else {
-          @if (activeView() === 'conversations') {
-            @if (conversations().length === 0) {
-              <div class="empty-state">
-                <div class="empty-icon">💬</div>
-                <p>No conversations yet</p>
-                <small>Start chatting with other users</small>
-                <button type="button" class="start-chat-btn" (click)="router.navigate([socialRoute()])">
-                  Discover People
-                </button>
-              </div>
-            } @else {
-              <div class="conversation-list">
-                @for (conversation of conversations(); track conversation.id) {
-                  <div 
-                    class="conversation-item"
-                    [class.active]="selectedConversation()?.id === conversation.id"
-                    [class.unread]="conversation.unread_count > 0"
-                    (click)="selectConversation(conversation)">
-                    <img
-                      [src]="getParticipantAvatar(conversation)"
-                      [alt]="getParticipantName(conversation)"
-                      class="conversation-avatar"
-                      appAvatarContextMenu
-                      (uploadAvatar)="openAvatarUpload()"
-                      (removeAvatar)="openAvatarUpload()">
-                    <div class="conversation-info">
-                      <div class="conversation-header">
-                        <h4>{{ getParticipantName(conversation) }}</h4>
-                        <span class="conversation-time">
-                          {{ formatTimestamp(conversation.last_message_at) }}
-                        </span>
-                      </div>
-                      <p class="conversation-preview">
-                        {{ conversation.last_message?.content || 'No messages yet' }}
-                      </p>
-                    </div>
-                    @if (conversation.unread_count > 0) {
-                      <span class="unread-badge">{{ conversation.unread_count }}</span>
-                    }
-                  </div>
-                }
-              </div>
-            }
-          }
-
-          @if (activeView() === 'requests') {
-            @if (chatRequests().length === 0) {
-              <div class="empty-state">
-                <div class="empty-icon">📨</div>
-                <p>No pending requests</p>
-                <small>Chat requests will appear here</small>
-              </div>
-            } @else {
-              <div class="request-list">
-                @for (request of chatRequests(); track request.id) {
-                  <div class="request-item">
-                    <img 
-                      [src]="getRequesterAvatar(request)" 
-                      [alt]="getRequesterName(request)"
-                      class="request-avatar">
-                    <div class="request-info">
-                      <h4>{{ getRequesterName(request) }}</h4>
-                      @if (request.message) {
-                        <p class="request-message">{{ request.message }}</p>
-                      }
-                      <span class="request-time">{{ formatTimestamp(request.created_at) }}</span>
-                    </div>
-                    <div class="request-actions">
-                      <button 
-                        type="button"
-                        class="accept-btn"
-                        (click)="acceptChatRequest(request.id)">
-                        Accept
-                      </button>
-                      <button 
-                        type="button"
-                        class="decline-btn"
-                        (click)="declineChatRequest(request.id)">
-                        Decline
-                      </button>
-                    </div>
-                  </div>
-                }
-              </div>
-            }
-          }
-        }
-      </div>
-
-      <!-- Pagination -->
-      @if (activeView() === 'conversations' && totalConversations() > conversationsLimit()) {
-        <div class="pagination-container">
-          <button
-            type="button"
-            class="pagination-btn"
-            [disabled]="conversationsPage() === 1"
-            (click)="previousPage()">
-            ← Prev
-          </button>
-          <span class="pagination-info">
-            Page {{ conversationsPage() }} of {{ totalPages() }}
-          </span>
-          <button
-            type="button"
-            class="pagination-btn"
-            [disabled]="conversationsPage() >= totalPages()"
-            (click)="nextPage()">
-            Next →
-          </button>
-        </div>
-      }
     </div>
+  </section>
 
-    <!-- Main: Chat View -->
-    <div class="chat-view">
-      @if (!selectedConversation()) {
-        <div class="no-conversation-selected">
-          <div class="empty-icon">💬</div>
-          <h3>Select a conversation</h3>
-          <p>Choose a conversation from the sidebar to start messaging</p>
+  @if (loading()) {
+    <section class="msg-body">
+      <div class="section-inner">
+        <div class="loading-card">
+          <div class="spinner"></div>
+          <p>Loading your conversations...</p>
         </div>
-      } @else {
-        <div class="chat-header">
-          <img 
-            [src]="getParticipantAvatar(selectedConversation()!)" 
-            [alt]="getParticipantName(selectedConversation()!)"
-            class="chat-avatar">
-          <div class="chat-info">
-            <h3>{{ getParticipantName(selectedConversation()!) }}</h3>
-            <span class="chat-status">Active</span>
-          </div>
-        </div>
-
-        <div class="messages-container">
-          @if (loadingMessages()) {
-            <div class="loading-messages">
-              <div class="spinner"></div>
+      </div>
+    </section>
+  } @else {
+    @if (activeView() === 'conversations') {
+      <section class="msg-body">
+        <div class="section-inner">
+          @if (conversationError()) {
+            <div class="empty-card error">
+              <lucide-icon [img]="MessageSquare" [size]="44" class="empty-icon"></lucide-icon>
+              <h3>Something went wrong</h3>
+              <p>{{ conversationError() }}</p>
+              <button class="retry-btn" (click)="loadConversations()">Try Again</button>
+            </div>
+          } @else if (filteredConversations().length === 0) {
+            <div class="empty-card">
+              <lucide-icon [img]="MessageSquare" [size]="44" class="empty-icon"></lucide-icon>
+              <h3>No conversations yet</h3>
+              <p>Start chatting with other users from your social feed.</p>
+              <a class="card-link" (click)="router.navigate([socialRoute()])" style="cursor:pointer">
+                Discover People
+                <lucide-icon [img]="ArrowRight" [size]="14"></lucide-icon>
+              </a>
             </div>
           } @else {
-            @for (message of messages(); track message.id) {
-              <div 
-                class="message"
-                [class.my-message]="isMyMessage(message)"
-                [class.their-message]="!isMyMessage(message)">
-                @if (!isMyMessage(message)) {
-                  <img 
-                    [src]="getParticipantAvatar(selectedConversation()!)" 
-                    [alt]="message.sender_first_name"
-                    class="message-avatar">
-                }
-                <div class="message-content">
-                  <p>{{ message.content }}</p>
-                  <span class="message-time">{{ formatMessageTime(message.created_at) }}</span>
+            <div class="conv-list">
+              @for (conversation of filteredConversations(); track conversation.id) {
+                <div class="conv-card" [class.active]="selectedConversation()?.id === conversation.id" [class.unread]="conversation.unread_count > 0" (click)="selectConversation(conversation)">
+                  <div class="conv-left">
+                    <img [src]="getParticipantAvatar(conversation)" [alt]="getParticipantName(conversation)" class="conv-avatar" appAvatarContextMenu (uploadAvatar)="openAvatarUpload()" (removeAvatar)="openAvatarUpload()">
+                  </div>
+                  <div class="conv-mid">
+                    <div class="conv-top">
+                      <h4>{{ getParticipantName(conversation) }}</h4>
+                      <span class="conv-time">{{ formatTimestamp(conversation.last_message_at) }}</span>
+                    </div>
+                    <p class="conv-msg">{{ conversation.last_message?.content || 'No messages yet' }}</p>
+                  </div>
+                  @if (conversation.unread_count > 0) {
+                    <span class="unread-count">{{ conversation.unread_count }}</span>
+                  }
                 </div>
+              }
+            </div>
+
+            @if (totalConversations() > conversationsLimit()) {
+              <div class="pagination-row">
+                <button type="button" class="page-btn" [disabled]="conversationsPage() === 1" (click)="previousPage()">Previous</button>
+                <span class="page-info">Page {{ conversationsPage() }} of {{ totalPages() }}</span>
+                <button type="button" class="page-btn" [disabled]="conversationsPage() >= totalPages()" (click)="nextPage()">Next</button>
               </div>
             }
           }
         </div>
+      </section>
+    }
 
-        <div class="message-input-container">
-          <form (submit)="sendMessage(); $event.preventDefault()">
-            <input 
-              type="text"
-              [(ngModel)]="newMessage"
-              name="message"
-              placeholder="Type a message..."
-              class="message-input"
-              [disabled]="sendingMessage()">
-            <button 
-              type="submit"
-              class="send-btn"
-              [disabled]="!newMessage().trim() || sendingMessage()">
-              @if (sendingMessage()) {
-                <span class="spinner-small"></span>
-              } @else {
-                Send
+    @if (activeView() === 'requests') {
+      <section class="msg-body">
+        <div class="section-inner">
+          @if (chatRequests().length === 0) {
+            <div class="empty-card">
+              <lucide-icon [img]="Mail" [size]="44" class="empty-icon"></lucide-icon>
+              <h3>No pending requests</h3>
+              <p>Chat requests from other users will appear here.</p>
+            </div>
+          } @else {
+            <div class="req-list">
+              @for (request of chatRequests(); track request.id) {
+                <div class="req-card">
+                  <img [src]="getRequesterAvatar(request)" [alt]="getRequesterName(request)" class="req-avatar">
+                  <div class="req-body">
+                    <h4>{{ getRequesterName(request) }}</h4>
+                    @if (request.message) {
+                      <p>{{ request.message }}</p>
+                    }
+                    <span class="req-time">{{ formatTimestamp(request.created_at) }}</span>
+                  </div>
+                  <div class="req-actions">
+                    <button type="button" class="accept-btn" (click)="acceptChatRequest(request.id)">Accept</button>
+                    <button type="button" class="decline-btn" (click)="declineChatRequest(request.id)">Decline</button>
+                  </div>
+                </div>
               }
-            </button>
-          </form>
+            </div>
+          }
         </div>
-      }
-    </div>
-  </div>
+      </section>
+    }
+
+    @if (selectedConversation()) {
+      <section class="msg-chat">
+        <div class="section-inner">
+          <div class="chat-card">
+            <div class="chat-top">
+              <button type="button" class="chat-back" (click)="selectedConversation.set(null)">
+                <lucide-icon [img]="ChevronLeft" [size]="16"></lucide-icon>
+              </button>
+              <img [src]="getParticipantAvatar(selectedConversation()!)" [alt]="getParticipantName(selectedConversation()!)" class="chat-avatar">
+              <div class="chat-meta">
+                <h3>{{ getParticipantName(selectedConversation()!) }}</h3>
+                <span class="chat-status">Active</span>
+              </div>
+            </div>
+
+            <div class="messages-container" #msgContainer>
+              @if (loadingMessages()) {
+                <div class="loading-msgs">
+                  <div class="spinner"></div>
+                </div>
+              } @else {
+                @if (!allMessagesLoaded() && messages().length > 0) {
+                  <div class="load-more-wrap">
+                    <button type="button" class="load-more-btn" (click)="loadMoreMessages()" [disabled]="loadMoreLoading()">
+                      @if (loadMoreLoading()) {
+                        <span class="spinner-sm"></span>
+                      } @else {
+                        <span>Load older messages</span>
+                      }
+                    </button>
+                  </div>
+                }
+                @for (message of messages(); track message.id) {
+                  <div class="msg" [class.my]="isMyMessage(message)">
+                    @if (!isMyMessage(message)) {
+                      <img [src]="getParticipantAvatar(selectedConversation()!)" [alt]="message.sender_first_name" class="msg-avatar">
+                    }
+                    <div class="msg-bubble">
+                      <p>{{ message.content }}</p>
+                      <span class="msg-time">{{ formatMessageTime(message.created_at) }}</span>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+
+            <div class="chat-input">
+              <form (submit)="sendMessage(); $event.preventDefault()">
+                <input type="text" [(ngModel)]="newMessage" name="message" placeholder="Type a message..." class="msg-input" [disabled]="sendingMessage()" (input)="onMessageInput()" />
+                <button type="submit" class="send-btn" [disabled]="!newMessage().trim() || sendingMessage()">
+                  @if (sendingMessage()) {
+                    <span class="spinner-sm"></span>
+                  } @else {
+                    <lucide-icon [img]="Send" [size]="18"></lucide-icon>
+                  }
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    }
+  }
 </div>
 
-<!-- Avatar Upload Modal -->
 @if (showAvatarUpload()) {
-  <app-avatar-upload
-    (avatarUploaded)="onAvatarUploaded($event)"
-    (closeModal)="closeAvatarUpload()">
-  </app-avatar-upload>
+  <app-avatar-upload (avatarUploaded)="onAvatarUploaded($event)" (closeModal)="closeAvatarUpload()"></app-avatar-upload>
 }
-

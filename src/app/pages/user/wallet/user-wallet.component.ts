@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { LucideAngularModule, Wallet, DollarSign, TrendingUp, Copy, Check, Gift, Users, Award, RefreshCw, ArrowUpRight, Calendar, Star } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -76,13 +77,26 @@ interface ReferralRecord {
 @Component({
   selector: 'app-user-wallet',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './user-wallet.component.html',
   styleUrls: ['./user-wallet.component.scss']
 })
 export class UserWalletComponent implements OnInit {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+
+  readonly Wallet = Wallet;
+  readonly DollarSign = DollarSign;
+  readonly TrendingUp = TrendingUp;
+  readonly Copy = Copy;
+  readonly Check = Check;
+  readonly Gift = Gift;
+  readonly Users = Users;
+  readonly Award = Award;
+  readonly RefreshCw = RefreshCw;
+  readonly ArrowUpRight = ArrowUpRight;
+  readonly Calendar = Calendar;
+  readonly Star = Star;
 
   loading = signal(true);
   wallet = signal<WalletData | null>(null);
@@ -107,7 +121,7 @@ export class UserWalletComponent implements OnInit {
   cashbackValue = computed(() => (this.pointsToConvert() / 100).toFixed(2));
 
   // Page title based on role
-  pageTitle = computed(() => this.isSpecialist() ? '💰 My Earnings' : '💳 My Wallet');
+  pageTitle = computed(() => this.isSpecialist() ? 'My Earnings' : 'My Wallet');
   pageSubtitle = computed(() => this.isSpecialist()
     ? 'Track your service earnings, tips, and payouts'
     : 'Manage your cashback, loyalty points, and rewards');

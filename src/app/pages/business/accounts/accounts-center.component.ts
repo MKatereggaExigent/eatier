@@ -1,12 +1,10 @@
 import { AccountFreezeOptions } from '../../../shared/models/business-profile.model';
 import { AccountActivity, Business, BusinessOwnerService, BusinessSubscription, NotificationSettings } from '../../../core/services/business-owner.service';
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-
-import { CommonModule } from '@angular/common';
 
 export interface SubscriptionPlan {
   id: string;
@@ -30,15 +28,13 @@ export interface PaymentMethod {
 @Component({
   selector: 'app-accounts-center',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './accounts-center.component.html',
   styleUrls: ['./accounts-center.component.scss']
 })
-export class AccountsCenterComponent implements OnInit, OnDestroy {
-  private fb = inject(FormBuilder);
+export class AccountsCenterComponent implements OnInit {
   private businessOwnerService = inject(BusinessOwnerService);
   private http = inject(HttpClient);
-  private destroy$ = new Subject<void>();
 
   // State management
   business = signal<Business | null>(null);
@@ -64,17 +60,52 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
   paymentMethods = signal<PaymentMethod[]>([]);
   billingCycle = signal<'monthly' | 'yearly'>('monthly');
 
-  // Forms
-  notificationForm: FormGroup;
-  freezeForm: FormGroup;
-  deleteForm: FormGroup;
-  paymentForm: FormGroup;
-  changePasswordForm: FormGroup;
-  enable2FAForm: FormGroup;
-
   // Data
   accountActivity = signal<AccountActivity[]>([]);
   notificationSettings = signal<NotificationSettings | null>(null);
+
+  // Notification form
+  notifMessages = signal(true);
+  notifUpdates = signal(true);
+  notifCustomerAlerts = signal(true);
+  notifMarketingEmails = signal(false);
+  notifSystemNotifications = signal(true);
+  notifEmailFrequency = signal('daily');
+
+  // Freeze form
+  freezeDuration = signal('1_week');
+  freezeReason = signal('');
+
+  // Delete form
+  deleteConfirmText = signal('');
+  deleteReason = signal('');
+  deletePassword = signal('');
+
+  // Payment form
+  paymentType = signal('card');
+  cardHolderName = signal('');
+  cardNumber = signal('');
+  expiryMonth = signal('');
+  expiryYear = signal('');
+  cvv = signal('');
+  accountHolderName = signal('');
+  accountNumber = signal('');
+  routingNumber = signal('');
+  bankName = signal('');
+  billingAddress = signal('');
+  billingCity = signal('');
+  billingState = signal('');
+  billingZip = signal('');
+  billingCountry = signal('South Africa');
+  savePaymentMethod = signal(true);
+
+  // Change password form
+  currentPassword = signal('');
+  newPwd = signal('');
+  confirmPwd = signal('');
+
+  // 2FA form
+  twoFAMethod = signal<'email' | 'mobile'>('email');
 
   // Subscription Plans
   readonly subscriptionPlans: SubscriptionPlan[] = [
@@ -139,174 +170,110 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
     emailFrequency: 'daily'
   };
 
-  constructor() {
-    this.notificationForm = this.fb.group({
-      messages: [true],
-      updates: [true],
-      customerAlerts: [true],
-      marketingEmails: [false],
-      systemNotifications: [true],
-      emailFrequency: ['daily', Validators.required]
-    });
-
-    this.freezeForm = this.fb.group({
-      duration: ['1_week', Validators.required],
-      reason: ['']
-    });
-
-    this.deleteForm = this.fb.group({
-      confirmText: ['', [Validators.required, this.confirmDeleteValidator]],
-      reason: [''],
-      password: ['', Validators.required]
-    });
-
-    // Payment form with card/bank details
-    this.paymentForm = this.fb.group({
-      paymentType: ['card', Validators.required],
-      // Card fields
-      cardHolderName: ['', Validators.required],
-      cardNumber: ['', [Validators.required, Validators.pattern(/^\d{16}$/)]],
-      expiryMonth: ['', [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])$/)]],
-      expiryYear: ['', [Validators.required, Validators.pattern(/^\d{2}$/)]],
-      cvv: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]],
-      // Bank fields (optional, used when paymentType is 'bank')
-      accountHolderName: [''],
-      accountNumber: [''],
-      routingNumber: [''],
-      bankName: [''],
-      // Billing address
-      billingAddress: [''],
-      billingCity: [''],
-      billingState: [''],
-      billingZip: [''],
-      billingCountry: ['South Africa'],
-      // Save for future
-      savePaymentMethod: [true]
-    });
-
-    // Change password form
-    this.changePasswordForm = this.fb.group({
-      currentPassword: ['', Validators.required],
-      newPassword: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', Validators.required]
-    });
-
-    // Enable 2FA form
-    this.enable2FAForm = this.fb.group({
-      method: ['email', Validators.required]
-    });
-  }
-
   ngOnInit(): void {
     this.loadAccountData();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   loadAccountData(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.businessOwnerService.getMyBusiness()
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError(error => {
-          console.error('Error loading business data:', error);
-          this.errorMessage.set('Failed to load account data. Please try again.');
-          return of({ business: null, subscription: null });
-        }),
-        finalize(() => {
-          this.isLoading.set(false);
-        })
-      )
-      .subscribe(response => {
+    this.businessOwnerService.getMyBusiness().subscribe({
+      next: (response) => {
         if (response && response.business) {
           this.business.set(response.business);
 
-          // Load subscription data
           if (response.subscription) {
             this.subscription.set(response.subscription);
           }
 
-          // Load notification settings from API
           this.loadNotificationSettings();
-
-          // Load account activity from API
           this.loadAccountActivity();
         }
-      });
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading business data:', error);
+        this.errorMessage.set('Failed to load account data. Please try again.');
+        this.isLoading.set(false);
+      }
+    });
   }
 
   loadNotificationSettings(): void {
-    this.businessOwnerService.getNotificationSettings()
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError(error => {
-          console.error('Error loading notification settings:', error);
-          // Use defaults on error
-          return of(this.defaultNotificationSettings);
-        })
-      )
-      .subscribe(settings => {
+    this.businessOwnerService.getNotificationSettings().subscribe({
+      next: (settings) => {
         this.notificationSettings.set(settings);
-        this.notificationForm.patchValue(settings);
-      });
+        this.notifMessages.set(settings.messages);
+        this.notifUpdates.set(settings.updates);
+        this.notifCustomerAlerts.set(settings.customerAlerts);
+        this.notifMarketingEmails.set(settings.marketingEmails);
+        this.notifSystemNotifications.set(settings.systemNotifications);
+        this.notifEmailFrequency.set(settings.emailFrequency);
+      },
+      error: (error) => {
+        console.error('Error loading notification settings:', error);
+        const defaults = this.defaultNotificationSettings;
+        this.notifMessages.set(defaults.messages);
+        this.notifUpdates.set(defaults.updates);
+        this.notifCustomerAlerts.set(defaults.customerAlerts);
+        this.notifMarketingEmails.set(defaults.marketingEmails);
+        this.notifSystemNotifications.set(defaults.systemNotifications);
+        this.notifEmailFrequency.set(defaults.emailFrequency);
+      }
+    });
   }
 
   loadAccountActivity(): void {
-    this.businessOwnerService.getAccountActivity(50, 0)
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError(error => {
-          console.error('Error loading account activity:', error);
-          return of({ activities: [], total: 0, limit: 50, offset: 0 });
-        })
-      )
-      .subscribe(response => {
+    this.businessOwnerService.getAccountActivity(50, 0).subscribe({
+      next: (response) => {
         this.accountActivity.set(response.activities);
-      });
+      },
+      error: (error) => {
+        console.error('Error loading account activity:', error);
+      }
+    });
   }
 
   setActiveSection(section: string): void {
     this.activeSection.set(section);
   }
 
-  onNotificationSubmit(): void {
-    if (this.notificationForm.valid) {
+  onNotificationSubmit(form: NgForm): void {
+    if (form.valid) {
       this.isLoading.set(true);
       this.errorMessage.set(null);
 
-      const formValue = this.notificationForm.value;
+      const formValue: NotificationSettings = {
+        messages: this.notifMessages(),
+        updates: this.notifUpdates(),
+        customerAlerts: this.notifCustomerAlerts(),
+        marketingEmails: this.notifMarketingEmails(),
+        systemNotifications: this.notifSystemNotifications(),
+        emailFrequency: this.notifEmailFrequency() as 'daily' | 'weekly' | 'immediate'
+      };
 
-      this.businessOwnerService.updateNotificationSettings(formValue)
-        .pipe(
-          takeUntil(this.destroy$),
-          catchError(error => {
-            console.error('Error updating notification settings:', error);
-            this.errorMessage.set('Failed to update notification settings. Please try again.');
-            return of(null);
-          }),
-          finalize(() => {
-            this.isLoading.set(false);
-          })
-        )
-        .subscribe(response => {
+      this.businessOwnerService.updateNotificationSettings(formValue).subscribe({
+        next: (response) => {
           if (response) {
             this.notificationSettings.set(response.settings);
             this.successMessage.set('Notification settings updated successfully!');
             setTimeout(() => this.successMessage.set(null), 3000);
           }
-        });
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error updating notification settings:', error);
+          this.errorMessage.set('Failed to update notification settings. Please try again.');
+          this.isLoading.set(false);
+        }
+      });
     }
   }
 
   exportAccountData(): void {
     this.isLoading.set(true);
 
-    // Mock export process
     setTimeout(() => {
       const filename = `account-activity-${Date.now()}.json`;
       const data = {
@@ -315,7 +282,6 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
         notificationSettings: this.notificationSettings()
       };
 
-      // Create mock download
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -332,45 +298,46 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
 
   openFreezeModal(): void {
     this.showFreezeModal.set(true);
-    this.freezeForm.reset({ duration: '1_week' });
+    this.freezeDuration.set('1_week');
+    this.freezeReason.set('');
   }
 
   closeFreezeModal(): void {
     this.showFreezeModal.set(false);
-    this.freezeForm.reset();
+    this.freezeDuration.set('1_week');
+    this.freezeReason.set('');
   }
 
   onFreezeSubmit(): void {
-    if (this.freezeForm.valid) {
-      this.isLoading.set(true);
-      const formValue = this.freezeForm.value;
+    this.isLoading.set(true);
 
-      // Mock API call
-      setTimeout(() => {
-        console.log('Freezing account:', formValue);
-        this.isLoading.set(false);
-        this.closeFreezeModal();
-        this.successMessage.set(`Account will be frozen for ${this.getFreezeLabel(formValue.duration)}`);
-        setTimeout(() => this.successMessage.set(null), 3000);
-      }, 1500);
-    }
+    setTimeout(() => {
+      console.log('Freezing account:', { duration: this.freezeDuration(), reason: this.freezeReason() });
+      this.isLoading.set(false);
+      this.closeFreezeModal();
+      this.successMessage.set(`Account will be frozen for ${this.getFreezeLabel(this.freezeDuration())}`);
+      setTimeout(() => this.successMessage.set(null), 3000);
+    }, 1500);
   }
 
   openDeleteModal(): void {
     this.showDeleteModal.set(true);
-    this.deleteForm.reset();
+    this.deleteConfirmText.set('');
+    this.deleteReason.set('');
+    this.deletePassword.set('');
   }
 
   closeDeleteModal(): void {
     this.showDeleteModal.set(false);
-    this.deleteForm.reset();
+    this.deleteConfirmText.set('');
+    this.deleteReason.set('');
+    this.deletePassword.set('');
   }
 
   onDeleteSubmit(): void {
-    if (this.deleteForm.valid) {
+    if (this.deleteConfirmText() === 'DELETE MY ACCOUNT' && this.deletePassword()) {
       this.isLoading.set(true);
 
-      // Mock API call
       setTimeout(() => {
         console.log('Deleting account permanently');
         this.isLoading.set(false);
@@ -379,14 +346,6 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
         setTimeout(() => this.successMessage.set(null), 5000);
       }, 2000);
     }
-  }
-
-  private confirmDeleteValidator(control: any) {
-    const value = control.value;
-    if (value !== 'DELETE MY ACCOUNT') {
-      return { confirmDelete: true };
-    }
-    return null;
   }
 
   getFreezeLabel(duration: string): string {
@@ -410,22 +369,22 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
 
   getActionIcon(action: string): string {
     const icons: Record<string, string> = {
-      'Profile Updated': '✏️',
-      'Menu Created': '📋',
-      'Menu Updated': '📝',
-      'Login': '🔐',
-      'Logout': '🚪',
-      'Password Changed': '🔑',
-      'password_changed': '🔑',
-      'Menu Access Granted': '🔗',
-      'Menu Access Revoked': '🚫',
-      'Settings Updated': '⚙️',
-      'two_factor_enabled': '📱',
-      'two_factor_disabled': '📱',
-      'session_revoked': '🔐',
-      'notification_settings_updated': '🔔'
+      'Profile Updated': 'edit',
+      'Menu Created': 'clipboard',
+      'Menu Updated': 'file-text',
+      'Login': 'lock',
+      'Logout': 'log-out',
+      'Password Changed': 'key',
+      'password_changed': 'key',
+      'Menu Access Granted': 'link',
+      'Menu Access Revoked': 'slash',
+      'Settings Updated': 'settings',
+      'two_factor_enabled': 'smartphone',
+      'two_factor_disabled': 'smartphone',
+      'session_revoked': 'lock',
+      'notification_settings_updated': 'bell'
     };
-    return icons[action] || '📄';
+    return icons[action] || 'file-text';
   }
 
   formatActivityDetails(details: any): string {
@@ -435,7 +394,6 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
     if (entries.length === 0) return '';
 
     return entries.map(([key, value]) => {
-      // Format the key to be more readable
       const formattedKey = key
         .replace(/([A-Z])/g, ' $1')
         .replace(/_/g, ' ')
@@ -444,38 +402,6 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
 
       return `${formattedKey}: ${value}`;
     }).join(' • ');
-  }
-
-  getFieldError(form: FormGroup, fieldName: string): string | null {
-    const field = form.get(fieldName);
-    if (field && field.invalid && (field.dirty || field.touched)) {
-      if (field.errors?.['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (field.errors?.['confirmDelete']) {
-        return 'Please type "DELETE MY ACCOUNT" to confirm';
-      }
-    }
-    return null;
-  }
-
-  private getFieldLabel(fieldName: string): string {
-    const labels: Record<string, string> = {
-      duration: 'Freeze duration',
-      reason: 'Reason',
-      confirmText: 'Confirmation text',
-      password: 'Password',
-      emailFrequency: 'Email frequency',
-      cardHolderName: 'Card holder name',
-      cardNumber: 'Card number',
-      expiryMonth: 'Expiry month',
-      expiryYear: 'Expiry year',
-      cvv: 'CVV',
-      accountHolderName: 'Account holder name',
-      accountNumber: 'Account number',
-      routingNumber: 'Routing number'
-    };
-    return labels[fieldName] || fieldName;
   }
 
   // ===================================
@@ -488,64 +414,45 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
 
   getPlanPrice(plan: SubscriptionPlan): number {
     if (this.billingCycle() === 'yearly') {
-      return Math.round(plan.price * 10); // 2 months free on yearly
+      return Math.round(plan.price * 10);
     }
     return plan.price;
   }
 
   selectPlan(plan: SubscriptionPlan): void {
-    console.log('🎯 Plan selected:', plan);
+    console.log('Plan selected:', plan);
     this.selectedPlan.set(plan);
     this.showPaymentModal.set(true);
-    console.log('📋 Payment modal should be visible:', this.showPaymentModal());
+    console.log('Payment modal should be visible:', this.showPaymentModal());
   }
 
   openPaymentModal(): void {
     this.showPaymentModal.set(true);
-    this.paymentForm.reset({
-      paymentType: 'card',
-      billingCountry: 'South Africa',
-      savePaymentMethod: true
-    });
+    this.paymentType.set('card');
+    this.cardHolderName.set('');
+    this.cardNumber.set('');
+    this.expiryMonth.set('');
+    this.expiryYear.set('');
+    this.cvv.set('');
+    this.accountHolderName.set('');
+    this.accountNumber.set('');
+    this.routingNumber.set('');
+    this.bankName.set('');
+    this.billingAddress.set('');
+    this.billingCity.set('');
+    this.billingState.set('');
+    this.billingZip.set('');
+    this.billingCountry.set('South Africa');
+    this.savePaymentMethod.set(true);
   }
 
   closePaymentModal(): void {
     this.showPaymentModal.set(false);
     this.selectedPlan.set(null);
-    this.paymentForm.reset();
   }
 
   onPaymentTypeChange(): void {
-    const paymentType = this.paymentForm.get('paymentType')?.value;
-
-    if (paymentType === 'card') {
-      // Make card fields required
-      this.paymentForm.get('cardHolderName')?.setValidators([Validators.required]);
-      this.paymentForm.get('cardNumber')?.setValidators([Validators.required, Validators.pattern(/^\d{16}$/)]);
-      this.paymentForm.get('expiryMonth')?.setValidators([Validators.required]);
-      this.paymentForm.get('expiryYear')?.setValidators([Validators.required]);
-      this.paymentForm.get('cvv')?.setValidators([Validators.required, Validators.pattern(/^\d{3,4}$/)]);
-      // Clear bank validators
-      this.paymentForm.get('accountHolderName')?.clearValidators();
-      this.paymentForm.get('accountNumber')?.clearValidators();
-      this.paymentForm.get('routingNumber')?.clearValidators();
-    } else {
-      // Make bank fields required
-      this.paymentForm.get('accountHolderName')?.setValidators([Validators.required]);
-      this.paymentForm.get('accountNumber')?.setValidators([Validators.required]);
-      this.paymentForm.get('routingNumber')?.setValidators([Validators.required]);
-      // Clear card validators
-      this.paymentForm.get('cardHolderName')?.clearValidators();
-      this.paymentForm.get('cardNumber')?.clearValidators();
-      this.paymentForm.get('expiryMonth')?.clearValidators();
-      this.paymentForm.get('expiryYear')?.clearValidators();
-      this.paymentForm.get('cvv')?.clearValidators();
-    }
-
-    // Update validity
-    Object.keys(this.paymentForm.controls).forEach(key => {
-      this.paymentForm.get(key)?.updateValueAndValidity();
-    });
+    // Handled naturally by @if blocks in template — validation only applies to visible fields
   }
 
   formatCardNumber(event: Event): void {
@@ -555,33 +462,31 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
       value = value.substring(0, 16);
     }
     input.value = value;
-    this.paymentForm.get('cardNumber')?.setValue(value);
+    this.cardNumber.set(value);
   }
 
   onPaymentSubmit(): void {
-    console.log('💳 Payment submit triggered');
-    console.log('📦 Selected plan:', this.selectedPlan());
+    console.log('Payment submit triggered');
+    console.log('Selected plan:', this.selectedPlan());
 
     if (this.selectedPlan()) {
       this.isProcessingPayment.set(true);
 
-      // Get user info from localStorage or business data
       let userId = localStorage.getItem('user_id');
       const userEmail = localStorage.getItem('user_email') || this.business()?.email;
 
-      // If user_id is not in localStorage, use owner_id from business
       if (!userId && this.business()?.owner_id) {
         userId = this.business()!.owner_id;
-        console.log('📌 Using owner_id from business:', userId);
+        console.log('Using owner_id from business:', userId);
       }
 
-      console.log('👤 User ID:', userId);
-      console.log('📧 User Email:', userEmail);
-      console.log('🏢 Business Email:', this.business()?.email);
-      console.log('🏢 Business Owner ID:', this.business()?.owner_id);
+      console.log('User ID:', userId);
+      console.log('User Email:', userEmail);
+      console.log('Business Email:', this.business()?.email);
+      console.log('Business Owner ID:', this.business()?.owner_id);
 
       if (!userId || !userEmail) {
-        console.error('❌ Missing user information');
+        console.error('Missing user information');
         this.errorMessage.set('User information not found. Please log in again.');
         this.isProcessingPayment.set(false);
         return;
@@ -594,22 +499,19 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
         email: userEmail
       };
 
-      console.log('📤 Sending payment request:', payload);
-      console.log('🔗 API URL:', `${environment.apiUrl}/subscriptions/subscribe`);
+      console.log('Sending payment request:', payload);
+      console.log('API URL:', `${environment.apiUrl}/subscriptions/subscribe`);
 
-      // Initialize Paystack payment
       this.http.post<any>(`${environment.apiUrl}/subscriptions/subscribe`, payload).subscribe({
         next: (response) => {
-          console.log('✅ Payment response:', response);
+          console.log('Payment response:', response);
           this.isProcessingPayment.set(false);
 
           if (response.success && response.authorization_url) {
-            console.log('🔗 Redirecting to Paystack:', response.authorization_url);
-            // Redirect to Paystack payment page
+            console.log('Redirecting to Paystack:', response.authorization_url);
             window.location.href = response.authorization_url;
           } else if (response.success && response.subscription) {
-            console.log('✅ Free plan activated');
-            // Free plan activated immediately
+            console.log('Free plan activated');
             this.closePaymentModal();
             const newSubscription: BusinessSubscription = {
               id: response.subscription.id || 'sub_' + Date.now(),
@@ -625,8 +527,8 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          console.error('❌ Payment error:', error);
-          console.error('❌ Error details:', error.error);
+          console.error('Payment error:', error);
+          console.error('Error details:', error.error);
           this.isProcessingPayment.set(false);
           this.errorMessage.set(error.error?.error || 'Failed to initialize payment. Please try again.');
           setTimeout(() => this.errorMessage.set(null), 5000);
@@ -667,47 +569,47 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
 
   openChangePasswordModal(): void {
     this.showChangePasswordModal.set(true);
-    this.changePasswordForm.reset();
+    this.currentPassword.set('');
+    this.newPwd.set('');
+    this.confirmPwd.set('');
   }
 
   closeChangePasswordModal(): void {
     this.showChangePasswordModal.set(false);
-    this.changePasswordForm.reset();
+    this.currentPassword.set('');
+    this.newPwd.set('');
+    this.confirmPwd.set('');
   }
 
   onChangePasswordSubmit(): void {
-    if (this.changePasswordForm.valid) {
-      const { currentPassword, newPassword, confirmPassword } = this.changePasswordForm.value;
-
-      if (newPassword !== confirmPassword) {
-        this.errorMessage.set('New passwords do not match');
-        setTimeout(() => this.errorMessage.set(null), 3000);
-        return;
-      }
-
-      this.isLoading.set(true);
-      this.errorMessage.set(null);
-
-      this.businessOwnerService.changePassword(currentPassword, newPassword)
-        .pipe(
-          takeUntil(this.destroy$),
-          catchError(error => {
-            console.error('Error changing password:', error);
-            this.errorMessage.set(error.error?.error || 'Failed to change password. Please try again.');
-            return of(null);
-          }),
-          finalize(() => {
-            this.isLoading.set(false);
-          })
-        )
-        .subscribe(response => {
-          if (response) {
-            this.closeChangePasswordModal();
-            this.successMessage.set('Password changed successfully!');
-            setTimeout(() => this.successMessage.set(null), 3000);
-          }
-        });
+    if (this.newPwd() !== this.confirmPwd()) {
+      this.errorMessage.set('New passwords do not match');
+      setTimeout(() => this.errorMessage.set(null), 3000);
+      return;
     }
+
+    if (!this.currentPassword() || !this.newPwd()) {
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.businessOwnerService.changePassword(this.currentPassword(), this.newPwd()).subscribe({
+      next: (response) => {
+        if (response) {
+          this.closeChangePasswordModal();
+          this.successMessage.set('Password changed successfully!');
+          setTimeout(() => this.successMessage.set(null), 3000);
+        }
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error changing password:', error);
+        this.errorMessage.set(error.error?.error || 'Failed to change password. Please try again.');
+        this.isLoading.set(false);
+      }
+    });
   }
 
   open2FAModal(): void {
@@ -721,49 +623,38 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
   }
 
   load2FAStatus(): void {
-    this.businessOwnerService.get2FAStatus()
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError(error => {
-          console.error('Error loading 2FA status:', error);
-          return of({ enabled: false, method: null, phoneVerified: false });
-        })
-      )
-      .subscribe(status => {
+    this.businessOwnerService.get2FAStatus().subscribe({
+      next: (status) => {
         this.twoFactorEnabled.set(status.enabled);
         this.twoFactorMethod.set(status.method);
-      });
+      },
+      error: (error) => {
+        console.error('Error loading 2FA status:', error);
+      }
+    });
   }
 
   onEnable2FA(): void {
-    if (this.enable2FAForm.valid) {
-      const { method } = this.enable2FAForm.value;
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
 
-      this.isLoading.set(true);
-      this.errorMessage.set(null);
-
-      this.businessOwnerService.enable2FA(method)
-        .pipe(
-          takeUntil(this.destroy$),
-          catchError(error => {
-            console.error('Error enabling 2FA:', error);
-            this.errorMessage.set(error.error?.error || 'Failed to enable 2FA. Please try again.');
-            return of(null);
-          }),
-          finalize(() => {
-            this.isLoading.set(false);
-          })
-        )
-        .subscribe(response => {
-          if (response) {
-            this.twoFactorEnabled.set(true);
-            this.twoFactorMethod.set(response.method as 'email' | 'mobile');
-            this.backupCodes.set(response.backupCodes);
-            this.successMessage.set('2FA enabled successfully! Please save your backup codes.');
-            setTimeout(() => this.successMessage.set(null), 5000);
-          }
-        });
-    }
+    this.businessOwnerService.enable2FA(this.twoFAMethod()).subscribe({
+      next: (response) => {
+        if (response) {
+          this.twoFactorEnabled.set(true);
+          this.twoFactorMethod.set(response.method as 'email' | 'mobile');
+          this.backupCodes.set(response.backupCodes);
+          this.successMessage.set('2FA enabled successfully! Please save your backup codes.');
+          setTimeout(() => this.successMessage.set(null), 5000);
+        }
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error enabling 2FA:', error);
+        this.errorMessage.set(error.error?.error || 'Failed to enable 2FA. Please try again.');
+        this.isLoading.set(false);
+      }
+    });
   }
 
   onDisable2FA(): void {
@@ -771,19 +662,8 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
       this.isLoading.set(true);
       this.errorMessage.set(null);
 
-      this.businessOwnerService.disable2FA()
-        .pipe(
-          takeUntil(this.destroy$),
-          catchError(error => {
-            console.error('Error disabling 2FA:', error);
-            this.errorMessage.set(error.error?.error || 'Failed to disable 2FA. Please try again.');
-            return of(null);
-          }),
-          finalize(() => {
-            this.isLoading.set(false);
-          })
-        )
-        .subscribe(response => {
+      this.businessOwnerService.disable2FA().subscribe({
+        next: (response) => {
           if (response) {
             this.twoFactorEnabled.set(false);
             this.twoFactorMethod.set(null);
@@ -791,7 +671,14 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
             this.successMessage.set('2FA disabled successfully.');
             setTimeout(() => this.successMessage.set(null), 3000);
           }
-        });
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error disabling 2FA:', error);
+          this.errorMessage.set(error.error?.error || 'Failed to disable 2FA. Please try again.');
+          this.isLoading.set(false);
+        }
+      });
     }
   }
 
@@ -805,17 +692,14 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
   }
 
   loadSessions(): void {
-    this.businessOwnerService.getSessions()
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError(error => {
-          console.error('Error loading sessions:', error);
-          return of({ sessions: [] });
-        })
-      )
-      .subscribe(response => {
+    this.businessOwnerService.getSessions().subscribe({
+      next: (response) => {
         this.sessions.set(response.sessions);
-      });
+      },
+      error: (error) => {
+        console.error('Error loading sessions:', error);
+      }
+    });
   }
 
   revokeSession(sessionId: string): void {
@@ -823,25 +707,21 @@ export class AccountsCenterComponent implements OnInit, OnDestroy {
       this.isLoading.set(true);
       this.errorMessage.set(null);
 
-      this.businessOwnerService.revokeSession(sessionId)
-        .pipe(
-          takeUntil(this.destroy$),
-          catchError(error => {
-            console.error('Error revoking session:', error);
-            this.errorMessage.set(error.error?.error || 'Failed to revoke session. Please try again.');
-            return of(null);
-          }),
-          finalize(() => {
-            this.isLoading.set(false);
-          })
-        )
-        .subscribe(response => {
+      this.businessOwnerService.revokeSession(sessionId).subscribe({
+        next: (response) => {
           if (response) {
-            this.loadSessions(); // Reload sessions
+            this.loadSessions();
             this.successMessage.set('Session revoked successfully.');
             setTimeout(() => this.successMessage.set(null), 3000);
           }
-        });
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error revoking session:', error);
+          this.errorMessage.set(error.error?.error || 'Failed to revoke session. Please try again.');
+          this.isLoading.set(false);
+        }
+      });
     }
   }
 }

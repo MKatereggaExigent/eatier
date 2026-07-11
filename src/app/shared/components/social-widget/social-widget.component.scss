@@ -1,63 +1,89 @@
+@use 'sass:color';
+
+$orange: #F97316;
+$black: #0F172A;
+$border-color: #E2E8F0;
+$bg-white: #FFFFFF;
+$bg-muted: #F8FAFC;
+$text-muted: #64748B;
+$text-secondary: #475569;
+
+$radius-xl: 20px;
+$radius-md: 12px;
+$radius-sm: 8px;
+
 .social-widget {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
   overflow: hidden;
 }
 
 .widget-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 20px 24px;
+  border-bottom: 1px solid $border-color;
 
   h3 {
-    margin: 0 0 0.75rem 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #111827;
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: $black;
   }
 
   .stats {
     display: flex;
-    gap: 1.5rem;
+    gap: 24px;
   }
 
   .stat-item {
-    font-size: 0.875rem;
-    color: #6b7280;
+    font-size: 13px;
+    color: $text-muted;
 
     strong {
-      color: #111827;
-      font-weight: 600;
+      color: $black;
+      font-weight: 700;
     }
   }
 }
 
 .widget-tabs {
   display: flex;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-bottom: 1px solid $border-color;
+  background: $bg-muted;
 
   .tab-btn {
     flex: 1;
-    padding: 0.75rem 1rem;
+    padding: 10px 12px;
     border: none;
     background: transparent;
-    color: #6b7280;
-    font-size: 0.875rem;
+    color: $text-muted;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    border-bottom: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 
     &:hover {
-      background: #f3f4f6;
-      color: #111827;
+      color: $black;
     }
 
     &.active {
-      color: #2563eb;
-      border-bottom-color: #2563eb;
-      background: white;
+      color: $orange;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+
+      &.active {
+        background: #10b981;
+      }
     }
   }
 }
@@ -68,48 +94,48 @@
 }
 
 .loading-state {
-  padding: 3rem;
+  padding: 40px;
   text-align: center;
 
   .spinner {
-    width: 40px;
-    height: 40px;
-    margin: 0 auto 1rem;
-    border: 3px solid #e5e7eb;
-    border-top-color: #2563eb;
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 12px;
+    border: 2px solid $border-color;
+    border-top-color: $orange;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
 
   p {
-    color: #6b7280;
-    font-size: 0.875rem;
+    color: $text-muted;
+    font-size: 14px;
   }
 }
 
 .empty-state {
-  padding: 3rem 1.5rem;
+  padding: 40px 24px;
   text-align: center;
 
   p {
-    color: #9ca3af;
-    font-size: 0.875rem;
+    color: $text-muted;
+    font-size: 14px;
   }
 }
 
 .user-list {
-  padding: 0.5rem 0;
+  padding: 6px 0;
 }
 
 .user-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.5rem;
+  gap: 12px;
+  padding: 10px 24px;
   transition: background 0.2s;
 
   &:hover {
-    background: #f9fafb;
+    background: $bg-muted;
   }
 
   .user-avatar-wrapper {
@@ -120,7 +146,7 @@
       height: 40px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #e5e7eb;
+      border: 2px solid $border-color;
     }
 
     .status-indicator {
@@ -130,8 +156,8 @@
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      border: 2px solid white;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      border: 2px solid $bg-white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
   }
 
@@ -141,24 +167,24 @@
 
     h4 {
       margin: 0;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #111827;
+      font-size: 14px;
+      font-weight: 600;
+      color: $black;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .user-role {
-      margin: 0.125rem 0 0 0;
-      font-size: 0.75rem;
-      color: #6b7280;
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: $text-muted;
       text-transform: capitalize;
     }
 
     .user-status {
-      margin: 0.125rem 0 0 0;
-      font-size: 0.7rem;
+      margin: 2px 0 0;
+      font-size: 11px;
       color: #10b981;
       font-weight: 500;
     }
@@ -166,22 +192,28 @@
 
   .user-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 6px;
     align-items: center;
   }
 
   .action-btn {
-    padding: 0.375rem 0.5rem;
-    font-size: 1rem;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    background: white;
+    padding: 6px 8px;
+    border-radius: $radius-sm;
+    border: 1px solid $border-color;
+    background: $bg-white;
     cursor: pointer;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
 
     &:hover:not(:disabled) {
-      transform: scale(1.1);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-color: $orange;
     }
 
     &:disabled {
@@ -190,60 +222,57 @@
     }
 
     &.chat-btn:hover:not(:disabled) {
-      background: #dbeafe;
-      border-color: #3b82f6;
+      border-color: $orange;
+      color: $orange;
     }
 
     &.poke-btn:hover:not(:disabled) {
-      background: #fef3c7;
-      border-color: #f59e0b;
+      border-color: $orange;
+      color: $orange;
     }
   }
 
   .view-profile-btn,
   .unfollow-btn {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
+    padding: 6px 12px;
+    font-size: 12px;
     font-weight: 500;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    background: white;
-    color: #374151;
+    border-radius: $radius-sm;
+    border: 1px solid $border-color;
+    background: $bg-white;
+    color: $text-secondary;
     cursor: pointer;
     transition: all 0.2s;
     text-decoration: none;
     white-space: nowrap;
 
     &:hover {
-      background: #f9fafb;
-      border-color: #9ca3af;
+      border-color: $black;
     }
   }
 
   .unfollow-btn {
     &:hover {
-      background: #fee2e2;
-      border-color: #fca5a5;
-      color: #dc2626;
+      border-color: #ef4444;
+      color: #ef4444;
     }
   }
 }
 
 .widget-footer {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  padding: 14px 24px;
+  border-top: 1px solid $border-color;
   text-align: center;
 
   .view-all-link {
-    color: #2563eb;
-    font-size: 0.875rem;
+    color: $orange;
+    font-size: 14px;
     font-weight: 500;
     text-decoration: none;
     transition: color 0.2s;
 
     &:hover {
-      color: #1d4ed8;
-      text-decoration: underline;
+      color: color.adjust($orange, $lightness: -10%);
     }
   }
 }
@@ -253,4 +282,3 @@
     transform: rotate(360deg);
   }
 }
-

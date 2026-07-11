@@ -35,13 +35,12 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
   width: 100%;
   max-width: 100vw;
 }
 
 body {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-base);
   font-weight: var(--font-normal);
   line-height: var(--leading-normal);
@@ -49,7 +48,6 @@ body {
   background: #ffffff; // NYT white background
   min-height: 100vh;
   min-height: 100dvh;
-  overflow-x: hidden;
   width: 100%;
   max-width: 100vw;
 }
@@ -137,7 +135,7 @@ h6 {
 }
 
 p {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-base);
   font-weight: var(--font-normal);
   line-height: var(--leading-normal);
@@ -197,7 +195,7 @@ a {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-6);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   line-height: 1;
@@ -241,7 +239,7 @@ a {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-6);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   line-height: 1;
@@ -279,7 +277,7 @@ a {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-6);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   line-height: 1;
@@ -427,7 +425,7 @@ a {
 .form-select {
   width: 100%;
   padding: var(--space-3) var(--space-4);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--text-base);
   color: #000000; // NYT black text
   background: #ffffff; // White background

@@ -1,15 +1,22 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 import { Menu, MenuAccessPermission } from '../../../shared/models/menu.model';
 import { BusinessOwnerService, MenuItem } from '../../../core/services/business-owner.service';
 
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule, Sun, Moon, UtensilsCrossed, Soup, Salad, Cookie, Coffee, Wine, Beer, Leaf, Heart, Star, CalendarDays, Package, ChefHat, Store, MoreHorizontal, CheckCircle, AlertTriangle, Plus, Edit3, Trash2, Circle, X, Image, Upload, ToggleLeft, ToggleRight, Save, Ban, Clock, Eye, Lock, LucideIconData } from 'lucide-angular';
+
+interface MenuType {
+  value: string;
+  label: string;
+  icon: LucideIconData;
+}
 
 @Component({
   selector: 'app-menu-management',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './menu-management.component.html',
   styleUrls: ['./menu-management.component.scss']
 })
@@ -34,8 +41,26 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
   editingAccess = signal<MenuAccessPermission | null>(null);
   selectedImageFile = signal<File | null>(null);
   imagePreviewUrl = signal<string | null>(null);
+  showCategoryDropdown = signal(false);
+  categorySearchQuery = signal('');
 
-  // Image fit mode - user preference for how images should display
+  readonly filteredMenuTypes = computed(() => {
+    const query = this.categorySearchQuery().toLowerCase();
+    if (!query) return this.menuTypes;
+    return this.menuTypes.filter(t =>
+      t.label.toLowerCase().includes(query) || t.value.toLowerCase().includes(query)
+    );
+  });
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.closeCategoryDropdown();
+  }
+
+  onCategorySearch(query: string): void {
+    this.categorySearchQuery.set(query);
+  }
+
   imageFitMode = signal<'contain' | 'cover' | 'fill' | 'scale-down'>('contain');
 
   // Forms
@@ -43,59 +68,83 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
   accessForm: FormGroup;
 
   // Constants
-  readonly menuTypes = [
-    // Meal Times
-    { value: 'breakfast', label: 'Breakfast', icon: '🌅' },
-    { value: 'brunch', label: 'Brunch', icon: '🥐' },
-    { value: 'lunch', label: 'Lunch', icon: '🌞' },
-    { value: 'dinner', label: 'Dinner', icon: '🌙' },
+  readonly DESCRIPTION_MAX_LENGTH = 500;
 
-    // Course Types
-    { value: 'appetizers', label: 'Appetizers', icon: '🥟' },
-    { value: 'starters', label: 'Starters', icon: '🍤' },
-    { value: 'soups', label: 'Soups', icon: '🍲' },
-    { value: 'salads', label: 'Salads', icon: '🥗' },
-    { value: 'main-courses', label: 'Main Courses', icon: '🍽️' },
-    { value: 'sides', label: 'Sides', icon: '🥔' },
-    { value: 'desserts', label: 'Desserts', icon: '🍰' },
+  // Lucide icons exposed to template
+  readonly Sun = Sun;
+  readonly Moon = Moon;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Soup = Soup;
+  readonly Salad = Salad;
+  readonly Cookie = Cookie;
+  readonly Coffee = Coffee;
+  readonly Wine = Wine;
+  readonly Beer = Beer;
+  readonly Leaf = Leaf;
+  readonly Heart = Heart;
+  readonly Star = Star;
+  readonly CalendarDays = CalendarDays;
+  readonly Package = Package;
+  readonly ChefHat = ChefHat;
+  readonly Store = Store;
+  readonly MoreHorizontal = MoreHorizontal;
+  readonly CheckCircle = CheckCircle;
+  readonly AlertTriangle = AlertTriangle;
+  readonly Plus = Plus;
+  readonly Edit3 = Edit3;
+  readonly Trash2 = Trash2;
+  readonly Circle = Circle;
+  readonly X = X;
+  readonly Image = Image;
+  readonly Upload = Upload;
+  readonly ToggleLeft = ToggleLeft;
+  readonly ToggleRight = ToggleRight;
+  readonly Save = Save;
+  readonly Ban = Ban;
+  readonly Clock = Clock;
+  readonly Eye = Eye;
+  readonly Lock = Lock;
 
-    // Protein Types
-    { value: 'seafood', label: 'Seafood', icon: '🦞' },
-    { value: 'chicken', label: 'Chicken', icon: '🍗' },
-    { value: 'beef', label: 'Beef', icon: '🥩' },
-    { value: 'pork', label: 'Pork', icon: '🥓' },
-    { value: 'lamb', label: 'Lamb', icon: '🍖' },
-
-    // Dietary Preferences
-    { value: 'vegetarian', label: 'Vegetarian', icon: '🥬' },
-    { value: 'vegan', label: 'Vegan', icon: '🌱' },
-    { value: 'gluten-free', label: 'Gluten-Free', icon: '🌾' },
-    { value: 'healthy', label: 'Healthy Options', icon: '💚' },
-
-    // Beverages
-    { value: 'beverages', label: 'Beverages', icon: '🥤' },
-    { value: 'coffee-tea', label: 'Coffee & Tea', icon: '☕' },
-    { value: 'cocktails', label: 'Cocktails', icon: '🍸' },
-    { value: 'wine', label: 'Wine', icon: '🍷' },
-    { value: 'beer', label: 'Beer', icon: '🍺' },
-    { value: 'smoothies', label: 'Smoothies & Juices', icon: '🥤' },
-
-    // Cuisine Types
-    { value: 'italian', label: 'Italian', icon: '🍝' },
-    { value: 'asian', label: 'Asian', icon: '🍜' },
-    { value: 'mexican', label: 'Mexican', icon: '🌮' },
-    { value: 'american', label: 'American', icon: '🍔' },
-    { value: 'mediterranean', label: 'Mediterranean', icon: '🫒' },
-    { value: 'indian', label: 'Indian', icon: '🍛' },
-
-    // Special Categories
-    { value: 'kids-menu', label: 'Kids Menu', icon: '👶' },
-    { value: 'specials', label: 'Chef Specials', icon: '⭐' },
-    { value: 'seasonal', label: 'Seasonal', icon: '🍂' },
-    { value: 'combo-meals', label: 'Combo Meals', icon: '🍱' },
-    { value: 'snacks', label: 'Snacks', icon: '🍿' },
-    { value: 'bakery', label: 'Bakery', icon: '🥖' },
-    { value: 'other', label: 'Other', icon: '📋' }
+  readonly menuTypes: MenuType[] = [
+    { value: 'breakfast', label: 'Breakfast', icon: Sun },
+    { value: 'brunch', label: 'Brunch', icon: Sun },
+    { value: 'lunch', label: 'Lunch', icon: Sun },
+    { value: 'dinner', label: 'Dinner', icon: Moon },
+    { value: 'appetizers', label: 'Appetizers', icon: UtensilsCrossed },
+    { value: 'starters', label: 'Starters', icon: UtensilsCrossed },
+    { value: 'soups', label: 'Soups', icon: Soup },
+    { value: 'salads', label: 'Salads', icon: Salad },
+    { value: 'main-courses', label: 'Main Courses', icon: UtensilsCrossed },
+    { value: 'sides', label: 'Sides', icon: Circle },
+    { value: 'desserts', label: 'Desserts', icon: Cookie },
+    { value: 'seafood', label: 'Seafood', icon: UtensilsCrossed },
+    { value: 'chicken', label: 'Chicken', icon: ChefHat },
+    { value: 'beef', label: 'Beef', icon: ChefHat },
+    { value: 'pork', label: 'Pork', icon: ChefHat },
+    { value: 'lamb', label: 'Lamb', icon: ChefHat },
+    { value: 'vegetarian', label: 'Vegetarian', icon: Leaf },
+    { value: 'vegan', label: 'Vegan', icon: Leaf },
+    { value: 'gluten-free', label: 'Gluten-Free', icon: Leaf },
+    { value: 'healthy', label: 'Healthy Options', icon: Heart },
+    { value: 'beverages', label: 'Beverages', icon: Coffee },
+    { value: 'coffee-tea', label: 'Coffee & Tea', icon: Coffee },
+    { value: 'cocktails', label: 'Cocktails', icon: Wine },
+    { value: 'wine', label: 'Wine', icon: Wine },
+    { value: 'beer', label: 'Beer', icon: Beer },
+    { value: 'smoothies', label: 'Smoothies & Juices', icon: Coffee },
+    { value: 'italian', label: 'Italian', icon: Store },
+    { value: 'asian', label: 'Asian', icon: Store },
+    { value: 'mexican', label: 'Mexican', icon: Store },
+    { value: 'american', label: 'American', icon: Store },
+    { value: 'mediterranean', label: 'Mediterranean', icon: Store },
+    { value: 'indian', label: 'Indian', icon: Store },
+    { value: 'kids-menu', label: 'Kids Menu', icon: Star },
+    { value: 'specials', label: 'Chef Specials', icon: Star },
+    { value: 'seasonal', label: 'Seasonal', icon: CalendarDays },
+    { value: 'combo-meals', label: 'Combo Meals', icon: Package },
+    { value: 'snacks', label: 'Snacks', icon: Cookie },
+    { value: 'bakery', label: 'Bakery', icon: Cookie },
+    { value: 'other', label: 'Other', icon: MoreHorizontal }
   ];
 
   readonly permissionLevels = [
@@ -103,35 +152,32 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
       value: 'edit_view',
       label: 'Full Access',
       description: 'Can edit, view, and manage all menu items',
-      icon: '👑',
+      icon: Star,
       features: ['Edit menu items', 'Add new items', 'Delete items', 'View analytics', 'Manage pricing']
     },
     {
       value: 'view_only',
       label: 'View Only',
       description: 'Can view menu but cannot make changes',
-      icon: '👀',
+      icon: Eye,
       features: ['View menu items', 'See pricing', 'Access read-only analytics']
     },
     {
       value: 'no_edit',
       label: 'Restricted',
       description: 'Limited access with specific restrictions',
-      icon: '🔒',
+      icon: Lock,
       features: ['Basic menu viewing', 'No editing permissions', 'No analytics access']
     }
   ];
 
   readonly accessDurations = [
-    { value: 7, label: '1 Week', icon: '📅' },
-    { value: 30, label: '1 Month', icon: '🗓️' },
-    { value: 90, label: '3 Months', icon: '📆' },
-    { value: 365, label: '1 Year', icon: '🗓️' },
-    { value: -1, label: 'Never', icon: '♾️' }
+    { value: 7, label: '1 Week', icon: CalendarDays },
+    { value: 30, label: '1 Month', icon: CalendarDays },
+    { value: 90, label: '3 Months', icon: CalendarDays },
+    { value: 365, label: '1 Year', icon: CalendarDays },
+    { value: -1, label: 'Never', icon: Ban }
   ];
-
-  // Character limits as specified
-  readonly DESCRIPTION_MAX_LENGTH = 500;
 
   constructor() {
     this.menuForm = this.fb.group({
@@ -220,6 +266,7 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
     this.selectedMenuItem.set(null);
     this.selectedImageFile.set(null);
     this.imagePreviewUrl.set(null);
+    this.showCategoryDropdown.set(false);
     this.menuForm.reset({
       name: '',
       description: '',
@@ -237,6 +284,7 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
     this.selectedMenuItem.set(null);
     this.selectedImageFile.set(null);
     this.imagePreviewUrl.set(null);
+    this.showCategoryDropdown.set(false);
     this.menuForm.reset();
   }
 
@@ -245,13 +293,11 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
 
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         this.errorMessage.set('Please select a valid image file');
         return;
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         this.errorMessage.set('Image size must be less than 5MB');
         return;
@@ -259,12 +305,10 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
 
       this.selectedImageFile.set(file);
 
-      // Create preview URL
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
         this.imagePreviewUrl.set(result);
-        // Update the form control with the base64 data
         this.menuForm.patchValue({ backgroundImage: result });
       };
       reader.readAsDataURL(file);
@@ -279,7 +323,25 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
 
   getCategoryLabel(category: string): string {
     const type = this.menuTypes.find(t => t.value === category);
-    return type ? `${type.icon} ${type.label}` : category;
+    return type ? type.label : category;
+  }
+
+  getCategoryIcon(category: string): LucideIconData {
+    return this.menuTypes.find(t => t.value === category)?.icon || MoreHorizontal;
+  }
+
+  selectCategory(value: string): void {
+    this.menuForm.patchValue({ type: value });
+    this.menuForm.get('type')?.markAsTouched();
+    this.showCategoryDropdown.set(false);
+  }
+
+  toggleCategoryDropdown(): void {
+    this.showCategoryDropdown.update(v => !v);
+  }
+
+  closeCategoryDropdown(): void {
+    this.showCategoryDropdown.set(false);
   }
 
   onSubmitMenu(): void {
@@ -332,6 +394,7 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
     this.showCreateMenuModal.set(false);
     this.isEditingMenu.set(false);
     this.selectedMenuItem.set(null);
+    this.showCategoryDropdown.set(false);
     this.menuForm.reset();
   }
 
@@ -390,15 +453,9 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
       });
   }
 
-  // ============================================
-  // UTILITY METHODS
-  // ============================================
-
   formatPrice(price: any): string {
-    // Convert to number if it's a string
     const numPrice = typeof price === 'string' ? parseFloat(price) : price;
 
-    // Return 0.00 if invalid
     if (isNaN(numPrice) || numPrice === null || numPrice === undefined) {
       return '0.00';
     }
@@ -406,36 +463,8 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
     return numPrice.toFixed(2);
   }
 
-  // ============================================
-  // ACCESS MANAGEMENT METHODS - CURRENTLY DISABLED
-  // These features are not supported by the current backend API
-  // TODO: Implement when backend supports menu sharing
-  // ============================================
-
-  /*
-  openAccessModal(menu: Menu): void {
-    // Not implemented - backend doesn't support menu sharing yet
-  }
-
-  closeAccessModal(): void {
-    // Not implemented
-  }
-
-  onSubmitAccess(): void {
-    // Not implemented
-  }
-
-  revokeAccess(menuOrAccess: Menu | MenuAccessPermission, permission?: MenuAccessPermission): void {
-    // Not implemented
-  }
-
-  copyShareLink(link: string): void {
-    // Not implemented
-  }
-  */
-
-  getMenuTypeIcon(type: string): string {
-    return this.menuTypes.find(t => t.value === type)?.icon || '📋';
+  getMenuTypeIcon(type: string): LucideIconData {
+    return this.menuTypes.find(t => t.value === type)?.icon || MoreHorizontal;
   }
 
   getMenuTypeLabel(type: string): string {
@@ -534,11 +563,9 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
       this.isLoading.set(true);
       const formValue = this.accessForm.value;
 
-      // Mock API call to grant access
       setTimeout(() => {
         const accessLink = `https://itiyum.com/menu/access/${Date.now()}`;
 
-        // Copy link to clipboard
         navigator.clipboard.writeText(accessLink).then(() => {
           this.successMessage.set(`Access granted to ${formValue.email}! Link copied to clipboard: ${accessLink}`);
         });
@@ -550,7 +577,6 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Custom validator to prevent emojis as specified
   private noEmojiValidator(control: any) {
     const value = control.value;
     if (value && /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(value)) {
@@ -559,14 +585,13 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  // Access Management Methods
   getInitials(email: string): string {
     return email.split('@')[0].substring(0, 2).toUpperCase();
   }
 
-  getPermissionIcon(permissionLevel: string): string {
+  getPermissionIcon(permissionLevel: string): LucideIconData {
     const level = this.permissionLevels.find(l => l.value === permissionLevel);
-    return level?.icon || '🔒';
+    return level?.icon || Star;
   }
 
   getPermissionClass(permissionLevel: string): string {
@@ -616,26 +641,16 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
     this.showAdvancedOptions.update(show => !show);
   }
 
-  /**
-   * Get CSS class for image fit mode
-   */
   getImageFitClass(): string {
     const mode = this.imageFitMode();
     return `fit-${mode}`;
   }
 
-  /**
-   * Set image fit mode
-   */
   setImageFitMode(mode: 'contain' | 'cover' | 'fill' | 'scale-down'): void {
     this.imageFitMode.set(mode);
-    // Save preference to localStorage
     localStorage.setItem('menu-image-fit-mode', mode);
   }
 
-  /**
-   * Load image fit mode preference from localStorage
-   */
   private loadImageFitPreference(): void {
     const saved = localStorage.getItem('menu-image-fit-mode');
     if (saved && ['contain', 'cover', 'fill', 'scale-down'].includes(saved)) {

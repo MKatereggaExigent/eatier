@@ -3,18 +3,46 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule, Settings, Bell, ClipboardList, Shield, User, Calendar, Eye, Download, PauseCircle, Trash2, PlayCircle, Key, Smartphone, Mail, MessageSquare, RefreshCw, X, AlertTriangle, CheckCircle, LogIn, LogOut, FileText, CreditCard, Image, Edit, Terminal, EyeOff } from 'lucide-angular';
 
 @Component({
   selector: 'app-user-accounts-center',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './user-accounts-center.component.html',
   styleUrls: ['./user-accounts-center.component.scss']
 })
 export class UserAccountsCenterComponent implements OnInit {
   private fb = inject(FormBuilder);
 
-  // State management
+  readonly Settings = Settings;
+  readonly Bell = Bell;
+  readonly ClipboardList = ClipboardList;
+  readonly Shield = Shield;
+  readonly User = User;
+  readonly Calendar = Calendar;
+  readonly Eye = Eye;
+  readonly Download = Download;
+  readonly PauseCircle = PauseCircle;
+  readonly Trash2 = Trash2;
+  readonly PlayCircle = PlayCircle;
+  readonly Key = Key;
+  readonly Smartphone = Smartphone;
+  readonly Mail = Mail;
+  readonly MessageSquare = MessageSquare;
+  readonly RefreshCw = RefreshCw;
+  readonly X = X;
+  readonly AlertTriangle = AlertTriangle;
+  readonly CheckCircle = CheckCircle;
+  readonly LogIn = LogIn;
+  readonly LogOut = LogOut;
+  readonly FileText = FileText;
+  readonly CreditCard = CreditCard;
+  readonly Image = Image;
+  readonly Edit = Edit;
+  readonly Terminal = Terminal;
+  readonly EyeOff = EyeOff;
+
   activeSection = signal<string>('overview');
   isLoading = signal<boolean>(false);
   successMessage = signal<string | null>(null);
@@ -23,18 +51,15 @@ export class UserAccountsCenterComponent implements OnInit {
   showDeleteModal = signal<boolean>(false);
   showReactivateModal = signal<boolean>(false);
 
-  // Forms
   notificationForm: FormGroup;
   freezeForm: FormGroup;
   deleteForm: FormGroup;
   reactivateForm: FormGroup;
 
-  // Data
   accountActivity = signal<UserAccountActivity[]>([]);
   notificationSettings = signal<UserNotificationSettings | null>(null);
   accountStatus = signal<'active' | 'frozen' | 'pending_deletion'>('active');
 
-  // Freeze duration options as specified
   readonly freezeDurations = [
     { value: '1_week', label: '1 week', description: 'Account will be reactivated automatically after 1 week' },
     { value: '1_month', label: 'Month', description: 'Account will be reactivated automatically after 1 month' },
@@ -42,7 +67,6 @@ export class UserAccountsCenterComponent implements OnInit {
     { value: 'indefinite', label: 'Indefinitely', description: 'Account will remain frozen until manually reactivated' }
   ];
 
-  // Default notification settings for new accounts
   readonly defaultNotificationSettings: UserNotificationSettings = {
     customerUpdates: true,
     systemUpdates: true,
@@ -92,16 +116,10 @@ export class UserAccountsCenterComponent implements OnInit {
   loadAccountData(): void {
     this.isLoading.set(true);
 
-    // TODO: Replace with actual API calls when endpoints are available
     setTimeout(() => {
-      // Use default notification settings until API is available
       this.notificationSettings.set(this.defaultNotificationSettings);
-      // Account activity will be empty until API is available
       this.accountActivity.set([]);
-
-      // Populate notification form with defaults
       this.notificationForm.patchValue(this.defaultNotificationSettings);
-
       this.isLoading.set(false);
     }, 500);
   }
@@ -114,7 +132,6 @@ export class UserAccountsCenterComponent implements OnInit {
     if (this.notificationForm.valid) {
       this.isLoading.set(true);
 
-      // Mock API call
       setTimeout(() => {
         const formValue = this.notificationForm.value;
         this.notificationSettings.set(formValue);
@@ -128,7 +145,6 @@ export class UserAccountsCenterComponent implements OnInit {
   exportAccountData(): void {
     this.isLoading.set(true);
 
-    // Mock export process
     setTimeout(() => {
       const filename = `user-account-data-${Date.now()}.json`;
       const data = {
@@ -138,7 +154,6 @@ export class UserAccountsCenterComponent implements OnInit {
         accountStatus: this.accountStatus()
       };
 
-      // Create mock download
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -168,7 +183,6 @@ export class UserAccountsCenterComponent implements OnInit {
       this.isLoading.set(true);
       const formValue = this.freezeForm.value;
 
-      // Mock API call
       setTimeout(() => {
         this.accountStatus.set('frozen');
         this.isLoading.set(false);
@@ -193,7 +207,6 @@ export class UserAccountsCenterComponent implements OnInit {
     if (this.reactivateForm.valid) {
       this.isLoading.set(true);
 
-      // Mock API call
       setTimeout(() => {
         this.accountStatus.set('active');
         this.isLoading.set(false);
@@ -218,7 +231,6 @@ export class UserAccountsCenterComponent implements OnInit {
     if (this.deleteForm.valid) {
       this.isLoading.set(true);
 
-      // Mock API call
       setTimeout(() => {
         this.accountStatus.set('pending_deletion');
         this.isLoading.set(false);
@@ -230,7 +242,6 @@ export class UserAccountsCenterComponent implements OnInit {
   }
 
   sendVerificationCode(): void {
-    // Mock sending verification code
     this.successMessage.set('Verification code sent to your email address.');
     setTimeout(() => this.successMessage.set(null), 3000);
   }
@@ -261,31 +272,24 @@ export class UserAccountsCenterComponent implements OnInit {
     });
   }
 
-  getActionIcon(action: string): string {
-    const icons: Record<string, string> = {
-      'Profile Updated': '✏️',
-      'Business Card Generated': '💳',
-      'Portfolio Updated': '🖼️',
-      'Login': '🔐',
-      'Logout': '🚪',
-      'Password Changed': '🔑',
-      'Legacy Access Granted': '👥',
-      'Legacy Access Revoked': '🚫',
-      'Settings Updated': '⚙️',
-      'Insights Viewed': '📊'
+  getActionIcon(action: string): any {
+    const icons: Record<string, any> = {
+      'Profile Updated': Edit,
+      'Business Card Generated': CreditCard,
+      'Portfolio Updated': Image,
+      'Login': LogIn,
+      'Logout': LogOut,
+      'Password Changed': Key,
+      'Legacy Access Granted': Terminal,
+      'Legacy Access Revoked': EyeOff,
+      'Settings Updated': Settings,
+      'Insights Viewed': Eye
     };
-    return icons[action] || '📄';
+    return icons[action] || FileText;
   }
 
-  getDeviceIcon(userAgent: string | undefined): string {
-    if (!userAgent) return '💻';
-    if (userAgent.includes('iPhone') || userAgent.includes('Android')) {
-      return '📱';
-    } else if (userAgent.includes('iPad') || userAgent.includes('Tablet')) {
-      return '📱';
-    } else {
-      return '💻';
-    }
+  getDeviceIcon(userAgent: string | undefined): any {
+    return Smartphone;
   }
 
   getFieldError(form: FormGroup, fieldName: string): string | null {

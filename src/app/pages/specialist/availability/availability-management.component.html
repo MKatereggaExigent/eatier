@@ -1,358 +1,318 @@
-<div class="availability-management" role="main" aria-label="Availability Management">
-  <!-- Header Section -->
-  <header class="availability-header">
-    <div class="header-content">
-      <div class="title-section">
-        <h1 class="page-title">
-          <lucide-icon [img]="Calendar" [size]="28" class="title-icon"></lucide-icon>
-          Availability Management
-        </h1>
-        <p class="page-subtitle">
-          Set your working hours, special dates, and booking rules
-        </p>
-      </div>
-      <div class="header-actions">
-        <button type="button" class="save-all-btn primary" (click)="saveAllChanges()" [disabled]="loading()">
-          @if (loading()) {
-            <span class="loading-spinner">⏳</span>
-          } @else {
-            <span class="btn-icon">💾</span>
-          }
-          Save All Changes
-        </button>
-      </div>
+<div class="section">
+  <div class="section-inner">
+    <div class="tag">
+      <lucide-icon [img]="Sun" [size]="14"></lucide-icon>
+      <span>Availability</span>
     </div>
-  </header>
 
-  <!-- Navigation Tabs -->
-  <nav class="availability-tabs" role="tablist">
-    <button 
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'weekly'"
-      (click)="setActiveTab('weekly')"
-      role="tab"
-      [attr.aria-selected]="activeTab() === 'weekly'">
-      <lucide-icon [img]="ClipboardList" [size]="18" class="tab-icon"></lucide-icon>
-      Weekly Schedule
-    </button>
-    <button
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'special'"
-      (click)="setActiveTab('special')"
-      role="tab"
-      [attr.aria-selected]="activeTab() === 'special'">
-      <lucide-icon [img]="CalendarDays" [size]="18" class="tab-icon"></lucide-icon>
-      Special Dates
-    </button>
-    <button
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'rules'"
-      (click)="setActiveTab('rules')"
-      role="tab"
-      [attr.aria-selected]="activeTab() === 'rules'">
-      <lucide-icon [img]="SettingsIcon" [size]="18" class="tab-icon"></lucide-icon>
-      Booking Rules
-    </button>
-    <button
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'calendar'"
-      (click)="setActiveTab('calendar')"
-      role="tab"
-      [attr.aria-selected]="activeTab() === 'calendar'">
-      <lucide-icon [img]="Calendar" [size]="18" class="tab-icon"></lucide-icon>
-      Calendar View
-    </button>
-  </nav>
-
-  <!-- Weekly Schedule Tab -->
-  @if (activeTab() === 'weekly') {
-    <section class="tab-content weekly-tab" role="tabpanel">
-      <div class="content-header">
-        <h2>Weekly Schedule</h2>
-        <p class="content-description">Set your regular working hours for each day of the week</p>
-      </div>
-
-      <div class="weekly-schedule">
-        @for (day of weeklyAvailability(); track day.day; let dayIndex = $index) {
-          <div class="day-card" [class.disabled]="!day.isEnabled">
-            <div class="day-header">
-              <div class="day-info">
-                <label class="day-toggle">
-                  <input 
-                    type="checkbox" 
-                    [checked]="day.isEnabled" 
-                    (change)="toggleDayEnabled(dayIndex)"
-                    class="toggle-checkbox">
-                  <span class="toggle-slider"></span>
-                </label>
-                <h3>{{ day.dayName }}</h3>
-              </div>
-              @if (day.isEnabled) {
-                <button type="button" class="add-slot-btn" (click)="addTimeSlot(dayIndex)">
-                  <span class="btn-icon">➕</span>
-                  Add Time Slot
-                </button>
+    <div class="availability-management" role="main" aria-label="Availability Management">
+      <!-- Header Card -->
+      <header class="header-card">
+        <div class="header-content">
+          <div class="title-section">
+            <h1 class="page-title">
+              <lucide-icon [img]="Calendar" [size]="28" class="title-icon"></lucide-icon>
+              Availability Management
+            </h1>
+            <p class="page-subtitle">
+              Set your working hours, special dates, and booking rules
+            </p>
+          </div>
+          <div class="header-actions">
+            <button type="button" class="btn-primary" (click)="saveAllChanges()" [disabled]="loading()">
+              @if (loading()) {
+                <span class="loading-spinner"></span>
+              } @else {
+                <lucide-icon [img]="Save" [size]="16"></lucide-icon>
               }
-            </div>
+              Save All Changes
+            </button>
+          </div>
+        </div>
+      </header>
 
-            @if (day.isEnabled) {
-              <div class="time-slots">
-                @if (day.timeSlots.length === 0) {
-                  <div class="no-slots">
-                    <p>No time slots set for this day</p>
-                    <button type="button" class="add-first-slot-btn" (click)="addTimeSlot(dayIndex)">
-                      Add First Time Slot
+      <!-- Navigation Tabs -->
+      <nav class="tabs-group" role="tablist">
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'weekly'" (click)="setActiveTab('weekly')" role="tab" [attr.aria-selected]="activeTab() === 'weekly'">
+          <lucide-icon [img]="ClipboardList" [size]="18" class="tab-icon"></lucide-icon>
+          Weekly Schedule
+        </button>
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'special'" (click)="setActiveTab('special')" role="tab" [attr.aria-selected]="activeTab() === 'special'">
+          <lucide-icon [img]="CalendarDays" [size]="18" class="tab-icon"></lucide-icon>
+          Special Dates
+        </button>
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'rules'" (click)="setActiveTab('rules')" role="tab" [attr.aria-selected]="activeTab() === 'rules'">
+          <lucide-icon [img]="SettingsIcon" [size]="18" class="tab-icon"></lucide-icon>
+          Booking Rules
+        </button>
+        <button type="button" class="tab-btn" [class.active]="activeTab() === 'calendar'" (click)="setActiveTab('calendar')" role="tab" [attr.aria-selected]="activeTab() === 'calendar'">
+          <lucide-icon [img]="Calendar" [size]="18" class="tab-icon"></lucide-icon>
+          Calendar View
+        </button>
+      </nav>
+
+      <!-- Weekly Schedule Tab -->
+      @if (activeTab() === 'weekly') {
+        <section class="tab-content weekly-tab" role="tabpanel">
+          <div class="content-header">
+            <h2>Weekly Schedule</h2>
+            <p class="content-description">Set your regular working hours for each day of the week</p>
+          </div>
+
+          <div class="weekly-schedule">
+            @for (day of weeklyAvailability(); track day.day; let dayIndex = $index) {
+              <div class="day-card" [class.disabled]="!day.isEnabled">
+                <div class="day-header">
+                  <div class="day-info">
+                    <label class="day-toggle">
+                      <input type="checkbox" [checked]="day.isEnabled" (change)="toggleDayEnabled(dayIndex)" class="toggle-checkbox">
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <h3>{{ day.dayName }}</h3>
+                  </div>
+                  @if (day.isEnabled) {
+                    <button type="button" class="add-slot-btn" (click)="addTimeSlot(dayIndex)">
+                      <lucide-icon [img]="Plus" [size]="14"></lucide-icon>
+                      Add Time Slot
                     </button>
+                  }
+                </div>
+
+                @if (day.isEnabled) {
+                  <div class="time-slots">
+                    @if (day.timeSlots.length === 0) {
+                      <div class="no-slots">
+                        <p>No time slots set for this day</p>
+                        <button type="button" class="btn-secondary add-first-slot-btn" (click)="addTimeSlot(dayIndex)">
+                          <lucide-icon [img]="Plus" [size]="14"></lucide-icon>
+                          Add First Time Slot
+                        </button>
+                      </div>
+                    } @else {
+                      @for (slot of day.timeSlots; track slot.id) {
+                        <div class="time-slot" [class.unavailable]="!slot.isAvailable">
+                          <div class="slot-times">
+                            <input type="time" [value]="slot.startTime" (change)="updateTimeSlot(dayIndex, slot.id, 'startTime', $any($event.target).value)" class="time-input">
+                            <span class="time-separator">to</span>
+                            <input type="time" [value]="slot.endTime" (change)="updateTimeSlot(dayIndex, slot.id, 'endTime', $any($event.target).value)" class="time-input">
+                          </div>
+                          <div class="slot-actions">
+                            <button type="button" class="toggle-availability-btn" [class.available]="slot.isAvailable" (click)="toggleTimeSlotAvailability(dayIndex, slot.id)" [title]="slot.isAvailable ? 'Mark as unavailable' : 'Mark as available'">
+                              <lucide-icon [img]="slot.isAvailable ? CheckCircle : XCircle" [size]="16"></lucide-icon>
+                            </button>
+                            <button type="button" class="remove-slot-btn" (click)="removeTimeSlot(dayIndex, slot.id)" title="Remove time slot">
+                              <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
+                            </button>
+                          </div>
+                        </div>
+                      }
+                    }
                   </div>
                 } @else {
-                  @for (slot of day.timeSlots; track slot.id) {
-                    <div class="time-slot" [class.unavailable]="!slot.isAvailable">
-                      <div class="slot-times">
-                        <input 
-                          type="time" 
-                          [value]="slot.startTime"
-                          (change)="updateTimeSlot(dayIndex, slot.id, 'startTime', $any($event.target).value)"
-                          class="time-input">
-                        <span class="time-separator">to</span>
-                        <input 
-                          type="time" 
-                          [value]="slot.endTime"
-                          (change)="updateTimeSlot(dayIndex, slot.id, 'endTime', $any($event.target).value)"
-                          class="time-input">
-                      </div>
-                      <div class="slot-actions">
-                        <button
-                          type="button"
-                          class="toggle-availability-btn"
-                          [class.available]="slot.isAvailable"
-                          (click)="toggleTimeSlotAvailability(dayIndex, slot.id)"
-                          [title]="slot.isAvailable ? 'Mark as unavailable' : 'Mark as available'">
-                          <lucide-icon [img]="slot.isAvailable ? CheckCircle : XCircle" [size]="16"></lucide-icon>
-                        </button>
-                        <button
-                          type="button"
-                          class="remove-slot-btn"
-                          (click)="removeTimeSlot(dayIndex, slot.id)"
-                          title="Remove time slot">
-                          <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
-                        </button>
-                      </div>
-                    </div>
-                  }
+                  <div class="day-disabled">
+                    <p>Not available on {{ day.dayName }}</p>
+                  </div>
                 }
-              </div>
-            } @else {
-              <div class="day-disabled">
-                <p>Not available on {{ day.dayName }}</p>
               </div>
             }
           </div>
-        }
-      </div>
-    </section>
-  }
-
-  <!-- Special Dates Tab -->
-  @if (activeTab() === 'special') {
-    <section class="tab-content special-tab" role="tabpanel">
-      <div class="content-header">
-        <h2>Special Dates</h2>
-        <p class="content-description">Set holidays, special hours, or unavailable dates</p>
-        <button type="button" class="add-btn primary" (click)="openSpecialDateModal()">
-          <span class="btn-icon">➕</span>
-          Add Special Date
-        </button>
-      </div>
-
-      @if (specialDates().length === 0) {
-        <div class="empty-state">
-          <lucide-icon [img]="Calendar" [size]="48" class="empty-icon"></lucide-icon>
-          <h3>No special dates set</h3>
-          <p>Add holidays, special hours, or unavailable dates</p>
-          <button type="button" class="add-btn primary" (click)="openSpecialDateModal()">
-            Add Your First Special Date
-          </button>
-        </div>
-      } @else {
-        <div class="special-dates-list">
-          @for (specialDate of specialDates(); track specialDate.id) {
-            <div class="special-date-card" [class]="'type-' + specialDate.type">
-              <div class="date-info">
-                <div class="date-display">
-                  <span class="date-day">{{ specialDate.date.getDate() }}</span>
-                  <span class="date-month">{{ specialDate.date.toLocaleDateString('en-US', { month: 'short' }) }}</span>
-                  <span class="date-year">{{ specialDate.date.getFullYear() }}</span>
-                </div>
-                <div class="date-details">
-                  <h4>{{ specialDate.reason }}</h4>
-                  <div class="date-meta">
-                    <span class="date-type" [class]="'type-' + specialDate.type">
-                      {{ getSpecialDateTypeLabel(specialDate.type) }}
-                    </span>
-                    <span class="date-full">{{ formatDate(specialDate.date) }}</span>
-                  </div>
-                  @if (specialDate.timeSlots && specialDate.timeSlots.length > 0) {
-                    <div class="special-hours">
-                      @for (slot of specialDate.timeSlots; track slot.id) {
-                        <span class="time-range">
-                          {{ formatTime(slot.startTime) }} - {{ formatTime(slot.endTime) }}
-                        </span>
-                      }
-                    </div>
-                  }
-                </div>
-              </div>
-              <div class="date-actions">
-                <button type="button" class="action-btn" (click)="openSpecialDateModal(specialDate)" title="Edit">
-                  <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
-                </button>
-                <button type="button" class="action-btn delete" (click)="deleteSpecialDate(specialDate.id)" title="Delete">
-                  <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
-                </button>
-              </div>
-            </div>
-          }
-        </div>
+        </section>
       }
-    </section>
-  }
 
-  <!-- Booking Rules Tab -->
-  @if (activeTab() === 'rules') {
-    <section class="tab-content rules-tab" role="tabpanel">
-      <div class="content-header">
-        <h2>Booking Rules</h2>
-        <p class="content-description">Set rules for how clients can book your services</p>
-        <button type="button" class="add-btn primary" (click)="openRuleModal()">
-          <span class="btn-icon">➕</span>
-          Add Rule
-        </button>
-      </div>
-
-      @if (bookingRules().length === 0) {
-        <div class="empty-state">
-          <lucide-icon [img]="SettingsIcon" [size]="48" class="empty-icon"></lucide-icon>
-          <h3>No booking rules set</h3>
-          <p>Add rules to control how clients can book your services</p>
-          <button type="button" class="add-btn primary" (click)="openRuleModal()">
-            Add Your First Rule
-          </button>
-        </div>
-      } @else {
-        <div class="rules-list">
-          @for (rule of bookingRules(); track rule.id) {
-            <div class="rule-card" [class.disabled]="!rule.isEnabled">
-              <div class="rule-info">
-                <div class="rule-header">
-                  <h4>{{ rule.name }}</h4>
-                  <label class="rule-toggle">
-                    <input 
-                      type="checkbox" 
-                      [checked]="rule.isEnabled" 
-                      (change)="toggleRuleEnabled(rule.id)"
-                      class="toggle-checkbox">
-                    <span class="toggle-slider"></span>
-                  </label>
-                </div>
-                <div class="rule-details">
-                  <span class="rule-type">{{ getRuleTypeLabel(rule.type) }}</span>
-                  <span class="rule-value">{{ rule.value }} {{ rule.unit }}</span>
-                </div>
-              </div>
-              <div class="rule-actions">
-                <button type="button" class="action-btn" (click)="openRuleModal(rule)" title="Edit">
-                  <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
-                </button>
-                <button type="button" class="action-btn delete" (click)="deleteRule(rule.id)" title="Delete">
-                  <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
-                </button>
-              </div>
-            </div>
-          }
-        </div>
-      }
-    </section>
-  }
-
-  <!-- Calendar View Tab -->
-  @if (activeTab() === 'calendar') {
-    <section class="tab-content calendar-tab" role="tabpanel">
-      <div class="content-header">
-        <h2>Calendar View</h2>
-        <p class="content-description">Visual overview of your availability</p>
-      </div>
-
-      <div class="calendar-container">
-        <div class="calendar-header">
-          <button type="button" class="nav-btn" (click)="previousMonth()">‹</button>
-          <h3 class="month-year">
-            {{ currentMonth().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) }}
-          </h3>
-          <button type="button" class="nav-btn" (click)="nextMonth()">›</button>
-        </div>
-
-        <div class="calendar-grid">
-          <div class="calendar-header-row">
-            <div class="day-header">Sun</div>
-            <div class="day-header">Mon</div>
-            <div class="day-header">Tue</div>
-            <div class="day-header">Wed</div>
-            <div class="day-header">Thu</div>
-            <div class="day-header">Fri</div>
-            <div class="day-header">Sat</div>
+      <!-- Special Dates Tab -->
+      @if (activeTab() === 'special') {
+        <section class="tab-content special-tab" role="tabpanel">
+          <div class="content-header">
+            <h2>Special Dates</h2>
+            <p class="content-description">Set holidays, special hours, or unavailable dates</p>
+            <button type="button" class="btn-primary" (click)="openSpecialDateModal()">
+              <lucide-icon [img]="Plus" [size]="16"></lucide-icon>
+              Add Special Date
+            </button>
           </div>
 
-          <div class="calendar-body">
-            @for (day of calendarDays(); track day.date.getTime()) {
-              <div class="calendar-day" 
-                   [class.other-month]="!day.isCurrentMonth"
-                   [class.today]="day.isToday"
-                   [class.available]="day.isAvailable"
-                   [class.unavailable]="!day.isAvailable && day.isCurrentMonth"
-                   [class.special]="day.specialDate">
-                <span class="day-number">{{ day.day }}</span>
-                @if (day.specialDate) {
-                  <div class="special-indicator" [class]="'type-' + day.specialDate.type">
-                    @switch (day.specialDate.type) {
-                      @case ('unavailable') { <lucide-icon [img]="XCircle" [size]="12"></lucide-icon> }
-                      @case ('special_hours') { <lucide-icon [img]="Clock" [size]="12"></lucide-icon> }
-                      @case ('holiday') { <lucide-icon [img]="PartyPopper" [size]="12"></lucide-icon> }
+          @if (specialDates().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="Calendar" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No special dates set</h3>
+              <p>Add holidays, special hours, or unavailable dates</p>
+              <button type="button" class="btn-primary" (click)="openSpecialDateModal()">
+                Add Your First Special Date
+              </button>
+            </div>
+          } @else {
+            <div class="special-dates-list">
+              @for (specialDate of specialDates(); track specialDate.id) {
+                <div class="special-date-card" [class]="'type-' + specialDate.type">
+                  <div class="date-info">
+                    <div class="date-display">
+                      <span class="date-day">{{ specialDate.date.getDate() }}</span>
+                      <span class="date-month">{{ specialDate.date.toLocaleDateString('en-US', { month: 'short' }) }}</span>
+                      <span class="date-year">{{ specialDate.date.getFullYear() }}</span>
+                    </div>
+                    <div class="date-details">
+                      <h4>{{ specialDate.reason }}</h4>
+                      <div class="date-meta">
+                        <span class="date-type" [class]="'type-' + specialDate.type">
+                          {{ getSpecialDateTypeLabel(specialDate.type) }}
+                        </span>
+                        <span class="date-full">{{ formatDate(specialDate.date) }}</span>
+                      </div>
+                      @if (specialDate.timeSlots && specialDate.timeSlots.length > 0) {
+                        <div class="special-hours">
+                          @for (slot of specialDate.timeSlots; track slot.id) {
+                            <span class="time-range">
+                              {{ formatTime(slot.startTime) }} - {{ formatTime(slot.endTime) }}
+                            </span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <div class="date-actions">
+                    <button type="button" class="action-btn" (click)="openSpecialDateModal(specialDate)" title="Edit">
+                      <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
+                    </button>
+                    <button type="button" class="action-btn delete" (click)="deleteSpecialDate(specialDate.id)" title="Delete">
+                      <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </section>
+      }
+
+      <!-- Booking Rules Tab -->
+      @if (activeTab() === 'rules') {
+        <section class="tab-content rules-tab" role="tabpanel">
+          <div class="content-header">
+            <h2>Booking Rules</h2>
+            <p class="content-description">Set rules for how clients can book your services</p>
+            <button type="button" class="btn-primary" (click)="openRuleModal()">
+              <lucide-icon [img]="Plus" [size]="16"></lucide-icon>
+              Add Rule
+            </button>
+          </div>
+
+          @if (bookingRules().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="SettingsIcon" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No booking rules set</h3>
+              <p>Add rules to control how clients can book your services</p>
+              <button type="button" class="btn-primary" (click)="openRuleModal()">
+                Add Your First Rule
+              </button>
+            </div>
+          } @else {
+            <div class="rules-list">
+              @for (rule of bookingRules(); track rule.id) {
+                <div class="rule-card" [class.disabled]="!rule.isEnabled">
+                  <div class="rule-info">
+                    <div class="rule-header">
+                      <h4>{{ rule.name }}</h4>
+                      <label class="rule-toggle">
+                        <input type="checkbox" [checked]="rule.isEnabled" (change)="toggleRuleEnabled(rule.id)" class="toggle-checkbox">
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                    <div class="rule-details">
+                      <span class="rule-type">{{ getRuleTypeLabel(rule.type) }}</span>
+                      <span class="rule-value">{{ rule.value }} {{ rule.unit }}</span>
+                    </div>
+                  </div>
+                  <div class="rule-actions">
+                    <button type="button" class="action-btn" (click)="openRuleModal(rule)" title="Edit">
+                      <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
+                    </button>
+                    <button type="button" class="action-btn delete" (click)="deleteRule(rule.id)" title="Delete">
+                      <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </section>
+      }
+
+      <!-- Calendar View Tab -->
+      @if (activeTab() === 'calendar') {
+        <section class="tab-content calendar-tab" role="tabpanel">
+          <div class="content-header">
+            <h2>Calendar View</h2>
+            <p class="content-description">Visual overview of your availability</p>
+          </div>
+
+          <div class="calendar-container">
+            <div class="calendar-header">
+              <button type="button" class="nav-btn" (click)="previousMonth()">
+                <lucide-icon [img]="ChevronLeft" [size]="20"></lucide-icon>
+              </button>
+              <h3 class="month-year">
+                {{ currentMonth().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) }}
+              </h3>
+              <button type="button" class="nav-btn" (click)="nextMonth()">
+                <lucide-icon [img]="ChevronRight" [size]="20"></lucide-icon>
+              </button>
+            </div>
+
+            <div class="calendar-grid">
+              <div class="calendar-header-row">
+                <div class="day-header">Sun</div>
+                <div class="day-header">Mon</div>
+                <div class="day-header">Tue</div>
+                <div class="day-header">Wed</div>
+                <div class="day-header">Thu</div>
+                <div class="day-header">Fri</div>
+                <div class="day-header">Sat</div>
+              </div>
+
+              <div class="calendar-body">
+                @for (day of calendarDays(); track day.date.getTime()) {
+                  <div class="calendar-day" [class.other-month]="!day.isCurrentMonth" [class.today]="day.isToday" [class.available]="day.isAvailable" [class.unavailable]="!day.isAvailable && day.isCurrentMonth" [class.special]="day.specialDate">
+                    <span class="day-number">{{ day.day }}</span>
+                    @if (day.specialDate) {
+                      <div class="special-indicator" [class]="'type-' + day.specialDate.type">
+                        @switch (day.specialDate.type) {
+                          @case ('unavailable') { <lucide-icon [img]="XCircle" [size]="12"></lucide-icon> }
+                          @case ('special_hours') { <lucide-icon [img]="Clock" [size]="12"></lucide-icon> }
+                          @case ('holiday') { <lucide-icon [img]="PartyPopper" [size]="12"></lucide-icon> }
+                        }
+                      </div>
+                    }
+                    @if (!day.weeklyAvailable && day.isCurrentMonth && !day.specialDate) {
+                      <div class="weekly-unavailable"><lucide-icon [img]="XCircle" [size]="12"></lucide-icon></div>
                     }
                   </div>
                 }
-                @if (!day.weeklyAvailable && day.isCurrentMonth && !day.specialDate) {
-                  <div class="weekly-unavailable"><lucide-icon [img]="XCircle" [size]="12"></lucide-icon></div>
-                }
               </div>
-            }
-          </div>
-        </div>
+            </div>
 
-        <div class="calendar-legend">
-          <div class="legend-item">
-            <span class="legend-color available"></span>
-            <span class="legend-text">Available</span>
+            <div class="calendar-legend">
+              <div class="legend-item">
+                <span class="legend-color available"></span>
+                <span class="legend-text">Available</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color unavailable"></span>
+                <span class="legend-text">Unavailable</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color special"></span>
+                <span class="legend-text">Special Date</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color today"></span>
+                <span class="legend-text">Today</span>
+              </div>
+            </div>
           </div>
-          <div class="legend-item">
-            <span class="legend-color unavailable"></span>
-            <span class="legend-text">Unavailable</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color special"></span>
-            <span class="legend-text">Special Date</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color today"></span>
-            <span class="legend-text">Today</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  }
+        </section>
+      }
+    </div>
+  </div>
 </div>
 
 <!-- Special Date Modal -->
@@ -360,17 +320,19 @@
   <div class="modal-overlay" (click)="closeSpecialDateModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>{{ selectedSpecialDate() ? 'Edit Special Date' : 'Add Special Date' }}</h3>
-        <button type="button" class="close-btn" (click)="closeSpecialDateModal()">✕</button>
+        <h2>{{ selectedSpecialDate() ? 'Edit Special Date' : 'Add Special Date' }}</h2>
+        <button type="button" class="close-btn" (click)="closeSpecialDateModal()">
+          <lucide-icon [img]="X" [size]="18"></lucide-icon>
+        </button>
       </div>
       <form [formGroup]="specialDateForm" (ngSubmit)="saveSpecialDate()" class="modal-form">
         <div class="form-group">
           <label for="specialDate">Date</label>
-          <input type="date" id="specialDate" formControlName="date" class="form-input" [min]="getTodayDate()">
+          <input type="date" id="specialDate" formControlName="date" class="form-control" [min]="getTodayDate()">
         </div>
         <div class="form-group">
           <label for="specialType">Type</label>
-          <select id="specialType" formControlName="type" class="form-select">
+          <select id="specialType" formControlName="type" class="form-control">
             <option value="unavailable">Unavailable</option>
             <option value="special_hours">Special Hours</option>
             <option value="holiday">Holiday</option>
@@ -378,24 +340,23 @@
         </div>
         <div class="form-group">
           <label for="specialReason">Reason</label>
-          <input type="text" id="specialReason" formControlName="reason" class="form-input" 
-                 placeholder="e.g., Personal day off, Extended hours for Valentine's Day">
+          <input type="text" id="specialReason" formControlName="reason" class="form-control" placeholder="e.g., Personal day off, Extended hours for Valentine's Day">
         </div>
         @if (specialDateForm.get('type')?.value === 'special_hours') {
           <div class="form-row">
             <div class="form-group">
               <label for="specialStartTime">Start Time</label>
-              <input type="time" id="specialStartTime" formControlName="startTime" class="form-input">
+              <input type="time" id="specialStartTime" formControlName="startTime" class="form-control">
             </div>
             <div class="form-group">
               <label for="specialEndTime">End Time</label>
-              <input type="time" id="specialEndTime" formControlName="endTime" class="form-input">
+              <input type="time" id="specialEndTime" formControlName="endTime" class="form-control">
             </div>
           </div>
         }
-        <div class="modal-actions">
-          <button type="button" class="cancel-btn" (click)="closeSpecialDateModal()">Cancel</button>
-          <button type="submit" class="save-btn primary" [disabled]="specialDateForm.invalid">
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeSpecialDateModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="specialDateForm.invalid">
             {{ selectedSpecialDate() ? 'Update' : 'Add' }} Special Date
           </button>
         </div>
@@ -409,18 +370,19 @@
   <div class="modal-overlay" (click)="closeRuleModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>{{ selectedRule() ? 'Edit Rule' : 'Add Booking Rule' }}</h3>
-        <button type="button" class="close-btn" (click)="closeRuleModal()">✕</button>
+        <h2>{{ selectedRule() ? 'Edit Rule' : 'Add Booking Rule' }}</h2>
+        <button type="button" class="close-btn" (click)="closeRuleModal()">
+          <lucide-icon [img]="X" [size]="18"></lucide-icon>
+        </button>
       </div>
       <form [formGroup]="ruleForm" (ngSubmit)="saveRule()" class="modal-form">
         <div class="form-group">
           <label for="ruleName">Rule Name</label>
-          <input type="text" id="ruleName" formControlName="name" class="form-input" 
-                 placeholder="e.g., Advance Booking Required">
+          <input type="text" id="ruleName" formControlName="name" class="form-control" placeholder="e.g., Advance Booking Required">
         </div>
         <div class="form-group">
           <label for="ruleType">Rule Type</label>
-          <select id="ruleType" formControlName="type" class="form-select">
+          <select id="ruleType" formControlName="type" class="form-control">
             <option value="advance_booking">Advance Booking</option>
             <option value="minimum_duration">Minimum Duration</option>
             <option value="maximum_duration">Maximum Duration</option>
@@ -430,11 +392,11 @@
         <div class="form-row">
           <div class="form-group">
             <label for="ruleValue">Value</label>
-            <input type="number" id="ruleValue" formControlName="value" class="form-input" min="1">
+            <input type="number" id="ruleValue" formControlName="value" class="form-control" min="1">
           </div>
           <div class="form-group">
             <label for="ruleUnit">Unit</label>
-            <select id="ruleUnit" formControlName="unit" class="form-select">
+            <select id="ruleUnit" formControlName="unit" class="form-control">
               <option value="hours">Hours</option>
               <option value="days">Days</option>
               <option value="weeks">Weeks</option>
@@ -447,9 +409,9 @@
             <span class="checkbox-text">Enable this rule</span>
           </label>
         </div>
-        <div class="modal-actions">
-          <button type="button" class="cancel-btn" (click)="closeRuleModal()">Cancel</button>
-          <button type="submit" class="save-btn primary" [disabled]="ruleForm.invalid">
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeRuleModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="ruleForm.invalid">
             {{ selectedRule() ? 'Update' : 'Add' }} Rule
           </button>
         </div>

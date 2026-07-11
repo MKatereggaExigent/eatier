@@ -1,9 +1,15 @@
 import { Business, BusinessOwnerService } from '../../../core/services/business-owner.service';
 import { BusinessInsightsResponse, InsightsService } from '../../../core/services/insights.service';
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal, computed } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { LucideAngularModule, Calendar, CalendarDays, BarChart3, ClipboardList, CalendarRange, TrendingUp, TrendingDown, ArrowRight } from 'lucide-angular';
-import { Subject, catchError, finalize, forkJoin, of, switchMap, takeUntil } from 'rxjs';
+import {
+  LucideAngularModule, Eye, User, UtensilsCrossed, Phone, QrCode, Share2,
+  Calendar, CalendarDays, BarChart3, ClipboardList, CalendarRange,
+  TrendingUp, TrendingDown, Minus, Clock, ArrowUpRight, ArrowDownRight,
+  MapPin, Smartphone, Globe, BookOpen, Star, MessageSquare, Activity,
+  ChevronRight, RefreshCw, Download
+} from 'lucide-angular';
+import { Subject, catchError, finalize, of, takeUntil } from 'rxjs';
 
 import { BusinessInsights } from '../../../shared/models/business-profile.model';
 import { CommonModule } from '@angular/common';
@@ -16,7 +22,12 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./business-insights.component.scss']
 })
 export class BusinessInsightsComponent implements OnInit, OnDestroy {
-  // Lucide Icons
+  readonly Eye = Eye;
+  readonly User = User;
+  readonly UtensilsCrossed = UtensilsCrossed;
+  readonly Phone = Phone;
+  readonly QrCode = QrCode;
+  readonly Share2 = Share2;
   readonly Calendar = Calendar;
   readonly CalendarDays = CalendarDays;
   readonly BarChart3 = BarChart3;
@@ -24,13 +35,26 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
   readonly CalendarRange = CalendarRange;
   readonly TrendingUp = TrendingUp;
   readonly TrendingDown = TrendingDown;
-  readonly ArrowRight = ArrowRight;
+  readonly Minus = Minus;
+  readonly Clock = Clock;
+  readonly ArrowUpRight = ArrowUpRight;
+  readonly ArrowDownRight = ArrowDownRight;
+  readonly MapPin = MapPin;
+  readonly Smartphone = Smartphone;
+  readonly Globe = Globe;
+  readonly BookOpen = BookOpen;
+  readonly Star = Star;
+  readonly MessageSquare = MessageSquare;
+  readonly Activity = Activity;
+  readonly ChevronRight = ChevronRight;
+  readonly RefreshCw = RefreshCw;
+  readonly Download = Download;
+
   private fb = inject(FormBuilder);
   private businessOwnerService = inject(BusinessOwnerService);
   private insightsService = inject(InsightsService);
   private destroy$ = new Subject<void>();
 
-  // State management
   business = signal<Business | null>(null);
   insights = signal<BusinessInsights | null>(null);
   insightsData = signal<BusinessInsightsResponse | null>(null);
@@ -39,19 +63,30 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
   isExporting = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
 
-  // Form for custom date range
   dateRangeForm: FormGroup;
 
-  // Period options
   readonly periodOptions = [
-    { value: 'daily', label: 'Daily', icon: this.Calendar },
-    { value: 'weekly', label: 'Weekly', icon: this.CalendarDays },
+    { value: 'daily', label: 'Daily', icon: this.CalendarDays },
+    { value: 'weekly', label: 'Weekly', icon: this.Calendar },
     { value: 'monthly', label: 'Monthly', icon: this.BarChart3 },
     { value: 'yearly', label: 'Yearly', icon: this.ClipboardList },
-    { value: 'custom', label: 'Custom Range', icon: this.CalendarRange }
+    { value: 'custom', label: 'Custom', icon: this.CalendarRange }
   ];
 
+  statCards = computed(() => {
+    const i = this.insights();
+    if (!i) return [];
+    return [
+      { value: this.formatNumber(i.metrics.totalViews), label: 'Total Views', icon: this.Eye, growth: i.growth.viewsGrowth, accent: '#89C4D9' },
+      { value: this.formatNumber(i.metrics.uniqueVisitors), label: 'Unique Visitors', icon: this.User, growth: i.growth.customerGrowth, accent: '#8FC9A3' },
+      { value: this.formatNumber(i.metrics.menuViews), label: 'Menu Views', icon: this.UtensilsCrossed, growth: null, accent: '#000000' },
+      { value: this.formatNumber(i.metrics.contactClicks), label: 'Contact Clicks', icon: this.Phone, growth: null, accent: '#F0B5BA' },
+      { value: this.formatNumber(i.metrics.qrScans), label: 'QR Scans', icon: this.QrCode, growth: null, accent: '#000000' },
+      { value: this.formatNumber(i.metrics.shareCount), label: 'Shares', icon: this.Share2, growth: null, accent: '#A8D8EA' },
+    ];
+  });
 
+  data = computed(() => this.insightsData());
 
   constructor() {
     this.dateRangeForm = this.fb.group({
@@ -115,6 +150,7 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
       )
       .subscribe(response => {
         if (response) {
+          this.errorMessage.set(null);
           this.insightsData.set(response);
           this.convertToBusinessInsights(response);
         }
@@ -122,9 +158,7 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
   }
 
   convertToBusinessInsights(data: BusinessInsightsResponse): void {
-    // Map 'weekly' to 'daily' for the BusinessInsights type which doesn't support 'weekly'
     const periodType = data.period.type === 'weekly' ? 'daily' : data.period.type;
-
     const insights: BusinessInsights = {
       businessId: data.businessId,
       period: {
@@ -140,12 +174,11 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
     this.insights.set(insights);
   }
 
-
-
   loadInsights(): void {
     const business = this.business();
     if (business) {
       this.isLoading.set(true);
+      this.errorMessage.set(null);
       this.fetchInsights(business.id);
       setTimeout(() => this.isLoading.set(false), 1000);
     } else {
@@ -170,32 +203,23 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
 
   exportToPDF(): void {
     this.isExporting.set(true);
-
-    // Mock PDF export
     setTimeout(() => {
-      // In a real app, this would generate and download a PDF
       const insights = this.insights();
       if (insights) {
         const filename = `business-insights-${insights.period.type}-${Date.now()}.pdf`;
         console.log(`Exporting insights to ${filename}`);
-
-        // Create a mock download
         const link = document.createElement('a');
         link.href = '#';
         link.download = filename;
         link.click();
       }
-
       this.isExporting.set(false);
     }, 2000);
   }
 
   formatNumber(num: number): string {
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
-    } else if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
-    }
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
     return num.toString();
   }
 
@@ -210,7 +234,7 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
   }
 
   getGrowthIcon(growth: number): any {
-    return growth > 0 ? this.TrendingUp : growth < 0 ? this.TrendingDown : this.ArrowRight;
+    return growth > 0 ? this.TrendingUp : growth < 0 ? this.TrendingDown : this.Minus;
   }
 
   getGrowthClass(growth: number): string {
@@ -243,28 +267,37 @@ export class BusinessInsightsComponent implements OnInit, OnDestroy {
 
   formatDate(date: Date): string {
     return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+      year: 'numeric', month: 'short', day: 'numeric'
     });
   }
 
-  getDeviceIcon(deviceType: string): string {
-    const icons: Record<string, string> = {
-      'Mobile': '📱',
-      'Desktop': '💻',
-      'Tablet': '📱'
-    };
-    return icons[deviceType] || '📱';
+  getTrendIcon(value: number, inverse = false): any {
+    if (value === 0) return this.Minus;
+    const positive = inverse ? value < 0 : value > 0;
+    return positive ? this.ArrowUpRight : this.ArrowDownRight;
   }
 
-  getReferralIcon(source: string): string {
-    const icons: Record<string, string> = {
-      'Google Search': '🔍',
-      'Social Media': '📱',
-      'Direct': '🌐',
-      'Referral': '🔗'
-    };
-    return icons[source] || '🌐';
+  getTrendClass(value: number, inverse = false): string {
+    if (value === 0) return 'neutral';
+    const positive = inverse ? value < 0 : value > 0;
+    return positive ? 'positive' : 'negative';
+  }
+
+  getRatingStars(rating: number): number[] {
+    return [1, 2, 3, 4, 5].map(i => (i <= Math.round(rating) ? 1 : 0));
+  }
+
+  getMaxViews(data: any): number {
+    if (!data || !data.dailyData || data.dailyData.length === 0) return 1;
+    return Math.max(...data.dailyData.map((d: any) => d.views));
+  }
+
+  formatGrowthAbs(value: number): string {
+    return this.formatPercentage(Math.abs(value));
+  }
+
+  formatDayLabel(dateStr: string): string {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 }

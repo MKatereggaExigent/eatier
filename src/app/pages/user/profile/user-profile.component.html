@@ -1,476 +1,345 @@
-<div class="user-profile-container">
-  <!-- Header -->
-  <div class="profile-header">
-    <h1><lucide-icon [img]="User" [size]="28"></lucide-icon> User Profile</h1>
-    <p>Manage your personal information and professional details</p>
-  </div>
-
-  <!-- Success/Error Messages -->
-  @if (successMessage()) {
-    <div class="success-message">
-      <lucide-icon [img]="CheckCircle" [size]="20" class="success-icon"></lucide-icon>
-      {{ successMessage() }}
+<div class="section">
+  <div class="section-inner">
+    <div class="page-header">
+      <div class="tag">
+        <lucide-icon [img]="User" class="tag-icon"></lucide-icon>
+        <span>Profile</span>
+      </div>
+      <h1 class="section-title">User Profile</h1>
+      <p class="section-desc">Manage your personal information and professional details</p>
     </div>
-  }
 
-  @if (errorMessage()) {
-    <div class="error-message">
-      <lucide-icon [img]="AlertTriangle" [size]="20" class="error-icon"></lucide-icon>
-      {{ errorMessage() }}
-    </div>
-  }
+    <!-- Success/Error Messages -->
+    @if (successMessage()) {
+      <div class="message success">
+        <lucide-icon [img]="CheckCircle" class="message-icon"></lucide-icon>
+        {{ successMessage() }}
+      </div>
+    }
 
-  <!-- Navigation Tabs -->
-  <div class="profile-tabs">
-    <button
-      type="button"
-      class="tab-button"
-      [class.active]="activeSection() === 'basic'"
-      (click)="setActiveSection('basic')"
-    >
-      <lucide-icon [img]="ClipboardList" [size]="18"></lucide-icon> Basic Info
-    </button>
-    <button
-      type="button"
-      class="tab-button"
-      [class.active]="activeSection() === 'professional'"
-      (click)="setActiveSection('professional')"
-    >
-      <lucide-icon [img]="ChefHat" [size]="18"></lucide-icon> Professional
-    </button>
-    <button
-      type="button"
-      class="tab-button"
-      [class.active]="activeSection() === 'media'"
-      (click)="setActiveSection('media')"
-    >
-      <lucide-icon [img]="Camera" [size]="18"></lucide-icon> Media
-    </button>
-    <button
-      type="button"
-      class="tab-button"
-      [class.active]="activeSection() === 'privacy'"
-      (click)="setActiveSection('privacy')"
-    >
-      <lucide-icon [img]="Lock" [size]="18"></lucide-icon> Privacy
-    </button>
-  </div>
+    @if (errorMessage()) {
+      <div class="message error">
+        <lucide-icon [img]="AlertTriangle" class="message-icon"></lucide-icon>
+        {{ errorMessage() }}
+      </div>
+    }
 
-  <!-- Profile Form -->
-  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+    <!-- Navigation Tabs -->
+    <nav class="tab-nav">
+      <button type="button" [class.active]="activeSection() === 'basic'" (click)="setActiveSection('basic')">
+        <lucide-icon [img]="ClipboardList" class="tab-icon"></lucide-icon>
+        Basic Info
+      </button>
+      <button type="button" [class.active]="activeSection() === 'professional'" (click)="setActiveSection('professional')">
+        <lucide-icon [img]="ChefHat" class="tab-icon"></lucide-icon>
+        Professional
+      </button>
+      <button type="button" [class.active]="activeSection() === 'media'" (click)="setActiveSection('media')">
+        <lucide-icon [img]="Camera" class="tab-icon"></lucide-icon>
+        Media
+      </button>
+      <button type="button" [class.active]="activeSection() === 'privacy'" (click)="setActiveSection('privacy')">
+        <lucide-icon [img]="Lock" class="tab-icon"></lucide-icon>
+        Privacy
+      </button>
+    </nav>
 
-    <!-- Basic Information Section -->
-    @if (activeSection() === 'basic') {
-      <div class="form-section">
-        <h2>Basic Information</h2>
+    <!-- Profile Form -->
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="firstName">First Name *</label>
-            <input
-              id="firstName"
-              type="text"
-              formControlName="firstName"
-              placeholder="Enter your first name"
-              [class.error]="getFieldError('firstName')"
-            />
-            @if (getFieldError('firstName')) {
-              <span class="field-error">{{ getFieldError('firstName') }}</span>
-            }
+      <!-- Basic Information Section -->
+      @if (activeSection() === 'basic') {
+        <div class="form-card">
+          <h2 class="card-title">Basic Information</h2>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">First Name *</label>
+              <input id="firstName" type="text" formControlName="firstName" placeholder="Enter your first name" [class.error]="getFieldError('firstName')" />
+              @if (getFieldError('firstName')) {
+                <span class="field-error">{{ getFieldError('firstName') }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last Name *</label>
+              <input id="lastName" type="text" formControlName="lastName" placeholder="Enter your last name" [class.error]="getFieldError('lastName')" />
+              @if (getFieldError('lastName')) {
+                <span class="field-error">{{ getFieldError('lastName') }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email Address *</label>
+              <input id="email" type="email" formControlName="email" placeholder="your@email.com" [class.error]="getFieldError('email')" />
+              @if (getFieldError('email')) {
+                <span class="field-error">{{ getFieldError('email') }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input id="phone" type="tel" formControlName="phone" placeholder="+1 (555) 123-4567" [class.error]="getFieldError('phone')" />
+              @if (getFieldError('phone')) {
+                <span class="field-error">{{ getFieldError('phone') }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="country">Country *</label>
+              <select id="country" formControlName="country" [class.error]="getFieldError('country')">
+                <option value="">Select country</option>
+                @for (country of countries; track country) {
+                  <option [value]="country">{{ country }}</option>
+                }
+              </select>
+              @if (getFieldError('country')) {
+                <span class="field-error">{{ getFieldError('country') }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="dateOfBirth">Date of Birth</label>
+              <input id="dateOfBirth" type="date" formControlName="dateOfBirth" [min]="getMinBirthDate()" [max]="getMaxBirthDate()" />
+              @if (calculateAge()) {
+                <span class="field-hint">Age: {{ calculateAge() }} years</span>
+              }
+            </div>
           </div>
 
           <div class="form-group">
-            <label for="lastName">Last Name *</label>
-            <input
-              id="lastName"
-              type="text"
-              formControlName="lastName"
-              placeholder="Enter your last name"
-              [class.error]="getFieldError('lastName')"
-            />
-            @if (getFieldError('lastName')) {
-              <span class="field-error">{{ getFieldError('lastName') }}</span>
-            }
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="email">Email Address *</label>
-            <input
-              id="email"
-              type="email"
-              formControlName="email"
-              placeholder="your@email.com"
-              [class.error]="getFieldError('email')"
-            />
-            @if (getFieldError('email')) {
-              <span class="field-error">{{ getFieldError('email') }}</span>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input
-              id="phone"
-              type="tel"
-              formControlName="phone"
-              placeholder="+1 (555) 123-4567"
-              [class.error]="getFieldError('phone')"
-            />
-            @if (getFieldError('phone')) {
-              <span class="field-error">{{ getFieldError('phone') }}</span>
-            }
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="country">Country *</label>
-            <select
-              id="country"
-              formControlName="country"
-              [class.error]="getFieldError('country')"
-            >
-              <option value="">Select country</option>
-              @for (country of countries; track country) {
-                <option [value]="country">{{ country }}</option>
+            <label for="gender">Gender (Optional)</label>
+            <select id="gender" formControlName="gender">
+              <option value="">Prefer not to say</option>
+              @for (option of genderOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
               }
             </select>
-            @if (getFieldError('country')) {
-              <span class="field-error">{{ getFieldError('country') }}</span>
-            }
           </div>
+
+          <h3 class="section-label">Address</h3>
 
           <div class="form-group">
-            <label for="dateOfBirth">Date of Birth</label>
-            <input
-              id="dateOfBirth"
-              type="date"
-              formControlName="dateOfBirth"
-              [min]="getMinBirthDate()"
-              [max]="getMaxBirthDate()"
-            />
-            @if (calculateAge()) {
-              <span class="age-display">Age: {{ calculateAge() }} years</span>
-            }
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="gender">Gender (Optional)</label>
-          <select id="gender" formControlName="gender">
-            <option value="">Prefer not to say</option>
-            @for (option of genderOptions; track option.value) {
-              <option [value]="option.value">{{ option.label }}</option>
-            }
-          </select>
-        </div>
-
-        <!-- Address -->
-        <h3>Address</h3>
-        <div class="form-group">
-          <label for="street">Street Address</label>
-          <input
-            id="street"
-            type="text"
-            formControlName="street"
-            placeholder="123 Main Street"
-          />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="city">City</label>
-            <input
-              id="city"
-              type="text"
-              formControlName="city"
-              placeholder="New York"
-            />
+            <label for="street">Street Address</label>
+            <input id="street" type="text" formControlName="street" placeholder="123 Main Street" />
           </div>
 
-          <div class="form-group">
-            <label for="state">State/Province</label>
-            <input
-              id="state"
-              type="text"
-              formControlName="state"
-              placeholder="NY"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="zipCode">ZIP/Postal Code</label>
-            <input
-              id="zipCode"
-              type="text"
-              formControlName="zipCode"
-              placeholder="10001"
-            />
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- Professional Section -->
-    @if (activeSection() === 'professional') {
-      <div class="form-section">
-        <h2>Professional Information</h2>
-
-        <div class="form-group">
-          <label class="chef-checkbox">
-            <input type="checkbox" formControlName="isChef" />
-            <span class="checkmark"></span>
-            <span class="chef-label">👨‍🍳 I'm a chef</span>
-          </label>
-        </div>
-
-        <div class="form-group">
-          <label for="experience">Years of Experience</label>
-          <input
-            id="experience"
-            type="number"
-            formControlName="experience"
-            placeholder="0"
-            min="0"
-            [max]="constraints.MAX_EXPERIENCE_YEARS"
-            [class.error]="getFieldError('experience')"
-          />
-          @if (getFieldError('experience')) {
-            <span class="field-error">{{ getFieldError('experience') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="bio">Professional Bio</label>
-          <textarea
-            id="bio"
-            formControlName="bio"
-            placeholder="Tell people about your culinary background and expertise..."
-            rows="4"
-            [class.error]="getFieldError('bio')"
-          ></textarea>
-          <div class="character-count" [class.limit-warning]="getBioCharacterCount() > constraints.BIO_MAX_LENGTH * 0.9">
-            {{ getBioCharacterCount() }}/{{ constraints.BIO_MAX_LENGTH }} characters
-          </div>
-          @if (getFieldError('bio')) {
-            <span class="field-error">{{ getFieldError('bio') }}</span>
-          }
-        </div>
-
-        <!-- Specialty Dishes -->
-        <div class="specialty-section">
-          <h3>Specialty Dishes</h3>
-          <div class="specialty-list">
-            @for (dish of currentProfile()?.specialtyDishes ?? []; track dish; let i = $index) {
-              <div class="specialty-item">
-                <span class="dish-name">{{ dish }}</span>
-                <button type="button" class="remove-btn" (click)="removeSpecialtyDish(i)">✕</button>
-              </div>
-            }
-          </div>
-          <div class="add-specialty">
-            <input
-              type="text"
-              placeholder="Add a specialty dish"
-              #specialtyInput
-              (keyup.enter)="addSpecialtyDish(specialtyInput.value); specialtyInput.value = ''"
-            />
-            <button
-              type="button"
-              class="add-btn"
-              (click)="addSpecialtyDish(specialtyInput.value); specialtyInput.value = ''"
-            >
-              Add
-            </button>
-          </div>
-        </div>
-
-        <!-- Certifications -->
-        <div class="certification-section">
-          <h3>Certifications</h3>
-          <div class="certification-list">
-            @for (cert of currentProfile()?.certifications ?? []; track cert; let i = $index) {
-              <div class="certification-item">
-                <span class="cert-name">{{ cert }}</span>
-                <button type="button" class="remove-btn" (click)="removeCertification(i)">✕</button>
-              </div>
-            }
-          </div>
-          <div class="add-certification">
-            <input
-              type="text"
-              placeholder="Add a certification"
-              #certInput
-              (keyup.enter)="addCertification(certInput.value); certInput.value = ''"
-            />
-            <button
-              type="button"
-              class="add-btn"
-              (click)="addCertification(certInput.value); certInput.value = ''"
-            >
-              Add
-            </button>
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- Media Section -->
-    @if (activeSection() === 'media') {
-      <div class="form-section">
-        <h2>Photos & Media</h2>
-
-        <!-- Profile Photo -->
-        <div class="media-group">
-          <h3>Profile Photo</h3>
-          @if (profilePhoto()) {
-            <div class="photo-preview">
-              <img [src]="profilePhoto()!" alt="Profile photo" />
-              <button type="button" class="remove-photo" (click)="removeProfilePhoto()">✕</button>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">City</label>
+              <input id="city" type="text" formControlName="city" placeholder="New York" />
             </div>
-          } @else {
-            <label class="photo-upload">
-              <input
-                type="file"
-                accept="image/*"
-                (change)="onFileUpload($event, 'profile')"
-                hidden
-              />
-              <div class="upload-placeholder">
-                <span class="upload-icon">📷</span>
-                <span>Upload Profile Photo</span>
-              </div>
-            </label>
-          }
-        </div>
 
-        <!-- Background Photo -->
-        <div class="media-group">
-          <h3>Background Photo</h3>
-          @if (backgroundPhoto()) {
-            <div class="background-preview">
-              <img [src]="backgroundPhoto()!" alt="Background photo" />
-              <button type="button" class="remove-background" (click)="removeBackgroundPhoto()">✕</button>
+            <div class="form-group">
+              <label for="state">State/Province</label>
+              <input id="state" type="text" formControlName="state" placeholder="NY" />
             </div>
-          } @else {
-            <label class="background-upload">
-              <input
-                type="file"
-                accept="image/*"
-                (change)="onFileUpload($event, 'background')"
-                hidden
-              />
-              <div class="upload-placeholder large">
-                <lucide-icon [img]="Image" [size]="32" class="upload-icon"></lucide-icon>
-                <span>Upload Background Photo</span>
-              </div>
-            </label>
-          }
+
+            <div class="form-group">
+              <label for="zipCode">ZIP/Postal Code</label>
+              <input id="zipCode" type="text" formControlName="zipCode" placeholder="10001" />
+            </div>
+          </div>
         </div>
+      }
 
-        <!-- Portfolio Images -->
-        <div class="media-group">
-          <h3>Portfolio Images</h3>
-          <p class="media-description">Upload up to {{ constraints.MAX_PORTFOLIO_IMAGES }} images showcasing your work</p>
+      <!-- Professional Section -->
+      @if (activeSection() === 'professional') {
+        <div class="form-card">
+          <h2 class="card-title">Professional Information</h2>
 
-          <div class="portfolio-grid">
-            @for (image of portfolioImages(); track $index) {
-              <div class="portfolio-item">
-                <img [src]="image" [alt]="'Portfolio image ' + ($index + 1)" />
-                <button
-                  type="button"
-                  class="remove-portfolio"
-                  (click)="removePortfolioImage($index)"
-                >
-                  ✕
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="isChef" />
+              <lucide-icon [img]="ChefHat" class="checkbox-icon"></lucide-icon>
+              <span>I'm a chef</span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label for="experience">Years of Experience</label>
+            <input id="experience" type="number" formControlName="experience" placeholder="0" min="0" [max]="constraints.MAX_EXPERIENCE_YEARS" [class.error]="getFieldError('experience')" />
+            @if (getFieldError('experience')) {
+              <span class="field-error">{{ getFieldError('experience') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="bio">Professional Bio</label>
+            <textarea id="bio" formControlName="bio" placeholder="Tell people about your culinary background and expertise..." rows="4" [class.error]="getFieldError('bio')"></textarea>
+            <div class="char-count" [class.warning]="getBioCharacterCount() > constraints.BIO_MAX_LENGTH * 0.9">
+              {{ getBioCharacterCount() }}/{{ constraints.BIO_MAX_LENGTH }} characters
+            </div>
+            @if (getFieldError('bio')) {
+              <span class="field-error">{{ getFieldError('bio') }}</span>
+            }
+          </div>
+
+          <!-- Specialty Dishes -->
+          <div class="list-section">
+            <h3 class="section-label">Specialty Dishes</h3>
+            <div class="item-list">
+              @for (dish of currentProfile()?.specialtyDishes ?? []; track dish; let i = $index) {
+                <div class="item-chip">
+                  <span>{{ dish }}</span>
+                  <button type="button" class="chip-remove" (click)="removeSpecialtyDish(i)">
+                    <lucide-icon [img]="X" [size]="14"></lucide-icon>
+                  </button>
+                </div>
+              }
+            </div>
+            <div class="add-row">
+              <input type="text" placeholder="Add a specialty dish" #specialtyInput (keyup.enter)="addSpecialtyDish(specialtyInput.value); specialtyInput.value = ''" />
+              <button type="button" class="btn-secondary btn-sm" (click)="addSpecialtyDish(specialtyInput.value); specialtyInput.value = ''">Add</button>
+            </div>
+          </div>
+
+          <!-- Certifications -->
+          <div class="list-section">
+            <h3 class="section-label">Certifications</h3>
+            <div class="item-list">
+              @for (cert of currentProfile()?.certifications ?? []; track cert; let i = $index) {
+                <div class="item-chip">
+                  <span>{{ cert }}</span>
+                  <button type="button" class="chip-remove" (click)="removeCertification(i)">
+                    <lucide-icon [img]="X" [size]="14"></lucide-icon>
+                  </button>
+                </div>
+              }
+            </div>
+            <div class="add-row">
+              <input type="text" placeholder="Add a certification" #certInput (keyup.enter)="addCertification(certInput.value); certInput.value = ''" />
+              <button type="button" class="btn-secondary btn-sm" (click)="addCertification(certInput.value); certInput.value = ''">Add</button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Media Section -->
+      @if (activeSection() === 'media') {
+        <div class="form-card">
+          <h2 class="card-title">Photos & Media</h2>
+
+          <!-- Profile Photo -->
+          <div class="media-group">
+            <h3 class="section-label">Profile Photo</h3>
+            @if (profilePhoto()) {
+              <div class="photo-preview">
+                <img [src]="profilePhoto()!" alt="Profile photo" />
+                <button type="button" class="remove-btn" (click)="removeProfilePhoto()">
+                  <lucide-icon [img]="X" [size]="16"></lucide-icon>
                 </button>
               </div>
-            }
-
-            @if (portfolioImages().length < constraints.MAX_PORTFOLIO_IMAGES) {
-              <label class="portfolio-upload">
-                <input
-                  type="file"
-                  accept="image/*"
-                  (change)="onFileUpload($event, 'portfolio')"
-                  hidden
-                />
+            } @else {
+              <label class="upload-label">
+                <input type="file" accept="image/*" (change)="onFileUpload($event, 'profile')" hidden />
                 <div class="upload-placeholder">
-                  <span class="upload-icon">📷</span>
-                  <span>Add Image</span>
+                  <lucide-icon [img]="Camera" class="upload-icon" [size]="28"></lucide-icon>
+                  <span>Upload Profile Photo</span>
                 </div>
               </label>
             }
           </div>
-        </div>
-      </div>
-    }
 
-    <!-- Privacy Section -->
-    @if (activeSection() === 'privacy') {
-      <div class="form-section">
-        <h2>Privacy Settings</h2>
-
-        <div class="privacy-group">
-          <h3>Profile Visibility</h3>
-          <div class="visibility-options">
-            @for (option of visibilityOptions; track option.value) {
-              <label class="visibility-option">
-                <input
-                  type="radio"
-                  formControlName="profileVisibility"
-                  [value]="option.value"
-                />
-                <div class="option-content">
-                  <span class="option-title">{{ option.label }}</span>
-                  <span class="option-description">{{ option.description }}</span>
+          <!-- Background Photo -->
+          <div class="media-group">
+            <h3 class="section-label">Background Photo</h3>
+            @if (backgroundPhoto()) {
+              <div class="bg-preview">
+                <img [src]="backgroundPhoto()!" alt="Background photo" />
+                <button type="button" class="remove-btn" (click)="removeBackgroundPhoto()">
+                  <lucide-icon [img]="X" [size]="16"></lucide-icon>
+                </button>
+              </div>
+            } @else {
+              <label class="upload-label">
+                <input type="file" accept="image/*" (change)="onFileUpload($event, 'background')" hidden />
+                <div class="upload-placeholder wide">
+                  <lucide-icon [img]="Image" class="upload-icon" [size]="28"></lucide-icon>
+                  <span>Upload Background Photo</span>
                 </div>
               </label>
             }
           </div>
-        </div>
 
-        <div class="privacy-group">
-          <h3>Information Display</h3>
-          <label class="privacy-checkbox">
-            <input type="checkbox" formControlName="showContactInfo" />
-            <span class="checkmark"></span>
-            Show contact information on public profile
-          </label>
-
-          <label class="privacy-checkbox">
-            <input type="checkbox" formControlName="showLocation" />
-            <span class="checkmark"></span>
-            Show location information
-          </label>
+          <!-- Portfolio Images -->
+          <div class="media-group">
+            <h3 class="section-label">Portfolio Images</h3>
+            <p class="media-desc">Upload up to {{ constraints.MAX_PORTFOLIO_IMAGES }} images showcasing your work</p>
+            <div class="portfolio-grid">
+              @for (image of portfolioImages(); track $index) {
+                <div class="portfolio-item">
+                  <img [src]="image" [alt]="'Portfolio image ' + ($index + 1)" />
+                  <button type="button" class="remove-btn" (click)="removePortfolioImage($index)">
+                    <lucide-icon [img]="X" [size]="16"></lucide-icon>
+                  </button>
+                </div>
+              }
+              @if (portfolioImages().length < constraints.MAX_PORTFOLIO_IMAGES) {
+                <label class="upload-label">
+                  <input type="file" accept="image/*" (change)="onFileUpload($event, 'portfolio')" hidden />
+                  <div class="upload-placeholder">
+                    <lucide-icon [img]="Camera" class="upload-icon" [size]="24"></lucide-icon>
+                    <span>Add Image</span>
+                  </div>
+                </label>
+              }
+            </div>
+          </div>
         </div>
+      }
+
+      <!-- Privacy Section -->
+      @if (activeSection() === 'privacy') {
+        <div class="form-card">
+          <h2 class="card-title">Privacy Settings</h2>
+
+          <div class="privacy-group">
+            <h3 class="section-label">Profile Visibility</h3>
+            <div class="visibility-options">
+              @for (option of visibilityOptions; track option.value) {
+                <label class="radio-option">
+                  <input type="radio" formControlName="profileVisibility" [value]="option.value" />
+                  <div class="option-content">
+                    <span class="option-title">{{ option.label }}</span>
+                    <span class="option-desc">{{ option.description }}</span>
+                  </div>
+                </label>
+              }
+            </div>
+          </div>
+
+          <div class="privacy-group">
+            <h3 class="section-label">Information Display</h3>
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="showContactInfo" />
+              <span>Show contact information on public profile</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="showLocation" />
+              <span>Show location information</span>
+            </label>
+          </div>
+        </div>
+      }
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="loadProfile()">Reset Changes</button>
+        <button type="submit" class="btn-primary" [disabled]="isLoading() || profileForm.invalid">
+          @if (isLoading()) {
+            <span class="spinner-small"></span>
+            Saving...
+          } @else {
+            <lucide-icon [img]="Save" class="btn-icon"></lucide-icon>
+            Save Profile
+          }
+        </button>
       </div>
-    }
-
-    <!-- Form Actions -->
-    <div class="form-actions">
-      <button
-        type="button"
-        class="secondary-button"
-        (click)="loadProfile()"
-      >
-        Reset Changes
-      </button>
-
-      <button
-        type="submit"
-        class="primary-button"
-        [disabled]="isLoading() || profileForm.invalid"
-      >
-        @if (isLoading()) {
-          <span class="loading-spinner"></span>
-          Saving...
-        } @else {
-          Save Profile
-        }
-      </button>
-    </div>
-  </form>
+    </form>
+  </div>
 </div>

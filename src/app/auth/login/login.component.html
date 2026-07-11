@@ -1,202 +1,133 @@
-<div class="login-container">
-  <div class="home-button-container">
-    <a routerLink="/" class="home-button">
-      🏠 Home
-    </a>
+<div class="auth-page">
+  <div class="auth-brand">
+    <div class="brand-bg">
+      <div class="bg-blob bg-blob-1"></div>
+      <div class="bg-blob bg-blob-2"></div>
+      <div class="bg-blob bg-blob-3"></div>
+    </div>
+    <div class="brand-content">
+      <a routerLink="/" class="brand-logo">
+        <img src="assets/images/itiyum-logo.jpeg" alt="Itiyum" />
+      </a>
+      <h2 class="brand-title">Welcome Back</h2>
+      <p class="brand-subtitle">Sign in to continue your culinary journey</p>
+      <div class="brand-features">
+        <div class="feature-item">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M3 3v18h2V3z"/><path d="M21 3v18h2V3z"/><path d="M12 3v18"/><path d="M7 3h10"/><path d="M7 21h10"/></svg></div>
+          <span>Discover restaurants</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <span>Book top specialists</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <span>Join the community</span>
+        </div>
+      </div>
+      <a routerLink="/" class="back-home-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Back to Home
+      </a>
+    </div>
   </div>
-  <div class="login-card">
-    <div class="login-header">
-      <h1>Welcome back to <span class="itiyum-brand">Itiyum</span></h1>
-      <p>Sign in to your account to continue</p>
-    </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <!-- Error Message -->
-      @if (errorMessage()) {
-        <div class="error-message">
-          <span class="error-icon">⚠️</span>
-          {{ errorMessage() }}
+  <div class="auth-form-wrapper">
+    <div class="auth-form-container">
+      <div class="form-card">
+        <div class="form-header">
+          <h1 class="form-title">Sign In</h1>
+          <p class="form-subtitle">Don't have an account? <a routerLink="/register">Create one</a></p>
         </div>
-      }
 
-      <!-- Email Field -->
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="Enter your email"
-          [class.error]="getFieldError('email')"
-          autocomplete="email"
-        />
-        @if (getFieldError('email')) {
-          <span class="field-error">{{ getFieldError('email') }}</span>
+        @if (errorMessage()) {
+          <div class="error-message">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {{ errorMessage() }}
+          </div>
         }
-      </div>
 
-      <!-- Password Field -->
-      <div class="form-group">
-        <label for="password">Password</label>
-        <div class="password-input">
-          <input
-            id="password"
-            [type]="showPassword() ? 'text' : 'password'"
-            formControlName="password"
-            placeholder="Enter your password"
-            [class.error]="getFieldError('password')"
-            autocomplete="current-password"
-          />
-          <button
-            type="button"
-            class="password-toggle"
-            (click)="togglePasswordVisibility()"
-            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
-          >
-            {{ showPassword() ? '👁️' : '👁️‍🗨️' }}
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                placeholder="you@example.com"
+                [class.error]="getFieldError('email')"
+                autocomplete="email"
+              />
+            </div>
+            @if (getFieldError('email')) {
+              <span class="field-error">{{ getFieldError('email') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <input
+                id="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Enter your password"
+                [class.error]="getFieldError('password')"
+                autocomplete="current-password"
+              />
+              <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+                @if (showPassword()) {
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                } @else {
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+            @if (getFieldError('password')) {
+              <span class="field-error">{{ getFieldError('password') }}</span>
+            }
+          </div>
+
+          <div class="form-options">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="rememberMe" />
+              <span class="checkmark"></span>
+              Remember me
+            </label>
+            <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="isLoading() || loginForm.invalid">
+            @if (isLoading()) {
+              <span class="btn-spinner"></span>
+              Signing in...
+            } @else {
+              Sign In
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+              </svg>
+            }
           </button>
-        </div>
-        @if (getFieldError('password')) {
-          <span class="field-error">{{ getFieldError('password') }}</span>
-        }
+        </form>
       </div>
-
-      <!-- Remember Me & Forgot Password -->
-      <div class="form-options">
-        <label class="checkbox-label">
-          <input type="checkbox" formControlName="rememberMe" />
-          <span class="checkmark"></span>
-          Remember me
-        </label>
-        <a routerLink="/auth/forgot-password" class="forgot-password">
-          Forgot password?
-        </a>
-      </div>
-
-      <!-- Submit Button -->
-      <button
-        type="submit"
-        class="login-button"
-        [disabled]="isLoading() || loginForm.invalid"
-      >
-        @if (isLoading()) {
-          <span class="loading-spinner"></span>
-          Signing in...
-        } @else {
-          Sign In
-        }
-      </button>
-    </form>
-
-    <!-- Sign Up Link -->
-    <div class="signup-link">
-      <p>Don't have an account?
-        <a routerLink="/auth/register">Sign up here</a>
-      </p>
     </div>
-
-    <!-- Social Login - TEMPORARILY HIDDEN UNTIL OAUTH CREDENTIALS ARE CONFIGURED -->
-    <!-- Uncomment this section once OAuth providers are set up in production -->
-    <!--
-    <div class="social-login">
-      <div class="divider">
-        <span>or continue with</span>
-      </div>
-
-      <div class="social-buttons-grid">
-        <button type="button" class="social-button google" (click)="loginWithGoogle()">
-          <span class="social-icon">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
-              <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
-              <path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.593.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9c0 1.452.348 2.827.957 4.042l3.007-2.335z" fill="#FBBC05"/>
-              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-            </svg>
-          </span>
-          Google
-        </button>
-
-        <button type="button" class="social-button facebook" (click)="loginWithFacebook()">
-          <span class="social-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-            </svg>
-          </span>
-          Facebook
-        </button>
-
-        <button type="button" class="social-button microsoft" (click)="loginWithMicrosoft()">
-          <span class="social-icon">
-            <svg width="18" height="18" viewBox="0 0 23 23" fill="none">
-              <path d="M0 0h11v11H0z" fill="#F25022"/>
-              <path d="M12 0h11v11H12z" fill="#7FBA00"/>
-              <path d="M0 12h11v11H0z" fill="#00A4EF"/>
-              <path d="M12 12h11v11H12z" fill="#FFB900"/>
-            </svg>
-          </span>
-          Microsoft
-        </button>
-
-        <button type="button" class="social-button apple" (click)="loginWithApple()">
-          <span class="social-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-            </svg>
-          </span>
-          Apple
-        </button>
-      </div>
-
-      <div class="social-buttons-secondary">
-        <button type="button" class="social-button-small twitter" (click)="loginWithTwitter()">
-          <span class="social-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-            </svg>
-          </span>
-          X (Twitter)
-        </button>
-
-        <button type="button" class="social-button-small linkedin" (click)="loginWithLinkedIn()">
-          <span class="social-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#0A66C2">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-            </svg>
-          </span>
-          LinkedIn
-        </button>
-
-        <button type="button" class="social-button-small github" (click)="loginWithGitHub()">
-          <span class="social-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
-          </span>
-          GitHub
-        </button>
-
-        <button type="button" class="social-button-small instagram" (click)="loginWithInstagram()">
-          <span class="social-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
-              <defs>
-                <linearGradient id="instagram-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" style="stop-color:#FD5949;stop-opacity:1" />
-                  <stop offset="50%" style="stop-color:#D6249F;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#285AEB;stop-opacity:1" />
-                </linearGradient>
-              </defs>
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-            </svg>
-          </span>
-          Instagram
-        </button>
-      </div>
-
-      <p class="social-note">
-        <span class="note-icon">🔐</span>
-        Secure authentication powered by OAuth 2.0
-      </p>
-    </div>
-    -->
   </div>
 </div>

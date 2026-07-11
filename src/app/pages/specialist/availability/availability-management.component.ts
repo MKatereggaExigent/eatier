@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LucideAngularModule, Calendar, CalendarDays, Settings as SettingsIcon, Edit, Trash2, CheckCircle, XCircle, PartyPopper, ClipboardList, Clock } from 'lucide-angular';
+import { LucideAngularModule, Sun, Calendar, CalendarDays, Settings as SettingsIcon, Edit, Trash2, CheckCircle, XCircle, PartyPopper, ClipboardList, Clock, Plus, Save, ChevronLeft, ChevronRight, X } from 'lucide-angular';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { Specialist } from '../../../shared/models/user.model';
@@ -45,7 +45,7 @@ interface BookingRule {
   styleUrls: ['./availability-management.component.scss']
 })
 export class AvailabilityManagementComponent {
-  // Lucide Icons
+  readonly Sun = Sun;
   readonly Calendar = Calendar;
   readonly CalendarDays = CalendarDays;
   readonly SettingsIcon = SettingsIcon;
@@ -56,13 +56,18 @@ export class AvailabilityManagementComponent {
   readonly PartyPopper = PartyPopper;
   readonly ClipboardList = ClipboardList;
   readonly Clock = Clock;
+  readonly Plus = Plus;
+  readonly Save = Save;
+  readonly ChevronLeft = ChevronLeft;
+  readonly ChevronRight = ChevronRight;
+  readonly X = X;
+
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
 
   currentUser = this.authService.currentUser;
   specialist = computed(() => this.currentUser() as Specialist);
 
-  // State management
   loading = signal(false);
   activeTab = signal<'weekly' | 'special' | 'rules' | 'calendar'>('weekly');
   showSpecialDateModal = signal(false);
@@ -70,7 +75,6 @@ export class AvailabilityManagementComponent {
   selectedSpecialDate = signal<SpecialDate | null>(null);
   selectedRule = signal<BookingRule | null>(null);
 
-  // Weekly availability
   weeklyAvailability = signal<DayAvailability[]>([
     {
       day: 'monday',
@@ -133,7 +137,6 @@ export class AvailabilityManagementComponent {
     }
   ]);
 
-  // Special dates
   specialDates = signal<SpecialDate[]>([
     {
       id: '1',
@@ -161,7 +164,6 @@ export class AvailabilityManagementComponent {
     }
   ]);
 
-  // Booking rules
   bookingRules = signal<BookingRule[]>([
     {
       id: '1',
@@ -197,11 +199,9 @@ export class AvailabilityManagementComponent {
     }
   ]);
 
-  // Forms
   specialDateForm: FormGroup;
   ruleForm: FormGroup;
 
-  // Calendar data
   currentMonth = signal(new Date());
   calendarDays = computed(() => this.generateCalendarDays());
 
@@ -223,15 +223,13 @@ export class AvailabilityManagementComponent {
     });
   }
 
-  // Tab management
   setActiveTab(tab: 'weekly' | 'special' | 'rules' | 'calendar'): void {
     this.activeTab.set(tab);
   }
 
-  // Weekly availability management
   toggleDayEnabled(dayIndex: number): void {
     const availability = this.weeklyAvailability();
-    const updatedAvailability = availability.map((day, index) => 
+    const updatedAvailability = availability.map((day, index) =>
       index === dayIndex ? { ...day, isEnabled: !day.isEnabled } : day
     );
     this.weeklyAvailability.set(updatedAvailability);
@@ -245,9 +243,9 @@ export class AvailabilityManagementComponent {
       endTime: '17:00',
       isAvailable: true
     };
-    
-    const updatedAvailability = availability.map((day, index) => 
-      index === dayIndex 
+
+    const updatedAvailability = availability.map((day, index) =>
+      index === dayIndex
         ? { ...day, timeSlots: [...day.timeSlots, newSlot] }
         : day
     );
@@ -256,8 +254,8 @@ export class AvailabilityManagementComponent {
 
   removeTimeSlot(dayIndex: number, slotId: string): void {
     const availability = this.weeklyAvailability();
-    const updatedAvailability = availability.map((day, index) => 
-      index === dayIndex 
+    const updatedAvailability = availability.map((day, index) =>
+      index === dayIndex
         ? { ...day, timeSlots: day.timeSlots.filter(slot => slot.id !== slotId) }
         : day
     );
@@ -266,11 +264,11 @@ export class AvailabilityManagementComponent {
 
   updateTimeSlot(dayIndex: number, slotId: string, field: 'startTime' | 'endTime', value: string): void {
     const availability = this.weeklyAvailability();
-    const updatedAvailability = availability.map((day, index) => 
-      index === dayIndex 
+    const updatedAvailability = availability.map((day, index) =>
+      index === dayIndex
         ? {
-            ...day, 
-            timeSlots: day.timeSlots.map(slot => 
+            ...day,
+            timeSlots: day.timeSlots.map(slot =>
               slot.id === slotId ? { ...slot, [field]: value } : slot
             )
           }
@@ -281,11 +279,11 @@ export class AvailabilityManagementComponent {
 
   toggleTimeSlotAvailability(dayIndex: number, slotId: string): void {
     const availability = this.weeklyAvailability();
-    const updatedAvailability = availability.map((day, index) => 
-      index === dayIndex 
+    const updatedAvailability = availability.map((day, index) =>
+      index === dayIndex
         ? {
-            ...day, 
-            timeSlots: day.timeSlots.map(slot => 
+            ...day,
+            timeSlots: day.timeSlots.map(slot =>
               slot.id === slotId ? { ...slot, isAvailable: !slot.isAvailable } : slot
             )
           }
@@ -294,7 +292,6 @@ export class AvailabilityManagementComponent {
     this.weeklyAvailability.set(updatedAvailability);
   }
 
-  // Special dates management
   openSpecialDateModal(specialDate?: SpecialDate): void {
     if (specialDate) {
       this.selectedSpecialDate.set(specialDate);
@@ -322,7 +319,7 @@ export class AvailabilityManagementComponent {
     if (this.specialDateForm.valid) {
       const formData = this.specialDateForm.value;
       const selectedDate = this.selectedSpecialDate();
-      
+
       const specialDate: SpecialDate = {
         id: selectedDate?.id || Date.now().toString(),
         date: new Date(formData.date),
@@ -334,14 +331,12 @@ export class AvailabilityManagementComponent {
       };
 
       if (selectedDate) {
-        // Update existing
         const dates = this.specialDates().map(d => d.id === selectedDate.id ? specialDate : d);
         this.specialDates.set(dates);
       } else {
-        // Add new
         this.specialDates.set([...this.specialDates(), specialDate]);
       }
-      
+
       this.closeSpecialDateModal();
     }
   }
@@ -353,7 +348,6 @@ export class AvailabilityManagementComponent {
     }
   }
 
-  // Booking rules management
   openRuleModal(rule?: BookingRule): void {
     if (rule) {
       this.selectedRule.set(rule);
@@ -381,7 +375,7 @@ export class AvailabilityManagementComponent {
     if (this.ruleForm.valid) {
       const formData = this.ruleForm.value;
       const selectedRule = this.selectedRule();
-      
+
       const rule: BookingRule = {
         id: selectedRule?.id || Date.now().toString(),
         name: formData.name,
@@ -392,14 +386,12 @@ export class AvailabilityManagementComponent {
       };
 
       if (selectedRule) {
-        // Update existing
         const rules = this.bookingRules().map(r => r.id === selectedRule.id ? rule : r);
         this.bookingRules.set(rules);
       } else {
-        // Add new
         this.bookingRules.set([...this.bookingRules(), rule]);
       }
-      
+
       this.closeRuleModal();
     }
   }
@@ -412,13 +404,12 @@ export class AvailabilityManagementComponent {
   }
 
   toggleRuleEnabled(ruleId: string): void {
-    const rules = this.bookingRules().map(r => 
+    const rules = this.bookingRules().map(r =>
       r.id === ruleId ? { ...r, isEnabled: !r.isEnabled } : r
     );
     this.bookingRules.set(rules);
   }
 
-  // Calendar management
   previousMonth(): void {
     const current = this.currentMonth();
     const previous = new Date(current.getFullYear(), current.getMonth() - 1, 1);
@@ -435,22 +426,22 @@ export class AvailabilityManagementComponent {
     const current = this.currentMonth();
     const year = current.getFullYear();
     const month = current.getMonth();
-    
+
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
-    
+
     const days = [];
     const currentDate = new Date(startDate);
-    
+
     for (let i = 0; i < 42; i++) {
       const isCurrentMonth = currentDate.getMonth() === month;
       const isToday = this.isSameDay(currentDate, new Date());
       const specialDate = this.specialDates().find(sd => this.isSameDay(sd.date, currentDate));
       const dayOfWeek = currentDate.getDay();
       const weeklyAvail = this.weeklyAvailability()[dayOfWeek === 0 ? 6 : dayOfWeek - 1];
-      
+
       days.push({
         date: new Date(currentDate),
         day: currentDate.getDate(),
@@ -460,10 +451,10 @@ export class AvailabilityManagementComponent {
         specialDate,
         weeklyAvailable: weeklyAvail?.isEnabled
       });
-      
+
       currentDate.setDate(currentDate.getDate() + 1);
     }
-    
+
     return days;
   }
 
@@ -473,7 +464,6 @@ export class AvailabilityManagementComponent {
            date1.getDate() === date2.getDate();
   }
 
-  // Utility methods
   formatDate(date: Date): string {
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
@@ -511,14 +501,12 @@ export class AvailabilityManagementComponent {
 
   saveAllChanges(): void {
     this.loading.set(true);
-    // Simulate API call
     setTimeout(() => {
       this.loading.set(false);
       console.log('Availability settings saved successfully');
     }, 1000);
   }
 
-  // Get today's date in YYYY-MM-DD format for date input min attribute
   getTodayDate(): string {
     return new Date().toISOString().split('T')[0];
   }

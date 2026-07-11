@@ -1,19 +1,15 @@
-<div class="user-reviews" role="main" aria-label="My Reviews">
-  <!-- Header Section -->
-  <header class="reviews-header">
-    <div class="header-content">
-      <div class="title-section">
-        <h1 class="page-title">My Reviews</h1>
-        <p class="page-subtitle">Manage your restaurant reviews and share your dining experiences</p>
+<div class="section">
+  <div class="section-inner">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-text">
+        <h1 class="section-title">My Reviews</h1>
+        <p class="tag">Manage your restaurant reviews and share your dining experiences</p>
       </div>
-      <div class="header-actions">
-        <button type="button" class="btn-primary" (click)="openNewReviewModal()">Write Review</button>
-      </div>
+      <button type="button" class="btn-primary" (click)="openNewReviewModal()">Write Review</button>
     </div>
-  </header>
 
-  <!-- Stats Overview -->
-  <section class="stats-overview" aria-label="Review Statistics">
+    <!-- Stats Overview -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-value">{{ reviewStats().totalReviews }}</div>
@@ -24,7 +20,7 @@
         <div class="stat-label">Average Rating</div>
         <div class="rating-stars">
           @for (star of getStarArray(reviewStats().averageRating || 0); track $index) {
-            <span class="star" [class.filled]="star">★</span>
+            <lucide-icon [img]="Star" [size]="14" [class.filled]="star" class="star-icon"></lucide-icon>
           }
         </div>
       </div>
@@ -33,20 +29,18 @@
         <div class="stat-label">Helpful Votes</div>
       </div>
     </div>
-  </section>
 
-  <!-- Filters and Search -->
-  <section class="filters-section" aria-label="Review Filters">
-    <div class="filters-container">
+    <!-- Filters -->
+    <div class="filters-section">
       <div class="search-box">
+        <lucide-icon [img]="Search" [size]="18" class="search-icon"></lucide-icon>
         <input
           type="text"
           placeholder="Search reviews..."
-          [(ngModel)]="searchQuery"
+          [ngModel]="searchQuery()"
           (ngModelChange)="searchQuery.set($event)"
           class="search-input">
       </div>
-
       <div class="filter-controls">
         <select
           [value]="filters().status"
@@ -57,7 +51,6 @@
           <option value="draft">Draft</option>
           <option value="archived">Archived</option>
         </select>
-
         <select
           [value]="filters().rating"
           (change)="updateFilters({ rating: $any($event.target).value })"
@@ -69,7 +62,6 @@
           <option value="2">2 Stars</option>
           <option value="1">1 Star</option>
         </select>
-
         <select
           [value]="filters().timeRange"
           (change)="updateFilters({ timeRange: $any($event.target).value })"
@@ -80,7 +72,6 @@
           <option value="3months">Last 3 Months</option>
           <option value="year">This Year</option>
         </select>
-
         <select
           [value]="filters().sortBy"
           (change)="updateFilters({ sortBy: $any($event.target).value })"
@@ -91,21 +82,19 @@
           <option value="rating_low">Lowest Rated</option>
           <option value="helpful">Most Helpful</option>
         </select>
-
-        <button type="button" class="btn-clear" (click)="clearFilters()">Clear</button>
+        <button type="button" class="btn-link" (click)="clearFilters()">Clear</button>
       </div>
     </div>
-  </section>
 
-  <!-- Reviews List -->
-  <section class="reviews-list" aria-label="Reviews List">
+    <!-- Reviews List -->
     @if (isLoading()) {
       <div class="loading-state">
-        <div class="loading-spinner"></div>
+        <div class="spinner"></div>
         <p>Loading your reviews...</p>
       </div>
     } @else if (filteredReviews().length === 0) {
       <div class="empty-state">
+        <lucide-icon [img]="Star" [size]="48" class="empty-icon"></lucide-icon>
         <h3>No reviews found</h3>
         @if (searchQuery() || filters().status !== 'all' || filters().rating !== 'all') {
           <p>Try adjusting your filters or search terms</p>
@@ -116,46 +105,50 @@
         }
       </div>
     } @else {
-      <div class="reviews-grid">
+      <div class="reviews-list">
         @for (review of filteredReviews(); track review.id) {
-          <article class="review-card" [class]="getStatusColor(review.status)">
-            <!-- Review Header -->
+          <div class="review-card">
             <div class="review-header">
               <div class="restaurant-info">
                 <div class="restaurant-avatar">{{ (review.businessName || 'R').charAt(0) }}</div>
                 <div class="restaurant-details">
-                  <h3 class="restaurant-name">{{ review.businessName }}</h3>
+                  <h3>{{ review.businessName }}</h3>
                   <div class="review-meta">
                     @if (review.visitDate) {
-                      <span class="visit-date">{{ formatDate(review.visitDate) }}</span>
+                      <span>{{ formatDate(review.visitDate) }}</span>
                     }
                     @if (review.businessType) {
-                      <span class="business-type">{{ review.businessType }}</span>
+                      <span>{{ review.businessType }}</span>
                     }
                   </div>
                 </div>
               </div>
-              <div class="review-actions">
+              <div class="review-actions-top">
                 <span class="status-badge" [class]="getStatusColor(review.status)">{{ review.status | titlecase }}</span>
-                <div class="action-menu">
-                  <button type="button" class="action-btn" (click)="editReview(review)">Edit</button>
-                  <button type="button" class="action-btn delete" (click)="deleteReview(review.id)">Delete</button>
+                <div class="action-buttons">
+                  <button type="button" class="btn-icon" (click)="editReview(review)" title="Edit">
+                    <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
+                  </button>
+                  <button type="button" class="btn-icon btn-icon-danger" (click)="deleteReview(review.id)" title="Delete">
+                    <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
+                  </button>
                 </div>
               </div>
             </div>
 
-            <!-- Review Content -->
             <div class="review-content">
               <div class="review-rating">
-                <div class="overall-rating">
+                <div class="stars">
                   @for (star of getStarArray(review.rating); track $index) {
-                    <span class="star" [class.filled]="star">★</span>
+                    <lucide-icon [img]="Star" [size]="16" [class.filled]="star" class="star-icon"></lucide-icon>
                   }
                   <span class="rating-value">{{ review.rating }}/5</span>
                 </div>
               </div>
 
-              <h4 class="review-title">{{ review.title }}</h4>
+              @if (review.title) {
+                <h4 class="review-title">{{ review.title }}</h4>
+              }
               <p class="review-text">{{ review.comment }}</p>
 
               @if (review.images && review.images.length > 0) {
@@ -167,23 +160,22 @@
               }
             </div>
 
-            <!-- Review Footer -->
             <div class="review-footer">
               <div class="review-stats">
                 <span class="helpful-votes">{{ review.helpfulCount }} helpful</span>
                 @if (review.wouldRecommend) {
-                  <span class="recommend">Recommends</span>
+                  <span class="recommend-badge">
+                    <lucide-icon [img]="Check" [size]="14"></lucide-icon> Recommends
+                  </span>
                 }
               </div>
-              <div class="review-dates">
-                <span class="created-date">{{ formatDate(review.createdAt) }}</span>
-              </div>
+              <span class="review-date">{{ formatDate(review.createdAt) }}</span>
             </div>
-          </article>
+          </div>
         }
       </div>
     }
-  </section>
+  </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -191,16 +183,23 @@
   <div class="modal-overlay" (click)="cancelDelete()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Delete Review</h3>
-        <button type="button" class="modal-close" (click)="cancelDelete()">×</button>
+        <h2>Delete Review</h2>
+        <button type="button" class="close-btn" (click)="cancelDelete()">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to delete your review for <strong>{{ selectedReview()?.businessName }}</strong>?</p>
-        <p class="warning-text">This action cannot be undone.</p>
+        <div class="modal-warning">
+          <lucide-icon [img]="AlertTriangle" [size]="24" class="warning-icon"></lucide-icon>
+          <div>
+            <p>Are you sure you want to delete your review for <strong>{{ selectedReview()?.businessName }}</strong>?</p>
+            <p class="warning-text">This action cannot be undone.</p>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn-secondary" (click)="cancelDelete()" [disabled]="deleting()">Cancel</button>
-        <button type="button" class="btn-danger" (click)="confirmDelete()" [disabled]="deleting()">
+        <button type="button" class="btn-primary" (click)="confirmDelete()" [disabled]="deleting()">
           {{ deleting() ? 'Deleting...' : 'Delete' }}
         </button>
       </div>
@@ -213,15 +212,17 @@
   <div class="modal-overlay" (click)="closeNewReviewModal()">
     <div class="modal-content large" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Write New Review</h3>
-        <button type="button" class="modal-close" (click)="closeNewReviewModal()">×</button>
+        <h2>Write New Review</h2>
+        <button type="button" class="close-btn" (click)="closeNewReviewModal()">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
       </div>
       <div class="modal-body">
-        <!-- Business Dropdown -->
+        <!-- Business Select -->
         <div class="form-group">
           <label>Select Restaurant *</label>
           @if (loadingBusinesses()) {
-            <div class="loading-text">Loading restaurants...</div>
+            <div class="loading-placeholder">Loading restaurants...</div>
           } @else {
             <select
               class="form-select"
@@ -235,75 +236,84 @@
           }
         </div>
 
-        <!-- Detailed Ratings (weights shown) -->
+        <!-- Ratings -->
         <div class="ratings-section">
           <label class="section-label">Rate Your Experience *</label>
           <p class="section-hint">Rate at least one category. Overall rating is calculated automatically.</p>
 
-          <div class="detailed-ratings-grid">
+          <div class="ratings-grid">
             <div class="rating-item">
               <label>Food <span class="weight">(30%)</span></label>
-              <div class="mini-star-rating">
+              <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button type="button" class="star-btn small"
-                          [class.filled]="star <= newReviewForm().foodRating"
-                          (click)="setNewReviewRating('foodRating', star)">★</button>
+                  <button type="button" class="star-btn"
+                    [class.filled]="star <= newReviewForm().foodRating"
+                    (click)="setNewReviewRating('foodRating', star)">
+                    <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= newReviewForm().foodRating"></lucide-icon>
+                  </button>
                 }
               </div>
             </div>
             <div class="rating-item">
               <label>Service <span class="weight">(30%)</span></label>
-              <div class="mini-star-rating">
+              <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button type="button" class="star-btn small"
-                          [class.filled]="star <= newReviewForm().serviceRating"
-                          (click)="setNewReviewRating('serviceRating', star)">★</button>
+                  <button type="button" class="star-btn"
+                    [class.filled]="star <= newReviewForm().serviceRating"
+                    (click)="setNewReviewRating('serviceRating', star)">
+                    <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= newReviewForm().serviceRating"></lucide-icon>
+                  </button>
                 }
               </div>
             </div>
             <div class="rating-item">
               <label>Hygiene <span class="weight">(20%)</span></label>
-              <div class="mini-star-rating">
+              <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button type="button" class="star-btn small"
-                          [class.filled]="star <= newReviewForm().hygieneRating"
-                          (click)="setNewReviewRating('hygieneRating', star)">★</button>
+                  <button type="button" class="star-btn"
+                    [class.filled]="star <= newReviewForm().hygieneRating"
+                    (click)="setNewReviewRating('hygieneRating', star)">
+                    <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= newReviewForm().hygieneRating"></lucide-icon>
+                  </button>
                 }
               </div>
             </div>
             <div class="rating-item">
               <label>Value <span class="weight">(10%)</span></label>
-              <div class="mini-star-rating">
+              <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button type="button" class="star-btn small"
-                          [class.filled]="star <= newReviewForm().valueRating"
-                          (click)="setNewReviewRating('valueRating', star)">★</button>
+                  <button type="button" class="star-btn"
+                    [class.filled]="star <= newReviewForm().valueRating"
+                    (click)="setNewReviewRating('valueRating', star)">
+                    <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= newReviewForm().valueRating"></lucide-icon>
+                  </button>
                 }
               </div>
             </div>
             <div class="rating-item">
               <label>Ambiance <span class="weight">(10%)</span></label>
-              <div class="mini-star-rating">
+              <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button type="button" class="star-btn small"
-                          [class.filled]="star <= newReviewForm().ambianceRating"
-                          (click)="setNewReviewRating('ambianceRating', star)">★</button>
+                  <button type="button" class="star-btn"
+                    [class.filled]="star <= newReviewForm().ambianceRating"
+                    (click)="setNewReviewRating('ambianceRating', star)">
+                    <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= newReviewForm().ambianceRating"></lucide-icon>
+                  </button>
                 }
               </div>
             </div>
           </div>
 
-          <!-- Calculated Overall Rating Display -->
           <div class="calculated-rating">
-            <span class="label">Overall Rating:</span>
-            <span class="rating-value" [class.has-rating]="calculatedNewReviewRating() > 0">
-              {{ calculatedNewReviewRating() > 0 ? calculatedNewReviewRating().toFixed(1) : '—' }} / 5
+            <span class="calc-label">Overall Rating:</span>
+            <span class="calc-value" [class.active]="calculatedNewReviewRating() > 0">
+              {{ calculatedNewReviewRating() > 0 ? calculatedNewReviewRating().toFixed(1) : '&mdash;' }} / 5
             </span>
-            <span class="rating-stars">
+            <div class="calc-stars">
               @for (star of ratingStars; track star) {
-                <span class="star" [class.filled]="star <= calculatedNewReviewRating()">★</span>
+                <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= calculatedNewReviewRating()"></lucide-icon>
               }
-            </span>
+            </div>
           </div>
         </div>
 
@@ -329,7 +339,7 @@
             rows="4"></textarea>
         </div>
 
-        <!-- Visit Date -->
+        <!-- Visit Date & Recommend -->
         <div class="form-row">
           <div class="form-group">
             <label>Visit Date</label>
@@ -341,7 +351,7 @@
               class="form-input">
           </div>
           <div class="form-group checkbox-group">
-            <label>
+            <label class="checkbox-label">
               <input
                 type="checkbox"
                 [checked]="newReviewForm().wouldRecommend"
@@ -370,8 +380,10 @@
   <div class="modal-overlay" (click)="closeEditModal()">
     <div class="modal-content large" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Edit Review</h3>
-        <button type="button" class="modal-close" (click)="closeEditModal()">×</button>
+        <h2>Edit Review</h2>
+        <button type="button" class="close-btn" (click)="closeEditModal()">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
       </div>
       <div class="modal-body">
         <!-- Business Name (read-only) -->
@@ -380,75 +392,84 @@
           <div class="business-display">{{ selectedReview()?.businessName }}</div>
         </div>
 
-        <!-- Detailed Ratings (weights shown) -->
+        <!-- Ratings -->
         <div class="ratings-section">
           <label class="section-label">Rate Your Experience *</label>
           <p class="section-hint">Rate at least one category. Overall rating is calculated automatically.</p>
 
-          <div class="detailed-ratings-grid">
+          <div class="ratings-grid">
             <div class="rating-item">
               <label>Food <span class="weight">(30%)</span></label>
-              <div class="mini-star-rating">
+              <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button type="button" class="star-btn small"
-                          [class.filled]="star <= editReviewForm().foodRating"
-                          (click)="setEditReviewRating('foodRating', star)">★</button>
+                  <button type="button" class="star-btn"
+                    [class.filled]="star <= editReviewForm().foodRating"
+                    (click)="setEditReviewRating('foodRating', star)">
+                    <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= editReviewForm().foodRating"></lucide-icon>
+                  </button>
                 }
               </div>
             </div>
             <div class="rating-item">
               <label>Service <span class="weight">(30%)</span></label>
-              <div class="mini-star-rating">
+              <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button type="button" class="star-btn small"
-                          [class.filled]="star <= editReviewForm().serviceRating"
-                          (click)="setEditReviewRating('serviceRating', star)">★</button>
+                  <button type="button" class="star-btn"
+                    [class.filled]="star <= editReviewForm().serviceRating"
+                    (click)="setEditReviewRating('serviceRating', star)">
+                    <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= editReviewForm().serviceRating"></lucide-icon>
+                  </button>
                 }
               </div>
             </div>
             <div class="rating-item">
               <label>Hygiene <span class="weight">(20%)</span></label>
-              <div class="mini-star-rating">
+              <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button type="button" class="star-btn small"
-                          [class.filled]="star <= editReviewForm().hygieneRating"
-                          (click)="setEditReviewRating('hygieneRating', star)">★</button>
+                  <button type="button" class="star-btn"
+                    [class.filled]="star <= editReviewForm().hygieneRating"
+                    (click)="setEditReviewRating('hygieneRating', star)">
+                    <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= editReviewForm().hygieneRating"></lucide-icon>
+                  </button>
                 }
               </div>
             </div>
             <div class="rating-item">
               <label>Value <span class="weight">(10%)</span></label>
-              <div class="mini-star-rating">
+              <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button type="button" class="star-btn small"
-                          [class.filled]="star <= editReviewForm().valueRating"
-                          (click)="setEditReviewRating('valueRating', star)">★</button>
+                  <button type="button" class="star-btn"
+                    [class.filled]="star <= editReviewForm().valueRating"
+                    (click)="setEditReviewRating('valueRating', star)">
+                    <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= editReviewForm().valueRating"></lucide-icon>
+                  </button>
                 }
               </div>
             </div>
             <div class="rating-item">
               <label>Ambiance <span class="weight">(10%)</span></label>
-              <div class="mini-star-rating">
+              <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button type="button" class="star-btn small"
-                          [class.filled]="star <= editReviewForm().ambianceRating"
-                          (click)="setEditReviewRating('ambianceRating', star)">★</button>
+                  <button type="button" class="star-btn"
+                    [class.filled]="star <= editReviewForm().ambianceRating"
+                    (click)="setEditReviewRating('ambianceRating', star)">
+                    <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= editReviewForm().ambianceRating"></lucide-icon>
+                  </button>
                 }
               </div>
             </div>
           </div>
 
-          <!-- Calculated Overall Rating Display -->
           <div class="calculated-rating">
-            <span class="label">Overall Rating:</span>
-            <span class="rating-value" [class.has-rating]="calculatedEditReviewRating() > 0">
-              {{ calculatedEditReviewRating() > 0 ? calculatedEditReviewRating().toFixed(1) : '—' }} / 5
+            <span class="calc-label">Overall Rating:</span>
+            <span class="calc-value" [class.active]="calculatedEditReviewRating() > 0">
+              {{ calculatedEditReviewRating() > 0 ? calculatedEditReviewRating().toFixed(1) : '&mdash;' }} / 5
             </span>
-            <span class="rating-stars">
+            <div class="calc-stars">
               @for (star of ratingStars; track star) {
-                <span class="star" [class.filled]="star <= calculatedEditReviewRating()">★</span>
+                <lucide-icon [img]="Star" [size]="18" [class.filled]="star <= calculatedEditReviewRating()"></lucide-icon>
               }
-            </span>
+            </div>
           </div>
         </div>
 
@@ -474,7 +495,7 @@
             rows="4"></textarea>
         </div>
 
-        <!-- Visit Date -->
+        <!-- Visit Date & Recommend -->
         <div class="form-row">
           <div class="form-group">
             <label>Visit Date</label>
@@ -486,7 +507,7 @@
               class="form-input">
           </div>
           <div class="form-group checkbox-group">
-            <label>
+            <label class="checkbox-label">
               <input
                 type="checkbox"
                 [checked]="editReviewForm().wouldRecommend"

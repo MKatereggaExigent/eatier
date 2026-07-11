@@ -1,5 +1,5 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LucideAngularModule, Search, ShoppingCart, Bell, User as UserIcon, Key, UserPlus, Hand, LayoutDashboard, Settings, LogOut, MessageSquare, HelpCircle, Lock } from 'lucide-angular';
 
 import { AuthService } from './services/auth.service';
@@ -43,7 +43,7 @@ interface NavItem {
     LucideAngularModule
   ]
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnDestroy {
   // Lucide Icons
   readonly Search = Search;
   readonly ShoppingCart = ShoppingCart;
@@ -72,6 +72,15 @@ export class LayoutComponent {
   showSearchModal = signal(false);
   showNotifications = signal(false);
   showMobileMenu = signal(false);
+  isScrolled = signal(false);
+
+  // Full-width layout for marketing pages (no sidebar ads)
+  private fullWidthPaths = ['/about', '/grow', '/messages', '/social', '/restaurants', '/specialists', '/help', '/faqs', '/pricing', '/careers', '/contact', '/accessibility', '/community', '/blog'];
+  currentUrl = signal(this.router.url);
+  isFullWidthPage = computed(() => {
+    const url = this.currentUrl().split('#')[0];
+    return this.fullWidthPaths.some(path => url === path || url.startsWith(path + '/'));
+  });
 
   // Search state
   searchQuery = signal('');
@@ -185,6 +194,18 @@ export class LayoutComponent {
   });
 
   constructor() {
+    // Track current URL for full-width page detection
+    this.router.events.subscribe(e => {
+      if (e instanceof NavigationEnd) {
+        this.currentUrl.set(e.urlAfterRedirects);
+      }
+    });
+
+    // Scroll tracking for navbar glass transition
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', this.handleScroll);
+    }
+
     // Effect to update authentication state
     effect(() => {
       const isAuth = this.authService.isAuthenticated();
@@ -198,6 +219,16 @@ export class LayoutComponent {
       }
     });
   }
+
+  ngOnDestroy(): void {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('scroll', this.handleScroll);
+    }
+  }
+
+  private handleScroll = (): void => {
+    this.isScrolled.set(window.scrollY > 30);
+  };
 
   // Toggle methods for interactive elements
   toggleProfileMenu(): void {

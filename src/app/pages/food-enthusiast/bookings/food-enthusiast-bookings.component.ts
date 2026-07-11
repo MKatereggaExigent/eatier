@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { LucideAngularModule, Calendar, ClipboardList, Clock, CheckCircle, XCircle, Search, List, CalendarDays, Plus, Users, FileText, Gift, MessageSquare, X, AlertTriangle, SlidersHorizontal, PartyPopper, Eye, type LucideIconData } from 'lucide-angular';
 import { BookingsService, Booking, Restaurant, BookingRequest, BookingStats, AvailableTimeSlot } from '../../../services/bookings.service';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -15,13 +16,13 @@ interface FilterOptions {
 interface ViewMode {
   type: 'list' | 'calendar';
   label: string;
-  icon: string;
+  icon: any;
 }
 
 @Component({
   selector: 'app-food-enthusiast-bookings',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './food-enthusiast-bookings.component.html',
   styleUrls: ['./food-enthusiast-bookings.component.scss']
 })
@@ -29,6 +30,25 @@ export class FoodEnthusiastBookingsComponent implements OnInit {
   private bookingsService = inject(BookingsService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
+
+  readonly Calendar = Calendar;
+  readonly ClipboardList = ClipboardList;
+  readonly Clock = Clock;
+  readonly CheckCircle = CheckCircle;
+  readonly XCircle = XCircle;
+  readonly Search = Search;
+  readonly List = List;
+  readonly CalendarDays = CalendarDays;
+  readonly Plus = Plus;
+  readonly Users = Users;
+  readonly FileText = FileText;
+  readonly Gift = Gift;
+  readonly MessageSquare = MessageSquare;
+  readonly X = X;
+  readonly AlertTriangle = AlertTriangle;
+  readonly SlidersHorizontal = SlidersHorizontal;
+  readonly PartyPopper = PartyPopper;
+  readonly Eye = Eye;
 
   currentUser = this.authService.currentUser;
 
@@ -41,7 +61,7 @@ export class FoodEnthusiastBookingsComponent implements OnInit {
   availableTimeSlots = signal<AvailableTimeSlot[]>([]);
 
   // UI state
-  viewMode = signal<ViewMode>({ type: 'list', label: 'List View', icon: '📋' });
+  viewMode = signal<ViewMode>({ type: 'list', label: 'List View', icon: this.List });
   searchQuery = signal('');
   showFilters = signal(false);
   showNewBookingModal = signal(false);
@@ -236,8 +256,8 @@ export class FoodEnthusiastBookingsComponent implements OnInit {
     const current = this.viewMode();
     this.viewMode.set(
       current.type === 'list'
-        ? { type: 'calendar', label: 'Calendar View', icon: '📅' }
-        : { type: 'list', label: 'List View', icon: '📋' }
+        ? { type: 'calendar', label: 'Calendar View', icon: this.CalendarDays }
+        : { type: 'list', label: 'List View', icon: this.List }
     );
   }
 
@@ -415,13 +435,13 @@ export class FoodEnthusiastBookingsComponent implements OnInit {
     }
   }
 
-  getStatusIcon(status: string): string {
+  getStatusIcon(status: string): any {
     switch (status) {
-      case 'confirmed': return '✅';
-      case 'pending': return '⏳';
-      case 'cancelled': return '❌';
-      case 'completed': return '🎉';
-      default: return '📋';
+      case 'confirmed': return this.CheckCircle;
+      case 'pending': return this.Clock;
+      case 'cancelled': return this.XCircle;
+      case 'completed': return this.PartyPopper;
+      default: return this.ClipboardList;
     }
   }
 

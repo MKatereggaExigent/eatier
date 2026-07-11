@@ -256,7 +256,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   // Load stats from all bookings (for accurate counts)
   private loadBookingStats(): void {
     const today = new Date().toISOString().split('T')[0];
-    console.log('🔍 Today\'s date for comparison:', today);
+    console.log('Today\'s date for comparison:', today);
 
     // Fetch ALL bookings to calculate accurate stats
     this.businessOwnerService.getBookings({ page: 1, limit: 1000 })
@@ -266,7 +266,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
           const allBookings = response.bookings;
 
           // Debug: Log all booking dates
-          console.log('📅 All booking dates:', allBookings.map(b => ({
+          console.log('All booking dates:', allBookings.map(b => ({
             ref: b.booking_reference,
             date: b.booking_date,
             matchesToday: b.booking_date === today
@@ -276,7 +276,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
           const confirmedCount = allBookings.filter(b => b.status === 'confirmed').length;
           const todayCount = allBookings.filter(b => b.booking_date === today).length;
 
-          console.log('📊 Today\'s bookings count:', todayCount);
+          console.log('Today\'s bookings count:', todayCount);
 
           this.stats.update(state => ({
             ...state,

@@ -1,314 +1,414 @@
-<div class="specialist-overview" role="main" aria-label="Specialist Dashboard Overview">
-  <!-- Header Section -->
-  <header class="overview-header">
-    <div class="header-content">
-      <div class="welcome-section">
-        <h1 class="page-title">
-          <lucide-icon [img]="ChefHat" [size]="32" class="title-icon"></lucide-icon>
-          Welcome back, {{ currentUser()?.firstName || 'Specialist' }}!
-        </h1>
-        <p class="page-subtitle">
-          Here's your business overview and recent activity
-        </p>
-      </div>
-      <div class="quick-actions">
-        <button type="button" class="action-btn primary" routerLink="../services">
-          <lucide-icon [img]="UtensilsCrossed" [size]="18"></lucide-icon> Manage Services
-        </button>
-        <button type="button" class="action-btn secondary" routerLink="../availability">
-          <lucide-icon [img]="Calendar" [size]="18"></lucide-icon> Update Availability
-        </button>
-        <button type="button" class="action-btn secondary" routerLink="../portfolio">
-          <lucide-icon [img]="Camera" [size]="18"></lucide-icon> Manage Portfolio
-        </button>
-      </div>
+<div class="section" role="main" aria-label="Specialist Dashboard Overview">
+  <div class="section-inner">
+
+    <!-- Tag -->
+    <div class="tag">
+      <lucide-icon [img]="ChefHat" [size]="16"></lucide-icon>
+      Dashboard
     </div>
-  </header>
 
-  <!-- Onboarding Prompt for No Services -->
-  @if (showServicesOnboarding()) {
-    <div class="onboarding-alert" role="alert">
-      <lucide-icon [img]="AlertTriangle" [size]="24" class="onboarding-icon"></lucide-icon>
-      <div class="onboarding-content">
-        <h3>Complete Your Profile</h3>
-        <p>You haven't added any services yet. Clients won't be able to book you until you add at least one service.</p>
-      </div>
-      <a routerLink="../services" class="onboarding-cta">
-        Add Your First Service →
-      </a>
-    </div>
-  }
-
-  <!-- Business Metrics Cards -->
-  <section class="metrics-section" aria-label="Business Metrics">
-    <div class="metrics-grid">
-      <div class="metric-card earnings">
-        <lucide-icon [img]="DollarSign" [size]="32" class="metric-icon"></lucide-icon>
-        <div class="metric-content">
-          <h3>{{ formatCurrency(businessMetrics().monthlyEarnings) }}</h3>
-          <p>This Month</p>
-          <div class="metric-change positive">
-            +{{ formatCurrency(businessMetrics().totalEarnings) }} total
-          </div>
+    <!-- Header Card -->
+    <div class="header-card">
+      <div class="header-top">
+        <div class="welcome-section">
+          <h2 class="page-title">
+            <lucide-icon [img]="Sun" [size]="28" class="title-icon"></lucide-icon>
+            Welcome back, {{ currentUser()?.firstName || 'Specialist' }}!
+          </h2>
+          <p class="page-subtitle">Here's your business overview and recent activity</p>
         </div>
-      </div>
-
-      <div class="metric-card bookings">
-        <lucide-icon [img]="Calendar" [size]="32" class="metric-icon"></lucide-icon>
-        <div class="metric-content">
-          <h3>{{ businessMetrics().upcomingBookings }}</h3>
-          <p>Upcoming Bookings</p>
-          <div class="metric-change neutral">
-            {{ businessMetrics().totalBookings }} completed
-          </div>
-        </div>
-      </div>
-
-      <div class="metric-card rating">
-        <lucide-icon [img]="Star" [size]="32" class="metric-icon"></lucide-icon>
-        <div class="metric-content">
-          <h3>{{ (businessMetrics().averageRating || 0).toFixed(1) }}</h3>
-          <p>Average Rating</p>
-          <div class="metric-change positive">
-            {{ businessMetrics().totalReviews }} reviews
-          </div>
-        </div>
-      </div>
-
-      <div class="metric-card requests">
-        <lucide-icon [img]="MessageSquare" [size]="32" class="metric-icon"></lucide-icon>
-        <div class="metric-content">
-          <h3>{{ businessMetrics().pendingRequests }}</h3>
-          <p>Pending Requests</p>
-          <div class="metric-change" [class.urgent]="businessMetrics().pendingRequests > 3">
-            {{ businessMetrics().responseRate }}% response rate
-          </div>
+        <div class="header-actions">
+          <a routerLink="../services" class="btn-primary">
+            <lucide-icon [img]="UtensilsCrossed" [size]="18" class="btn-icon"></lucide-icon>
+            Manage Services
+          </a>
+          <a routerLink="../availability" class="btn-secondary">
+            <lucide-icon [img]="Calendar" [size]="18" class="btn-icon"></lucide-icon>
+            Update Availability
+          </a>
+          <a routerLink="../portfolio" class="btn-secondary">
+            <lucide-icon [img]="Camera" [size]="18" class="btn-icon"></lucide-icon>
+            Manage Portfolio
+          </a>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- Main Content Grid -->
-  <div class="content-grid">
-    <!-- Pending Requests -->
-    <section class="content-card requests-card" aria-label="Pending Booking Requests">
-      <div class="card-header">
-        <h2>
-          <lucide-icon [img]="Mail" [size]="24" class="header-icon"></lucide-icon>
-          Pending Requests
-          @if (pendingRequests().length > 0) {
-            <span class="count-badge">{{ pendingRequests().length }}</span>
+    <!-- Onboarding Alert -->
+    @if (showServicesOnboarding()) {
+      <div class="onboarding-alert" role="alert">
+        <lucide-icon [img]="AlertTriangle" [size]="20" class="onboarding-icon"></lucide-icon>
+        <div class="onboarding-content">
+          <h3>Complete Your Profile</h3>
+          <p>You haven't added any services yet. Clients won't be able to book you until you add at least one service.</p>
+        </div>
+        <a routerLink="../services" class="btn-primary">
+          <lucide-icon [img]="UtensilsCrossed" [size]="16" class="btn-icon"></lucide-icon>
+          Add Your First Service
+        </a>
+      </div>
+    }
+
+    <!-- Error Banner -->
+    @if (hasErrors()) {
+      <div class="error-banner" role="alert">
+        <lucide-icon [img]="AlertTriangle" [size]="24" class="error-icon"></lucide-icon>
+        <div class="error-content">
+          <h3>Unable to load overview data</h3>
+          <p>{{ error() }}</p>
+        </div>
+        <button type="button" class="retry-btn" (click)="refreshData()">
+          <lucide-icon [img]="RefreshCw" [size]="16"></lucide-icon> Retry
+        </button>
+      </div>
+    }
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <!-- Earnings -->
+      <div class="stat-card">
+        @if (loading()) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+            </div>
+          </div>
+        } @else {
+          <lucide-icon [img]="DollarSign" [size]="28" class="stat-icon"></lucide-icon>
+          <div class="stat-content">
+            <h3>{{ formatCurrency(businessMetrics().monthlyEarnings) }}</h3>
+            <p>This Month</p>
+            <span class="stat-description">+{{ formatCurrency(businessMetrics().totalEarnings) }} total</span>
+          </div>
+        }
+      </div>
+
+      <!-- Bookings -->
+      <div class="stat-card">
+        @if (loading()) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+            </div>
+          </div>
+        } @else {
+          <lucide-icon [img]="Calendar" [size]="28" class="stat-icon"></lucide-icon>
+          <div class="stat-content">
+            <h3>{{ businessMetrics().upcomingBookings }}</h3>
+            <p>Upcoming Bookings</p>
+            <span class="stat-description">{{ businessMetrics().totalBookings }} completed</span>
+          </div>
+        }
+      </div>
+
+      <!-- Rating -->
+      <div class="stat-card">
+        @if (loading()) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+            </div>
+          </div>
+        } @else {
+          <lucide-icon [img]="Star" [size]="28" class="stat-icon"></lucide-icon>
+          <div class="stat-content">
+            <h3>{{ (businessMetrics().averageRating || 0).toFixed(1) }}</h3>
+            <p>Average Rating</p>
+            <span class="stat-description">{{ businessMetrics().totalReviews }} reviews</span>
+          </div>
+        }
+      </div>
+
+      <!-- Requests -->
+      <div class="stat-card">
+        @if (loading()) {
+          <div class="stat-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-number"></div>
+              <div class="skeleton-label"></div>
+            </div>
+          </div>
+        } @else {
+          <lucide-icon [img]="MessageSquare" [size]="28" class="stat-icon"></lucide-icon>
+          <div class="stat-content">
+            <h3>{{ businessMetrics().pendingRequests }}</h3>
+            <p>Pending Requests</p>
+            <span class="stat-description">{{ businessMetrics().responseRate }}% response rate</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+
+      <!-- Pending Requests -->
+      <section class="content-card requests-card" aria-label="Pending Booking Requests">
+        <div class="card-header">
+          <h2>
+            <lucide-icon [img]="Mail" [size]="20" class="header-icon"></lucide-icon>
+            Pending Requests
+            @if (pendingRequests().length > 0) {
+              <span class="count-badge">{{ pendingRequests().length }}</span>
+            }
+          </h2>
+          <button type="button" class="view-all-btn" (click)="viewAllRequests()">View All</button>
+        </div>
+
+        <div class="card-content">
+          @if (errors()['bookings']) {
+            <div class="error-state" role="alert">
+              <lucide-icon [img]="AlertTriangle" [size]="24" class="error-icon"></lucide-icon>
+              <p>{{ errors()['bookings'] }}</p>
+              <button type="button" class="retry-btn" (click)="refreshData()">
+                <lucide-icon [img]="RefreshCw" [size]="16"></lucide-icon> Retry
+              </button>
+            </div>
+          } @else if (loadingBookings()) {
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <p>Loading requests...</p>
+            </div>
+          } @else if (pendingRequests().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="Inbox" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No pending requests</h3>
+              <p>New booking requests will appear here</p>
+            </div>
+          } @else {
+            <div class="requests-list">
+              @for (request of pendingRequests().slice(0, 3); track request.id) {
+                <div class="request-item">
+                  <div class="request-header">
+                    <div class="client-info">
+                      @if (request.clientAvatar) {
+                        <img [src]="request.clientAvatar" [alt]="request.clientName" class="client-avatar">
+                      } @else {
+                        <div class="client-avatar-placeholder">
+                          {{ request.clientName.charAt(0) }}
+                        </div>
+                      }
+                      <div class="client-details">
+                        <h4>{{ request.clientName }}</h4>
+                        <p class="event-type">{{ request.eventType }}</p>
+                      </div>
+                    </div>
+                    <div class="request-budget">
+                      {{ formatCurrency(request.budget) }}
+                    </div>
+                  </div>
+
+                  <div class="request-details">
+                    <div class="detail-item">
+                      <lucide-icon [img]="Calendar" [size]="16" class="detail-icon"></lucide-icon>
+                      <span>{{ formatDate(request.eventDate) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <lucide-icon [img]="MapPin" [size]="16" class="detail-icon"></lucide-icon>
+                      <span>{{ request.location }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <lucide-icon [img]="Users" [size]="16" class="detail-icon"></lucide-icon>
+                      <span>{{ request.guests }} guests</span>
+                    </div>
+                  </div>
+
+                  @if (request.message) {
+                    <div class="request-message">
+                      <p>{{ request.message }}</p>
+                    </div>
+                  }
+
+                  <div class="request-actions">
+                    <button type="button" class="btn-secondary" (click)="declineRequest(request.id)">Decline</button>
+                    <button type="button" class="btn-primary" (click)="acceptRequest(request.id)">Accept</button>
+                  </div>
+                </div>
+              }
+            </div>
           }
-        </h2>
-        <button type="button" class="view-all-btn" (click)="viewAllRequests()">
-          View All
-        </button>
-      </div>
+        </div>
+      </section>
 
-      <div class="card-content">
-        @if (pendingRequests().length === 0) {
-          <div class="empty-state">
-            <lucide-icon [img]="Inbox" [size]="64" class="empty-icon"></lucide-icon>
-            <h3>No pending requests</h3>
-            <p>New booking requests will appear here</p>
-          </div>
-        } @else {
-          <div class="requests-list">
-            @for (request of pendingRequests().slice(0, 3); track request.id) {
-              <div class="request-item">
-                <div class="request-header">
-                  <div class="client-info">
-                    @if (request.clientAvatar) {
-                      <img [src]="request.clientAvatar" [alt]="request.clientName" class="client-avatar">
-                    } @else {
-                      <div class="client-avatar-placeholder">
-                        {{ request.clientName.charAt(0) }}
-                      </div>
-                    }
-                    <div class="client-details">
-                      <h4>{{ request.clientName }}</h4>
-                      <p class="event-type">{{ request.eventType }}</p>
+      <!-- Upcoming Bookings -->
+      <section class="content-card bookings-card" aria-label="Upcoming Bookings">
+        <div class="card-header">
+          <h2>
+            <lucide-icon [img]="Calendar" [size]="20" class="header-icon"></lucide-icon>
+            Upcoming Bookings
+          </h2>
+          <button type="button" class="view-all-btn" (click)="viewAllBookings()">View All</button>
+        </div>
+
+        <div class="card-content">
+          @if (errors()['bookings'] && upcomingBookings().length === 0) {
+            <div class="error-state" role="alert">
+              <lucide-icon [img]="AlertTriangle" [size]="24" class="error-icon"></lucide-icon>
+              <p>{{ errors()['bookings'] }}</p>
+              <button type="button" class="retry-btn" (click)="refreshData()">
+                <lucide-icon [img]="RefreshCw" [size]="16"></lucide-icon> Retry
+              </button>
+            </div>
+          } @else if (upcomingBookings().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="Calendar" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No upcoming bookings</h3>
+              <p>Your confirmed bookings will appear here</p>
+            </div>
+          } @else {
+            <div class="bookings-list">
+              @for (booking of upcomingBookings().slice(0, 4); track booking.id) {
+                <div class="booking-item" (click)="viewBookingDetails(booking.id)">
+                  <div class="booking-date">
+                    <div class="date-day">{{ booking.eventDate.getDate() }}</div>
+                    <div class="date-month">{{ booking.eventDate.toLocaleDateString('en-US', { month: 'short' }) }}</div>
+                  </div>
+                  <div class="booking-details">
+                    <h4>{{ booking.eventType }}</h4>
+                    <p class="client-name">{{ booking.clientName }}</p>
+                    <div class="booking-meta">
+                      <span class="location"><lucide-icon [img]="MapPin" [size]="14"></lucide-icon> {{ booking.location }}</span>
+                      <span class="guests"><lucide-icon [img]="Users" [size]="14"></lucide-icon> {{ booking.guests }} guests</span>
                     </div>
                   </div>
-                  <div class="request-budget">
-                    {{ formatCurrency(request.budget) }}
+                  <div class="booking-amount">
+                    {{ formatCurrency(booking.amount) }}
                   </div>
                 </div>
+              }
+            </div>
+          }
+        </div>
+      </section>
 
-                <div class="request-details">
-                  <div class="detail-item">
-                    <lucide-icon [img]="Calendar" [size]="16" class="detail-icon"></lucide-icon>
-                    <span>{{ formatDate(request.eventDate) }}</span>
+      <!-- Recent Earnings -->
+      <section class="content-card earnings-card" aria-label="Recent Earnings">
+        <div class="card-header">
+          <h2>
+            <lucide-icon [img]="DollarSign" [size]="20" class="header-icon"></lucide-icon>
+            Recent Earnings
+          </h2>
+          <button type="button" class="view-all-btn" (click)="viewAllEarnings()">View All</button>
+        </div>
+
+        <div class="card-content">
+          @if (errors()['earnings']) {
+            <div class="error-state" role="alert">
+              <lucide-icon [img]="AlertTriangle" [size]="24" class="error-icon"></lucide-icon>
+              <p>{{ errors()['earnings'] }}</p>
+              <button type="button" class="retry-btn" (click)="refreshData()">
+                <lucide-icon [img]="RefreshCw" [size]="16"></lucide-icon> Retry
+              </button>
+            </div>
+          } @else if (loadingEarnings()) {
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <p>Loading earnings...</p>
+            </div>
+          } @else if (recentEarnings().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="DollarSign" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No recent earnings</h3>
+              <p>Your payment history will appear here</p>
+            </div>
+          } @else {
+            <div class="earnings-list">
+              @for (earning of recentEarnings().slice(0, 5); track earning.id) {
+                <div class="earning-item">
+                  <div class="earning-info">
+                    <h4>{{ earning.clientName }}</h4>
+                    <p class="event-type">{{ earning.eventType }}</p>
+                    <span class="earning-date">{{ formatDate(earning.date) }}</span>
                   </div>
-                  <div class="detail-item">
-                    <lucide-icon [img]="MapPin" [size]="16" class="detail-icon"></lucide-icon>
-                    <span>{{ request.location }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <lucide-icon [img]="Users" [size]="16" class="detail-icon"></lucide-icon>
-                    <span>{{ request.guests }} guests</span>
-                  </div>
-                </div>
-
-                <div class="request-message">
-                  <p>{{ request.message }}</p>
-                </div>
-
-                <div class="request-actions">
-                  <button type="button" class="action-btn secondary" (click)="declineRequest(request.id)">
-                    Decline
-                  </button>
-                  <button type="button" class="action-btn primary" (click)="acceptRequest(request.id)">
-                    Accept
-                  </button>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </section>
-
-    <!-- Upcoming Bookings -->
-    <section class="content-card bookings-card" aria-label="Upcoming Bookings">
-      <div class="card-header">
-        <h2>
-          <lucide-icon [img]="Calendar" [size]="24" class="header-icon"></lucide-icon>
-          Upcoming Bookings
-        </h2>
-        <button type="button" class="view-all-btn" (click)="viewAllBookings()">
-          View All
-        </button>
-      </div>
-
-      <div class="card-content">
-        @if (upcomingBookings().length === 0) {
-          <div class="empty-state">
-            <lucide-icon [img]="Calendar" [size]="64" class="empty-icon"></lucide-icon>
-            <h3>No upcoming bookings</h3>
-            <p>Your confirmed bookings will appear here</p>
-          </div>
-        } @else {
-          <div class="bookings-list">
-            @for (booking of upcomingBookings().slice(0, 4); track booking.id) {
-              <div class="booking-item" (click)="viewBookingDetails(booking.id)">
-                <div class="booking-date">
-                  <div class="date-day">{{ booking.eventDate.getDate() }}</div>
-                  <div class="date-month">{{ booking.eventDate.toLocaleDateString('en-US', { month: 'short' }) }}</div>
-                </div>
-                <div class="booking-details">
-                  <h4>{{ booking.eventType }}</h4>
-                  <p class="client-name">{{ booking.clientName }}</p>
-                  <div class="booking-meta">
-                    <span class="location"><lucide-icon [img]="MapPin" [size]="14"></lucide-icon> {{ booking.location }}</span>
-                    <span class="guests"><lucide-icon [img]="Users" [size]="14"></lucide-icon> {{ booking.guests }} guests</span>
+                  <div class="earning-amount">
+                    <span class="amount">{{ formatCurrency(earning.amount) }}</span>
+                    <span class="status" [class]="getStatusClass(earning.status)">
+                      {{ getStatusText(earning.status) }}
+                    </span>
                   </div>
                 </div>
-                <div class="booking-amount">
-                  {{ formatCurrency(booking.amount) }}
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </section>
+              }
+            </div>
+          }
+        </div>
+      </section>
 
-    <!-- Recent Earnings -->
-    <section class="content-card earnings-card" aria-label="Recent Earnings">
-      <div class="card-header">
-        <h2>
-          <lucide-icon [img]="DollarSign" [size]="24" class="header-icon"></lucide-icon>
-          Recent Earnings
-        </h2>
-        <button type="button" class="view-all-btn" (click)="viewAllEarnings()">
-          View All
-        </button>
-      </div>
+      <!-- Recent Reviews -->
+      <section class="content-card reviews-card" aria-label="Recent Reviews">
+        <div class="card-header">
+          <h2>
+            <lucide-icon [img]="Star" [size]="20" class="header-icon"></lucide-icon>
+            Recent Reviews
+          </h2>
+          <button type="button" class="view-all-btn" (click)="viewAllReviews()">View All</button>
+        </div>
 
-      <div class="card-content">
-        @if (recentEarnings().length === 0) {
-          <div class="empty-state">
-            <lucide-icon [img]="DollarSign" [size]="64" class="empty-icon"></lucide-icon>
-            <h3>No recent earnings</h3>
-            <p>Your payment history will appear here</p>
-          </div>
-        } @else {
-          <div class="earnings-list">
-            @for (earning of recentEarnings().slice(0, 5); track earning.id) {
-              <div class="earning-item">
-                <div class="earning-info">
-                  <h4>{{ earning.clientName }}</h4>
-                  <p class="event-type">{{ earning.eventType }}</p>
-                  <span class="earning-date">{{ formatDate(earning.date) }}</span>
-                </div>
-                <div class="earning-amount">
-                  <span class="amount">{{ formatCurrency(earning.amount) }}</span>
-                  <span class="status" [class]="getStatusClass(earning.status)">
-                    {{ getStatusText(earning.status) }}
-                  </span>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </section>
-
-    <!-- Recent Reviews -->
-    <section class="content-card reviews-card" aria-label="Recent Reviews">
-      <div class="card-header">
-        <h2>
-          <lucide-icon [img]="Star" [size]="24" class="header-icon"></lucide-icon>
-          Recent Reviews
-        </h2>
-        <button type="button" class="view-all-btn" (click)="viewAllReviews()">
-          View All
-        </button>
-      </div>
-
-      <div class="card-content">
-        @if (recentReviews().length === 0) {
-          <div class="empty-state">
-            <lucide-icon [img]="Star" [size]="64" class="empty-icon"></lucide-icon>
-            <h3>No reviews yet</h3>
-            <p>Client reviews will appear here</p>
-          </div>
-        } @else {
-          <div class="reviews-list">
-            @for (review of recentReviews().slice(0, 3); track review.id) {
-              <div class="review-item">
-                <div class="review-header">
-                  <div class="client-info">
-                    @if (review.clientAvatar) {
-                      <img [src]="review.clientAvatar" [alt]="review.clientName" class="client-avatar">
-                    } @else {
-                      <div class="client-avatar-placeholder">
-                        {{ review.clientName.charAt(0) }}
-                      </div>
-                    }
-                    <div class="client-details">
-                      <h4>{{ review.clientName }}</h4>
-                      <div class="review-rating">
-                        @for (star of getStarArray(review.rating); track $index) {
-                          <lucide-icon [img]="Star" [size]="16" class="star" [class.filled]="star"></lucide-icon>
-                        }
+        <div class="card-content">
+          @if (errors()['reviews']) {
+            <div class="error-state" role="alert">
+              <lucide-icon [img]="AlertTriangle" [size]="24" class="error-icon"></lucide-icon>
+              <p>{{ errors()['reviews'] }}</p>
+              <button type="button" class="retry-btn" (click)="refreshData()">
+                <lucide-icon [img]="RefreshCw" [size]="16"></lucide-icon> Retry
+              </button>
+            </div>
+          } @else if (loadingReviews()) {
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <p>Loading reviews...</p>
+            </div>
+          } @else if (recentReviews().length === 0) {
+            <div class="empty-state">
+              <lucide-icon [img]="Star" [size]="48" class="empty-icon"></lucide-icon>
+              <h3>No reviews yet</h3>
+              <p>Client reviews will appear here</p>
+            </div>
+          } @else {
+            <div class="reviews-list">
+              @for (review of recentReviews().slice(0, 3); track review.id) {
+                <div class="review-item">
+                  <div class="review-header">
+                    <div class="client-info">
+                      @if (review.clientAvatar) {
+                        <img [src]="review.clientAvatar" [alt]="review.clientName" class="client-avatar">
+                      } @else {
+                        <div class="client-avatar-placeholder">
+                          {{ review.clientName.charAt(0) }}
+                        </div>
+                      }
+                      <div class="client-details">
+                        <h4>{{ review.clientName }}</h4>
+                        <div class="review-rating">
+                          @for (star of getStarArray(review.rating); track $index) {
+                            <lucide-icon [img]="Star" [size]="16" class="star" [class.filled]="star"></lucide-icon>
+                          }
+                        </div>
                       </div>
                     </div>
+                    <div class="review-date">
+                      {{ formatDate(review.date) }}
+                    </div>
                   </div>
-                  <div class="review-date">
-                    {{ formatDate(review.date) }}
+                  <div class="review-content">
+                    @if (review.comment) {
+                      <p>{{ review.comment }}</p>
+                    }
+                    <span class="event-type">{{ review.eventType }}</span>
                   </div>
                 </div>
-                <div class="review-content">
-                  <p>{{ review.comment }}</p>
-                  <span class="event-type">{{ review.eventType }}</span>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </section>
+              }
+            </div>
+          }
+        </div>
+      </section>
+
+    </div>
   </div>
 </div>

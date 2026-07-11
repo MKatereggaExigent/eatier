@@ -6,8 +6,9 @@
     </div>
   } @else if (errorMessage()) {
     <div class="error-container">
-      <p class="error-message">{{ errorMessage() }}</p>
-      <button type="button" (click)="loadRestaurantData(restaurantId())" class="retry-btn">
+      <div class="error-message">{{ errorMessage() }}</div>
+      <button type="button" (click)="loadRestaurantData(restaurantId())" class="btn-primary">
+        <lucide-icon [img]="RefreshCw" [size]="16"></lucide-icon>
         Try Again
       </button>
     </div>
@@ -35,14 +36,14 @@
             @if (restaurant().reviewCount > 0) {
               <div class="rating">
                 @for (star of getStarArray(restaurant().rating); track $index) {
-                  <span class="star filled">⭐</span>
+                  <span class="star">★</span>
                 }
                 <span class="rating-value">{{ restaurant().rating }}</span>
                 <span class="review-count">({{ restaurant().reviewCount }} reviews)</span>
               </div>
             } @else {
               <div class="rating">
-                <span class="new-badge">New Restaurant</span>
+                <span class="cuisine" style="background:rgba(255,255,255,0.15);color:white;">New Restaurant</span>
               </div>
             }
             <div class="cuisine-price">
@@ -53,386 +54,358 @@
           </div>
         </div>
 
-        <div class="restaurant-status" [class]="restaurant().isOpen ? 'open' : 'closed'">
-          {{ restaurant().isOpen ? 'Open now' : 'Closed' }}
-          <span class="hours">{{ getCurrentDayHours() }}</span>
+        <div class="status-wrapper">
+          <div class="restaurant-status" [class.open]="restaurant().isOpen" [class.closed]="!restaurant().isOpen">
+            {{ restaurant().isOpen ? 'Open now' : 'Closed' }}
+            @if (getCurrentDayHours()) {
+              <span class="stat-sep"></span>
+              <span class="hours">{{ getCurrentDayHours() }}</span>
+            }
+          </div>
         </div>
 
-      <div class="action-buttons">
-        <button type="button" class="primary-btn book-btn" (click)="openBookingModal()">
-          📅 Book a Table
-        </button>
-        <button type="button" class="secondary-btn" (click)="callRestaurant()">
-          📞 Call
-        </button>
-        <button type="button" class="secondary-btn" (click)="getDirections()">
-          🗺️ Directions
-        </button>
-        <button type="button" class="secondary-btn"
-                [class.saved]="isFavorite()"
-                [disabled]="isSavingFavorite()"
-                (click)="toggleFavorite()">
-          {{ isFavorite() ? '💖 Saved' : '🤍 Save' }}
-        </button>
-        <button type="button" class="secondary-btn" (click)="shareRestaurant()">
-          📤 Share
-        </button>
+        <div class="action-buttons">
+          <button type="button" class="btn-primary" (click)="openBookingModal()">
+            <lucide-icon [img]="CalendarDays" [size]="16"></lucide-icon>
+            Book a Table
+          </button>
+          <button type="button" class="btn-secondary" (click)="callRestaurant()">
+            <lucide-icon [img]="Phone" [size]="16"></lucide-icon>
+            Call
+          </button>
+          <button type="button" class="btn-secondary" (click)="getDirections()">
+            <lucide-icon [img]="MapPin" [size]="16"></lucide-icon>
+            Directions
+          </button>
+          <button type="button" class="btn-secondary" [class.saved]="isFavorite()" [disabled]="isSavingFavorite()" (click)="toggleFavorite()">
+            <lucide-icon [img]="isFavorite() ? Heart : HeartOff" [size]="16"></lucide-icon>
+            {{ isFavorite() ? 'Saved' : 'Save' }}
+          </button>
+          <button type="button" class="btn-secondary" (click)="shareRestaurant()">
+            <lucide-icon [img]="Share2" [size]="16"></lucide-icon>
+            Share
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Restaurant Info -->
-  <div class="restaurant-info">
-    <div class="info-section">
-      <h2>About</h2>
-      <p>{{ restaurant().description }}</p>
+    <!-- Restaurant Info -->
+    <div class="restaurant-info">
+      <div class="info-section">
+        <h2>About</h2>
+        <p>{{ restaurant().description }}</p>
 
-      <div class="contact-info">
-        <div class="contact-item">
-          <span class="icon">📍</span>
-          <span>{{ restaurant().address }}</span>
-        </div>
-        <div class="contact-item">
-          <span class="icon">📞</span>
-          <span>{{ restaurant().phone }}</span>
-        </div>
-        @if (restaurant().website) {
+        <div class="contact-info">
           <div class="contact-item">
-            <span class="icon">🌐</span>
-            <a (click)="visitWebsite()" class="website-link">{{ restaurant().website }}</a>
+            <lucide-icon [img]="MapPin" [size]="16"></lucide-icon>
+            <span>{{ restaurant().address }}</span>
           </div>
-        }
-      </div>
-
-      @if (restaurant().features && restaurant().features.length > 0) {
-        <div class="features">
-          <h3>Features</h3>
-          <div class="feature-tags">
-            @for (feature of restaurant().features; track feature) {
-              <span class="feature-tag">{{ feature }}</span>
-            }
+          <div class="contact-item">
+            <lucide-icon [img]="Phone" [size]="16"></lucide-icon>
+            <span>{{ restaurant().phone }}</span>
           </div>
-        </div>
-      }
-    </div>
-
-    <div class="hours-section">
-      <h3>Hours</h3>
-      <div class="hours-list">
-        @for (dayHours of restaurant().hours; track dayHours.day) {
-          <div class="hours-item">
-            <span class="day">{{ dayHours.day }}</span>
-            <span class="hours">{{ dayHours.hours }}</span>
-          </div>
-        }
-      </div>
-    </div>
-  </div>
-
-  <!-- Add to Cart Notification -->
-  @if (addedToCartNotification()) {
-    <div class="cart-notification">
-      ✓ {{ addedToCartNotification() }} added to cart!
-    </div>
-  }
-
-  <!-- Menu Section -->
-  <div id="menu-section" class="menu-section">
-    <div class="menu-header">
-      <div class="menu-title-area">
-        <h2>Menu</h2>
-        <span class="menu-count">{{ menuItems().length }} items</span>
-      </div>
-      <div class="menu-controls">
-        <!-- View Mode Toggle - NYT Style -->
-        <div class="view-toggle">
-          <button type="button"
-                  class="toggle-btn"
-                  [class.active]="menuViewMode() === 'grid'"
-                  (click)="setMenuViewMode('grid')"
-                  title="Grid View">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-            </svg>
-          </button>
-          <button type="button"
-                  class="toggle-btn"
-                  [class.active]="menuViewMode() === 'list'"
-                  (click)="setMenuViewMode('list')"
-                  title="List View">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <button type="button"
-                  class="toggle-btn"
-                  [class.active]="menuViewMode() === 'gallery'"
-                  (click)="setMenuViewMode('gallery')"
-                  title="Gallery View">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <path d="M21 15l-5-5L5 21"></path>
-            </svg>
-          </button>
-          <button type="button"
-                  class="toggle-btn"
-                  [class.active]="menuViewMode() === 'table'"
-                  (click)="setMenuViewMode('table')"
-                  title="Table View">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="3" y1="9" x2="21" y2="9"></line>
-              <line x1="3" y1="15" x2="21" y2="15"></line>
-              <line x1="9" y1="3" x2="9" y2="21"></line>
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    @if (menuItems().length > 0) {
-      <!-- Grid View -->
-      @if (menuViewMode() === 'grid') {
-        <div class="dishes-grid">
-          @for (item of paginatedMenuItems(); track item.id) {
-            <div class="dish-card">
-              <img [src]="item.image" [alt]="item.name" class="dish-image" />
-              <div class="dish-info">
-                <div class="dish-header">
-                  <h3>{{ item.name }}</h3>
-                  <span class="dish-price">{{ item.formattedPrice }}</span>
-                </div>
-                <p>{{ item.description }}</p>
-                <div class="dish-actions">
-                  <button type="button" class="add-to-cart-btn" [disabled]="item.isAdding" (click)="addToCart(item)">
-                    @if (item.isAdding) { <span class="btn-spinner"></span> Adding... } @else { 🛒 Add to Cart }
-                  </button>
-                </div>
-              </div>
+          @if (restaurant().website) {
+            <div class="contact-item">
+              <lucide-icon [img]="Globe" [size]="16"></lucide-icon>
+              <a (click)="visitWebsite()" class="website-link">{{ restaurant().website }}</a>
             </div>
           }
         </div>
-      }
 
-      <!-- List View -->
-      @if (menuViewMode() === 'list') {
-        <div class="dishes-list">
-          @for (item of paginatedMenuItems(); track item.id) {
-            <div class="dish-list-item">
-              <img [src]="item.image" [alt]="item.name" class="dish-list-image" />
-              <div class="dish-list-info">
-                <h3>{{ item.name }}</h3>
-                <p>{{ item.description }}</p>
-              </div>
-              <div class="dish-list-actions">
-                <span class="dish-price">{{ item.formattedPrice }}</span>
-                <button type="button" class="add-to-cart-btn" [disabled]="item.isAdding" (click)="addToCart(item)">
-                  @if (item.isAdding) { Adding... } @else { 🛒 Add }
-                </button>
-              </div>
-            </div>
-          }
-        </div>
-      }
-
-      <!-- Gallery View -->
-      @if (menuViewMode() === 'gallery') {
-        <div class="dishes-gallery">
-          @for (item of paginatedMenuItems(); track item.id) {
-            <div class="dish-gallery-item">
-              <img [src]="item.image" [alt]="item.name" class="dish-gallery-image" />
-              <div class="dish-gallery-overlay">
-                <h3>{{ item.name }}</h3>
-                <span class="dish-price">{{ item.formattedPrice }}</span>
-                <button type="button" class="add-to-cart-btn-small" [disabled]="item.isAdding" (click)="addToCart(item)">
-                  @if (item.isAdding) { ... } @else { 🛒 }
-                </button>
-              </div>
-            </div>
-          }
-        </div>
-      }
-
-      <!-- Table View -->
-      @if (menuViewMode() === 'table') {
-        <div class="dishes-table-wrapper">
-          <table class="dishes-table">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of paginatedMenuItems(); track item.id) {
-                <tr>
-                  <td class="table-item-name">
-                    <img [src]="item.image" [alt]="item.name" class="table-item-image" />
-                    <span>{{ item.name }}</span>
-                  </td>
-                  <td class="table-item-desc">{{ item.description }}</td>
-                  <td class="table-item-price">{{ item.formattedPrice }}</td>
-                  <td class="table-item-action">
-                    <button type="button" class="add-to-cart-btn-small" [disabled]="item.isAdding" (click)="addToCart(item)">
-                      @if (item.isAdding) { ... } @else { 🛒 Add }
-                    </button>
-                  </td>
-                </tr>
+        @if (restaurant().features && restaurant().features.length > 0) {
+          <div class="features">
+            <h3>Features</h3>
+            <div class="feature-tags">
+              @for (feature of restaurant().features; track feature) {
+                <span class="feature-tag">{{ feature }}</span>
               }
-            </tbody>
-          </table>
-        </div>
-      }
-
-      <!-- Pagination - NYT Style -->
-      @if (menuTotalPages() > 1) {
-        <div class="menu-pagination">
-          <button type="button" class="pagination-btn" [disabled]="menuPage() === 1" (click)="prevMenuPage()" title="Previous Page">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </button>
-          <div class="pagination-numbers">
-            @for (page of getMenuPageNumbers(); track page) {
-              <button type="button"
-                      class="pagination-num"
-                      [class.active]="page === menuPage()"
-                      (click)="goToMenuPage(page)">
-                {{ page }}
-              </button>
-            }
+            </div>
           </div>
-          <button type="button" class="pagination-btn" [disabled]="menuPage() === menuTotalPages()" (click)="nextMenuPage()" title="Next Page">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </button>
-        </div>
-      }
-
-      <!-- View Full Menu Button - NYT Style -->
-      <div class="view-full-menu-wrapper">
-        <button type="button" class="view-menu-btn" (click)="viewFullMenu()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10 9 9 9 8 9"></polyline>
-          </svg>
-          <span>View Full Menu</span>
-          <span class="item-count">{{ menuItems().length }} items</span>
-        </button>
+        }
       </div>
-    } @else {
-      <div class="empty-state">
-        <p style="text-align: center; padding: 2rem; color: #666;">
-          📋 No menu items available yet. Check back soon!
-        </p>
+
+      <div class="hours-section">
+        <h3>Hours</h3>
+        <div class="hours-list">
+          @for (dayHours of restaurant().hours; track dayHours.day) {
+            <div class="hours-item">
+              <span class="day">{{ dayHours.day }}</span>
+              <span class="hours">{{ dayHours.hours }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Add to Cart Notification -->
+    @if (addedToCartNotification()) {
+      <div class="cart-notification">
+        <lucide-icon [img]="CheckCircle" [size]="16"></lucide-icon>
+        {{ addedToCartNotification() }} added to cart!
       </div>
     }
-  </div>
 
-  <!-- Reviews Section -->
-  <div class="reviews-section">
-    <div class="reviews-header">
-      <h2>Reviews ({{ restaurant().reviewCount }})</h2>
-      <button type="button" class="write-review-btn" (click)="openWriteReview()">
-        ✍️ Write a Review
-      </button>
-    </div>
+    <!-- Menu Section -->
+    <div id="menu-section" class="menu-section">
+      <div class="menu-header">
+        <div class="menu-title-area">
+          <h2>Menu</h2>
+          <span class="menu-count">{{ menuItems().length }} items</span>
+        </div>
+        <div class="menu-controls">
+          <div class="view-toggle">
+            <button type="button" class="toggle-btn" [class.active]="menuViewMode() === 'grid'" (click)="setMenuViewMode('grid')" title="Grid View">
+              <lucide-icon [img]="LayoutGrid" [size]="16"></lucide-icon>
+            </button>
+            <button type="button" class="toggle-btn" [class.active]="menuViewMode() === 'list'" (click)="setMenuViewMode('list')" title="List View">
+              <lucide-icon [img]="List" [size]="16"></lucide-icon>
+            </button>
+            <button type="button" class="toggle-btn" [class.active]="menuViewMode() === 'gallery'" (click)="setMenuViewMode('gallery')" title="Gallery View">
+              <lucide-icon [img]="Image" [size]="16"></lucide-icon>
+            </button>
+            <button type="button" class="toggle-btn" [class.active]="menuViewMode() === 'table'" (click)="setMenuViewMode('table')" title="Table View">
+              <lucide-icon [img]="Table" [size]="16"></lucide-icon>
+            </button>
+          </div>
+        </div>
+      </div>
 
-    @if (recentReviews().length > 0) {
-      <div class="reviews-list">
-        @for (review of recentReviews(); track review.id) {
-          <div class="review-card">
-            <div class="review-header">
-              <div class="reviewer-info">
-                <div class="reviewer-avatar">
-                  {{ review.customerName.charAt(0) }}
-                </div>
-                <div class="reviewer-details">
-                  <h4>{{ review.customerName }}</h4>
-                  <div class="review-rating">
-                    @for (star of getStarArray(review.rating); track $index) {
-                      <span class="star filled">⭐</span>
-                    }
+      @if (menuItems().length > 0) {
+        <!-- Grid View -->
+        @if (menuViewMode() === 'grid') {
+          <div class="dishes-grid">
+            @for (item of paginatedMenuItems(); track item.id) {
+              <div class="dish-card">
+                <img [src]="item.image" [alt]="item.name" class="dish-image" />
+                <div class="dish-info">
+                  <div class="dish-header">
+                    <h3>{{ item.name }}</h3>
+                    <span class="dish-price">{{ item.formattedPrice }}</span>
+                  </div>
+                  <p>{{ item.description }}</p>
+                  <div class="dish-actions">
+                    <button type="button" class="add-to-cart-btn" [disabled]="item.isAdding" (click)="addToCart(item)">
+                      @if (item.isAdding) { <span class="btn-spinner"></span> Adding... } @else {
+                        <lucide-icon [img]="ShoppingCart" [size]="14"></lucide-icon> Add to Cart
+                      }
+                    </button>
                   </div>
                 </div>
               </div>
-              <span class="review-date">{{ formatDate(review.date) }}</span>
-            </div>
-            <p class="review-comment">{{ review.comment }}</p>
-            <div class="review-actions">
-              <button
-                type="button"
-                class="action-btn"
-                [class.marked]="isMarkedHelpful(review.id)"
-                (click)="markHelpful(review.id)">
-                <span class="icon">{{ isMarkedHelpful(review.id) ? '👍' : '👍🏻' }}</span>
-                Helpful ({{ review.helpful }})
-              </button>
-              <button
-                type="button"
-                class="action-btn"
-                (click)="replyToReview(review.id)">
-                <span class="icon">💬</span>
-                Reply
-              </button>
-            </div>
+            }
           </div>
         }
+
+        <!-- List View -->
+        @if (menuViewMode() === 'list') {
+          <div class="dishes-list">
+            @for (item of paginatedMenuItems(); track item.id) {
+              <div class="dish-list-item">
+                <img [src]="item.image" [alt]="item.name" class="dish-list-image" />
+                <div class="dish-list-info">
+                  <h3>{{ item.name }}</h3>
+                  <p>{{ item.description }}</p>
+                </div>
+                <div class="dish-list-actions">
+                  <span class="dish-price">{{ item.formattedPrice }}</span>
+                  <button type="button" class="add-to-cart-btn" [disabled]="item.isAdding" (click)="addToCart(item)">
+                    @if (item.isAdding) { Adding... } @else { <lucide-icon [img]="ShoppingCart" [size]="14"></lucide-icon> Add }
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Gallery View -->
+        @if (menuViewMode() === 'gallery') {
+          <div class="dishes-gallery">
+            @for (item of paginatedMenuItems(); track item.id) {
+              <div class="dish-gallery-item">
+                <img [src]="item.image" [alt]="item.name" class="dish-gallery-image" />
+                <div class="dish-gallery-overlay">
+                  <h3>{{ item.name }}</h3>
+                  <span class="dish-price">{{ item.formattedPrice }}</span>
+                  <button type="button" class="add-to-cart-btn-small" [disabled]="item.isAdding" (click)="addToCart(item)">
+                    @if (item.isAdding) { ... } @else { <lucide-icon [img]="ShoppingCart" [size]="12"></lucide-icon> }
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Table View -->
+        @if (menuViewMode() === 'table') {
+          <div class="dishes-table-wrapper">
+            <table class="dishes-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Description</th>
+                  <th>Price</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of paginatedMenuItems(); track item.id) {
+                  <tr>
+                    <td class="table-item-name">
+                      <img [src]="item.image" [alt]="item.name" class="table-item-image" />
+                      <span>{{ item.name }}</span>
+                    </td>
+                    <td class="table-item-desc">{{ item.description }}</td>
+                    <td class="table-item-price">{{ item.formattedPrice }}</td>
+                    <td class="table-item-action">
+                      <button type="button" class="add-to-cart-btn-small" [disabled]="item.isAdding" (click)="addToCart(item)">
+                        @if (item.isAdding) { ... } @else { <lucide-icon [img]="ShoppingCart" [size]="12"></lucide-icon> Add }
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- Pagination -->
+        @if (menuTotalPages() > 1) {
+          <div class="menu-pagination">
+            <button type="button" class="pagination-btn" [disabled]="menuPage() === 1" (click)="prevMenuPage()" title="Previous Page">
+              <lucide-icon [img]="ChevronLeft" [size]="16"></lucide-icon>
+            </button>
+            <div class="pagination-numbers">
+              @for (page of getMenuPageNumbers(); track page) {
+                <button type="button" class="pagination-num" [class.active]="page === menuPage()" (click)="goToMenuPage(page)">
+                  {{ page }}
+                </button>
+              }
+            </div>
+            <button type="button" class="pagination-btn" [disabled]="menuPage() === menuTotalPages()" (click)="nextMenuPage()" title="Next Page">
+              <lucide-icon [img]="ChevronRight" [size]="16"></lucide-icon>
+            </button>
+          </div>
+        }
+
+        <!-- View Full Menu -->
+        <div class="view-full-menu-wrapper">
+          <button type="button" class="view-menu-btn" (click)="viewFullMenu()">
+            <lucide-icon [img]="FileText" [size]="16"></lucide-icon>
+            <span>View Full Menu</span>
+            <span class="menu-count">{{ menuItems().length }} items</span>
+          </button>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p><lucide-icon [img]="Utensils" [size]="24" style="display:block;margin:0 auto 8px;"></lucide-icon> No menu items available yet. Check back soon!</p>
+        </div>
+      }
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="reviews-section">
+      <div class="section">
+        <div class="tag">
+          <lucide-icon [img]="MessageSquare" [size]="14"></lucide-icon>
+          Reviews
+        </div>
+        <div class="header-card">
+          <div>
+            <h2>Reviews ({{ restaurant().reviewCount }})</h2>
+            <p>{{ restaurant().rating > 0 ? restaurant().rating + ' average rating' : 'No ratings yet' }}</p>
+          </div>
+          <button type="button" class="btn-primary" (click)="openWriteReview()">
+            <lucide-icon [img]="PenLine" [size]="16"></lucide-icon>
+            Write a Review
+          </button>
+        </div>
       </div>
 
-      <button type="button" class="view-all-reviews-btn" (click)="viewAllReviews()">
-        View All Reviews
-      </button>
-    } @else {
-      <div class="empty-state">
-        <p style="text-align: center; padding: 2rem; color: #666;">
-          ⭐ No reviews yet. Be the first to review this restaurant!
-        </p>
-      </div>
-    }
-  </div>
+      @if (recentReviews().length > 0) {
+        <div class="reviews-list">
+          @for (review of recentReviews(); track review.id) {
+            <div class="review-card">
+              <div class="review-header">
+                <div class="reviewer-info">
+                  <div class="reviewer-avatar">{{ review.customerName.charAt(0) }}</div>
+                  <div class="reviewer-details">
+                    <h4>{{ review.customerName }}</h4>
+                    <div class="review-rating">
+                      @for (star of getStarArray(review.rating); track $index) {
+                        <span class="star">★</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+                <span class="review-date">{{ formatDate(review.date) }}</span>
+              </div>
+              <p class="review-comment">{{ review.comment }}</p>
+              <div class="review-actions">
+                <button type="button" class="action-btn" [class.marked]="isMarkedHelpful(review.id)" (click)="markHelpful(review.id)">
+                  <lucide-icon [img]="ThumbsUp" [size]="14"></lucide-icon>
+                  Helpful ({{ review.helpful }})
+                </button>
+                <button type="button" class="action-btn" (click)="replyToReview(review.id)">
+                  <lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon>
+                  Reply
+                </button>
+              </div>
+            </div>
+          }
+        </div>
 
-  <!-- Map Section (Placeholder) -->
-  <div class="map-section">
-    <h2>Location</h2>
-    <div class="map-placeholder">
-      <div class="map-content">
-        <span class="map-icon">🗺️</span>
-        <p>Interactive map would be displayed here</p>
-        <p class="address">{{ restaurant().address }}</p>
-        <button type="button" class="directions-btn" (click)="getDirections()">
-          Get Directions
+        <button type="button" class="btn-secondary" style="display:block;margin:0 auto;" (click)="viewAllReviews()">
+          View All Reviews
         </button>
+      } @else {
+        <div class="section-card">
+          <div class="empty-state">
+            <p><lucide-icon [img]="Star" [size]="24" style="display:block;margin:0 auto 8px;"></lucide-icon> No reviews yet. Be the first to review this restaurant!</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Map Section -->
+    <div class="map-section">
+      <div class="section">
+        <div class="tag">
+          <lucide-icon [img]="MapPin" [size]="14"></lucide-icon>
+          Location
+        </div>
+        <div class="header-card">
+          <h2>Location</h2>
+        </div>
+      </div>
+      <div class="map-placeholder">
+        <div class="map-content">
+          <lucide-icon [img]="MapIcon" [size]="48"></lucide-icon>
+          <p>Interactive map would be displayed here</p>
+          <p class="address">{{ restaurant().address }}</p>
+          <button type="button" class="btn-primary" (click)="getDirections()">
+            <lucide-icon [img]="MapPin" [size]="16"></lucide-icon>
+            Get Directions
+          </button>
+        </div>
       </div>
     </div>
-  </div>
   }
 </div>
 
 <!-- Booking Modal -->
 @if (showBookingModal()) {
   <div class="modal-overlay" (click)="closeBookingModal()">
-    <div class="modal-container booking-modal" (click)="$event.stopPropagation()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Book a Table at {{ restaurant().name }}</h2>
-        <button type="button" class="close-btn" (click)="closeBookingModal()">×</button>
+        <button type="button" class="close-btn" (click)="closeBookingModal()">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
       </div>
 
       @if (bookingSuccess()) {
         <div class="booking-success">
-          <div class="success-icon">✅</div>
+          <lucide-icon [img]="CheckCircle" [size]="56"></lucide-icon>
           <h3>Booking Confirmed!</h3>
           <p>Your table has been reserved.</p>
           <div class="booking-ref">
@@ -442,7 +415,8 @@
             A confirmation email has been sent to <strong>{{ bookingConfirmedEmail() }}</strong>.
             The restaurant will contact you shortly to confirm your reservation.
           </p>
-          <button type="button" class="primary-btn" (click)="closeBookingModal()">
+          <button type="button" class="btn-primary" (click)="closeBookingModal()">
+            <lucide-icon [img]="X" [size]="16"></lucide-icon>
             Close
           </button>
         </div>
@@ -451,15 +425,9 @@
           <div class="form-row">
             <div class="form-group">
               <label for="bookingDate">Date *</label>
-              <input
-                type="date"
-                id="bookingDate"
-                formControlName="bookingDate"
-                [min]="getMinDate()"
-                [max]="getMaxDate()"
-                class="form-control"
-                (change)="onDateChange($event)"
-              />
+              <input type="date" id="bookingDate" formControlName="bookingDate"
+                     [min]="getMinDate()" [max]="getMaxDate()"
+                     class="form-control" (change)="onDateChange($event)" />
               @if (bookingForm.get('bookingDate')?.invalid && bookingForm.get('bookingDate')?.touched) {
                 <span class="error-message">Date is required</span>
               }
@@ -467,20 +435,15 @@
 
             <div class="form-group">
               <label for="bookingTime">Time *</label>
-
               @if (isLoadingSlots()) {
                 <div class="loading-slots">Loading available times...</div>
               } @else if (availableTimeSlots().length > 0) {
                 <div class="time-slots-grid">
                   @for (slot of availableTimeSlots(); track slot.time) {
-                    <button
-                      type="button"
-                      class="time-slot-btn"
-                      [class.selected]="bookingForm.get('bookingTime')?.value === slot.time"
-                      [class.unavailable]="!slot.available"
-                      [disabled]="!slot.available"
-                      (click)="bookingForm.patchValue({ bookingTime: slot.time })"
-                    >
+                    <button type="button" class="time-slot-btn"
+                            [class.selected]="bookingForm.get('bookingTime')?.value === slot.time"
+                            [class.unavailable]="!slot.available" [disabled]="!slot.available"
+                            (click)="bookingForm.patchValue({ bookingTime: slot.time })">
                       <span class="time">{{ slot.time }}</span>
                       @if (!slot.available) {
                         <span class="status fully-booked">Fully Booked</span>
@@ -491,15 +454,9 @@
                   }
                 </div>
               } @else {
-                <input
-                  type="time"
-                  id="bookingTime"
-                  formControlName="bookingTime"
-                  class="form-control"
-                  placeholder="Select a date first"
-                />
+                <input type="time" id="bookingTime" formControlName="bookingTime"
+                       class="form-control" placeholder="Select a date first" />
               }
-
               @if (bookingForm.get('bookingTime')?.invalid && bookingForm.get('bookingTime')?.touched) {
                 <span class="error-message">Time is required</span>
               }
@@ -507,14 +464,7 @@
 
             <div class="form-group">
               <label for="partySize">Party Size *</label>
-              <input
-                type="number"
-                id="partySize"
-                formControlName="partySize"
-                min="1"
-                max="20"
-                class="form-control"
-              />
+              <input type="number" id="partySize" formControlName="partySize" min="1" max="20" class="form-control" />
               @if (bookingForm.get('partySize')?.invalid && bookingForm.get('partySize')?.touched) {
                 <span class="error-message">Party size must be between 1 and 20</span>
               }
@@ -524,13 +474,7 @@
           <div class="form-row">
             <div class="form-group">
               <label for="contactName">Name *</label>
-              <input
-                type="text"
-                id="contactName"
-                formControlName="contactName"
-                placeholder="Your full name"
-                class="form-control"
-              />
+              <input type="text" id="contactName" formControlName="contactName" placeholder="Your full name" class="form-control" />
               @if (bookingForm.get('contactName')?.invalid && bookingForm.get('contactName')?.touched) {
                 <span class="error-message">Name is required</span>
               }
@@ -540,27 +484,14 @@
           <div class="form-row">
             <div class="form-group">
               <label for="contactPhone">Phone *</label>
-              <input
-                type="tel"
-                id="contactPhone"
-                formControlName="contactPhone"
-                placeholder="+1 (555) 123-4567"
-                class="form-control"
-              />
+              <input type="tel" id="contactPhone" formControlName="contactPhone" placeholder="+1 (555) 123-4567" class="form-control" />
               @if (bookingForm.get('contactPhone')?.invalid && bookingForm.get('contactPhone')?.touched) {
                 <span class="error-message">Phone is required</span>
               }
             </div>
-
             <div class="form-group">
               <label for="contactEmail">Email *</label>
-              <input
-                type="email"
-                id="contactEmail"
-                formControlName="contactEmail"
-                placeholder="your@email.com"
-                class="form-control"
-              />
+              <input type="email" id="contactEmail" formControlName="contactEmail" placeholder="your@email.com" class="form-control" />
               @if (bookingForm.get('contactEmail')?.invalid && bookingForm.get('contactEmail')?.touched) {
                 <span class="error-message">Valid email is required</span>
               }
@@ -580,11 +511,9 @@
                 <option value="other">Other</option>
               </select>
             </div>
-
             <div class="form-group table-preference-group">
               <label for="tablePreferences">Table Preference (Optional)</label>
-              <select id="tablePreferences" formControlName="tablePreferences" class="form-control"
-                      (change)="onTablePreferenceChange($event)">
+              <select id="tablePreferences" formControlName="tablePreferences" class="form-control" (change)="onTablePreferenceChange($event)">
                 <option value="">No preference</option>
                 <option value="window">Window seat</option>
                 <option value="quiet">Quiet area</option>
@@ -593,7 +522,6 @@
               </select>
               @if (showTablePreferenceNotice()) {
                 <div class="preference-notice">
-                  <span class="notice-icon">ℹ️</span>
                   <span>This area may be reserved. We'll confirm availability.</span>
                 </div>
               }
@@ -602,32 +530,23 @@
 
           <div class="form-group">
             <label for="specialRequests">Special Requests (Optional)</label>
-            <textarea
-              id="specialRequests"
-              formControlName="specialRequests"
-              rows="3"
-              placeholder="Any dietary restrictions, allergies, or special requests..."
-              class="form-control"
-            ></textarea>
+            <textarea id="specialRequests" formControlName="specialRequests" rows="3"
+                      placeholder="Any dietary restrictions, allergies, or special requests..."
+                      class="form-control"></textarea>
           </div>
 
-          <!-- Availability Notice -->
           <div class="availability-notice">
-            <span class="notice-icon">📋</span>
+            <lucide-icon [img]="Info" [size]="16"></lucide-icon>
             <span class="notice-text">Reservations are subject to space availability. The restaurant will confirm your booking.</span>
           </div>
 
           @if (bookingError()) {
-            <div class="error-alert">
-              {{ bookingError() }}
-            </div>
+            <div class="error-alert">{{ bookingError() }}</div>
           }
 
           <div class="modal-actions">
-            <button type="button" class="secondary-btn" (click)="closeBookingModal()" [disabled]="isSubmittingBooking()">
-              Cancel
-            </button>
-            <button type="submit" class="primary-btn" [disabled]="isSubmittingBooking()">
+            <button type="button" class="btn-secondary" (click)="closeBookingModal()" [disabled]="isSubmittingBooking()">Cancel</button>
+            <button type="submit" class="btn-primary" [disabled]="isSubmittingBooking()">
               @if (isSubmittingBooking()) {
                 <span>Booking...</span>
               } @else {
@@ -647,18 +566,18 @@
     <div class="modal-container review-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Write a Review</h2>
-        <button type="button" class="close-btn" (click)="closeReviewModal()">×</button>
+        <button type="button" class="close-btn" (click)="closeReviewModal()">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
       </div>
 
       @if (reviewSuccess()) {
         <div class="review-success">
-          <div class="success-icon">✅</div>
+          <lucide-icon [img]="CheckCircle" [size]="56"></lucide-icon>
           <h3>Review Submitted!</h3>
           <p>Thank you for sharing your experience at {{ restaurant().name }}.</p>
           <p class="success-message">Your review will help others discover great dining experiences.</p>
-          <button type="button" class="primary-btn" (click)="closeReviewModal()">
-            Close
-          </button>
+          <button type="button" class="btn-primary" (click)="closeReviewModal()">Close</button>
         </div>
       } @else {
         <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="review-form">
@@ -667,11 +586,7 @@
             <label>Overall Rating *</label>
             <div class="star-rating">
               @for (star of ratingStars; track star) {
-                <button
-                  type="button"
-                  class="star-btn"
-                  [class.active]="star <= getRating('overallRating')"
-                  (click)="setRating('overallRating', star)">
+                <button type="button" class="star-btn" [class.active]="star <= getRating('overallRating')" (click)="setRating('overallRating', star)">
                   {{ star <= getRating('overallRating') ? '★' : '☆' }}
                 </button>
               }
@@ -694,11 +609,7 @@
               <label>Food</label>
               <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button
-                    type="button"
-                    class="mini-star"
-                    [class.active]="star <= getRating('foodRating')"
-                    (click)="setRating('foodRating', star)">
+                  <button type="button" class="mini-star" [class.active]="star <= getRating('foodRating')" (click)="setRating('foodRating', star)">
                     {{ star <= getRating('foodRating') ? '★' : '☆' }}
                   </button>
                 }
@@ -708,11 +619,7 @@
               <label>Service</label>
               <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button
-                    type="button"
-                    class="mini-star"
-                    [class.active]="star <= getRating('serviceRating')"
-                    (click)="setRating('serviceRating', star)">
+                  <button type="button" class="mini-star" [class.active]="star <= getRating('serviceRating')" (click)="setRating('serviceRating', star)">
                     {{ star <= getRating('serviceRating') ? '★' : '☆' }}
                   </button>
                 }
@@ -722,11 +629,7 @@
               <label>Ambiance</label>
               <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button
-                    type="button"
-                    class="mini-star"
-                    [class.active]="star <= getRating('ambianceRating')"
-                    (click)="setRating('ambianceRating', star)">
+                  <button type="button" class="mini-star" [class.active]="star <= getRating('ambianceRating')" (click)="setRating('ambianceRating', star)">
                     {{ star <= getRating('ambianceRating') ? '★' : '☆' }}
                   </button>
                 }
@@ -736,11 +639,7 @@
               <label>Value</label>
               <div class="mini-stars">
                 @for (star of ratingStars; track star) {
-                  <button
-                    type="button"
-                    class="mini-star"
-                    [class.active]="star <= getRating('valueRating')"
-                    (click)="setRating('valueRating', star)">
+                  <button type="button" class="mini-star" [class.active]="star <= getRating('valueRating')" (click)="setRating('valueRating', star)">
                     {{ star <= getRating('valueRating') ? '★' : '☆' }}
                   </button>
                 }
@@ -751,25 +650,15 @@
           <!-- Review Title -->
           <div class="form-group">
             <label for="reviewTitle">Review Title (Optional)</label>
-            <input
-              type="text"
-              id="reviewTitle"
-              formControlName="title"
-              placeholder="Summarize your experience"
-              class="form-control"
-              maxlength="100">
+            <input type="text" id="reviewTitle" formControlName="title" placeholder="Summarize your experience" class="form-control" maxlength="100">
           </div>
 
           <!-- Review Content -->
           <div class="form-group">
             <label for="reviewComment">Your Review *</label>
-            <textarea
-              id="reviewComment"
-              formControlName="comment"
-              rows="5"
-              placeholder="Tell us about your dining experience. What did you enjoy? What could be improved?"
-              class="form-control"
-              minlength="20"></textarea>
+            <textarea id="reviewComment" formControlName="comment" rows="5"
+                      placeholder="Tell us about your dining experience. What did you enjoy? What could be improved?"
+                      class="form-control" minlength="20"></textarea>
             <span class="char-hint">Minimum 20 characters</span>
           </div>
 
@@ -777,12 +666,7 @@
           <div class="form-row">
             <div class="form-group">
               <label for="visitDate">When did you visit? (Optional)</label>
-              <input
-                type="date"
-                id="visitDate"
-                formControlName="visitDate"
-                class="form-control"
-                [max]="today">
+              <input type="date" id="visitDate" formControlName="visitDate" class="form-control" [max]="today">
             </div>
             <div class="form-group checkbox-group">
               <label class="checkbox-label">
@@ -793,21 +677,13 @@
           </div>
 
           @if (reviewError()) {
-            <div class="error-alert">
-              {{ reviewError() }}
-            </div>
+            <div class="error-alert">{{ reviewError() }}</div>
           }
 
           <div class="modal-actions">
-            <button type="button" class="secondary-btn" (click)="closeReviewModal()" [disabled]="isSubmittingReview()">
-              Cancel
-            </button>
-            <button type="submit" class="primary-btn" [disabled]="isSubmittingReview()">
-              @if (isSubmittingReview()) {
-                <span>Submitting...</span>
-              } @else {
-                <span>Submit Review</span>
-              }
+            <button type="button" class="btn-secondary" (click)="closeReviewModal()" [disabled]="isSubmittingReview()">Cancel</button>
+            <button type="submit" class="btn-primary" [disabled]="isSubmittingReview()">
+              @if (isSubmittingReview()) { Submitting... } @else { Submit Review }
             </button>
           </div>
         </form>
@@ -816,7 +692,7 @@
   </div>
 }
 
-<!-- Full Menu Modal - NYT Style -->
+<!-- Full Menu Modal -->
 @if (showFullMenuModal()) {
   <div class="modal-overlay" (click)="closeFullMenuModal()">
     <div class="modal-container full-menu-modal" (click)="$event.stopPropagation()">
@@ -825,45 +701,23 @@
         <span class="modal-subtitle">{{ restaurant().name }}</span>
         <div class="modal-view-toggle">
           <button type="button" class="toggle-btn" [class.active]="menuViewMode() === 'grid'" (click)="setMenuViewMode('grid')" title="Grid View">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-            </svg>
+            <lucide-icon [img]="LayoutGrid" [size]="14"></lucide-icon>
           </button>
           <button type="button" class="toggle-btn" [class.active]="menuViewMode() === 'list'" (click)="setMenuViewMode('list')" title="List View">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
+            <lucide-icon [img]="List" [size]="14"></lucide-icon>
           </button>
           <button type="button" class="toggle-btn" [class.active]="menuViewMode() === 'gallery'" (click)="setMenuViewMode('gallery')" title="Gallery View">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <path d="M21 15l-5-5L5 21"></path>
-            </svg>
+            <lucide-icon [img]="Image" [size]="14"></lucide-icon>
           </button>
           <button type="button" class="toggle-btn" [class.active]="menuViewMode() === 'table'" (click)="setMenuViewMode('table')" title="Table View">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="3" y1="9" x2="21" y2="9"></line>
-              <line x1="3" y1="15" x2="21" y2="15"></line>
-              <line x1="9" y1="3" x2="9" y2="21"></line>
-            </svg>
+            <lucide-icon [img]="Table" [size]="14"></lucide-icon>
           </button>
         </div>
         <button type="button" class="close-btn" (click)="closeFullMenuModal()" title="Close">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
         </button>
       </div>
-      <div class="modal-body full-menu-body">
-        <!-- Grid View in Modal -->
+      <div class="full-menu-body">
         @if (menuViewMode() === 'grid') {
           <div class="dishes-grid modal-grid">
             @for (item of menuItems(); track item.id) {
@@ -877,7 +731,7 @@
                   <p>{{ item.description }}</p>
                   <div class="dish-actions">
                     <button type="button" class="add-to-cart-btn" [disabled]="item.isAdding" (click)="addToCart(item)">
-                      @if (item.isAdding) { Adding... } @else { 🛒 Add to Cart }
+                      @if (item.isAdding) { Adding... } @else { <lucide-icon [img]="ShoppingCart" [size]="14"></lucide-icon> Add to Cart }
                     </button>
                   </div>
                 </div>
@@ -885,8 +739,6 @@
             }
           </div>
         }
-
-        <!-- List View in Modal -->
         @if (menuViewMode() === 'list') {
           <div class="dishes-list">
             @for (item of menuItems(); track item.id) {
@@ -899,15 +751,13 @@
                 <div class="dish-list-actions">
                   <span class="dish-price">{{ item.formattedPrice }}</span>
                   <button type="button" class="add-to-cart-btn" [disabled]="item.isAdding" (click)="addToCart(item)">
-                    @if (item.isAdding) { Adding... } @else { 🛒 Add }
+                    @if (item.isAdding) { Adding... } @else { <lucide-icon [img]="ShoppingCart" [size]="14"></lucide-icon> Add }
                   </button>
                 </div>
               </div>
             }
           </div>
         }
-
-        <!-- Gallery View in Modal -->
         @if (menuViewMode() === 'gallery') {
           <div class="dishes-gallery modal-gallery">
             @for (item of menuItems(); track item.id) {
@@ -917,15 +767,13 @@
                   <h3>{{ item.name }}</h3>
                   <span class="dish-price">{{ item.formattedPrice }}</span>
                   <button type="button" class="add-to-cart-btn-small" [disabled]="item.isAdding" (click)="addToCart(item)">
-                    @if (item.isAdding) { ... } @else { 🛒 }
+                    @if (item.isAdding) { ... } @else { <lucide-icon [img]="ShoppingCart" [size]="12"></lucide-icon> }
                   </button>
                 </div>
               </div>
             }
           </div>
         }
-
-        <!-- Table View in Modal -->
         @if (menuViewMode() === 'table') {
           <div class="dishes-table-wrapper">
             <table class="dishes-table">
@@ -948,7 +796,7 @@
                     <td class="table-item-price">{{ item.formattedPrice }}</td>
                     <td class="table-item-action">
                       <button type="button" class="add-to-cart-btn-small" [disabled]="item.isAdding" (click)="addToCart(item)">
-                        @if (item.isAdding) { ... } @else { 🛒 Add }
+                        @if (item.isAdding) { ... } @else { <lucide-icon [img]="ShoppingCart" [size]="12"></lucide-icon> Add }
                       </button>
                     </td>
                   </tr>

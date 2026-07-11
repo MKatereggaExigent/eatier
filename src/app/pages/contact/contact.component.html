@@ -1,172 +1,199 @@
 <div class="contact-page">
-  <!-- Hero Section -->
-  <section class="contact-hero">
-    <div class="hero-content">
-      <h1>Get in Touch</h1>
-      <p class="hero-subtitle">We'd love to hear from you. Our team is here to help.</p>
+  <!-- Full-bleed Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-text">
+      <span class="hero-label">Contact</span>
+      <h1 class="hero-title">Get in Touch</h1>
+      <p class="hero-subtitle">We'd love to hear from you. Our team is here to help with any questions, partnerships, or feedback.</p>
     </div>
   </section>
 
-  <div class="contact-container">
-    <!-- Contact Form Section -->
-    <section class="contact-form-section">
-      <div class="form-header">
-        <h2>Send Us a Message</h2>
-        <p>Fill out the form below and we'll get back to you within 24 hours.</p>
+  <!-- Stats Bar -->
+  <section class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <span class="stat-value">&lt; 2hrs</span>
+        <span class="stat-label">Avg. Response</span>
       </div>
+      <div class="stat-item">
+        <span class="stat-value">3</span>
+        <span class="stat-label">Languages</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">98%</span>
+        <span class="stat-label">Satisfaction</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">3</span>
+        <span class="stat-label">Offices</span>
+      </div>
+    </div>
+  </section>
 
-      @if (submitSuccess()) {
-        <div class="success-message">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <p>Thank you! Your message has been sent successfully. We'll be in touch soon.</p>
-        </div>
-      }
-
-      @if (submitError()) {
-        <div class="error-message">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <p>{{ submitError() }}</p>
-        </div>
-      }
-
-      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="name">Full Name *</label>
-            <input 
-              type="text" 
-              id="name" 
-              formControlName="name"
-              [class.invalid]="isFieldInvalid('name')"
-              placeholder="John Doe">
-            @if (isFieldInvalid('name')) {
-              <span class="error-text">{{ getFieldError('name') }}</span>
-            }
+  <!-- Contact Form + Info -->
+  <section class="contact-main">
+    <div class="section-inner">
+      <div class="contact-grid">
+        <!-- Form -->
+        <div class="card form-card">
+          <div class="form-header">
+            <span class="tag">Message</span>
+            <h2 class="form-title">Send Us a Message</h2>
+            <p class="form-sub">Fill out the form below and we'll get back to you within 24 hours.</p>
           </div>
 
-          <div class="form-group">
-            <label for="email">Email Address *</label>
-            <input 
-              type="email" 
-              id="email" 
-              formControlName="email"
-              [class.invalid]="isFieldInvalid('email')"
-              placeholder="john@example.com">
-            @if (isFieldInvalid('email')) {
-              <span class="error-text">{{ getFieldError('email') }}</span>
-            }
-          </div>
-        </div>
+          @if (submitSuccess()) {
+            <div class="success-message">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span>Thank you! Your message has been sent successfully. We'll be in touch soon.</span>
+            </div>
+          }
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="phone">Phone Number (Optional)</label>
-            <input 
-              type="tel" 
-              id="phone" 
-              formControlName="phone"
-              placeholder="+27 12 345 6789">
-          </div>
+          @if (submitError()) {
+            <div class="error-message">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>{{ submitError() }}</span>
+            </div>
+          }
 
-          <div class="form-group">
-            <label for="reason">Reason for Contact *</label>
-            <select id="reason" formControlName="reason">
-              @for (reason of contactReasons; track reason.value) {
-                <option [value]="reason.value">{{ reason.label }}</option>
+          <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+            <div class="form-row">
+              <div class="field">
+                <label for="name">Full Name <span class="required">*</span></label>
+                <input type="text" id="name" formControlName="name" placeholder="John Doe" [class.invalid]="isFieldInvalid('name')">
+                @if (isFieldInvalid('name')) {
+                  <span class="field-error">{{ getFieldError('name') }}</span>
+                }
+              </div>
+              <div class="field">
+                <label for="email">Email <span class="required">*</span></label>
+                <input type="email" id="email" formControlName="email" placeholder="john@example.com" [class.invalid]="isFieldInvalid('email')">
+                @if (isFieldInvalid('email')) {
+                  <span class="field-error">{{ getFieldError('email') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="phone">Phone <span class="optional">(optional)</span></label>
+                <input type="tel" id="phone" formControlName="phone" placeholder="+27 12 345 6789">
+              </div>
+              <div class="field">
+                <label for="reason">Reason for Contact <span class="required">*</span></label>
+                <select id="reason" formControlName="reason">
+                  @for (reason of contactReasons; track reason.value) {
+                    <option [value]="reason.value">{{ reason.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="subject">Subject <span class="required">*</span></label>
+              <input type="text" id="subject" formControlName="subject" placeholder="Brief description of your inquiry" [class.invalid]="isFieldInvalid('subject')">
+              @if (isFieldInvalid('subject')) {
+                <span class="field-error">{{ getFieldError('subject') }}</span>
               }
-            </select>
+            </div>
+
+            <div class="field">
+              <label for="message">Message <span class="required">*</span></label>
+              <textarea id="message" formControlName="message" rows="5" placeholder="Please provide details about your inquiry..." [class.invalid]="isFieldInvalid('message')"></textarea>
+              @if (isFieldInvalid('message')) {
+                <span class="field-error">{{ getFieldError('message') }}</span>
+              }
+            </div>
+
+            <div class="field checkbox-field">
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="consent">
+                <span>I consent to Itiyum processing my personal data in accordance with the <a routerLink="/legal/privacy">Privacy Policy</a> <span class="required">*</span></span>
+              </label>
+              @if (isFieldInvalid('consent')) {
+                <span class="field-error">You must consent to continue</span>
+              }
+            </div>
+
+            <button type="submit" class="btn-primary" [disabled]="isSubmitting()">
+              @if (isSubmitting()) {
+                <span class="spinner"></span>
+                <span>Sending...</span>
+              } @else {
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <span>Send Message</span>
+              }
+            </button>
+          </form>
+        </div>
+
+        <!-- Contact Info Cards -->
+        <div class="info-column">
+          <div class="card info-card">
+            <div class="info-icon" style="background: #8FC9A3;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+            </div>
+            <h3>Email Us</h3>
+            <a href="mailto:hello@itiyum.com" class="info-link">hello@itiyum.com</a>
+            <p class="info-desc">For general inquiries and support</p>
+          </div>
+
+          <div class="card info-card">
+            <div class="info-icon" style="background: #89C4D9;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <h3>Call Us</h3>
+            <a href="tel:+270652877664" class="info-link">065 287 7664</a>
+            <p class="info-desc">Mon–Fri: 9:00 AM – 6:00 PM SAST</p>
+          </div>
+
+          <div class="card info-card">
+            <div class="info-icon" style="background: #F5D760;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E293B" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <h3>Live Chat</h3>
+            <a routerLink="/help" class="info-link">Visit Help Centre &rarr;</a>
+            <p class="info-desc">Get instant support from our team</p>
           </div>
         </div>
-
-        <div class="form-group">
-          <label for="subject">Subject *</label>
-          <input 
-            type="text" 
-            id="subject" 
-            formControlName="subject"
-            [class.invalid]="isFieldInvalid('subject')"
-            placeholder="Brief description of your inquiry">
-          @if (isFieldInvalid('subject')) {
-            <span class="error-text">{{ getFieldError('subject') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="message">Message *</label>
-          <textarea 
-            id="message" 
-            formControlName="message"
-            [class.invalid]="isFieldInvalid('message')"
-            rows="6"
-            placeholder="Please provide details about your inquiry..."></textarea>
-          @if (isFieldInvalid('message')) {
-            <span class="error-text">{{ getFieldError('message') }}</span>
-          }
-        </div>
-
-        <div class="form-group checkbox-group">
-          <label class="checkbox-label">
-            <input type="checkbox" formControlName="consent">
-            <span>I consent to Itiyum processing my personal data in accordance with the <a routerLink="/legal/privacy">Privacy Policy</a> *</span>
-          </label>
-          @if (isFieldInvalid('consent')) {
-            <span class="error-text">You must consent to continue</span>
-          }
-        </div>
-
-        <button 
-          type="submit" 
-          class="submit-button"
-          [disabled]="isSubmitting()">
-          @if (isSubmitting()) {
-            <span>Sending...</span>
-          } @else {
-            <span>Send Message</span>
-          }
-        </button>
-      </form>
-    </section>
-
-    <!-- Contact Information Section -->
-    <section class="contact-info-section">
-      <div class="info-card">
-        <h3>📧 Email Us</h3>
-        <p><a href="mailto:hello@itiyum.com">hello@itiyum.com</a></p>
-        <p class="info-description">For general inquiries and support</p>
       </div>
+    </div>
+  </section>
 
-      <div class="info-card">
-        <h3>📞 Call Us</h3>
-        <p>+27 (0) 21 123 4567</p>
-        <p class="info-description">Monday - Friday: 9:00 AM - 6:00 PM SAST</p>
-      </div>
-
-      <div class="info-card">
-        <h3>💬 Live Chat</h3>
-        <p><a routerLink="/help">Visit Help Centre</a></p>
-        <p class="info-description">Get instant support from our team</p>
-      </div>
-    </section>
-  </div>
-
-  <!-- Offices Section -->
+  <!-- Offices -->
   <section class="offices-section">
-    <div class="section-container">
-      <h2 class="section-title">Our Offices</h2>
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="tag">Locations</span>
+        <h2 class="section-title">Our Offices</h2>
+        <p class="section-sub">Visit or reach out to any of our locations worldwide</p>
+      </div>
       <div class="offices-grid">
-        @for (office of offices; track office.city) {
-          <div class="office-card">
-            <h3>{{ office.city }}</h3>
-            <p class="office-country">{{ office.country }}</p>
+        @for (office of offices; track office.city; let i = $index) {
+          <div class="card office-card" [style.animation-delay]="i * 0.08 + 's'">
+            <div class="office-top">
+              <h3>{{ office.city }}</h3>
+              <span class="office-country">{{ office.country }}</span>
+            </div>
             <div class="office-details">
-              <p><strong>📍 Address:</strong><br>{{ office.address }}</p>
-              <p><strong>📞 Phone:</strong><br>{{ office.phone }}</p>
-              <p><strong>📧 Email:</strong><br><a [href]="'mailto:' + office.email">{{ office.email }}</a></p>
-              <p><strong>🕒 Hours:</strong><br>{{ office.hours }}</p>
+              <div class="office-detail">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>{{ office.address }}</span>
+              </div>
+              <div class="office-detail">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <a [href]="'tel:' + office.phone">{{ office.phone }}</a>
+              </div>
+              <div class="office-detail">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+                <a [href]="'mailto:' + office.email">{{ office.email }}</a>
+              </div>
+              <div class="office-detail">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>{{ office.hours }}</span>
+              </div>
             </div>
           </div>
         }
@@ -174,4 +201,3 @@
     </div>
   </section>
 </div>
-

@@ -20,7 +20,6 @@ interface JobOpening {
   styleUrls: ['./careers.component.scss']
 })
 export class CareersComponent {
-  // Lucide Icons
   readonly DollarSign = DollarSign;
   readonly Heart = Heart;
   readonly Calendar = Calendar;
@@ -29,6 +28,7 @@ export class CareersComponent {
   readonly UtensilsCrossed = UtensilsCrossed;
   readonly Rocket = Rocket;
   readonly Globe = Globe;
+
   jobOpenings = signal<JobOpening[]>([
     {
       id: '1',
@@ -102,22 +102,27 @@ export class CareersComponent {
     }
   ]);
 
-  benefits = [
-    { icon: this.DollarSign, title: 'Competitive Salary', description: 'Market-related compensation packages' },
-    { icon: this.Heart, title: 'Medical Aid', description: 'Comprehensive health coverage' },
-    { icon: this.Calendar, title: 'Paid Leave', description: '20 days annual leave plus public holidays' },
-    { icon: this.BookOpen, title: 'Learning Budget', description: 'Annual budget for courses and conferences' },
-    { icon: this.Home, title: 'Remote Flexibility', description: 'Hybrid and remote work options' },
-    { icon: this.UtensilsCrossed, title: 'Food Perks', description: 'Monthly credits on the Itiyum platform' },
-    { icon: this.Rocket, title: 'Growth Opportunities', description: 'Clear career progression paths' },
-    { icon: this.Globe, title: 'Impact', description: 'Build solutions for Africa and beyond' }
+  values = [
+    { icon: 'zap', title: 'Innovation', description: 'We embrace new ideas and technologies to solve real problems', color: '#8FC9A3' },
+    { icon: 'users', title: 'Community', description: 'We build connections between food lovers and culinary professionals', color: '#89C4D9' },
+    { icon: 'star', title: 'Excellence', description: 'We strive for quality in everything we do', color: '#F5D760' },
+    { icon: 'globe', title: 'Diversity', description: 'We celebrate Africa\'s rich cultural and culinary diversity', color: '#FFB88C' }
   ];
 
-  values = [
-    { title: 'Innovation', description: 'We embrace new ideas and technologies to solve real problems' },
-    { title: 'Community', description: 'We build connections between food lovers and culinary professionals' },
-    { title: 'Excellence', description: 'We strive for quality in everything we do' },
-    { title: 'Diversity', description: 'We celebrate South Africa\'s rich cultural and culinary diversity' }
+  benefits = [
+    { icon: DollarSign, title: 'Competitive Salary', description: 'Market-related compensation packages', color: '#8FC9A3' },
+    { icon: Heart, title: 'Medical Aid', description: 'Comprehensive health coverage', color: '#F0B5BA' },
+    { icon: Calendar, title: 'Paid Leave', description: '20 days annual leave plus public holidays', color: '#89C4D9' },
+    { icon: BookOpen, title: 'Learning Budget', description: 'Annual budget for courses and conferences', color: '#F5D760' },
+    { icon: Home, title: 'Remote Flexibility', description: 'Hybrid and remote work options', color: '#FFB88C' },
+    { icon: UtensilsCrossed, title: 'Food Perks', description: 'Monthly credits on the Itiyum platform', color: '#8FC9A3' },
+    { icon: Rocket, title: 'Growth Opportunities', description: 'Clear career progression paths', color: '#89C4D9' },
+    { icon: Globe, title: 'Impact', description: 'Build solutions for Africa and beyond', color: '#F0B5BA' }
+  ];
+
+  cultureItems = [
+    { icon: 'heart', title: 'Building Together', description: 'At Itiyum, we believe in creating an inclusive environment where everyone can thrive. We celebrate South Africa\'s diversity and bring together people from different backgrounds, cultures, and experiences.', color: '#F0B5BA' },
+    { icon: 'lightbulb', title: 'Innovation First', description: 'We encourage experimentation and learning. Whether you\'re a developer, marketer, or support specialist, you\'ll have the freedom to try new approaches and make an impact.', color: '#F5D760' },
+    { icon: 'sun', title: 'Work-Life Balance', description: 'We understand the importance of balance. With flexible work arrangements and generous leave policies, we support our team members in all aspects of their lives.', color: '#89C4D9' }
   ];
 }
-

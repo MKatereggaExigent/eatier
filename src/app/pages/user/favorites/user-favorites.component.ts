@@ -2,14 +2,14 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Heart, UtensilsCrossed, Eye, Calendar, FileText, Edit, Trash2, SlidersHorizontal } from 'lucide-angular';
+import { LucideAngularModule, Heart, UtensilsCrossed, Eye, Calendar, FileText, Edit, Trash2, SlidersHorizontal, Search, X, Folder, Plus, LayoutGrid, List, Star } from 'lucide-angular';
 import { FavoritesService, FavoriteItem, FavoritesStats, FavoriteCollection, Restaurant } from '../../../services/favorites.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 interface ViewMode {
   type: 'grid' | 'list';
   label: string;
-  icon: string;
+  icon: any;
 }
 
 interface SortOption {
@@ -47,6 +47,13 @@ export class UserFavoritesComponent implements OnInit {
   readonly Edit = Edit;
   readonly Trash2 = Trash2;
   readonly SlidersHorizontal = SlidersHorizontal;
+  readonly Search = Search;
+  readonly X = X;
+  readonly Folder = Folder;
+  readonly Plus = Plus;
+  readonly LayoutGrid = LayoutGrid;
+  readonly List = List;
+  readonly Star = Star;
 
   // State management
   isLoading = signal(false);
@@ -56,7 +63,7 @@ export class UserFavoritesComponent implements OnInit {
   selectedFavorite = signal<FavoriteItem | null>(null);
 
   // UI state
-  viewMode = signal<ViewMode>({ type: 'grid', label: 'Grid View', icon: '⊞' });
+  viewMode = signal<ViewMode>({ type: 'grid', label: 'Grid View', icon: LayoutGrid });
   searchQuery = signal('');
   showFilters = signal(false);
   showNewCollectionModal = signal(false);
@@ -74,8 +81,8 @@ export class UserFavoritesComponent implements OnInit {
 
   // Available options
   viewModes: ViewMode[] = [
-    { type: 'grid', label: 'Grid View', icon: '⊞' },
-    { type: 'list', label: 'List View', icon: '☰' }
+    { type: 'grid', label: 'Grid View', icon: LayoutGrid },
+    { type: 'list', label: 'List View', icon: List }
   ];
 
   sortOptions: SortOption[] = [
@@ -307,10 +314,8 @@ export class UserFavoritesComponent implements OnInit {
     }).format(date);
   }
 
-  getStarRating(rating: number): string {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    return '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0));
+  getStarArray(rating: number): number[] {
+    return Array(5).fill(0).map((_, i) => i < Math.round(rating) ? 1 : 0);
   }
 
   // Modal methods

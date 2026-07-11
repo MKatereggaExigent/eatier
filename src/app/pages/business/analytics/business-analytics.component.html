@@ -1,281 +1,336 @@
-<div class="analytics-container">
-  <!-- Header -->
-  <div class="analytics-header">
-    <div class="header-content">
-      <h1><lucide-icon [img]="BarChart3" [size]="32"></lucide-icon> Business Analytics</h1>
-      <p class="subtitle">Comprehensive insights into your business performance</p>
+<div class="section" role="main">
+  <div class="section-inner">
+    <div class="tag">
+      <lucide-icon [img]="BarChart3" [size]="16"></lucide-icon>
+      Analytics
     </div>
-    <div class="header-actions">
-      <!-- Period Selector -->
-      <select class="period-selector" [value]="selectedPeriod()" (change)="onPeriodChange($any($event.target).value)">
-        @for (period of periods; track period.value) {
-          <option [value]="period.value">{{ period.label }}</option>
-        }
-      </select>
-      <button class="export-btn" (click)="exportData()" [disabled]="!analyticsData()">
-        <lucide-icon [img]="Download" [size]="18"></lucide-icon> Export Data
-      </button>
-    </div>
-  </div>
 
-  <!-- Loading State -->
-  @if (loading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading analytics data...</p>
-    </div>
-  }
-
-  <!-- Error State -->
-  @if (error() && !loading()) {
-    <div class="error-state">
-      <lucide-icon [img]="AlertTriangle" [size]="48" class="error-icon"></lucide-icon>
-      <h3>Error Loading Analytics</h3>
-      <p>{{ error() }}</p>
-      <button class="retry-btn" (click)="loadAnalytics()">Retry</button>
-    </div>
-  }
-
-  <!-- Analytics Content -->
-  @if (analyticsData() && !loading()) {
-    <div class="analytics-content">
-      <!-- Key Metrics Cards -->
-      <div class="metrics-grid">
-        <!-- Total Revenue -->
-        <div class="metric-card revenue">
-          <lucide-icon [img]="DollarSign" [size]="40" class="metric-icon"></lucide-icon>
-          <div class="metric-content">
-            <h3>Total Revenue</h3>
-            <p class="metric-value">{{ formatCurrency(analyticsData()!.orderMetrics.totalRevenue) }}</p>
-            <span class="metric-change" [class]="getGrowthClass(analyticsData()!.revenueGrowth)">
-              <lucide-icon [img]="getGrowthIcon(analyticsData()!.revenueGrowth)" [size]="16"></lucide-icon> {{ formatPercentage(analyticsData()!.revenueGrowth) }}
-            </span>
-          </div>
+    <div class="header-card">
+      <div class="header-content">
+        <div class="welcome-section">
+          <h1 class="page-title">
+            <lucide-icon [img]="BarChart3" [size]="28" class="title-icon"></lucide-icon>
+            Business Analytics
+          </h1>
+          <p class="page-subtitle">Comprehensive insights into your business performance</p>
         </div>
-
-        <!-- Total Orders -->
-        <div class="metric-card orders">
-          <lucide-icon [img]="Package" [size]="40" class="metric-icon"></lucide-icon>
-          <div class="metric-content">
-            <h3>Total Orders</h3>
-            <p class="metric-value">{{ formatNumber(analyticsData()!.orderMetrics.totalOrders) }}</p>
-            <span class="metric-change" [class]="getGrowthClass(analyticsData()!.orderGrowth)">
-              <lucide-icon [img]="getGrowthIcon(analyticsData()!.orderGrowth)" [size]="16"></lucide-icon> {{ formatPercentage(analyticsData()!.orderGrowth) }}
-            </span>
-          </div>
-        </div>
-
-        <!-- Average Order Value -->
-        <div class="metric-card aov">
-          <lucide-icon [img]="DollarSign" [size]="40" class="metric-icon"></lucide-icon>
-          <div class="metric-content">
-            <h3>Avg Order Value</h3>
-            <p class="metric-value">{{ formatCurrency(analyticsData()!.orderMetrics.averageOrderValue) }}</p>
-            <span class="metric-info">Per transaction</span>
-          </div>
-        </div>
-
-        <!-- Total Customers -->
-        <div class="metric-card customers">
-          <lucide-icon [img]="Users" [size]="40" class="metric-icon"></lucide-icon>
-          <div class="metric-content">
-            <h3>Total Customers</h3>
-            <p class="metric-value">{{ formatNumber(analyticsData()!.customerMetrics.totalCustomers) }}</p>
-            <span class="metric-change" [class]="getGrowthClass(analyticsData()!.customerGrowth)">
-              <lucide-icon [img]="getGrowthIcon(analyticsData()!.customerGrowth)" [size]="16"></lucide-icon> {{ formatPercentage(analyticsData()!.customerGrowth) }}
-            </span>
-          </div>
+        <div class="header-actions">
+          <select class="period-selector" [value]="selectedPeriod()" (change)="onPeriodChange($any($event.target).value)">
+            @for (period of periods; track period.value) {
+              <option [value]="period.value">{{ period.label }}</option>
+            }
+          </select>
+          <button class="btn-primary" (click)="exportData()" [disabled]="!analyticsData()">
+            <lucide-icon [img]="Download" [size]="18" class="btn-icon"></lucide-icon>
+            Export Data
+          </button>
         </div>
       </div>
+    </div>
 
-      <!-- Revenue Chart Section -->
-      <div class="chart-section">
-        <div class="section-header">
-          <h2><lucide-icon [img]="TrendingUp" [size]="24"></lucide-icon> Revenue Trend</h2>
-          <p>Daily revenue and order volume over {{ currentPeriod().label.toLowerCase() }}</p>
-        </div>
-        <div class="revenue-chart">
-          <div class="chart-container">
-            @for (item of analyticsData()!.revenue; track item.date) {
-              <div class="chart-bar" 
-                   [style.height.%]="(item.revenue / getMaxRevenue()) * 100"
-                   [title]="item.date + ': ' + formatCurrency(item.revenue) + ' (' + item.orders + ' orders)'">
-                <span class="bar-label">{{ formatCurrency(item.revenue) }}</span>
+    @if (loading()) {
+      <div class="stats-grid">
+        @for (_ of [1,2,3,4]; track _) {
+          <div class="stat-card">
+            <div class="stat-skeleton">
+              <div class="skeleton-icon"></div>
+              <div class="skeleton-lines">
+                <div class="skeleton-line w-40"></div>
+                <div class="skeleton-line w-70"></div>
               </div>
-            }
+            </div>
           </div>
-          <div class="chart-labels">
-            @for (item of analyticsData()!.revenue; track item.date; let i = $index) {
-              @if (i % Math.ceil(analyticsData()!.revenue.length / 7) === 0) {
-                <span class="label">{{ item.date.split('-')[2] }}</span>
+        }
+      </div>
+    }
+
+    @if (error() && !loading()) {
+      <div class="error-card">
+        <lucide-icon [img]="AlertTriangle" [size]="48" class="error-icon"></lucide-icon>
+        <h3>Error Loading Analytics</h3>
+        <p>{{ error() }}</p>
+        <button class="btn-primary" (click)="loadAnalytics()">Retry</button>
+      </div>
+    }
+
+    @if (analyticsData() && !loading()) {
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon orange">
+              <lucide-icon [img]="DollarSign" [size]="22"></lucide-icon>
+            </div>
+            <span class="stat-change" [class]="getGrowthClass(analyticsData()!.revenueGrowth)">
+              <lucide-icon [img]="getGrowthIcon(analyticsData()!.revenueGrowth)" [size]="14"></lucide-icon>
+              {{ formatPercentage(analyticsData()!.revenueGrowth) }}
+            </span>
+          </div>
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-value">{{ formatCurrency(analyticsData()!.orderMetrics.totalRevenue) }}</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon orange">
+              <lucide-icon [img]="Package" [size]="22"></lucide-icon>
+            </div>
+            <span class="stat-change" [class]="getGrowthClass(analyticsData()!.orderGrowth)">
+              <lucide-icon [img]="getGrowthIcon(analyticsData()!.orderGrowth)" [size]="14"></lucide-icon>
+              {{ formatPercentage(analyticsData()!.orderGrowth) }}
+            </span>
+          </div>
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-value">{{ formatNumber(analyticsData()!.orderMetrics.totalOrders) }}</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon orange">
+              <lucide-icon [img]="TrendingUp" [size]="22"></lucide-icon>
+            </div>
+          </div>
+          <div class="stat-label">Avg Order Value</div>
+          <div class="stat-value">{{ formatCurrency(analyticsData()!.orderMetrics.averageOrderValue) }}</div>
+          <div class="stat-sub">Per transaction</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon orange">
+              <lucide-icon [img]="Users" [size]="22"></lucide-icon>
+            </div>
+            <span class="stat-change" [class]="getGrowthClass(analyticsData()!.customerGrowth)">
+              <lucide-icon [img]="getGrowthIcon(analyticsData()!.customerGrowth)" [size]="14"></lucide-icon>
+              {{ formatPercentage(analyticsData()!.customerGrowth) }}
+            </span>
+          </div>
+          <div class="stat-label">Total Customers</div>
+          <div class="stat-value">{{ formatNumber(analyticsData()!.customerMetrics.totalCustomers) }}</div>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="content-card revenue-section">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon orange">
+                <lucide-icon [img]="TrendingUp" [size]="20"></lucide-icon>
+              </div>
+              <h2>Revenue Trend</h2>
+            </div>
+          </div>
+          <p class="card-subtitle">Daily revenue and order volume over {{ currentPeriod().label.toLowerCase() }}</p>
+          <div class="revenue-chart">
+            <div class="chart-container">
+              @for (item of analyticsData()!.revenue; track item.date) {
+                <div class="chart-bar"
+                     [style.height.%]="(item.revenue / getMaxRevenue()) * 100"
+                     [title]="item.date + ': ' + formatCurrency(item.revenue) + ' (' + item.orders + ' orders)'">
+                  <span class="bar-label">{{ formatCurrency(item.revenue) }}</span>
+                </div>
               }
-            }
-          </div>
-        </div>
-      </div>
-
-      <!-- Order Status Breakdown -->
-      <div class="status-section">
-        <h2><lucide-icon [img]="BarChart3" [size]="24"></lucide-icon> Order Status Breakdown</h2>
-        <div class="status-grid">
-          <div class="status-card completed">
-            <lucide-icon [img]="CheckCircle" [size]="32" class="status-icon"></lucide-icon>
-            <div class="status-content">
-              <h3>Completed</h3>
-              <p class="status-value">{{ formatNumber(analyticsData()!.orderMetrics.completedOrders) }}</p>
-              <span class="status-percentage">
-                {{ formatPercentage((analyticsData()!.orderMetrics.completedOrders / analyticsData()!.orderMetrics.totalOrders) * 100) }}
-              </span>
             </div>
-          </div>
-
-          <div class="status-card pending">
-            <lucide-icon [img]="Clock" [size]="32" class="status-icon"></lucide-icon>
-            <div class="status-content">
-              <h3>Pending</h3>
-              <p class="status-value">{{ formatNumber(analyticsData()!.orderMetrics.pendingOrders) }}</p>
-              <span class="status-percentage">
-                {{ formatPercentage((analyticsData()!.orderMetrics.pendingOrders / analyticsData()!.orderMetrics.totalOrders) * 100) }}
-              </span>
-            </div>
-          </div>
-
-          <div class="status-card cancelled">
-            <lucide-icon [img]="XCircle" [size]="32" class="status-icon"></lucide-icon>
-            <div class="status-content">
-              <h3>Cancelled</h3>
-              <p class="status-value">{{ formatNumber(analyticsData()!.orderMetrics.cancelledOrders) }}</p>
-              <span class="status-percentage">
-                {{ formatPercentage((analyticsData()!.orderMetrics.cancelledOrders / analyticsData()!.orderMetrics.totalOrders) * 100) }}
-              </span>
+            <div class="chart-labels">
+              @for (item of analyticsData()!.revenue; track item.date; let i = $index) {
+                @if (i % Math.ceil(analyticsData()!.revenue.length / 7) === 0) {
+                  <span class="label">{{ item.date.split('-')[2] }}</span>
+                }
+              }
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Top Menu Items -->
-      <div class="top-items-section">
-        <h2><lucide-icon [img]="Trophy" [size]="24"></lucide-icon> Top Performing Menu Items</h2>
-        <div class="top-items-list">
-          @for (item of analyticsData()!.topMenuItems; track item.id; let i = $index) {
-            <div class="item-card">
-              <div class="item-rank">{{ i + 1 }}</div>
-              <div class="item-details">
-                <h3>{{ item.name }}</h3>
-                <div class="item-stats">
-                  <span class="stat">
-                    <span class="stat-label">Orders:</span>
-                    <span class="stat-value">{{ formatNumber(item.orders) }}</span>
-                  </span>
-                  <span class="stat">
-                    <span class="stat-label">Revenue:</span>
-                    <span class="stat-value">{{ formatCurrency(item.revenue) }}</span>
-                  </span>
+        <div class="content-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon orange">
+                <lucide-icon [img]="BarChart3" [size]="20"></lucide-icon>
+              </div>
+              <h2>Order Status</h2>
+            </div>
+          </div>
+          <div class="status-grid">
+            <div class="status-item">
+              <div class="status-icon-wrap completed">
+                <lucide-icon [img]="CheckCircle" [size]="24"></lucide-icon>
+              </div>
+              <div class="status-info">
+                <span class="status-label">Completed</span>
+                <span class="status-value">{{ formatNumber(analyticsData()!.orderMetrics.completedOrders) }}</span>
+                <span class="status-pct">{{ formatPercentage((analyticsData()!.orderMetrics.completedOrders / analyticsData()!.orderMetrics.totalOrders) * 100) }}</span>
+              </div>
+            </div>
+            <div class="status-item">
+              <div class="status-icon-wrap pending">
+                <lucide-icon [img]="Clock" [size]="24"></lucide-icon>
+              </div>
+              <div class="status-info">
+                <span class="status-label">Pending</span>
+                <span class="status-value">{{ formatNumber(analyticsData()!.orderMetrics.pendingOrders) }}</span>
+                <span class="status-pct">{{ formatPercentage((analyticsData()!.orderMetrics.pendingOrders / analyticsData()!.orderMetrics.totalOrders) * 100) }}</span>
+              </div>
+            </div>
+            <div class="status-item">
+              <div class="status-icon-wrap cancelled">
+                <lucide-icon [img]="XCircle" [size]="24"></lucide-icon>
+              </div>
+              <div class="status-info">
+                <span class="status-label">Cancelled</span>
+                <span class="status-value">{{ formatNumber(analyticsData()!.orderMetrics.cancelledOrders) }}</span>
+                <span class="status-pct">{{ formatPercentage((analyticsData()!.orderMetrics.cancelledOrders / analyticsData()!.orderMetrics.totalOrders) * 100) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon orange">
+                <lucide-icon [img]="Trophy" [size]="20"></lucide-icon>
+              </div>
+              <h2>Top Menu Items</h2>
+            </div>
+          </div>
+          <div class="top-items-list">
+            @for (item of analyticsData()!.topMenuItems; track item.id; let i = $index) {
+              <div class="top-item-row">
+                <div class="item-rank" [class]="'rank-' + (i + 1)">{{ i + 1 }}</div>
+                <div class="item-info">
+                  <div class="item-name">{{ item.name }}</div>
+                  <div class="item-meta">
+                    <span>{{ formatNumber(item.orders) }} orders</span>
+                    <span class="meta-dot"></span>
+                    <span>{{ formatCurrency(item.revenue) }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          }
+            }
+          </div>
         </div>
-      </div>
 
-      <!-- Customer Insights -->
-      <div class="customer-section">
-        <h2><lucide-icon [img]="UserCircle" [size]="24"></lucide-icon> Customer Insights</h2>
-        <div class="customer-grid">
-          <div class="customer-card">
-            <h3>New Customers</h3>
-            <p class="customer-value">{{ formatNumber(analyticsData()!.customerMetrics.newCustomers) }}</p>
-            <div class="customer-bar">
-              <div class="bar-fill new"
-                   [style.width.%]="(analyticsData()!.customerMetrics.newCustomers / analyticsData()!.customerMetrics.totalCustomers) * 100">
+        <div class="content-card customer-section">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon orange">
+                <lucide-icon [img]="UserCircle" [size]="20"></lucide-icon>
+              </div>
+              <h2>Customer Insights</h2>
+            </div>
+          </div>
+          <div class="customer-grid">
+            <div class="customer-metric">
+              <div class="customer-metric-header">
+                <span class="customer-label">New Customers</span>
+                <span class="customer-value">{{ formatNumber(analyticsData()!.customerMetrics.newCustomers) }}</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="(analyticsData()!.customerMetrics.newCustomers / analyticsData()!.customerMetrics.totalCustomers) * 100"></div>
+              </div>
+            </div>
+            <div class="customer-metric">
+              <div class="customer-metric-header">
+                <span class="customer-label">Returning Customers</span>
+                <span class="customer-value">{{ formatNumber(analyticsData()!.customerMetrics.returningCustomers) }}</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="(analyticsData()!.customerMetrics.returningCustomers / analyticsData()!.customerMetrics.totalCustomers) * 100"></div>
+              </div>
+            </div>
+            <div class="customer-metric">
+              <div class="customer-metric-header">
+                <span class="customer-label">Retention Rate</span>
+                <span class="customer-value">{{ formatPercentage(analyticsData()!.customerMetrics.customerRetentionRate) }}</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="analyticsData()!.customerMetrics.customerRetentionRate"></div>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="customer-card">
-            <h3>Returning Customers</h3>
-            <p class="customer-value">{{ formatNumber(analyticsData()!.customerMetrics.returningCustomers) }}</p>
-            <div class="customer-bar">
-              <div class="bar-fill returning"
-                   [style.width.%]="(analyticsData()!.customerMetrics.returningCustomers / analyticsData()!.customerMetrics.totalCustomers) * 100">
+        <div class="content-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon orange">
+                <lucide-icon [img]="Truck" [size]="20"></lucide-icon>
               </div>
+              <h2>Order Types</h2>
             </div>
           </div>
-
-          <div class="customer-card">
-            <h3>Retention Rate</h3>
-            <p class="customer-value">{{ formatPercentage(analyticsData()!.customerMetrics.customerRetentionRate) }}</p>
-            <div class="customer-bar">
-              <div class="bar-fill retention"
-                   [style.width.%]="analyticsData()!.customerMetrics.customerRetentionRate">
+          <div class="order-types-list">
+            @for (type of analyticsData()!.ordersByType; track type.type) {
+              <div class="order-type-row">
+                <div class="type-icon-wrap orange">
+                  <lucide-icon [img]="getOrderTypeIcon(type.type)" [size]="20"></lucide-icon>
+                </div>
+                <div class="type-info">
+                  <div class="type-name">{{ type.type }}</div>
+                  <div class="type-count">{{ formatNumber(type.count) }} orders</div>
+                </div>
+                <div class="type-bar-wrap">
+                  <div class="type-bar" [style.width.%]="type.percentage"></div>
+                </div>
+                <span class="type-pct">{{ formatPercentage(type.percentage) }}</span>
               </div>
+            }
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon orange">
+                <lucide-icon [img]="Clock" [size]="20"></lucide-icon>
+              </div>
+              <h2>Peak Hours</h2>
             </div>
+          </div>
+          <div class="peak-hours-chart">
+            @for (hour of analyticsData()!.peakHours; track hour.hour) {
+              <div class="hour-bar-wrap">
+                <div class="hour-bar" [style.height.%]="(hour.orders / getMaxPeakOrders()) * 100">
+                  <span class="hour-bar-value">{{ hour.orders }}</span>
+                </div>
+                <span class="hour-label">{{ hour.hour }}:00</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="content-card actions-section">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon orange">
+                <lucide-icon [img]="Target" [size]="20"></lucide-icon>
+              </div>
+              <h2>Quick Actions</h2>
+            </div>
+          </div>
+          <div class="actions-grid">
+            <a routerLink="../menu" class="action-card">
+              <lucide-icon [img]="UtensilsCrossed" [size]="28"></lucide-icon>
+              <h3>Manage Menu</h3>
+              <p>Update your menu items based on performance</p>
+            </a>
+            <a routerLink="../ads/create" class="action-card">
+              <lucide-icon [img]="Megaphone" [size]="28"></lucide-icon>
+              <h3>Create Ad Campaign</h3>
+              <p>Promote your top-performing items</p>
+            </a>
+            <a routerLink="../insights" class="action-card">
+              <lucide-icon [img]="BarChart3" [size]="28"></lucide-icon>
+              <h3>View Insights</h3>
+              <p>Get detailed business insights</p>
+            </a>
+            <a routerLink="../reviews" class="action-card">
+              <lucide-icon [img]="Star" [size]="28"></lucide-icon>
+              <h3>Manage Reviews</h3>
+              <p>Respond to customer feedback</p>
+            </a>
           </div>
         </div>
       </div>
-
-      <!-- Order Types Distribution -->
-      <div class="order-types-section">
-        <h2><lucide-icon [img]="Truck" [size]="24"></lucide-icon> Order Types Distribution</h2>
-        <div class="order-types-grid">
-          @for (type of analyticsData()!.ordersByType; track type.type) {
-            <div class="order-type-card">
-              <div class="type-icon">
-                <lucide-icon [img]="getOrderTypeIcon(type.type)" [size]="32"></lucide-icon>
-              </div>
-              <h3>{{ type.type }}</h3>
-              <p class="type-count">{{ formatNumber(type.count) }} orders</p>
-              <div class="type-percentage-bar">
-                <div class="percentage-fill" [style.width.%]="type.percentage"></div>
-              </div>
-              <span class="type-percentage">{{ formatPercentage(type.percentage) }}</span>
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- Peak Hours -->
-      <div class="peak-hours-section">
-        <h2><lucide-icon [img]="Clock" [size]="24"></lucide-icon> Peak Order Hours</h2>
-        <div class="peak-hours-chart">
-          @for (hour of analyticsData()!.peakHours; track hour.hour) {
-            <div class="hour-bar">
-              <div class="bar" [style.height.%]="(hour.orders / getMaxPeakOrders()) * 100">
-                <span class="bar-value">{{ hour.orders }}</span>
-              </div>
-              <span class="hour-label">{{ hour.hour }}:00</span>
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="actions-section">
-        <h2><lucide-icon [img]="Target" [size]="24"></lucide-icon> Quick Actions</h2>
-        <div class="actions-grid">
-          <a routerLink="../menu" class="action-card">
-            <lucide-icon [img]="UtensilsCrossed" [size]="32" class="action-icon"></lucide-icon>
-            <h3>Manage Menu</h3>
-            <p>Update your menu items based on performance</p>
-          </a>
-          <a routerLink="../ads/create" class="action-card">
-            <lucide-icon [img]="Megaphone" [size]="32" class="action-icon"></lucide-icon>
-            <h3>Create Ad Campaign</h3>
-            <p>Promote your top-performing items</p>
-          </a>
-          <a routerLink="../insights" class="action-card">
-            <lucide-icon [img]="BarChart3" [size]="32" class="action-icon"></lucide-icon>
-            <h3>View Insights</h3>
-            <p>Get detailed business insights</p>
-          </a>
-          <a routerLink="../reviews" class="action-card">
-            <lucide-icon [img]="Star" [size]="32" class="action-icon"></lucide-icon>
-            <h3>Manage Reviews</h3>
-            <p>Respond to customer feedback</p>
-          </a>
-        </div>
-      </div>
-    </div>
-  }
+    }
+  </div>
 </div>
-

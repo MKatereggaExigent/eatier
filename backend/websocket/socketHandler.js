@@ -158,7 +158,7 @@ async function getConnectedUsers(userId, tenantId) {
           WHEN follower_id = $1 THEN following_id
           ELSE follower_id
         END as user_id
-      FROM followers
+      FROM user_follows
       WHERE tenant_id = $2
         AND (follower_id = $1 OR following_id = $1)
     `, [userId, tenantId]);

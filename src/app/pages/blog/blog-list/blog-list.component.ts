@@ -68,6 +68,7 @@ export class BlogListComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   private refreshSubscription?: Subscription;
+  private carouselInterval: any;
 
   // Lucide Icons
   readonly Search = Search;
@@ -92,6 +93,32 @@ export class BlogListComponent implements OnInit, OnDestroy {
   readonly Users = Users;
   readonly DollarSign = DollarSign;
 
+  // Carousel
+  currentSlide = signal<number>(0);
+
+  carouselSlides = [
+    {
+      image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1600&h=900&fit=crop',
+      overlay: 'linear-gradient(135deg, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0.5) 50%, rgba(15,23,42,0.4) 100%)'
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1504711434969-e33886168d2c?w=1600&h=900&fit=crop',
+      overlay: 'linear-gradient(135deg, rgba(15,23,42,0.8) 0%, rgba(15,23,42,0.45) 50%, rgba(15,23,42,0.35) 100%)'
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&h=900&fit=crop',
+      overlay: 'linear-gradient(135deg, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0.5) 50%, rgba(15,23,42,0.4) 100%)'
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1471107340929-a87cd0f5b5f3?w=1600&h=900&fit=crop',
+      overlay: 'linear-gradient(135deg, rgba(15,23,42,0.8) 0%, rgba(15,23,42,0.45) 50%, rgba(15,23,42,0.35) 100%)'
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1532619675605-1ede6c2ed2b0?w=1600&h=900&fit=crop',
+      overlay: 'linear-gradient(135deg, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0.5) 50%, rgba(15,23,42,0.4) 100%)'
+    }
+  ];
+
   posts = signal<BlogPost[]>([]);
   featuredPosts = signal<BlogPost[]>([]);
   categories = signal<BlogCategory[]>([]);
@@ -115,6 +142,8 @@ export class BlogListComponent implements OnInit, OnDestroy {
   totalPosts = signal(0);
   
   ngOnInit(): void {
+    this.startCarousel();
+
     // Check for category in route params
     this.route.queryParams.subscribe(params => {
       if (params['category']) {
@@ -143,7 +172,36 @@ export class BlogListComponent implements OnInit, OnDestroy {
     });
   }
 
+  startCarousel(): void {
+    this.carouselInterval = setInterval(() => {
+      this.nextSlide();
+    }, 5000);
+  }
+
+  stopCarousel(): void {
+    if (this.carouselInterval) {
+      clearInterval(this.carouselInterval);
+    }
+  }
+
+  nextSlide(): void {
+    this.currentSlide.update(current =>
+      current === this.carouselSlides.length - 1 ? 0 : current + 1
+    );
+  }
+
+  prevSlide(): void {
+    this.currentSlide.update(current =>
+      current === 0 ? this.carouselSlides.length - 1 : current - 1
+    );
+  }
+
+  goToSlide(index: number): void {
+    this.currentSlide.set(index);
+  }
+
   ngOnDestroy(): void {
+    this.stopCarousel();
     if (this.refreshSubscription) {
       this.refreshSubscription.unsubscribe();
     }

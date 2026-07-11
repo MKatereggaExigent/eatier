@@ -1,783 +1,809 @@
-/* ========== NYT-Inspired Community Page ========== */
+$font-serif: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-// Design System Variables
-$font-serif: 'Playfair Display', 'Georgia', serif;
-$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+$orange: #ff8c00;
+$orange-dark: #e67e00;
+$orange-bg: rgba(255,140,0,0.08);
+$dark: #0F172A;
+$dark-2: #1E293B;
+$border: #E2E8F0;
+$text: #334155;
+$text-light: #64748B;
+$text-lighter: #94A3B8;
+$bg-warm: #FAFAF8;
+$white: #FFFFFF;
+$shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+$shadow-hover: 0 24px 56px -12px rgba(0,0,0,0.12);
+$radius-sm: 10px;
+$radius: 12px;
+$radius-lg: 16px;
+$radius-xl: 20px;
 
-// NYT Color Palette
-$nyt-black: #121212;
-$nyt-dark-gray: #333333;
-$nyt-medium-gray: #666666;
-$nyt-light-gray: #f7f7f5;
-$nyt-warm-white: #faf9f6;
-$nyt-border: #e2e2e2;
-$itiyum-orange: #ff8c00;
-$itiyum-orange-dark: #e67e00;
+$pastel-green: #8FC9A3;
+$pastel-blue: #89C4D9;
+$pastel-yellow: #F5D760;
 
-// Animations
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* ========== Main Container ========== */
-.community-container {
+.community-page {
+  width: 100%;
   min-height: 100vh;
-  background: $nyt-warm-white;
-  padding: 0;
+  background: $bg-warm;
 }
 
-/* ========== Community Header ========== */
-.community-header {
-  text-align: center;
-  margin-bottom: 0;
-  padding: 80px 20px 50px;
-  max-width: 1200px;
-  margin: 0 auto;
-  background: white;
-  border-radius: 12px;
-  border-bottom: 1px solid $nyt-border;
+/* ========== HERO CAROUSEL ========== */
+.hero {
+  position: relative;
+  height: 480px;
+  overflow: hidden;
 
-  .header-content {
-    max-width: 700px;
-    margin: 0 auto;
+  .hero-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.4s cubic-bezier(0.4,0,0.2,1);
 
-    h1 {
-      font-family: $font-serif;
-      font-size: clamp(2.5rem, 5vw, 3.5rem);
-      font-weight: 700;
-      color: $nyt-black;
-      margin-bottom: 1rem;
-      letter-spacing: -0.02em;
+    &.active { opacity: 1; }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.05);
+      transition: transform 7s cubic-bezier(0.4,0,0.2,1);
     }
 
-    p {
-      font-family: $font-sans;
-      font-size: 1.15rem;
-      color: $nyt-medium-gray;
-      font-weight: 400;
-      max-width: 550px;
-      margin: 0 auto;
-      line-height: 1.7;
-    }
-  }
-}
-
-/* ========== Navigation Tabs ========== */
-.community-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 0;
-  margin-bottom: 0;
-  flex-wrap: wrap;
-  max-width: 1200px;
-  margin: 0 auto;
-  background: white;
-  border-radius: 12px;
-  border-bottom: 1px solid $nyt-border;
-  padding: 0 20px;
-
-  .tab-btn {
-    padding: 18px 28px;
-    border: none;
-    border-bottom: 3px solid transparent;
-    border-radius: 0;
-    background: transparent;
-    color: $nyt-medium-gray;
-    font-family: $font-sans;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-
-    &:hover {
-      color: $nyt-black;
-      background: $nyt-light-gray;
-    }
-
-    &.active {
-      color: $itiyum-orange;
-      border-bottom-color: $itiyum-orange;
-      background: transparent;
-    }
+    &.active .hero-bg { transform: scale(1); }
   }
 
-  @media (max-width: 768px) {
-    overflow-x: auto;
-    justify-content: flex-start;
-    -webkit-overflow-scrolling: touch;
-
-    .tab-btn {
-      padding: 14px 20px;
-      font-size: 0.8rem;
-      white-space: nowrap;
-    }
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
   }
-}
 
-/* ========== Community Content ========== */
-.community-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  min-height: 400px;
-  padding: 40px 20px;
-}
-
-/* ========== Loading State ========== */
-.loading-state {
-  text-align: center;
-  padding: 60px 20px;
-
-  .loading-container {
+  .hero-content {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 0 2rem;
 
-    .loading-spinner.large {
-      width: 44px;
-      height: 44px;
-      border: 3px solid $nyt-border;
-      border-top: 3px solid $itiyum-orange;
+    .hero-label {
+      display: inline-block;
+      font-family: $font-sans;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: $pastel-yellow;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-title {
+      font-family: $font-serif;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 0.5rem;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-subtitle {
+      font-family: $font-sans;
+      font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+      color: rgba(255,255,255,0.75);
+      margin: 0 auto 1.5rem;
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    .hero-tabs {
+      display: flex;
+      gap: 0.5rem;
+
+      .hero-tab {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.6rem 1.2rem;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 10px;
+        background: rgba(255,255,255,0.06);
+        backdrop-filter: blur(6px);
+        color: rgba(255,255,255,0.75);
+        font-family: $font-sans;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s;
+
+        &:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
+        &.active {
+          background: $orange;
+          border-color: $orange;
+          color: #fff;
+          box-shadow: 0 4px 16px rgba($orange, 0.3);
+        }
+      }
+    }
+  }
+
+  .hero-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    &:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); transform: translateY(-50%) scale(1.05); }
+    &.left { left: 1.5rem; }
+    &.right { right: 1.5rem; }
+  }
+
+  .hero-indicators {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    gap: 0.5rem;
+
+    .hero-dot {
+      width: 8px;
+      height: 8px;
+      border: none;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
+      background: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0;
 
-    .loading-text {
-      h3 {
-        font-family: $font-serif;
-        font-size: 1.3rem;
-        color: $nyt-black;
-        margin-bottom: 0.5rem;
-      }
-
-      p {
-        font-family: $font-sans;
-        color: $nyt-medium-gray;
-        font-size: 0.95rem;
-      }
-    }
-  }
-
-  .loading-skeletons {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: 700px;
-    margin: 0 auto;
-
-    .skeleton-card {
-      background: white;
-      border: 1px solid $nyt-border;
-      border-radius: 4px;
-      padding: 24px;
-
-      .skeleton {
-        background: linear-gradient(90deg, $nyt-light-gray 25%, $nyt-border 50%, $nyt-light-gray 75%);
-        background-size: 200% 100%;
-        animation: shimmer 1.5s infinite;
-        border-radius: 2px;
-      }
-
-      .skeleton-header {
-        height: 40px;
-        width: 50%;
-        margin-bottom: 16px;
-      }
-
-      .skeleton-content {
-        height: 80px;
-        width: 100%;
-        margin-bottom: 16px;
-      }
-
-      .skeleton-actions {
-        height: 24px;
-        width: 35%;
-      }
+      &.active { background: #fff; width: 24px; border-radius: 4px; }
     }
   }
 }
 
-/* ========== Feed Section ========== */
-.feed-section {
-  .posts-container {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    max-width: 700px;
-    margin: 0 auto;
-  }
-
-  .post-card {
-    background: white;
-    border: 1px solid $nyt-border;
-    border-radius: 4px;
-    overflow: hidden;
-    transition: all 0.25s ease;
-    padding: 24px;
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 3px;
-      height: 0;
-      background: $itiyum-orange;
-      transition: height 0.3s ease;
-    }
-
-    &:hover {
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-
-      &::before {
-        height: 100%;
-      }
-    }
-
-    .post-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid $nyt-light-gray;
-
-      .author-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-
-        .author-avatar {
-          width: 48px;
-          height: 48px;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 2px solid $nyt-light-gray;
-        }
-
-        .author-details {
-          .author-name {
-            font-family: $font-sans;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: $nyt-black;
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-
-            .author-badge {
-              color: white;
-              padding: 3px 8px;
-              border-radius: 2px;
-              font-size: 0.65rem;
-              font-weight: 700;
-              text-transform: uppercase;
-              letter-spacing: 0.05em;
-              background: $itiyum-orange;
-            }
-          }
-
-          .post-time {
-            font-family: $font-sans;
-            font-size: 0.8rem;
-            color: $nyt-medium-gray;
-          }
-        }
-      }
-
-      .post-menu-btn {
-        background: $nyt-light-gray;
-        border: 1px solid $nyt-border;
-        font-size: 1.2rem;
-        color: $nyt-medium-gray;
-        cursor: pointer;
-        padding: 6px 10px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: $nyt-border;
-          color: $nyt-black;
-        }
-      }
-    }
-
-    .post-content {
-      margin-bottom: 16px;
-
-      p {
-        font-family: $font-sans;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.75;
-        color: $nyt-dark-gray;
-        margin-bottom: 16px;
-      }
-
-      .post-images {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 12px;
-        margin-bottom: 16px;
-
-        .post-image {
-          width: 100%;
-          height: 200px;
-          object-fit: cover;
-          border-radius: 4px;
-          transition: all 0.3s ease;
-
-          &:hover {
-            transform: scale(1.02);
-          }
-        }
-      }
-
-      .post-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-
-        .tag {
-          background: $nyt-light-gray;
-          color: $itiyum-orange;
-          padding: 4px 10px;
-          border-radius: 2px;
-          font-family: $font-sans;
-          font-size: 0.8rem;
-          font-weight: 600;
-          border: 1px solid $nyt-border;
-          transition: all 0.2s ease;
-
-          &:hover {
-            background: rgba($itiyum-orange, 0.1);
-            border-color: $itiyum-orange;
-          }
-        }
-      }
-    }
-
-    .post-actions {
-      display: flex;
-      gap: 12px;
-      padding-top: 16px;
-      border-top: 1px solid $nyt-light-gray;
-      justify-content: flex-start;
-
-      .action-btn {
-        background: transparent;
-        border: 1px solid $nyt-border;
-        color: $nyt-medium-gray;
-        font-family: $font-sans;
-        font-weight: 500;
-        font-size: 0.85rem;
-        cursor: pointer;
-        padding: 8px 16px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-
-        &:hover {
-          background: $nyt-light-gray;
-          color: $nyt-black;
-          border-color: $nyt-dark-gray;
-        }
-
-        &.liked {
-          color: #dc2626;
-          border-color: rgba(220, 38, 38, 0.3);
-          background: rgba(220, 38, 38, 0.05);
-        }
-      }
-    }
-  }
+/* ========== LAYOUT ========== */
+.community-layout {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 2rem 4rem;
 }
 
-/* ========== Section Header (Shared) ========== */
-.section-header {
+/* ========== LOADING ========== */
+.loading-state {
   text-align: center;
-  margin-bottom: 32px;
+  padding: 4rem 2rem;
 
-  h2 {
-    font-family: $font-serif;
-    font-size: clamp(1.75rem, 4vw, 2.25rem);
-    font-weight: 700;
-    color: $nyt-black;
-    margin-bottom: 8px;
-    letter-spacing: -0.01em;
-  }
-
-  .section-subtitle {
-    font-family: $font-sans;
-    font-size: 1rem;
-    color: $nyt-medium-gray;
-    max-width: 450px;
-    margin: 0 auto;
-    line-height: 1.6;
-  }
-
-  &.popular-section {
-    margin-top: 48px;
-    padding-top: 40px;
-    border-top: 1px solid $nyt-border;
-  }
-}
-
-/* ========== Empty State ========== */
-.empty-state {
-  text-align: center;
-  padding: 60px 24px;
-  background: white;
-  border: 1px solid $nyt-border;
-  border-radius: 4px;
-
-  .empty-icon {
-    font-size: 3rem;
-    margin-bottom: 16px;
-  }
-
-  h3 {
-    font-family: $font-serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: $nyt-black;
-    margin-bottom: 8px;
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid $border;
+    border-top-color: $orange;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
   }
 
   p {
     font-family: $font-sans;
-    color: $nyt-medium-gray;
+    color: $text-light;
     font-size: 0.95rem;
-    margin-bottom: 20px;
-  }
-
-  .cta-btn, .primary-btn {
-    display: inline-block;
-    padding: 12px 24px;
-    background: $nyt-black;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-family: $font-sans;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-  }
-
-  &.small {
-    padding: 40px 20px;
   }
 }
 
-/* ========== Trending Section ========== */
-.trending-section {
-  max-width: 1200px;
-  margin: 0 auto;
+/* ========== SHARED ========== */
+.section-head {
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid $dark;
 
-  .trending-topics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-    margin-bottom: 40px;
-
-    .trending-topic-card {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      background: white;
-      border: 1px solid $nyt-border;
-      border-radius: 4px;
-      transition: all 0.25s ease;
-      padding: 16px 20px;
-      cursor: pointer;
-
-      &:hover {
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        border-color: $itiyum-orange;
-
-        .topic-arrow {
-          transform: translateX(4px);
-          color: $itiyum-orange;
-        }
-      }
-
-      &.top-3 {
-        border-left: 3px solid $itiyum-orange;
-      }
-
-      .rank-badge {
-        min-width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: $nyt-light-gray;
-        border-radius: 4px;
-        font-family: $font-sans;
-        font-weight: 700;
-        font-size: 1rem;
-        color: $nyt-medium-gray;
-
-        &.gold { background: $itiyum-orange; color: white; }
-        &.silver { background: $nyt-dark-gray; color: white; }
-        &.bronze { background: $nyt-medium-gray; color: white; }
-      }
-
-      .topic-content {
-        flex: 1;
-
-        .topic-name {
-          display: block;
-          font-family: $font-sans;
-          font-weight: 600;
-          color: $nyt-black;
-          font-size: 0.95rem;
-          margin-bottom: 4px;
-        }
-
-        .topic-stats {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-
-          .topic-count {
-            font-family: $font-sans;
-            color: $nyt-medium-gray;
-            font-size: 0.8rem;
-          }
-
-          .trending-badge {
-            background: rgba($itiyum-orange, 0.1);
-            color: $itiyum-orange;
-            padding: 2px 8px;
-            border-radius: 2px;
-            font-family: $font-sans;
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-          }
-        }
-      }
-
-      .topic-arrow {
-        font-size: 1rem;
-        color: $nyt-medium-gray;
-        transition: all 0.2s ease;
-      }
-    }
+  h2 {
+    font-family: $font-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: $dark-2;
+    margin: 0 0 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
-  // Popular Posts Grid
-  .popular-posts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+  p {
+    font-family: $font-sans;
+    font-size: 0.85rem;
+    color: $text-light;
+    margin: 0;
+  }
 
-    .popular-post-card {
-      background: white;
-      border: 1px solid $nyt-border;
-      border-radius: 4px;
-      padding: 20px;
-      transition: all 0.25s ease;
-      position: relative;
+  &.popular-head { margin-top: 2.5rem; }
+}
 
-      &:hover {
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  background: $white;
+
+  h3 {
+    font-family: $font-serif;
+    font-size: 1.15rem;
+    color: $dark-2;
+    margin: 0.75rem 0 0.5rem;
+  }
+
+  p {
+    font-family: $font-sans;
+    color: $text-light;
+    margin: 0 0 1rem;
+  }
+}
+
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.4rem;
+  border: none;
+  border-radius: $radius-sm;
+  background: $orange;
+  color: #fff;
+  font-family: $font-sans;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.25s;
+
+  &:hover { background: $orange-dark; box-shadow: 0 4px 16px rgba($orange, 0.3); transform: translateY(-1px); }
+}
+
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.4rem;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  background: $white;
+  color: $dark-2;
+  font-family: $font-sans;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+
+  &:hover:not(:disabled) { border-color: $orange; color: $orange; background: $orange-bg; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ========== FEED ========== */
+.feed-section {
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+}
+
+.post-card {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+  animation: fadeUp 0.5s ease backwards;
+  animation-delay: var(--card-delay, 0s);
+
+  &:hover {
+    box-shadow: $shadow-hover;
+    transform: translateY(-3px);
+  }
+
+  .post-header {
+    padding: 1.25rem 1.25rem 0;
+
+    .author-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      .author-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid $orange-bg;
       }
 
-      &.featured {
-        grid-column: span 2;
-        border-left: 3px solid $itiyum-orange;
-
-        @media (max-width: 768px) {
-          grid-column: span 1;
-        }
-      }
-
-      .featured-badge {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        background: $itiyum-orange;
-        color: white;
-        padding: 4px 10px;
-        border-radius: 2px;
-        font-family: $font-sans;
-        font-size: 0.65rem;
-        font-weight: 700;
-        text-transform: uppercase;
-      }
-
-      .post-author-section {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 12px;
-
-        .post-avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 2px solid $nyt-light-gray;
-        }
-
-        .author-details {
+      .author-details {
+        .author-name-row {
           display: flex;
-          flex-direction: column;
-          gap: 2px;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.15rem;
 
           .author-name {
             font-family: $font-sans;
             font-weight: 600;
-            color: $nyt-black;
             font-size: 0.9rem;
+            color: $dark-2;
           }
 
-          .post-type-badge {
+          .author-badge {
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
             font-family: $font-sans;
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 2px;
-            font-weight: 600;
+            font-size: 0.6rem;
+            font-weight: 700;
             text-transform: uppercase;
-            width: fit-content;
+            letter-spacing: 0.04em;
 
-            &.chef { background: #e8f5e9; color: #2e7d32; }
-            &.business { background: #e3f2fd; color: #1976d2; }
-            &.user { background: rgba($itiyum-orange, 0.1); color: $itiyum-orange; }
+            &.chef { background: $pastel-green; color: #166534; }
+            &.business { background: $pastel-blue; color: #1e40af; }
+            &.user { background: $orange-bg; color: $orange; }
           }
         }
-      }
 
-      .post-content-preview {
-        font-family: $font-sans;
-        color: $nyt-dark-gray;
-        font-size: 0.9rem;
-        line-height: 1.6;
-        margin-bottom: 12px;
-      }
-
-      .post-image-preview {
-        margin-bottom: 12px;
-        border-radius: 4px;
-        overflow: hidden;
-
-        .preview-image {
-          width: 100%;
-          height: 140px;
-          object-fit: cover;
-        }
-      }
-
-      .post-engagement {
-        display: flex;
-        gap: 16px;
-        padding-top: 12px;
-        border-top: 1px solid $nyt-light-gray;
-
-        .engagement-item {
+        .post-time {
           font-family: $font-sans;
-          font-size: 0.8rem;
-          color: $nyt-medium-gray;
+          font-size: 0.75rem;
+          color: $text-lighter;
         }
+      }
+    }
+  }
+
+  .post-body {
+    padding: 1rem 1.25rem;
+
+    p {
+      font-family: $font-sans;
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: $text;
+      margin: 0 0 0.75rem;
+    }
+
+    .post-images {
+      display: grid;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+
+      &.single {
+        grid-template-columns: 1fr;
+        .post-image { height: 280px; }
+      }
+
+      &.pair {
+        grid-template-columns: 1fr 1fr;
+        .post-image { height: 200px; }
+      }
+
+      &.many {
+        grid-template-columns: 1fr 1fr 1fr;
+        .post-image { height: 150px; }
+      }
+
+      .post-image {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: $radius-sm;
+      }
+    }
+
+    .post-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+
+      .tag {
+        padding: 0.2rem 0.65rem;
+        border: 1px solid $border;
+        border-radius: 5px;
+        background: $bg-warm;
+        font-family: $font-sans;
+        font-size: 0.7rem;
+        color: $orange;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .post-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid $border;
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.45rem 0.9rem;
+      border: 1px solid $border;
+      border-radius: 8px;
+      background: $white;
+      font-family: $font-sans;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: $text-light;
+      cursor: pointer;
+      transition: all 0.25s;
+
+      &:hover { border-color: $dark-2; color: $dark-2; }
+
+      &.liked {
+        color: #DC2626;
+        border-color: rgba(220,38,38,0.25);
+        background: rgba(220,38,38,0.04);
       }
     }
   }
 }
 
-/* ========== Chefs Section ========== */
-.chefs-section {
-  max-width: 1200px;
-  margin: 0 auto;
+/* ========== PAGINATION ========== */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding: 0.75rem 1.25rem;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
 
-  // Top Chef Spotlight
-  .top-chef-spotlight {
-    background: white;
-    border: 1px solid $nyt-border;
-    border-left: 4px solid $itiyum-orange;
-    border-radius: 4px;
-    padding: 32px;
-    margin-bottom: 40px;
-    position: relative;
+  .page-arrow {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    background: $white;
+    color: $text;
+    cursor: pointer;
+    transition: all 0.2s;
 
-    .spotlight-badge {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: $itiyum-orange;
-      color: white;
-      padding: 6px 14px;
-      border-radius: 2px;
-      font-family: $font-sans;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
+    &:hover:not(:disabled) { border-color: $orange; color: $orange; background: $orange-bg; }
+    &:disabled { opacity: 0.3; cursor: not-allowed; }
+  }
+
+  .page-info {
+    font-family: $font-sans;
+    font-size: 0.8rem;
+    color: $text-lighter;
+    white-space: nowrap;
+  }
+
+  .page-nums {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .page-num {
+    min-width: 36px;
+    height: 36px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    font-family: $font-sans;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: $text-light;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(.active) { border-color: $border; background: $bg-warm; }
+    &.active { background: $orange; color: #fff; font-weight: 700; border-color: $orange; }
+  }
+
+  .page-ellipsis {
+    font-family: $font-sans;
+    color: $text-lighter;
+    font-weight: 600;
+    padding: 0 0.25rem;
+    user-select: none;
+  }
+}
+
+/* ========== TRENDING ========== */
+.trending-section {
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .topic-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $radius;
+    box-shadow: $shadow-sm;
+    transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+    animation: fadeUp 0.5s ease backwards;
+    animation-delay: var(--card-delay, 0s);
+
+    &:hover {
+      box-shadow: $shadow-hover;
+      transform: translateY(-3px);
+      border-color: transparent;
     }
 
-    .spotlight-content {
+    &.top-3 { border-left: 3px solid $orange; }
+
+    .topic-rank {
+      min-width: 38px;
+      height: 38px;
       display: flex;
       align-items: center;
-      gap: 32px;
+      justify-content: center;
+      background: $bg-warm;
+      border-radius: $radius-sm;
+      font-family: $font-sans;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: $text-lighter;
 
-      @media (max-width: 768px) {
-        flex-direction: column;
-        text-align: center;
+      &.gold { background: $orange; color: #fff; }
+      &.silver { background: $dark-2; color: #fff; }
+      &.bronze { background: $text; color: #fff; }
+    }
+
+    .topic-info {
+      flex: 1;
+
+      .topic-name {
+        display: block;
+        font-family: $font-sans;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: $dark-2;
+        margin-bottom: 0.2rem;
+      }
+
+      .topic-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: $font-sans;
+        font-size: 0.75rem;
+        color: $text-lighter;
+
+        .hot-badge {
+          display: flex;
+          align-items: center;
+          gap: 0.15rem;
+          background: $orange-bg;
+          color: $orange;
+          padding: 0.1rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.65rem;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
+
+  .popular-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+
+  .popular-card {
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    padding: 1.15rem;
+    transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+    animation: fadeUp 0.5s ease backwards;
+    animation-delay: var(--card-delay, 0s);
+    position: relative;
+
+    &:hover {
+      box-shadow: $shadow-hover;
+      transform: translateY(-3px);
+    }
+
+    &.featured { border-left: 3px solid $orange; }
+
+    .featured-badge {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: $orange;
+      color: #fff;
+      padding: 0.2rem 0.6rem;
+      border-radius: 5px;
+      font-family: $font-sans;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .popular-author {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.65rem;
+
+      .popular-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .popular-author-name {
+        display: block;
+        font-family: $font-sans;
+        font-weight: 600;
+        font-size: 0.83rem;
+        color: $dark-2;
+      }
+
+      .popular-author-type {
+        font-family: $font-sans;
+        font-size: 0.6rem;
+        padding: 0.1rem 0.4rem;
+        border-radius: 3px;
+        font-weight: 600;
+        text-transform: uppercase;
+
+        &.chef { background: $pastel-green; color: #166534; }
+        &.business { background: $pastel-blue; color: #1e40af; }
+        &.user { background: $orange-bg; color: $orange; }
       }
     }
 
-    .spotlight-avatar-wrapper {
+    .popular-text {
+      font-family: $font-sans;
+      font-size: 0.82rem;
+      color: $text;
+      line-height: 1.5;
+      margin: 0 0 0.65rem;
+    }
+
+    .popular-image {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      border-radius: $radius-sm;
+      margin-bottom: 0.65rem;
+    }
+
+    .popular-engagement {
+      display: flex;
+      gap: 1rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid $border;
+      font-family: $font-sans;
+      font-size: 0.75rem;
+      color: $text-lighter;
+
+      span { display: flex; align-items: center; gap: 0.3rem; }
+    }
+  }
+}
+
+/* ========== CHEFS ========== */
+.chefs-section {
+  .chef-spotlight {
+    background: $white;
+    border: 1px solid $border;
+    border-left: 4px solid $orange;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    padding: 1.75rem;
+    margin-bottom: 2rem;
+    position: relative;
+    transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+
+    &:hover { box-shadow: $shadow-hover; transform: translateY(-3px); }
+
+    .spotlight-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: $orange;
+      color: #fff;
+      padding: 0.35rem 0.85rem;
+      border-radius: 6px;
+      font-family: $font-sans;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .spotlight-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .spotlight-avatar-wrap {
       position: relative;
+      flex-shrink: 0;
 
       .spotlight-avatar {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
         object-fit: cover;
-        border: 3px solid $itiyum-orange;
+        border: 3px solid $orange-bg;
       }
 
       .verified-badge {
         position: absolute;
-        bottom: 4px;
-        right: 4px;
-        width: 28px;
-        height: 28px;
-        background: $itiyum-orange;
-        color: white;
+        bottom: 2px;
+        right: 2px;
+        width: 26px;
+        height: 26px;
+        background: $orange;
+        color: #fff;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
-        font-size: 0.85rem;
-        border: 2px solid white;
+        border: 2px solid $white;
       }
     }
 
@@ -786,1124 +812,565 @@ $itiyum-orange-dark: #e67e00;
 
       h3 {
         font-family: $font-serif;
-        font-size: 1.6rem;
+        font-size: 1.35rem;
         font-weight: 700;
-        color: $nyt-black;
-        margin-bottom: 6px;
+        color: $dark-2;
+        margin: 0 0 0.25rem;
       }
 
-      .chef-specialty {
+      .spotlight-specialty {
         font-family: $font-sans;
-        font-size: 1rem;
-        color: $nyt-medium-gray;
-        margin-bottom: 16px;
+        font-size: 0.9rem;
+        color: $text-light;
+        margin: 0 0 1rem;
       }
 
       .spotlight-stats {
         display: flex;
         align-items: center;
-        gap: 20px;
-        margin-bottom: 20px;
+        gap: 1.25rem;
+        margin-bottom: 1rem;
 
-        @media (max-width: 768px) {
-          justify-content: center;
-        }
-
-        .stat-item {
+        .spotlight-stat {
           text-align: center;
 
-          .stat-value {
-            font-family: $font-serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: $itiyum-orange;
+          .spotlight-stat-value {
             display: block;
+            font-family: $font-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: $orange;
           }
 
-          .stat-label {
+          .spotlight-stat-label {
             font-family: $font-sans;
-            font-size: 0.7rem;
-            color: $nyt-medium-gray;
+            font-size: 0.65rem;
+            color: $text-lighter;
             text-transform: uppercase;
             letter-spacing: 0.05em;
           }
         }
 
-        .stat-divider {
+        .spotlight-stat-divider {
           width: 1px;
-          height: 32px;
-          background: $nyt-border;
+          height: 30px;
+          background: $border;
         }
-      }
-
-      .follow-btn.large {
-        padding: 12px 28px;
-        font-size: 0.95rem;
       }
     }
   }
 
-  // Chefs Grid Section
   .chefs-grid-section {
-    .grid-title {
+    h3 {
       font-family: $font-serif;
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 700;
-      color: $nyt-black;
-      margin-bottom: 20px;
+      color: $dark-2;
+      margin: 0 0 1rem;
       text-align: center;
     }
   }
 
   .chefs-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
 
-    .chef-card {
-      background: white;
-      border: 1px solid $nyt-border;
-      border-radius: 4px;
-      transition: all 0.25s ease;
-      padding: 24px;
-      text-align: center;
-      position: relative;
+  .chef-card {
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+    animation: fadeUp 0.5s ease backwards;
+    animation-delay: var(--card-delay, 0s);
 
-      &:hover {
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    &:hover {
+      box-shadow: $shadow-hover;
+      transform: translateY(-4px);
+    }
 
-        .chef-avatar {
-          border-color: $itiyum-orange;
-        }
-      }
+    .chef-badge {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: $orange;
+      color: #fff;
+      padding: 0.2rem 0.6rem;
+      border-radius: 5px;
+      font-family: $font-sans;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
 
-      &.verified {
-        border-top: 3px solid $itiyum-orange;
-      }
+    .chef-card-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid $orange-bg;
+      margin-bottom: 0.75rem;
+    }
 
-      .card-header {
-        position: absolute;
-        top: 12px;
-        right: 12px;
+    h4 {
+      font-family: $font-sans;
+      font-size: 1rem;
+      font-weight: 600;
+      color: $dark-2;
+      margin: 0 0 0.2rem;
+    }
 
-        .chef-badge.verified {
-          background: $itiyum-orange;
-          color: white;
-          padding: 3px 8px;
-          border-radius: 2px;
-          font-family: $font-sans;
-          font-size: 0.6rem;
-          font-weight: 700;
-          text-transform: uppercase;
-        }
-      }
+    .chef-card-specialty {
+      font-family: $font-sans;
+      font-size: 0.8rem;
+      color: $text-light;
+      margin: 0 0 0.65rem;
+    }
 
-      .avatar-wrapper {
-        margin-bottom: 16px;
+    .chef-card-followers {
+      font-family: $font-sans;
+      font-size: 0.75rem;
+      color: $text-lighter;
+      margin-bottom: 0.75rem;
 
-        .chef-avatar {
-          width: 80px;
-          height: 80px;
-          border-radius: 50%;
-          object-fit: cover;
-          margin: 0 auto;
-          border: 2px solid $nyt-border;
-          transition: all 0.25s ease;
-        }
-      }
-
-      .chef-info {
-        h4 {
-          font-family: $font-sans;
-          font-size: 1.05rem;
-          font-weight: 600;
-          color: $nyt-black;
-          margin-bottom: 4px;
-        }
-
-        .chef-specialty {
-          font-family: $font-sans;
-          font-size: 0.85rem;
-          color: $nyt-medium-gray;
-          margin-bottom: 12px;
-        }
-
-        .chef-stats {
-          margin-bottom: 16px;
-
-          .followers-count {
-            display: flex;
-            justify-content: center;
-            align-items: baseline;
-            gap: 4px;
-
-            .count {
-              font-family: $font-serif;
-              font-size: 1.1rem;
-              font-weight: 700;
-              color: $itiyum-orange;
-            }
-
-            .label {
-              font-family: $font-sans;
-              font-size: 0.75rem;
-              color: $nyt-medium-gray;
-            }
-          }
-        }
-
-        .follow-btn {
-          padding: 10px 20px;
-          border-radius: 4px;
-          font-family: $font-sans;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          width: 100%;
-          font-size: 0.85rem;
-
-          &.following {
-            background: white;
-            color: $nyt-black;
-            border: 1px solid $nyt-black;
-
-            &:hover {
-              background: $nyt-black;
-              color: white;
-            }
-          }
-
-          &:not(.following) {
-            background: $nyt-black;
-            color: white;
-            border: 1px solid $nyt-black;
-
-            &:hover {
-              background: $nyt-dark-gray;
-            }
-          }
-        }
+      .chef-card-count {
+        font-family: $font-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        color: $orange;
       }
     }
   }
 
-  // Become a Chef CTA
-  .become-chef-cta {
-    margin-top: 40px;
-    background: white;
-    border: 1px solid $nyt-border;
-    border-left: 4px solid $itiyum-orange;
-    border-radius: 4px;
-    padding: 24px;
+  .follow-btn {
+    padding: 0.55rem 1.1rem;
+    border-radius: 8px;
+    font-family: $font-sans;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
 
-    .cta-content {
+    &.large { padding: 0.7rem 1.5rem; font-size: 0.85rem; }
+
+    &.following {
+      background: $white;
+      color: $dark-2;
+      border: 1px solid $border;
+      &:hover { border-color: $orange; color: $orange; background: $orange-bg; }
+    }
+
+    &:not(.following) {
+      background: $dark;
+      color: #fff;
+      border: 1px solid $dark;
+      &:hover { background: $dark-2; }
+    }
+  }
+
+  .chef-cta {
+    margin-top: 2rem;
+
+    .chef-cta-inner {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      background: $white;
+      border: 1px solid $border;
+      border-left: 4px solid $orange;
+      border-radius: $radius-lg;
+      box-shadow: $shadow-sm;
+      transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
 
-      @media (max-width: 768px) {
-        flex-direction: column;
-        text-align: center;
-      }
-    }
-
-    .cta-icon {
-      font-size: 2.5rem;
-    }
-
-    .cta-text {
-      flex: 1;
+      &:hover { box-shadow: $shadow-hover; transform: translateY(-2px); }
 
       h3 {
         font-family: $font-serif;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 700;
-        color: $nyt-black;
-        margin-bottom: 4px;
+        color: $dark-2;
+        margin: 0 0 0.2rem;
       }
 
       p {
         font-family: $font-sans;
-        color: $nyt-medium-gray;
-        font-size: 0.9rem;
+        color: $text-light;
+        font-size: 0.85rem;
+        margin: 0;
       }
-    }
 
-    .cta-btn {
-      padding: 12px 24px;
-      background: $itiyum-orange;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-family: $font-sans;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-
-      &:hover {
-        background: $itiyum-orange-dark;
-      }
+      .primary-btn { flex-shrink: 0; }
     }
   }
 }
 
-/* ========== Create Post Section ========== */
-.create-post-section {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 0;
-
-  .login-required-card {
-    background: white;
-    border: 1px solid $nyt-border;
-    border-radius: 4px;
-    padding: 48px 32px;
+/* ========== CREATE ========== */
+.create-section {
+  .login-card {
     text-align: center;
-    max-width: 480px;
-    margin: 24px auto;
-
-    .login-icon {
-      font-size: 3rem;
-      margin-bottom: 16px;
-    }
+    padding: 3rem 2rem;
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    max-width: 420px;
+    margin: 0 auto;
 
     h3 {
       font-family: $font-serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: $nyt-black;
-      margin-bottom: 12px;
+      font-size: 1.25rem;
+      color: $dark-2;
+      margin: 0.75rem 0 0.5rem;
     }
 
     p {
       font-family: $font-sans;
-      color: $nyt-medium-gray;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-
-    .login-btn {
-      display: inline-block;
-      padding: 12px 28px;
-      background: $nyt-black;
-      color: white;
-      font-family: $font-sans;
-      font-weight: 600;
+      color: $text-light;
       font-size: 0.9rem;
-      border-radius: 4px;
-      text-decoration: none;
-      transition: all 0.2s ease;
-
-      &:hover {
-      }
+      margin: 0 0 1.25rem;
     }
 
     .signup-hint {
-      margin-top: 16px;
-      font-family: $font-sans;
+      margin-top: 1rem;
       font-size: 0.85rem;
-      color: $nyt-medium-gray;
 
-      a {
-        color: $itiyum-orange;
-        font-weight: 600;
-        text-decoration: none;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
+      a { color: $orange; font-weight: 600; text-decoration: none; }
     }
   }
 
-  .create-post-layout {
+  .create-layout {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
+    grid-template-columns: 1fr 280px;
+    gap: 1.5rem;
     align-items: start;
   }
 
-  .form-container {
-    background: white;
-    border: 1px solid $nyt-border;
-    border-radius: 4px;
-    padding: 28px;
+  .form-card {
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    padding: 1.5rem;
   }
 
-  .success-message {
+  .success-msg {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
     background: #e8f5e9;
     border: 1px solid #4CAF50;
-    border-radius: 4px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
+    border-radius: $radius-sm;
     color: #2e7d32;
     font-family: $font-sans;
     font-weight: 500;
-
-    .success-icon {
-      width: 24px;
-      height: 24px;
-      background: #4CAF50;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.8rem;
-    }
-  }
-
-  .form-section {
-    margin-bottom: 24px;
-
-    .section-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid $nyt-light-gray;
-
-      .label-icon {
-        font-size: 1rem;
-      }
-
-      .label-text {
-        font-family: $font-sans;
-        font-weight: 600;
-        color: $nyt-black;
-        font-size: 0.9rem;
-      }
-
-      .optional-badge {
-        margin-left: auto;
-        font-family: $font-sans;
-        font-size: 0.7rem;
-        color: $nyt-medium-gray;
-        background: $nyt-light-gray;
-        padding: 3px 8px;
-        border-radius: 2px;
-        font-weight: 500;
-      }
-    }
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
   }
 
   .form-group {
-    .post-textarea {
-      width: 100%;
-      padding: 16px;
-      border: 1px solid $nyt-border;
-      border-radius: 4px;
-      background: white;
-      color: $nyt-black;
-      font-family: $font-sans;
-      font-size: 0.95rem;
-      transition: all 0.2s ease;
-      line-height: 1.7;
-      resize: vertical;
-      min-height: 160px;
+    margin-bottom: 1.25rem;
 
-      &:hover {
-        border-color: $nyt-dark-gray;
-      }
-
-      &:focus {
-        outline: none;
-        border-color: $itiyum-orange;
-        box-shadow: 0 0 0 3px rgba($itiyum-orange, 0.1);
-      }
-
-      &::placeholder {
-        color: $nyt-medium-gray;
-      }
-    }
-
-    .textarea-footer {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 8px;
-    }
-
-    .character-counter {
+    label {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 0.5rem;
       font-family: $font-sans;
-      font-size: 0.8rem;
-      color: $nyt-medium-gray;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: $dark-2;
+      margin-bottom: 0.5rem;
 
-      .counter-icon {
-        font-size: 0.85rem;
+      .optional {
+        font-weight: 400;
+        color: $text-lighter;
+        font-size: 0.75rem;
+        background: $bg-warm;
+        padding: 0.1rem 0.5rem;
+        border-radius: 4px;
       }
+    }
 
-      &.exceeded {
-        color: #d32f2f;
-      }
+    textarea, input[type="text"], input[type="url"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid $border;
+      border-radius: $radius-sm;
+      font-family: $font-sans;
+      font-size: 0.9rem;
+      color: $dark-2;
+      background: $white;
+      transition: all 0.25s;
+      box-sizing: border-box;
+
+      &:hover { border-color: $text-light; }
+      &:focus { outline: none; border-color: $orange; box-shadow: 0 0 0 3px $orange-bg; }
+      &::placeholder { color: $text-lighter; }
+    }
+
+    textarea { min-height: 140px; resize: vertical; line-height: 1.6; }
+
+    .char-counter {
+      text-align: right;
+      font-family: $font-sans;
+      font-size: 0.75rem;
+      color: $text-lighter;
+      margin-top: 0.35rem;
+
+      &.exceeded { color: #DC2626; }
     }
 
     .field-error {
       display: block;
-      margin-top: 6px;
-      color: #d32f2f;
+      margin-top: 0.3rem;
       font-family: $font-sans;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
+      color: #DC2626;
     }
 
-    .post-input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid $nyt-border;
-      border-radius: 4px;
-      background: white;
-      color: $nyt-black;
-      font-family: $font-sans;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
-
-      &:hover {
-        border-color: $nyt-dark-gray;
-      }
-
-      &:focus {
-        outline: none;
-        border-color: $itiyum-orange;
-        box-shadow: 0 0 0 3px rgba($itiyum-orange, 0.1);
-      }
-
-      &::placeholder {
-        color: $nyt-medium-gray;
-      }
-    }
-
-    .hint-text {
+    small {
       display: block;
-      margin-top: 6px;
+      margin-top: 0.3rem;
       font-family: $font-sans;
-      color: $nyt-medium-gray;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
+      color: $text-lighter;
     }
   }
 
-  .image-input-wrapper {
+  .file-area {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: $bg-warm;
+    border: 1px dashed $border;
+    border-radius: $radius-sm;
+    margin-bottom: 0.65rem;
 
-    .post-input {
-      flex: 1;
+    .file-hidden { display: none; }
+
+    .browse-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid $border;
+      border-radius: 6px;
+      background: $white;
+      font-family: $font-sans;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: $dark-2;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { border-color: $orange; color: $orange; }
     }
 
-    .add-image-btn {
-      padding: 12px 18px;
-      background: $nyt-black;
-      color: white;
-      border: none;
-      border-radius: 4px;
+    .file-hint {
+      font-family: $font-sans;
+      font-size: 0.78rem;
+      color: $text-lighter;
+    }
+  }
+
+  .image-url-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.65rem;
+
+    input { flex: 1; }
+
+    .add-btn {
+      padding: 0.75rem 1rem;
+      border: 1px solid $border;
+      border-radius: $radius-sm;
+      background: $white;
       font-family: $font-sans;
       font-weight: 600;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
+      color: $dark-2;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
       white-space: nowrap;
 
-      &:hover:not(:disabled) {
-        background: $nyt-dark-gray;
-      }
-
-      &:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-      }
+      &:hover:not(:disabled) { border-color: $orange; color: $orange; background: $orange-bg; }
+      &:disabled { opacity: 0.4; cursor: not-allowed; }
     }
   }
 
-  .images-section {
-    margin-top: 12px;
-
-    .images-header {
-      font-family: $font-sans;
-      font-size: 0.8rem;
-      color: $nyt-medium-gray;
-      margin-bottom: 10px;
-    }
-  }
-
-  .image-preview-grid {
+  .image-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
 
-    .image-preview-item {
+    .image-item {
       position: relative;
-      border-radius: 4px;
+      border-radius: 8px;
       overflow: hidden;
       aspect-ratio: 1;
-      border: 1px solid $nyt-border;
+      border: 1px solid $border;
 
-      .preview-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
+      img { width: 100%; height: 100%; object-fit: cover; }
 
-      .remove-image-btn {
+      .remove-btn {
         position: absolute;
-        top: 4px;
-        right: 4px;
-        width: 22px;
-        height: 22px;
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
+        top: 3px;
+        right: 3px;
+        width: 20px;
+        height: 20px;
         border: none;
         border-radius: 50%;
+        background: rgba(0,0,0,0.65);
+        color: #fff;
+        font-size: 0.65rem;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.7rem;
-        transition: all 0.2s ease;
+        transition: all 0.2s;
 
-        &:hover {
-          background: #d32f2f;
-        }
+        &:hover { background: #DC2626; }
       }
     }
   }
 
   .form-actions {
     display: flex;
-    gap: 12px;
+    gap: 0.75rem;
     justify-content: flex-end;
-    padding-top: 20px;
-    border-top: 1px solid $nyt-border;
-    margin-top: 16px;
-
-    @media (max-width: 768px) {
-      flex-direction: column-reverse;
-    }
-
-    .secondary-btn {
-      padding: 12px 24px;
-      background: white;
-      border: 1px solid $nyt-border;
-      border-radius: 4px;
-      color: $nyt-black;
-      font-family: $font-sans;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-
-      &:hover:not(:disabled) {
-        background: $nyt-light-gray;
-        border-color: $nyt-dark-gray;
-      }
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-    }
-
-    .primary-btn {
-      padding: 12px 28px;
-      background: $itiyum-orange;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-family: $font-sans;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      &:hover:not(:disabled) {
-        background: $itiyum-orange-dark;
-      }
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      .spinner {
-        animation: spin 0.8s linear infinite;
-      }
-    }
+    padding-top: 1.25rem;
+    border-top: 1px solid $border;
+    margin-top: 1.5rem;
   }
 
-  // Tips Sidebar
-  .tips-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 24px;
-
-    @media (max-width: 1024px) {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    @media (max-width: 600px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .tips-card, .guidelines-card {
-    background: white;
-    border: 1px solid $nyt-border;
-    border-radius: 4px;
-    padding: 20px;
+  .tips-card {
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    padding: 1.25rem;
 
     h4 {
       font-family: $font-sans;
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: $nyt-black;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid $nyt-light-gray;
-    }
-  }
-
-  .tips-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-
-    li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid $nyt-light-gray;
-
-      &:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-      }
-
-      .tip-icon {
-        font-size: 0.9rem;
-        flex-shrink: 0;
-      }
-
-      span:last-child {
-        font-family: $font-sans;
-        color: $nyt-dark-gray;
-        font-size: 0.85rem;
-        line-height: 1.5;
-      }
-    }
-  }
-
-  .guidelines-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-
-    li {
-      position: relative;
-      padding: 8px 0 8px 16px;
-      font-family: $font-sans;
-      color: $nyt-dark-gray;
-      font-size: 0.85rem;
-      line-height: 1.5;
-
-      &::before {
-        content: '•';
-        position: absolute;
-        left: 0;
-        color: $itiyum-orange;
-        font-weight: 700;
-      }
-    }
-  }
-}
-
-/* ========== Create Section ========== */
-.create-section {
-  max-width: 700px;
-  margin: 0 auto;
-
-  .create-post-form {
-    background: white;
-    border: 1px solid $nyt-border;
-    border-radius: 4px;
-    padding: 32px;
-
-    .form-group {
-      margin-bottom: 24px;
-
-      label {
-        display: block;
-        font-family: $font-sans;
-        font-weight: 600;
-        color: $nyt-black;
-        margin-bottom: 10px;
-        font-size: 0.9rem;
-      }
-
-      textarea,
-      input {
-        width: 100%;
-        padding: 14px 16px;
-        border: 1px solid $nyt-border;
-        border-radius: 4px;
-        background: white;
-        color: $nyt-black;
-        font-family: $font-sans;
-        font-size: 0.95rem;
-        transition: all 0.2s ease;
-        line-height: 1.6;
-
-        &:hover {
-          border-color: $nyt-dark-gray;
-        }
-
-        &:focus {
-          outline: none;
-          border-color: $itiyum-orange;
-          box-shadow: 0 0 0 3px rgba($itiyum-orange, 0.1);
-        }
-
-        &::placeholder {
-          color: $nyt-medium-gray;
-        }
-      }
-
-      textarea {
-        min-height: 180px;
-        resize: vertical;
-        line-height: 1.7;
-      }
-
-      .char-count {
-        text-align: right;
-        font-family: $font-sans;
-        font-size: 0.8rem;
-        color: $nyt-medium-gray;
-        margin-top: 6px;
-      }
-
-      .file-upload {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-
-        .file-input {
-          display: none;
-        }
-
-        .file-label {
-          padding: 10px 18px;
-          background: $nyt-light-gray;
-          border: 1px solid $nyt-border;
-          border-radius: 4px;
-          color: $nyt-black;
-          font-family: $font-sans;
-          font-weight: 600;
-          font-size: 0.85rem;
-          cursor: pointer;
-          transition: all 0.2s ease;
-
-          &:hover {
-            background: $nyt-border;
-          }
-        }
-
-        .file-info {
-          font-family: $font-sans;
-          color: $nyt-medium-gray;
-          font-size: 0.85rem;
-        }
-      }
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-      padding-top: 20px;
-      border-top: 1px solid $nyt-border;
-      margin-top: 24px;
-
-      @media (max-width: 768px) {
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      button {
-        padding: 12px 24px;
-        border-radius: 4px;
-        font-family: $font-sans;
-        font-weight: 600;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        @media (max-width: 768px) {
-          width: 100%;
-          padding: 14px;
-        }
-
-        &.cancel-btn {
-          background: white;
-          border: 1px solid $nyt-border;
-          color: $nyt-black;
-
-          &:hover {
-            background: $nyt-light-gray;
-            border-color: $nyt-dark-gray;
-          }
-        }
-
-        &.submit-btn {
-          background: $itiyum-orange;
-          color: white;
-          border: none;
-
-          &:hover {
-            background: $itiyum-orange-dark;
-          }
-
-          &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-          }
-        }
-      }
-    }
-  }
-}
-
-/* ========== Responsive Design ========== */
-@media (max-width: 768px) {
-  .community-header {
-    padding: 50px 16px 30px;
-  }
-
-  .feed-section .posts-container,
-  .trending-section,
-  .chefs-section,
-  .create-section,
-  .create-post-section {
-    padding: 0 16px;
-  }
-
-  .post-card {
-    padding: 20px;
-
-    .post-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .post-actions {
-      flex-wrap: wrap;
-
-      .action-btn {
-        flex: 1 1 calc(50% - 6px);
-        min-width: 100px;
-      }
-    }
-  }
-
-  .chefs-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .create-section .create-post-form,
-  .create-post-section .create-post-form {
-    padding: 20px;
-
-    .form-actions {
-      flex-direction: column;
-
-      button {
-        width: 100%;
-      }
-    }
-  }
-}
-
-/* ========== File Upload Wrapper ========== */
-.file-upload-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  padding: 16px 20px;
-  background: $nyt-light-gray;
-  border: 1px dashed $nyt-border;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: $nyt-dark-gray;
-    background: white;
-  }
-
-  .file-input-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .browse-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    background: $nyt-black;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-family: $font-sans;
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    .browse-icon {
-      font-size: 1rem;
-    }
-
-    &:hover {
-      background: $nyt-dark-gray;
-    }
-  }
-
-  .upload-hint {
-    font-family: $font-sans;
-    color: $nyt-medium-gray;
-    font-size: 0.85rem;
-  }
-}
-
-/* ========== Utility Classes ========== */
-.spinner {
-  display: inline-block;
-  animation: spin 0.8s linear infinite;
-}
-
-/* ========== Pagination ========== */
-.pagination-container {
-  margin-top: 40px;
-  padding: 24px;
-  background: white;
-  border: 1px solid $nyt-border;
-  border-radius: 4px;
-
-  .pagination-info {
-    text-align: center;
-    font-family: $font-sans;
-    font-size: 0.85rem;
-    color: $nyt-medium-gray;
-    margin-bottom: 16px;
-  }
-
-  .pagination-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-
-    .pagination-btn {
-      padding: 10px 18px;
-      background: white;
-      border: 1px solid $nyt-border;
-      border-radius: 4px;
-      color: $nyt-black;
-      font-family: $font-sans;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-
-      &:hover:not(:disabled) {
-        background: $nyt-light-gray;
-        border-color: $nyt-dark-gray;
-      }
-
-      &:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-      }
-    }
-
-    .pagination-number {
-      width: 40px;
-      height: 40px;
-      padding: 0;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: $dark-2;
+      margin: 0 0 0.75rem;
       display: flex;
       align-items: center;
-      justify-content: center;
-      background: white;
-      border: 1px solid $nyt-border;
-      border-radius: 4px;
-      color: $nyt-black;
-      font-family: $font-sans;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-
-      &:hover {
-        background: $nyt-light-gray;
-        border-color: $nyt-dark-gray;
-      }
-
-      &.active {
-        background: $itiyum-orange;
-        border-color: $itiyum-orange;
-        color: white;
-      }
+      gap: 0.4rem;
     }
 
-    .pagination-ellipsis {
-      font-family: $font-sans;
-      color: $nyt-medium-gray;
-      font-weight: 600;
-      font-size: 1rem;
-      padding: 0 6px;
-      user-select: none;
+    hr {
+      border: none;
+      border-top: 1px solid $border;
+      margin: 1rem 0;
     }
-  }
 
-  @media (max-width: 768px) {
-    padding: 16px;
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
 
-    .pagination-controls {
-      gap: 6px;
-
-      .pagination-btn {
-        padding: 8px 14px;
+      li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.4rem;
+        padding: 0.4rem 0;
+        font-family: $font-sans;
         font-size: 0.8rem;
-      }
+        color: $text;
+        line-height: 1.5;
 
-      .pagination-number {
-        width: 36px;
-        height: 36px;
-        font-size: 0.85rem;
+        &:last-child { padding-bottom: 0; }
       }
     }
   }
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+  .hero { height: 460px; }
+  .hero .hero-arrow { display: none; }
+  .create-section .create-layout { grid-template-columns: 1fr; }
+  .create-section .tips-card { display: none; }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: auto;
+    min-height: 420px;
+
+    .hero-content {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+
+      .hero-tabs { flex-wrap: wrap; justify-content: center; gap: 0.4rem; }
+      .hero-tab { font-size: 0.75rem; padding: 0.5rem 1rem; }
+    }
+
+    .hero-arrow { display: none; }
+  }
+
+  .community-layout { padding: 1.5rem 1rem 3rem; }
+
+  .post-card .post-body .post-images {
+    &.single .post-image { height: 200px; }
+    &.pair { grid-template-columns: 1fr; .post-image { height: 200px; } }
+    &.many { grid-template-columns: 1fr 1fr; .post-image { height: 120px; } }
+  }
+
+  .pagination-bar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    .page-info { order: -1; width: 100%; text-align: center; }
+  }
+
+  .trending-section {
+    .topics-grid, .popular-grid { grid-template-columns: 1fr; }
+  }
+
+  .chefs-section {
+    .chef-spotlight .spotlight-inner {
+      flex-direction: column;
+      text-align: center;
+
+      .spotlight-stats { justify-content: center; }
+      .spotlight-badge { position: relative; top: auto; right: auto; margin-bottom: 0.75rem; display: inline-flex; }
+    }
+
+    .chefs-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .chef-cta .chef-cta-inner {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+
+  .create-section {
+    .form-actions { flex-direction: column-reverse; }
+    .form-actions .primary-btn, .form-actions .secondary-btn { width: 100%; justify-content: center; }
+  }
+}
+
+@media (max-width: 480px) {
+  .hero .hero-content { padding-top: 2rem; padding-bottom: 2rem; }
+  .hero .hero-content .hero-tab { font-size: 0.7rem; padding: 0.4rem 0.8rem; }
+
+  .post-card .post-header .author-info .author-avatar { width: 36px; height: 36px; }
+  .post-card .post-body { padding: 0.75rem 1rem; }
+  .post-card .post-body .post-images.single .post-image { height: 180px; }
+  .post-card .post-footer .action-btn { font-size: 0.75rem; padding: 0.35rem 0.7rem; }
+
+  .chefs-section .chefs-grid { grid-template-columns: 1fr; }
 }

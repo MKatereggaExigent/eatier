@@ -160,7 +160,7 @@ router.post('/posts/:postId/like', async (req, res) => {
 
     // Check if user already liked this post
     const existingLike = await pool.query(`
-      SELECT id FROM post_likes WHERE post_id = $1 AND user_id = $2
+      SELECT id FROM community_post_likes WHERE post_id = $1 AND user_id = $2
     `, [postId, userId]);
 
     let isLiked;
@@ -168,13 +168,13 @@ router.post('/posts/:postId/like', async (req, res) => {
 
     if (existingLike.rows.length > 0) {
       // Unlike the post
-      await pool.query(`DELETE FROM post_likes WHERE post_id = $1 AND user_id = $2`, [postId, userId]);
+      await pool.query(`DELETE FROM community_post_likes WHERE post_id = $1 AND user_id = $2`, [postId, userId]);
       await pool.query(`UPDATE community_posts SET likes_count = likes_count - 1 WHERE id = $1`, [postId]);
       isLiked = false;
       likesChange = -1;
     } else {
       // Like the post
-      await pool.query(`INSERT INTO post_likes (post_id, user_id) VALUES ($1, $2)`, [postId, userId]);
+      await pool.query(`INSERT INTO community_post_likes (post_id, user_id) VALUES ($1, $2)`, [postId, userId]);
       await pool.query(`UPDATE community_posts SET likes_count = likes_count + 1 WHERE id = $1`, [postId]);
       isLiked = true;
       likesChange = 1;

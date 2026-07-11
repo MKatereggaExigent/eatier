@@ -30,8 +30,8 @@ export class CheckoutComponent implements OnInit {
   newAddress = signal<Partial<DeliveryAddress>>({
     label: 'Home',
     addressLine1: '',
-    city: 'Kampala',
-    country: 'Uganda'
+    city: 'Johannesburg',
+    country: 'South Africa'
   });
   deliveryInstructions = signal('');
   paymentMethod = signal('cash');
@@ -131,8 +131,8 @@ export class CheckoutComponent implements OnInit {
         request.deliveryAddress = {
           addressLine1: this.newAddress().addressLine1 || '',
           addressLine2: this.newAddress().addressLine2,
-          city: this.newAddress().city || 'Kampala',
-          country: this.newAddress().country || 'Uganda',
+          city: this.newAddress().city || 'Johannesburg',
+          country: this.newAddress().country || 'South Africa',
           recipientName: this.newAddress().recipientName,
           phone: this.newAddress().phone
         };

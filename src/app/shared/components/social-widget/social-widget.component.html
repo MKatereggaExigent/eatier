@@ -31,7 +31,7 @@
       class="tab-btn"
       [class.active]="activeTab() === 'online'"
       (click)="setActiveTab('online')">
-      🟢 Online ({{ onlineUsers().length }})
+      <span class="status-dot active"></span> Online ({{ onlineUsers().length }})
     </button>
   </div>
 
@@ -67,7 +67,7 @@
                     class="action-btn chat-btn"
                     (click)="startChat(user.user_id || user.id)"
                     title="Start Chat">
-                    💬
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                   </button>
                   <button
                     type="button"
@@ -75,7 +75,7 @@
                     (click)="pokeUser(user.user_id || user.id)"
                     [disabled]="pokingUserId() === (user.user_id || user.id)"
                     title="Poke">
-                    👋
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                   </button>
                 </div>
               </div>
@@ -109,7 +109,7 @@
                     class="action-btn chat-btn"
                     (click)="startChat(user.user_id || user.id)"
                     title="Start Chat">
-                    💬
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                   </button>
                   <button
                     type="button"
@@ -117,7 +117,7 @@
                     (click)="pokeUser(user.user_id || user.id)"
                     [disabled]="pokingUserId() === (user.user_id || user.id)"
                     title="Poke">
-                    👋
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                   </button>
                   <button
                     type="button"
@@ -163,7 +163,7 @@
                     class="action-btn chat-btn"
                     (click)="startChat(user.id)"
                     title="Start Chat">
-                    💬
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                   </button>
                   <button
                     type="button"
@@ -171,7 +171,7 @@
                     (click)="pokeUser(user.id)"
                     [disabled]="pokingUserId() === user.id"
                     title="Poke">
-                    👋
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                   </button>
                 </div>
               </div>

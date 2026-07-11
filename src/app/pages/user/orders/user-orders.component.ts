@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { LucideAngularModule, Star, X, Search, RefreshCw, Package, Clock, Check, ChefHat } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
 import { CartService } from '../../../core/services/cart.service';
 import { CurrencyService } from '../../../core/services/currency.service';
@@ -45,7 +46,7 @@ interface Order {
 @Component({
   selector: 'app-user-orders',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './user-orders.component.html',
   styleUrls: ['./user-orders.component.scss']
 })
@@ -54,6 +55,15 @@ export class UserOrdersComponent implements OnInit {
   private router = inject(Router);
   private cartService = inject(CartService);
   protected currencyService = inject(CurrencyService);
+
+  readonly Star = Star;
+  readonly X = X;
+  readonly Search = Search;
+  readonly RefreshCw = RefreshCw;
+  readonly Package = Package;
+  readonly Clock = Clock;
+  readonly Check = Check;
+  readonly ChefHat = ChefHat;
 
   loading = signal(true);
   orders = signal<Order[]>([]);
@@ -168,17 +178,21 @@ export class UserOrdersComponent implements OnInit {
     }
   }
 
-  getStatusIcon(status: string): string {
-    switch (status) {
-      case 'completed': return '✅';
-      case 'pending': return '⏳';
-      case 'confirmed': return '✔️';
-      case 'preparing': return '👨‍🍳';
-      case 'ready': return '📦';
-      case 'delivered': return '🚗';
-      case 'cancelled': return '❌';
-      default: return '📋';
-    }
+  getStarArray(rating: number): number[] {
+    return Array(5).fill(0).map((_, i) => i < Math.round(rating) ? 1 : 0);
+  }
+
+  getStatusIcon(status: string): any {
+    const icons: Record<string, any> = {
+      completed: this.Check,
+      pending: this.Clock,
+      confirmed: this.Check,
+      preparing: this.ChefHat,
+      ready: this.Package,
+      delivered: this.Package,
+      cancelled: this.X
+    };
+    return icons[status] || this.Package;
   }
 
   formatDate(date: Date): string {

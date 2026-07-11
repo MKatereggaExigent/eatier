@@ -1,225 +1,194 @@
-<div class="restaurant-list-container">
-  <!-- Hero Header with Background -->
-  <div class="hero-header">
+<div class="restaurants-page">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <h1 class="page-title">Discover Restaurants</h1>
-      <p class="page-subtitle">Find the finest dining experiences curated for you</p>
+      <span class="hero-label">Explore</span>
+      <h1 class="hero-title">Discover Restaurants</h1>
+      <p class="hero-subtitle">Find the finest dining experiences curated for you</p>
 
-      <!-- Enhanced Search Bar -->
-      <div class="search-bar-wrapper">
-        <div class="search-bar">
-          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-          <input
-            type="text"
-            placeholder="Search restaurants, cuisines, or locations..."
-            [value]="searchQuery()"
-            (input)="onSearchChange($any($event.target).value)"
-            class="search-input"
-          />
-          @if (searchQuery()) {
-            <button type="button" class="clear-search" (click)="onSearchChange('')">×</button>
-          }
-        </div>
+      <div class="search-bar">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input
+          type="text"
+          placeholder="Search restaurants, cuisines, or locations..."
+          [value]="searchQuery()"
+          (input)="onSearchChange($any($event.target).value)"
+          class="search-input"
+        />
+        @if (searchQuery()) {
+          <button type="button" class="clear-search" (click)="onSearchChange('')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        }
       </div>
+    </div>
 
-      <!-- Quick Stats -->
-      <div class="quick-stats">
+    <div class="hero-stats">
+      <div class="stats-bar">
         <div class="stat-item">
-          <span class="stat-number">{{ stats().restaurants }}</span>
+          <span class="stat-value">{{ stats().restaurants }}</span>
           <span class="stat-label">Restaurants</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">{{ cuisineTypes.length - 1 }}</span>
+          <span class="stat-value">{{ cuisineTypes.length - 1 }}</span>
           <span class="stat-label">Cuisines</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">{{ stats().reviews }}</span>
+          <span class="stat-value">{{ stats().reviews }}</span>
           <span class="stat-label">Reviews</span>
         </div>
         @if (stats().reviews > 0) {
           <div class="stat-item">
-            <span class="stat-number">{{ stats().avgRating.toFixed(1) }}</span>
+            <span class="stat-value">{{ stats().avgRating.toFixed(1) }}</span>
             <span class="stat-label">Avg Rating</span>
           </div>
         }
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Filters Section -->
-  <div class="filters-section">
-    <div class="filters-container">
-      <div class="filter-group">
-        <label class="filter-label">Cuisine</label>
-        <select
-          [value]="selectedCuisine()"
-          (change)="onCuisineChange($any($event.target).value)"
-          class="filter-select"
-        >
-          @for (cuisine of cuisineTypes; track cuisine) {
-            <option [value]="cuisine === 'All Cuisines' ? '' : cuisine">
-              {{ cuisine }}
-            </option>
-          }
-        </select>
+  <!-- Filters + Results Bar -->
+  <section class="filters-bar">
+    <div class="filters-inner">
+      <div class="filter-selects">
+        <div class="filter-group">
+          <label class="filter-label">Cuisine</label>
+          <select
+            [value]="selectedCuisine()"
+            (change)="onCuisineChange($any($event.target).value)"
+            class="filter-select"
+          >
+            @for (cuisine of cuisineTypes; track cuisine) {
+              <option [value]="cuisine === 'All Cuisines' ? '' : cuisine">{{ cuisine }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Price Range</label>
+          <select
+            [value]="selectedPriceRange()"
+            (change)="onPriceRangeChange($any($event.target).value)"
+            class="filter-select"
+          >
+            @for (range of priceRanges; track range.value) {
+              <option [value]="range.value">{{ range.label }}</option>
+            }
+          </select>
+        </div>
+        @if (searchQuery() || selectedCuisine() || selectedPriceRange()) {
+          <button type="button" class="clear-btn" (click)="clearAllFilters()">Clear Filters</button>
+        }
       </div>
-
-      <div class="filter-group">
-        <label class="filter-label">Price Range</label>
-        <select
-          [value]="selectedPriceRange()"
-          (change)="onPriceRangeChange($any($event.target).value)"
-          class="filter-select"
-        >
-          @for (range of priceRanges; track range.value) {
-            <option [value]="range.value">{{ range.label }}</option>
-          }
-        </select>
-      </div>
-
-      @if (searchQuery() || selectedCuisine() || selectedPriceRange()) {
-        <button
-          type="button"
-          class="clear-all-btn"
-          (click)="clearAllFilters()">
-          Clear Filters
-        </button>
-      }
+      <span class="results-count">{{ filteredRestaurants().length }} restaurants found</span>
     </div>
+  </section>
 
-    <!-- Results Count -->
-    <div class="results-info">
-      <p class="results-text">
-        <span class="results-count">{{ filteredRestaurants().length }}</span> restaurants found
-      </p>
-    </div>
-  </div>
-
-  <!-- Sponsored Banner Ad -->
-  <div class="sponsored-banner">
+  <!-- Ad Banner -->
+  <div class="ad-banner">
     <app-banner-ad placement="restaurant_list_banner" [autoRotate]="true" [rotationInterval]="8000" [limit]="3"></app-banner-ad>
   </div>
 
   <!-- Restaurant Grid -->
   <div class="restaurant-grid">
-    @for (restaurant of paginatedRestaurants(); track restaurant.id) {
-      <article class="restaurant-card">
-        <a [routerLink]="['/restaurants', restaurant.id]" class="restaurant-link">
-          <div class="card-image-wrapper">
-            <img [src]="restaurant.image" [alt]="restaurant.name" class="restaurant-image" />
-            <div class="image-overlay"></div>
+    @for (restaurant of paginatedRestaurants(); track restaurant.id; let i = $index) {
+      <article class="restaurant-card" [style.--card-delay]="i * 0.08 + 's'">
+        <a [routerLink]="['/restaurants', restaurant.id]" class="card-link">
+          <div class="card-image-wrap">
+            <img [src]="restaurant.image" [alt]="restaurant.name" class="card-img" />
+            <div class="card-img-overlay"></div>
 
-            <!-- Status Badge -->
-            <div class="status-badge" [class.open]="restaurant.isOpen" [class.closed]="!restaurant.isOpen">
-              <span class="status-dot"></span>
+            <div class="card-badge status" [class.open]="restaurant.isOpen" [class.closed]="!restaurant.isOpen">
+              <span class="dot"></span>
               {{ getStatusText(restaurant.isOpen) }}
             </div>
 
-            <!-- Distance Badge - Only show if available -->
             @if (restaurant.distance && restaurant.distance !== 'N/A') {
-              <div class="distance-badge">
-                {{ restaurant.distance }}
-              </div>
+              <div class="card-badge distance">{{ restaurant.distance }}</div>
             }
 
-            <!-- Rating Badge - Show "New" if no reviews -->
-            <div class="rating-badge">
+            <div class="card-badge rating">
               @if (restaurant.reviewCount > 0) {
-                <span class="rating-value">{{ restaurant.rating.toFixed(1) }} ★</span>
+                {{ restaurant.rating.toFixed(1) }}
               } @else {
-                <span class="new-badge">New</span>
+                New
               }
             </div>
           </div>
 
-          <div class="card-content">
-            <div class="card-header">
-              <h3 class="restaurant-name">{{ restaurant.name }}</h3>
-              <div class="review-count">
-                @if (restaurant.reviewCount > 0) {
-                  {{ restaurant.reviewCount }} {{ restaurant.reviewCount === 1 ? 'review' : 'reviews' }}
-                } @else {
-                  <span class="no-reviews">No reviews yet</span>
-                }
-              </div>
-            </div>
+          <div class="card-body">
+            <h3 class="card-title">{{ restaurant.name }}</h3>
 
-            <div class="restaurant-meta">
-              <span class="cuisine-badge">{{ restaurant.cuisine }}</span>
-              <span class="price-badge">{{ restaurant.priceRange }}</span>
+            <div class="card-meta">
+              <span class="card-tag cuisine">{{ restaurant.cuisine }}</span>
+              <span class="card-tag price">{{ restaurant.priceRange }}</span>
             </div>
 
             @if (restaurant.address && restaurant.address !== 'Address not provided') {
-              <p class="restaurant-address">
-                {{ restaurant.address }}
-              </p>
+              <p class="card-address">{{ restaurant.address }}</p>
             } @else {
-              <p class="restaurant-address no-address">
-                <span class="setup-required">Address setup required</span>
-              </p>
+              <p class="card-address no-address">Address setup required</p>
             }
 
-            @if (restaurant.features && restaurant.features.length > 0) {
-              <div class="restaurant-features">
-                @for (feature of restaurant.features.slice(0, 3); track feature) {
-                  <span class="feature-tag">{{ feature }}</span>
+            <div class="card-footer">
+              <span class="card-review-count">
+                @if (restaurant.reviewCount > 0) {
+                  {{ restaurant.reviewCount }} {{ restaurant.reviewCount === 1 ? 'review' : 'reviews' }}
+                } @else {
+                  No reviews yet
                 }
+              </span>
+              <div class="card-actions" (click)="$event.preventDefault(); $event.stopPropagation()">
+                <button
+                  type="button"
+                  class="card-action-btn favorite"
+                  [class.saved]="isFavorite(restaurant.id)"
+                  [attr.aria-label]="isFavorite(restaurant.id) ? 'Remove from favorites' : 'Add to favorites'"
+                  (click)="toggleFavorite($event, restaurant)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" [attr.fill]="isFavorite(restaurant.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="card-action-btn"
+                  aria-label="Share"
+                  (click)="shareRestaurant($event, restaurant)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="card-action-btn"
+                  aria-label="Get directions"
+                  (click)="getDirections($event, restaurant)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                  </svg>
+                </button>
               </div>
-            }
+            </div>
           </div>
         </a>
-
-        <!-- Action Buttons -->
-        <div class="card-actions">
-          <button
-            type="button"
-            class="action-btn favorite"
-            [class.saved]="isFavorite(restaurant.id)"
-            title="Save to favorites"
-            (click)="toggleFavorite($event, restaurant)">
-            <svg width="18" height="18" viewBox="0 0 24 24" [attr.fill]="isFavorite(restaurant.id) ? '#ff8c00' : 'none'" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-            </svg>
-          </button>
-          <button
-            type="button"
-            class="action-btn share"
-            title="Share"
-            (click)="shareRestaurant($event, restaurant)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="18" cy="5" r="3"></circle>
-              <circle cx="6" cy="12" r="3"></circle>
-              <circle cx="18" cy="19" r="3"></circle>
-              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-            </svg>
-          </button>
-          <button
-            type="button"
-            class="action-btn directions"
-            title="Get directions"
-            (click)="getDirections($event, restaurant)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
-            </svg>
-          </button>
-        </div>
       </article>
     } @empty {
       <div class="no-results">
-        <svg class="no-results-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.35-4.35"></path>
         </svg>
         <h3>No restaurants found</h3>
         <p>Try adjusting your search criteria or filters</p>
-        <button type="button" class="clear-filters-btn" (click)="clearAllFilters()">
-          Clear All Filters
-        </button>
+        <button type="button" class="btn-primary" (click)="clearAllFilters()">Clear All Filters</button>
       </div>
     }
   </div>
@@ -227,77 +196,45 @@
   <!-- Pagination -->
   @if (totalPages() > 1) {
     <div class="pagination-section">
-      <div class="pagination-container">
-        <!-- Page Size Selector -->
-        <div class="page-size-selector">
-          <label class="page-size-label">Show:</label>
-          <select
-            class="page-size-select"
-            [value]="pageSize()"
-            (change)="changePageSize(+$any($event.target).value)">
+      <div class="pagination-bar">
+        <div class="page-size">
+          <label>Show:</label>
+          <select [value]="pageSize()" (change)="changePageSize(+$any($event.target).value)">
             @for (size of pageSizeOptions; track size) {
               <option [value]="size">{{ size }}</option>
             }
           </select>
         </div>
 
-        <!-- Pagination Controls -->
-        <div class="pagination-controls">
-          <!-- Previous Button -->
-          <button
-            type="button"
-            class="pagination-btn prev"
-            [disabled]="currentPage() === 1"
-            (click)="prevPage()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M15 18l-6-6 6-6"></path>
-            </svg>
+        <div class="page-controls">
+          <button type="button" class="page-arrow" [disabled]="currentPage() === 1" (click)="prevPage()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </button>
 
-          <!-- Page Numbers -->
-          <div class="page-numbers">
-            @if (getPageNumbers()[0] > 1) {
-              <button type="button" class="page-btn" (click)="goToPage(1)">1</button>
-              @if (getPageNumbers()[0] > 2) {
-                <span class="page-ellipsis">...</span>
-              }
+          @if (getPageNumbers()[0] > 1) {
+            <button type="button" class="page-num" (click)="goToPage(1)">1</button>
+            @if (getPageNumbers()[0] > 2) {
+              <span class="page-ellipsis">...</span>
             }
-            @for (page of getPageNumbers(); track page) {
-              <button
-                type="button"
-                class="page-btn"
-                [class.active]="page === currentPage()"
-                (click)="goToPage(page)">
-                {{ page }}
-              </button>
+          }
+          @for (page of getPageNumbers(); track page) {
+            <button type="button" class="page-num" [class.active]="page === currentPage()" (click)="goToPage(page)">{{ page }}</button>
+          }
+          @if (getPageNumbers()[getPageNumbers().length - 1] < totalPages()) {
+            @if (getPageNumbers()[getPageNumbers().length - 1] < totalPages() - 1) {
+              <span class="page-ellipsis">...</span>
             }
-            @if (getPageNumbers()[getPageNumbers().length - 1] < totalPages()) {
-              @if (getPageNumbers()[getPageNumbers().length - 1] < totalPages() - 1) {
-                <span class="page-ellipsis">...</span>
-              }
-              <button type="button" class="page-btn" (click)="goToPage(totalPages())">{{ totalPages() }}</button>
-            }
-          </div>
+            <button type="button" class="page-num" (click)="goToPage(totalPages())">{{ totalPages() }}</button>
+          }
 
-          <!-- Next Button -->
-          <button
-            type="button"
-            class="pagination-btn next"
-            [disabled]="currentPage() === totalPages()"
-            (click)="nextPage()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 18l6-6-6-6"></path>
-            </svg>
+          <button type="button" class="page-arrow" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </button>
         </div>
 
-        <!-- Page Info -->
-        <div class="page-info">
-          <span class="page-info-text">
-            {{ (currentPage() - 1) * pageSize() + 1 }}–{{ currentPage() * pageSize() > filteredRestaurants().length ? filteredRestaurants().length : currentPage() * pageSize() }}
-            of {{ filteredRestaurants().length }}
-          </span>
-        </div>
+        <span class="page-info">
+          {{ (currentPage() - 1) * pageSize() + 1 }}&ndash;{{ currentPage() * pageSize() > filteredRestaurants().length ? filteredRestaurants().length : currentPage() * pageSize() }} of {{ filteredRestaurants().length }}
+        </span>
       </div>
     </div>
   }

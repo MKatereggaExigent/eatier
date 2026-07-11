@@ -1,627 +1,789 @@
-// NYT-Inspired Pricing Page Styles
+$font-serif: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-// Color Palette
-$nyt-black: #121212;
-$nyt-dark-gray: #333333;
-$nyt-medium-gray: #666666;
-$nyt-light-gray: #f7f7f5;
-$nyt-warm-white: #faf9f6;
-$nyt-border: #e2e2e2;
-$itiyum-orange: #ff8c00;
-$itiyum-orange-dark: #e67e00;
+$orange: #ff8c00;
+$orange-dark: #e67e00;
+$orange-light: rgba(255,140,0,0.1);
+$dark: #0F172A;
+$dark-2: #1E293B;
+$border: #E2E8F0;
+$text: #334155;
+$text-light: #64748B;
+$text-lighter: #94A3B8;
+$bg-warm: #F8FAFC;
+$white: #FFFFFF;
+$shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+$shadow-hover: 0 24px 56px -12px rgba(0,0,0,0.12);
+$radius: 12px;
 
-// Typography
-$font-serif: 'Playfair Display', 'Georgia', serif;
-$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-
-.pricing-page {
-  width: 100%;
-  min-height: 100vh;
-  background: $nyt-warm-white;
-  overflow-x: hidden;
-  padding: 0;
-  margin: 0;
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-// Hero Section
-.hero-section {
-  padding: 5rem 2rem 3rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  text-align: center;
-  background: linear-gradient(180deg, #ffffff 0%, $nyt-light-gray 100%);
-  border-radius: 12px;
-  border-bottom: 1px solid $nyt-border;
-}
-
-.hero-content {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.hero-title {
-  font-family: $font-serif;
-  font-size: clamp(2.5rem, 5vw, 3.5rem);
-  font-weight: 700;
-  color: $nyt-black;
-  margin: 0 0 1rem;
-  letter-spacing: -0.02em;
-}
-
-.hero-subtitle {
-  font-family: $font-sans;
-  font-size: 1.125rem;
-  color: $nyt-medium-gray;
-  line-height: 1.7;
-  margin: 0 0 2.5rem;
-}
-
-// Billing Toggle
-.billing-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  font-family: $font-sans;
-  font-size: 1rem;
-  color: $nyt-medium-gray;
-
-  span {
-    transition: color 0.3s ease;
-
-    &.active {
-      color: $nyt-black;
-      font-weight: 600;
-    }
-  }
-
-  .save-badge {
-    display: inline-block;
-    background: $itiyum-orange;
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    margin-left: 0.5rem;
-    text-transform: uppercase;
-  }
-}
-
-.toggle-switch {
-  position: relative;
-  width: 56px;
-  height: 28px;
-  background: $nyt-border;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-
-  &.yearly {
-    background: $itiyum-orange;
-  }
-
-  .toggle-knob {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 22px;
-    height: 22px;
-    background: white;
-    border-radius: 50%;
-    transition: transform 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  &.yearly .toggle-knob {
-    transform: translateX(28px);
-  }
-}
-
-// User Type Tabs
-.user-type-section {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  background: white;
-  border-radius: 12px;
-  border-bottom: 1px solid $nyt-border;
-}
-
-.user-type-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  max-width: 100%;
-  margin: 0 auto;
-  flex-wrap: wrap;
-}
-
-.user-type-tab {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.25rem 1.5rem;
-  background: $nyt-light-gray;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 180px;
-
-  &:hover {
-    background: white;
-    border-color: $nyt-border;
-    transform: translateY(-2px);
-  }
-
-  &.active {
-    background: white;
-    border-color: $itiyum-orange;
-    box-shadow: 0 4px 12px rgba($itiyum-orange, 0.2);
-  }
-
-  .tab-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .tab-name {
-    font-family: $font-sans;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: $nyt-black;
-    margin-bottom: 0.25rem;
-  }
-
-  .tab-description {
-    font-family: $font-sans;
-    font-size: 0.75rem;
-    color: $nyt-medium-gray;
-  }
-}
-
-
-// Error Banner
-.error-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  background: #fef2f2;
-  color: #dc2626;
-  font-family: $font-sans;
-  font-size: 0.95rem;
-  border-bottom: 1px solid #fecaca;
-}
-
-// Loading State
-.loading-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 6rem 2rem;
-
-  p {
-    font-family: $font-sans;
-    color: $nyt-medium-gray;
-    margin-top: 1rem;
-  }
-}
-
-.loading-spinner {
-  width: 48px;
-  height: 48px;
-  border: 3px solid $nyt-border;
-  border-top-color: $itiyum-orange;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-// Plans Section
-.plans-section {
-  padding: 4rem 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+.pricing-page {
+  width: 100%;
+  min-height: 100vh;
+  background: $bg-warm;
 }
 
-.plans-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
-  justify-items: center;
-}
-
-// Plan Card
-.plan-card {
+/* ========== HERO ========== */
+.hero {
   position: relative;
   width: 100%;
-  max-width: 380px;
-  background: white;
-  border: 1px solid $nyt-border;
-  border-radius: 16px;
-  padding: 2rem;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 6rem 2rem 7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 
-  &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1920&h=800&fit=crop') center/cover;
   }
 
-  &.popular {
-    border-color: $itiyum-orange;
-    box-shadow: 0 8px 24px rgba($itiyum-orange, 0.15);
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0.78) 50%, rgba(15,23,42,0.95) 100%);
+    z-index: 1;
+  }
 
-    &:hover {
-      box-shadow: 0 20px 40px rgba($itiyum-orange, 0.2);
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 720px;
+
+    .hero-label {
+      display: inline-block;
+      font-family: $font-sans;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: $orange;
+      margin-bottom: 1rem;
+      background: rgba($orange, 0.1);
+      padding: 0.35rem 1rem;
+      border: 1px solid rgba($orange, 0.2);
+      border-radius: 20px;
+    }
+
+    .hero-title {
+      font-family: $font-serif;
+      font-size: clamp(2.5rem, 5vw, 3.75rem);
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 1rem;
+      line-height: 1.1;
+    }
+
+    .hero-subtitle {
+      font-family: $font-sans;
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+      color: rgba(255,255,255,0.8);
+      margin: 0 0 2.5rem;
+      line-height: 1.6;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .billing-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.6rem 1.25rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 100px;
+
+      .toggle-label {
+        font-family: $font-sans;
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.5);
+        transition: color 0.3s;
+        user-select: none;
+
+        &.active {
+          color: #fff;
+          font-weight: 600;
+        }
+
+        .save-badge {
+          display: inline-block;
+          background: $orange;
+          color: #fff;
+          font-size: 0.6rem;
+          font-weight: 700;
+          padding: 0.15rem 0.45rem;
+          border-radius: 4px;
+          margin-left: 0.35rem;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+        }
+      }
+
+      .toggle-switch {
+        position: relative;
+        width: 52px;
+        height: 26px;
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 13px;
+        cursor: pointer;
+        transition: background 0.3s;
+
+        &.yearly {
+          background: $orange;
+          border-color: $orange;
+        }
+
+        .toggle-knob {
+          position: absolute;
+          top: 2px;
+          left: 2px;
+          width: 20px;
+          height: 20px;
+          background: #fff;
+          border-radius: 50%;
+          transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        &.yearly .toggle-knob {
+          transform: translateX(26px);
+        }
+      }
     }
   }
-
-  &.free {
-    background: $nyt-light-gray;
-  }
 }
 
-.popular-badge {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: $itiyum-orange;
-  color: white;
-  font-family: $font-sans;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.375rem 1rem;
-  border-radius: 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+/* ========== USER TYPE TABS ========== */
+.user-type-section {
+  max-width: 1200px;
+  margin: -2.5rem auto 0;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 3;
 }
 
-.plan-header {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid $nyt-border;
+.user-type-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 }
 
-.plan-name {
-  font-family: $font-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: $nyt-black;
-  margin: 0 0 0.5rem;
-}
-
-.plan-description {
-  font-family: $font-sans;
-  font-size: 0.9rem;
-  color: $nyt-medium-gray;
-  margin: 0;
-  line-height: 1.5;
-}
-
-.plan-pricing {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.price-amount {
-  font-family: $font-serif;
-  font-size: 3rem;
-  font-weight: 700;
-  color: $nyt-black;
-}
-
-.price-period {
-  font-family: $font-sans;
-  font-size: 1rem;
-  color: $nyt-medium-gray;
-}
-
-.yearly-savings {
-  margin-top: 0.5rem;
-
-  .monthly-equivalent {
-    font-family: $font-sans;
-    font-size: 0.85rem;
-    color: $nyt-medium-gray;
-  }
-
-  .savings-badge {
-    display: inline-block;
-    background: #dcfce7;
-    color: #16a34a;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    margin-left: 0.5rem;
-  }
-}
-
-
-// Features List
-.plan-features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1.5rem;
-}
-
-.feature-item {
+.user-type-tab {
   display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.5rem 0;
-  font-family: $font-sans;
-  font-size: 0.9rem;
-  color: $nyt-dark-gray;
-  line-height: 1.4;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1.5rem 1rem;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius;
+  box-shadow: $shadow-sm;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+  animation: fadeUp 0.5s ease backwards;
+  animation-delay: var(--tab-delay, 0s);
 
-  .feature-check {
-    color: #16a34a;
-    font-weight: 700;
-    flex-shrink: 0;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-hover;
+    border-color: rgba($orange, 0.3);
+  }
+
+  &.active {
+    border-color: $orange;
+    box-shadow: 0 4px 20px rgba($orange, 0.15);
+
+    .tab-icon-wrap {
+      background: $orange;
+      color: #fff;
+    }
+
+    .tab-name { color: $orange; }
+  }
+
+  .tab-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: $orange-light;
+    color: $orange;
+    transition: all 0.3s;
+    margin-bottom: 0.25rem;
+  }
+
+  .tab-name {
+    font-family: $font-sans;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $dark-2;
+    transition: color 0.3s;
+  }
+
+  .tab-desc {
+    font-family: $font-sans;
+    font-size: 0.7rem;
+    color: $text-light;
+    text-align: center;
   }
 }
 
-// Subscribe Button
-.subscribe-btn {
-  width: 100%;
-  padding: 1rem;
-  background: $itiyum-orange;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-family: $font-sans;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
+/* ========== ERROR ========== */
+.error-banner {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-
-  &:hover:not(:disabled) {
-    background: $itiyum-orange-dark;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba($itiyum-orange, 0.3);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-
-  &.processing {
-    background: $nyt-medium-gray;
-  }
-}
-
-.btn-spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-.trial-note {
-  text-align: center;
+  max-width: 1200px;
+  margin: 1rem auto 0;
+  padding: 0.75rem 1rem;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 10px;
+  color: #DC2626;
   font-family: $font-sans;
-  font-size: 0.8rem;
-  color: $nyt-medium-gray;
-  margin: 1rem 0 0;
+  font-size: 0.9rem;
 }
 
-// Comparison Section
-.comparison-section {
+/* ========== LOADING ========== */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 5rem 2rem;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid $border;
+    border-top-color: $orange;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-family: $font-sans;
+    color: $text-light;
+    font-size: 0.95rem;
+  }
+}
+
+/* ========== PLANS SECTION ========== */
+.plans-section {
   max-width: 1200px;
   margin: 0 auto;
-  background: white;
-  border-radius: 12px;
-  border-top: 1px solid $nyt-border;
+  padding: 3rem 2rem 4rem;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ========== PLAN CARD ========== */
+.plan-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: $shadow-sm;
+  transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+  animation: fadeUp 0.6s ease backwards;
+  animation-delay: var(--card-delay, 0s);
+
+  &:hover {
+    box-shadow: $shadow-hover;
+    transform: translateY(-4px);
+  }
+
+  &.popular {
+    border-color: $orange;
+    box-shadow: 0 8px 30px rgba($orange, 0.12);
+    transform: scale(1.03);
+    z-index: 1;
+
+    &:hover {
+      box-shadow: 0 24px 56px -12px rgba($orange, 0.25);
+      transform: scale(1.03) translateY(-4px);
+    }
+  }
+
+  &.free {
+    background: linear-gradient(180deg, $white 0%, $bg-warm 100%);
+  }
+
+  .popular-badge {
+    position: absolute;
+    top: -13px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, $orange, $orange-dark);
+    color: #fff;
+    font-family: $font-sans;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.35rem 1.1rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba($orange, 0.3);
+  }
+
+  .plan-header {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid $border;
+
+    .plan-name {
+      font-family: $font-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $dark;
+      margin: 0 0 0.4rem;
+    }
+
+    .plan-desc {
+      font-family: $font-sans;
+      font-size: 0.85rem;
+      color: $text-light;
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+
+  .plan-price {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    min-height: 80px;
+
+    .price-amount {
+      font-family: $font-serif;
+      font-size: 2.75rem;
+      font-weight: 700;
+      color: $dark;
+      line-height: 1;
+    }
+
+    .price-period {
+      font-family: $font-sans;
+      font-size: 0.95rem;
+      color: $text-light;
+      margin-left: 0.2rem;
+    }
+
+    .yearly-info {
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+
+      .monthly-eq {
+        font-family: $font-sans;
+        font-size: 0.8rem;
+        color: $text-light;
+      }
+
+      .savings-badge {
+        display: inline-block;
+        background: #DCFCE7;
+        color: #16A34A;
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    flex: 1;
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      padding: 0.5rem 0;
+      font-family: $font-sans;
+      font-size: 0.85rem;
+      color: $text;
+      line-height: 1.4;
+
+      .feature-icon {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: $orange-light;
+        color: $orange;
+        margin-top: 0.05rem;
+      }
+    }
+  }
+
+  .subscribe-btn {
+    width: 100%;
+    padding: 0.9rem;
+    background: linear-gradient(135deg, $orange, $orange-dark);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: $font-sans;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 8px 24px rgba($orange, 0.35);
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &.processing {
+      background: $text-lighter;
+    }
+
+    .btn-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+  }
+
+  .trial-note {
+    text-align: center;
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    color: $text-lighter;
+    margin: 0.75rem 0 0;
+  }
+}
+
+/* ========== BENEFITS ========== */
+.benefits-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
+.benefits-inner {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 16px;
+  padding: 3.5rem 3rem;
+  box-shadow: $shadow-sm;
 }
 
 .section-title {
   font-family: $font-serif;
-  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-size: clamp(1.8rem, 3.5vw, 2.25rem);
   font-weight: 700;
   text-align: center;
-  color: $nyt-black;
-  margin: 0 0 3rem;
+  color: $dark;
+  margin: 0 0 2.5rem;
 }
 
 .benefits-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
 }
 
 .benefit-card {
   text-align: center;
-  padding: 2rem;
-  border-radius: 12px;
-  transition: all 0.3s ease;
+  padding: 1.5rem;
+  border-radius: $radius;
+  transition: all 0.3s;
 
   &:hover {
-    background: $nyt-light-gray;
-    transform: translateY(-4px);
+    transform: translateY(-3px);
+
+    .benefit-icon-wrap {
+      background: $orange;
+      color: #fff;
+    }
   }
 
-  .benefit-icon {
-    font-size: 3rem;
+  .benefit-icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: $orange-light;
+    color: $orange;
     margin-bottom: 1rem;
-    display: block;
+    transition: all 0.3s;
   }
 
   h3 {
-    font-family: $font-serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: $nyt-black;
-    margin: 0 0 0.75rem;
+    font-family: $font-sans;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $dark-2;
+    margin: 0 0 0.5rem;
   }
 
   p {
     font-family: $font-sans;
-    font-size: 0.9rem;
-    color: $nyt-medium-gray;
+    font-size: 0.85rem;
+    color: $text-light;
     line-height: 1.6;
     margin: 0;
   }
 }
 
-// FAQ Section
+/* ========== FAQ ========== */
 .faq-section {
-  padding: 5rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  background: $nyt-light-gray;
-  border-radius: 12px;
+  padding: 0 2rem 4rem;
+}
+
+.faq-inner {
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .faq-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
 }
 
 .faq-item {
-  background: white;
   padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid $nyt-border;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius;
+  transition: all 0.3s;
+
+  &:hover {
+    box-shadow: $shadow-sm;
+    border-color: rgba($orange, 0.2);
+  }
 
   h4 {
     font-family: $font-sans;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    color: $nyt-black;
-    margin: 0 0 0.75rem;
+    color: $dark;
+    margin: 0 0 0.5rem;
   }
 
   p {
     font-family: $font-sans;
-    font-size: 0.9rem;
-    color: $nyt-medium-gray;
+    font-size: 0.85rem;
+    color: $text-light;
     line-height: 1.6;
     margin: 0;
   }
 }
 
-// CTA Section
+/* ========== CTA ========== */
 .cta-section {
-  padding: 5rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  background: linear-gradient(135deg, $itiyum-orange 0%, $itiyum-orange-dark 100%);
-  border-radius: 12px;
+  padding: 0 2rem 4rem;
+}
+
+.cta-inner {
+  background: linear-gradient(135deg, $dark 0%, $dark-2 100%);
+  border-radius: 16px;
+  padding: 4rem 3rem;
   text-align: center;
-  color: white;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba($orange, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
 
   h2 {
     font-family: $font-serif;
-    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-size: clamp(1.8rem, 3.5vw, 2.25rem);
     font-weight: 700;
-    margin: 0 0 1rem;
+    color: #fff;
+    margin: 0 0 0.75rem;
+    position: relative;
   }
 
   p {
     font-family: $font-sans;
-    font-size: 1.125rem;
-    opacity: 0.9;
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.7);
     margin: 0 0 2rem;
+    position: relative;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    padding: 1rem 2.5rem;
+    background: linear-gradient(135deg, $orange, $orange-dark);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: $font-sans;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+
+    &:hover {
+      box-shadow: 0 8px 28px rgba($orange, 0.4);
+      transform: translateY(-2px);
+    }
   }
 }
 
-.cta-btn {
-  display: inline-block;
-  padding: 1rem 2.5rem;
-  background: white;
-  color: $itiyum-orange;
-  border: none;
-  border-radius: 8px;
-  font-family: $font-sans;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+  .user-type-tabs {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  .plans-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .plan-card.popular {
+    transform: none;
+    &:hover { transform: translateY(-4px); }
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-// Responsive Design
 @media (max-width: 768px) {
-  .hero-section {
-    padding: 3rem 1.5rem 2rem;
+  .hero {
+    padding: 4rem 1.25rem 6rem;
+
+    .hero-content {
+      .hero-title { font-size: 2rem; }
+      .hero-subtitle { font-size: 0.95rem; margin-bottom: 2rem; }
+    }
   }
 
-  .billing-toggle {
-    flex-direction: column;
-    gap: 0.75rem;
+  .user-type-section {
+    padding: 0 1rem;
+    margin-top: -2rem;
+  }
 
-    .save-badge {
-      display: block;
-      margin: 0.25rem 0 0;
+  .user-type-tab {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .plans-section { padding: 2rem 1rem 3rem; }
+
+  .plans-grid {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .plan-card.popular {
+    transform: none;
+    &:hover { transform: translateY(-4px); }
+  }
+
+  .benefits-section { padding: 0 1rem 3rem; }
+  .benefits-inner { padding: 2rem 1.5rem; }
+  .benefits-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+  .faq-section { padding: 0 1rem 3rem; }
+
+  .faq-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-section { padding: 0 1rem 3rem; }
+  .cta-inner { padding: 3rem 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 3rem 1rem 5rem;
+
+    .hero-content {
+      .hero-title { font-size: 1.7rem; }
+      .billing-toggle {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.6rem;
+        padding: 0.5rem 1rem;
+      }
     }
   }
 
   .user-type-tabs {
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: 1fr;
   }
 
   .user-type-tab {
-    min-width: auto;
+    flex-direction: row;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+
+    .tab-icon-wrap { width: 40px; height: 40px; margin-bottom: 0; flex-shrink: 0; }
+    .tab-desc { text-align: left; }
   }
 
-  .plans-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .plan-card {
-    max-width: 100%;
-  }
-
-  .benefits-grid,
-  .faq-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-
-  .plan-card {
-    padding: 1.5rem;
-  }
-
-  .price-amount {
-    font-size: 2.5rem;
-  }
-
-  .comparison-section,
-  .faq-section,
-  .cta-section {
-    padding: 3rem 1.5rem;
-  }
+  .benefit-card { padding: 1rem; }
 }

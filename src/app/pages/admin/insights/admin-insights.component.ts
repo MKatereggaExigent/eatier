@@ -23,9 +23,9 @@ export class AdminInsightsComponent {
   currentUser = this.authService.currentUser;
 
   tabs: TabItem[] = [
-    { path: 'overview', label: 'Overview', icon: '📊' },
-    { path: 'analytics', label: 'Analytics', icon: '📈' },
-    { path: 'reports', label: 'Reports', icon: '📋' }
+    { path: 'overview', label: 'Overview', icon: 'bar-chart' },
+    { path: 'analytics', label: 'Analytics', icon: 'trending-up' },
+    { path: 'reports', label: 'Reports', icon: 'clipboard' }
   ];
 
   isActiveTab(path: string): boolean {

@@ -1,15 +1,21 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { SocialWidgetComponent } from '../../../shared/components/social-widget/social-widget.component';
 import { MessagingWidgetComponent } from '../../../shared/components/messaging-widget/messaging-widget.component';
 import { AvatarUploadComponent } from '../../../shared/components/avatar-upload/avatar-upload.component';
 import { AvatarContextMenuDirective } from '../../../shared/directives/avatar-context-menu.directive';
+import { MessagingService } from '../../../core/services/messaging.service';
+import {
+  LucideAngularModule, Heart, MessageCircle, Share2, Search, Bell, Camera, Send,
+  UserCheck, MoreHorizontal, Users, MessageSquare, UserPlus, AtSign, Star, Image,
+  Plus, Eye, CheckCircle, Clock, AlertTriangle, ChevronLeft, ChevronRight, UserMinus, FileText, Calendar
+} from 'lucide-angular';
 
 interface UserToFollow {
   id: string;
-  // Support both snake_case (API response) and camelCase (legacy)
   firstName?: string;
   first_name?: string;
   lastName?: string;
@@ -19,7 +25,6 @@ interface UserToFollow {
   followerCount?: number;
   follower_count?: number;
   isFollowing: boolean;
-  // Avatar fields
   profile_image_url?: string;
   avatar_url?: string;
   avatar?: string;
@@ -38,12 +43,40 @@ interface ActivityItem {
 @Component({
   selector: 'app-business-social',
   standalone: true,
-  imports: [CommonModule, SocialWidgetComponent, MessagingWidgetComponent, AvatarUploadComponent, AvatarContextMenuDirective],
+  imports: [CommonModule, SocialWidgetComponent, MessagingWidgetComponent, AvatarUploadComponent, AvatarContextMenuDirective, LucideAngularModule],
   templateUrl: './business-social.component.html',
   styleUrls: ['./business-social.component.scss']
 })
 export class BusinessSocialComponent implements OnInit {
+  readonly Heart = Heart;
+  readonly MessageCircle = MessageCircle;
+  readonly Share2 = Share2;
+  readonly Search = Search;
+  readonly Bell = Bell;
+  readonly Camera = Camera;
+  readonly Send = Send;
+  readonly UserCheck = UserCheck;
+  readonly MoreHorizontal = MoreHorizontal;
+  readonly Users = Users;
+  readonly MessageSquare = MessageSquare;
+  readonly UserPlus = UserPlus;
+  readonly AtSign = AtSign;
+  readonly Star = Star;
+  readonly Image = Image;
+  readonly Plus = Plus;
+  readonly Eye = Eye;
+  readonly CheckCircle = CheckCircle;
+  readonly Clock = Clock;
+  readonly AlertTriangle = AlertTriangle;
+  readonly ChevronLeft = ChevronLeft;
+  readonly ChevronRight = ChevronRight;
+  readonly UserMinus = UserMinus;
+  readonly FileText = FileText;
+  readonly Calendar = Calendar;
+
   private http = inject(HttpClient);
+  private router = inject(Router);
+  private messagingService = inject(MessagingService);
 
   loading = signal(true);
   activeTab = signal<'feed' | 'discover' | 'following' | 'followers'>('feed');
@@ -55,13 +88,37 @@ export class BusinessSocialComponent implements OnInit {
 
   followingInProgress = signal<Set<string>>(new Set());
 
-  // Pagination
   activityPage = signal(1);
   activityLimit = 10;
   totalActivityPages = signal(1);
 
-  // Avatar upload
   showAvatarUpload = signal(false);
+
+  searchQuery = signal('');
+  showNotifications = signal(false);
+  likedActivities = signal<Set<string>>(new Set());
+
+  filteredDiscover = computed(() => {
+    const q = this.searchQuery().toLowerCase();
+    if (!q) return this.discoverUsers();
+    return this.discoverUsers().filter(u => this.getUserFullName(u).toLowerCase().includes(q));
+  });
+
+  filteredFollowing = computed(() => {
+    const q = this.searchQuery().toLowerCase();
+    if (!q) return this.following();
+    return this.following().filter(u => this.getUserFullName(u).toLowerCase().includes(q));
+  });
+
+  filteredFollowers = computed(() => {
+    const q = this.searchQuery().toLowerCase();
+    if (!q) return this.followers();
+    return this.followers().filter(u => this.getUserFullName(u).toLowerCase().includes(q));
+  });
+
+  stories = computed(() => this.discoverUsers().slice(0, 8));
+
+  private currentUserAvatarSeed = signal(`user_${Date.now()}`);
 
   ngOnInit(): void {
     this.loadActivityFeed();
@@ -70,6 +127,7 @@ export class BusinessSocialComponent implements OnInit {
 
   setActiveTab(tab: 'feed' | 'discover' | 'following' | 'followers'): void {
     this.activeTab.set(tab);
+    this.searchQuery.set('');
     if (tab === 'feed') this.loadActivityFeed();
     else if (tab === 'discover') this.loadDiscoverUsers();
     else if (tab === 'following') this.loadFollowing();
@@ -90,26 +148,18 @@ export class BusinessSocialComponent implements OnInit {
     });
   }
 
-  /**
-   * Go to next activity page
-   */
   nextActivityPage(): void {
     if (this.activityPage() < this.totalActivityPages()) {
       this.activityPage.update(p => p + 1);
       this.loadActivityFeed();
-      // Scroll to top of activity feed
       document.querySelector('.activity-list')?.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
-  /**
-   * Go to previous activity page
-   */
   previousActivityPage(): void {
     if (this.activityPage() > 1) {
       this.activityPage.update(p => p - 1);
       this.loadActivityFeed();
-      // Scroll to top of activity feed
       document.querySelector('.activity-list')?.scrollIntoView({ behavior: 'smooth' });
     }
   }
@@ -168,11 +218,11 @@ export class BusinessSocialComponent implements OnInit {
 
   getActivityIcon(type: string): string {
     switch (type) {
-      case 'review': return '⭐';
-      case 'favorite': return '❤️';
-      case 'booking': return '📅';
-      case 'share': return '🔗';
-      default: return '📋';
+      case 'review': return 'star';
+      case 'favorite': return 'heart';
+      case 'booking': return 'calendar';
+      case 'share': return 'share';
+      default: return 'file-text';
     }
   }
 
@@ -202,43 +252,32 @@ export class BusinessSocialComponent implements OnInit {
     return this.followingInProgress().has(userId);
   }
 
-  /**
-   * Get user's full name
-   */
   getUserFullName(user: UserToFollow): string {
     const firstName = user.first_name || user.firstName || '';
     const lastName = user.last_name || user.lastName || '';
     return `${firstName} ${lastName}`.trim() || 'Unknown User';
   }
 
-  /**
-   * Get beautiful avatar URL for user
-   */
   getUserAvatarUrl(user: UserToFollow): string {
-    // If user has uploaded avatar, use it
     if (user.profile_image_url || user.avatar_url) {
       return user.profile_image_url || user.avatar_url || '';
     }
-
-    // Otherwise use DiceBear beautiful default avatar
     const seed = user.id || this.getUserFullName(user);
     const encodedSeed = encodeURIComponent(seed);
     return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodedSeed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50`;
   }
 
-  /**
-   * Open avatar upload modal
-   */
+  getCurrentUserAvatar(): string {
+    const seed = encodeURIComponent(this.currentUserAvatarSeed());
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50`;
+  }
+
   openAvatarUpload(): void {
     this.showAvatarUpload.set(true);
   }
 
-  /**
-   * Handle avatar uploaded successfully
-   */
   onAvatarUploaded(avatarUrl: string): void {
-    console.log('Avatar uploaded:', avatarUrl);
-    // Reload current tab data to show new avatar
+    this.currentUserAvatarSeed.set(`user_${Date.now()}`);
     const currentTab = this.activeTab();
     if (currentTab === 'feed') this.loadActivityFeed();
     else if (currentTab === 'discover') this.loadDiscoverUsers();
@@ -246,11 +285,60 @@ export class BusinessSocialComponent implements OnInit {
     else if (currentTab === 'followers') this.loadFollowers();
   }
 
-  /**
-   * Close avatar upload modal
-   */
   closeAvatarUpload(): void {
     this.showAvatarUpload.set(false);
   }
-}
 
+  enc(seed: string): string {
+    return encodeURIComponent(seed);
+  }
+
+  toggleLike(activityId: string): void {
+    const set = new Set(this.likedActivities());
+    if (set.has(activityId)) {
+      set.delete(activityId);
+    } else {
+      set.add(activityId);
+    }
+    this.likedActivities.set(set);
+  }
+
+  isLiked(activityId: string): boolean {
+    return this.likedActivities().has(activityId);
+  }
+
+  shareActivity(activity: ActivityItem): void {
+    this.http.post(`${environment.apiUrl}/social/share`, {
+      shareType: 'activity',
+      referenceId: activity.id,
+      platform: 'internal'
+    }).subscribe({
+      next: () => {
+        const btn = document.querySelector(`[data-share="${activity.id}"]`);
+        if (btn) {
+          btn.textContent = 'Shared!';
+          setTimeout(() => { btn.textContent = ''; }, 2000);
+        }
+      }
+    });
+  }
+
+  messageUser(userId: string, userName: string): void {
+    if (!userId) {
+      alert('Error: User ID is missing.');
+      return;
+    }
+    this.messagingService.sendChatRequest(userId, `Hi ${userName}! I would like to connect.`).subscribe({
+      next: () => this.router.navigate(['/dashboard/business/messages']),
+      error: (err) => alert('Error: ' + (err.error?.error || 'Failed to start chat'))
+    });
+  }
+
+  toggleNotifications(): void {
+    this.showNotifications.update(v => !v);
+  }
+
+  closeNotifications(): void {
+    this.showNotifications.set(false);
+  }
+}

@@ -1,30 +1,44 @@
+@use 'sass:color';
+
+$orange: #F97316;
+$black: #0F172A;
+$border-color: #E2E8F0;
+$bg-white: #FFFFFF;
+$bg-muted: #F8FAFC;
+$text-muted: #64748B;
+$text-secondary: #475569;
+
+$radius-xl: 20px;
+$radius-md: 12px;
+$radius-sm: 8px;
+
 .messaging-widget {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
   overflow: hidden;
 }
 
 .widget-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 20px 24px;
+  border-bottom: 1px solid $border-color;
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   h3 {
     margin: 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #111827;
+    font-size: 16px;
+    font-weight: 700;
+    color: $black;
   }
 
   .unread-badge {
-    background: #ef4444;
+    background: $orange;
     color: white;
-    font-size: 0.75rem;
+    font-size: 12px;
     font-weight: 600;
-    padding: 0.25rem 0.5rem;
+    padding: 4px 8px;
     border-radius: 12px;
     min-width: 20px;
     text-align: center;
@@ -33,42 +47,39 @@
 
 .widget-tabs {
   display: flex;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-bottom: 1px solid $border-color;
+  background: $bg-muted;
 
   .tab-btn {
     flex: 1;
-    padding: 0.75rem 1rem;
+    padding: 10px 12px;
     border: none;
     background: transparent;
-    color: #6b7280;
-    font-size: 0.875rem;
+    color: $text-muted;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    border-bottom: 2px solid transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 6px;
 
     &:hover {
-      background: #f3f4f6;
-      color: #111827;
+      color: $black;
     }
 
     &.active {
-      color: #2563eb;
-      border-bottom-color: #2563eb;
-      background: white;
+      color: $orange;
+      font-weight: 600;
     }
 
     .tab-badge {
-      background: #ef4444;
+      background: $orange;
       color: white;
-      font-size: 0.625rem;
+      font-size: 10px;
       font-weight: 600;
-      padding: 0.125rem 0.375rem;
+      padding: 2px 6px;
       border-radius: 10px;
       min-width: 16px;
       text-align: center;
@@ -82,79 +93,84 @@
 }
 
 .loading-state {
-  padding: 3rem;
+  padding: 40px;
   text-align: center;
 
   .spinner {
-    width: 40px;
-    height: 40px;
-    margin: 0 auto 1rem;
-    border: 3px solid #e5e7eb;
-    border-top-color: #2563eb;
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 12px;
+    border: 2px solid $border-color;
+    border-top-color: $orange;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
 
   p {
-    color: #6b7280;
-    font-size: 0.875rem;
+    color: $text-muted;
+    font-size: 14px;
   }
 }
 
 .empty-state {
-  padding: 3rem 1.5rem;
+  padding: 40px 24px;
   text-align: center;
 
   .empty-icon {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 8px;
+    color: $text-muted;
+
+    svg {
+      width: 40px;
+      height: 40px;
+    }
   }
 
   p {
-    color: #374151;
-    font-size: 0.875rem;
+    color: $text-secondary;
+    font-size: 14px;
     font-weight: 500;
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 4px;
   }
 
   small {
-    color: #9ca3af;
-    font-size: 0.75rem;
+    color: $text-muted;
+    font-size: 12px;
   }
 }
 
 .conversation-list {
-  padding: 0.5rem 0;
+  padding: 6px 0;
 }
 
 .conversation-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.5rem;
+  gap: 12px;
+  padding: 12px 24px;
   transition: background 0.2s;
   text-decoration: none;
   color: inherit;
   position: relative;
 
   &:hover {
-    background: #f9fafb;
+    background: $bg-muted;
   }
 
   &.unread {
-    background: #eff6ff;
+    background: rgba($orange, 0.04);
 
     &:hover {
-      background: #dbeafe;
+      background: rgba($orange, 0.08);
     }
   }
 
   .conversation-avatar {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #e5e7eb;
+    border: 2px solid $border-color;
     flex-shrink: 0;
   }
 
@@ -166,30 +182,30 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 0.25rem;
+      margin-bottom: 4px;
 
       h4 {
         margin: 0;
-        font-size: 0.875rem;
+        font-size: 14px;
         font-weight: 600;
-        color: #111827;
+        color: $black;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
       .conversation-time {
-        font-size: 0.75rem;
-        color: #9ca3af;
+        font-size: 12px;
+        color: $text-muted;
         white-space: nowrap;
-        margin-left: 0.5rem;
+        margin-left: 8px;
       }
     }
 
     .conversation-preview {
       margin: 0;
-      font-size: 0.8125rem;
-      color: #6b7280;
+      font-size: 13px;
+      color: $text-muted;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -197,11 +213,11 @@
   }
 
   .unread-indicator {
-    background: #2563eb;
+    background: $orange;
     color: white;
-    font-size: 0.625rem;
+    font-size: 10px;
     font-weight: 600;
-    padding: 0.25rem 0.5rem;
+    padding: 4px 8px;
     border-radius: 12px;
     min-width: 20px;
     text-align: center;
@@ -210,26 +226,26 @@
 }
 
 .request-list {
-  padding: 0.5rem 0;
+  padding: 6px 0;
 }
 
 .request-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  gap: 12px;
+  padding: 12px 24px;
+  border-bottom: 1px solid $border-color;
 
   &:last-child {
     border-bottom: none;
   }
 
   .request-avatar {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #e5e7eb;
+    border: 2px solid $border-color;
     flex-shrink: 0;
   }
 
@@ -238,30 +254,30 @@
     min-width: 0;
 
     h4 {
-      margin: 0 0 0.25rem 0;
-      font-size: 0.875rem;
+      margin: 0 0 4px;
+      font-size: 14px;
       font-weight: 600;
-      color: #111827;
+      color: $black;
     }
 
     .request-message {
-      margin: 0 0 0.25rem 0;
-      font-size: 0.8125rem;
-      color: #6b7280;
+      margin: 0 0 4px;
+      font-size: 13px;
+      color: $text-muted;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .request-time {
-      font-size: 0.75rem;
-      color: #9ca3af;
+      font-size: 12px;
+      color: $text-muted;
     }
   }
 
   .request-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 6px;
     flex-shrink: 0;
 
     button {
@@ -270,7 +286,7 @@
       border-radius: 50%;
       border: none;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 16px;
       font-weight: 600;
       transition: all 0.2s;
       display: flex;
@@ -279,40 +295,51 @@
     }
 
     .accept-btn {
-      background: #10b981;
+      background: $black;
       color: white;
 
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+
       &:hover {
-        background: #059669;
+        background: color.adjust($black, $lightness: 20%);
       }
     }
 
     .decline-btn {
-      background: #ef4444;
-      color: white;
+      background: $bg-muted;
+      color: $text-muted;
+      border: 1px solid $border-color;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
 
       &:hover {
-        background: #dc2626;
+        border-color: #ef4444;
+        color: #ef4444;
       }
     }
   }
 }
 
 .widget-footer {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  padding: 14px 24px;
+  border-top: 1px solid $border-color;
   text-align: center;
 
   .view-all-link {
-    color: #2563eb;
-    font-size: 0.875rem;
+    color: $orange;
+    font-size: 14px;
     font-weight: 500;
     text-decoration: none;
     transition: color 0.2s;
 
     &:hover {
-      color: #1d4ed8;
-      text-decoration: underline;
+      color: color.adjust($orange, $lightness: -10%);
     }
   }
 }
@@ -322,4 +349,3 @@
     transform: rotate(360deg);
   }
 }
-

@@ -1,73 +1,73 @@
-<div class="bookings-dashboard" role="main" aria-label="Food Enthusiast Bookings Dashboard">
-  <!-- Header Section -->
-  <header class="dashboard-header">
-    <div class="header-content">
-      <div class="title-section">
-        <h1 class="page-title">
-          <span class="title-icon">📅</span>
-          My Bookings
-        </h1>
-        <p class="page-subtitle">
-          Manage your restaurant reservations and dining experiences
-        </p>
-      </div>
+<div class="section" role="main" aria-label="Food Enthusiast Bookings Dashboard">
+  <div class="section-inner">
 
-      <div class="header-actions">
-        <button
-          type="button"
-          class="btn-primary new-booking-btn"
-          (click)="openNewBookingModal()"
-          aria-label="Make new reservation">
-          <span class="btn-icon">➕</span>
+    <div class="tag">
+      <lucide-icon [img]="Calendar" [size]="16"></lucide-icon>
+      Bookings
+    </div>
+
+    <h2 class="section-title">My Bookings</h2>
+    <p class="section-subtitle">Manage your restaurant reservations and dining experiences</p>
+
+    <!-- Header Card (Stats + New Booking) -->
+    <div class="header-card">
+      <div class="header-top">
+        <button type="button" class="btn-primary" (click)="openNewBookingModal()" aria-label="Make new reservation">
+          <lucide-icon [img]="Plus" [size]="18"></lucide-icon>
           New Booking
         </button>
       </div>
+
+      @if (stats(); as bookingStats) {
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon-wrap">
+              <lucide-icon [img]="ClipboardList" [size]="22"></lucide-icon>
+            </div>
+            <div class="stat-content">
+              <h4>{{ bookingStats.totalBookings }}</h4>
+              <p>Total Bookings</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap">
+              <lucide-icon [img]="Clock" [size]="22"></lucide-icon>
+            </div>
+            <div class="stat-content">
+              <h4>{{ bookingStats.upcomingBookings }}</h4>
+              <p>Upcoming</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap">
+              <lucide-icon [img]="CheckCircle" [size]="22"></lucide-icon>
+            </div>
+            <div class="stat-content">
+              <h4>{{ bookingStats.completedBookings }}</h4>
+              <p>Completed</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap">
+              <lucide-icon [img]="XCircle" [size]="22"></lucide-icon>
+            </div>
+            <div class="stat-content">
+              <h4>{{ bookingStats.cancelledBookings }}</h4>
+              <p>Cancelled</p>
+            </div>
+          </div>
+        </div>
+      }
     </div>
 
-    <!-- Stats Cards -->
-    @if (stats(); as bookingStats) {
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">📊</div>
-          <div class="stat-content">
-            <div class="stat-number">{{ bookingStats.totalBookings }}</div>
-            <div class="stat-label">Total Bookings</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">⏰</div>
-          <div class="stat-content">
-            <div class="stat-number">{{ bookingStats.upcomingBookings }}</div>
-            <div class="stat-label">Upcoming</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">✅</div>
-          <div class="stat-content">
-            <div class="stat-number">{{ bookingStats.completedBookings }}</div>
-            <div class="stat-label">Completed</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">❌</div>
-          <div class="stat-content">
-            <div class="stat-number">{{ bookingStats.cancelledBookings }}</div>
-            <div class="stat-label">Cancelled</div>
-          </div>
-        </div>
-      </div>
-    }
-  </header>
-
-  <!-- Controls Section -->
-  <section class="controls-section">
-    <div class="controls-content">
-      <!-- Search and View Toggle -->
-      <div class="search-controls">
-        <div class="search-input-wrapper">
+    <!-- Controls -->
+    <div class="controls-card">
+      <div class="controls-row">
+        <div class="search-wrapper">
+          <lucide-icon [img]="Search" [size]="16" class="search-icon"></lucide-icon>
           <input
             type="text"
             class="search-input"
@@ -75,107 +75,75 @@
             [value]="searchQuery()"
             (input)="onSearchInput($event)"
             aria-label="Search bookings">
-          <span class="search-icon">🔍</span>
         </div>
 
-        <button
-          type="button"
-          class="view-toggle-btn"
-          (click)="toggleViewMode()"
-          [attr.aria-label]="'Switch to ' + viewMode().label">
-          <span class="btn-icon">{{ viewMode().icon }}</span>
-          {{ viewMode().label }}
-        </button>
-      </div>
-
-      <!-- Filter Controls -->
-      <div class="filter-controls">
-        <button
-          type="button"
-          class="filter-toggle-btn"
-          (click)="toggleFilters()"
-          [class.active]="showFilters()">
-          <span class="btn-icon">🔽</span>
-          Filters
-          @if (hasActiveFilters()) {
-            <span class="filter-badge">{{ filteredBookings().length }}</span>
-          }
-        </button>
-
-        @if (hasActiveFilters()) {
-          <button
-            type="button"
-            class="clear-filters-btn"
-            (click)="clearFilters()">
-            Clear Filters
+        <div class="controls-actions">
+          <button type="button" class="btn-secondary" (click)="toggleViewMode()" [attr.aria-label]="'Switch to ' + viewMode().label">
+            <lucide-icon [img]="viewMode().icon" [size]="16"></lucide-icon>
+            {{ viewMode().label }}
           </button>
-        }
+
+          <button type="button" class="btn-secondary" (click)="toggleFilters()" [class.active]="showFilters()">
+            <lucide-icon [img]="SlidersHorizontal" [size]="16"></lucide-icon>
+            Filters
+            @if (hasActiveFilters()) {
+              <span class="filter-count">{{ filteredBookings().length }}</span>
+            }
+          </button>
+
+          @if (hasActiveFilters()) {
+            <button type="button" class="btn-ghost" (click)="clearFilters()">
+              Clear
+            </button>
+          }
+        </div>
       </div>
+
+      @if (showFilters()) {
+        <div class="filter-panel">
+          <div class="filter-grid">
+            <div class="filter-group">
+              <label>Status</label>
+              <select class="filter-select" [value]="filters().status" (change)="onFilterChange('status', $event)">
+                @for (option of statusOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label>Date Range</label>
+              <select class="filter-select" [value]="filters().dateRange" (change)="onFilterChange('dateRange', $event)">
+                @for (option of dateRangeOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label>Restaurant</label>
+              <select class="filter-select" [value]="filters().restaurant" (change)="onFilterChange('restaurant', $event)">
+                <option value="all">All Restaurants</option>
+                @for (restaurant of restaurants(); track restaurant.id) {
+                  <option [value]="restaurant.id">{{ restaurant.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label>Sort By</label>
+              <select class="filter-select" [value]="filters().sortBy" (change)="onFilterChange('sortBy', $event)">
+                @for (option of sortOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+      }
     </div>
 
-    <!-- Filter Panel -->
-    @if (showFilters()) {
-      <div class="filter-panel">
-        <div class="filter-grid">
-          <!-- Status Filter -->
-          <div class="filter-group">
-            <label class="filter-label">Status</label>
-            <select
-              class="filter-select"
-              [value]="filters().status"
-              (change)="onFilterChange('status', $event)">
-              @for (option of statusOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Date Range Filter -->
-          <div class="filter-group">
-            <label class="filter-label">Date Range</label>
-            <select
-              class="filter-select"
-              [value]="filters().dateRange"
-              (change)="onFilterChange('dateRange', $event)">
-              @for (option of dateRangeOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Restaurant Filter -->
-          <div class="filter-group">
-            <label class="filter-label">Restaurant</label>
-            <select
-              class="filter-select"
-              [value]="filters().restaurant"
-              (change)="onFilterChange('restaurant', $event)">
-              <option value="all">All Restaurants</option>
-              @for (restaurant of restaurants(); track restaurant.id) {
-                <option [value]="restaurant.id">{{ restaurant.name }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Sort Filter -->
-          <div class="filter-group">
-            <label class="filter-label">Sort By</label>
-            <select
-              class="filter-select"
-              [value]="filters().sortBy"
-              (change)="onFilterChange('sortBy', $event)">
-              @for (option of sortOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </div>
-        </div>
-      </div>
-    }
-  </section>
-
-  <!-- Bookings List -->
-  <section class="bookings-section">
+    <!-- Bookings -->
     @if (isLoading()) {
       <div class="loading-state">
         <div class="loading-spinner"></div>
@@ -183,32 +151,23 @@
       </div>
     } @else if (filteredBookings().length === 0) {
       <div class="empty-state">
-        <div class="empty-icon">📅</div>
+        <lucide-icon [img]="Calendar" [size]="48" class="empty-icon"></lucide-icon>
         <h3>No bookings found</h3>
         @if (hasActiveFilters()) {
           <p>Try adjusting your filters or search terms.</p>
-          <button type="button" class="btn-secondary" (click)="clearFilters()">
-            Clear Filters
-          </button>
+          <button type="button" class="btn-secondary" (click)="clearFilters()">Clear Filters</button>
         } @else {
           <p>You haven't made any restaurant reservations yet.</p>
-          <button type="button" class="btn-primary" (click)="openNewBookingModal()">
-            Make Your First Booking
-          </button>
+          <button type="button" class="btn-primary" (click)="openNewBookingModal()">Make Your First Booking</button>
         }
       </div>
     } @else {
-      <div class="bookings-grid" [class.list-view]="viewMode().type === 'list'">
+      <div class="bookings-list" [class.list-view]="viewMode().type === 'list'">
         @for (booking of filteredBookings(); track booking.id) {
           <div class="booking-card" [class]="'status-' + booking.status">
-            <!-- Booking Header -->
             <div class="booking-header">
               <div class="restaurant-info">
-                <img
-                  [src]="booking.restaurant.imageUrl"
-                  [alt]="booking.restaurant.name"
-                  class="restaurant-image"
-                  loading="lazy">
+                <img [src]="booking.restaurant.imageUrl" [alt]="booking.restaurant.name" class="restaurant-image" loading="lazy">
                 <div class="restaurant-details">
                   <h3 class="restaurant-name">{{ booking.restaurant.name }}</h3>
                   <p class="restaurant-cuisine">{{ booking.restaurant.cuisineTypes.join(', ') }}</p>
@@ -216,19 +175,16 @@
                 </div>
               </div>
 
-              <div class="booking-status">
-                <span class="status-badge" [class]="'status-' + booking.status">
-                  <span class="status-icon">{{ getStatusIcon(booking.status) }}</span>
-                  {{ booking.status | titlecase }}
-                </span>
-              </div>
+              <span class="status-badge" [class]="'status-' + booking.status">
+                <lucide-icon [img]="getStatusIcon(booking.status)" [size]="14"></lucide-icon>
+                {{ booking.status | titlecase }}
+              </span>
             </div>
 
-            <!-- Booking Details -->
             <div class="booking-details">
               <div class="detail-grid">
                 <div class="detail-item">
-                  <span class="detail-icon">📅</span>
+                  <lucide-icon [img]="Calendar" [size]="16" class="detail-icon"></lucide-icon>
                   <div class="detail-content">
                     <span class="detail-label">Date</span>
                     <span class="detail-value">{{ formatDate(booking.bookingDate) }}</span>
@@ -236,7 +192,7 @@
                 </div>
 
                 <div class="detail-item">
-                  <span class="detail-icon">🕐</span>
+                  <lucide-icon [img]="Clock" [size]="16" class="detail-icon"></lucide-icon>
                   <div class="detail-content">
                     <span class="detail-label">Time</span>
                     <span class="detail-value">{{ formatTime(booking.bookingTime) }}</span>
@@ -244,7 +200,7 @@
                 </div>
 
                 <div class="detail-item">
-                  <span class="detail-icon">👥</span>
+                  <lucide-icon [img]="Users" [size]="16" class="detail-icon"></lucide-icon>
                   <div class="detail-content">
                     <span class="detail-label">Party Size</span>
                     <span class="detail-value">{{ booking.partySize }} {{ booking.partySize === 1 ? 'person' : 'people' }}</span>
@@ -252,7 +208,7 @@
                 </div>
 
                 <div class="detail-item">
-                  <span class="detail-icon">🎫</span>
+                  <lucide-icon [img]="FileText" [size]="16" class="detail-icon"></lucide-icon>
                   <div class="detail-content">
                     <span class="detail-label">Reference</span>
                     <span class="detail-value">{{ booking.bookingReference }}</span>
@@ -262,42 +218,33 @@
 
               @if (booking.occasion) {
                 <div class="occasion-tag">
-                  <span class="occasion-icon">🎉</span>
+                  <lucide-icon [img]="Gift" [size]="14"></lucide-icon>
                   {{ booking.occasion }}
                 </div>
               }
 
               @if (booking.specialRequests) {
                 <div class="special-requests">
-                  <span class="requests-icon">💬</span>
-                  <span class="requests-text">{{ booking.specialRequests }}</span>
+                  <lucide-icon [img]="MessageSquare" [size]="14"></lucide-icon>
+                  <span>{{ booking.specialRequests }}</span>
                 </div>
               }
             </div>
 
-            <!-- Booking Actions -->
             <div class="booking-actions">
-              <button
-                type="button"
-                class="btn-secondary"
-                (click)="openBookingDetails(booking)">
+              <button type="button" class="btn-secondary" (click)="openBookingDetails(booking)">
+                <lucide-icon [img]="Eye" [size]="16"></lucide-icon>
                 View Details
               </button>
 
               @if (canCancel(booking)) {
-                <button
-                  type="button"
-                  class="btn-danger"
-                  (click)="openCancelConfirm(booking)">
+                <button type="button" class="btn-secondary" (click)="openCancelConfirm(booking)">
                   Cancel Booking
                 </button>
               }
 
               @if (booking.status === 'confirmed' && isUpcoming(booking)) {
-                <button
-                  type="button"
-                  class="btn-primary"
-                  (click)="openBookingDetails(booking)">
+                <button type="button" class="btn-primary" (click)="openBookingDetails(booking)">
                   View Confirmation
                 </button>
               }
@@ -306,143 +253,93 @@
         }
       </div>
     }
-  </section>
+  </div>
 </div>
 
 <!-- New Booking Modal -->
 @if (showNewBookingModal()) {
   <div class="modal-overlay" (click)="closeNewBookingModal()">
-    <div class="modal-content new-booking-modal" (click)="$event.stopPropagation()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Make a New Reservation</h3>
-        <button type="button" class="modal-close" (click)="closeNewBookingModal()">✕</button>
+        <h2>Make a New Reservation</h2>
+        <button type="button" class="close-btn" (click)="closeNewBookingModal()">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
       </div>
+      <form [formGroup]="newBookingForm" (ngSubmit)="createBooking()">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="restaurant">Restaurant *</label>
+              <select id="restaurant" formControlName="restaurantId" class="form-control" (change)="onRestaurantChange()">
+                <option value="">Select a restaurant</option>
+                @for (restaurant of restaurants(); track restaurant.id) {
+                  <option [value]="restaurant.id">{{ restaurant.name }} - {{ restaurant.cuisineTypes.join(', ') }}</option>
+                }
+              </select>
+            </div>
 
-      <form [formGroup]="newBookingForm" (ngSubmit)="createBooking()" class="booking-form">
-        <div class="form-grid">
-          <!-- Restaurant Selection -->
-          <div class="form-group full-width">
-            <label for="restaurant">Restaurant *</label>
-            <select
-              id="restaurant"
-              formControlName="restaurantId"
-              class="form-control"
-              (change)="onRestaurantChange()">
-              <option value="">Select a restaurant</option>
-              @for (restaurant of restaurants(); track restaurant.id) {
-                <option [value]="restaurant.id">{{ restaurant.name }} - {{ restaurant.cuisineTypes.join(', ') }}</option>
-              }
-            </select>
-          </div>
+            <div class="form-group">
+              <label for="date">Date *</label>
+              <input type="date" id="date" formControlName="bookingDate" class="form-control" [min]="getTodayDate()" (change)="onDateChange()">
+            </div>
 
-          <!-- Date and Time -->
-          <div class="form-group">
-            <label for="date">Date *</label>
-            <input
-              type="date"
-              id="date"
-              formControlName="bookingDate"
-              class="form-control"
-              [min]="getTodayDate()"
-              (change)="onDateChange()">
-          </div>
+            <div class="form-group">
+              <label for="time">Time *</label>
+              <select id="time" formControlName="bookingTime" class="form-control">
+                <option value="">Select time</option>
+                @for (slot of availableTimeSlots(); track slot.time) {
+                  <option [value]="slot.time" [disabled]="!slot.available">
+                    {{ formatTime(slot.time) }}
+                    @if (!slot.available) { (Unavailable) }
+                  </option>
+                }
+              </select>
+            </div>
 
-          <div class="form-group">
-            <label for="time">Time *</label>
-            <select id="time" formControlName="bookingTime" class="form-control">
-              <option value="">Select time</option>
-              @for (slot of availableTimeSlots(); track slot.time) {
-                <option [value]="slot.time" [disabled]="!slot.available">
-                  {{ formatTime(slot.time) }}
-                  @if (!slot.available) {
-                    (Unavailable)
-                  }
-                </option>
-              }
-            </select>
-          </div>
+            <div class="form-group">
+              <label for="partySize">Party Size *</label>
+              <select id="partySize" formControlName="partySize" class="form-control">
+                @for (size of partySizeOptions; track size) {
+                  <option [value]="size">{{ size }} {{ size === 1 ? 'person' : 'people' }}</option>
+                }
+              </select>
+            </div>
 
-          <!-- Party Size -->
-          <div class="form-group">
-            <label for="partySize">Party Size *</label>
-            <select id="partySize" formControlName="partySize" class="form-control">
-              @for (size of partySizeOptions; track size) {
-                <option [value]="size">{{ size }} {{ size === 1 ? 'person' : 'people' }}</option>
-              }
-            </select>
-          </div>
+            <div class="form-group">
+              <label for="contactName">Contact Name *</label>
+              <input type="text" id="contactName" formControlName="contactName" class="form-control" placeholder="Full name">
+            </div>
 
-          <!-- Contact Information -->
-          <div class="form-group">
-            <label for="contactName">Contact Name *</label>
-            <input
-              type="text"
-              id="contactName"
-              formControlName="contactName"
-              class="form-control"
-              placeholder="Full name">
-          </div>
+            <div class="form-group">
+              <label for="contactPhone">Phone Number *</label>
+              <input type="tel" id="contactPhone" formControlName="contactPhone" class="form-control" placeholder="(555) 123-4567">
+            </div>
 
-          <div class="form-group">
-            <label for="contactPhone">Phone Number *</label>
-            <input
-              type="tel"
-              id="contactPhone"
-              formControlName="contactPhone"
-              class="form-control"
-              placeholder="(555) 123-4567">
-          </div>
+            <div class="form-group">
+              <label for="contactEmail">Email Address *</label>
+              <input type="email" id="contactEmail" formControlName="contactEmail" class="form-control" placeholder="email@example.com">
+            </div>
 
-          <div class="form-group">
-            <label for="contactEmail">Email Address *</label>
-            <input
-              type="email"
-              id="contactEmail"
-              formControlName="contactEmail"
-              class="form-control"
-              placeholder="email@example.com">
-          </div>
+            <div class="form-group">
+              <label for="occasion">Occasion</label>
+              <input type="text" id="occasion" formControlName="occasion" class="form-control" placeholder="Birthday, Anniversary, etc.">
+            </div>
 
-          <!-- Optional Fields -->
-          <div class="form-group">
-            <label for="occasion">Occasion</label>
-            <input
-              type="text"
-              id="occasion"
-              formControlName="occasion"
-              class="form-control"
-              placeholder="Birthday, Anniversary, etc.">
-          </div>
+            <div class="form-group full-width">
+              <label for="tablePreferences">Table Preferences</label>
+              <input type="text" id="tablePreferences" formControlName="tablePreferences" class="form-control" placeholder="Window seat, quiet area, etc.">
+            </div>
 
-          <div class="form-group full-width">
-            <label for="tablePreferences">Table Preferences</label>
-            <input
-              type="text"
-              id="tablePreferences"
-              formControlName="tablePreferences"
-              class="form-control"
-              placeholder="Window seat, quiet area, etc.">
-          </div>
-
-          <div class="form-group full-width">
-            <label for="specialRequests">Special Requests</label>
-            <textarea
-              id="specialRequests"
-              formControlName="specialRequests"
-              class="form-control"
-              rows="3"
-              placeholder="Dietary restrictions, accessibility needs, etc."></textarea>
+            <div class="form-group full-width">
+              <label for="specialRequests">Special Requests</label>
+              <textarea id="specialRequests" formControlName="specialRequests" class="form-control" rows="3" placeholder="Dietary restrictions, accessibility needs, etc."></textarea>
+            </div>
           </div>
         </div>
-
         <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="closeNewBookingModal()">
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="btn-primary"
-            [disabled]="!newBookingForm.valid || isLoading()">
+          <button type="button" class="btn-secondary" (click)="closeNewBookingModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="!newBookingForm.valid || isLoading()">
             @if (isLoading()) {
               <span class="loading-spinner small"></span>
               Creating...
@@ -459,85 +356,80 @@
 <!-- Booking Details Modal -->
 @if (showBookingDetailsModal()) {
   <div class="modal-overlay" (click)="closeBookingDetails()">
-    <div class="modal-content booking-details-modal" (click)="$event.stopPropagation()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
       @if (selectedBooking(); as booking) {
         <div class="modal-header">
-          <h3>Booking Details</h3>
-          <button type="button" class="modal-close" (click)="closeBookingDetails()">✕</button>
-        </div>
-
-        <div class="modal-body">
-          <div class="booking-summary">
-            <div class="restaurant-header">
-              <img [src]="booking.restaurant.imageUrl" [alt]="booking.restaurant.name" class="restaurant-image">
-              <div class="restaurant-info">
-                <h4>{{ booking.restaurant.name }}</h4>
-                <p>{{ booking.restaurant.cuisineTypes.join(', ') }}</p>
-                <p>{{ booking.restaurant.address }}, {{ booking.restaurant.city }}</p>
-              </div>
-              <div class="status-badge" [class]="'status-' + booking.status">
-                {{ getStatusIcon(booking.status) }} {{ booking.status | titlecase }}
-              </div>
-            </div>
-
-            <div class="booking-info-grid">
-              <div class="info-item">
-                <span class="label">Reference</span>
-                <span class="value">{{ booking.bookingReference }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Date</span>
-                <span class="value">{{ formatDate(booking.bookingDate) }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Time</span>
-                <span class="value">{{ formatTime(booking.bookingTime) }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Party Size</span>
-                <span class="value">{{ booking.partySize }} {{ booking.partySize === 1 ? 'person' : 'people' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Contact</span>
-                <span class="value">{{ booking.contactName }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Phone</span>
-                <span class="value">{{ booking.contactPhone }}</span>
-              </div>
-            </div>
-
-            @if (booking.occasion) {
-              <div class="additional-info">
-                <span class="label">Occasion</span>
-                <span class="value">{{ booking.occasion }}</span>
-              </div>
-            }
-
-            @if (booking.tablePreferences) {
-              <div class="additional-info">
-                <span class="label">Table Preferences</span>
-                <span class="value">{{ booking.tablePreferences }}</span>
-              </div>
-            }
-
-            @if (booking.specialRequests) {
-              <div class="additional-info">
-                <span class="label">Special Requests</span>
-                <span class="value">{{ booking.specialRequests }}</span>
-              </div>
-            }
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="closeBookingDetails()">
-            Close
+          <h2>Booking Details</h2>
+          <button type="button" class="close-btn" (click)="closeBookingDetails()">
+            <lucide-icon [img]="X" [size]="20"></lucide-icon>
           </button>
+        </div>
+        <div class="modal-body">
+          <div class="restaurant-header">
+            <img [src]="booking.restaurant.imageUrl" [alt]="booking.restaurant.name" class="restaurant-image">
+            <div class="restaurant-info">
+              <h4>{{ booking.restaurant.name }}</h4>
+              <p>{{ booking.restaurant.cuisineTypes.join(', ') }}</p>
+              <p>{{ booking.restaurant.address }}, {{ booking.restaurant.city }}</p>
+            </div>
+            <span class="status-badge" [class]="'status-' + booking.status">
+              <lucide-icon [img]="getStatusIcon(booking.status)" [size]="14"></lucide-icon>
+              {{ booking.status | titlecase }}
+            </span>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Reference</span>
+              <span class="info-value">{{ booking.bookingReference }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Date</span>
+              <span class="info-value">{{ formatDate(booking.bookingDate) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Time</span>
+              <span class="info-value">{{ formatTime(booking.bookingTime) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Party Size</span>
+              <span class="info-value">{{ booking.partySize }} {{ booking.partySize === 1 ? 'person' : 'people' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Contact</span>
+              <span class="info-value">{{ booking.contactName }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Phone</span>
+              <span class="info-value">{{ booking.contactPhone }}</span>
+            </div>
+          </div>
+
+          @if (booking.occasion) {
+            <div class="extra-info">
+              <span class="info-label">Occasion</span>
+              <span class="info-value">{{ booking.occasion }}</span>
+            </div>
+          }
+
+          @if (booking.tablePreferences) {
+            <div class="extra-info">
+              <span class="info-label">Table Preferences</span>
+              <span class="info-value">{{ booking.tablePreferences }}</span>
+            </div>
+          }
+
+          @if (booking.specialRequests) {
+            <div class="extra-info">
+              <span class="info-label">Special Requests</span>
+              <span class="info-value">{{ booking.specialRequests }}</span>
+            </div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeBookingDetails()">Close</button>
           @if (canCancel(booking)) {
-            <button type="button" class="btn-danger" (click)="openCancelConfirm(booking); closeBookingDetails()">
-              Cancel Booking
-            </button>
+            <button type="button" class="btn-secondary" (click)="openCancelConfirm(booking); closeBookingDetails()">Cancel Booking</button>
           }
         </div>
       }
@@ -548,52 +440,37 @@
 <!-- Cancel Confirmation Modal -->
 @if (showCancelConfirmModal()) {
   <div class="modal-overlay" (click)="closeCancelConfirm()">
-    <div class="modal-content cancel-modal" (click)="$event.stopPropagation()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
       @if (selectedBooking(); as booking) {
         <div class="modal-header">
-          <h3>Cancel Booking</h3>
-          <button type="button" class="modal-close" (click)="closeCancelConfirm()">✕</button>
+          <h2>Cancel Booking</h2>
+          <button type="button" class="close-btn" (click)="closeCancelConfirm()">
+            <lucide-icon [img]="X" [size]="20"></lucide-icon>
+          </button>
         </div>
-
         <div class="modal-body">
-          <div class="cancel-warning">
-            <div class="warning-icon">⚠️</div>
-            <div class="warning-content">
-              <h4>Are you sure you want to cancel this booking?</h4>
-              <p>
-                <strong>{{ booking.restaurant.name }}</strong><br>
-                {{ formatDate(booking.bookingDate) }} at {{ formatTime(booking.bookingTime) }}<br>
-                Party of {{ booking.partySize }}
-              </p>
+          <div class="modal-warning">
+            <lucide-icon [img]="AlertTriangle" [size]="24" class="warning-icon"></lucide-icon>
+            <div>
+              <p>Are you sure you want to cancel this booking?</p>
+              <p><strong>{{ booking.restaurant.name }}</strong> — {{ formatDate(booking.bookingDate) }} at {{ formatTime(booking.bookingTime) }}, Party of {{ booking.partySize }}</p>
               <p class="warning-text">This action cannot be undone.</p>
             </div>
           </div>
 
-          <div class="cancellation-reason">
+          <div class="form-group">
             <label for="cancellationReason">Reason for cancellation (optional)</label>
-            <textarea
-              id="cancellationReason"
-              #reasonTextarea
-              class="form-control"
-              rows="3"
-              placeholder="Please let us know why you're cancelling..."></textarea>
+            <textarea #reasonTextarea class="form-control" rows="3" placeholder="Please let us know why you're cancelling..."></textarea>
           </div>
         </div>
-
         <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="closeCancelConfirm()">
-            Keep Booking
-          </button>
-          <button
-            type="button"
-            class="btn-danger"
-            (click)="cancelBooking(reasonTextarea.value)"
-            [disabled]="isLoading()">
+          <button type="button" class="btn-secondary" (click)="closeCancelConfirm()">Keep Booking</button>
+          <button type="button" class="btn-primary" (click)="cancelBooking(reasonTextarea.value)" [disabled]="isLoading()">
             @if (isLoading()) {
               <span class="loading-spinner small"></span>
               Cancelling...
             } @else {
-              Cancel Booking
+              Confirm Cancellation
             }
           </button>
         </div>

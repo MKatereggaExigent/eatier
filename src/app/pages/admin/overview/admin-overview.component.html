@@ -93,7 +93,9 @@
 
         @if (unreadAlerts().length > 0) {
           <button type="button" class="alerts-btn" (click)="viewAllReports()">
-            <span class="alert-icon">🔔</span>
+            <span class="alert-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </span>
             <span class="alert-badge">{{ unreadAlerts().length }}</span>
           </button>
         }
@@ -110,7 +112,9 @@
       </div>
     } @else if (statsError()) {
       <div class="error-state">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
         <p class="error-message">{{ statsError() }}</p>
         <button type="button" class="retry-btn" (click)="retryLoadStats()">Retry</button>
       </div>
@@ -122,7 +126,9 @@
       <div class="dashboard-section revenue-section">
         <div class="section-header">
           <h2 class="section-title">
-            <span class="section-icon">💰</span>
+            <span class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </span>
             Revenue Overview
           </h2>
           <span class="section-subtitle">Your platform's financial performance</span>
@@ -262,7 +268,9 @@
       <div class="dashboard-section subscription-section">
         <div class="section-header">
           <h2 class="section-title">
-            <span class="section-icon">📊</span>
+            <span class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+          </span>
             Subscription Health
           </h2>
           <span class="section-subtitle">Monitor your subscription business metrics</span>
@@ -403,7 +411,9 @@
       <div class="dashboard-section booking-section">
         <div class="section-header">
           <h2 class="section-title">
-            <span class="section-icon">📅</span>
+            <span class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </span>
             Booking Performance
           </h2>
           <span class="section-subtitle">Track booking conversions and commission earnings</span>
@@ -494,21 +504,28 @@
           <h3 class="chart-title">Booking Status</h3>
           <div class="status-grid">
             <div class="status-item confirmed">
-              <div class="status-icon">✓</div>
+              <div class="status-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
               <div class="status-info">
                 <span class="status-count">{{ platformStats().confirmedBookings }}</span>
                 <span class="status-label">Confirmed</span>
               </div>
             </div>
             <div class="status-item completed">
-              <div class="status-icon">✓✓</div>
+              <div class="status-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
               <div class="status-info">
                 <span class="status-count">{{ platformStats().completedBookings }}</span>
                 <span class="status-label">Completed</span>
               </div>
             </div>
             <div class="status-item cancelled">
-              <div class="status-icon">✗</div>
+              <div class="status-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </div>
               <div class="status-info">
                 <span class="status-count">{{ platformStats().cancelledBookings }}</span>
                 <span class="status-label">Cancelled</span>
@@ -524,7 +541,9 @@
       <div class="dashboard-section business-section">
         <div class="section-header">
           <h2 class="section-title">
-            <span class="section-icon">🏪</span>
+            <span class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+          </span>
             Business Metrics
           </h2>
           <span class="section-subtitle">Monitor business growth and engagement</span>
@@ -613,7 +632,9 @@
       <div class="dashboard-section health-section">
         <div class="section-header">
           <h2 class="section-title">
-            <span class="section-icon">💚</span>
+            <span class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </span>
             Platform Health Score
           </h2>
           <span class="section-subtitle">Overall platform performance indicator</span>
@@ -677,7 +698,9 @@
       <div class="card-header">
         <div class="header-left">
           <h3 class="card-title">
-            <span class="title-icon">📊</span>
+            <span class="title-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+            </span>
             Activity Stream
           </h3>
           <span class="card-subtitle">Real-time platform events</span>
@@ -695,13 +718,17 @@
           </div>
         } @else if (activityError()) {
           <div class="error-state-compact">
-            <div class="error-icon">⚠️</div>
+            <div class="error-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
             <p class="error-message">{{ activityError() }}</p>
             <button type="button" class="retry-btn-small" (click)="retryLoadActivity()">Retry</button>
           </div>
         } @else if (recentActivity().length === 0) {
           <div class="empty-state-compact">
-            <div class="empty-icon">📊</div>
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+            </div>
             <p class="empty-text">No recent activity</p>
             <p class="empty-subtext">Activity will appear here as users interact with the platform</p>
           </div>
@@ -710,7 +737,28 @@
             @for (activity of recentActivity().slice(0, 6); track activity.id) {
               <div class="timeline-item" [attr.data-type]="activity.type">
                 <div class="timeline-marker">
-                  <span class="marker-icon">{{ getActivityIcon(activity.type) }}</span>
+                  <span class="marker-icon">
+                    @switch (activity.type) {
+                      @case ('user_registration') {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      }
+                      @case ('business_registration') {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+                      }
+                      @case ('booking') {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      }
+                      @case ('review') {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      }
+                      @case ('payment') {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      }
+                      @default {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                      }
+                    }
+                  </span>
                 </div>
                 <div class="timeline-content">
                   <div class="timeline-header">
@@ -737,7 +785,9 @@
       <div class="card-header">
         <div class="header-left">
           <h3 class="card-title">
-            <span class="title-icon">🔔</span>
+            <span class="title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </span>
             System Health
             @if (unreadAlerts().length > 0) {
               <span class="alert-count-badge">{{ unreadAlerts().length }}</span>
@@ -755,13 +805,17 @@
           </div>
         } @else if (alertsError()) {
           <div class="error-state-compact">
-            <div class="error-icon">⚠️</div>
+            <div class="error-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
             <p class="error-message">{{ alertsError() }}</p>
             <button type="button" class="retry-btn-small" (click)="retryLoadAlerts()">Retry</button>
           </div>
         } @else if (systemAlerts().length === 0) {
           <div class="empty-state-compact">
-            <div class="empty-icon">✅</div>
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
             <p class="empty-text">All systems operational</p>
             <p class="empty-subtext">No alerts or warnings at this time</p>
           </div>
@@ -772,7 +826,25 @@
                 <div class="alert-indicator"></div>
                 <div class="alert-main">
                   <div class="alert-header">
-                    <span class="alert-icon-badge">{{ getAlertIcon(alert.type) }}</span>
+                    <span class="alert-icon-badge">
+                      @switch (alert.type) {
+                        @case ('warning') {
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        }
+                        @case ('error') {
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        }
+                        @case ('info') {
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        }
+                        @case ('success') {
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+                        }
+                        @default {
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                        }
+                      }
+                    </span>
                     <h4 class="alert-title">{{ alert.title }}</h4>
                   </div>
                   <p class="alert-message">{{ alert.message }}</p>
@@ -780,7 +852,7 @@
                 </div>
                 @if (!alert.isRead) {
                   <button type="button" class="alert-action-btn" (click)="markAlertAsRead(alert.id)" title="Mark as read">
-                    ✓
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="20 6 9 17 4 12"/></svg>
                   </button>
                 }
               </div>
@@ -794,7 +866,9 @@
     <section class="content-card performers-card" aria-label="Top Performers">
       <div class="card-header">
         <h2>
-          <span class="header-icon">🏆</span>
+          <span class="header-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+          </span>
           Top Performers
         </h2>
         <button type="button" class="view-all-btn" (click)="viewAllBusinesses()">
@@ -810,13 +884,17 @@
           </div>
         } @else if (performersError()) {
           <div class="error-state-compact">
-            <div class="error-icon">⚠️</div>
+            <div class="error-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
             <p class="error-message">{{ performersError() }}</p>
             <button type="button" class="retry-btn-small" (click)="retryLoadPerformers()">Retry</button>
           </div>
         } @else if (topPerformers().length === 0) {
           <div class="empty-state-compact">
-            <div class="empty-icon">🏆</div>
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+            </div>
             <p class="empty-text">No performers yet</p>
             <p class="empty-subtext">Top performing businesses and specialists will appear here</p>
           </div>
@@ -833,21 +911,42 @@
                     </div>
                   }
                   <div class="performer-type">
-                    {{ performer.type === 'business' ? '🏪' : '👨‍🍳' }}
+                    @if (performer.type === 'business') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    }
                   </div>
                 </div>
                 <div class="performer-info">
                   <h4>{{ performer.name }}</h4>
                   <div class="performer-rating">
                     @for (star of getStarArray(performer.rating); track $index) {
-                      <span class="star" [class.filled]="star">⭐</span>
+                      @if (star) {
+                        <span class="star filled">
+                          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                      } @else {
+                        <span class="star">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                      }
                     }
                     <span class="rating-value">{{ performer.rating }}</span>
                   </div>
                   <div class="performer-stats">
-                    <span class="bookings">📅 {{ performer.totalBookings }} bookings</span>
-                    <span class="revenue">💰 {{ formatCurrency(performer.monthlyRevenue) }}/mo</span>
-                    <span class="location">📍 {{ performer.location }}</span>
+                    <span class="bookings">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      {{ performer.totalBookings }} bookings
+                    </span>
+                    <span class="revenue">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      {{ formatCurrency(performer.monthlyRevenue) }}/mo
+                    </span>
+                    <span class="location">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      {{ performer.location }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -862,7 +961,9 @@
   <div class="dashboard-section geo-section">
     <div class="section-header">
       <h2 class="section-title">
-        <span class="section-icon">🌍</span>
+        <span class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </span>
         Geographical Distribution
       </h2>
       <p class="section-subtitle">Business and user distribution across regions</p>
@@ -906,7 +1007,9 @@
           </div>
         } @else if (geoError()) {
           <div class="error-state">
-            <div class="error-icon">⚠️</div>
+            <div class="error-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
             <p class="error-message">{{ geoError() }}</p>
             <button type="button" class="retry-btn" (click)="retryLoadGeoData()">Retry</button>
           </div>
@@ -1009,9 +1112,18 @@
                 <div class="region-bar-fill" [style.width.%]="getRegionPercentage(region)"></div>
               </div>
               <div class="region-details">
-                <span class="detail-item">🏪 {{ region.businesses }} businesses</span>
-                <span class="detail-item">👥 {{ region.users }} users</span>
-                <span class="detail-item">📅 {{ region.bookings }} bookings</span>
+                <span class="detail-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+                  {{ region.businesses }} businesses
+                </span>
+                <span class="detail-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  {{ region.users }} users
+                </span>
+                <span class="detail-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  {{ region.bookings }} bookings
+                </span>
               </div>
             </div>
           }

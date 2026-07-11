@@ -1,90 +1,81 @@
-<div class="specialist-list-container">
-  <!-- Hero Header -->
-  <div class="hero-header">
+<div class="specialist-page">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <h1 class="page-title">Find Your Perfect Specialist</h1>
-      <p class="page-subtitle">Discover talented chefs, caterers, and culinary experts for your next event</p>
+      <span class="hero-label">Find Your Expert</span>
+      <h1 class="hero-title">Specialists &amp; Chefs</h1>
+      <p class="hero-subtitle">Connect with top culinary professionals for private dining, catering, classes, and more</p>
 
-      <!-- Search Bar -->
-      <div class="search-bar-wrapper">
-        <div class="search-bar">
-          <span class="search-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="Search by name, specialty, or service..."
-            [value]="searchQuery()"
-            (input)="onSearchChange($any($event.target).value)"
-            class="search-input"
-          />
-          @if (searchQuery()) {
-            <button type="button" class="clear-search" (click)="onSearchChange('')">✕</button>
-          }
-        </div>
-      </div>
-
-      <!-- Quick Stats -->
-      <div class="quick-stats">
-        <div class="stat-item">
-          <span class="stat-number">{{ stats().totalSpecialists }}</span>
-          <span class="stat-label">Specialists</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <span class="stat-number">{{ stats().totalReviews }}</span>
-          <span class="stat-label">Reviews</span>
-        </div>
-        @if (stats().avgRating > 0) {
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <span class="stat-number">{{ stats().avgRating.toFixed(1) }}★</span>
-            <span class="stat-label">Avg Rating</span>
-          </div>
+      <div class="search-bar">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input
+          type="text"
+          placeholder="Search by name, specialty, or service..."
+          [value]="searchQuery()"
+          (input)="onSearchChange($any($event.target).value)"
+          class="search-input"
+        />
+        @if (searchQuery()) {
+          <button type="button" class="clear-search" (click)="onSearchChange('')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         }
       </div>
     </div>
-  </div>
 
-  <!-- Filters Section -->
-  <div class="filters-section">
-    <div class="filters-container">
-      <!-- Row 1: Main filters -->
+    <div class="hero-stats">
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-value">{{ stats().totalSpecialists }}</span>
+          <span class="stat-label">Specialists</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ stats().totalReviews }}</span>
+          <span class="stat-label">Reviews</span>
+        </div>
+        @if (stats().avgRating > 0) {
+          <div class="stat-item">
+            <span class="stat-value">{{ stats().avgRating.toFixed(1) }}</span>
+            <span class="stat-label">Avg Rating</span>
+          </div>
+        }
+        <div class="stat-item">
+          <span class="stat-value">{{ specialtyTypes.length - 1 }}</span>
+          <span class="stat-label">Specialties</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Content Area -->
+  <section class="content-area">
+    <!-- Filters Card -->
+    <div class="filters-card">
       <div class="filters-row">
         <div class="filter-group">
           <label class="filter-label">Specialty</label>
-          <select
-            [value]="selectedSpecialty()"
-            (change)="onSpecialtyChange($any($event.target).value)"
-            class="filter-select"
-          >
+          <select [value]="selectedSpecialty()" (change)="onSpecialtyChange($any($event.target).value)" class="filter-select">
             @for (specialty of specialtyTypes; track specialty.value) {
-              <option [value]="specialty.value">
-                {{ specialty.label }}
-              </option>
+              <option [value]="specialty.value">{{ specialty.label }}</option>
             }
           </select>
         </div>
-
         <div class="filter-group">
           <label class="filter-label">Cuisine</label>
-          <select
-            [value]="selectedCuisine()"
-            (change)="onCuisineChange($any($event.target).value)"
-            class="filter-select"
-          >
+          <select [value]="selectedCuisine()" (change)="onCuisineChange($any($event.target).value)" class="filter-select">
             @for (cuisine of cuisineTypes; track cuisine.value) {
               <option [value]="cuisine.value">{{ cuisine.label }}</option>
             }
           </select>
         </div>
-
         <div class="filter-group">
           <label class="filter-label">Rating</label>
-          <select
-            [value]="selectedRating()"
-            (change)="onRatingChange($any($event.target).value)"
-            class="filter-select"
-          >
+          <select [value]="selectedRating()" (change)="onRatingChange($any($event.target).value)" class="filter-select">
             @for (rating of ratingFilters; track rating.value) {
               <option [value]="rating.value">{{ rating.label }}</option>
             }
@@ -92,21 +83,15 @@
         </div>
       </div>
 
-      <!-- Row 2: Additional filters -->
       <div class="filters-row">
         <div class="filter-group">
           <label class="filter-label">Price Range</label>
-          <select
-            [value]="selectedPriceRange()"
-            (change)="onPriceRangeChange($any($event.target).value)"
-            class="filter-select"
-          >
+          <select [value]="selectedPriceRange()" (change)="onPriceRangeChange($any($event.target).value)" class="filter-select">
             @for (price of priceRanges; track price.value) {
               <option [value]="price.value">{{ price.label }}</option>
             }
           </select>
         </div>
-
         <div class="filter-group">
           <label class="filter-label">Country</label>
           <input
@@ -117,282 +102,278 @@
             class="filter-input"
           />
         </div>
-
         @if (hasActiveFilters()) {
-          <div class="filter-group filter-actions">
+          <div class="filter-group filter-action">
             <label class="filter-label">&nbsp;</label>
-            <button type="button" class="clear-filters-btn" (click)="clearFilters()">
-              Clear All Filters
-            </button>
+            <button type="button" class="clear-btn" (click)="clearFilters()">Clear Filters</button>
           </div>
         }
       </div>
 
-      <!-- Row 3: View Controls -->
-      <div class="filters-row view-controls-row">
-        <div class="view-mode-toggle">
-          <button
-            type="button"
-            class="view-btn"
-            [class.active]="viewMode() === 'grid'"
-            (click)="setViewMode('grid')"
-            title="Grid View"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
+      <div class="controls-row">
+        <div class="view-toggle">
+          <button type="button" class="view-btn" [class.active]="viewMode() === 'grid'" (click)="setViewMode('grid')" title="Grid View">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
             </svg>
           </button>
-          <button
-            type="button"
-            class="view-btn"
-            [class.active]="viewMode() === 'list'"
-            (click)="setViewMode('list')"
-            title="List View"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button type="button" class="view-btn" [class.active]="viewMode() === 'list'" (click)="setViewMode('list')" title="List View">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="8" y1="6" x2="21" y2="6"></line>
               <line x1="8" y1="12" x2="21" y2="12"></line>
               <line x1="8" y1="18" x2="21" y2="18"></line>
-              <line x1="3" y1="6" x2="3.01" y2="6"></line>
-              <line x1="3" y1="12" x2="3.01" y2="12"></line>
-              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              <circle cx="3" cy="6" r="1.5"></circle>
+              <circle cx="3" cy="12" r="1.5"></circle>
+              <circle cx="3" cy="18" r="1.5"></circle>
             </svg>
           </button>
-          <button
-            type="button"
-            class="view-btn"
-            [class.active]="viewMode() === 'gallery'"
-            (click)="setViewMode('gallery')"
-            title="Gallery View"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <button type="button" class="view-btn" [class.active]="viewMode() === 'gallery'" (click)="setViewMode('gallery')" title="Gallery View">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
               <circle cx="8.5" cy="8.5" r="1.5"></circle>
               <polyline points="21 15 16 10 5 21"></polyline>
             </svg>
           </button>
         </div>
 
-        <div class="page-size-control">
-          <label class="filter-label">Show</label>
-          <select
-            [value]="pageSize()"
-            (change)="onPageSizeChange(+$any($event.target).value)"
-            class="filter-select page-size-select"
-          >
-            @for (size of pageSizeOptions; track size) {
-              <option [value]="size">{{ size }} per page</option>
-            }
-          </select>
-        </div>
-
-        <div class="results-info">
-          <span>Showing {{ ((currentPage() - 1) * pageSize()) + 1 }}-{{ minValue(currentPage() * pageSize(), totalItems()) }} of {{ totalItems() }}</span>
+        <div class="controls-right">
+          <div class="page-size-control">
+            <label>Show</label>
+            <select [value]="pageSize()" (change)="onPageSizeChange(+$any($event.target).value)" class="size-select">
+              @for (size of pageSizeOptions; track size) {
+                <option [value]="size">{{ size }}</option>
+              }
+            </select>
+          </div>
+          <span class="results-info">
+            {{ ((currentPage() - 1) * pageSize()) + 1 }}&ndash;{{ minValue(currentPage() * pageSize(), totalItems()) }} of {{ totalItems() }}
+          </span>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Results Section -->
-  <div class="results-section">
-    @if (loading()) {
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Finding specialists for you...</p>
-      </div>
-    } @else if (error()) {
-      <div class="error-state">
-        <span class="error-icon">⚠️</span>
-        <p>{{ error() }}</p>
-        <button type="button" class="retry-btn" (click)="loadSpecialists()">Try Again</button>
-      </div>
-    } @else if (specialists().length === 0) {
-      <div class="empty-state">
-        <span class="empty-icon">👨‍🍳</span>
-        <h3>No specialists found</h3>
-        <p>Try adjusting your search or filters</p>
-      </div>
-    } @else {
-      <!-- Grid View -->
-      @if (viewMode() === 'grid') {
-        <div class="specialists-grid">
-          @for (specialist of paginatedSpecialists(); track specialist.id) {
-            <a [routerLink]="['/specialists', specialist.id]" class="specialist-card">
-              <div class="specialist-image">
-                <img
-                  [src]="specialist.profilePhoto || getDefaultAvatar(specialist.fullName)"
-                  [alt]="specialist.fullName"
-                  (error)="$any($event.target).src = getDefaultAvatar(specialist.fullName)"
-                />
-                @if (specialist.averageRating >= 4.5) {
-                  <div class="top-rated-badge">Top Rated</div>
-                }
-              </div>
-              <div class="specialist-info">
-                <h3 class="specialist-name">{{ specialist.fullName }}</h3>
-                <div class="specialist-rating">
-                  <span class="stars">{{ getStarRating(specialist.averageRating) }}</span>
-                  <span class="rating-text">{{ specialist.averageRating.toFixed(1) }}</span>
-                  <span class="review-count">({{ specialist.reviewCount }} reviews)</span>
-                </div>
-                <div class="specialist-specialties">
-                  @for (specialty of specialist.specialties.slice(0, 3); track specialty) {
-                    <span class="specialty-tag">{{ specialty }}</span>
+    <!-- Ad Banner -->
+    <div class="ad-banner">
+      <app-banner-ad placement="specialist_list_banner" [autoRotate]="true" [rotationInterval]="8000" [limit]="3"></app-banner-ad>
+    </div>
+
+    <!-- Results -->
+    <div class="results-area">
+      @if (loading()) {
+        <div class="state-message">
+          <div class="spinner"></div>
+          <p>Finding specialists for you...</p>
+        </div>
+      } @else if (error()) {
+        <div class="state-message error">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <h3>Something went wrong</h3>
+          <p>{{ error() }}</p>
+          <button type="button" class="retry-btn" (click)="loadSpecialists()">Try Again</button>
+        </div>
+      } @else if (specialists().length === 0) {
+        <div class="state-message empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <h3>No specialists found</h3>
+          <p>Try adjusting your search or filters</p>
+          @if (hasActiveFilters()) {
+            <button type="button" class="retry-btn" (click)="clearFilters()">Clear All Filters</button>
+          }
+        </div>
+      } @else {
+        <!-- Grid View -->
+        @if (viewMode() === 'grid') {
+          <div class="specialists-grid">
+            @for (specialist of paginatedSpecialists(); track specialist.id; let i = $index) {
+              <a [routerLink]="['/specialists', specialist.id]" class="profile-card" [style.--card-delay]="i * 0.08 + 's'">
+                <div class="card-image">
+                  @if (specialist.profilePhoto && !imageErrors().has(specialist.id)) {
+                    <img
+                      [src]="specialist.profilePhoto"
+                      [alt]="specialist.fullName"
+                      (error)="onImageError(specialist.id)"
+                    />
+                  } @else {
+                    <div class="avatar-fallback">
+                      <lucide-icon [img]="User" [size]="36"></lucide-icon>
+                    </div>
+                  }
+                  @if (specialist.averageRating >= 4.5) {
+                    <div class="top-badge">Top Rated</div>
                   }
                 </div>
-                @if (specialist.minPrice > 0) {
-                  <div class="specialist-pricing">
-                    <span class="price-label">From</span>
-                    <span class="price-value">R{{ specialist.minPrice }}</span>
-                    @if (specialist.maxPrice > specialist.minPrice) {
-                      <span class="price-range">- R{{ specialist.maxPrice }}</span>
+                <div class="card-body">
+                  <div class="card-header">
+                    <h3 class="card-name">{{ specialist.fullName }}</h3>
+                    <div class="card-rating">
+                      <span class="stars">{{ getStarRating(specialist.averageRating) }}</span>
+                      <span class="rating-value">{{ specialist.averageRating.toFixed(1) }}</span>
+                      <span class="review-count">({{ specialist.reviewCount }})</span>
+                    </div>
+                  </div>
+                  <div class="card-tags">
+                    @for (specialty of specialist.specialties.slice(0, 3); track specialty) {
+                      <span class="tag">{{ specialty }}</span>
                     }
                   </div>
-                }
-                @if (specialist.location && specialist.location.country) {
-                  <div class="specialist-location">
-                    <span class="location-icon">📍</span>
-                    <span class="location-text">{{ specialist.location.country }}</span>
-                  </div>
-                }
-                @if (specialist.bio) {
-                  <p class="specialist-bio">{{ specialist.bio | slice:0:100 }}{{ specialist.bio.length > 100 ? '...' : '' }}</p>
-                }
-                <div class="specialist-stats">
-                  <span class="stat">{{ specialist.totalBookings }} bookings ({{ specialist.completedBookings }} completed)</span>
-                  <span class="stat">{{ specialist.services.length }} services</span>
-                </div>
-              </div>
-            </a>
-          }
-        </div>
-      }
-
-      <!-- List View -->
-      @if (viewMode() === 'list') {
-        <div class="specialists-list">
-          @for (specialist of paginatedSpecialists(); track specialist.id) {
-            <a [routerLink]="['/specialists', specialist.id]" class="specialist-list-item">
-              <div class="list-item-image">
-                <img
-                  [src]="specialist.profilePhoto || getDefaultAvatar(specialist.fullName)"
-                  [alt]="specialist.fullName"
-                  (error)="$any($event.target).src = getDefaultAvatar(specialist.fullName)"
-                />
-                @if (specialist.averageRating >= 4.5) {
-                  <div class="top-rated-badge">Top Rated</div>
-                }
-              </div>
-              <div class="list-item-content">
-                <div class="list-item-header">
-                  <h3 class="specialist-name">{{ specialist.fullName }}</h3>
-                  <div class="specialist-rating">
-                    <span class="stars">{{ getStarRating(specialist.averageRating) }}</span>
-                    <span class="rating-text">{{ specialist.averageRating.toFixed(1) }}</span>
-                    <span class="review-count">({{ specialist.reviewCount }} reviews)</span>
+                  @if (specialist.bio) {
+                    <p class="card-bio">{{ specialist.bio.length > 90 ? (specialist.bio | slice:0:90) + '...' : specialist.bio }}</p>
+                  }
+                  <div class="card-footer">
+                    @if (specialist.minPrice > 0) {
+                      <span class="card-price">From R{{ specialist.minPrice }}</span>
+                    }
+                    @if (specialist.location && specialist.location.country) {
+                      <span class="card-location">{{ specialist.location.country }}</span>
+                    }
                   </div>
                 </div>
-                <div class="specialist-specialties">
-                  @for (specialty of specialist.specialties; track specialty) {
-                    <span class="specialty-tag">{{ specialty }}</span>
-                  }
-                </div>
-                @if (specialist.bio) {
-                  <p class="specialist-bio">{{ specialist.bio | slice:0:200 }}{{ specialist.bio.length > 200 ? '...' : '' }}</p>
-                }
-                <div class="list-item-footer">
-                  @if (specialist.location && specialist.location.country) {
-                    <span class="location"><span class="location-icon">📍</span> {{ specialist.location.country }}</span>
-                  }
-                  @if (specialist.minPrice > 0) {
-                    <span class="pricing">From R{{ specialist.minPrice }}</span>
-                  }
-                  <span class="stat">{{ specialist.totalBookings }} bookings ({{ specialist.completedBookings }} completed)</span>
-                </div>
-              </div>
-            </a>
-          }
-        </div>
-      }
-
-      <!-- Gallery View -->
-      @if (viewMode() === 'gallery') {
-        <div class="specialists-gallery">
-          @for (specialist of paginatedSpecialists(); track specialist.id) {
-            <a [routerLink]="['/specialists', specialist.id]" class="gallery-item">
-              <div class="gallery-image">
-                <img
-                  [src]="specialist.profilePhoto || getDefaultAvatar(specialist.fullName)"
-                  [alt]="specialist.fullName"
-                  (error)="$any($event.target).src = getDefaultAvatar(specialist.fullName)"
-                />
-                <div class="gallery-overlay">
-                  <h3 class="gallery-name">{{ specialist.fullName }}</h3>
-                  <div class="gallery-rating">
-                    <span class="stars">{{ getStarRating(specialist.averageRating) }}</span>
-                    <span>{{ specialist.averageRating.toFixed(1) }}</span>
-                  </div>
-                  @if (specialist.minPrice > 0) {
-                    <span class="gallery-price">From R{{ specialist.minPrice }}</span>
-                  }
-                </div>
-                @if (specialist.averageRating >= 4.5) {
-                  <div class="top-rated-badge">Top Rated</div>
-                }
-              </div>
-            </a>
-          }
-        </div>
-      }
-
-      <!-- Pagination -->
-      @if (totalPages() > 1) {
-        <div class="pagination">
-          <button
-            type="button"
-            class="pagination-btn prev"
-            [disabled]="currentPage() === 1"
-            (click)="prevPage()"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-            Previous
-          </button>
-
-          <div class="pagination-pages">
-            @for (page of pageNumbers(); track page) {
-              @if (page === '...') {
-                <span class="pagination-ellipsis">...</span>
-              } @else {
-                <button
-                  type="button"
-                  class="pagination-page"
-                  [class.active]="page === currentPage()"
-                  (click)="goToPage(page)"
-                >
-                  {{ page }}
-                </button>
-              }
+              </a>
             }
           </div>
+        }
 
-          <button
-            type="button"
-            class="pagination-btn next"
-            [disabled]="currentPage() === totalPages()"
-            (click)="nextPage()"
-          >
-            Next
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </button>
-        </div>
+        <!-- List View -->
+        @if (viewMode() === 'list') {
+          <div class="specialists-list">
+            @for (specialist of paginatedSpecialists(); track specialist.id; let i = $index) {
+              <a [routerLink]="['/specialists', specialist.id]" class="list-card" [style.--card-delay]="i * 0.06 + 's'">
+                <div class="list-image">
+                  @if (specialist.profilePhoto && !imageErrors().has(specialist.id)) {
+                    <img
+                      [src]="specialist.profilePhoto"
+                      [alt]="specialist.fullName"
+                      (error)="onImageError(specialist.id)"
+                    />
+                  } @else {
+                    <div class="avatar-fallback">
+                      <lucide-icon [img]="User" [size]="28"></lucide-icon>
+                    </div>
+                  }
+                  @if (specialist.averageRating >= 4.5) {
+                    <div class="top-badge">Top Rated</div>
+                  }
+                </div>
+                <div class="list-content">
+                  <div class="list-top">
+                    <div>
+                      <h3 class="list-name">{{ specialist.fullName }}</h3>
+                      <div class="list-tags">
+                        @for (specialty of specialist.specialties.slice(0, 4); track specialty) {
+                          <span class="tag">{{ specialty }}</span>
+                        }
+                      </div>
+                    </div>
+                    <div class="list-rating">
+                      <span class="stars">{{ getStarRating(specialist.averageRating) }}</span>
+                      <span class="rating-value">{{ specialist.averageRating.toFixed(1) }}</span>
+                      <span class="review-count">({{ specialist.reviewCount }} {{ specialist.reviewCount === 1 ? 'review' : 'reviews' }})</span>
+                    </div>
+                  </div>
+                  @if (specialist.bio) {
+                    <p class="list-bio">{{ specialist.bio.length > 160 ? (specialist.bio | slice:0:160) + '...' : specialist.bio }}</p>
+                  }
+                  <div class="list-stats">
+                    @if (specialist.minPrice > 0) {
+                      <span class="list-stat price">From R{{ specialist.minPrice }}</span>
+                    }
+                    @if (specialist.location && specialist.location.country) {
+                      <span class="list-stat location">{{ specialist.location.country }}</span>
+                    }
+                    <span class="list-stat bookings">{{ specialist.completedBookings }} bookings completed</span>
+                    <span class="list-stat services">{{ specialist.services.length }} services</span>
+                  </div>
+                </div>
+              </a>
+            }
+          </div>
+        }
+
+        <!-- Gallery View -->
+        @if (viewMode() === 'gallery') {
+          <div class="specialists-gallery">
+            @for (specialist of paginatedSpecialists(); track specialist.id; let i = $index) {
+              <a [routerLink]="['/specialists', specialist.id]" class="gallery-card" [style.--card-delay]="i * 0.06 + 's'">
+                <div class="gallery-image">
+                  @if (specialist.profilePhoto && !imageErrors().has(specialist.id)) {
+                    <img
+                      [src]="specialist.profilePhoto"
+                      [alt]="specialist.fullName"
+                      (error)="onImageError(specialist.id)"
+                    />
+                  } @else {
+                    <div class="avatar-fallback">
+                      <lucide-icon [img]="User" [size]="36"></lucide-icon>
+                    </div>
+                  }
+                  <div class="gallery-overlay">
+                    <h3 class="gallery-name">{{ specialist.fullName }}</h3>
+                    <div class="gallery-meta">
+                      <span class="stars">{{ getStarRating(specialist.averageRating) }}</span>
+                      <span>{{ specialist.averageRating.toFixed(1) }}</span>
+                    </div>
+                    @if (specialist.minPrice > 0) {
+                      <span class="gallery-price">From R{{ specialist.minPrice }}</span>
+                    }
+                    <div class="gallery-tags">
+                      @for (specialty of specialist.specialties.slice(0, 2); track specialty) {
+                        <span class="tag">{{ specialty }}</span>
+                      }
+                    </div>
+                  </div>
+                  @if (specialist.averageRating >= 4.5) {
+                    <div class="top-badge">Top Rated</div>
+                  }
+                </div>
+              </a>
+            }
+          </div>
+        }
+
+        <!-- Pagination -->
+        @if (totalPages() > 1) {
+          <div class="pagination-bar">
+            <div class="page-size">
+              <label>Show:</label>
+              <select [value]="pageSize()" (change)="onPageSizeChange(+$any($event.target).value)">
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size">{{ size }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="page-controls">
+              <button type="button" class="page-arrow" [disabled]="currentPage() === 1" (click)="prevPage()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              @for (page of pageNumbers(); track page) {
+                @if (page === '...') {
+                  <span class="page-ellipsis">...</span>
+                } @else {
+                  <button type="button" class="page-num" [class.active]="page === currentPage()" (click)="goToPage(page)">{{ page }}</button>
+                }
+              }
+              <button type="button" class="page-arrow" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+
+            <span class="page-info">
+              Page {{ currentPage() }} of {{ totalPages() }}
+            </span>
+          </div>
+        }
       }
-    }
-  </div>
+    </div>
+  </section>
 </div>

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subject, of, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { LucideAngularModule, Star, X, Search, Edit, Trash2, Check, AlertTriangle } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
 
@@ -69,7 +70,7 @@ interface NewReviewForm {
 @Component({
   selector: 'app-user-reviews',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule],
   templateUrl: './user-reviews.component.html',
   styleUrls: ['./user-reviews.component.scss']
 })
@@ -80,6 +81,14 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
   private businessSearch$ = new Subject<string>();
 
   currentUser = this.authService.currentUser;
+
+  readonly Star = Star;
+  readonly X = X;
+  readonly Search = Search;
+  readonly Edit = Edit;
+  readonly Trash2 = Trash2;
+  readonly Check = Check;
+  readonly AlertTriangle = AlertTriangle;
 
   // State management
   isLoading = signal(false);

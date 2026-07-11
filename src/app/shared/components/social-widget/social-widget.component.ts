@@ -146,21 +146,11 @@ export class SocialWidgetComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         console.log('✅ Chat request sent successfully:', response);
 
-        // Show success message with auto-follow info
-        if (response.autoFollowed) {
-          alert('Chat request sent! You are now following this user.');
-        }
-
-        // Navigate to messages page based on user role
+        // Navigate to messages page — handles both new and existing requests/conversations
         this.router.navigate([this.getMessagesRoute()]);
       },
       error: (err) => {
         console.error('❌ Error starting chat:', err);
-        console.error('❌ Error details:', {
-          status: err.status,
-          error: err.error,
-          sentUserId: userId
-        });
 
         const errorMessage = err.error?.error || err.error?.message || 'Failed to start chat';
         alert(`Error: ${errorMessage}. Please try again.`);

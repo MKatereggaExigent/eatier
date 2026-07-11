@@ -6,60 +6,94 @@
     </div>
   } @else if (error()) {
     <div class="error-state">
-      <span class="error-icon">⚠️</span>
+      <lucide-icon [img]="AlertTriangle" [size]="48" class="error-icon"></lucide-icon>
       <p>{{ error() }}</p>
-      <a routerLink="/specialists" class="back-btn">Back to Specialists</a>
+      <a routerLink="/specialists" class="btn-primary">
+        <lucide-icon [img]="ArrowLeft" [size]="16"></lucide-icon>
+        Back to Specialists
+      </a>
     </div>
   } @else if (specialist()) {
-    <!-- Hero Section -->
-    <div class="hero-section">
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <a routerLink="/specialists" class="back-link">← Back to Specialists</a>
-        <div class="specialist-header">
-          <div class="specialist-avatar">
-            <img
-              [src]="specialist()!.profilePhoto || getDefaultAvatar(specialist()!.fullName)"
-              [alt]="specialist()!.fullName"
-            />
+    <!-- Header / Hero -->
+    <header class="overview-header">
+      <div class="header-content">
+        <div class="welcome-section">
+          <div class="back-link-row">
+            <a routerLink="/specialists">
+              <lucide-icon [img]="ArrowLeft" [size]="14"></lucide-icon>
+              Back to Specialists
+            </a>
           </div>
-          <div class="specialist-intro">
-            <h1>{{ specialist()!.fullName }}</h1>
-            <div class="rating-info">
-              <span class="stars">{{ getStarRating(specialist()!.averageRating) }}</span>
-              <span class="rating">{{ specialist()!.averageRating.toFixed(1) }}</span>
-              <span class="reviews">({{ specialist()!.reviewCount }} reviews)</span>
+          <div class="specialist-header">
+            <div class="specialist-avatar">
+              <img
+                [src]="specialist()!.profilePhoto || getDefaultAvatar(specialist()!.fullName)"
+                [alt]="specialist()!.fullName"
+              />
             </div>
-            <p class="bio">{{ specialist()!.bio || 'Professional culinary specialist ready to create amazing experiences.' }}</p>
-            <div class="quick-stats">
-              <div class="stat">
-                <span class="value">{{ specialist()!.totalBookings }}</span>
-                <span class="label">Bookings</span>
+            <div class="specialist-intro">
+              <h1>{{ specialist()!.fullName }}</h1>
+              <div class="rating-info">
+                <span class="stars">
+                  @for (star of ratingStars; track star) {
+                    {{ star <= Math.round(specialist()!.averageRating) ? '★' : '☆' }}
+                  }
+                </span>
+                <span class="rating-value">{{ specialist()!.averageRating.toFixed(1) }}</span>
+                <span class="review-count">({{ specialist()!.reviewCount }} reviews)</span>
               </div>
-              <div class="stat">
-                <span class="value">{{ specialist()!.completedBookings }}</span>
-                <span class="label">Completed</span>
-              </div>
-              <div class="stat">
-                <span class="value">{{ specialist()!.services.length }}</span>
-                <span class="label">Services</span>
+              <p class="bio">{{ specialist()!.bio || 'Professional culinary specialist ready to create amazing experiences.' }}</p>
+              <div class="quick-stats">
+                <div class="stat">
+                  <span class="value">{{ specialist()!.totalBookings }}</span>
+                  <span class="label">Bookings</span>
+                </div>
+                <div class="stat">
+                  <span class="value">{{ specialist()!.completedBookings }}</span>
+                  <span class="label">Completed</span>
+                </div>
+                <div class="stat">
+                  <span class="value">{{ specialist()!.services.length }}</span>
+                  <span class="label">Services</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <div class="header-actions">
+          <button class="btn-primary" (click)="openBookingForm()">
+            <lucide-icon [img]="CalendarCheck" [size]="16"></lucide-icon>
+            Request Booking
+          </button>
+          <button class="btn-secondary" (click)="shareSpecialist()">
+            <lucide-icon [img]="Share2" [size]="16"></lucide-icon>
+            Share Profile
+          </button>
+        </div>
       </div>
-    </div>
+    </header>
 
-    <div class="content-section">
-      <!-- Services Section -->
-      <section class="services-section">
-        <h2>🍽️ Services Offered</h2>
+    <!-- Services Section -->
+    <div class="section">
+      <div class="section-inner">
+        <div class="tag">
+          <lucide-icon [img]="UtensilsCrossed" [size]="14"></lucide-icon>
+          Services
+        </div>
+        <div class="header-card">
+          <div>
+            <h2>Services Offered</h2>
+            <p>Choose from {{ specialist()!.services.length }} service{{ specialist()!.services.length !== 1 ? 's' : '' }} offered by {{ specialist()!.firstName }}</p>
+          </div>
+        </div>
         @if (specialist()!.services.length === 0) {
-          <div class="empty-message">No services listed yet.</div>
+          <div class="section-card">
+            <div class="empty-message">No services listed yet.</div>
+          </div>
         } @else {
           <div class="services-grid">
             @for (service of specialist()!.services; track service.id) {
-              <div class="service-card glass-morphic">
+              <div class="service-card">
                 <div class="service-header">
                   <h3>{{ service.name }}</h3>
                   <span class="category-badge">{{ service.category }}</span>
@@ -67,11 +101,11 @@
                 <p class="service-description">{{ service.description }}</p>
                 <div class="service-details">
                   <div class="detail">
-                    <span class="icon">👥</span>
+                    <lucide-icon [img]="Users" [size]="16"></lucide-icon>
                     <span>{{ service.minGuests }}-{{ service.maxGuests }} guests</span>
                   </div>
                   <div class="detail">
-                    <span class="icon">⏱️</span>
+                    <lucide-icon [img]="Clock" [size]="16"></lucide-icon>
                     <span>{{ service.durationHours }}h</span>
                   </div>
                 </div>
@@ -83,32 +117,48 @@
                       <span class="plus">+ ${{ service.pricePerPerson }}/person</span>
                     }
                   </div>
-                  <button class="book-btn" (click)="selectService(service)">Book Now</button>
+                  <button class="btn-primary" (click)="selectService(service)">
+                    Book Now
+                  </button>
                 </div>
               </div>
             }
           </div>
         }
-      </section>
+      </div>
+    </div>
 
-      <!-- Reviews Section -->
-      <section class="reviews-section">
-        <div class="reviews-header">
-          <h2>⭐ Reviews</h2>
-          <button class="write-review-btn" (click)="openWriteReview()">
-            ✍️ Write a Review
+    <!-- Reviews Section -->
+    <div class="section">
+      <div class="section-inner">
+        <div class="tag">
+          <lucide-icon [img]="Star" [size]="14"></lucide-icon>
+          Reviews
+        </div>
+        <div class="header-card">
+          <div>
+            <h2>Client Reviews</h2>
+            <p>{{ specialist()!.reviewCount }} review{{ specialist()!.reviewCount !== 1 ? 's' : '' }} • {{ specialist()!.averageRating.toFixed(1) }} average rating</p>
+          </div>
+          <button class="btn-primary" (click)="openWriteReview()">
+            <lucide-icon [img]="PenLine" [size]="16"></lucide-icon>
+            Write a Review
           </button>
         </div>
         @if (specialist()!.reviews.length === 0) {
-          <div class="empty-message">No reviews yet. Be the first to review!</div>
+          <div class="section-card">
+            <div class="empty-message">No reviews yet. Be the first to review!</div>
+          </div>
         } @else {
           <div class="reviews-list">
             @for (review of specialist()!.reviews; track review.id) {
-              <div class="review-card glass-morphic">
+              <div class="review-card">
                 <div class="review-header">
                   <div class="reviewer-info">
                     <span class="reviewer-name">{{ review.clientName }}</span>
-                    <span class="event-type">{{ review.eventType }}</span>
+                    @if (review.eventType) {
+                      <span class="event-type">{{ review.eventType }}</span>
+                    }
                   </div>
                   <div class="review-rating">
                     <span class="stars">{{ getStarRating(review.rating) }}</span>
@@ -120,31 +170,36 @@
             }
           </div>
         }
-      </section>
+      </div>
+    </div>
 
-      <!-- Contact CTA -->
-      <section class="cta-section glass-morphic">
-        <h2>Ready to book {{ specialist()!.firstName }}?</h2>
-        <p>Get in touch to discuss your event and create an unforgettable culinary experience.</p>
-        <button class="cta-btn" (click)="openBookingForm()">Request Booking</button>
-      </section>
+    <!-- CTA -->
+    <div class="section-card cta-card">
+      <h2>Ready to book {{ specialist()!.firstName }}?</h2>
+      <p>Get in touch to discuss your event and create an unforgettable culinary experience.</p>
+      <button class="btn-primary" (click)="openBookingForm()">
+        <lucide-icon [img]="CalendarCheck" [size]="18"></lucide-icon>
+        Request Booking
+      </button>
     </div>
 
     <!-- Booking Modal -->
     @if (showBookingForm()) {
       <div class="modal-overlay" (click)="closeBookingForm()">
-        <div class="booking-modal glass-morphic" (click)="$event.stopPropagation()">
-          <button class="close-btn" (click)="closeBookingForm()">✕</button>
+        <div class="modal-content large" (click)="$event.stopPropagation()">
+          <button class="close-btn" (click)="closeBookingForm()">
+            <lucide-icon [img]="X" [size]="20"></lucide-icon>
+          </button>
 
           @if (bookingSuccess()) {
             <div class="success-state">
-              <span class="success-icon">✅</span>
+              <lucide-icon [img]="CheckCircle" [size]="56"></lucide-icon>
               <h3>Booking Request Sent!</h3>
               <p>{{ specialist()!.firstName }} will review your request and get back to you soon.</p>
-              <button class="done-btn" (click)="closeBookingForm()">Done</button>
+              <button class="btn-primary" (click)="closeBookingForm()">Done</button>
             </div>
           } @else {
-            <h3>Book {{ specialist()!.fullName }}</h3>
+            <h2>Book {{ specialist()!.fullName }}</h2>
             @if (selectedService()) {
               <div class="selected-service">
                 <strong>{{ selectedService()!.name }}</strong>
@@ -152,17 +207,17 @@
               </div>
             }
 
-            <form (ngSubmit)="submitBooking()" class="booking-form">
+            <form (ngSubmit)="submitBooking()">
               <div class="form-row">
                 <div class="form-group date-group">
                   <label>Event Date *</label>
                   <div class="date-input-wrapper">
-                    <input type="date" [value]="bookingForm().bookingDate"
+                    <input type="date" class="form-control" [value]="bookingForm().bookingDate"
                            [min]="today"
                            (focus)="showAvailabilityCalendar.set(true)"
                            (input)="updateBookingField('bookingDate', $any($event.target).value)" required />
                     <button type="button" class="calendar-toggle-btn" (click)="toggleAvailabilityCalendar()">
-                      📅
+                      <lucide-icon [img]="Calendar" [size]="18"></lucide-icon>
                     </button>
                   </div>
 
@@ -170,10 +225,16 @@
                   @if (showAvailabilityCalendar()) {
                     <div class="availability-calendar-preview">
                       <div class="calendar-header">
-                        <button type="button" class="nav-btn" (click)="previousMonth()">‹</button>
+                        <button type="button" class="nav-btn" (click)="previousMonth()">
+                          <lucide-icon [img]="ChevronLeft" [size]="16"></lucide-icon>
+                        </button>
                         <span class="month-year">{{ calendarMonthYear() }}</span>
-                        <button type="button" class="nav-btn" (click)="nextMonth()">›</button>
-                        <button type="button" class="close-calendar" (click)="showAvailabilityCalendar.set(false)">✕</button>
+                        <button type="button" class="nav-btn" (click)="nextMonth()">
+                          <lucide-icon [img]="ChevronRight" [size]="16"></lucide-icon>
+                        </button>
+                        <button type="button" class="close-calendar" (click)="showAvailabilityCalendar.set(false)">
+                          <lucide-icon [img]="X" [size]="14"></lucide-icon>
+                        </button>
                       </div>
                       <div class="calendar-legend">
                         <span class="legend-item available"><span class="dot"></span> Available</span>
@@ -205,14 +266,14 @@
                 </div>
                 <div class="form-group">
                   <label>Guests *</label>
-                  <input type="number" [value]="bookingForm().guestCount" min="1" max="100"
+                  <input type="number" class="form-control" [value]="bookingForm().guestCount" min="1" max="100"
                          (input)="updateBookingField('guestCount', +$any($event.target).value)" required />
                 </div>
               </div>
 
               <div class="form-group">
                 <label for="eventType">Event Type *</label>
-                <select id="eventType" title="Event Type" [value]="bookingForm().eventType"
+                <select id="eventType" class="form-control" title="Event Type" [value]="bookingForm().eventType"
                         (change)="updateBookingField('eventType', $any($event.target).value)">
                   @for (type of eventTypes; track type) {
                     <option [value]="type">{{ type }}</option>
@@ -223,13 +284,13 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="eventCity">City *</label>
-                  <input id="eventCity" type="text" [value]="bookingForm().eventCity"
+                  <input id="eventCity" type="text" class="form-control" [value]="bookingForm().eventCity"
                          (input)="updateBookingField('eventCity', $any($event.target).value)"
                          placeholder="e.g., Manhattan, NY" required />
                 </div>
                 <div class="form-group">
                   <label for="eventAddress">Address</label>
-                  <input id="eventAddress" type="text" [value]="bookingForm().eventAddress"
+                  <input id="eventAddress" type="text" class="form-control" [value]="bookingForm().eventAddress"
                          (input)="updateBookingField('eventAddress', $any($event.target).value)"
                          placeholder="Event address (optional)" />
                 </div>
@@ -238,13 +299,13 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="contactName">Your Name *</label>
-                  <input id="contactName" type="text" [value]="bookingForm().contactName"
+                  <input id="contactName" type="text" class="form-control" [value]="bookingForm().contactName"
                          (input)="updateBookingField('contactName', $any($event.target).value)"
                          placeholder="Your full name" required />
                 </div>
                 <div class="form-group">
                   <label for="contactPhone">Phone *</label>
-                  <input id="contactPhone" type="tel" [value]="bookingForm().contactPhone"
+                  <input id="contactPhone" type="tel" class="form-control" [value]="bookingForm().contactPhone"
                          (input)="updateBookingField('contactPhone', $any($event.target).value)"
                          placeholder="Your phone number" required />
                 </div>
@@ -252,36 +313,38 @@
 
               <div class="form-group">
                 <label for="contactEmail">Email *</label>
-                <input id="contactEmail" type="email" [value]="bookingForm().contactEmail"
+                <input id="contactEmail" type="email" class="form-control" [value]="bookingForm().contactEmail"
                        (input)="updateBookingField('contactEmail', $any($event.target).value)"
                        placeholder="Your email address" required />
               </div>
 
               <div class="form-group">
                 <label>Special Requests</label>
-                <textarea [value]="bookingForm().specialRequests"
+                <textarea class="form-control" [value]="bookingForm().specialRequests"
                           (input)="updateBookingField('specialRequests', $any($event.target).value)"
                           placeholder="Any dietary requirements, preferences, or special notes..."
                           rows="3"></textarea>
               </div>
 
-              <!-- Availability Notice -->
               <div class="availability-notice">
-                <span class="notice-icon">📅</span>
+                <lucide-icon [img]="Calendar" [size]="16"></lucide-icon>
                 <span class="notice-text">Bookings are subject to availability. The chef will confirm your request.</span>
               </div>
 
               @if (bookingError()) {
-                <div class="error-message">{{ bookingError() }}</div>
+                <div class="error-alert">{{ bookingError() }}</div>
               }
 
-              <button type="submit" class="submit-btn" [disabled]="bookingLoading()">
-                @if (bookingLoading()) {
-                  <span class="spinner-small"></span> Submitting...
-                } @else {
-                  Submit Booking Request
-                }
-              </button>
+              <div class="modal-footer">
+                <button type="button" class="btn-secondary" (click)="closeBookingForm()">Cancel</button>
+                <button type="submit" class="btn-primary" [disabled]="bookingLoading()">
+                  @if (bookingLoading()) {
+                    <span class="spinner-small"></span> Submitting...
+                  } @else {
+                    Submit Booking Request
+                  }
+                </button>
+              </div>
             </form>
           }
         </div>
@@ -291,20 +354,22 @@
     <!-- Review Modal -->
     @if (showReviewModal()) {
       <div class="modal-overlay" (click)="closeReviewModal()">
-        <div class="review-modal glass-morphic" (click)="$event.stopPropagation()">
-          <button class="close-btn" (click)="closeReviewModal()">✕</button>
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <button class="close-btn" (click)="closeReviewModal()">
+            <lucide-icon [img]="X" [size]="20"></lucide-icon>
+          </button>
 
           @if (reviewSuccess()) {
             <div class="success-state">
-              <span class="success-icon">✅</span>
+              <lucide-icon [img]="CheckCircle" [size]="56"></lucide-icon>
               <h3>Review Submitted!</h3>
               <p>Thank you for reviewing {{ specialist()!.firstName }}. Your feedback helps others.</p>
-              <button class="done-btn" (click)="closeReviewModal()">Done</button>
+              <button class="btn-primary" (click)="closeReviewModal()">Done</button>
             </div>
           } @else {
-            <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="review-form">
-              <h3>Review {{ specialist()!.firstName }}</h3>
+            <h2>Review {{ specialist()!.firstName }}</h2>
 
+            <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
               <!-- Overall Rating -->
               <div class="form-group rating-group">
                 <label>Overall Rating *</label>
@@ -422,9 +487,9 @@
               }
 
               <div class="form-actions">
-                <button type="button" class="cancel-btn" (click)="closeReviewModal()"
+                <button type="button" class="btn-secondary" (click)="closeReviewModal()"
                         [disabled]="isSubmittingReview()">Cancel</button>
-                <button type="submit" class="submit-btn" [disabled]="isSubmittingReview()">
+                <button type="submit" class="btn-primary" [disabled]="isSubmittingReview()">
                   @if (isSubmittingReview()) {
                     <span class="spinner-small"></span> Submitting...
                   } @else {

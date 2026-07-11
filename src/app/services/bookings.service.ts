@@ -246,19 +246,19 @@ export class BookingsService {
   }
 
   private transformBusinessToRestaurant(business: any): Restaurant {
-    const businessName = business.business_name || business.name || 'Unknown Business';
+    const businessName = business.businessName || business.business_name || business.name || 'Unknown Business';
     return {
       id: business.id,
       name: businessName,
       slug: businessName.toLowerCase().replace(/\s+/g, '-'),
       description: business.bio || '',
       cuisineTypes: [],
-      priceRange: 'moderate',
+      priceRange: business.priceRange || 'moderate',
       averageRating: 0,
       totalReviews: 0,
-      imageUrl: business.profile_photos?.[0] || `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop`,
+      imageUrl: business.profilePhotos?.[0] || business.profile_photos?.[0] || `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop`,
       address: business.address || '',
-      city: '',
+      city: business.country || business.city || '',
       state: '',
       phone: business.phone || '',
       email: business.email || '',

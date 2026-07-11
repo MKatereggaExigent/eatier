@@ -1,71 +1,59 @@
 <div class="layout-container" (click)="closeAllMenus()">
-  <!-- Glassmorphic Navigation Bar -->
-  <nav class="navbar">
+  <!-- Premium Glassmorphic Navigation Bar -->
+  <nav class="navbar" [class.scrolled]="isScrolled()">
     <div class="navbar-content">
-      <!-- Brand -->
+      <!-- Brand / Logo - Prominent on far left -->
       <a routerLink="/" class="navbar-brand">
         <img src="assets/images/itiyum-logo.jpeg" alt="Itiyum" class="brand-logo-image" />
       </a>
 
-      <!-- Navigation Links - Dynamic based on login state and role -->
+      <!-- Navigation Links - Centered -->
       <ul class="navbar-nav" [class.mobile-open]="showMobileMenu()">
         @for (navItem of navigationItems(); track navItem.route) {
           <li class="nav-item">
             <a [routerLink]="navItem.route" routerLinkActive="active" class="nav-link">
-              {{ navItem.icon }} {{ navItem.label }}
+              {{ navItem.label }}
             </a>
           </li>
         }
       </ul>
 
-      <!-- Action Buttons -->
+      <!-- Right Actions -->
       <div class="navbar-actions">
-        <button type="button" class="search-btn" title="Search" (click)="toggleSearch(); $event.stopPropagation()">
-          <lucide-icon [img]="Search" [size]="20"></lucide-icon>
+        <button type="button" class="icon-btn search-btn" title="Search" (click)="toggleSearch(); $event.stopPropagation()">
+          <lucide-icon [img]="Search" [size]="18"></lucide-icon>
         </button>
 
-        <!-- Cart Button - Show for all users (guests and authenticated) -->
-        <button type="button" class="cart-btn" title="Shopping Cart" (click)="toggleCart(); $event.stopPropagation()">
-          <lucide-icon [img]="ShoppingCart" [size]="20"></lucide-icon>
+        <button type="button" class="icon-btn cart-btn" title="Shopping Cart" (click)="toggleCart(); $event.stopPropagation()">
+          <lucide-icon [img]="ShoppingCart" [size]="18"></lucide-icon>
           @if (cartItemCount() > 0) {
-            <span class="cart-badge">{{ cartItemCount() }}</span>
+            <span class="badge cart-badge">{{ cartItemCount() }}</span>
           }
         </button>
 
-        <!-- Notifications - Only show for authenticated users -->
         @if (isLoggedIn()) {
-          <button type="button" class="notifications-btn" title="Notifications" (click)="toggleNotifications(); $event.stopPropagation()">
-            <lucide-icon [img]="Bell" [size]="20"></lucide-icon>
+          <button type="button" class="icon-btn notifications-btn" title="Notifications" (click)="toggleNotifications(); $event.stopPropagation()">
+            <lucide-icon [img]="Bell" [size]="18"></lucide-icon>
             @if (unreadCount() > 0) {
-              <span class="notification-badge">{{ unreadCount() }}</span>
+              <span class="badge notification-badge">{{ unreadCount() }}</span>
             }
           </button>
         }
 
         <div class="profile-dropdown" (click)="$event.stopPropagation()">
-          <button type="button" class="profile-btn" [title]="isLoggedIn() ? 'Profile' : 'Account'" (click)="toggleProfileMenu()">
+          <button type="button" class="icon-btn profile-btn" [title]="isLoggedIn() ? 'Profile' : 'Account'" (click)="toggleProfileMenu()">
             @if (isLoggedIn()) {
-              <!-- Show user avatar or initials when logged in -->
               @if (currentUser()?.avatar) {
-                <img
-                  [src]="currentUser()?.avatar"
-                  alt="Profile"
-                  class="profile-avatar"
-                />
+                <img [src]="currentUser()?.avatar" alt="Profile" class="profile-avatar-img" />
               } @else {
-                <div class="profile-avatar-initials">
-                  {{ userInitials() }}
-                </div>
+                <div class="profile-avatar-initials">{{ userInitials() }}</div>
               }
             } @else {
-              <!-- Show generic user icon when not logged in -->
-              <lucide-icon [img]="UserIcon" [size]="20" class="profile-icon-guest"></lucide-icon>
+              <lucide-icon [img]="UserIcon" [size]="18" class="profile-icon-guest"></lucide-icon>
             }
           </button>
-          <!-- Profile Dropdown Menu -->
           @if (showProfileMenu()) {
             <div class="profile-menu">
-            <!-- Show login/register for non-authenticated users -->
             @if (!isLoggedIn()) {
               <a routerLink="/auth/login" class="profile-menu-item">
                 <lucide-icon [img]="Key" [size]="16"></lucide-icon> Login
@@ -74,34 +62,31 @@
                 <lucide-icon [img]="UserPlus" [size]="16"></lucide-icon> Register
               </a>
             }
-
-            <!-- Show user options for authenticated users -->
             @if (isLoggedIn() && currentUser()) {
               <div class="profile-menu-user">
                 <div class="user-info">
-                  <span class="user-name"><lucide-icon [img]="Hand" [size]="16"></lucide-icon> Welcome back, {{ currentUser()?.firstName || 'User' }}!</span>
+                  <span class="user-greeting"><lucide-icon [img]="Hand" [size]="14"></lucide-icon> Hi, {{ currentUser()?.firstName || 'User' }}</span>
                   <span class="user-email">{{ currentUser()?.email }}</span>
                 </div>
-                <hr class="profile-menu-divider">
+                <hr class="menu-divider">
                 <a [routerLink]="getDashboardRoute()" class="profile-menu-item">
                   <lucide-icon [img]="LayoutDashboard" [size]="16"></lucide-icon> Dashboard
                 </a>
                 <a [routerLink]="getDashboardRoute() + '/profile'" class="profile-menu-item">
                   <lucide-icon [img]="Settings" [size]="16"></lucide-icon> Settings
                 </a>
-                <hr class="profile-menu-divider">
+                <hr class="menu-divider">
                 <button type="button" class="profile-menu-item logout-btn" (click)="logout()">
                   <lucide-icon [img]="LogOut" [size]="16"></lucide-icon> Logout
                 </button>
               </div>
             }
-
-            <hr class="profile-menu-divider">
+            <hr class="menu-divider">
             <a routerLink="/feedback" class="profile-menu-item">
               <lucide-icon [img]="MessageSquare" [size]="16"></lucide-icon> Feedback
             </a>
             <a routerLink="/help" class="profile-menu-item">
-              <lucide-icon [img]="HelpCircle" [size]="16"></lucide-icon> Help & Support
+              <lucide-icon [img]="HelpCircle" [size]="16"></lucide-icon> Help
             </a>
             </div>
           }
@@ -109,11 +94,9 @@
       </div>
 
       <!-- Mobile Menu Toggle -->
-      <button type="button" class="mobile-menu-toggle" title="Toggle Menu" (click)="toggleMobileMenu(); $event.stopPropagation()">
-        <div class="hamburger" [class.open]="showMobileMenu()">
-          <span></span>
-          <span></span>
-          <span></span>
+      <button type="button" class="hamburger-btn" [class.open]="showMobileMenu()" (click)="toggleMobileMenu(); $event.stopPropagation()" aria-label="Menu">
+        <div class="hamburger-box">
+          <span class="hamburger-inner"></span>
         </div>
       </button>
     </div>
@@ -168,16 +151,16 @@
             </div>
           } @else if (searchQuery().trim().length >= 2) {
             <div class="no-results">
-              <span class="empty-icon">🔍</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="empty-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <p>No results found for "{{ searchQuery() }}"</p>
             </div>
           } @else {
             <div class="search-suggestions">
               <p class="suggestions-title">Try searching for:</p>
               <div class="suggestion-chips">
-                <button type="button" class="suggestion-chip" (click)="searchSuggestion('pizza')">🍕 Pizza</button>
-                <button type="button" class="suggestion-chip" (click)="searchSuggestion('coffee')">☕ Coffee</button>
-                <button type="button" class="suggestion-chip" (click)="searchSuggestion('sushi')">🍣 Sushi</button>
+                <button type="button" class="suggestion-chip" (click)="searchSuggestion('pizza')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M15 11h.01M8 9h.01M11 5h.01"/><path d="M3 3l18 18"/><path d="M3 3l9 18 9-18z"/></svg> Pizza</button>
+                <button type="button" class="suggestion-chip" (click)="searchSuggestion('coffee')"> Coffee</button>
+                <button type="button" class="suggestion-chip" (click)="searchSuggestion('sushi')"> Sushi</button>
               </div>
             </div>
           }
@@ -265,10 +248,10 @@
                           class="action-btn delete-btn"
                           (click)="deleteNotification(notification.id); $event.stopPropagation()"
                           title="Delete">
-                    🗑️
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                   </button>
-                </div>
-              </div>
+        </div>
+      </div>
             }
           }
         }
@@ -276,73 +259,102 @@
     </div>
   }
 
+
   <!-- Header Ad - Full Width at Top -->
-  <div class="header-ad-overlay">
-    <app-header-ad placement="header_banner"></app-header-ad>
-  </div>
+  @if (!isFullWidthPage()) {
+    <div class="header-ad-overlay">
+      <app-header-ad placement="header_banner"></app-header-ad>
+    </div>
+  }
 
   <!-- 3-Column Grid Layout: Left Sidebar | Main Content | Right Sidebar -->
-  <div class="content-grid">
+  <div class="content-grid" [class.full-width]="isFullWidthPage()">
     <!-- Left Sidebar Ads -->
-    <aside class="left-sidebar-ads">
-      <app-left-sidebar-ad></app-left-sidebar-ad>
-    </aside>
+    @if (!isFullWidthPage()) {
+      <aside class="left-sidebar-ads">
+        <app-left-sidebar-ad></app-left-sidebar-ad>
+      </aside>
+    }
 
     <!-- Main Content -->
-    <main class="main-wrapper">
+    <main class="main-wrapper" [class.full-width]="isFullWidthPage()">
       <router-outlet></router-outlet>
     </main>
 
     <!-- Right Sidebar Ads -->
-    <aside class="right-sidebar-ads">
-      <app-right-sidebar-ad></app-right-sidebar-ad>
-    </aside>
+    @if (!isFullWidthPage()) {
+      <aside class="right-sidebar-ads">
+        <app-right-sidebar-ad></app-right-sidebar-ad>
+      </aside>
+    }
   </div>
 
   <!-- Footer Ad - Full Width at Bottom -->
-  <div class="footer-ad-overlay">
-    <app-footer-ad></app-footer-ad>
-  </div>
+  @if (!isFullWidthPage()) {
+    <div class="footer-ad-overlay">
+      <app-footer-ad></app-footer-ad>
+    </div>
+  }
 
-  <!-- Glassmorphic Footer -->
-  <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-brand">
-        <img src="assets/images/itiyum-logo.jpeg" alt="Itiyum" class="footer-logo-image" />
-        <div class="brand-tagline">Connecting food lovers worldwide</div>
+  <!-- Modern Footer -->
+  <footer class="footer" [class.full-width]="isFullWidthPage()">
+    <div class="footer-bg">
+      <div class="footer-blob footer-blob-1"></div>
+      <div class="footer-blob footer-blob-2"></div>
+    </div>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="assets/images/itiyum-logo.jpeg" alt="Itiyum" class="footer-logo" />
+          <p class="footer-desc">Connecting food lovers, restaurants, and culinary professionals worldwide. One platform for the entire food ecosystem.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <a routerLink="/about" class="footer-link">About</a>
+          <a routerLink="/careers" class="footer-link">Careers</a>
+          <a routerLink="/contact" class="footer-link">Contact</a>
+          <a routerLink="/grow" class="footer-link">Grow</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Support</h4>
+          <a routerLink="/help" class="footer-link">Help Center</a>
+          <a routerLink="/faqs" class="footer-link">FAQs</a>
+          <a routerLink="/pricing" class="footer-link">Pricing</a>
+          <a routerLink="/community" class="footer-link">Community</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a routerLink="/legal/privacy" class="footer-link">Privacy Policy</a>
+          <a routerLink="/legal/terms" class="footer-link">Terms of Service</a>
+          <a routerLink="/legal/cookies" class="footer-link">Cookie Policy</a>
+          <a routerLink="/accessibility" class="footer-link">Accessibility</a>
+        </div>
       </div>
 
-      <div class="footer-links">
-        <a routerLink="/about" class="footer-link">About</a>
-        <a routerLink="/legal/privacy" class="footer-link">Privacy</a>
-        <a routerLink="/legal/terms" class="footer-link">Terms</a>
-        <a routerLink="/help" class="footer-link">Support</a>
-        <a routerLink="/careers" class="footer-link">Careers</a>
-        <a routerLink="/legal/cookies" class="footer-link">Cookies</a>
-        <a routerLink="/accessibility" class="footer-link">Accessibility</a>
-        <a routerLink="/contact" class="footer-link">Contact</a>
-      </div>
-
-      <div class="footer-social">
-        <a href="https://www.facebook.com/share/1ZSogcT63w/" target="_blank" rel="noopener noreferrer" class="social-link" title="Facebook">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-        </a>
-        <a href="https://www.instagram.com/itiyum?igsh=YWRwNGpodmptYTdr" target="_blank" rel="noopener noreferrer" class="social-link" title="Instagram">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-        </a>
-        <a href="https://vm.tiktok.com/ZSH7tUhjUwLaJ-YRH9o/" target="_blank" rel="noopener noreferrer" class="social-link" title="TikTok">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>
-        </a>
-        <a href="https://www.youtube.com/@Itiyum" target="_blank" rel="noopener noreferrer" class="social-link" title="YouTube">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-        </a>
-        <a href="https://www.linkedin.com/company/itiyum/" target="_blank" rel="noopener noreferrer" class="social-link" title="LinkedIn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-        </a>
-      </div>
-
-      <div class="footer-copyright">
-        © 2024 <span class="itiyum-brand">Itiyum</span>. All rights reserved. Made with ❤️ for food lovers.
+      <div class="footer-social-row">
+        <div class="footer-social">
+          <a href="https://www.facebook.com/share/1ZSogcT63w/" target="_blank" rel="noopener noreferrer" class="social-link" title="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/itiyum?igsh=YWRwNGpodmptYTdr" target="_blank" rel="noopener noreferrer" class="social-link" title="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a href="https://vm.tiktok.com/ZSH7tUhjUwLaJ-YRH9o/" target="_blank" rel="noopener noreferrer" class="social-link" title="TikTok">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>
+          </a>
+          <a href="https://www.youtube.com/@Itiyum" target="_blank" rel="noopener noreferrer" class="social-link" title="YouTube">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/company/itiyum/" target="_blank" rel="noopener noreferrer" class="social-link" title="LinkedIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+        </div>
+        <p class="footer-copyright">
+          &copy; 2024 Itiyum. All rights reserved.
+        </p>
       </div>
     </div>
   </footer>

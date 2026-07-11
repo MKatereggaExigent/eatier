@@ -1,165 +1,390 @@
-<div class="social-container">
-  <div class="page-header">
-    <h1>Social</h1>
-    <p>Connect with fellow food lovers and discover new favorites</p>
-  </div>
+<div class="section">
+  <div class="section-inner">
+    <!-- Main Scrollable Content -->
+    <div class="main-content">
 
-  <!-- Social and Messaging Widgets -->
-  <section class="widgets-section" aria-label="Social and Messaging">
-    <div class="widgets-grid">
-      <app-social-widget></app-social-widget>
-      <app-messaging-widget></app-messaging-widget>
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="tag"><lucide-icon [img]="Users" [size]="16"></lucide-icon><span>Your Social Hub</span></div>
+      <h1 class="section-title">Social</h1>
+      <p class="section-desc">Connect with food lovers, share posts, and discover new people.</p>
     </div>
-  </section>
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <button type="button" class="tab" [class.active]="activeTab() === 'feed'" (click)="setActiveTab('feed')">
-      Activity Feed
-    </button>
-    <button type="button" class="tab" [class.active]="activeTab() === 'discover'" (click)="setActiveTab('discover')">
-      Discover
-    </button>
-    <button type="button" class="tab" [class.active]="activeTab() === 'following'" (click)="setActiveTab('following')">
-      Following
-    </button>
-    <button type="button" class="tab" [class.active]="activeTab() === 'followers'" (click)="setActiveTab('followers')">
-      Followers
-    </button>
-  </div>
+    <!-- Stories Bar -->
+    @if (storyUsers().length > 0) {
+      <div class="stories-bar">
+        @for (su of storyUsers(); track su.user.id) {
+          <button class="story-ring" (click)="openStoryViewer(su)">
+            <div class="ring-avatar">
+              <img [src]="su.user.avatar || getActorAvatarUrl(su.user.firstName + ' ' + su.user.lastName)" [alt]="su.user.firstName">
+            </div>
+            <span class="ring-name">{{ su.user.firstName }}</span>
+          </button>
+        }
+      </div>
+    }
 
-  @if (loading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading...</p>
-    </div>
-  } @else {
-    <!-- Activity Feed -->
-    @if (activeTab() === 'feed') {
-      @if (activityFeed().length === 0) {
-        <div class="empty-state">
-          <span class="empty-icon">📰</span>
-          <h2>No activity yet</h2>
-          <p>Follow some food lovers to see their activity here!</p>
-          <button type="button" class="action-btn" (click)="setActiveTab('discover')">Discover People</button>
+    <!-- Post Creation -->
+    <div class="post-create">
+      <div class="pc-top">
+        <div class="pc-avatar">
+          <img [src]="getActorAvatarUrl('Me')" alt="You">
         </div>
-      } @else {
-        <div class="activity-list">
-          @for (activity of activityFeed(); track activity.id) {
-            <div class="activity-card">
-              <div class="activity-icon">{{ getActivityIcon(activity.activityType) }}</div>
-              <div class="activity-content">
-                <div class="activity-header">
-                  <span class="actor-name">{{ activity.actorName }}</span>
-                  <span class="activity-text">{{ getActivityText(activity) }}</span>
-                </div>
-                @if (activity.contentPreview) {
-                  <p class="activity-preview">"{{ activity.contentPreview }}"</p>
-                }
-                <span class="activity-time">{{ formatDate(activity.createdAt) }}</span>
-              </div>
+        <input class="pc-input" [(ngModel)]="newPostContent" placeholder="What's on your mind?" (keydown.enter)="createPost()">
+      </div>
+      @if (newPostImages().length > 0) {
+        <div class="pc-previews">
+          @for (img of newPostImages(); track img; let i = $index) {
+            <div class="pc-preview">
+              <img [src]="img" alt="Preview">
+              <button class="pc-remove" (click)="removeImage(i)">&times;</button>
             </div>
           }
         </div>
       }
-    }
+      <div class="pc-actions">
+        <label class="pc-btn">
+          <lucide-icon [img]="Camera" [size]="18"></lucide-icon>
+          <span>Photo</span>
+          <input type="file" accept="image/*" multiple (change)="onImageSelected($event)" hidden>
+        </label>
+        <button class="pc-submit" (click)="createPost()" [disabled]="isCreatingPost() || (!newPostContent().trim() && newPostImages().length === 0)">
+          {{ isCreatingPost() ? 'Posting...' : 'Post' }}
+        </button>
+      </div>
+      @if (postError()) {
+        <div class="post-error">{{ postError() }}</div>
+      }
+    </div>
 
-    <!-- Discover Users -->
-    @if (activeTab() === 'discover') {
-      @if (discoverUsers().length === 0) {
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab" [class.active]="activeTab() === 'feed'" (click)="setActiveTab('feed')">Feed</button>
+      <button class="tab" [class.active]="activeTab() === 'discover'" (click)="setActiveTab('discover')">Discover</button>
+      <button class="tab" [class.active]="activeTab() === 'following'" (click)="setActiveTab('following')">Following</button>
+      <button class="tab" [class.active]="activeTab() === 'followers'" (click)="setActiveTab('followers')">Followers</button>
+    </div>
+
+    <!-- Feed Tab -->
+    @if (activeTab() === 'feed') {
+      <div class="tab-header">
+        <span class="tab-title">Feed</span>
+        <button class="refresh-btn" (click)="refreshFeed()" [disabled]="feedRefreshing()" title="Refresh feed">
+          <lucide-icon [img]="RefreshCw" [size]="16" [class.spinning]="feedRefreshing()"></lucide-icon>
+        </button>
+      </div>
+      @if (loading()) {
+        <div class="loading-state"><div class="spinner"></div><p>Loading feed...</p></div>
+      } @else if (posts().length === 0) {
         <div class="empty-state">
-          <span class="empty-icon">🔍</span>
-          <h2>No suggestions</h2>
-          <p>Check back later for new food lovers to follow!</p>
+          <lucide-icon [img]="MessageSquare" [size]="40"></lucide-icon>
+          <h3>No posts yet</h3>
+          <p>Follow some users or create your first post to get started.</p>
         </div>
       } @else {
-        <div class="users-grid">
+        <div class="feed">
+          @for (post of posts(); track post.id) {
+            <div class="post-card">
+              <div class="post-header">
+                <img class="post-avatar" [src]="post.avatar_url || getActorAvatarUrl(post.first_name + ' ' + post.last_name)" alt="">
+                <div class="post-author">
+                  <strong>{{ post.first_name }} {{ post.last_name }}</strong>
+                  <span class="post-time">{{ formatDate(post.created_at) }}</span>
+                </div>
+              </div>
+              @if (post.content) {
+                <p class="post-content">{{ post.content }}</p>
+              }
+              @if (post.image_urls && post.image_urls.length > 0) {
+                <div class="post-images" [class.single]="post.image_urls.length === 1">
+                  @for (img of post.image_urls; track img) {
+                    <img [src]="img" alt="Post image" class="post-img" loading="lazy">
+                  }
+                </div>
+              }
+              <div class="post-stats">
+                <button class="stat-btn" [class.active]="post.is_liked" (click)="togglePostLike(post)">
+                  <lucide-icon [img]="ThumbsUp" [size]="14"></lucide-icon>
+                  {{ post.like_count }} {{ post.like_count === 1 ? 'like' : 'likes' }}
+                </button>
+                <button class="stat-btn" (click)="toggleComments(post.id)">
+                  <lucide-icon [img]="MessageCircleIcon" [size]="14"></lucide-icon>
+                  {{ post.comment_count }} {{ post.comment_count === 1 ? 'comment' : 'comments' }}
+                </button>
+              </div>
+              <div class="post-actions">
+                <button class="pa-btn" [class.liked]="post.is_liked" (click)="togglePostLike(post)">
+                  <lucide-icon [img]="ThumbsUp" [size]="18"></lucide-icon>
+                  <span>{{ post.is_liked ? 'Liked' : 'Like' }}</span>
+                </button>
+                <button class="pa-btn" (click)="toggleComments(post.id)">
+                  <lucide-icon [img]="MessageCircleIcon" [size]="18"></lucide-icon>
+                  <span>Comment</span>
+                </button>
+                <button class="pa-btn">
+                  <lucide-icon [img]="Share2" [size]="18"></lucide-icon>
+                  <span>Share</span>
+                </button>
+              </div>
+              @if (commentsVisible[post.id]) {
+                <div class="comments-section">
+                  @for (comment of getTopLevelComments(post.id); track comment.id) {
+                    <div class="comment">
+                      <img class="comment-avatar" [src]="comment.avatar_url || getActorAvatarUrl(comment.first_name + ' ' + comment.last_name)" alt="">
+                      <div class="comment-body">
+                        <strong>{{ comment.first_name }} {{ comment.last_name }}</strong>
+                        <p>{{ comment.content }}</p>
+                        <div class="comment-actions">
+                          <button class="ca-btn" [class.active]="comment.is_liked" (click)="toggleCommentLike(comment.id)">
+                            <lucide-icon [img]="ThumbsUp" [size]="12"></lucide-icon>
+                            {{ comment.like_count }} {{ comment.like_count === 1 ? 'like' : 'likes' }}
+                          </button>
+                          <button class="ca-btn" (click)="setReplyToComment(post.id, comment.id)">
+                            <lucide-icon [img]="MessageCircleIcon" [size]="12"></lucide-icon>
+                            Reply
+                          </button>
+                          <button class="ca-btn">
+                            <lucide-icon [img]="Share2" [size]="12"></lucide-icon>
+                            Share
+                          </button>
+                        </div>
+                        @if (replyToComment[post.id] === comment.id) {
+                          <div class="reply-input">
+                            <input [(ngModel)]="replyContent[comment.id]" (keydown.enter)="addReply(post.id, comment.id)" placeholder="Write a reply..." [disabled]="replyLoading[comment.id]">
+                            <button (click)="addReply(post.id, comment.id)" [disabled]="!replyContent[comment.id]?.trim() || replyLoading[comment.id]">
+                              <lucide-icon [img]="Send" [size]="14"></lucide-icon>
+                            </button>
+                          </div>
+                        }
+                        @if (getCommentReplies(post.id, comment.id).length > 0) {
+                          <div class="replies">
+                            @for (reply of getCommentReplies(post.id, comment.id); track reply.id) {
+                              <div class="comment reply">
+                                <img class="comment-avatar" [src]="reply.avatar_url || getActorAvatarUrl(reply.first_name + ' ' + reply.last_name)" alt="">
+                                <div class="comment-body">
+                                  <strong>{{ reply.first_name }} {{ reply.last_name }}</strong>
+                                  <p>{{ reply.content }}</p>
+                                  <div class="comment-actions">
+                                    <button class="ca-btn" [class.active]="reply.is_liked" (click)="toggleCommentLike(reply.id)">
+                                      <lucide-icon [img]="ThumbsUp" [size]="12"></lucide-icon>
+                                      {{ reply.like_count }} {{ reply.like_count === 1 ? 'like' : 'likes' }}
+                                    </button>
+                                    <button class="ca-btn">
+                                      <lucide-icon [img]="Share2" [size]="12"></lucide-icon>
+                                      Share
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                  <div class="comment-input">
+                    <input [(ngModel)]="newComment[post.id]" (keydown.enter)="addComment(post.id)" placeholder="Write a comment..." [disabled]="commentLoading[post.id]">
+                    <button (click)="addComment(post.id)" [disabled]="!newComment[post.id]?.trim() || commentLoading[post.id]">
+                      <lucide-icon [img]="Send" [size]="16"></lucide-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+        @if (feedHasMore()) {
+          <div class="load-more-wrap">
+            <button class="load-more-btn" (click)="loadMorePosts()" [disabled]="feedLoadingMore()">
+              @if (feedLoadingMore()) {
+                <span class="spinner-sm"></span>
+              } @else {
+                <span>Load more posts</span>
+              }
+            </button>
+          </div>
+        }
+      }
+    }
+
+    <!-- Discover Tab -->
+    @if (activeTab() === 'discover') {
+      @if (discoverLoading()) {
+        <div class="loading-state"><div class="spinner"></div><p>Discovering users...</p></div>
+      } @else if (discoverUsers().length === 0) {
+        <div class="empty-state">
+          <lucide-icon [img]="Users" [size]="40"></lucide-icon>
+          <h3>No users found</h3>
+          <p>More food lovers will appear here as the community grows.</p>
+        </div>
+      } @else {
+        <div class="user-grid">
           @for (user of discoverUsers(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
-              <div class="user-info">
-                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
-                <div class="user-stats">
-                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
-                  <span><lucide-icon [img]="Users" [size]="14"></lucide-icon> {{ user.follower_count || user.followerCount || 0 }} followers</span>
+              <div class="uc-avatar">
+                <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)">
+              </div>
+              <div class="uc-info">
+                <h4>{{ getUserFullName(user) }}</h4>
+                <div class="uc-stats">
+                  <span>{{ user.reviewCount || user.review_count || 0 }} reviews</span>
+                  <span class="uc-dot">&bull;</span>
+                  <span>{{ user.followerCount || user.follower_count || 0 }} followers</span>
                 </div>
               </div>
-              <button 
-                type="button" 
-                class="follow-btn" 
-                [class.following]="user.isFollowing"
-                [disabled]="isFollowInProgress(user.id)"
-                (click)="toggleFollow(user.id, user.isFollowing)">
-                @if (isFollowInProgress(user.id)) {
-                  ...
-                } @else if (user.isFollowing) {
-                  Following
-                } @else {
-                  Follow
-                }
-              </button>
+              <div class="uc-actions">
+                <button class="msg-btn" (click)="startChat(user.id)" title="Send message">
+                  <lucide-icon [img]="MessageCircle" [size]="16"></lucide-icon>
+                </button>
+                <button class="follow-btn" [class.following]="user.isFollowing" (click)="toggleFollow(user.id, user.isFollowing)" [disabled]="isFollowInProgress(user.id)">
+                  {{ isFollowInProgress(user.id) ? '...' : (user.isFollowing ? 'Following' : 'Follow') }}
+                </button>
+              </div>
             </div>
           }
         </div>
       }
     }
 
-    <!-- Following -->
+    <!-- Following Tab -->
     @if (activeTab() === 'following') {
-      @if (following().length === 0) {
+      @if (followingLoading()) {
+        <div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>
+      } @else if (following().length === 0) {
         <div class="empty-state">
-          <lucide-icon [img]="User" [size]="48" class="empty-icon"></lucide-icon>
-          <h2>Not following anyone</h2>
-          <p>Discover and follow food lovers to see their activity!</p>
-          <button type="button" class="action-btn" (click)="setActiveTab('discover')">Discover People</button>
+          <lucide-icon [img]="UserPlus" [size]="40"></lucide-icon>
+          <h3>Not following anyone yet</h3>
+          <p>Discover users to follow and build your network.</p>
         </div>
       } @else {
-        <div class="users-grid">
+        <div class="user-grid">
           @for (user of following(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
-              <div class="user-info">
-                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
-                <div class="user-stats">
-                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
-                </div>
+              <div class="uc-avatar"><img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)"></div>
+              <div class="uc-info">
+                <h4>{{ getUserFullName(user) }}</h4>
               </div>
-              <button type="button" class="follow-btn following" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, true)">
-                @if (isFollowInProgress(user.id)) { ... } @else { Unfollow }
-              </button>
+              <div class="uc-actions">
+                <button class="msg-btn" (click)="startChat(user.id)" title="Send message">
+                  <lucide-icon [img]="MessageCircle" [size]="16"></lucide-icon>
+                </button>
+                <button class="follow-btn following" (click)="toggleFollow(user.id, user.isFollowing)" [disabled]="isFollowInProgress(user.id)">Unfollow</button>
+              </div>
             </div>
           }
         </div>
       }
     }
 
-    <!-- Followers -->
+    <!-- Followers Tab -->
     @if (activeTab() === 'followers') {
-      @if (followers().length === 0) {
+      @if (followersLoading()) {
+        <div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>
+      } @else if (followers().length === 0) {
         <div class="empty-state">
-          <lucide-icon [img]="Users" [size]="48" class="empty-icon"></lucide-icon>
-          <h2>No followers yet</h2>
-          <p>Share your reviews and favorites to attract followers!</p>
+          <lucide-icon [img]="Users" [size]="40"></lucide-icon>
+          <h3>No followers yet</h3>
+          <p>Engage with the community to gain followers.</p>
         </div>
       } @else {
-        <div class="users-grid">
+        <div class="user-grid">
           @for (user of followers(); track user.id) {
             <div class="user-card">
-              <div class="user-avatar">{{ (user.first_name || user.firstName || 'U').charAt(0) }}</div>
-              <div class="user-info">
-                <h3>{{ user.first_name || user.firstName || 'Unknown' }} {{ user.last_name || user.lastName || '' }}</h3>
-                <div class="user-stats">
-                  <span><lucide-icon [img]="Star" [size]="14"></lucide-icon> {{ user.review_count || user.reviewCount || 0 }} reviews</span>
-                </div>
+              <div class="uc-avatar"><img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)"></div>
+              <div class="uc-info">
+                <h4>{{ getUserFullName(user) }}</h4>
               </div>
-              <button type="button" class="follow-btn" [class.following]="user.isFollowing" [disabled]="isFollowInProgress(user.id)" (click)="toggleFollow(user.id, user.isFollowing)">
-                @if (isFollowInProgress(user.id)) { ... } @else if (user.isFollowing) { Following } @else { Follow Back }
-              </button>
+              <div class="uc-actions">
+                <button class="msg-btn" (click)="startChat(user.id)" title="Send message">
+                  <lucide-icon [img]="MessageCircle" [size]="16"></lucide-icon>
+                </button>
+                <button class="follow-btn" [class.following]="user.isFollowing" (click)="toggleFollow(user.id, user.isFollowing)" [disabled]="isFollowInProgress(user.id)">
+                  {{ isFollowInProgress(user.id) ? '...' : (user.isFollowing ? 'Following' : 'Follow') }}
+                </button>
+              </div>
             </div>
           }
         </div>
       }
     }
-  }
+
+    </div>
+    <!-- Sidebar -->
+    <div class="social-sidebar">
+      <app-social-widget></app-social-widget>
+      <app-messaging-widget></app-messaging-widget>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        @for (s of stats(); track s.label) {
+          <div class="stat-item">
+            <span class="stat-value">{{ s.value }}</span>
+            <span class="stat-label">{{ s.label }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Resources -->
+      <section class="resources-section">
+        <h2 class="section-subtitle">Get Started</h2>
+        <div class="resources-grid">
+          <a class="resource-card" routerLink="/dashboard/user/profile">
+            <div class="rc-icon"><lucide-icon [img]="UserPlus" [size]="24"></lucide-icon></div>
+            <h3>Create your profile</h3>
+            <p>Set up your food lover profile, upload your avatar, and start connecting.</p>
+          </a>
+          <a class="resource-card" routerLink="/messages">
+            <div class="rc-icon"><lucide-icon [img]="MessageCircle" [size]="24"></lucide-icon></div>
+            <h3>Start chatting</h3>
+            <p>Send messages, share recommendations, and build relationships with fellow foodies.</p>
+          </a>
+          <div class="resource-card">
+            <div class="rc-icon"><lucide-icon [img]="Star" [size]="24"></lucide-icon></div>
+            <h3>Share reviews</h3>
+            <p>Write reviews, share food photos, and become a trusted voice in the community.</p>
+          </div>
+          <div class="resource-card">
+            <div class="rc-icon"><lucide-icon [img]="Users" [size]="24"></lucide-icon></div>
+            <h3>Grow your network</h3>
+            <p>Follow, get followed, and build a community around your culinary interests.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
 </div>
 
+<!-- Story Viewer Modal -->
+@if (viewingStoryUser()) {
+  <div class="story-overlay" (click)="closeStoryViewer()">
+    <div class="story-viewer" (click)="$event.stopPropagation()">
+      <div class="sv-header">
+        <img [src]="viewingStoryUser()!.user.avatar || getActorAvatarUrl(viewingStoryUser()!.user.firstName + ' ' + viewingStoryUser()!.user.lastName)" alt="">
+        <div class="sv-user">
+          <strong>{{ viewingStoryUser()!.user.firstName }} {{ viewingStoryUser()!.user.lastName }}</strong>
+          <span>{{ viewingStoryUser()!.stories.length }} story{{ viewingStoryUser()!.stories.length > 1 ? 'ies' : 'y' }}</span>
+        </div>
+        <button class="sv-close" (click)="closeStoryViewer()">&times;</button>
+      </div>
+      <div class="sv-nav-left" (click)="prevStory()"></div>
+      <div class="sv-media">
+        @if (viewingStoryUser()!.stories[currentStoryIndex()]) {
+          @if (viewingStoryUser()!.stories[currentStoryIndex()].media_type === 'video') {
+            <video [src]="viewingStoryUser()!.stories[currentStoryIndex()].media_url" autoplay controls></video>
+          } @else {
+            <img [src]="viewingStoryUser()!.stories[currentStoryIndex()].media_url" alt="Story">
+          }
+          @if (viewingStoryUser()!.stories[currentStoryIndex()].caption) {
+            <p class="sv-caption">{{ viewingStoryUser()!.stories[currentStoryIndex()].caption }}</p>
+          }
+        }
+      </div>
+      <div class="sv-nav-right" (click)="nextStory()"></div>
+      <div class="sv-progress">
+        @for (s of viewingStoryUser()!.stories; track s.id; let i = $index) {
+          <div class="sv-progress-bar" [class.active]="i <= currentStoryIndex()"></div>
+        }
+      </div>
+    </div>
+  </div>
+}

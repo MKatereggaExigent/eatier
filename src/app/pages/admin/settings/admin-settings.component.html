@@ -16,7 +16,9 @@
       class="tab-button"
       [class.active]="activeTab() === 'general'"
       (click)="setActiveTab('general')">
-      <span class="tab-icon">⚙️</span>
+      <span class="tab-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></svg>
+      </span>
       General
     </button>
     <button
@@ -24,7 +26,9 @@
       class="tab-button"
       [class.active]="activeTab() === 'security'"
       (click)="setActiveTab('security')">
-      <span class="tab-icon">🔒</span>
+      <span class="tab-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </span>
       Security
     </button>
     <button
@@ -32,7 +36,9 @@
       class="tab-button"
       [class.active]="activeTab() === 'notifications'"
       (click)="setActiveTab('notifications')">
-      <span class="tab-icon">🔔</span>
+      <span class="tab-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </span>
       Notifications
     </button>
     <button
@@ -40,7 +46,9 @@
       class="tab-button"
       [class.active]="activeTab() === 'bookings'"
       (click)="setActiveTab('bookings')">
-      <span class="tab-icon">📅</span>
+      <span class="tab-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </span>
       Bookings
     </button>
     <button
@@ -48,7 +56,9 @@
       class="tab-button"
       [class.active]="activeTab() === 'businesses'"
       (click)="setActiveTab('businesses')">
-      <span class="tab-icon">🏪</span>
+      <span class="tab-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+      </span>
       Businesses
     </button>
   </nav>
@@ -161,7 +171,7 @@
               <div class="form-group">
                 <label for="defaultCurrency" class="form-label">Default Currency</label>
                 <select id="defaultCurrency" class="form-select" [(ngModel)]="defaultCurrency">
-                  <option value="UGX">UGX - Ugandan Shilling</option>
+                  <option value="ZAR">ZAR - South African Rand</option>
                   <option value="USD">USD - US Dollar</option>
                   <option value="EUR">EUR - Euro</option>
                   <option value="GBP">GBP - British Pound</option>
@@ -672,7 +682,9 @@
   <!-- Success Message -->
   @if (showSuccessMessage()) {
     <div class="success-toast">
-      <span class="toast-icon">✅</span>
+      <span class="toast-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
       <span class="toast-message">Settings saved successfully!</span>
     </div>
   }

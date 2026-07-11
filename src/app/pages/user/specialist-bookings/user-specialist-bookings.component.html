@@ -1,172 +1,194 @@
-<div class="specialist-bookings-container">
-  <!-- Header -->
-  <header class="page-header">
-    <div class="header-content">
-      <h1>
-        <lucide-icon [img]="ChefHat" [size]="32" class="header-icon"></lucide-icon>
-        My Specialist Bookings
-      </h1>
-      <p class="subtitle">View and manage your bookings with culinary specialists</p>
-    </div>
-
-    @if (pendingReviewCount() > 0) {
-      <div class="review-banner">
-        <lucide-icon [img]="Star" [size]="20" class="banner-icon"></lucide-icon>
-        <span>You have {{ pendingReviewCount() }} booking(s) waiting for your review!</span>
+<div class="section">
+  <div class="section-inner">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-text">
+        <h1 class="section-title">My Specialist Bookings</h1>
+        <p class="tag">View and manage your bookings with culinary specialists</p>
       </div>
-    }
-  </header>
-
-  <!-- Tabs -->
-  <nav class="booking-tabs">
-    <button 
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'all'"
-      (click)="setActiveTab('all')">
-      All ({{ bookings().length }})
-    </button>
-    <button 
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'upcoming'"
-      (click)="setActiveTab('upcoming')">
-      Upcoming ({{ upcomingBookings().length }})
-    </button>
-    <button 
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'completed'"
-      (click)="setActiveTab('completed')">
-      Completed ({{ completedBookings().length }})
-    </button>
-    <button 
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'cancelled'"
-      (click)="setActiveTab('cancelled')">
-      Cancelled ({{ cancelledBookings().length }})
-    </button>
-  </nav>
-
-  <!-- Loading State -->
-  @if (loading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading your bookings...</p>
-    </div>
-  }
-
-  <!-- Error State -->
-  @if (error()) {
-    <div class="error-state">
-      <span class="error-icon">⚠️</span>
-      <p>{{ error() }}</p>
-      <button type="button" class="retry-btn" (click)="loadBookings()">Try Again</button>
-    </div>
-  }
-
-  <!-- Empty State -->
-  @if (!loading() && currentBookings().length === 0) {
-    <div class="empty-state">
-      <lucide-icon [img]="Calendar" [size]="64" class="empty-icon"></lucide-icon>
-      <h3>No bookings found</h3>
-      <p>
-        @switch (activeTab()) {
-          @case ('upcoming') { You don't have any upcoming specialist bookings. }
-          @case ('completed') { You haven't completed any specialist bookings yet. }
-          @case ('cancelled') { You don't have any cancelled bookings. }
-          @default { You haven't made any specialist bookings yet. }
-        }
-      </p>
-      <a routerLink="/specialists" class="browse-btn">Browse Specialists</a>
-    </div>
-  }
-
-  <!-- Bookings List -->
-  @if (!loading() && currentBookings().length > 0) {
-    <div class="bookings-list">
-      @for (booking of currentBookings(); track booking.id) {
-        <article class="booking-card" [class]="getStatusClass(booking.status)">
-          <div class="booking-header">
-            <div class="specialist-info">
-              <div class="specialist-avatar">
-                {{ booking.specialist.fullName.charAt(0) }}
-              </div>
-              <div class="specialist-details">
-                <h3>{{ booking.specialist.fullName }}</h3>
-                <p class="service-name">{{ booking.service?.name || 'Custom Service' }}</p>
-              </div>
-            </div>
-            <div class="booking-status" [class]="getStatusClass(booking.status)">
-              {{ getStatusLabel(booking.status) }}
-            </div>
-          </div>
-
-          <div class="booking-details">
-            <div class="detail-row">
-              <lucide-icon [img]="Calendar" [size]="18" class="detail-icon"></lucide-icon>
-              <span class="detail-label">Date:</span>
-              <span class="detail-value">{{ formatDate(booking.bookingDate) }}</span>
-            </div>
-            <div class="detail-row">
-              <lucide-icon [img]="Users" [size]="18" class="detail-icon"></lucide-icon>
-              <span class="detail-label">Guests:</span>
-              <span class="detail-value">{{ booking.guestCount }}</span>
-            </div>
-            <div class="detail-row">
-              <lucide-icon [img]="PartyPopper" [size]="18" class="detail-icon"></lucide-icon>
-              <span class="detail-label">Event:</span>
-              <span class="detail-value">{{ booking.eventType || 'Not specified' }}</span>
-            </div>
-            <div class="detail-row">
-              <lucide-icon [img]="MapPin" [size]="18" class="detail-icon"></lucide-icon>
-              <span class="detail-label">Location:</span>
-              <span class="detail-value">{{ booking.eventCity || 'Not specified' }}</span>
-            </div>
-            <div class="detail-row">
-              <lucide-icon [img]="DollarSign" [size]="18" class="detail-icon"></lucide-icon>
-              <span class="detail-label">Total:</span>
-              <span class="detail-value price">{{ formatCurrency(booking.totalPrice) }}</span>
-            </div>
-            @if (booking.bookingReference) {
-              <div class="detail-row">
-                <lucide-icon [img]="Tag" [size]="18" class="detail-icon"></lucide-icon>
-                <span class="detail-label">Reference:</span>
-                <span class="detail-value reference">{{ booking.bookingReference }}</span>
-              </div>
-            }
-          </div>
-
-          @if (booking.specialRequests) {
-            <div class="special-requests">
-              <strong>Special Requests:</strong>
-              <p>{{ booking.specialRequests }}</p>
-            </div>
-          }
-
-          <div class="booking-actions">
-            @if (canReview(booking)) {
-              <button type="button" class="action-btn primary" (click)="openTestimonialModal(booking)">
-                <lucide-icon [img]="Star" [size]="16"></lucide-icon> Leave Review
-              </button>
-            }
-            @if (booking.hasTestimonial) {
-              <span class="reviewed-badge"><lucide-icon [img]="CheckCircle" [size]="16"></lucide-icon> Reviewed</span>
-            }
-            @if (canCancel(booking)) {
-              <button type="button" class="action-btn danger" (click)="openCancelModal(booking)">
-                Cancel Booking
-              </button>
-            }
-            <a [routerLink]="['/specialists', booking.specialist.id]" class="action-btn secondary">
-              View Specialist
-            </a>
-          </div>
-        </article>
+      @if (pendingReviewCount() > 0) {
+        <div class="review-banner">
+          <lucide-icon [img]="Star" [size]="18" class="banner-icon"></lucide-icon>
+          <span>{{ pendingReviewCount() }} booking(s) waiting for your review</span>
+        </div>
       }
     </div>
-  }
+
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button
+        type="button"
+        class="tab"
+        [class.active]="activeTab() === 'all'"
+        (click)="setActiveTab('all')">
+        All ({{ bookings().length }})
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [class.active]="activeTab() === 'upcoming'"
+        (click)="setActiveTab('upcoming')">
+        Upcoming ({{ upcomingBookings().length }})
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [class.active]="activeTab() === 'completed'"
+        (click)="setActiveTab('completed')">
+        Completed ({{ completedBookings().length }})
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [class.active]="activeTab() === 'cancelled'"
+        (click)="setActiveTab('cancelled')">
+        Cancelled ({{ cancelledBookings().length }})
+      </button>
+    </nav>
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading your bookings...</p>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (error()) {
+      <div class="error-state">
+        <lucide-icon [img]="XCircle" [size]="32" class="error-icon"></lucide-icon>
+        <p>{{ error() }}</p>
+        <button type="button" class="btn-primary" (click)="loadBookings()">Try Again</button>
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (!loading() && currentBookings().length === 0) {
+      <div class="empty-state">
+        <lucide-icon [img]="Calendar" [size]="48" class="empty-icon"></lucide-icon>
+        <h3>No bookings found</h3>
+        <p>
+          @switch (activeTab()) {
+            @case ('upcoming') { You don't have any upcoming specialist bookings. }
+            @case ('completed') { You haven't completed any specialist bookings yet. }
+            @case ('cancelled') { You don't have any cancelled bookings. }
+            @default { You haven't made any specialist bookings yet. }
+          }
+        </p>
+        <a routerLink="/specialists" class="btn-primary">Browse Specialists</a>
+      </div>
+    }
+
+    <!-- Bookings List -->
+    @if (!loading() && currentBookings().length > 0) {
+      <div class="bookings-list">
+        @for (booking of currentBookings(); track booking.id) {
+          <div class="booking-card">
+            <div class="booking-header">
+              <div class="specialist-info">
+                <div class="specialist-avatar">{{ booking.specialist.fullName.charAt(0) }}</div>
+                <div class="specialist-details">
+                  <h3>{{ booking.specialist.fullName }}</h3>
+                  <p class="service-name">{{ booking.service?.name || 'Custom Service' }}</p>
+                </div>
+              </div>
+              <span class="status-badge" [class]="getStatusClass(booking.status)">
+                {{ getStatusLabel(booking.status) }}
+              </span>
+            </div>
+
+            <div class="booking-details">
+              <div class="detail-item">
+                <span class="detail-icon">
+                  <lucide-icon [img]="Calendar" [size]="16"></lucide-icon>
+                </span>
+                <div class="detail-text">
+                  <span class="label">Date</span>
+                  <span class="value">{{ formatDate(booking.bookingDate) }}</span>
+                </div>
+              </div>
+              <div class="detail-item">
+                <span class="detail-icon">
+                  <lucide-icon [img]="Users" [size]="16"></lucide-icon>
+                </span>
+                <div class="detail-text">
+                  <span class="label">Guests</span>
+                  <span class="value">{{ booking.guestCount }}</span>
+                </div>
+              </div>
+              <div class="detail-item">
+                <span class="detail-icon">
+                  <lucide-icon [img]="PartyPopper" [size]="16"></lucide-icon>
+                </span>
+                <div class="detail-text">
+                  <span class="label">Event</span>
+                  <span class="value">{{ booking.eventType || 'Not specified' }}</span>
+                </div>
+              </div>
+              <div class="detail-item">
+                <span class="detail-icon">
+                  <lucide-icon [img]="MapPin" [size]="16"></lucide-icon>
+                </span>
+                <div class="detail-text">
+                  <span class="label">Location</span>
+                  <span class="value">{{ booking.eventCity || 'Not specified' }}</span>
+                </div>
+              </div>
+              <div class="detail-item">
+                <span class="detail-icon">
+                  <lucide-icon [img]="DollarSign" [size]="16"></lucide-icon>
+                </span>
+                <div class="detail-text">
+                  <span class="label">Total</span>
+                  <span class="value price">{{ formatCurrency(booking.totalPrice) }}</span>
+                </div>
+              </div>
+              @if (booking.bookingReference) {
+                <div class="detail-item">
+                  <span class="detail-icon">
+                    <lucide-icon [img]="Tag" [size]="16"></lucide-icon>
+                  </span>
+                  <div class="detail-text">
+                    <span class="label">Reference</span>
+                    <span class="value reference">{{ booking.bookingReference }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (booking.specialRequests) {
+              <div class="extra-info">
+                <span class="extra-label">Special Requests</span>
+                <p>{{ booking.specialRequests }}</p>
+              </div>
+            }
+
+            <div class="booking-actions">
+              @if (canReview(booking)) {
+                <button type="button" class="btn-primary" (click)="openTestimonialModal(booking)">
+                  <lucide-icon [img]="Star" [size]="16"></lucide-icon> Leave Review
+                </button>
+              }
+              @if (booking.hasTestimonial) {
+                <span class="reviewed-badge">
+                  <lucide-icon [img]="CheckCircle" [size]="16"></lucide-icon> Reviewed
+                </span>
+              }
+              @if (canCancel(booking)) {
+                <button type="button" class="btn-secondary" (click)="openCancelModal(booking)">
+                  Cancel Booking
+                </button>
+              }
+              <a [routerLink]="['/specialists', booking.specialist.id]" class="btn-secondary">
+                View Specialist
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
 </div>
 
 <!-- Cancel Modal -->
@@ -175,7 +197,9 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Cancel Booking</h2>
-        <button type="button" class="close-btn" (click)="closeCancelModal()">×</button>
+        <button type="button" class="close-btn" (click)="closeCancelModal()">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
       </div>
       <div class="modal-body">
         <p>Are you sure you want to cancel your booking with <strong>{{ selectedBooking()?.specialist?.fullName }}</strong>?</p>
@@ -194,7 +218,7 @@
         <button type="button" class="btn-secondary" (click)="closeCancelModal()">Keep Booking</button>
         <button
           type="button"
-          class="btn-danger"
+          class="btn-primary"
           (click)="confirmCancellation()"
           [disabled]="cancelling()">
           {{ cancelling() ? 'Cancelling...' : 'Confirm Cancellation' }}
@@ -210,7 +234,9 @@
     <div class="modal-content testimonial-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Leave a Review</h2>
-        <button type="button" class="close-btn" (click)="closeTestimonialModal()">×</button>
+        <button type="button" class="close-btn" (click)="closeTestimonialModal()">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
       </div>
       <div class="modal-body">
         <p class="review-intro">
@@ -224,9 +250,12 @@
               <button
                 type="button"
                 class="star-btn"
-                [class.active]="star <= testimonialRating()"
                 (click)="setRating(star)">
-                {{ star <= testimonialRating() ? '★' : '☆' }}
+                <lucide-icon
+                  [img]="Star"
+                  [size]="28"
+                  [class.filled]="star <= testimonialRating()"
+                ></lucide-icon>
               </button>
             }
           </div>
@@ -257,4 +286,3 @@
     </div>
   </div>
 }
-

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LucideAngularModule, User, CheckCircle, AlertTriangle, Image, ClipboardList, ChefHat, Camera, Lock } from 'lucide-angular';
+import { LucideAngularModule, User, CheckCircle, AlertTriangle, Image, ClipboardList, ChefHat, Camera, Lock, X, Save } from 'lucide-angular';
 import { USER_PROFILE_CONSTRAINTS, UserProfile, UserProfileUpdateData } from '../../../shared/models/user-profile.model';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -28,6 +28,8 @@ export class UserProfileComponent implements OnInit {
   readonly ChefHat = ChefHat;
   readonly Camera = Camera;
   readonly Lock = Lock;
+  readonly X = X;
+  readonly Save = Save;
 
   // State management
   profileForm: FormGroup;

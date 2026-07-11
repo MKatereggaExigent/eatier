@@ -1,118 +1,91 @@
-<div class="community-container">
-  <!-- Header -->
-  <div class="community-header">
-    <div class="header-content">
-      <h1>
-        <lucide-icon [img]="Star" [size]="32" style="display: inline-block; vertical-align: middle; margin-right: 8px;"></lucide-icon>
-        Community
-      </h1>
-      <p>Connect with chefs, restaurants, and food lovers from around the world</p>
+<div class="community-page">
+  <!-- ========== HERO CAROUSEL ========== -->
+  <section class="hero" (mouseenter)="stopCarousel()" (mouseleave)="startCarousel()">
+    @for (slide of carouselSlides; track slide.image; let i = $index) {
+      <div class="hero-slide" [class.active]="currentSlide() === i">
+        <div class="hero-bg" [style.background-image]="'url(' + slide.image + ')'"></div>
+        <div class="hero-overlay" [style.background]="slide.overlay"></div>
+      </div>
+    }
+    <div class="hero-content">
+      <span class="hero-label">Community</span>
+      <h1 class="hero-title">Connect &amp; Share</h1>
+      <p class="hero-subtitle">Join thousands of food lovers, chefs, and restaurants sharing culinary experiences</p>
+      <div class="hero-tabs">
+        <button class="hero-tab" [class.active]="activeTab() === 'feed'" (click)="setActiveTab('feed')">
+          <lucide-icon [img]="Home" [size]="16"></lucide-icon> Feed
+        </button>
+        <button class="hero-tab" [class.active]="activeTab() === 'trending'" (click)="setActiveTab('trending')">
+          <lucide-icon [img]="Flame" [size]="16"></lucide-icon> Trending
+        </button>
+        <button class="hero-tab" [class.active]="activeTab() === 'chefs'" (click)="setActiveTab('chefs')">
+          <lucide-icon [img]="ChefHat" [size]="16"></lucide-icon> Chefs
+        </button>
+        <button class="hero-tab" [class.active]="activeTab() === 'create'" (click)="setActiveTab('create')">
+          <lucide-icon [img]="PenSquare" [size]="16"></lucide-icon> Create Post
+        </button>
+      </div>
     </div>
-  </div>
+    <button class="hero-arrow left" (click)="prevSlide()" aria-label="Previous">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <button class="hero-arrow right" (click)="nextSlide()" aria-label="Next">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+    <div class="hero-indicators">
+      @for (slide of carouselSlides; track slide.image; let i = $index) {
+        <button class="hero-dot" [class.active]="currentSlide() === i" (click)="goToSlide(i)" [attr.aria-label]="'Slide ' + (i + 1)"></button>
+      }
+    </div>
+  </section>
 
-  <!-- Navigation Tabs -->
-  <div class="community-tabs">
-    <button
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'feed'"
-      (click)="setActiveTab('feed')"
-    >
-      <lucide-icon [img]="Home" [size]="18"></lucide-icon> Feed
-    </button>
-    <button
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'trending'"
-      (click)="setActiveTab('trending')"
-    >
-      <lucide-icon [img]="Flame" [size]="18"></lucide-icon> Trending
-    </button>
-    <button
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'chefs'"
-      (click)="setActiveTab('chefs')"
-    >
-      <lucide-icon [img]="ChefHat" [size]="18"></lucide-icon> Featured Chefs
-    </button>
-    <button
-      type="button"
-      class="tab-btn"
-      [class.active]="activeTab() === 'create'"
-      (click)="setActiveTab('create')"
-    >
-      <lucide-icon [img]="PenSquare" [size]="18"></lucide-icon> Create Post
-    </button>
-  </div>
-
-  <div class="community-content">
-    <!-- Enhanced Loading State -->
+  <div class="community-layout">
+    <!-- ========== LOADING ========== -->
     @if (isLoading()) {
       <div class="loading-state">
-        <div class="loading-container">
-          <div class="loading-spinner large"></div>
-          <div class="loading-text">
-            <h3>Loading community content...</h3>
-            <p>Discovering amazing food stories and chefs</p>
-          </div>
-        </div>
-
-        <!-- Loading Skeletons -->
-        <div class="loading-skeletons">
-          @for (item of [1,2,3]; track item) {
-            <div class="skeleton-card">
-              <div class="skeleton skeleton-header"></div>
-              <div class="skeleton skeleton-content"></div>
-              <div class="skeleton skeleton-actions"></div>
-            </div>
-          }
-        </div>
+        <div class="spinner"></div>
+        <p>Loading community...</p>
       </div>
     }
 
-    <!-- Feed Tab -->
+    <!-- ========== FEED TAB ========== -->
     @if (activeTab() === 'feed' && !isLoading()) {
-      <div class="feed-section">
+      <section class="feed-section">
         @if (posts().length === 0) {
           <div class="empty-state">
-            <lucide-icon [img]="PenSquare" [size]="48" class="empty-icon"></lucide-icon>
+            <lucide-icon [img]="PenSquare" [size]="40"></lucide-icon>
             <h3>No posts yet</h3>
             <p>Be the first to share something with the community!</p>
-            <button type="button" class="primary-btn" (click)="setActiveTab('create')">
-              <lucide-icon [img]="PenSquare" [size]="18"></lucide-icon> Create a Post
+            <button class="primary-btn" (click)="setActiveTab('create')">
+              <lucide-icon [img]="PenSquare" [size]="16"></lucide-icon> Create a Post
             </button>
           </div>
         }
 
-        <div class="posts-container">
-          @for (post of posts(); track post.id) {
-            <div class="post-card">
+        <div class="posts-list">
+          @for (post of posts(); track post.id; let i = $index) {
+            <div class="post-card" [style.--card-delay]="i * 0.07 + 's'">
               <div class="post-header">
                 <div class="author-info">
                   <img [src]="post.authorAvatar" [alt]="post.authorName" class="author-avatar" />
                   <div class="author-details">
-                    <div class="author-name">
-                      {{ getAuthorTypeIcon(post.authorType) }} {{ post.authorName }}
-                      <span class="author-badge">{{ getAuthorTypeBadge(post.authorType) }}</span>
+                    <div class="author-name-row">
+                      <span class="author-name">{{ post.authorName }}</span>
+                      <span class="author-badge" [class]="post.authorType">{{ getAuthorTypeBadge(post.authorType) }}</span>
                     </div>
-                    <div class="post-time">{{ formatDate(post.createdAt) }}</div>
+                    <span class="post-time">{{ formatDate(post.createdAt) }}</span>
                   </div>
                 </div>
-                <button type="button" class="post-menu-btn">⋯</button>
               </div>
-
-              <div class="post-content">
+              <div class="post-body">
                 <p>{{ post.content }}</p>
-
                 @if (post.images && post.images.length > 0) {
-                  <div class="post-images">
+                  <div class="post-images" [class.single]="post.images.length === 1" [class.pair]="post.images.length === 2" [class.many]="post.images.length >= 3">
                     @for (image of post.images; track $index) {
-                      <img [src]="image" [alt]="'Post image ' + ($index + 1)" class="post-image" />
+                      <img [src]="image" alt="" class="post-image" />
                     }
                   </div>
                 }
-
                 @if (post.tags.length > 0) {
                   <div class="post-tags">
                     @for (tag of post.tags; track tag) {
@@ -121,226 +94,163 @@
                   </div>
                 }
               </div>
-
-              <div class="post-actions">
-                <button
-                  type="button"
-                  class="action-btn like-btn"
-                  [class.liked]="post.isLiked"
-                  (click)="toggleLike(post)"
-                >
-                  <lucide-icon [img]="Heart" [size]="16" [class.filled]="post.isLiked"></lucide-icon> {{ post.likes }}
+              <div class="post-footer">
+                <button class="action-btn like-btn" [class.liked]="post.isLiked" (click)="toggleLike(post)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" [attr.fill]="post.isLiked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  {{ post.likes }}
                 </button>
-                <button type="button" class="action-btn comment-btn">
-                  <lucide-icon [img]="MessageCircle" [size]="16"></lucide-icon> {{ post.comments }}
+                <button class="action-btn comment-btn">
+                  <lucide-icon [img]="MessageCircle" [size]="16"></lucide-icon>
+                  {{ post.comments }}
                 </button>
-                <button
-                  type="button"
-                  class="action-btn share-btn"
-                  (click)="sharePost(post)"
-                >
-                  <lucide-icon [img]="Share2" [size]="16"></lucide-icon> {{ post.shares }}
+                <button class="action-btn share-btn" (click)="sharePost(post)">
+                  <lucide-icon [img]="Share2" [size]="16"></lucide-icon>
+                  {{ post.shares }}
                 </button>
               </div>
             </div>
           }
         </div>
 
-        <!-- Pagination -->
         @if (totalPages() > 1) {
-          <div class="pagination-container">
-            <div class="pagination-info">
-              Showing {{ (currentPage() - 1) * pageSize() + 1 }} - {{ Math.min(currentPage() * pageSize(), totalPosts()) }} of {{ totalPosts() }} posts
-            </div>
-
-            <div class="pagination-controls">
-              <button
-                type="button"
-                class="pagination-btn"
-                [disabled]="currentPage() === 1"
-                (click)="previousPage()"
-              >
-                ← Previous
-              </button>
-
+          <div class="pagination-bar">
+            <button class="page-arrow" [disabled]="currentPage() === 1" (click)="previousPage()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div class="page-info">{{ (currentPage() - 1) * pageSize() + 1 }} &ndash; {{ Math.min(currentPage() * pageSize(), totalPosts()) }} of {{ totalPosts() }}</div>
+            <div class="page-nums">
               @for (page of getPageNumbers(); track page) {
                 @if (page === -1) {
-                  <span class="pagination-ellipsis">...</span>
+                  <span class="page-ellipsis">...</span>
                 } @else {
-                  <button
-                    type="button"
-                    class="pagination-number"
-                    [class.active]="page === currentPage()"
-                    (click)="goToPage(page)"
-                  >
-                    {{ page }}
-                  </button>
+                  <button class="page-num" [class.active]="page === currentPage()" (click)="goToPage(page)">{{ page }}</button>
                 }
               }
-
-              <button
-                type="button"
-                class="pagination-btn"
-                [disabled]="currentPage() === totalPages()"
-                (click)="nextPage()"
-              >
-                Next →
-              </button>
             </div>
+            <button class="page-arrow" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
           </div>
         }
-      </div>
+      </section>
     }
 
-    <!-- Trending Tab -->
+    <!-- ========== TRENDING TAB ========== -->
     @if (activeTab() === 'trending' && !isLoading()) {
-      <div class="trending-section">
-        <!-- Section Header -->
-        <div class="section-header">
-          <h2>
-            <lucide-icon [img]="Flame" [size]="24" style="display: inline-block; vertical-align: middle; margin-right: 8px;"></lucide-icon>
-            Trending Topics
-          </h2>
-          <p class="section-subtitle">Discover what the culinary community is talking about</p>
+      <section class="trending-section">
+        <div class="section-head">
+          <h2><lucide-icon [img]="Flame" [size]="22"></lucide-icon> Trending Topics</h2>
+          <p>Discover what the culinary community is talking about</p>
         </div>
 
         @if (trendingTopics().length === 0) {
           <div class="empty-state">
-            <lucide-icon [img]="BarChart3" [size]="48" class="empty-icon"></lucide-icon>
+            <lucide-icon [img]="BarChart3" [size]="40"></lucide-icon>
             <h3>No trending topics yet</h3>
             <p>Start posting with hashtags to create trends!</p>
           </div>
         } @else {
-          <div class="trending-topics-grid">
+          <div class="topics-grid">
             @for (topic of trendingTopics().slice(0, 12); track topic.name; let i = $index) {
-              <div class="trending-topic-card" [class.top-3]="i < 3">
-                <div class="rank-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
-                  @if (i < 3) {
-                    <lucide-icon [img]="Star" [size]="16"></lucide-icon>
-                  } @else {
-                    #{{ i + 1 }}
-                  }
+              <div class="topic-card" [class.top-3]="i < 3" [style.--card-delay]="i * 0.05 + 's'">
+                <div class="topic-rank" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                  @if (i < 3) { <lucide-icon [img]="Star" [size]="14"></lucide-icon> }
+                  @else { #{{ i + 1 }} }
                 </div>
-                <div class="topic-content">
+                <div class="topic-info">
                   <span class="topic-name">{{ topic.name }}</span>
-                  <div class="topic-stats">
-                    <span class="topic-count">{{ topic.count.toLocaleString() }} posts</span>
+                  <div class="topic-meta">
+                    <span>{{ topic.count.toLocaleString() }} posts</span>
                     @if (i < 3) {
-                      <span class="trending-badge">
-                        <lucide-icon [img]="Flame" [size]="14" style="display: inline-block; vertical-align: middle;"></lucide-icon>
-                        Hot
-                      </span>
+                      <span class="hot-badge"><lucide-icon [img]="Flame" [size]="12"></lucide-icon> Hot</span>
                     }
                   </div>
                 </div>
-                <div class="topic-arrow">→</div>
               </div>
             }
           </div>
         }
 
-        <!-- Popular Posts Section -->
-        <div class="section-header popular-section">
-          <h2><lucide-icon [img]="TrendingUp" [size]="24"></lucide-icon> Popular Posts</h2>
-          <p class="section-subtitle">Most engaged posts from the community</p>
+        <div class="section-head popular-head">
+          <h2><lucide-icon [img]="TrendingUp" [size]="22"></lucide-icon> Popular Posts</h2>
+          <p>Most engaged posts from the community</p>
         </div>
 
         @if (posts().length === 0) {
-          <div class="empty-state small">
-            <lucide-icon [img]="PenSquare" [size]="32" class="empty-icon"></lucide-icon>
+          <div class="empty-state">
+            <lucide-icon [img]="PenSquare" [size]="40"></lucide-icon>
             <h3>No popular posts yet</h3>
             <p>Be the first to share something amazing!</p>
           </div>
         } @else {
-          <div class="popular-posts-grid">
+          <div class="popular-grid">
             @for (post of posts().slice(0, 6); track post.id; let i = $index) {
-              <div class="popular-post-card" [class.featured]="i === 0">
-                @if (i === 0) {
-                  <div class="featured-badge"><lucide-icon [img]="Star" [size]="14"></lucide-icon> Featured</div>
-                }
-                <div class="post-author-section">
-                  <img [src]="post.authorAvatar" [alt]="post.authorName" class="post-avatar" title="{{ post.authorName }}" />
-                  <div class="author-details">
-                    <span class="author-name">{{ post.authorName }}</span>
-                    <span class="post-type-badge" [class]="post.authorType">{{ post.authorType }}</span>
+              <div class="popular-card" [class.featured]="i === 0" [style.--card-delay]="i * 0.06 + 's'">
+                @if (i === 0) { <span class="featured-badge"><lucide-icon [img]="Star" [size]="12"></lucide-icon> Featured</span> }
+                <div class="popular-author">
+                  <img [src]="post.authorAvatar" alt="" class="popular-avatar" />
+                  <div>
+                    <span class="popular-author-name">{{ post.authorName }}</span>
+                    <span class="popular-author-type" [class]="post.authorType">{{ getAuthorTypeBadge(post.authorType) }}</span>
                   </div>
                 </div>
-                <div class="post-content-preview">
-                  {{ post.content.substring(0, 120) }}{{ post.content.length > 120 ? '...' : '' }}
-                </div>
+                <p class="popular-text">{{ post.content.substring(0, 120) }}{{ post.content.length > 120 ? '...' : '' }}</p>
                 @if (post.images && post.images.length > 0) {
-                  <div class="post-image-preview">
-                    <img [src]="post.images[0]" alt="Post image" class="preview-image" title="Post image" />
-                  </div>
+                  <img [src]="post.images[0]" alt="" class="popular-image" />
                 }
-                <div class="post-engagement">
-                  <span class="engagement-item"><lucide-icon [img]="Heart" [size]="14"></lucide-icon> {{ post.likes }}</span>
-                  <span class="engagement-item"><lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon> {{ post.comments }}</span>
-                  <span class="engagement-item"><lucide-icon [img]="Share2" [size]="14"></lucide-icon> {{ post.shares }}</span>
+                <div class="popular-engagement">
+                  <span><lucide-icon [img]="Heart" [size]="14"></lucide-icon> {{ post.likes }}</span>
+                  <span><lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon> {{ post.comments }}</span>
+                  <span><lucide-icon [img]="Share2" [size]="14"></lucide-icon> {{ post.shares }}</span>
                 </div>
               </div>
             }
           </div>
         }
-      </div>
+      </section>
     }
 
-    <!-- Featured Chefs Tab -->
+    <!-- ========== CHEFS TAB ========== -->
     @if (activeTab() === 'chefs' && !isLoading()) {
-      <div class="chefs-section">
-        <!-- Section Header -->
-        <div class="section-header">
-          <h2>
-            <lucide-icon [img]="ChefHat" [size]="24" style="display: inline-block; vertical-align: middle; margin-right: 8px;"></lucide-icon>
-            Featured Chefs
-          </h2>
-          <p class="section-subtitle">Meet the culinary experts in our community</p>
+      <section class="chefs-section">
+        <div class="section-head">
+          <h2><lucide-icon [img]="ChefHat" [size]="22"></lucide-icon> Featured Chefs</h2>
+          <p>Meet the culinary experts in our community</p>
         </div>
 
         @if (featuredChefs().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">
-              <lucide-icon [img]="ChefHat" [size]="48"></lucide-icon>
-            </div>
+            <lucide-icon [img]="ChefHat" [size]="40"></lucide-icon>
             <h3>No featured chefs yet</h3>
             <p>Our culinary experts will appear here soon. Are you a chef? Register as a specialist!</p>
-            <button type="button" class="cta-btn" routerLink="/specialists">Become a Chef →</button>
+            <button class="primary-btn" routerLink="/specialists">Become a Chef →</button>
           </div>
         } @else {
-          <!-- Top Chef Spotlight -->
           @if (featuredChefs().length > 0) {
-            <div class="top-chef-spotlight">
-              <div class="spotlight-badge"><lucide-icon [img]="Star" [size]="16"></lucide-icon> Top Chef This Week</div>
-              <div class="spotlight-content">
-                <div class="spotlight-avatar-wrapper">
-                  <img [src]="featuredChefs()[0].avatar" [alt]="featuredChefs()[0].name" class="spotlight-avatar" title="{{ featuredChefs()[0].name }}" />
-                  <div class="verified-badge">
-                    <lucide-icon [img]="Check" [size]="16"></lucide-icon>
-                  </div>
+            <div class="chef-spotlight">
+              <div class="spotlight-badge"><lucide-icon [img]="Star" [size]="14"></lucide-icon> Top Chef This Week</div>
+              <div class="spotlight-inner">
+                <div class="spotlight-avatar-wrap">
+                  <img [src]="featuredChefs()[0].avatar" [alt]="featuredChefs()[0].name" class="spotlight-avatar" />
+                  <div class="verified-badge"><lucide-icon [img]="Check" [size]="14"></lucide-icon></div>
                 </div>
                 <div class="spotlight-info">
                   <h3>{{ featuredChefs()[0].name }}</h3>
-                  <p class="chef-specialty">{{ featuredChefs()[0].specialty }}</p>
+                  <p class="spotlight-specialty">{{ featuredChefs()[0].specialty }}</p>
                   <div class="spotlight-stats">
-                    <div class="stat-item">
-                      <span class="stat-value">{{ featuredChefs()[0].followers.toLocaleString() }}</span>
-                      <span class="stat-label">Followers</span>
+                    <div class="spotlight-stat">
+                      <span class="spotlight-stat-value">{{ featuredChefs()[0].followers.toLocaleString() }}</span>
+                      <span class="spotlight-stat-label">Followers</span>
                     </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                      <lucide-icon [img]="Star" [size]="18" class="stat-value"></lucide-icon>
-                      <span class="stat-label">Featured</span>
+                    <div class="spotlight-stat-divider"></div>
+                    <div class="spotlight-stat">
+                      <lucide-icon [img]="Star" [size]="20"></lucide-icon>
+                      <span class="spotlight-stat-label">Featured</span>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    class="follow-btn large"
-                    [class.following]="featuredChefs()[0].isFollowing"
-                    (click)="followChef(featuredChefs()[0])"
-                  >
+                  <button class="follow-btn large" [class.following]="featuredChefs()[0].isFollowing" (click)="followChef(featuredChefs()[0])">
                     @if (featuredChefs()[0].isFollowing) {
-                      <lucide-icon [img]="Check" [size]="16" style="display: inline-block; vertical-align: middle; margin-right: 4px;"></lucide-icon>
-                      Following
+                      <lucide-icon [img]="Check" [size]="16"></lucide-icon> Following
                     } @else {
                       + Follow Chef
                     }
@@ -350,320 +260,155 @@
             </div>
           }
 
-          <!-- Chefs Grid -->
           <div class="chefs-grid-section">
-            <h3 class="grid-title">More Talented Chefs</h3>
+            <h3>More Talented Chefs</h3>
             <div class="chefs-grid">
               @for (chef of featuredChefs().slice(1); track chef.id; let i = $index) {
-                <div class="chef-card" [class.verified]="i < 2">
-                  <div class="card-header">
-                    @if (i < 2) {
-                      <span class="chef-badge verified">
-                        <lucide-icon [img]="Check" [size]="14" style="display: inline-block; vertical-align: middle; margin-right: 4px;"></lucide-icon>
-                        Verified
-                      </span>
+                <div class="chef-card" [style.--card-delay]="i * 0.07 + 's'">
+                  @if (i < 2) {
+                    <span class="chef-badge"><lucide-icon [img]="Check" [size]="12"></lucide-icon> Verified</span>
+                  }
+                  <img [src]="chef.avatar" [alt]="chef.name" class="chef-card-avatar" />
+                  <h4>{{ chef.name }}</h4>
+                  <p class="chef-card-specialty">{{ chef.specialty }}</p>
+                  <div class="chef-card-followers">
+                    <span class="chef-card-count">{{ chef.followers.toLocaleString() }}</span>
+                    <span>followers</span>
+                  </div>
+                  <button class="follow-btn" [class.following]="chef.isFollowing" (click)="followChef(chef)">
+                    @if (chef.isFollowing) {
+                      <lucide-icon [img]="Check" [size]="14"></lucide-icon> Following
+                    } @else {
+                      + Follow
                     }
-                  </div>
-                  <div class="avatar-wrapper">
-                    <img [src]="chef.avatar" [alt]="chef.name" class="chef-avatar" title="{{ chef.name }}" />
-                  </div>
-                  <div class="chef-info">
-                    <h4>{{ chef.name }}</h4>
-                    <p class="chef-specialty">{{ chef.specialty }}</p>
-                    <div class="chef-stats">
-                      <span class="followers-count">
-                        <span class="count">{{ chef.followers.toLocaleString() }}</span>
-                        <span class="label">followers</span>
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      class="follow-btn"
-                      [class.following]="chef.isFollowing"
-                      (click)="followChef(chef)"
-                    >
-                      @if (chef.isFollowing) {
-                        <lucide-icon [img]="Check" [size]="14" style="display: inline-block; vertical-align: middle; margin-right: 4px;"></lucide-icon>
-                        Following
-                      } @else {
-                        + Follow
-                      }
-                    </button>
-                  </div>
+                  </button>
                 </div>
               }
             </div>
           </div>
         }
 
-        <!-- Become a Chef CTA -->
-        <div class="become-chef-cta">
-          <div class="cta-content">
-            <div class="cta-icon">
-              <lucide-icon [img]="ChefHat" [size]="48"></lucide-icon>
-            </div>
-            <div class="cta-text">
+        <div class="chef-cta">
+          <div class="chef-cta-inner">
+            <lucide-icon [img]="ChefHat" [size]="40"></lucide-icon>
+            <div>
               <h3>Are you a chef?</h3>
               <p>Join our community of culinary experts and share your passion with food lovers.</p>
             </div>
-            <button type="button" class="cta-btn" routerLink="/specialists">Register as Chef →</button>
+            <button class="primary-btn" routerLink="/specialists">Register as Chef →</button>
           </div>
         </div>
-      </div>
+      </section>
     }
 
-    <!-- Create Post Tab -->
+    <!-- ========== CREATE POST TAB ========== -->
     @if (activeTab() === 'create' && !isLoading()) {
-      <div class="create-post-section">
-        <!-- Section Header -->
-        <div class="section-header">
-          <h2><lucide-icon [img]="PenSquare" [size]="24"></lucide-icon> Create New Post</h2>
-          <p class="section-subtitle">Share your culinary experiences with the community</p>
+      <section class="create-section">
+        <div class="section-head">
+          <h2><lucide-icon [img]="PenSquare" [size]="22"></lucide-icon> Create Post</h2>
+          <p>Share your culinary experiences with the community</p>
         </div>
 
-        <!-- Login Required Message -->
         @if (!isAuthenticated()) {
-          <div class="login-required-card">
-            <div class="login-icon">
-              <lucide-icon [img]="Lock" [size]="48"></lucide-icon>
-            </div>
+          <div class="login-card">
+            <lucide-icon [img]="Lock" [size]="40"></lucide-icon>
             <h3>Login Required</h3>
-            <p>You need to be logged in to create a post and share your culinary experiences with the community.</p>
-            <a routerLink="/auth/login" class="login-btn">Log In to Continue</a>
-            <p class="signup-hint">Don't have an account? <a routerLink="/auth/register">Sign up here</a></p>
+            <p>You need to be logged in to create a post.</p>
+            <a routerLink="/auth/login" class="primary-btn">Log In</a>
+            <p class="signup-hint">Don't have an account? <a routerLink="/auth/register">Sign up</a></p>
           </div>
         } @else {
-
-        <div class="create-post-layout">
-          <!-- Main Form -->
-          <div class="form-container">
-            <!-- Success Message -->
-            @if (postSuccessMessage()) {
-              <div class="success-message">
-                <span class="success-icon">
-                  <lucide-icon [img]="Check" [size]="20"></lucide-icon>
-                </span>
-                {{ postSuccessMessage() }}
-              </div>
-            }
-
-            <form [formGroup]="postForm" (ngSubmit)="onCreatePost()" class="create-post-form">
-              <!-- Content Section -->
-              <div class="form-section">
-                <div class="section-label">
-                  <span class="label-icon">
-                    <lucide-icon [img]="MessageCircle" [size]="18"></lucide-icon>
-                  </span>
-                  <span class="label-text">Your Message</span>
+          <div class="create-layout">
+            <div class="form-card">
+              @if (postSuccessMessage()) {
+                <div class="success-msg">
+                  <lucide-icon [img]="Check" [size]="18"></lucide-icon>
+                  {{ postSuccessMessage() }}
                 </div>
+              }
+              <form [formGroup]="postForm" (ngSubmit)="onCreatePost()">
                 <div class="form-group">
-                  <textarea
-                    id="postContent"
-                    formControlName="content"
-                    placeholder="Share your culinary thoughts, recipes, food experiences, or ask the community for advice..."
-                    rows="8"
-                    class="post-textarea"
-                  ></textarea>
-
-                  <div class="textarea-footer">
-                    <div class="character-counter" [class.exceeded]="isCharacterLimitExceeded()">
-                      <lucide-icon [img]="BarChart3" [size]="14" class="counter-icon"></lucide-icon>
-                      {{ getCharacterCount() }} / 1000
-                      @if (isCharacterLimitExceeded()) {
-                        <span class="error-text"> ({{ Math.abs(getRemainingCharacters()) }} over)</span>
-                      }
-                    </div>
+                  <label>Your Message</label>
+                  <textarea formControlName="content" placeholder="Share your culinary thoughts, recipes, food experiences..." rows="6"></textarea>
+                  <div class="char-counter" [class.exceeded]="isCharacterLimitExceeded()">
+                    {{ getCharacterCount() }} / 1000
+                    @if (isCharacterLimitExceeded()) { <span>({{ Math.abs(getRemainingCharacters()) }} over)</span> }
                   </div>
-
                   @if (postForm.get('content')?.invalid && postForm.get('content')?.touched) {
                     <span class="field-error">
-                      @if (postForm.get('content')?.errors?.['required']) {
-                        Content is required
-                      }
-                      @if (postForm.get('content')?.errors?.['minlength']) {
-                        Please write at least 10 characters
-                      }
-                      @if (postForm.get('content')?.errors?.['maxlength']) {
-                        Maximum 1000 characters allowed
-                      }
+                      @if (postForm.get('content')?.errors?.['required']) { Content is required }
+                      @if (postForm.get('content')?.errors?.['minlength']) { At least 10 characters }
                     </span>
                   }
                 </div>
-              </div>
 
-              <!-- Images Section -->
-              <div class="form-section">
-                <div class="section-label">
-                  <span class="label-icon">
-                    <lucide-icon [img]="Camera" [size]="18"></lucide-icon>
-                  </span>
-                  <span class="label-text">Add Images</span>
-                  <span class="optional-badge">Optional</span>
-                </div>
                 <div class="form-group">
-                  <!-- File Upload Button -->
-                  <div class="file-upload-wrapper">
-                    <input
-                      #fileInput
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      (change)="onFileSelected($event)"
-                      class="file-input-hidden"
-                    />
-                    <button
-                      type="button"
-                      class="browse-btn"
-                      (click)="fileInput.click()"
-                    >
-                      <span class="browse-icon">📁</span>
-                      <span>Browse Files</span>
-                    </button>
-                    <span class="upload-hint">or paste URL below</span>
+                  <label>Add Images <span class="optional">Optional</span></label>
+                  <div class="file-area">
+                    <input #fileInput type="file" accept="image/*" multiple (change)="onFileSelected($event)" class="file-hidden" />
+                    <button type="button" class="browse-btn" (click)="fileInput.click()">Browse Files</button>
+                    <span class="file-hint">or paste URL</span>
                   </div>
-
-                  <!-- URL Input -->
-                  <div class="image-input-wrapper">
-                    <input
-                      id="postImages"
-                      type="url"
-                      formControlName="images"
-                      placeholder="Paste image URL (e.g., https://example.com/food.jpg)"
-                      class="post-input"
-                    />
-                    <button
-                      type="button"
-                      class="add-image-btn"
-                      (click)="addImageUrl()"
-                      [disabled]="!postForm.get('images')?.value"
-                    >
-                      ➕ Add
-                    </button>
+                  <div class="image-url-row">
+                    <input type="url" formControlName="images" placeholder="https://example.com/food.jpg" />
+                    <button type="button" class="add-btn" (click)="addImageUrl()" [disabled]="!postForm.get('images')?.value">Add</button>
                   </div>
-
-                  <!-- Image Preview Grid -->
                   @if (selectedImages().length > 0) {
-                    <div class="images-section">
-                      <div class="images-header">
-                        <span>{{ selectedImages().length }} image{{ selectedImages().length > 1 ? 's' : '' }} added</span>
-                      </div>
-                      <div class="image-preview-grid">
-                        @for (image of selectedImages(); track $index) {
-                          <div class="image-preview-item">
-                            <img [src]="image" [alt]="'Preview ' + ($index + 1)" class="preview-image" title="Image preview" />
-                            <button
-                              type="button"
-                              class="remove-image-btn"
-                              (click)="removeImage($index)"
-                              title="Remove image"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        }
-                      </div>
+                    <div class="image-grid">
+                      @for (image of selectedImages(); track $index) {
+                        <div class="image-item">
+                          <img [src]="image" alt="" />
+                          <button type="button" class="remove-btn" (click)="removeImage($index)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                          </button>
+                        </div>
+                      }
                     </div>
                   }
                 </div>
-              </div>
 
-              <!-- Tags Section -->
-              <div class="form-section">
-                <div class="section-label">
-                  <lucide-icon [img]="Tag" [size]="16" class="label-icon"></lucide-icon>
-                  <span class="label-text">Add Tags</span>
-                  <span class="optional-badge">Optional</span>
-                </div>
                 <div class="form-group">
-                  <input
-                    id="postTags"
-                    type="text"
-                    formControlName="tags"
-                    placeholder="cooking, recipe, italian (separate with commas)"
-                    class="post-input"
-                  />
-                  <small class="hint-text">Use hashtags to help others discover your post</small>
+                  <label>Tags <span class="optional">Optional</span></label>
+                  <input type="text" formControlName="tags" placeholder="cooking, recipe, italian (comma separated)" />
+                  <small>Use hashtags to help others discover your post</small>
                 </div>
-              </div>
 
-              <!-- Form Actions -->
-              <div class="form-actions">
-                <button
-                  type="button"
-                  class="secondary-btn"
-                  (click)="postForm.reset(); selectedImages.set([])"
-                  [disabled]="isSubmittingPost()"
-                >
-                  <lucide-icon [img]="Trash2" [size]="16"></lucide-icon> Clear All
-                </button>
-                <button
-                  type="submit"
-                  class="primary-btn"
-                  [disabled]="postForm.invalid || isSubmittingPost()"
-                >
-                  @if (isSubmittingPost()) {
-                    <lucide-icon [img]="Clock" [size]="16" class="spinner"></lucide-icon> Posting...
-                  } @else {
-                    <lucide-icon [img]="PenSquare" [size]="16"></lucide-icon> Share Post
-                  }
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Tips Sidebar -->
-          <div class="tips-sidebar">
-            <div class="tips-card">
-              <h4>
-                <lucide-icon [img]="Lightbulb" [size]="18" style="display: inline-block; vertical-align: middle; margin-right: 6px;"></lucide-icon>
-                Posting Tips
-              </h4>
-              <ul class="tips-list">
-                <li>
-                  <span class="tip-icon">
-                    <lucide-icon [img]="FileText" [size]="16"></lucide-icon>
-                  </span>
-                  <span>Be descriptive - share the story behind your dish</span>
-                </li>
-                <li>
-                  <span class="tip-icon">
-                    <lucide-icon [img]="Camera" [size]="16"></lucide-icon>
-                  </span>
-                  <span>Add high-quality photos to attract more engagement</span>
-                </li>
-                <li>
-                  <lucide-icon [img]="Tag" [size]="16" class="tip-icon"></lucide-icon>
-                  <span>Use relevant tags like #recipe, #cooking, #foodie</span>
-                </li>
-                <li>
-                  <lucide-icon [img]="MessageCircle" [size]="16" class="tip-icon"></lucide-icon>
-                  <span>Ask questions to start conversations</span>
-                </li>
-                <li>
-                  <lucide-icon [img]="Star" [size]="16" class="tip-icon"></lucide-icon>
-                  <span>Share recipes, tips, or restaurant recommendations</span>
-                </li>
-              </ul>
+                <div class="form-actions">
+                  <button type="button" class="secondary-btn" (click)="postForm.reset(); selectedImages.set([])" [disabled]="isSubmittingPost()">
+                    <lucide-icon [img]="Trash2" [size]="16"></lucide-icon> Clear
+                  </button>
+                  <button type="submit" class="primary-btn" [disabled]="postForm.invalid || isSubmittingPost()">
+                    @if (isSubmittingPost()) {
+                      <div class="spinner"></div> Posting...
+                    } @else {
+                      <lucide-icon [img]="PenSquare" [size]="16"></lucide-icon> Share Post
+                    }
+                  </button>
+                </div>
+              </form>
             </div>
 
-            <div class="guidelines-card">
-              <h4>
-                <lucide-icon [img]="FileText" [size]="18" style="display: inline-block; vertical-align: middle; margin-right: 6px;"></lucide-icon>
-                Community Guidelines
-              </h4>
-              <ul class="guidelines-list">
+            <aside class="tips-card">
+              <h4><lucide-icon [img]="Lightbulb" [size]="18"></lucide-icon> Posting Tips</h4>
+              <ul>
+                <li><lucide-icon [img]="FileText" [size]="14"></lucide-icon> Be descriptive &mdash; share the story behind your dish</li>
+                <li><lucide-icon [img]="Camera" [size]="14"></lucide-icon> Add high-quality photos</li>
+                <li><lucide-icon [img]="Tag" [size]="14"></lucide-icon> Use relevant tags like #recipe, #cooking</li>
+                <li><lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon> Ask questions to start conversations</li>
+                <li><lucide-icon [img]="Star" [size]="14"></lucide-icon> Share recipes, tips, or recommendations</li>
+              </ul>
+              <hr />
+              <h4><lucide-icon [img]="FileText" [size]="18"></lucide-icon> Community Guidelines</h4>
+              <ul>
                 <li>Be respectful and constructive</li>
                 <li>Share original content when possible</li>
                 <li>No spam or promotional content</li>
                 <li>Credit sources when sharing recipes</li>
               </ul>
-            </div>
+            </aside>
           </div>
-        </div>
         }
-      </div>
+      </section>
     }
   </div>
 </div>
-
-

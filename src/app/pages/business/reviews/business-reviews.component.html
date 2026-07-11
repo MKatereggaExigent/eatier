@@ -1,336 +1,279 @@
-<div class="reviews-container" role="main" aria-label="Business Reviews Management">
-  <!-- Header Section -->
-  <header class="reviews-header">
+<div class="reviews-management-container">
+  <!-- Header -->
+  <div class="page-header">
     <div class="header-content">
-      <h1 class="page-title">
-        <span class="title-icon">⭐</span>
-        Customer Reviews
-      </h1>
-      <p class="page-subtitle">
-        Manage and respond to customer feedback to build stronger relationships
-      </p>
+      <h1><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Reviews Management</h1>
+      <p>Manage and respond to customer feedback to build stronger relationships</p>
     </div>
-  </header>
+  </div>
 
-  <!-- Reviews Statistics -->
-  <section class="reviews-stats" aria-label="Reviews Statistics">
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon">⭐</div>
-        <div class="stat-content">
-          <h3>{{ +(reviewStats().averageRating || 0) | number:'1.1-1' }}</h3>
-          <p>Average Rating</p>
-          <div class="stat-change" [class]="getRatingChangeClass()">
-            {{ getRatingChangeText() }}
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon">📝</div>
-        <div class="stat-content">
-          <h3>{{ reviewStats().totalReviews.toLocaleString() }}</h3>
-          <p>Total Reviews</p>
-          <div class="stat-change positive">
-            +{{ reviewStats().monthlyReviews }} this month
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon">💬</div>
-        <div class="stat-content">
-          <h3>{{ reviewStats().responseRate }}%</h3>
-          <p>Response Rate</p>
-          <div class="stat-change" [class]="getResponseRateClass()">
-            {{ getResponseRateText() }}
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon">⏱️</div>
-        <div class="stat-content">
-          <h3>{{ reviewStats().averageResponseTime }}h</h3>
-          <p>Avg Response Time</p>
-          <div class="stat-change positive">
-            -2h from last month
-          </div>
-        </div>
-      </div>
+  <!-- Success/Error Messages -->
+  @if (successMessage()) {
+    <div class="alert alert-success">
+      <span class="alert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
+      {{ successMessage() }}
     </div>
-  </section>
+  }
 
-  <!-- Filters and Actions -->
-  <section class="reviews-controls" aria-label="Review Filters and Actions">
-    <div class="controls-row">
-      <div class="filters-group">
-        <div class="filter-item">
-          <label for="rating-filter" class="filter-label">Rating</label>
-          <select
-            id="rating-filter"
-            class="filter-select"
-            [(ngModel)]="selectedRating"
-            (ngModelChange)="onFilterChange()">
-            <option value="">All Ratings</option>
-            <option value="5">5 Stars</option>
-            <option value="4">4 Stars</option>
-            <option value="3">3 Stars</option>
-            <option value="2">2 Stars</option>
-            <option value="1">1 Star</option>
-          </select>
-        </div>
+  @if (errorMessage()) {
+    <div class="alert alert-error">
+      <span class="alert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>
+      {{ errorMessage() }}
+    </div>
+  }
 
-        <div class="filter-item">
-          <label for="status-filter" class="filter-label">Status</label>
-          <select
-            id="status-filter"
-            class="filter-select"
-            [(ngModel)]="selectedStatus"
-            (ngModelChange)="onFilterChange()">
-            <option value="">All Reviews</option>
-            <option value="responded">Responded</option>
-            <option value="pending">Pending Response</option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label for="date-filter" class="filter-label">Date Range</label>
-          <select
-            id="date-filter"
-            class="filter-select"
-            [(ngModel)]="selectedDateRange"
-            (ngModelChange)="onFilterChange()">
-            <option value="all">All Time</option>
-            <option value="week">Last Week</option>
-            <option value="month">Last Month</option>
-            <option value="quarter">Last 3 Months</option>
-            <option value="year">Last Year</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="actions-group">
-        <button
-          type="button"
-          class="action-btn secondary"
-          (click)="exportReviews()"
-          aria-label="Export reviews data">
-          📊 Export
-        </button>
-        <button
-          type="button"
-          class="action-btn primary"
-          (click)="openBulkResponseModal()"
-          [disabled]="selectedReviews().length === 0"
-          aria-label="Respond to selected reviews">
-          💬 Bulk Response ({{ selectedReviews().length }})
-        </button>
+  <!-- Statistics Cards -->
+  <div class="statistics-grid">
+    <div class="stat-card">
+      <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics().total }}</div>
+        <div class="stat-label">Total Reviews</div>
       </div>
     </div>
 
-    <div class="search-row">
-      <div class="search-container">
+    <div class="stat-card stat-avg-rating">
+      <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics().avgRating | number:'1.1-1' }}</div>
+        <div class="stat-label">Average Rating</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-responded">
+      <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics().responseRate }}%</div>
+        <div class="stat-label">Response Rate</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-monthly">
+      <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics().pending }}</div>
+        <div class="stat-label">Pending Response</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="ratingFilter">Rating</label>
+        <select
+          id="ratingFilter"
+          [value]="ratingFilter()"
+          (change)="onRatingFilterChange($any($event.target).value)"
+          class="filter-select">
+          <option value="all">All Ratings</option>
+          <option value="5">5 Stars</option>
+          <option value="4">4 Stars</option>
+          <option value="3">3 Stars</option>
+          <option value="2">2 Stars</option>
+          <option value="1">1 Star</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="searchQuery">Search</label>
         <input
-          type="search"
-          class="search-input"
-          placeholder="Search reviews by customer name, content, or keywords..."
-          [(ngModel)]="searchQuery"
-          (input)="onSearch()"
-          aria-label="Search reviews">
-        <button
-          type="button"
-          class="search-btn"
-          (click)="onSearch()"
-          aria-label="Search">
-          🔍
+          id="searchQuery"
+          type="text"
+          [value]="searchQuery()"
+          (input)="onSearchChange($any($event.target).value)"
+          placeholder="Search by customer name or comment..."
+          class="filter-input">
+      </div>
+
+      <div class="filter-group">
+        <label>&nbsp;</label>
+        <button type="button" (click)="clearFilters()" class="btn-clear-filters">
+          Clear Filters
         </button>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Reviews List -->
-  <section class="reviews-list-section" aria-label="Customer Reviews List">
-    @if (loading()) {
-      <div class="reviews-loading" aria-live="polite">
-        <div class="loading-spinner"></div>
+  <!-- Reviews Table -->
+  <div class="reviews-table-container">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
         <p>Loading reviews...</p>
       </div>
     } @else if (filteredReviews().length === 0) {
-      <div class="no-reviews" role="status">
-        <div class="no-reviews-icon">📝</div>
-        <h3>No Reviews Found</h3>
-        <p>{{ getNoReviewsMessage() }}</p>
-        @if (hasActiveFilters()) {
-          <button
-            type="button"
-            class="clear-filters-btn"
-            (click)="clearAllFilters()">
-            Clear Filters
-          </button>
-        }
+      <div class="empty-state">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <h3>No reviews found</h3>
+        <p>There are no reviews matching your filters.</p>
       </div>
     } @else {
-      <div class="reviews-list" role="list">
-        @for (review of paginatedReviews(); track review.id) {
-          <article class="review-card" role="listitem" [class.selected]="isReviewSelected(review.id)">
-            <div class="review-header">
-              <div class="review-select">
-                <input
-                  type="checkbox"
-                  [id]="'review-' + review.id"
-                  [checked]="isReviewSelected(review.id)"
-                  (change)="toggleReviewSelection(review.id)"
-                  class="review-checkbox"
-                  [attr.aria-label]="'Select review from ' + review.customerName">
-              </div>
-
-              <div class="customer-info">
-                @if (review.customerAvatar) {
-                  <img
-                    [src]="review.customerAvatar"
-                    [alt]="review.customerName + ' avatar'"
-                    class="customer-avatar">
-                } @else {
-                  <div class="customer-avatar-placeholder">
-                    {{ review.customerName.charAt(0).toUpperCase() }}
-                  </div>
-                }
-                <div class="customer-details">
-                  <h4 class="customer-name">{{ review.customerName }}</h4>
-                  <div class="review-rating" [attr.aria-label]="getAriaLabel(review.rating)">
-                    @for (star of getStarArray(review.rating); track $index) {
-                      <span class="star" [class.filled]="star">⭐</span>
-                    }
-                    <span class="rating-value">({{ review.rating }}/5)</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="review-meta">
-                <time class="review-date" [dateTime]="review.date.toISOString()">
-                  {{ formatDate(review.date) }}
-                </time>
-                <div class="review-status" [class]="review.status">
-                  {{ getStatusText(review.status) }}
-                </div>
-              </div>
-            </div>
-
-            <div class="review-content">
-              <p class="review-comment">{{ review.comment }}</p>
-
-              @if (review.photos && review.photos.length > 0) {
-                <div class="review-photos">
-                  @for (photo of review.photos; track photo.id) {
-                    <img
-                      [src]="photo.url"
-                      [alt]="'Photo from ' + review.customerName"
-                      class="review-photo"
-                      (click)="openPhotoModal(photo)">
+      <table class="reviews-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Rating</th>
+            <th>Review</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (review of filteredReviews(); track review.id) {
+            <tr>
+              <td>
+                <div class="customer-info">
+                  @if (review.customerAvatar) {
+                    <img [src]="review.customerAvatar" [alt]="review.customerName + ' avatar'" class="customer-avatar">
+                  } @else {
+                    <div class="customer-avatar-placeholder">{{ review.customerName.charAt(0).toUpperCase() }}</div>
                   }
+                  <div class="customer-name">{{ review.customerName }}</div>
                 </div>
-              }
-            </div>
-
-            @if (review.businessResponse) {
-              <div class="business-response">
-                <div class="response-header">
-                  <span class="response-icon">💬</span>
-                  <span class="response-label">Your Response</span>
-                  <time class="response-date" [dateTime]="review.businessResponse.date.toISOString()">
-                    {{ formatDate(review.businessResponse.date) }}
-                  </time>
+              </td>
+              <td>
+                <div class="star-rating">
+                  @for (star of getStarArray(review.rating); track $index) {
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" class="star {{star ? 'filled' : 'empty'}}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  }
+                  <span class="rating-number">{{ review.rating }}</span>
                 </div>
-                <p class="response-content">{{ review.businessResponse.content }}</p>
-                <div class="response-actions">
-                  <button
-                    type="button"
-                    class="edit-response-btn"
-                    (click)="editResponse(review.id)"
-                    [attr.aria-label]="'Edit response to ' + review.customerName">
-                    ✏️ Edit
-                  </button>
+              </td>
+              <td>
+                <div class="review-comment">{{ review.comment || 'No comment' }}</div>
+              </td>
+              <td>
+                <div class="review-date">
+                  <div>{{ formatDate(review.date) }}</div>
+                  <div class="date-ago">{{ formatTimeAgo(review.date) }}</div>
                 </div>
-              </div>
-            }
-
-            <div class="review-actions">
-              @if (!review.businessResponse) {
+              </td>
+              <td>
+                <span [class]="'status-badge ' + getStatusBadgeClass(review.status)">
+                  {{ getStatusIcon(review.status) }} {{ review.status }}
+                </span>
+              </td>
+              <td>
                 <button
                   type="button"
-                  class="respond-btn primary"
                   (click)="openResponseModal(review)"
-                  [attr.aria-label]="'Respond to ' + review.customerName + ' review'">
-                  💬 Respond
+                  class="btn-view-details">
+                  {{ review.status === 'responded' ? 'View Response' : 'Respond' }}
                 </button>
-              }
-
-              <button
-                type="button"
-                class="helpful-btn"
-                (click)="markAsHelpful(review.id)"
-                [class.marked]="review.isMarkedHelpful"
-                [attr.aria-label]="'Mark ' + review.customerName + ' review as helpful'">
-                👍 {{ review.isMarkedHelpful ? 'Helpful' : 'Mark Helpful' }} ({{ review.helpfulCount }})
-              </button>
-
-              <button
-                type="button"
-                class="share-btn"
-                (click)="shareReview(review)"
-                [attr.aria-label]="'Share ' + review.customerName + ' review'">
-                📤 Share
-              </button>
-
-              <div class="more-actions">
-                <button
-                  type="button"
-                  class="more-btn"
-                  (click)="toggleMoreActions(review.id)"
-                  [attr.aria-label]="'More actions for ' + review.customerName + ' review'">
-                  ⋯
-                </button>
-                @if (showMoreActions() === review.id) {
-                  <div class="more-menu">
-                    <button type="button" (click)="reportReview(review.id)">🚩 Report</button>
-                    <button type="button" (click)="hideReview(review.id)">👁️ Hide</button>
-                    <button type="button" (click)="downloadReview(review.id)">💾 Download</button>
-                  </div>
-                }
-              </div>
-            </div>
-          </article>
-        }
-      </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
 
       <!-- Pagination -->
-      @if (totalPages() > 1) {
-        <div class="pagination" role="navigation" aria-label="Reviews pagination">
-          <button
-            type="button"
-            class="pagination-btn"
-            [disabled]="currentPage() === 1"
-            (click)="goToPage(currentPage() - 1)"
-            aria-label="Go to previous page">
-            ← Previous
-          </button>
+      <div class="pagination">
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="currentPage() === 1"
+          class="btn-pagination">
+          ← Previous
+        </button>
+        <span class="pagination-info">
+          Page {{ currentPage() }} • {{ totalReviews() }} total reviews
+        </span>
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="!hasMore()"
+          class="btn-pagination">
+          Next →
+        </button>
+      </div>
+    }
+  </div>
+</div>
 
-          <div class="pagination-info">
-            Page {{ currentPage() }} of {{ totalPages() }}
-            ({{ filteredReviews().length }} reviews)
+<!-- Response Modal -->
+@if (showResponseModal() && selectedReview()) {
+  <div class="modal-overlay" (click)="closeResponseModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedReview()!.status === 'responded' ? 'Edit Response' : 'Respond to Review' }}</h2>
+        <button type="button" (click)="closeResponseModal()" class="btn-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="detail-section">
+          <h3>Customer Review</h3>
+          <div class="review-detail-card">
+            <div class="review-detail-header">
+              <div class="customer-info">
+                @if (selectedReview()!.customerAvatar) {
+                  <img [src]="selectedReview()!.customerAvatar" alt="Avatar" class="customer-avatar">
+                } @else {
+                  <div class="customer-avatar-placeholder">{{ selectedReview()!.customerName.charAt(0).toUpperCase() }}</div>
+                }
+                <div>
+                  <div class="customer-name-lg">{{ selectedReview()!.customerName }}</div>
+                  <div class="star-rating">
+                    @for (star of getStarArray(selectedReview()!.rating); track $index) {
+                      <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" class="star {{star ? 'filled' : 'empty'}}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    }
+                    <span class="rating-number">{{ selectedReview()!.rating }}/5</span>
+                  </div>
+                </div>
+              </div>
+              <div class="review-date-lg">{{ formatDate(selectedReview()!.date) }}</div>
+            </div>
+            <p class="review-comment-lg">{{ selectedReview()!.comment }}</p>
           </div>
+        </div>
 
+        @if (selectedReview()!.businessResponse) {
+          <div class="detail-section">
+            <h3>Your Response</h3>
+            <div class="existing-response">
+              <p>{{ selectedReview()!.businessResponse!.content }}</p>
+            </div>
+          </div>
+        }
+
+        <div class="detail-section">
+          <h3>{{ selectedReview()!.businessResponse ? 'Update Response' : 'Write Response' }}</h3>
+          <textarea
+            class="response-textarea"
+            [ngModel]="respondContent()"
+            (ngModelChange)="respondContent.set($event)"
+            placeholder="Write your response to this review..."
+            rows="4"
+            maxlength="1000">
+          </textarea>
+          <div class="textarea-footer">
+            <span class="char-count">{{ respondContent().length }}/1000</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
           <button
             type="button"
-            class="pagination-btn"
-            [disabled]="currentPage() === totalPages()"
-            (click)="goToPage(currentPage() + 1)"
-            aria-label="Go to next page">
-            Next →
+            (click)="closeResponseModal()"
+            class="btn-cancel-action">
+            Cancel
+          </button>
+          <button
+            type="button"
+            (click)="submitResponse()"
+            [disabled]="isSubmitting() || !respondContent().trim()"
+            class="btn-submit-action">
+            @if (isSubmitting()) {
+              <span class="btn-spinner"></span>
+              Submitting...
+            } @else {
+              {{ selectedReview()!.businessResponse ? 'Update Response' : 'Submit Response' }}
+            }
           </button>
         </div>
-      }
-    }
-  </section>
-</div>
+      </div>
+    </div>
+  </div>
+}

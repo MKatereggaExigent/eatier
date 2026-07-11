@@ -1,103 +1,105 @@
 <div class="digital-card-container">
   <!-- Header -->
-  <div class="card-header">
-    <h1>Digital Business Card</h1>
-    <p>Create and customize your digital business card with QR code</p>
+  <div class="page-header">
+    <div class="header-content">
+      <h1><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg> Digital Business Card</h1>
+      <p>Create and customize your digital business card with QR code</p>
+    </div>
   </div>
 
-  <!-- Success Message -->
+  <!-- Success/Error Messages -->
   @if (successMessage()) {
-    <div class="success-message">
-      <span class="success-icon">✅</span>
+    <div class="alert alert-success">
+      <span class="alert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
       {{ successMessage() }}
     </div>
   }
 
+  @if (errorMessage()) {
+    <div class="alert alert-error">
+      <span class="alert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Main Layout -->
   <div class="card-layout">
     <!-- Customization Panel -->
-    <div class="customization-panel" [formGroup]="customizationForm">
-      <h2>Customize Your Card</h2>
+    <div class="customization-panel">
+      <div class="panel-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.06-.61.78-.95.47-.54.72-1.23.72-1.95 0-1.53-1.14-2.8-2.5-2.8s-2.5 1.27-2.5 2.8c0 .72.25 1.41.72 1.95-.28.34-.15.95.78.95 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
+        Customize Your Card
+      </div>
 
       <!-- Color Presets -->
       <div class="customization-section">
-        <h3>Color Themes</h3>
+        <div class="section-label">Color Themes</div>
         <div class="color-presets">
           @for (preset of colorPresets; track preset.name) {
             <button
               type="button"
               class="color-preset"
+              [class.active]="primaryColor() === preset.primary && secondaryColor() === preset.secondary"
               [style.background]="'linear-gradient(135deg, ' + preset.primary + ' 0%, ' + preset.secondary + ' 100%)'"
               (click)="applyColorPreset(preset)"
-              [title]="preset.name"
-            >
+              [title]="preset.name">
               <span>{{ preset.name }}</span>
             </button>
           }
         </div>
       </div>
 
-      <!-- Layout Options -->
+      <!-- Custom Colors -->
       <div class="customization-section">
-        <h3>Layout</h3>
-        <div class="layout-options">
-          @for (layout of layoutOptions; track layout.value) {
-            <label class="layout-option">
-              <input
-                type="radio"
-                [value]="layout.value"
-                formControlName="logoPosition"
-              />
-              <div class="option-content">
-                <span class="option-icon">{{ layout.preview }}</span>
-                <span class="option-label">{{ layout.label }}</span>
-              </div>
-            </label>
-          }
+        <div class="section-label">Custom Colors</div>
+        <div class="color-inputs">
+          <div class="color-input-group">
+            <label for="primaryColor">Primary</label>
+            <div class="color-picker-row">
+              <input id="primaryColor" type="color" [value]="primaryColor()" (input)="primaryColor.set($any($event.target).value); updatePreview()" />
+              <span class="color-value">{{ primaryColor() }}</span>
+            </div>
+          </div>
+          <div class="color-input-group">
+            <label for="secondaryColor">Secondary</label>
+            <div class="color-picker-row">
+              <input id="secondaryColor" type="color" [value]="secondaryColor()" (input)="secondaryColor.set($any($event.target).value); updatePreview()" />
+              <span class="color-value">{{ secondaryColor() }}</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Custom Colors -->
+      <!-- Layout Options -->
       <div class="customization-section">
-        <h3>🎨 Custom Colors - Pick Any Color You Want!</h3>
-        <p style="font-size: 0.875rem; color: #666; margin-bottom: 1rem;">
-          Click on the color boxes below to choose your own custom colors for your digital business card.
-        </p>
-        <div class="color-inputs">
-          <div class="color-input">
-            <label for="primaryColor">Primary Color</label>
-            <input
-              id="primaryColor"
-              type="color"
-              formControlName="primaryColor"
-            />
-            <span class="color-value">{{ customizationForm.get('primaryColor')?.value }}</span>
-          </div>
-          <div class="color-input">
-            <label for="secondaryColor">Secondary Color</label>
-            <input
-              id="secondaryColor"
-              type="color"
-              formControlName="secondaryColor"
-            />
-            <span class="color-value">{{ customizationForm.get('secondaryColor')?.value }}</span>
-          </div>
+        <div class="section-label">Logo Position</div>
+        <div class="layout-options">
+          @for (layout of layoutOptions; track layout.value) {
+            <button
+              type="button"
+              class="layout-option"
+              [class.active]="logoPosition() === layout.value"
+              (click)="logoPosition.set($any(layout.value)); updatePreview()">
+              {{ layout.label }}
+            </button>
+          }
         </div>
       </div>
 
       <!-- Content Options -->
       <div class="customization-section">
-        <h3>Content Options</h3>
+        <div class="section-label">Content Options</div>
         <div class="content-options">
           <label class="content-option">
-            <input type="checkbox" formControlName="includeQR" />
+            <input type="checkbox" [checked]="includeQR()" (change)="includeQR.set($any($event.target).checked); updatePreview()" />
             <span>Include QR Code</span>
           </label>
           <label class="content-option">
-            <input type="checkbox" formControlName="includeContact" />
+            <input type="checkbox" [checked]="includeContact()" (change)="includeContact.set($any($event.target).checked); updatePreview()" />
             <span>Include Contact Info</span>
           </label>
           <label class="content-option">
-            <input type="checkbox" formControlName="includeSocial" />
+            <input type="checkbox" [checked]="includeSocial()" (change)="includeSocial.set($any($event.target).checked); updatePreview()" />
             <span>Include Social Links</span>
           </label>
         </div>
@@ -105,85 +107,95 @@
 
       <!-- Actions -->
       <div class="customization-actions">
-        <button type="button" class="primary-btn" (click)="saveCustomization()">
-          Save Customization
+        <button type="button" class="btn-primary" (click)="saveCustomization()" [disabled]="isSaving()">
+          @if (isSaving()) {
+            <span class="btn-spinner"></span>
+            Saving...
+          } @else {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save Customization
+          }
         </button>
-        <button type="button" class="secondary-btn" (click)="generateQRCode()" [disabled]="isGenerating()">
+        <button type="button" class="btn-secondary" (click)="generateQRCode()" [disabled]="isGenerating()">
           @if (isGenerating()) {
-            <span class="loading-spinner"></span>
+            <span class="btn-spinner"></span>
             Generating...
           } @else {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
             Regenerate QR
           }
         </button>
       </div>
     </div>
 
-    <!-- Card Preview -->
-    <div class="card-preview">
-      <h2>Preview</h2>
+    <!-- Preview Panel -->
+    <div class="preview-panel">
+      <div class="panel-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Preview
+      </div>
 
-      @if (businessProfile()) {
+      @if (isLoading()) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading business profile...</p>
+        </div>
+      } @else if (businessProfile()) {
         <div class="business-card" [ngStyle]="getPreviewStyle()">
-          <!-- Background Image -->
           @if (businessProfile()!.backgroundImage) {
-            <div
-              class="card-background"
-              [style.background-image]="'url(' + businessProfile()!.backgroundImage + ')'"
-            ></div>
+            <div class="card-background" [style.background-image]="'url(' + businessProfile()!.backgroundImage + ')'"></div>
           }
 
-          <!-- Card Content -->
           <div class="card-content" [ngClass]="getLogoPositionClass()">
-            <!-- Business Logo/Photo -->
             @if (businessProfile()!.profilePhotos && businessProfile()!.profilePhotos!.length > 0) {
               <div class="business-logo card-element">
                 <img [src]="businessProfile()!.profilePhotos![0]" [alt]="businessProfile()!.businessName" />
               </div>
             }
 
-            <!-- Business Info -->
             <div class="business-info card-element">
               <h3 class="business-name">{{ businessProfile()!.businessName }}</h3>
 
-              @if (customizationForm.get('includeContact')?.value && businessProfile()!.address) {
-                <div class="business-address">
-                  📍 {{ businessProfile()!.address!.city }}, {{ businessProfile()!.address!.state }}
+              @if (includeContact() && businessProfile()!.address?.city) {
+                <div class="info-row">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-sm"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {{ businessProfile()!.address!.city }}, {{ businessProfile()!.address!.state }}
                 </div>
               }
 
-              @if (customizationForm.get('includeContact')?.value) {
-                <div class="business-contact">
-                  @if (businessProfile()!.contactNumber) {
-                    <div class="contact-item">📞 {{ businessProfile()!.contactNumber }}</div>
-                  }
-                  @if (businessProfile()!.email) {
-                    <div class="contact-item">✉️ {{ businessProfile()!.email }}</div>
-                  }
-                </div>
+              @if (includeContact()) {
+                @if (businessProfile()!.contactNumber) {
+                  <div class="info-row">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-sm"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    {{ businessProfile()!.contactNumber }}
+                  </div>
+                }
+                @if (businessProfile()!.email) {
+                  <div class="info-row">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-sm"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/></svg>
+                    {{ businessProfile()!.email }}
+                  </div>
+                }
               }
 
               @if (businessProfile()!.bio) {
                 <div class="business-bio">{{ businessProfile()!.bio }}</div>
               }
 
-              <!-- Facilities -->
               @if (businessProfile()!.facilities) {
-                <div class="business-facilities">
+                <div class="facility-icons">
                   @for (icon of getFacilityIcons(); track icon) {
-                    <span class="facility-icon">{{ icon }}</span>
+                    <span>{{ icon }}</span>
                   }
                 </div>
               }
 
-              <!-- Business Hours -->
               <div class="business-hours">
                 <strong>Today:</strong> {{ getOpenHours() }}
               </div>
             </div>
 
-            <!-- QR Code -->
-            @if (customizationForm.get('includeQR')?.value && qrCodeUrl()) {
+            @if (includeQR() && qrCodeUrl()) {
               <div class="qr-code card-element">
                 <img [src]="qrCodeUrl()" alt="QR Code" />
                 <span class="qr-label">Scan to visit</span>
@@ -191,44 +203,32 @@
             }
           </div>
         </div>
+
+        <!-- Download & Share -->
+        <div class="download-section">
+          <div class="section-label">Download & Share</div>
+          <div class="download-buttons">
+            <button type="button" class="btn-download" (click)="downloadCard('png')" [disabled]="isDownloading()">
+              @if (isDownloading()) { <span class="btn-spinner-sm"></span> } @else { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-sm"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> } PNG
+            </button>
+            <button type="button" class="btn-download" (click)="downloadCard('pdf')" [disabled]="isDownloading()">
+              @if (isDownloading()) { <span class="btn-spinner-sm"></span> } @else { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-sm"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> } PDF
+            </button>
+            <button type="button" class="btn-download" (click)="downloadCard('svg')" [disabled]="isDownloading()">
+              @if (isDownloading()) { <span class="btn-spinner-sm"></span> } @else { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-sm"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.06-.61.78-.95.47-.54.72-1.23.72-1.95 0-1.53-1.14-2.8-2.5-2.8s-2.5 1.27-2.5 2.8c0 .72.25 1.41.72 1.95-.28.34-.15.95.78.95 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg> } SVG
+            </button>
+          </div>
+          <button type="button" class="btn-share" (click)="shareCard()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Share Card
+          </button>
+        </div>
       } @else {
-        <div class="loading-preview">
-          <span class="loading-spinner large"></span>
-          <p>Loading business profile...</p>
+        <div class="empty-state">
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></div>
+          <h3>No business profile found</h3>
+          <p>Please set up your business profile first.</p>
         </div>
       }
-
-      <!-- Download Options -->
-      <div class="download-options">
-        <h3>📥 Download & Share</h3>
-        <div class="download-buttons">
-          <button type="button" class="download-btn" (click)="downloadCard('png')" [disabled]="isDownloading()">
-            @if (isDownloading()) {
-              <span class="loading-spinner"></span>
-            } @else {
-              🖼️ PNG
-            }
-          </button>
-          <button type="button" class="download-btn" (click)="downloadCard('pdf')" [disabled]="isDownloading()">
-            @if (isDownloading()) {
-              <span class="loading-spinner"></span>
-            } @else {
-              📄 PDF
-            }
-          </button>
-          <button type="button" class="download-btn" (click)="downloadCard('svg')" [disabled]="isDownloading()">
-            @if (isDownloading()) {
-              <span class="loading-spinner"></span>
-            } @else {
-              🎨 SVG
-            }
-          </button>
-        </div>
-
-        <button type="button" class="share-btn" (click)="shareCard()">
-          📤 Share Card
-        </button>
-      </div>
     </div>
   </div>
 </div>

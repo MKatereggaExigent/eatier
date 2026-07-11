@@ -1,151 +1,161 @@
-<div class="orders-container">
-  <div class="page-header">
-    <h1>Order History</h1>
-    <p>View your past orders and quickly reorder your favorites</p>
-  </div>
-
-  @if (loading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading your orders...</p>
+<div class="section">
+  <div class="section-inner">
+    <div class="tag">
+      <lucide-icon [img]="Package" [size]="16"></lucide-icon>
+      <span>Orders</span>
     </div>
-  } @else if (orders().length === 0) {
-    <div class="empty-state">
-      <h2>No orders yet</h2>
-      <p>Your order history will appear here once you place your first order.</p>
-      <a href="/restaurants" class="browse-btn">Browse Restaurants</a>
-    </div>
-  } @else {
-    <div class="orders-list">
-      @for (order of orders(); track order.id) {
-        <div class="order-card">
-          <div class="order-header">
-            <div class="business-info">
-              <div class="business-logo">
-                @if (order.businessLogo) {
-                  <img [src]="order.businessLogo" [alt]="order.businessName">
-                } @else {
-                  <span class="logo-placeholder">{{ (order.businessName || 'R').charAt(0) }}</span>
-                }
+    <h1 class="section-title">Order History</h1>
+    <p class="section-subtitle">View your past orders and quickly reorder your favorites</p>
+
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading your orders...</p>
+      </div>
+    } @else if (orders().length === 0) {
+      <div class="empty-state">
+        <lucide-icon [img]="Search" [size]="48" class="empty-icon"></lucide-icon>
+        <h2>No orders yet</h2>
+        <p>Your order history will appear here once you place your first order.</p>
+        <a href="/restaurants" class="btn-primary">Browse Restaurants</a>
+      </div>
+    } @else {
+      <div class="orders-list">
+        @for (order of orders(); track order.id) {
+          <div class="order-card">
+            <div class="order-header">
+              <div class="business-info">
+                <div class="business-logo">
+                  @if (order.businessLogo) {
+                    <img [src]="order.businessLogo" [alt]="order.businessName">
+                  } @else {
+                    <span class="logo-placeholder">{{ (order.businessName || 'R').charAt(0) }}</span>
+                  }
+                </div>
+                <div class="business-details">
+                  <h3>{{ order.businessName || 'Restaurant' }}</h3>
+                  <span class="order-number">Order #{{ order.orderNumber }}</span>
+                </div>
               </div>
-              <div class="business-details">
-                <h3>{{ order.businessName || 'Restaurant' }}</h3>
-                <span class="order-number">Order #{{ order.orderNumber }}</span>
+              <div class="order-status" [class]="getStatusClass(order.status)">
+                <lucide-icon [img]="getStatusIcon(order.status)" [size]="14"></lucide-icon>
+                <span class="status-text">{{ order.status | titlecase }}</span>
               </div>
             </div>
-            <div class="order-status" [class]="getStatusClass(order.status)">
-              <span class="status-text">{{ order.status | titlecase }}</span>
-            </div>
-          </div>
 
-          <div class="order-meta">
-            <div class="meta-item">
-              <span class="meta-label">Date</span>
-              <span class="meta-value">{{ formatDate(order.createdAt) }}</span>
+            <div class="order-meta">
+              <div class="meta-item">
+                <span class="meta-label">Date</span>
+                <span class="meta-value">{{ formatDate(order.createdAt) }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Type</span>
+                <span class="meta-value">{{ order.orderType | titlecase }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Total</span>
+                <span class="meta-value amount">{{ currencyService.formatAmount(order.totalAmount) }}</span>
+              </div>
             </div>
-            <div class="meta-item">
-              <span class="meta-label">Type</span>
-              <span class="meta-value">{{ order.orderType | titlecase }}</span>
-            </div>
-            <div class="meta-item">
-              <span class="meta-label">Total</span>
-              <span class="meta-value amount">{{ currencyService.formatAmount(order.totalAmount) }}</span>
-            </div>
-          </div>
 
-          <div class="order-items-preview">
-            <span class="items-label">Items:</span>
-            @for (item of order.items.slice(0, 3); track item.id) {
-              <span class="item-tag">{{ item.quantity }}× {{ item.name }}</span>
-            }
-            @if (order.items.length > 3) {
-              <span class="more-items">+{{ order.items.length - 3 }} more</span>
-            }
-          </div>
-
-          <div class="order-actions">
-            <button type="button" class="btn-secondary" (click)="viewOrderDetails(order)">
-              View Details
-            </button>
-            <button
-              type="button"
-              class="btn-primary"
-              (click)="reorder(order.id)"
-              [disabled]="reordering() === order.id">
-              @if (reordering() === order.id) {
-                <span class="spinner-small"></span> Reordering...
-              } @else {
-                Reorder
+            <div class="order-items-preview">
+              <span class="items-label">Items:</span>
+              @for (item of order.items.slice(0, 3); track item.id) {
+                <span class="item-tag">{{ item.quantity }}x {{ item.name }}</span>
               }
-            </button>
-          </div>
-
-          @if (order.status === 'completed' || order.status === 'delivered') {
-            <div class="order-rating">
-              <span class="rating-label">Rate this order:</span>
-              <div class="stars">
-                @for (star of [1, 2, 3, 4, 5]; track star) {
-                  <button
-                    type="button"
-                    class="star-btn"
-                    [class.filled]="order.rating && star <= order.rating"
-                    (click)="rateOrder(order.id, star)">
-                    {{ order.rating && star <= order.rating ? '★' : '☆' }}
-                  </button>
-                }
-              </div>
+              @if (order.items.length > 3) {
+                <span class="more-items">+{{ order.items.length - 3 }} more</span>
+              }
             </div>
-          }
-        </div>
-      }
-    </div>
-  }
 
-  <!-- Order Details Modal -->
-  @if (selectedOrder()) {
-    <div class="modal-overlay" (click)="closeOrderDetails()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>Order #{{ selectedOrder()!.orderNumber }}</h2>
-          <button type="button" class="close-btn" (click)="closeOrderDetails()">×</button>
-        </div>
+            <div class="order-actions">
+              <button type="button" class="btn-secondary" (click)="viewOrderDetails(order)">
+                View Details
+              </button>
+              <button
+                type="button"
+                class="btn-primary"
+                (click)="reorder(order.id)"
+                [disabled]="reordering() === order.id">
+                @if (reordering() === order.id) {
+                  <span class="spinner-small"></span> Reordering...
+                } @else {
+                  Reorder
+                }
+              </button>
+            </div>
 
-        <div class="modal-section">
-          <h3>Items Ordered</h3>
-          <div class="items-list">
-            @for (item of selectedOrder()!.items; track item.id) {
-              <div class="item-row">
-                <span class="item-name">{{ item.quantity }}× {{ item.name }}</span>
-                <span class="item-price">{{ currencyService.formatAmount(item.totalPrice) }}</span>
+            @if (order.status === 'completed' || order.status === 'delivered') {
+              <div class="order-rating">
+                <span class="rating-label">Rate this order:</span>
+                <div class="stars">
+                  @for (star of getStarArray(order.rating || 0); track $index) {
+                    <button
+                      type="button"
+                      class="star-btn"
+                      (click)="rateOrder(order.id, $index + 1)">
+                      <lucide-icon
+                        [img]="Star"
+                        [size]="18"
+                        [class.filled]="star === 1"
+                      ></lucide-icon>
+                    </button>
+                  }
+                </div>
               </div>
             }
           </div>
-        </div>
+        }
+      </div>
+    }
 
-        <div class="modal-section totals">
-          <div class="total-row">
-            <span>Subtotal</span>
-            <span>{{ currencyService.formatAmount(selectedOrder()!.subtotal) }}</span>
+    <!-- Order Details Modal -->
+    @if (selectedOrder()) {
+      <div class="modal-overlay" (click)="closeOrderDetails()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Order #{{ selectedOrder()!.orderNumber }}</h2>
+            <button type="button" class="close-btn" (click)="closeOrderDetails()">
+              <lucide-icon [img]="X" [size]="20"></lucide-icon>
+            </button>
           </div>
-          @if (selectedOrder()!.discount > 0) {
-            <div class="total-row discount">
-              <span>Discount</span>
-              <span>−{{ currencyService.formatAmount(selectedOrder()!.discount) }}</span>
+
+          <div class="modal-section">
+            <h3>Items Ordered</h3>
+            <div class="items-list">
+              @for (item of selectedOrder()!.items; track item.id) {
+                <div class="item-row">
+                  <span class="item-name">{{ item.quantity }}x {{ item.name }}</span>
+                  <span class="item-price">{{ currencyService.formatAmount(item.totalPrice) }}</span>
+                </div>
+              }
             </div>
-          }
-          @if (selectedOrder()!.deliveryFee > 0) {
+          </div>
+
+          <div class="modal-section totals">
             <div class="total-row">
-              <span>Delivery Fee</span>
-              <span>{{ currencyService.formatAmount(selectedOrder()!.deliveryFee) }}</span>
+              <span>Subtotal</span>
+              <span>{{ currencyService.formatAmount(selectedOrder()!.subtotal) }}</span>
             </div>
-          }
-          <div class="total-row grand-total">
-            <span>Total</span>
-            <span>{{ currencyService.formatAmount(selectedOrder()!.totalAmount) }}</span>
+            @if (selectedOrder()!.discount > 0) {
+              <div class="total-row discount">
+                <span>Discount</span>
+                <span>-{{ currencyService.formatAmount(selectedOrder()!.discount) }}</span>
+              </div>
+            }
+            @if (selectedOrder()!.deliveryFee > 0) {
+              <div class="total-row">
+                <span>Delivery Fee</span>
+                <span>{{ currencyService.formatAmount(selectedOrder()!.deliveryFee) }}</span>
+              </div>
+            }
+            <div class="total-row grand-total">
+              <span>Total</span>
+              <span>{{ currencyService.formatAmount(selectedOrder()!.totalAmount) }}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  }
+    }
+  </div>
 </div>
-

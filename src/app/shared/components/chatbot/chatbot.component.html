@@ -6,9 +6,9 @@
   [class.open]="isOpen()"
   aria-label="Toggle AI Assistant">
   @if (isOpen()) {
-    <span class="toggle-icon">✕</span>
+    <span class="toggle-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
   } @else {
-    <span class="toggle-icon">💬</span>
+    <span class="toggle-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
   }
 </button>
 
@@ -18,7 +18,7 @@
     <!-- Header -->
     <div class="chatbot-header">
       <div class="header-content">
-        <div class="header-icon">🤖</div>
+        <div class="header-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></div>
         <div class="header-text">
           <h3 class="header-title"><span class="itiyum-brand">Itiyum</span> AI Assistant</h3>
           <p class="header-subtitle">Context-aware help for {{ currentPage() }}</p>
@@ -30,14 +30,14 @@
           class="header-btn"
           (click)="clearHistory()"
           title="Clear chat history">
-          🗑️
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         </button>
         <button
           type="button"
           class="header-btn"
           (click)="toggleChat()"
           title="Close chat">
-          ✕
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
     </div>
@@ -46,7 +46,7 @@
     <div class="chat-messages">
       @if (messages().length === 0) {
         <div class="welcome-message">
-          <div class="welcome-icon">👋</div>
+          <div class="welcome-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
                     <h4 class="welcome-title">Welcome to <span class="itiyum-brand">Itiyum</span> AI Assistant!</h4>
           <p class="welcome-subtitle">I'm here to help you navigate the platform.</p>
           <p class="welcome-description">
@@ -59,9 +59,9 @@
         <div class="message" [class.user-message]="!message.isAI" [class.ai-message]="message.isAI">
           <div class="message-avatar">
             @if (message.isAI) {
-              <span class="avatar-icon">🤖</span>
+              <span class="avatar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span>
             } @else {
-              <span class="avatar-icon">👤</span>
+              <span class="avatar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
             }
           </div>
           <div class="message-content">
@@ -76,7 +76,7 @@
       @if (isTyping()) {
         <div class="message ai-message typing">
           <div class="message-avatar">
-            <span class="avatar-icon">🤖</span>
+            <span class="avatar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span>
           </div>
           <div class="message-content">
             <div class="typing-indicator">
@@ -122,17 +122,11 @@
         (click)="sendMessage()"
         [disabled]="!userInput().trim() || isTyping()"
         title="Send message">
-        <span class="send-icon">➤</span>
+        <span class="send-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="9 18 15 12 9 6"/></svg></span>
       </button>
     </div>
 
-    <!-- Footer -->
-    <div class="chatbot-footer">
-      <p class="footer-text">
-        <span class="footer-icon">ℹ️</span>
-        AI-powered assistant. Responses may not always be 100% accurate.
-      </p>
-    </div>
+
   </div>
 }
 

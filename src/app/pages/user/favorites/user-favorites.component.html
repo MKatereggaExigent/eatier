@@ -1,315 +1,322 @@
-<div class="user-favorites" role="main" aria-label="My Favorite Restaurants">
-  <!-- Header Section -->
-  <header class="favorites-header">
-    <div class="header-content">
-      <div class="title-section">
-        <h1 class="page-title">
-          <lucide-icon [img]="Heart" [size]="32" class="title-icon"></lucide-icon>
-          My Favorites
-        </h1>
-        <p class="page-subtitle">
-          Your saved restaurants and collections
-        </p>
+<div class="section" role="main" aria-label="My Favorite Restaurants">
+  <div class="section-inner">
+    <div class="tag">
+      <lucide-icon [img]="Heart" [size]="16"></lucide-icon>
+      Favorites
+    </div>
+
+    <header class="favorites-header">
+      <div class="header-content">
+        <div class="title-section">
+          <h1 class="page-title">
+            <lucide-icon [img]="Heart" [size]="32" class="title-icon"></lucide-icon>
+            My Favorites
+          </h1>
+          <p class="page-subtitle">
+            Your saved restaurants and collections
+          </p>
+        </div>
+
+        @if (stats()) {
+          <div class="header-stats">
+            <div class="stat-item">
+              <span class="stat-number">{{ stats()!.totalFavorites }}</span>
+              <span class="stat-label">Favorites</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">{{ stats()!.averageRating.toFixed(1) }}</span>
+              <span class="stat-label">Avg Rating</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">{{ collections().length }}</span>
+              <span class="stat-label">Collections</span>
+            </div>
+          </div>
+        }
+      </div>
+    </header>
+
+    <section class="search-filter-section">
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <lucide-icon [img]="Search" [size]="16" class="search-icon"></lucide-icon>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search your favorites..."
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+            aria-label="Search favorites">
+        </div>
+
+        <div class="view-controls">
+          <button
+            type="button"
+            class="view-toggle-btn"
+            (click)="toggleViewMode()"
+            [attr.aria-label]="viewMode().label">
+            <lucide-icon [img]="viewMode().icon" [size]="16" class="btn-icon"></lucide-icon>
+            <span class="btn-text">{{ viewMode().label }}</span>
+          </button>
+
+          <button
+            type="button"
+            class="filter-toggle-btn"
+            [class.active]="showFilters()"
+            (click)="toggleFilters()"
+            aria-label="Toggle filters">
+            <lucide-icon [img]="SlidersHorizontal" [size]="16" class="btn-icon"></lucide-icon>
+            <span class="btn-text">Filters</span>
+            @if (hasActiveFilters()) {
+              <span class="filter-badge">{{ filteredFavorites().length }}</span>
+            }
+          </button>
+        </div>
       </div>
 
-      @if (stats()) {
-        <div class="header-stats">
-          <div class="stat-item">
-            <span class="stat-number">{{ stats()!.totalFavorites }}</span>
-            <span class="stat-label">Favorites</span>
+      @if (showFilters()) {
+        <div class="filter-panel">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label class="filter-label">Cuisine</label>
+              <select
+                class="filter-select"
+                [value]="filters().cuisine"
+                (change)="updateFilter('cuisine', $any($event.target).value)">
+                <option value="all">All Cuisines</option>
+                @for (cuisine of cuisineOptions.slice(1); track cuisine) {
+                  <option [value]="cuisine">{{ cuisine }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Price Range</label>
+              <select
+                class="filter-select"
+                [value]="filters().priceRange"
+                (change)="updateFilter('priceRange', $any($event.target).value)">
+                @for (option of priceRangeOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Rating</label>
+              <select
+                class="filter-select"
+                [value]="filters().rating"
+                (change)="updateFilter('rating', $any($event.target).value)">
+                <option value="all">All Ratings</option>
+                <option value="4">4+ Stars</option>
+                <option value="3">3+ Stars</option>
+                <option value="2">2+ Stars</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Sort By</label>
+              <select
+                class="filter-select"
+                [value]="filters().sortBy"
+                (change)="updateFilter('sortBy', $any($event.target).value)">
+                @for (option of sortOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
           </div>
-          <div class="stat-item">
-            <span class="stat-number">{{ stats()!.averageRating.toFixed(1) }}</span>
-            <span class="stat-label">Avg Rating</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number">{{ collections().length }}</span>
-            <span class="stat-label">Collections</span>
-          </div>
+
+          @if (hasActiveFilters()) {
+            <div class="filter-actions">
+              <button type="button" class="clear-filters-btn" (click)="clearFilters()">
+                <lucide-icon [img]="X" [size]="14" class="btn-icon"></lucide-icon>
+                Clear All Filters
+              </button>
+            </div>
+          }
         </div>
       }
-    </div>
-  </header>
-
-  <!-- Search and Filter Section -->
-  <section class="search-filter-section">
-    <div class="search-container">
-      <div class="search-input-wrapper">
-        <span class="search-icon">🔍</span>
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Search your favorites..."
-          [value]="searchQuery()"
-          (input)="searchQuery.set($any($event.target).value)"
-          aria-label="Search favorites">
-      </div>
-
-      <div class="view-controls">
-        <button
-          type="button"
-          class="view-toggle-btn"
-          (click)="toggleViewMode()"
-          [attr.aria-label]="viewMode().label">
-          <span class="btn-icon">{{ viewMode().icon }}</span>
-          <span class="btn-text">{{ viewMode().label }}</span>
-        </button>
-
-        <button
-          type="button"
-          class="filter-toggle-btn"
-          [class.active]="showFilters()"
-          (click)="toggleFilters()"
-          aria-label="Toggle filters">
-          <lucide-icon [img]="SlidersHorizontal" [size]="16" class="btn-icon"></lucide-icon>
-          <span class="btn-text">Filters</span>
-          @if (hasActiveFilters()) {
-            <span class="filter-badge">{{ filteredFavorites().length }}</span>
-          }
-        </button>
-      </div>
-    </div>
-
-    <!-- Filter Panel -->
-    @if (showFilters()) {
-      <div class="filter-panel" [@slideDown]>
-        <div class="filter-row">
-          <div class="filter-group">
-            <label class="filter-label">Cuisine</label>
-            <select
-              class="filter-select"
-              [value]="filters().cuisine"
-              (change)="updateFilter('cuisine', $any($event.target).value)">
-              <option value="all">All Cuisines</option>
-              @for (cuisine of cuisineOptions.slice(1); track cuisine) {
-                <option [value]="cuisine">{{ cuisine }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">Price Range</label>
-            <select
-              class="filter-select"
-              [value]="filters().priceRange"
-              (change)="updateFilter('priceRange', $any($event.target).value)">
-              @for (option of priceRangeOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">Rating</label>
-            <select
-              class="filter-select"
-              [value]="filters().rating"
-              (change)="updateFilter('rating', $any($event.target).value)">
-              <option value="all">All Ratings</option>
-              <option value="4">4+ Stars</option>
-              <option value="3">3+ Stars</option>
-              <option value="2">2+ Stars</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">Sort By</label>
-            <select
-              class="filter-select"
-              [value]="filters().sortBy"
-              (change)="updateFilter('sortBy', $any($event.target).value)">
-              @for (option of sortOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </div>
-        </div>
-
-        @if (hasActiveFilters()) {
-          <div class="filter-actions">
-            <button type="button" class="clear-filters-btn" (click)="clearFilters()">
-              <span class="btn-icon">✕</span>
-              Clear All Filters
-            </button>
-          </div>
-        }
-      </div>
-    }
-  </section>
-
-  <!-- Collections Section -->
-  @if (collections().length > 0) {
-    <section class="collections-section">
-      <h2 class="section-title">
-        <span class="title-icon">📁</span>
-        My Collections
-      </h2>
-      <div class="collections-grid">
-        @for (collection of collections(); track collection.id) {
-          <div class="collection-card">
-            @if ($any(collection).coverImageUrl) {
-              <div class="collection-cover">
-                <img [src]="$any(collection).coverImageUrl" [alt]="collection.name">
-              </div>
-            }
-            <div class="collection-info">
-              <h3 class="collection-name">{{ collection.name }}</h3>
-              <p class="collection-description">{{ collection.description }}</p>
-              <div class="collection-meta">
-                <span class="item-count">{{ $any(collection).itemCount || 0 }} restaurants</span>
-                @if (collection.isPublic) {
-                  <span class="public-badge">Public</span>
-                }
-              </div>
-            </div>
-          </div>
-        }
-
-        <button type="button" class="new-collection-btn" (click)="showNewCollectionModal.set(true)">
-          <span class="btn-icon">➕</span>
-          <span class="btn-text">New Collection</span>
-        </button>
-      </div>
     </section>
-  }
 
-  <!-- Favorites Grid/List -->
-  <section class="favorites-section">
-    <div class="section-header">
-      <h2 class="section-title">
-        <lucide-icon [img]="UtensilsCrossed" [size]="20" class="title-icon"></lucide-icon>
-        All Favorites
-        <span class="count-badge">{{ filteredFavorites().length }}</span>
-      </h2>
-    </div>
-
-    @if (isLoading()) {
-      <div class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>Loading your favorites...</p>
-      </div>
-    } @else if (filteredFavorites().length === 0) {
-      <div class="empty-state">
-        @if (hasActiveFilters()) {
-          <div class="empty-icon">🔍</div>
-          <h3>No favorites match your filters</h3>
-          <p>Try adjusting your search criteria or clearing filters.</p>
-          <button type="button" class="btn-secondary" (click)="clearFilters()">
-            Clear Filters
-          </button>
-        } @else {
-          <lucide-icon [img]="Heart" [size]="48" class="empty-icon"></lucide-icon>
-          <h3>No favorites yet</h3>
-          <p>Start exploring restaurants and add them to your favorites!</p>
-          <a routerLink="/restaurants" class="btn-primary">
-            Discover Restaurants
-          </a>
-        }
-      </div>
-    } @else {
-      <div class="favorites-container" [class]="viewMode().type + '-view'">
-        @for (favorite of filteredFavorites(); track favorite.id) {
-          <article class="favorite-card">
-            <div class="restaurant-image">
-              <img [src]="favorite.restaurant.imageUrl" [alt]="favorite.restaurant.name">
-              <div class="image-overlay">
-                <button
-                  type="button"
-                  class="action-btn view-btn"
-                  (click)="viewRestaurant(favorite.restaurant)"
-                  aria-label="View restaurant details">
-                  <lucide-icon [img]="Eye" [size]="16" class="btn-icon"></lucide-icon>
-                </button>
-                <button
-                  type="button"
-                  class="action-btn reserve-btn"
-                  (click)="makeReservation(favorite.restaurant)"
-                  aria-label="Make reservation">
-                  <lucide-icon [img]="Calendar" [size]="16" class="btn-icon"></lucide-icon>
-                </button>
-              </div>
-              @if ($any(favorite.restaurant).isOpen) {
-                <div class="status-badge open">Open</div>
-              } @else {
-                <div class="status-badge closed">Closed</div>
-              }
-            </div>
-
-            <div class="restaurant-info">
-              <div class="restaurant-header">
-                <h3 class="restaurant-name">{{ favorite.restaurant.name }}</h3>
-                <div class="restaurant-rating">
-                  <span class="stars">{{ getStarRating(favorite.restaurant.averageRating) }}</span>
-                  <span class="rating-number">{{ favorite.restaurant.averageRating }}</span>
-                  <span class="review-count">({{ favorite.restaurant.totalReviews }})</span>
+    @if (collections().length > 0) {
+      <section class="collections-section">
+        <h2 class="section-title">
+          <lucide-icon [img]="Folder" [size]="20" class="title-icon"></lucide-icon>
+          My Collections
+        </h2>
+        <div class="collections-grid">
+          @for (collection of collections(); track collection.id) {
+            <div class="collection-card">
+              @if ($any(collection).coverImageUrl) {
+                <div class="collection-cover">
+                  <img [src]="$any(collection).coverImageUrl" [alt]="collection.name">
                 </div>
-              </div>
-
-              <div class="restaurant-details">
-                <div class="cuisine-tags">
-                  @for (cuisine of favorite.restaurant.cuisineTypes; track cuisine) {
-                    <span class="cuisine-tag">{{ cuisine }}</span>
+              }
+              <div class="collection-info">
+                <h3 class="collection-name">{{ collection.name }}</h3>
+                <p class="collection-description">{{ collection.description }}</p>
+                <div class="collection-meta">
+                  <span class="item-count">{{ $any(collection).itemCount || 0 }} restaurants</span>
+                  @if (collection.isPublic) {
+                    <span class="public-badge">Public</span>
                   }
                 </div>
-                <div class="price-range">{{ getPriceRangeDisplay(favorite.restaurant.priceRange) }}</div>
               </div>
+            </div>
+          }
 
-              <p class="restaurant-description">{{ favorite.restaurant.description }}</p>
+          <button type="button" class="new-collection-btn" (click)="showNewCollectionModal.set(true)">
+            <lucide-icon [img]="Plus" [size]="20" class="btn-icon"></lucide-icon>
+            <span class="btn-text">New Collection</span>
+          </button>
+        </div>
+      </section>
+    }
 
-              <div class="location-info">
-                <span class="address">{{ favorite.restaurant.address }}, {{ favorite.restaurant.city }}</span>
-                @if ($any(favorite.restaurant).distance) {
-                  <span class="distance">{{ $any(favorite.restaurant).distance }} mi</span>
+    <section class="favorites-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <lucide-icon [img]="UtensilsCrossed" [size]="20" class="title-icon"></lucide-icon>
+          All Favorites
+          <span class="count-badge">{{ filteredFavorites().length }}</span>
+        </h2>
+      </div>
+
+      @if (isLoading()) {
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading your favorites...</p>
+        </div>
+      } @else if (filteredFavorites().length === 0) {
+        <div class="empty-state">
+          @if (hasActiveFilters()) {
+            <lucide-icon [img]="Search" [size]="48" class="empty-icon"></lucide-icon>
+            <h3>No favorites match your filters</h3>
+            <p>Try adjusting your search criteria or clearing filters.</p>
+            <button type="button" class="btn-secondary" (click)="clearFilters()">
+              Clear Filters
+            </button>
+          } @else {
+            <lucide-icon [img]="Heart" [size]="48" class="empty-icon"></lucide-icon>
+            <h3>No favorites yet</h3>
+            <p>Start exploring restaurants and add them to your favorites!</p>
+            <a routerLink="/restaurants" class="btn-primary">
+              Discover Restaurants
+            </a>
+          }
+        </div>
+      } @else {
+        <div class="favorites-container" [class]="viewMode().type + '-view'">
+          @for (favorite of filteredFavorites(); track favorite.id) {
+            <article class="favorite-card">
+              <div class="restaurant-image">
+                <img [src]="favorite.restaurant.imageUrl" [alt]="favorite.restaurant.name">
+                <div class="image-overlay">
+                  <button
+                    type="button"
+                    class="action-btn view-btn"
+                    (click)="viewRestaurant(favorite.restaurant)"
+                    aria-label="View restaurant details">
+                    <lucide-icon [img]="Eye" [size]="16" class="btn-icon"></lucide-icon>
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn reserve-btn"
+                    (click)="makeReservation(favorite.restaurant)"
+                    aria-label="Make reservation">
+                    <lucide-icon [img]="Calendar" [size]="16" class="btn-icon"></lucide-icon>
+                  </button>
+                </div>
+                @if ($any(favorite.restaurant).isOpen) {
+                  <div class="status-badge open">Open</div>
+                } @else {
+                  <div class="status-badge closed">Closed</div>
                 }
               </div>
 
-              @if (favorite.notes) {
-                <div class="favorite-notes">
-                  <lucide-icon [img]="FileText" [size]="14" class="notes-icon"></lucide-icon>
-                  <span class="notes-text">{{ favorite.notes }}</span>
+              <div class="restaurant-info">
+                <div class="restaurant-header">
+                  <h3 class="restaurant-name">{{ favorite.restaurant.name }}</h3>
+                  <div class="restaurant-rating">
+                    <span class="stars">
+                      @for (star of getStarArray(favorite.restaurant.averageRating); track $index) {
+                        <lucide-icon [img]="Star" [size]="14" [class.filled]="star === 1" class="star-icon"></lucide-icon>
+                      }
+                    </span>
+                    <span class="rating-number">{{ favorite.restaurant.averageRating }}</span>
+                    <span class="review-count">({{ favorite.restaurant.totalReviews }})</span>
+                  </div>
                 </div>
-              }
 
-              <div class="favorite-meta">
-                <div class="meta-info">
-                  <span class="added-date">Added {{ formatDate(favorite.addedAt) }}</span>
-                  @if (favorite.visitCount > 0) {
-                    <span class="visit-count">{{ favorite.visitCount }} visits</span>
+                <div class="restaurant-details">
+                  <div class="cuisine-tags">
+                    @for (cuisine of favorite.restaurant.cuisineTypes; track cuisine) {
+                      <span class="cuisine-tag">{{ cuisine }}</span>
+                    }
+                  </div>
+                  <div class="price-range">{{ getPriceRangeDisplay(favorite.restaurant.priceRange) }}</div>
+                </div>
+
+                <p class="restaurant-description">{{ favorite.restaurant.description }}</p>
+
+                <div class="location-info">
+                  <span class="address">{{ favorite.restaurant.address }}, {{ favorite.restaurant.city }}</span>
+                  @if ($any(favorite.restaurant).distance) {
+                    <span class="distance">{{ $any(favorite.restaurant).distance }} mi</span>
                   }
                 </div>
 
-                <div class="favorite-actions">
-                  <button
-                    type="button"
-                    class="action-btn edit-btn"
-                    (click)="editNotes(favorite)"
-                    aria-label="Edit notes">
-                    <lucide-icon [img]="Edit" [size]="16" class="btn-icon"></lucide-icon>
-                  </button>
-                  <button
-                    type="button"
-                    class="action-btn remove-btn"
-                    (click)="removeFromFavorites(favorite)"
-                    aria-label="Remove from favorites">
-                    <lucide-icon [img]="Trash2" [size]="16" class="btn-icon"></lucide-icon>
-                  </button>
+                @if (favorite.notes) {
+                  <div class="favorite-notes">
+                    <lucide-icon [img]="FileText" [size]="14" class="notes-icon"></lucide-icon>
+                    <span class="notes-text">{{ favorite.notes }}</span>
+                  </div>
+                }
+
+                <div class="favorite-meta">
+                  <div class="meta-info">
+                    <span class="added-date">Added {{ formatDate(favorite.addedAt) }}</span>
+                    @if (favorite.visitCount > 0) {
+                      <span class="visit-count">{{ favorite.visitCount }} visits</span>
+                    }
+                  </div>
+
+                  <div class="favorite-actions">
+                    <button
+                      type="button"
+                      class="action-btn edit-btn"
+                      (click)="editNotes(favorite)"
+                      aria-label="Edit notes">
+                      <lucide-icon [img]="Edit" [size]="16" class="btn-icon"></lucide-icon>
+                    </button>
+                    <button
+                      type="button"
+                      class="action-btn remove-btn"
+                      (click)="removeFromFavorites(favorite)"
+                      aria-label="Remove from favorites">
+                      <lucide-icon [img]="Trash2" [size]="16" class="btn-icon"></lucide-icon>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </article>
-        }
-      </div>
-    }
-  </section>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  </div>
 </div>
 
-<!-- Edit Notes Modal -->
 @if (showEditNotesModal()) {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Edit Notes</h3>
-        <button type="button" class="modal-close" (click)="closeModal()">✕</button>
+        <button type="button" class="modal-close" (click)="closeModal()">
+          <lucide-icon [img]="X" [size]="16"></lucide-icon>
+        </button>
       </div>
       <div class="modal-body">
         @if (selectedFavorite()?.restaurant?.name) {
@@ -332,13 +339,14 @@
   </div>
 }
 
-<!-- Delete Confirmation Modal -->
 @if (showDeleteConfirm()) {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Remove from Favorites</h3>
-        <button type="button" class="modal-close" (click)="closeModal()">✕</button>
+        <button type="button" class="modal-close" (click)="closeModal()">
+          <lucide-icon [img]="X" [size]="16"></lucide-icon>
+        </button>
       </div>
       <div class="modal-body">
         @if (selectedFavorite()?.restaurant?.name) {

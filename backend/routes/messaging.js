@@ -81,7 +81,11 @@ router.post('/request', async (req, res) => {
     if (existingRequest.rows.length > 0) {
       const status = existingRequest.rows[0].status;
       if (status === 'pending') {
-        return res.status(400).json({ error: 'Chat request already pending' });
+        return res.json({
+          message: 'Chat request already pending',
+          requestId: existingRequest.rows[0].id,
+          alreadyPending: true
+        });
       }
       // If request was accepted but no conversation exists (edge case), allow creating new request
     }

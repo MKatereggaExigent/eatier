@@ -1,107 +1,79 @@
-// ===================================
-// NYT Editorial Design System Variables
-// ===================================
-$font-serif: 'Georgia', 'Times New Roman', serif;
-$font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+@use 'sass:color';
 
-$color-black: #1a1a1a;
-$color-dark-gray: #333;
-$color-medium-gray: #666;
-$color-light-gray: #999;
-$color-border: #e0e0e0;
-$color-bg-light: #f8f8f8;
-$color-white: #fff;
+$black: #0F172A;
+$orange: #F97316;
+$border-color: #E2E8F0;
+$text-muted: #64748B;
+$bg-light: #F8FAFC;
+$white: #FFFFFF;
+$font-serif: 'Playfair Display', Georgia, serif;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-$border-thin: 1px solid $color-border;
-$border-medium: 2px solid $color-black;
+.section {
+  padding: 2rem 1rem;
+  background: $white;
 
-// ===================================
-// CONTAINER
-// ===================================
-.orders-container {
-  padding: 2rem;
-  max-width: 900px;
-  margin: 0 auto;
-  background: $color-white;
-}
-
-// ===================================
-// PAGE HEADER - NYT Editorial
-// ===================================
-.page-header {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: $border-medium;
-
-  h1 {
-    font-family: $font-serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: $color-black;
-    margin: 0 0 0.5rem 0;
-    letter-spacing: -0.02em;
-  }
-
-  p {
-    font-family: $font-sans;
-    font-size: 1rem;
-    color: $color-medium-gray;
-    margin: 0;
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
   }
 }
 
-// ===================================
-// LOADING & EMPTY STATES
-// ===================================
-.loading-state,
-.empty-state {
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: $font-sans;
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+
+  lucide-icon {
+    color: $orange;
+  }
+}
+
+.section-title {
+  font-family: $font-serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: $black;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.section-subtitle {
+  font-family: $font-sans;
+  font-size: 1rem;
+  color: $text-muted;
+  margin: 0 0 2.5rem;
+}
+
+.loading-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 4rem 2rem;
   text-align: center;
-  background: $color-bg-light;
-  border: $border-thin;
 
   .spinner {
-    width: 32px;
-    height: 32px;
-    border: 2px solid $color-border;
-    border-top-color: $color-black;
+    width: 40px;
+    height: 40px;
+    border: 3px solid $border-color;
+    border-top-color: $orange;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
-  }
-
-  h2 {
-    font-family: $font-serif;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: $color-black;
-    margin: 0 0 0.5rem 0;
+    margin-bottom: 1rem;
   }
 
   p {
-    font-size: 0.9375rem;
-    color: $color-medium-gray;
-    margin: 0 0 1.5rem 0;
-  }
-
-  .browse-btn {
-    padding: 0.75rem 1.5rem;
-    background: $color-black;
-    color: $color-white;
-    text-decoration: none;
     font-family: $font-sans;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    transition: background-color 0.15s ease;
-
-    &:hover {
-      background: $color-dark-gray;
-    }
+    color: $text-muted;
+    margin: 0;
   }
 }
 
@@ -110,474 +82,499 @@ $border-medium: 2px solid $color-black;
   100% { transform: rotate(360deg); }
 }
 
-// ===================================
-// ORDERS LIST
-// ===================================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  border: 1px dashed $border-color;
+  border-radius: 20px;
+
+  .empty-icon {
+    color: $border-color;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-family: $font-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $black;
+    margin: 0 0 0.5rem;
+  }
+
+  p {
+    font-family: $font-sans;
+    font-size: 0.9375rem;
+    color: $text-muted;
+    margin: 0 0 1.5rem;
+    max-width: 400px;
+  }
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: $black;
+  color: $white;
+  border: 1px solid $black;
+  border-radius: 8px;
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: color.adjust($black, $lightness: 20%);
+    border-color: color.adjust($black, $lightness: 20%);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: $white;
+  color: $black;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: $black;
+  }
+}
+
 .orders-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  border: $border-thin;
-  border-top: $border-medium;
+  gap: 1rem;
 }
 
-// ===================================
-// ORDER CARD - NYT Editorial
-// ===================================
 .order-card {
-  background: $color-white;
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: 20px;
   padding: 1.5rem;
-  border-bottom: $border-thin;
-  transition: background-color 0.15s ease;
-
-  &:last-child {
-    border-bottom: none;
-  }
+  transition: box-shadow 0.2s ease;
 
   &:hover {
-    background: $color-bg-light;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
+}
 
-  .order-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: $border-thin;
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $border-color;
+  gap: 1rem;
 
-    .business-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-
-      .business-logo {
-        width: 48px;
-        height: 48px;
-        background: $color-black;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
-        .logo-placeholder {
-          font-family: $font-serif;
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: $color-white;
-        }
-      }
-
-      .business-details {
-        min-width: 0;
-        flex: 1;
-
-        h3 {
-          font-family: $font-serif;
-          font-size: 1.125rem;
-          font-weight: 600;
-          color: $color-black;
-          margin: 0 0 0.25rem 0;
-          word-break: break-word;
-          overflow-wrap: break-word;
-        }
-
-        .order-number {
-          font-family: $font-sans;
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          color: $color-medium-gray;
-          word-break: break-all;
-          overflow-wrap: break-word;
-        }
-      }
-    }
-
-    .order-status {
-      padding: 0.375rem 0.75rem;
-      font-family: $font-sans;
-      font-size: 0.6875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border: 1px solid;
-
-      &.status-completed,
-      &.status-delivered {
-        background: #f0f7f0;
-        border-color: #2e7d32;
-        color: #2e7d32;
-      }
-
-      &.status-pending {
-        background: #fff8f0;
-        border-color: #ef6c00;
-        color: #ef6c00;
-      }
-
-      &.status-confirmed,
-      &.status-preparing,
-      &.status-ready {
-        background: #f0f4f8;
-        border-color: #1565c0;
-        color: #1565c0;
-      }
-
-      &.status-cancelled {
-        background: #fdf0f0;
-        border-color: #c62828;
-        color: #c62828;
-      }
-    }
-  }
-
-  .order-meta {
-    display: flex;
-    gap: 2rem;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: $border-thin;
-
-    .meta-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-
-      .meta-label {
-        font-family: $font-sans;
-        font-size: 0.6875rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: $color-light-gray;
-      }
-
-      .meta-value {
-        font-family: $font-sans;
-        font-size: 0.9375rem;
-        color: $color-black;
-
-        &.amount {
-          font-family: $font-serif;
-          font-weight: 700;
-          font-size: 1.125rem;
-        }
-      }
-    }
-  }
-
-  .order-items-preview {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.25rem;
-
-    .items-label {
-      font-family: $font-sans;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: $color-medium-gray;
-    }
-
-    .item-tag {
-      padding: 0.25rem 0.625rem;
-      background: $color-bg-light;
-      border: $border-thin;
-      font-family: $font-sans;
-      font-size: 0.8125rem;
-      color: $color-dark-gray;
-    }
-
-    .more-items {
-      padding: 0.25rem 0.625rem;
-      background: $color-black;
-      color: $color-white;
-      font-family: $font-sans;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-  }
-
-  .order-actions {
-    display: flex;
-    gap: 0.75rem;
-
-    .btn-secondary,
-    .btn-primary {
-      padding: 0.625rem 1.25rem;
-      font-family: $font-sans;
-      font-size: 0.6875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .btn-secondary {
-      background: $color-white;
-      border: 2px solid $color-border;
-      color: $color-medium-gray;
-
-      &:hover {
-        border-color: $color-black;
-        color: $color-black;
-      }
-    }
-
-    .btn-primary {
-      background: $color-black;
-      border: 2px solid $color-black;
-      color: $color-white;
-
-      &:hover:not(:disabled) {
-        background: $color-dark-gray;
-        border-color: $color-dark-gray;
-      }
-
-      &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-    }
-
-    .spinner-small {
-      width: 12px;
-      height: 12px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: $color-white;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-  }
-
-  .order-rating {
-    margin-top: 1.25rem;
-    padding-top: 1.25rem;
-    border-top: $border-thin;
+  .business-info {
     display: flex;
     align-items: center;
     gap: 1rem;
+    min-width: 0;
+    flex: 1;
+  }
 
-    .rating-label {
+  .business-logo {
+    width: 48px;
+    height: 48px;
+    background: $bg-light;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    .logo-placeholder {
+      font-family: $font-sans;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: $black;
+    }
+  }
+
+  .business-details {
+    min-width: 0;
+    flex: 1;
+
+    h3 {
+      font-family: $font-sans;
+      font-size: 1rem;
+      font-weight: 600;
+      color: $black;
+      margin: 0 0 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .order-number {
+      font-family: $font-sans;
+      font-size: 0.8125rem;
+      color: $text-muted;
+    }
+  }
+}
+
+.order-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.375rem 0.75rem;
+  border-radius: 999px;
+  font-family: $font-sans;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &.status-completed,
+  &.status-delivered {
+    background: #F0FDF4;
+    color: #16A34A;
+  }
+
+  &.status-pending {
+    background: #FFF7ED;
+    color: #EA580C;
+  }
+
+  &.status-confirmed,
+  &.status-preparing,
+  &.status-ready {
+    background: #EFF6FF;
+    color: #2563EB;
+  }
+
+  &.status-cancelled {
+    background: #FEF2F2;
+    color: #DC2626;
+  }
+}
+
+.order-meta {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+
+    .meta-label {
       font-family: $font-sans;
       font-size: 0.75rem;
       font-weight: 600;
+      color: $text-muted;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: $color-medium-gray;
     }
 
-    .stars {
-      display: flex;
-      gap: 0.25rem;
-    }
+    .meta-value {
+      font-family: $font-sans;
+      font-size: 0.9375rem;
+      color: $black;
 
-    .star-btn {
-      background: none;
-      border: none;
-      font-size: 1.25rem;
-      color: $color-border;
-      cursor: pointer;
-      transition: color 0.15s ease;
-      padding: 0;
-
-      &.filled,
-      &:hover {
-        color: $color-black;
+      &.amount {
+        font-weight: 600;
+        font-size: 1rem;
       }
     }
   }
 }
 
-// ===================================
-// MODAL - NYT Editorial
-// ===================================
+.order-items-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+
+  .items-label {
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .item-tag {
+    padding: 0.25rem 0.625rem;
+    background: $bg-light;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    font-family: $font-sans;
+    font-size: 0.8125rem;
+    color: $black;
+  }
+
+  .more-items {
+    padding: 0.25rem 0.625rem;
+    background: $black;
+    color: $white;
+    border-radius: 6px;
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+}
+
+.order-actions {
+  display: flex;
+  gap: 0.75rem;
+
+  .spinner-small {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: $white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+  }
+}
+
+.order-rating {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid $border-color;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .rating-label {
+    font-family: $font-sans;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: $text-muted;
+  }
+
+  .stars {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .star-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    color: $border-color;
+    transition: color 0.15s ease;
+    display: flex;
+
+    lucide-icon {
+      display: flex;
+    }
+
+    &:hover lucide-icon,
+    lucide-icon.filled {
+      color: $orange;
+    }
+  }
+}
+
+// Modal
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 
   .modal-content {
-    background: $color-white;
-    border: $border-medium;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: 20px;
     padding: 0;
     max-width: 500px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
+  }
 
-    .modal-header {
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid $border-color;
+
+    h2 {
+      font-family: $font-sans;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: $black;
+      margin: 0;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: $text-muted;
+      padding: 4px;
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 1rem;
-      padding: 1.5rem;
-      border-bottom: $border-medium;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+      flex-shrink: 0;
 
-      h2 {
-        font-family: $font-serif;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: $color-black;
-        margin: 0;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        flex: 1;
-        min-width: 0;
-
-        @media (max-width: 480px) {
-          font-size: 1rem;
-        }
-      }
-
-      .close-btn {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: $color-medium-gray;
-        padding: 0;
-        line-height: 1;
-        flex-shrink: 0;
-
-        &:hover {
-          color: $color-black;
-        }
+      &:hover {
+        background: $bg-light;
+        color: $black;
       }
     }
+  }
 
-    .modal-section {
-      padding: 1.5rem;
-      border-bottom: $border-thin;
+  .modal-section {
+    padding: 1.5rem;
+    border-bottom: 1px solid $border-color;
 
-      &:last-child {
-        border-bottom: none;
-      }
-
-      h3 {
-        font-family: $font-sans;
-        font-size: 0.6875rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: $color-medium-gray;
-        margin: 0 0 1rem 0;
-      }
+    &:last-child {
+      border-bottom: none;
     }
 
-    .items-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
+    h3 {
+      font-family: $font-sans;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: $text-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0 0 1rem;
+    }
+  }
+
+  .items-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .item-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid $border-color;
+
+    &:last-child {
+      border-bottom: none;
     }
 
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.75rem 0;
-      border-bottom: $border-thin;
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      .item-name {
-        font-family: $font-sans;
-        font-size: 0.9375rem;
-        color: $color-black;
-      }
-
-      .item-price {
-        font-family: $font-sans;
-        font-size: 0.9375rem;
-        font-weight: 600;
-        color: $color-black;
-      }
-    }
-
-    .totals {
-      background: $color-bg-light;
-    }
-
-    .total-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem 0;
+    .item-name {
       font-family: $font-sans;
       font-size: 0.9375rem;
+      color: $black;
+    }
 
-      &.discount {
-        color: #2e7d32;
-      }
+    .item-price {
+      font-family: $font-sans;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: $black;
+    }
+  }
 
-      &.grand-total {
-        font-weight: 700;
-        font-size: 1.125rem;
-        border-top: $border-medium;
-        padding-top: 1rem;
-        margin-top: 0.5rem;
-      }
+  .totals {
+    background: $bg-light;
+    border-radius: 0 0 20px 20px;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    font-family: $font-sans;
+    font-size: 0.9375rem;
+
+    &.discount {
+      color: #16A34A;
+    }
+
+    &.grand-total {
+      font-weight: 700;
+      font-size: 1.0625rem;
+      border-top: 1px solid $border-color;
+      padding-top: 1rem;
+      margin-top: 0.5rem;
     }
   }
 }
 
-// ===================================
-// RESPONSIVE
-// ===================================
 @media (max-width: 768px) {
-  .orders-container {
-    padding: 1rem;
+  .section {
+    padding: 1.5rem 1rem;
   }
 
-  .page-header h1 {
-    font-size: 2rem;
+  .page-header .section-title {
+    font-size: 1.75rem;
   }
 
   .order-card {
-    .order-header {
-      flex-direction: column;
-      gap: 1rem;
+    padding: 1.25rem;
+  }
 
-      .order-status {
-        align-self: flex-start;
-      }
+  .order-header {
+    flex-direction: column;
+
+    .order-status {
+      align-self: flex-start;
     }
+  }
 
-    .order-meta {
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
+  .order-meta {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
 
-    .order-actions {
-      flex-direction: column;
+  .order-actions {
+    flex-direction: column;
 
-      .btn-secondary,
-      .btn-primary {
-        justify-content: center;
-      }
+    .btn-secondary,
+    .btn-primary {
+      justify-content: center;
     }
   }
 }
-

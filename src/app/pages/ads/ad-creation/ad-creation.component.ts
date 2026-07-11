@@ -20,7 +20,7 @@ import { CurrencyService, CurrencyInfo, Country } from '../../../core/services/c
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { LucideAngularModule, Edit, Rocket } from 'lucide-angular';
+import { LucideAngularModule, Edit, Rocket, Image, Video, X, Check, ChevronLeft, ChevronRight } from 'lucide-angular';
 
 interface StepValidation {
   isValid: boolean;
@@ -57,6 +57,12 @@ export class AdCreationComponent implements OnInit {
   // Lucide Icons
   readonly Edit = Edit;
   readonly Rocket = Rocket;
+  readonly Image = Image;
+  readonly Video = Video;
+  readonly X = X;
+  readonly Check = Check;
+  readonly ChevronLeft = ChevronLeft;
+  readonly ChevronRight = ChevronRight;
 
   // Edit mode signals
   isEditMode = signal(false);

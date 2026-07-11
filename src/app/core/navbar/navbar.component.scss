@@ -83,6 +83,7 @@ $nyt-dark-gray: #333333;
   gap: 2px;
 
   .nav-link {
+    position: relative;
     padding: 6px 11px;
     color: $nyt-dark-gray;
     text-decoration: none;
@@ -90,19 +91,37 @@ $nyt-dark-gray: #333333;
     font-size: 0.8rem;
     font-weight: 500;
     letter-spacing: -0.01em;
-    border-radius: 16px;
-    transition: all 0.12s ease;
+    transition: color 0.25s ease;
     white-space: nowrap;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: $itiyum-orange;
+      border-radius: 2px;
+      transform: translateX(-50%);
+      transition: width 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
 
     &:hover {
       color: $itiyum-orange;
-      background: rgba(255, 140, 0, 0.1);
+    }
+
+    &:hover::after {
+      width: 60%;
     }
 
     &.active {
-      color: white;
-      background: $itiyum-orange;
+      color: $itiyum-orange;
       font-weight: 600;
+
+      &::after {
+        width: 70%;
+      }
     }
   }
 }
@@ -1035,11 +1054,9 @@ $nyt-dark-gray: #333333;
   background: transparent;
   border: none;
   border-radius: 50%;
-  font-size: 1rem;
   cursor: pointer;
   pointer-events: auto !important;
   padding: 0;
-  color: $nyt-dark-gray;
   width: 28px;
   height: 28px;
   min-width: 28px;
@@ -1050,8 +1067,49 @@ $nyt-dark-gray: #333333;
   position: relative;
   z-index: 1000;
 
-  .hamburger-icon {
+  .hamburger-box {
+    width: 18px;
+    height: 14px;
+    display: inline-block;
+    position: relative;
     pointer-events: none;
+  }
+
+  .hamburger-inner {
+    display: block;
+    top: 50%;
+    margin-top: -1px;
+
+    &, &::before, &::after {
+      width: 18px;
+      height: 2px;
+      background: $nyt-dark-gray;
+      border-radius: 2px;
+      position: absolute;
+      transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    &::before, &::after {
+      content: '';
+      display: block;
+    }
+
+    &::before { top: -6px; }
+    &::after { top: 6px; }
+  }
+
+  &.open .hamburger-inner {
+    background: transparent;
+
+    &::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    &::after {
+      top: 0;
+      transform: rotate(-45deg);
+    }
   }
 
   &:hover {
@@ -1079,7 +1137,7 @@ $nyt-dark-gray: #333333;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 16px;
   padding: 10px;
-  animation: slideDown 0.15s ease;
+  animation: slideDown 0.25s cubic-bezier(0.22,1,0.36,1);
   max-height: calc(100vh - 80px);
   overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
@@ -1108,7 +1166,7 @@ $nyt-dark-gray: #333333;
   font-family: $font-sans;
   font-weight: 500;
   font-size: 0.875rem;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   margin-bottom: 2px;
   border: none;
   width: 100%;
@@ -1116,15 +1174,24 @@ $nyt-dark-gray: #333333;
   text-align: left;
   cursor: pointer;
   min-height: 40px;
+  animation: mobileItemIn 0.3s ease-out backwards;
+
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) { animation-delay: #{$i * 0.03}s; }
+  }
 
   .link-icon {
     font-size: 1rem;
     flex-shrink: 0;
+    transition: transform 0.2s ease;
   }
 
   &:hover {
     background: rgba(255, 140, 0, 0.1);
     color: $itiyum-orange;
+    padding-left: 16px;
+
+    .link-icon { transform: scale(1.15); }
   }
 
   &.active {
@@ -1156,6 +1223,7 @@ $nyt-dark-gray: #333333;
   height: 1px;
   background: rgba(0, 0, 0, 0.06);
   margin: 6px 0;
+  animation: mobileItemIn 0.3s ease-out backwards;
 }
 
 /* ========== Auth Modal Styles ========== */
@@ -1533,6 +1601,17 @@ $nyt-dark-gray: #333333;
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes mobileItemIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 

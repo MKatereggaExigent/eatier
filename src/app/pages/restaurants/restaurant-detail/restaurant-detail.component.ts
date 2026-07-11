@@ -12,6 +12,7 @@ import { FavoritesService } from '../../../services/favorites.service';
 import { HttpClient } from '@angular/common/http';
 import { InsightsService } from '../../../core/services/insights.service';
 import { environment } from '../../../../environments/environment';
+import { LucideAngularModule, RefreshCw, CalendarDays, Phone, MapPin, Heart, HeartOff, Share2, Globe, CheckCircle, LayoutGrid, List, Image, Table, ShoppingCart, ChevronLeft, ChevronRight, FileText, Utensils, MessageSquare, PenLine, ThumbsUp, MessageCircle, Star, Map as MapIcon, X, Info } from 'lucide-angular';
 
 interface MenuItem {
   id: string;
@@ -28,7 +29,7 @@ interface MenuItem {
 @Component({
   selector: 'app-restaurant-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './restaurant-detail.component.html',
   styleUrls: ['./restaurant-detail.component.scss']
 })
@@ -51,6 +52,34 @@ export class RestaurantDetailComponent implements OnInit {
   private sessionId = this.generateSessionId();
   private sessionStartTime = Date.now();
   private pagesVisited = 1;
+
+  // Lucide Icons
+  readonly RefreshCw = RefreshCw;
+  readonly CalendarDays = CalendarDays;
+  readonly Phone = Phone;
+  readonly MapPin = MapPin;
+  readonly Heart = Heart;
+  readonly HeartOff = HeartOff;
+  readonly Share2 = Share2;
+  readonly Globe = Globe;
+  readonly CheckCircle = CheckCircle;
+  readonly LayoutGrid = LayoutGrid;
+  readonly List = List;
+  readonly Image = Image;
+  readonly Table = Table;
+  readonly ShoppingCart = ShoppingCart;
+  readonly ChevronLeft = ChevronLeft;
+  readonly ChevronRight = ChevronRight;
+  readonly FileText = FileText;
+  readonly Utensils = Utensils;
+  readonly MessageSquare = MessageSquare;
+  readonly PenLine = PenLine;
+  readonly ThumbsUp = ThumbsUp;
+  readonly MessageCircle = MessageCircle;
+  readonly Star = Star;
+  readonly MapIcon = MapIcon;
+  readonly X = X;
+  readonly Info = Info;
 
   // Favorites state
   isFavorite = signal<boolean>(false);
@@ -321,7 +350,7 @@ export class RestaurantDetailComponent implements OnInit {
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     if (!opensAt || !closesAt) {
-      return days.map(day => ({ day, hours: 'Hours not available' }));
+      return days.map(day => ({ day, hours: '' }));
     }
 
     const hoursString = `${opensAt} - ${closesAt}`;
@@ -477,7 +506,7 @@ export class RestaurantDetailComponent implements OnInit {
   getCurrentDayHours(): string {
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
     const todayHours = this.restaurant().hours.find((h: any) => h.day === today);
-    return todayHours ? todayHours.hours : 'Hours not available';
+    return todayHours?.hours || '';
   }
 
   callRestaurant(): void {

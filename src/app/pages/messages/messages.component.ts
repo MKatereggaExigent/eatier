@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, signal, effect, computed } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { LucideAngularModule, ChevronLeft, Search, MessageSquare, ArrowRight, Mail, Send } from 'lucide-angular';
 import { MessagingService, ChatConversation, ChatMessage, ChatRequest } from '../../core/services/messaging.service';
 import { WebSocketService } from '../../core/services/websocket.service';
 import { PresenceService } from '../../core/services/presence.service';
@@ -14,21 +15,29 @@ import { AvatarContextMenuDirective } from '../../shared/directives/avatar-conte
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [CommonModule, FormsModule, AvatarUploadComponent, AvatarContextMenuDirective],
+  imports: [CommonModule, FormsModule, LucideAngularModule, AvatarUploadComponent, AvatarContextMenuDirective],
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.scss']
 })
 export class MessagesComponent implements OnInit, OnDestroy {
+  readonly ChevronLeft = ChevronLeft;
+  readonly Search = Search;
+  readonly MessageSquare = MessageSquare;
+  readonly ArrowRight = ArrowRight;
+  readonly Mail = Mail;
+  readonly Send = Send;
+
   conversations = signal<ChatConversation[]>([]);
   selectedConversation = signal<ChatConversation | null>(null);
   messages = signal<ChatMessage[]>([]);
   chatRequests = signal<ChatRequest[]>([]);
-  
+
   newMessage = signal<string>('');
   loading = signal<boolean>(true);
   loadingMessages = signal<boolean>(false);
   sendingMessage = signal<boolean>(false);
-  
+  conversationError = signal<string>('');
+
   activeView = signal<'conversations' | 'requests'>('conversations');
   typingUsers = signal<string[]>([]);
   uploadingFile = signal<boolean>(false);
@@ -45,6 +54,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
   totalConversations = signal<number>(0);
   totalPages = computed(() => Math.ceil(this.totalConversations() / this.conversationsLimit()));
 
+  // Message pagination
+  messagesPage = signal<number>(1);
+  messagesLimit = 50;
+  allMessagesLoaded = signal<boolean>(false);
+  loadMoreLoading = signal<boolean>(false);
+
   private pollingSubscription?: Subscription;
   private currentUserId: string = '';
   private typingSubject = new Subject<string>();
@@ -53,15 +68,13 @@ export class MessagesComponent implements OnInit, OnDestroy {
   constructor(
     private messagingService: MessagingService,
     private route: ActivatedRoute,
-    public router: Router, // Make public so template can access it
+    public router: Router,
     private websocketService: WebSocketService,
     private presenceService: PresenceService,
     private authService: AuthService
   ) {
-    // Get current user ID from localStorage
     this.currentUserId = localStorage.getItem('userId') || '';
 
-    // Setup typing debounce
     this.typingSubject.pipe(
       debounceTime(3000)
     ).subscribe(conversationId => {
@@ -69,10 +82,8 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Get current user from auth service (computed property)
   currentUser = computed(() => this.authService.currentUser());
 
-  // Computed property to get the correct social route based on user role
   socialRoute = computed(() => {
     const user = this.currentUser();
     if (!user) return '/dashboard/user/social';
@@ -97,14 +108,11 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.loadConversations();
     this.loadChatRequests();
 
-    // Connect to WebSocket
     this.websocketService.connect();
     this.presenceService.startHeartbeat();
 
-    // Setup WebSocket listeners
     this.setupWebSocketListeners();
 
-    // Check if there's a conversation ID in the route
     this.route.params.subscribe(params => {
       const conversationId = params['id'];
       if (conversationId) {
@@ -112,14 +120,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Start polling for new messages every 5 seconds (fallback)
     this.startPolling();
   }
 
   ngOnDestroy(): void {
     this.stopPolling();
 
-    // Leave current conversation
     const currentConv = this.selectedConversation();
     if (currentConv) {
       this.websocketService.leaveConversation(currentConv.id);
@@ -137,7 +143,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.conversations.set(response.conversations);
 
-          // Reload messages smoothly if a conversation is selected
           if (this.selectedConversation()) {
             this.loadMessagesSmooth(this.selectedConversation()!.id);
           }
@@ -154,6 +159,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   loadConversations(): void {
     this.loading.set(true);
+    this.conversationError.set('');
     const limit = this.conversationsLimit();
     const offset = (this.conversationsPage() - 1) * limit;
 
@@ -167,6 +173,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error loading conversations:', err);
         this.loading.set(false);
+        this.conversationError.set('Could not load conversations. Please try again.');
       }
     });
   }
@@ -180,7 +187,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Search functionality
   onSearchChange(): void {
     const query = this.searchQuery().toLowerCase().trim();
     const allConversations = this.conversations();
@@ -192,13 +198,11 @@ export class MessagesComponent implements OnInit, OnDestroy {
     }
 
     const filtered = allConversations.filter(conv => {
-      // Search in participant names
       const participantMatch = conv.participants?.some((p: any) => {
         const fullName = `${p.first_name || ''} ${p.last_name || ''}`.toLowerCase();
         return fullName.includes(query) || p.email?.toLowerCase().includes(query);
       });
 
-      // Search in last message
       const messageMatch = conv.last_message?.content?.toLowerCase().includes(query);
 
       return participantMatch || messageMatch;
@@ -206,10 +210,9 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
     this.filteredConversations.set(filtered);
     this.totalConversations.set(filtered.length);
-    this.conversationsPage.set(1); // Reset to first page
+    this.conversationsPage.set(1);
   }
 
-  // Pagination methods
   nextPage(): void {
     if (this.conversationsPage() < this.totalPages()) {
       this.conversationsPage.update(p => p + 1);
@@ -227,8 +230,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   selectConversation(conversation: ChatConversation): void {
     this.selectedConversation.set(conversation);
     this.loadMessages(conversation.id);
-    
-    // Update URL
+
     this.router.navigate(['/messages', conversation.id], { replaceUrl: true });
   }
 
@@ -237,7 +239,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
     if (conversation) {
       this.selectConversation(conversation);
     } else {
-      // Load conversation from API
       this.messagingService.getConversations().subscribe({
         next: (response) => {
           const conv = response.conversations.find(c => c.id === conversationId);
@@ -251,12 +252,16 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   loadMessages(conversationId: string): void {
     this.loadingMessages.set(true);
-    this.messagingService.getMessages(conversationId).subscribe({
+    this.messagesPage.set(1);
+    this.allMessagesLoaded.set(false);
+    this.messagingService.getMessages(conversationId, this.messagesLimit, 0).subscribe({
       next: (response) => {
         this.messages.set(response.messages);
+        if (response.messages.length < this.messagesLimit) {
+          this.allMessagesLoaded.set(true);
+        }
         this.loadingMessages.set(false);
 
-        // Scroll to bottom
         setTimeout(() => this.scrollToBottom(), 100);
       },
       error: (err) => {
@@ -266,33 +271,20 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Load messages smoothly without causing UI blink - used for polling
-   */
   private loadMessagesSmooth(conversationId: string): void {
-    // Don't show loading spinner for polling updates
-    this.messagingService.getMessages(conversationId).subscribe({
+    this.messagingService.getMessages(conversationId, this.messagesLimit, 0).subscribe({
       next: (response) => {
         const currentMessages = this.messages();
         const newMessages = response.messages;
 
-        // Only update if there are new messages
         if (newMessages.length > currentMessages.length) {
-          // Get the last message ID from current messages
-          const lastCurrentMessageId = currentMessages.length > 0
-            ? currentMessages[currentMessages.length - 1].id
-            : null;
-
-          // Find new messages that aren't already in the list
           const messagesToAdd = newMessages.filter(msg => {
             return !currentMessages.some(current => current.id === msg.id);
           });
 
           if (messagesToAdd.length > 0) {
-            // Append only new messages
             this.messages.set([...currentMessages, ...messagesToAdd]);
 
-            // Scroll to bottom only if user is already near the bottom
             setTimeout(() => {
               const container = document.querySelector('.messages-container');
               if (container) {
@@ -311,6 +303,30 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadMoreMessages(): void {
+    const conversationId = this.selectedConversation()?.id;
+    if (!conversationId || this.allMessagesLoaded() || this.loadMoreLoading()) return;
+
+    this.loadMoreLoading.set(true);
+    const nextPage = this.messagesPage() + 1;
+    const offset = (nextPage - 1) * this.messagesLimit;
+
+    this.messagingService.getMessages(conversationId, this.messagesLimit, offset).subscribe({
+      next: (response) => {
+        this.messages.update(current => [...response.messages, ...current]);
+        this.messagesPage.set(nextPage);
+        if (response.messages.length < this.messagesLimit) {
+          this.allMessagesLoaded.set(true);
+        }
+        this.loadMoreLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading more messages:', err);
+        this.loadMoreLoading.set(false);
+      }
+    });
+  }
+
   sendMessage(): void {
     const content = this.newMessage().trim();
     if (!content || !this.selectedConversation()) return;
@@ -321,12 +337,10 @@ export class MessagesComponent implements OnInit, OnDestroy {
       content
     ).subscribe({
       next: (response) => {
-        // Add message to list
         this.messages.update(msgs => [...msgs, response.data]);
         this.newMessage.set('');
         this.sendingMessage.set(false);
-        
-        // Scroll to bottom
+
         setTimeout(() => this.scrollToBottom(), 100);
       },
       error: (err) => {
@@ -343,11 +357,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Setup WebSocket event listeners
-   */
   private setupWebSocketListeners(): void {
-    // Listen for new messages
     this.websocketService.onNewMessage((message: ChatMessage) => {
       const currentConv = this.selectedConversation();
       if (currentConv && message.conversation_id === currentConv.id) {
@@ -356,58 +366,40 @@ export class MessagesComponent implements OnInit, OnDestroy {
         setTimeout(() => this.scrollToBottom(), 100);
       }
 
-      // Update conversation list
       this.loadConversations();
     });
 
-    // Listen for typing indicators
     this.websocketService.onNewMessage((data: any) => {
-      // Typing indicators are handled via the typingUsers signal
     });
 
-    // Listen for pokes
     this.websocketService.onPoke((poke: any) => {
       console.log('Received poke:', poke);
-      // Could show a notification here
     });
 
-    // Listen for presence changes
     this.websocketService.onPresenceChange((data: { userId: string; status: string }) => {
       console.log('Presence changed:', data);
-      // Update UI to reflect presence changes
     });
 
-    // Listen for reactions
     this.websocketService.onMessageReaction((data: { messageId: string; reaction: any }) => {
       console.log('Message reaction:', data);
-      // Update message with new reaction
     });
   }
 
-  /**
-   * Handle typing in message input
-   */
   onMessageInput(): void {
     const currentConv = this.selectedConversation();
     if (!currentConv) return;
 
-    // Emit typing start
     this.websocketService.startTyping(currentConv.id);
 
-    // Clear existing timeout
     if (this.typingTimeout) {
       clearTimeout(this.typingTimeout);
     }
 
-    // Set new timeout to stop typing after 3 seconds
     this.typingTimeout = setTimeout(() => {
       this.websocketService.stopTyping(currentConv.id);
     }, 3000);
   }
 
-  /**
-   * Handle file selection
-   */
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
@@ -415,9 +407,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Upload and send file
-   */
   async sendFileMessage(): Promise<void> {
     const file = this.selectedFile();
     const currentConv = this.selectedConversation();
@@ -427,11 +416,9 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.uploadingFile.set(true);
 
     try {
-      // Create FormData for file upload
       const formData = new FormData();
       formData.append('file', file);
 
-      // Upload file (you'll need to implement this endpoint)
       const response = await fetch(`${this.messagingService['apiUrl']}/uploads`, {
         method: 'POST',
         headers: {
@@ -442,7 +429,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
       const data = await response.json();
 
-      // Send message with file attachment
       this.messagingService.sendMessage(currentConv.id, {
         content: file.name,
         messageType: 'file',
@@ -468,23 +454,16 @@ export class MessagesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Add reaction to message
-   */
   addReaction(messageId: string, reaction: string): void {
-    // Call messaging service to add reaction
-    // This will be implemented in the messaging service
     console.log('Adding reaction:', messageId, reaction);
   }
 
   acceptChatRequest(requestId: string): void {
     this.messagingService.respondToChatRequest(requestId, 'accepted').subscribe({
       next: () => {
-        // Remove from requests
         const updated = this.chatRequests().filter(r => r.id !== requestId);
         this.chatRequests.set(updated);
 
-        // Reload conversations
         this.loadConversations();
         this.activeView.set('conversations');
       },
@@ -514,12 +493,10 @@ export class MessagesComponent implements OnInit, OnDestroy {
   getParticipantAvatar(conversation: ChatConversation): string {
     const participant = conversation.participants?.[0];
 
-    // If participant has uploaded avatar, use it
     if (participant?.profile_image_url || participant?.avatar_url) {
       return participant.profile_image_url || participant.avatar_url || '';
     }
 
-    // Otherwise use beautiful DiceBear avatar
     const seed = participant?.id || participant?.email || this.getParticipantName(conversation);
     const encodedSeed = encodeURIComponent(seed);
     return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodedSeed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50`;
@@ -531,12 +508,10 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   getRequesterAvatar(request: ChatRequest): string {
-    // If requester has uploaded avatar, use it
     if (request.profile_image_url || request.avatar_url) {
       return request.profile_image_url || request.avatar_url || '';
     }
 
-    // Otherwise use beautiful DiceBear avatar
     const seed = request.id || request.email || this.getRequesterName(request);
     const encodedSeed = encodeURIComponent(seed);
     return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodedSeed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50`;
@@ -571,28 +546,17 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.activeView.set(view);
   }
 
-  /**
-   * Open avatar upload modal
-   */
   openAvatarUpload(): void {
     this.showAvatarUpload.set(true);
   }
 
-  /**
-   * Handle avatar uploaded successfully
-   */
   onAvatarUploaded(avatarUrl: string): void {
     console.log('Avatar uploaded:', avatarUrl);
-    // Refresh conversations to show new avatar
     this.loadConversations();
     this.loadChatRequests();
   }
 
-  /**
-   * Close avatar upload modal
-   */
   closeAvatarUpload(): void {
     this.showAvatarUpload.set(false);
   }
 }
-

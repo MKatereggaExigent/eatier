@@ -885,13 +885,13 @@ export class AdminOverviewComponent implements OnInit {
   }
 
   // Convert longitude to SVG X coordinate
-  // Uganda's longitude range is approximately 29.5°E to 35.0°E
+  // South Africa's longitude range is approximately 16.5°E to 33.0°E
   private longitudeToX(longitude: number): number {
     const minLon = 29.5;
     const maxLon = 35.0;
     const svgWidth = 1000;
 
-    // Clamp longitude to Uganda's range
+    // Clamp longitude to South Africa's range
     const clampedLon = Math.max(minLon, Math.min(maxLon, longitude));
 
     // Convert to 0-1 range, then to SVG coordinates
@@ -900,13 +900,13 @@ export class AdminOverviewComponent implements OnInit {
   }
 
   // Convert latitude to SVG Y coordinate
-  // Uganda's latitude range is approximately -1.5°S to 4.2°N
+  // South Africa's latitude range is approximately -34.8°S to -22.1°S
   private latitudeToY(latitude: number): number {
     const minLat = -1.5;
     const maxLat = 4.2;
     const svgHeight = 600;
 
-    // Clamp latitude to Uganda's range
+    // Clamp latitude to South Africa's range
     const clampedLat = Math.max(minLat, Math.min(maxLat, latitude));
 
     // Convert to 0-1 range (inverted because SVG Y increases downward)

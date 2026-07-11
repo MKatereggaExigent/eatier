@@ -1,145 +1,143 @@
-<div class="preferences-container">
-  <header class="page-header">
-    <h1>My Preferences</h1>
-    <p>Customize your food discovery experience</p>
-  </header>
-
-  @if (loading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading your preferences...</p>
-    </div>
-  } @else {
-    <div class="preferences-grid">
-      <!-- Cuisine Preferences -->
-      <section class="preference-card">
-        <header class="card-header">
-          <h2>Cuisine Preferences</h2>
-          <p class="card-description">Select your favorite cuisines for personalized recommendations</p>
-        </header>
-        <div class="tags-grid">
-          @for (cuisine of availableCuisines; track cuisine) {
-            <button
-              type="button"
-              class="tag-btn"
-              [class.selected]="isCuisineSelected(cuisine)"
-              (click)="toggleCuisine(cuisine)">
-              {{ cuisine }}
-            </button>
-          }
-        </div>
-      </section>
-
-      <!-- Dietary Restrictions -->
-      <section class="preference-card">
-        <header class="card-header">
-          <h2>Dietary Restrictions</h2>
-          <p class="card-description">Let us know about your dietary needs</p>
-        </header>
-        <div class="tags-grid">
-          @for (restriction of availableDietaryRestrictions; track restriction) {
-            <button
-              type="button"
-              class="tag-btn"
-              [class.selected]="isDietarySelected(restriction)"
-              (click)="toggleDietary(restriction)">
-              {{ restriction }}
-            </button>
-          }
-        </div>
-      </section>
-
-      <!-- Price Range -->
-      <section class="preference-card">
-        <header class="card-header">
-          <h2>Price Range</h2>
-          <p class="card-description">Set your preferred price range</p>
-        </header>
-        <div class="price-range">
-          <div class="price-labels">
-            <span class="price-label" [class.active]="preferences().priceRangeMin <= 1">$</span>
-            <span class="price-label" [class.active]="preferences().priceRangeMin <= 2 && preferences().priceRangeMax >= 2">$$</span>
-            <span class="price-label" [class.active]="preferences().priceRangeMin <= 3 && preferences().priceRangeMax >= 3">$$$</span>
-            <span class="price-label" [class.active]="preferences().priceRangeMax >= 4">$$$$</span>
-          </div>
-          <div class="range-inputs">
-            <label>
-              <span class="input-label">Minimum</span>
-              <select [ngModel]="preferences().priceRangeMin" (ngModelChange)="updatePreference('priceRangeMin', $event)">
-                <option [value]="1">$ (Budget)</option>
-                <option [value]="2">$$ (Moderate)</option>
-                <option [value]="3">$$$ (Upscale)</option>
-                <option [value]="4">$$$$ (Fine Dining)</option>
-              </select>
-            </label>
-            <label>
-              <span class="input-label">Maximum</span>
-              <select [ngModel]="preferences().priceRangeMax" (ngModelChange)="updatePreference('priceRangeMax', $event)">
-                <option [value]="1">$ (Budget)</option>
-                <option [value]="2">$$ (Moderate)</option>
-                <option [value]="3">$$$ (Upscale)</option>
-                <option [value]="4">$$$$ (Fine Dining)</option>
-              </select>
-            </label>
-          </div>
-        </div>
-      </section>
-
-      <!-- Distance Preference -->
-      <section class="preference-card">
-        <header class="card-header">
-          <h2>Search Distance</h2>
-          <p class="card-description">How far are you willing to travel?</p>
-        </header>
-        <div class="distance-slider">
-          <input
-            type="range"
-            min="1"
-            max="50"
-            [ngModel]="preferences().preferredDistance"
-            (ngModelChange)="updatePreference('preferredDistance', $event)">
-          <span class="distance-value">{{ preferences().preferredDistance }} km</span>
-        </div>
-      </section>
-
-      <!-- Notification Preferences -->
-      <section class="preference-card full-width">
-        <header class="card-header">
-          <h2>Notification Preferences</h2>
-        </header>
-        <div class="notification-options">
-          <label class="toggle-option">
-            <input type="checkbox" [ngModel]="preferences().notifyNewRestaurants" (ngModelChange)="updatePreference('notifyNewRestaurants', $event)">
-            <span class="toggle-label">New restaurants in your area</span>
-          </label>
-          <label class="toggle-option">
-            <input type="checkbox" [ngModel]="preferences().notifyPromotions" (ngModelChange)="updatePreference('notifyPromotions', $event)">
-            <span class="toggle-label">Exclusive member promotions</span>
-          </label>
-          <label class="toggle-option">
-            <input type="checkbox" [ngModel]="preferences().notifyRecommendations" (ngModelChange)="updatePreference('notifyRecommendations', $event)">
-            <span class="toggle-label">Personalized recommendations</span>
-          </label>
-        </div>
-      </section>
+<div class="section">
+  <div class="section-inner">
+    <div class="page-header">
+      <div class="tag">
+        <lucide-icon [img]="Sliders" class="tag-icon"></lucide-icon>
+        <span>Preferences</span>
+      </div>
+      <h1 class="section-title">My Preferences</h1>
+      <p class="section-desc">Customize your food discovery experience</p>
     </div>
 
-    <!-- Save Button -->
-    <div class="actions">
-      @if (successMessage()) {
-        <div class="success-message">{{ successMessage() }}</div>
-      }
-      @if (errorMessage()) {
-        <div class="error-message">{{ errorMessage() }}</div>
-      }
-      <button type="button" class="save-btn" (click)="savePreferences()" [disabled]="saving()">
-        @if (saving()) {
-          <span class="spinner-small"></span> Saving...
-        } @else {
-          Save Preferences
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading your preferences...</p>
+      </div>
+    } @else {
+      <div class="preferences-grid">
+        <!-- Cuisine Preferences -->
+        <section class="preference-card">
+          <div class="card-header">
+            <lucide-icon [img]="UtensilsCrossed" class="card-icon"></lucide-icon>
+            <h2>Cuisine Preferences</h2>
+          </div>
+          <p class="card-desc">Select your favorite cuisines for personalized recommendations</p>
+          <div class="tags-grid">
+            @for (cuisine of availableCuisines; track cuisine) {
+              <button type="button" class="chip" [class.selected]="isCuisineSelected(cuisine)" (click)="toggleCuisine(cuisine)">
+                {{ cuisine }}
+              </button>
+            }
+          </div>
+        </section>
+
+        <!-- Dietary Restrictions -->
+        <section class="preference-card">
+          <div class="card-header">
+            <lucide-icon [img]="Heart" class="card-icon"></lucide-icon>
+            <h2>Dietary Restrictions</h2>
+          </div>
+          <p class="card-desc">Let us know about your dietary needs</p>
+          <div class="tags-grid">
+            @for (restriction of availableDietaryRestrictions; track restriction) {
+              <button type="button" class="chip" [class.selected]="isDietarySelected(restriction)" (click)="toggleDietary(restriction)">
+                {{ restriction }}
+              </button>
+            }
+          </div>
+        </section>
+
+        <!-- Price Range -->
+        <section class="preference-card">
+          <div class="card-header">
+            <lucide-icon [img]="DollarSign" class="card-icon"></lucide-icon>
+            <h2>Price Range</h2>
+          </div>
+          <p class="card-desc">Set your preferred price range</p>
+          <div class="price-range">
+            <div class="price-labels">
+              <span class="price-label" [class.active]="preferences().priceRangeMin <= 1">$</span>
+              <span class="price-label" [class.active]="preferences().priceRangeMin <= 2 && preferences().priceRangeMax >= 2">$$</span>
+              <span class="price-label" [class.active]="preferences().priceRangeMin <= 3 && preferences().priceRangeMax >= 3">$$$</span>
+              <span class="price-label" [class.active]="preferences().priceRangeMax >= 4">$$$$</span>
+            </div>
+            <div class="range-inputs">
+              <label>
+                <span class="input-label">Minimum</span>
+                <select [ngModel]="preferences().priceRangeMin" (ngModelChange)="updatePreference('priceRangeMin', $event)">
+                  <option [value]="1">$ (Budget)</option>
+                  <option [value]="2">$$ (Moderate)</option>
+                  <option [value]="3">$$$ (Upscale)</option>
+                  <option [value]="4">$$$$ (Fine Dining)</option>
+                </select>
+              </label>
+              <label>
+                <span class="input-label">Maximum</span>
+                <select [ngModel]="preferences().priceRangeMax" (ngModelChange)="updatePreference('priceRangeMax', $event)">
+                  <option [value]="1">$ (Budget)</option>
+                  <option [value]="2">$$ (Moderate)</option>
+                  <option [value]="3">$$$ (Upscale)</option>
+                  <option [value]="4">$$$$ (Fine Dining)</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Distance Preference -->
+        <section class="preference-card">
+          <div class="card-header">
+            <lucide-icon [img]="MapPin" class="card-icon"></lucide-icon>
+            <h2>Search Distance</h2>
+          </div>
+          <p class="card-desc">How far are you willing to travel?</p>
+          <div class="distance-slider">
+            <input type="range" min="1" max="50" [ngModel]="preferences().preferredDistance" (ngModelChange)="updatePreference('preferredDistance', $event)">
+            <span class="distance-value">{{ preferences().preferredDistance }} km</span>
+          </div>
+        </section>
+
+        <!-- Notification Preferences -->
+        <section class="preference-card full-width">
+          <div class="card-header">
+            <lucide-icon [img]="Bell" class="card-icon"></lucide-icon>
+            <h2>Notification Preferences</h2>
+          </div>
+          <div class="notification-options">
+            <label class="toggle-option">
+              <input type="checkbox" [ngModel]="preferences().notifyNewRestaurants" (ngModelChange)="updatePreference('notifyNewRestaurants', $event)">
+              <span class="toggle-label">New restaurants in your area</span>
+            </label>
+            <label class="toggle-option">
+              <input type="checkbox" [ngModel]="preferences().notifyPromotions" (ngModelChange)="updatePreference('notifyPromotions', $event)">
+              <span class="toggle-label">Exclusive member promotions</span>
+            </label>
+            <label class="toggle-option">
+              <input type="checkbox" [ngModel]="preferences().notifyRecommendations" (ngModelChange)="updatePreference('notifyRecommendations', $event)">
+              <span class="toggle-label">Personalized recommendations</span>
+            </label>
+          </div>
+        </section>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        @if (successMessage()) {
+          <div class="message success">{{ successMessage() }}</div>
         }
-      </button>
-    </div>
-  }
+        @if (errorMessage()) {
+          <div class="message error">{{ errorMessage() }}</div>
+        }
+        <button type="button" class="btn-primary" (click)="savePreferences()" [disabled]="saving()">
+          @if (saving()) {
+            <span class="spinner-small"></span> Saving...
+          } @else {
+            <lucide-icon [img]="Save" class="btn-icon"></lucide-icon>
+            Save Preferences
+          }
+        </button>
+      </div>
+    }
+  </div>
 </div>
-

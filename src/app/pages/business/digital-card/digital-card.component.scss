@@ -1,71 +1,110 @@
-// ===================================
-// DIGITAL CARD - NYT EDITORIAL DESIGN
-// ===================================
+@use 'sass:color';
 
-// Typography
-$font-serif: Georgia, 'Times New Roman', serif;
-$font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-$font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Courier New', monospace;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
 
-// Colors
-$color-black: #000;
-$color-white: #fff;
-$color-gray-100: #f7f7f7;
-$color-gray-200: #e5e5e5;
-$color-gray-400: #999;
-$color-gray-600: #666;
-$color-gray-800: #333;
-$color-success: #0a7c42;
+$orange: #F97316;
+$orange-light: rgba($orange, 0.08);
+$orange-medium: rgba($orange, 0.15);
 
-// Spacing
-$space-xs: 0.25rem;
-$space-sm: 0.5rem;
-$space-md: 1rem;
-$space-lg: 1.5rem;
-$space-xl: 2rem;
-$space-2xl: 3rem;
+$black: #0F172A;
+$border-color: #E2E8F0;
+$bg-white: #FFFFFF;
+$bg-muted: #F8FAFC;
+
+$color-text: #0F172A;
+$color-text-secondary: #475569;
+$color-text-muted: #94A3B8;
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 20px;
+
+$space-xs: 4px;
+$space-sm: 8px;
+$space-md: 16px;
+$space-lg: 24px;
+$space-xl: 32px;
+$space-2xl: 48px;
 
 .digital-card-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: $space-xl;
+  min-height: 100vh;
+  background: $bg-white;
 }
 
-.card-header {
-  text-align: center;
-  margin-bottom: $space-2xl;
-  padding-bottom: $space-xl;
-  border-bottom: 1px solid $color-black;
-
-  h1 {
-    font-family: $font-serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: $color-black;
-    margin-bottom: $space-sm;
-    line-height: 1.2;
-  }
-
-  p {
-    font-family: $font-sans;
-    color: $color-gray-600;
-    font-size: 1rem;
-  }
-}
-
-.success-message {
-  font-family: $font-sans;
-  padding: $space-md $space-lg;
+.page-header {
   margin-bottom: $space-xl;
+  padding: $space-xl;
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
+
+  .header-content {
+    h1 {
+      font-family: $font-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: $color-text;
+      margin: 0 0 $space-sm;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: $space-sm;
+
+      .icon {
+        width: 24px;
+        height: 24px;
+        color: $orange;
+      }
+    }
+
+    p {
+      font-family: $font-sans;
+      color: $color-text-muted;
+      font-size: 0.9375rem;
+      margin: 0;
+    }
+  }
+}
+
+// ===================================
+// ALERTS
+// ===================================
+.alert {
+  padding: $space-md $space-lg;
+  margin-bottom: $space-lg;
   display: flex;
   align-items: center;
   gap: $space-md;
+  font-family: $font-sans;
   font-weight: 500;
-  background: $color-white;
-  border: 2px solid $color-success;
-  color: $color-success;
+  border-radius: $radius-md;
+  background: $bg-white;
+  border: 1px solid $border-color;
+
+  .alert-icon {
+    font-size: 1rem;
+    .icon { width: 20px; height: 20px; }
+  }
 }
 
+.alert-success {
+  border-left: 4px solid #22C55E;
+  color: #16A34A;
+}
+
+.alert-error {
+  border-left: 4px solid #EF4444;
+  color: #DC2626;
+}
+
+// ===================================
+// CARD LAYOUT
+// ===================================
 .card-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -73,582 +112,598 @@ $space-2xl: 3rem;
   align-items: start;
 }
 
+.panel-header {
+  font-family: $font-sans;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: $color-text;
+  margin-bottom: $space-lg;
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+
+  .icon {
+    width: 20px;
+    height: 20px;
+    color: $orange;
+  }
+}
+
+// ===================================
+// CUSTOMIZATION PANEL
+// ===================================
 .customization-panel {
-  background: $color-white;
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
   padding: $space-xl;
-  border: 1px solid $color-black;
+}
 
-  h2 {
-    font-family: $font-serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: $color-black;
-    margin-bottom: $space-xl;
-    padding-bottom: $space-md;
-    border-bottom: 1px solid $color-gray-200;
+.customization-section {
+  margin-bottom: $space-xl;
+
+  &:last-of-type {
+    margin-bottom: 0;
   }
+}
 
-  .customization-section {
-    margin-bottom: $space-xl;
+.section-label {
+  font-family: $font-sans;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: $color-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: $space-md;
+}
 
-    h3 {
-      font-family: $font-sans;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: $color-black;
-      margin-bottom: $space-md;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
+// ===================================
+// COLOR PRESETS
+// ===================================
+.color-presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-sm;
 
-    .color-presets {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: $space-sm;
-
-      .color-preset {
-        height: 50px;
-        border: 1px solid $color-black;
-        cursor: pointer;
-        transition: transform 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: $color-white;
-        font-family: $font-sans;
-        font-weight: 500;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-
-        &:hover {
-          transform: scale(1.02);
-        }
-
-        span {
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        }
-      }
-    }
-
-    .layout-options {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: $space-sm;
-
-      .layout-option {
-        cursor: pointer;
-
-        input[type='radio'] {
-          display: none;
-        }
-
-        .option-content {
-          padding: $space-md;
-          border: 1px solid $color-black;
-          text-align: center;
-          transition: background-color 0.2s;
-
-          .option-icon {
-            display: block;
-            font-size: 1.25rem;
-            margin-bottom: $space-sm;
-          }
-
-          .option-label {
-            font-family: $font-sans;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: $color-black;
-          }
-        }
-
-        input[type='radio']:checked + .option-content {
-          background: $color-gray-100;
-        }
-
-        &:hover .option-content {
-          background: $color-gray-100;
-        }
-      }
-    }
-
-    .color-inputs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: $space-md;
-
-      .color-input {
-        display: flex;
-        flex-direction: column;
-
-        label {
-          font-family: $font-sans;
-          display: block;
-          font-weight: 600;
-          color: $color-black;
-          margin-bottom: $space-sm;
-          font-size: 0.875rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-
-        input[type='color'] {
-          width: 100%;
-          height: 60px;
-          border: 2px solid $color-black;
-          border-radius: 4px;
-          cursor: pointer;
-          background: $color-white;
-          padding: 4px;
-          transition: all 0.2s ease;
-
-          &:hover {
-            border-color: $color-gray-600;
-            transform: scale(1.02);
-          }
-
-          &:focus {
-            outline: none;
-            border-width: 3px;
-            border-color: $color-black;
-            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
-          }
-
-          // Style the color swatch
-          &::-webkit-color-swatch-wrapper {
-            padding: 0;
-          }
-
-          &::-webkit-color-swatch {
-            border: none;
-            border-radius: 2px;
-          }
-
-          &::-moz-color-swatch {
-            border: none;
-            border-radius: 2px;
-          }
-        }
-
-        // Display current color value
-        .color-value {
-          font-family: $font-mono, monospace;
-          font-size: 0.75rem;
-          color: $color-gray-600;
-          margin-top: $space-xs;
-          text-align: center;
-          font-weight: 500;
-        }
-      }
-    }
-
-    .content-options {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      border: 1px solid $color-black;
-
-      .content-option {
-        display: flex;
-        align-items: center;
-        gap: $space-md;
-        cursor: pointer;
-        padding: $space-md;
-        border-bottom: 1px solid $color-gray-200;
-        transition: background-color 0.2s;
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        &:hover {
-          background: $color-gray-100;
-        }
-
-        input[type='checkbox'] {
-          width: 16px;
-          height: 16px;
-          accent-color: $color-black;
-        }
-
-        span {
-          font-family: $font-sans;
-          font-weight: 500;
-          color: $color-black;
-          font-size: 0.875rem;
-        }
-      }
-    }
-  }
-
-  .customization-actions {
+  .color-preset {
+    height: 48px;
+    border: 2px solid transparent;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all 0.25s ease;
     display: flex;
-    gap: $space-md;
-    flex-direction: column;
-    padding-top: $space-lg;
-    border-top: 1px solid $color-gray-200;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: $font-sans;
+    font-weight: 600;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 
-    .primary-btn,
-    .secondary-btn {
-      font-family: $font-sans;
-      padding: $space-md $space-lg;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: $space-sm;
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
+    span {
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
 
-    .primary-btn {
-      background: $color-black;
-      color: $color-white;
-      border: 1px solid $color-black;
-
-      &:hover:not(:disabled) {
-        background: $color-gray-800;
-      }
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     }
 
-    .secondary-btn {
-      background: $color-white;
-      color: $color-black;
-      border: 1px solid $color-black;
-
-      &:hover:not(:disabled) {
-        background: $color-gray-100;
-      }
-    }
-
-    .loading-spinner {
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top: 2px solid $color-white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+    &.active {
+      border-color: $black;
+      box-shadow: 0 0 0 2px #fff, 0 0 0 4px $black;
     }
   }
 }
 
-// Card Preview Panel
-.card-preview {
-  background: $color-white;
-  padding: $space-xl;
-  border: 1px solid $color-black;
+// ===================================
+// COLOR INPUTS
+// ===================================
+.color-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-md;
+}
 
-  h2 {
-    font-family: $font-serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: $color-black;
-    margin-bottom: $space-xl;
-    padding-bottom: $space-md;
-    border-bottom: 1px solid $color-gray-200;
+.color-input-group {
+  label {
+    font-family: $font-sans;
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: $color-text-secondary;
+    margin-bottom: $space-sm;
   }
+}
 
-  .business-card {
-    position: relative;
-    padding: $space-xl;
-    color: $color-white;
-    margin-bottom: $space-xl;
-    overflow: hidden;
-    min-height: 280px;
-    border: 1px solid $color-black;
+.color-picker-row {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
 
-    .card-background {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-size: cover;
-      background-position: center;
-      opacity: 0.3;
+  input[type='color'] {
+    width: 48px;
+    height: 48px;
+    border: 2px solid $border-color;
+    border-radius: $radius-md;
+    cursor: pointer;
+    background: #fff;
+    padding: 2px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $black;
     }
 
-    .card-content {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      gap: $space-md;
+    &:focus {
+      outline: none;
+      border-color: $black;
+      box-shadow: 0 0 0 3px rgba($black, 0.08);
+    }
 
-      .business-logo {
-        width: 70px;
-        height: 70px;
-        overflow: hidden;
-        border: 2px solid rgba(255, 255, 255, 0.5);
+    &::-webkit-color-swatch-wrapper { padding: 0; }
+    &::-webkit-color-swatch { border: none; border-radius: 4px; }
+    &::-moz-color-swatch { border: none; border-radius: 4px; }
+  }
 
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
+  .color-value {
+    font-family: $font-sans;
+    font-size: 0.8125rem;
+    color: $color-text-muted;
+    font-weight: 500;
+  }
+}
+
+// ===================================
+// LAYOUT OPTIONS
+// ===================================
+.layout-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-sm;
+}
+
+.layout-option {
+  font-family: $font-sans;
+  padding: $space-sm $space-md;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  background: $bg-white;
+  color: $color-text-secondary;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: center;
+
+  &:hover {
+    border-color: $black;
+    color: $black;
+  }
+
+  &.active {
+    background: $black;
+    border-color: $black;
+    color: #fff;
+  }
+}
+
+// ===================================
+// CONTENT OPTIONS
+// ===================================
+.content-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.content-option {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  padding: $space-md;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border-bottom: 1px solid $border-color;
+
+  &:last-child { border-bottom: none; }
+
+  &:hover { background: $bg-muted; }
+
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    accent-color: $black;
+    cursor: pointer;
+  }
+
+  span {
+    font-family: $font-sans;
+    font-weight: 500;
+    color: $color-text;
+    font-size: 0.875rem;
+  }
+}
+
+// ===================================
+// CUSTOMIZATION ACTIONS
+// ===================================
+.customization-actions {
+  display: flex;
+  gap: $space-md;
+  flex-direction: column;
+  padding-top: $space-lg;
+  margin-top: $space-xl;
+  border-top: 1px solid $border-color;
+}
+
+.btn-primary,
+.btn-secondary {
+  font-family: $font-sans;
+  padding: 10px 24px;
+  border-radius: $radius-md;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-sm;
+  min-height: 44px;
+
+  .icon { width: 16px; height: 16px; }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: $black;
+  color: #fff;
+  border: 1px solid $black;
+
+  &:hover:not(:disabled) {
+    background: color.adjust($black, $lightness: 20%);
+    border-color: color.adjust($black, $lightness: 20%);
+  }
+}
+
+.btn-secondary {
+  background: $bg-white;
+  color: $black;
+  border: 1px solid $border-color;
+
+  &:hover:not(:disabled) {
+    border-color: $black;
+  }
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.btn-spinner-sm {
+  width: 14px;
+  height: 14px;
+  border: 2px solid $border-color;
+  border-top-color: $color-text;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+
+// ===================================
+// PREVIEW PANEL
+// ===================================
+.preview-panel {
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
+  padding: $space-xl;
+}
+
+// ===================================
+// LOADING & EMPTY STATES
+// ===================================
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: $space-2xl * 1.5;
+
+  .spinner {
+    width: 44px;
+    height: 44px;
+    border: 3px solid $border-color;
+    border-top-color: $orange;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto $space-md;
+  }
+
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto $space-lg;
+    background: $orange-light;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $orange;
+
+    .icon { width: 36px; height: 36px; }
+  }
+
+  h3 {
+    font-family: $font-sans;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $color-text;
+    margin: 0 0 $space-sm;
+  }
+
+  p {
+    font-family: $font-sans;
+    color: $color-text-muted;
+    font-size: 0.9375rem;
+    margin: 0;
+  }
+}
+
+// ===================================
+// BUSINESS CARD PREVIEW
+// ===================================
+.business-card {
+  position: relative;
+  padding: $space-xl;
+  border-radius: $radius-lg;
+  margin-bottom: $space-lg;
+  overflow: hidden;
+  min-height: 280px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  .card-background {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.3;
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+
+    .business-logo {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .business-info {
+      .business-name {
+        font-family: $font-serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 $space-sm;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      }
+
+      .info-row {
+        font-family: $font-sans;
+        font-size: 0.875rem;
+        margin-bottom: $space-xs;
+        opacity: 0.9;
+        display: flex;
+        align-items: center;
+        gap: $space-sm;
+
+        .icon-sm {
+          width: 14px;
+          height: 14px;
+          flex-shrink: 0;
         }
       }
 
-      .business-info {
-        .business-name {
-          font-family: $font-serif;
-          font-size: 1.5rem;
-          font-weight: 700;
-          margin-bottom: $space-sm;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .business-address {
-          font-family: $font-sans;
-          font-size: 0.875rem;
-          margin-bottom: $space-md;
-          opacity: 0.9;
-        }
-
-        .business-contact {
-          display: flex;
-          flex-direction: column;
-          gap: $space-xs;
-          margin-bottom: $space-md;
-
-          .contact-item {
-            font-family: $font-sans;
-            font-size: 0.875rem;
-            opacity: 0.9;
-          }
-        }
-
-        .business-bio {
-          font-family: $font-sans;
-          font-size: 0.875rem;
-          line-height: 1.5;
-          margin-bottom: $space-md;
-          opacity: 0.9;
-        }
-
-        .business-facilities {
-          display: flex;
-          gap: $space-sm;
-          margin-bottom: $space-md;
-
-          .facility-icon {
-            font-size: 1.125rem;
-          }
-        }
-
-        .business-hours {
-          font-family: $font-sans;
-          font-size: 0.875rem;
-          opacity: 0.9;
-        }
+      .business-bio {
+        font-family: $font-sans;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        margin: $space-md 0;
+        opacity: 0.9;
       }
 
+      .facility-icons {
+        display: flex;
+        gap: $space-sm;
+        margin-bottom: $space-md;
+        font-size: 1.125rem;
+      }
+
+      .business-hours {
+        font-family: $font-sans;
+        font-size: 0.875rem;
+        opacity: 0.9;
+      }
+    }
+
+    .qr-code {
+      text-align: center;
+
+      img {
+        width: 80px;
+        height: 80px;
+        background: #fff;
+        padding: 4px;
+        border-radius: $radius-sm;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .qr-label {
+        font-family: $font-sans;
+        display: block;
+        font-size: 0.625rem;
+        margin-top: $space-xs;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+    }
+
+    // Logo Position Variants
+    &.logo-top {
       .qr-code {
         position: absolute;
         top: $space-md;
         right: $space-md;
-        text-align: center;
-
-        img {
-          width: 70px;
-          height: 70px;
-          background: $color-white;
-          padding: $space-xs;
-          border: 1px solid $color-black;
-        }
-
-        .qr-label {
-          font-family: $font-sans;
-          display: block;
-          font-size: 0.625rem;
-          margin-top: $space-xs;
-          opacity: 0.8;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
       }
-
-      // Logo Position Variants
-      &.logo-top {
-        // Logo at the top, left-aligned (default)
-        .qr-code {
-          position: absolute;
-          top: $space-md;
-          right: $space-md;
-        }
-
-        .business-logo.card-element {
-          order: 1;
-        }
-
-        .business-info.card-element {
-          order: 2;
-        }
-      }
-
-      &.logo-center {
-        // Everything centered
-        align-items: center;
-        text-align: center;
-
-        .qr-code {
-          position: absolute;
-          top: $space-md;
-          right: $space-md;
-        }
-
-        .business-logo.card-element {
-          align-self: center;
-          order: 1;
-        }
-
-        .business-info.card-element {
-          align-items: center;
-          order: 2;
-        }
-      }
-
-      &.logo-bottom {
-        // Logo at the bottom - QR code in flow, not absolute
-        .qr-code {
-          position: static;
-          order: 2;
-        }
-
-        .business-info.card-element {
-          order: 1;
-        }
-
-        .business-logo.card-element {
-          order: 3;
-        }
-      }
-    }
-  }
-
-  .loading-preview {
-    text-align: center;
-    padding: $space-2xl $space-xl;
-    border: 1px solid $color-gray-200;
-
-    .loading-spinner.large {
-      width: 2.5rem;
-      height: 2.5rem;
-      border: 2px solid $color-gray-200;
-      border-top: 2px solid $color-black;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto $space-md;
+      .business-logo.card-element { order: 1; }
+      .business-info.card-element { order: 2; }
     }
 
-    p {
-      font-family: $font-sans;
-      color: $color-gray-600;
-      font-size: 0.875rem;
-    }
-  }
-
-  .download-options {
-    padding-top: $space-lg;
-    border-top: 1px solid $color-gray-200;
-
-    h3 {
-      font-family: $font-sans;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: $color-black;
-      margin-bottom: $space-md;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .download-buttons {
-      display: flex;
-      gap: $space-md;
-      margin-bottom: $space-md;
-
-      .download-btn {
-        font-family: $font-sans;
-        flex: 1;
-        padding: $space-md;
-        border: 1px solid $color-black;
-        background: $color-white;
-        color: $color-black;
-        font-weight: 500;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: $space-sm;
-
-        &:hover:not(:disabled) {
-          background: $color-gray-100;
-        }
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        .loading-spinner {
-          width: 14px;
-          height: 14px;
-          border: 2px solid $color-gray-400;
-          border-top: 2px solid $color-black;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
+    &.logo-center {
+      align-items: center;
+      text-align: center;
+      .qr-code {
+        position: absolute;
+        top: $space-md;
+        right: $space-md;
       }
+      .business-logo.card-element { align-self: center; order: 1; }
+      .business-info.card-element { align-items: center; order: 2; }
     }
 
-    .share-btn {
-      font-family: $font-sans;
-      width: 100%;
-      padding: $space-md;
-      background: $color-black;
-      color: $color-white;
-      border: 1px solid $color-black;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s;
-
-      &:hover {
-        background: $color-gray-800;
-      }
+    &.logo-bottom {
+      .qr-code { position: static; order: 2; }
+      .business-info.card-element { order: 1; }
+      .business-logo.card-element { order: 3; }
     }
   }
 }
 
-// Animation
+// ===================================
+// DOWNLOAD SECTION
+// ===================================
+.download-section {
+  padding-top: $space-lg;
+  border-top: 1px solid $border-color;
+
+  .section-label {
+    margin-bottom: $space-md;
+  }
+}
+
+.download-buttons {
+  display: flex;
+  gap: $space-sm;
+  margin-bottom: $space-md;
+}
+
+.btn-download {
+  font-family: $font-sans;
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  background: $bg-white;
+  color: $color-text-secondary;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-sm;
+  min-height: 44px;
+
+  .icon-sm {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: $black;
+    color: $black;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-share {
+  font-family: $font-sans;
+  width: 100%;
+  padding: 10px 24px;
+  background: $black;
+  color: #fff;
+  border: 1px solid $black;
+  border-radius: $radius-md;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-sm;
+  min-height: 44px;
+
+  .icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: color.adjust($black, $lightness: 20%);
+    border-color: color.adjust($black, $lightness: 20%);
+  }
+}
+
+// ===================================
+// ANIMATIONS
+// ===================================
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-// Responsive
+// ===================================
+// RESPONSIVE
+// ===================================
 @media (max-width: 1024px) {
   .card-layout {
     grid-template-columns: 1fr;
-    gap: $space-xl;
   }
 
-  .customization-panel {
-    order: 2;
-  }
-
-  .card-preview {
-    order: 1;
+  .color-presets {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -657,51 +712,64 @@ $space-2xl: 3rem;
     padding: $space-md;
   }
 
-  .card-header {
-    padding-bottom: $space-lg;
-    margin-bottom: $space-xl;
-
-    h1 {
-      font-size: 2rem;
-    }
+  .page-header .header-content h1 {
+    font-size: 1.5rem;
   }
 
-  .customization-panel .customization-section {
-    .color-presets {
-      grid-template-columns: 1fr;
-    }
-
-    .layout-options {
-      grid-template-columns: 1fr;
-    }
-
-    .color-inputs {
-      grid-template-columns: 1fr;
-    }
+  .color-presets {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .card-preview .download-options .download-buttons {
+  .color-inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .layout-options {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .download-buttons {
     flex-direction: column;
   }
 
-  .card-preview .business-card {
+  .business-card {
     padding: $space-lg;
     min-height: 240px;
 
     .card-content {
-      .business-logo {
-        width: 55px;
-        height: 55px;
-      }
-
-      .business-info .business-name {
-        font-size: 1.25rem;
-      }
-
-      .qr-code img {
-        width: 55px;
-        height: 55px;
-      }
+      .business-logo { width: 55px; height: 55px; }
+      .business-info .business-name { font-size: 1.25rem; }
+      .qr-code img { width: 60px; height: 60px; }
     }
+  }
+
+  .btn-download,
+  .btn-share,
+  .btn-primary,
+  .btn-secondary {
+    min-height: 44px;
+  }
+
+  input, select {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .digital-card-container {
+    padding: $space-sm;
+  }
+
+  .page-header .header-content h1 {
+    font-size: 1.3rem;
+  }
+
+  .color-presets {
+    grid-template-columns: 1fr;
+  }
+
+  .layout-options {
+    grid-template-columns: 1fr;
   }
 }

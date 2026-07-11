@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, ChefHat, Star, Calendar, DollarSign, CheckCircle, XCircle, Clock, RefreshCw, Users, PartyPopper, MapPin, Tag } from 'lucide-angular';
+import { LucideAngularModule, ChefHat, Star, Calendar, DollarSign, CheckCircle, XCircle, Clock, RefreshCw, Users, PartyPopper, MapPin, Tag, X, Search } from 'lucide-angular';
 import { Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 import { UserSpecialistBookingsService, SpecialistBooking, ReviewableBooking } from '../../../core/services/user-specialist-bookings.service';
@@ -33,6 +33,8 @@ export class UserSpecialistBookingsComponent implements OnInit, OnDestroy {
   readonly PartyPopper = PartyPopper;
   readonly MapPin = MapPin;
   readonly Tag = Tag;
+  readonly X = X;
+  readonly Search = Search;
 
   // State
   bookings = signal<SpecialistBooking[]>([]);

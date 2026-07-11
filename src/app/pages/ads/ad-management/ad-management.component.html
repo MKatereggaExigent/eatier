@@ -2,11 +2,14 @@
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-content">
-      <h1>Ad Campaign Management</h1>
+      <h1>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Ad Campaign Management
+      </h1>
       <p>Create, manage, and track your advertising campaigns</p>
     </div>
     <button class="btn-primary" (click)="openCreateCampaign()">
-      <lucide-icon [img]="Plus" [size]="16" class="icon"></lucide-icon>
+      <lucide-icon [img]="Plus" [size]="16"></lucide-icon>
       Create Campaign
     </button>
   </div>
@@ -14,14 +17,14 @@
   <!-- Success/Error Messages -->
   @if (successMessage()) {
     <div class="alert alert-success">
-      <lucide-icon [img]="CheckCircle" [size]="20" class="icon"></lucide-icon>
+      <lucide-icon [img]="CheckCircle" [size]="18" class="alert-icon"></lucide-icon>
       {{ successMessage() }}
     </div>
   }
 
   @if (errorMessage()) {
     <div class="alert alert-error">
-      <lucide-icon [img]="AlertTriangle" [size]="20" class="icon"></lucide-icon>
+      <lucide-icon [img]="AlertTriangle" [size]="18" class="alert-icon"></lucide-icon>
       {{ errorMessage() }}
     </div>
   }
@@ -29,118 +32,138 @@
   <!-- Statistics Grid -->
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-icon">
-        <lucide-icon [img]="BarChart3" [size]="28"></lucide-icon>
-      </div>
-      <div class="stat-content">
-        <div class="stat-label">Total Campaigns</div>
-        <div class="stat-value">{{ statistics().total }}</div>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">
-        <lucide-icon [img]="Circle" [size]="28" class="status-active"></lucide-icon>
-      </div>
-      <div class="stat-content">
-        <div class="stat-label">Active</div>
-        <div class="stat-value">{{ statistics().active }}</div>
+      <div class="stat-accent total-accent"></div>
+      <div class="stat-body">
+        <div class="stat-icon-wrap">
+          <lucide-icon [img]="BarChart3" [size]="22"></lucide-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Total Campaigns</div>
+          <div class="stat-value">{{ statistics().total }}</div>
+        </div>
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">
-        <lucide-icon [img]="FileText" [size]="28"></lucide-icon>
-      </div>
-      <div class="stat-content">
-        <div class="stat-label">Draft</div>
-        <div class="stat-value">{{ statistics().draft }}</div>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">
-        <lucide-icon [img]="Pause" [size]="28"></lucide-icon>
-      </div>
-      <div class="stat-content">
-        <div class="stat-label">Paused</div>
-        <div class="stat-value">{{ statistics().paused }}</div>
+      <div class="stat-accent active-accent"></div>
+      <div class="stat-body">
+        <div class="stat-icon-wrap active-icon">
+          <lucide-icon [img]="Circle" [size]="22"></lucide-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Active</div>
+          <div class="stat-value">{{ statistics().active }}</div>
+        </div>
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">
-        <lucide-icon [img]="DollarSign" [size]="28"></lucide-icon>
-      </div>
-      <div class="stat-content">
-        <div class="stat-label">Total Spend</div>
-        <div class="stat-value">{{ formatCurrency(statistics().totalSpend) }}</div>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">
-        <lucide-icon [img]="Eye" [size]="28"></lucide-icon>
-      </div>
-      <div class="stat-content">
-        <div class="stat-label">Impressions</div>
-        <div class="stat-value">{{ formatNumber(statistics().totalImpressions) }}</div>
+      <div class="stat-accent draft-accent"></div>
+      <div class="stat-body">
+        <div class="stat-icon-wrap draft-icon">
+          <lucide-icon [img]="FileText" [size]="22"></lucide-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Draft</div>
+          <div class="stat-value">{{ statistics().draft }}</div>
+        </div>
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">
-        <lucide-icon [img]="MousePointerClick" [size]="28"></lucide-icon>
-      </div>
-      <div class="stat-content">
-        <div class="stat-label">Clicks</div>
-        <div class="stat-value">{{ formatNumber(statistics().totalClicks) }}</div>
+      <div class="stat-accent paused-accent"></div>
+      <div class="stat-body">
+        <div class="stat-icon-wrap paused-icon">
+          <lucide-icon [img]="Pause" [size]="22"></lucide-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Paused</div>
+          <div class="stat-value">{{ statistics().paused }}</div>
+        </div>
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon">
-        <lucide-icon [img]="TrendingUp" [size]="28"></lucide-icon>
+      <div class="stat-accent spend-accent"></div>
+      <div class="stat-body">
+        <div class="stat-icon-wrap spend-icon">
+          <lucide-icon [img]="DollarSign" [size]="22"></lucide-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Total Spend</div>
+          <div class="stat-value">{{ formatCurrency(statistics().totalSpend) }}</div>
+        </div>
       </div>
-      <div class="stat-content">
-        <div class="stat-label">Avg CTR</div>
-        <div class="stat-value">
-          {{ statistics().totalImpressions > 0 ? formatPercentage((statistics().totalClicks / statistics().totalImpressions) * 100) : '0.00%' }}
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-accent impressions-accent"></div>
+      <div class="stat-body">
+        <div class="stat-icon-wrap impressions-icon">
+          <lucide-icon [img]="Eye" [size]="22"></lucide-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Impressions</div>
+          <div class="stat-value">{{ formatNumber(statistics().totalImpressions) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-accent clicks-accent"></div>
+      <div class="stat-body">
+        <div class="stat-icon-wrap clicks-icon">
+          <lucide-icon [img]="MousePointerClick" [size]="22"></lucide-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Clicks</div>
+          <div class="stat-value">{{ formatNumber(statistics().totalClicks) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-accent ctr-accent"></div>
+      <div class="stat-body">
+        <div class="stat-icon-wrap ctr-icon">
+          <lucide-icon [img]="TrendingUp" [size]="22"></lucide-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Avg CTR</div>
+          <div class="stat-value">
+            {{ statistics().totalImpressions > 0 ? formatPercentage((statistics().totalClicks / statistics().totalImpressions) * 100) : '0.00%' }}
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Filters Section -->
-  <div class="filters-section">
-    <div class="filter-group">
-      <label for="statusFilter">Status</label>
-      <select id="statusFilter" [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()">
-        <option value="all">All Statuses</option>
-        <option value="draft">Draft</option>
-        <option value="active">Active</option>
-        <option value="paused">Paused</option>
-        <option value="completed">Completed</option>
-        <option value="cancelled">Cancelled</option>
-      </select>
-    </div>
+  <div class="filters-card">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="statusFilter">Status</label>
+        <select id="statusFilter" [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()">
+          <option value="all">All Statuses</option>
+          <option value="draft">Draft</option>
+          <option value="active">Active</option>
+          <option value="paused">Paused</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
 
-    <div class="filter-group">
-      <label for="searchQuery">Search</label>
-      <input
-        type="text"
-        id="searchQuery"
-        [(ngModel)]="searchQuery"
-        (ngModelChange)="onSearchChange()"
-        placeholder="Search by title or description..."
-      />
-    </div>
+      <div class="filter-group">
+        <label for="searchQuery">Search</label>
+        <input type="text" id="searchQuery" [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()" placeholder="Search by title or description..." />
+      </div>
 
-    <button class="btn-secondary" (click)="clearFilters()">Clear Filters</button>
+      <button class="btn-secondary" (click)="clearFilters()">Clear Filters</button>
+    </div>
   </div>
 
   <!-- Campaigns Table -->
-  <div class="table-container">
+  <div class="table-card">
     @if (isLoading()) {
       <div class="loading-state">
         <div class="spinner"></div>
@@ -148,116 +171,111 @@
       </div>
     } @else if (filteredCampaigns().length === 0) {
       <div class="empty-state">
-        <div class="empty-icon">📢</div>
+        <div class="empty-icon"><lucide-icon [img]="Megaphone" [size]="48"></lucide-icon></div>
         <h3>No campaigns found</h3>
         <p>Create your first campaign to start advertising</p>
         <button class="btn-primary" (click)="openCreateCampaign()">Create Campaign</button>
       </div>
     } @else {
-      <table class="campaigns-table">
-        <thead>
-          <tr>
-            <th>Campaign</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Budget</th>
-            <th>Spent</th>
-            <th>Impressions</th>
-            <th>Clicks</th>
-            <th>CTR</th>
-            <th>Dates</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (campaign of filteredCampaigns(); track campaign.id) {
+      <div class="table-responsive">
+        <table class="campaigns-table">
+          <thead>
             <tr>
-              <td>
-                <div class="campaign-info">
-                  <div class="campaign-title">{{ campaign.title }}</div>
-                  <div class="campaign-description">{{ campaign.description }}</div>
-                </div>
-              </td>
-              <td>
-                <span class="type-badge">{{ campaign.type }}</span>
-              </td>
-              <td>
-                <span [class]="'status-badge ' + getStatusBadgeClass(campaign.status)">
-                  {{ getStatusIcon(campaign.status) }} {{ campaign.status }}
-                </span>
-              </td>
-              <td>{{ formatCurrency(campaign.totalBudget, campaign.currency) }}</td>
-              <td>
-                <div class="spend-info">
-                  <div>{{ formatCurrency(campaign.spentAmount, campaign.currency) }}</div>
-                  <div class="spend-percentage">
-                    {{ campaign.totalBudget > 0 ? formatPercentage((campaign.spentAmount / campaign.totalBudget) * 100) : '0%' }}
-                  </div>
-                </div>
-              </td>
-              <td>{{ formatNumber(campaign.impressions) }}</td>
-              <td>{{ formatNumber(campaign.clicks) }}</td>
-              <td>{{ formatPercentage(campaign.clickThroughRate) }}</td>
-              <td>
-                <div class="date-info">
-                  <div>{{ formatDate(campaign.startDate) }}</div>
-                  @if (campaign.endDate) {
-                    <div class="end-date">to {{ formatDate(campaign.endDate) }}</div>
-                  }
-                </div>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn-icon" (click)="viewCampaignDetails(campaign)" title="View Details">
-                    <lucide-icon [img]="Eye" [size]="16"></lucide-icon>
-                  </button>
-                  @if (campaign.status === 'draft') {
-                    <button class="btn-icon btn-success" (click)="startCampaign(campaign.id)" title="Start Campaign">
-                      <lucide-icon [img]="Play" [size]="16"></lucide-icon>
-                    </button>
-                    <button class="btn-icon" (click)="editCampaign(campaign)" title="Edit">
-                      <lucide-icon [img]="Edit" [size]="16"></lucide-icon>
-                    </button>
-                  }
-                  @if (campaign.status === 'active') {
-                    <button class="btn-icon btn-warning" (click)="pauseCampaign(campaign.id)" title="Pause">
-                      <lucide-icon [img]="Pause" [size]="16"></lucide-icon>
-                    </button>
-                  }
-                  @if (campaign.status === 'paused') {
-                    <button class="btn-icon btn-success" (click)="resumeCampaign(campaign.id)" title="Resume">
-                      <lucide-icon [img]="Play" [size]="16"></lucide-icon>
-                    </button>
-                  }
-                  <button class="btn-icon btn-danger" (click)="confirmDeleteCampaign(campaign)" title="Delete">
-                    <lucide-icon [img]="Trash2" [size]="16"></lucide-icon>
-                  </button>
-                </div>
-              </td>
+              <th>Campaign</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Budget</th>
+              <th>Spent</th>
+              <th>Impressions</th>
+              <th>Clicks</th>
+              <th>CTR</th>
+              <th>Dates</th>
+              <th>Actions</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (campaign of filteredCampaigns(); track campaign.id) {
+              <tr>
+                <td>
+                  <div class="campaign-info">
+                    <div class="campaign-title">{{ campaign.title }}</div>
+                    <div class="campaign-description">{{ campaign.description }}</div>
+                  </div>
+                </td>
+                <td><span class="type-badge">{{ campaign.type }}</span></td>
+                <td>
+                  <span [class]="'status-badge ' + getStatusBadgeClass(campaign.status)">
+                    <span class="status-dot" [class]="'dot-' + campaign.status"></span>
+                    {{ campaign.status }}
+                  </span>
+                </td>
+                <td class="cell-mono">{{ formatCurrency(campaign.totalBudget, campaign.currency) }}</td>
+                <td>
+                  <div class="spend-info">
+                    <div class="cell-mono">{{ formatCurrency(campaign.spentAmount, campaign.currency) }}</div>
+                    <div class="spend-bar-wrap">
+                      <div class="spend-bar" [style.width.%]="campaign.totalBudget > 0 ? (campaign.spentAmount / campaign.totalBudget) * 100 : 0"></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="cell-mono">{{ formatNumber(campaign.impressions) }}</td>
+                <td class="cell-mono">{{ formatNumber(campaign.clicks) }}</td>
+                <td class="cell-mono">{{ formatPercentage(campaign.clickThroughRate) }}</td>
+                <td>
+                  <div class="date-info">
+                    <div>{{ formatDate(campaign.startDate) }}</div>
+                    @if (campaign.endDate) {
+                      <div class="end-date">to {{ formatDate(campaign.endDate) }}</div>
+                    }
+                  </div>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn-icon" (click)="viewCampaignDetails(campaign)" title="View Details">
+                      <lucide-icon [img]="Eye" [size]="15"></lucide-icon>
+                    </button>
+                    @if (campaign.status === 'draft') {
+                      <button class="btn-icon btn-success" (click)="startCampaign(campaign.id)" title="Start Campaign">
+                        <lucide-icon [img]="Play" [size]="15"></lucide-icon>
+                      </button>
+                      <button class="btn-icon" (click)="editCampaign(campaign)" title="Edit">
+                        <lucide-icon [img]="Edit" [size]="15"></lucide-icon>
+                      </button>
+                    }
+                    @if (campaign.status === 'active') {
+                      <button class="btn-icon btn-warning" (click)="pauseCampaign(campaign.id)" title="Pause">
+                        <lucide-icon [img]="Pause" [size]="15"></lucide-icon>
+                      </button>
+                    }
+                    @if (campaign.status === 'paused') {
+                      <button class="btn-icon btn-success" (click)="resumeCampaign(campaign.id)" title="Resume">
+                        <lucide-icon [img]="Play" [size]="15"></lucide-icon>
+                      </button>
+                    }
+                    <button class="btn-icon btn-danger" (click)="confirmDeleteCampaign(campaign)" title="Delete">
+                      <lucide-icon [img]="Trash2" [size]="15"></lucide-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     }
   </div>
 
   <!-- Pagination -->
   @if (!isLoading() && filteredCampaigns().length > 0) {
     <div class="pagination">
-      <button
-        class="btn-secondary"
-        (click)="previousPage()"
-        [disabled]="currentPage() === 1"
-      >
-        ← Previous
+      <button class="btn-secondary" (click)="previousPage()" [disabled]="currentPage() === 1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        Previous
       </button>
       <span class="page-info">Page {{ currentPage() }}</span>
-      <button
-        class="btn-secondary"
-        (click)="nextPage()"
-        [disabled]="!hasMore()"
-      >
-        Next →
+      <button class="btn-secondary" (click)="nextPage()" [disabled]="!hasMore()">
+        Next
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
       </button>
     </div>
   }
@@ -292,7 +310,8 @@
               <label>Status</label>
               <div>
                 <span [class]="'status-badge ' + getStatusBadgeClass(selectedCampaign()!.status)">
-                  {{ getStatusIcon(selectedCampaign()!.status) }} {{ selectedCampaign()!.status }}
+                  <span class="status-dot" [class]="'dot-' + selectedCampaign()!.status"></span>
+                  {{ selectedCampaign()!.status }}
                 </span>
               </div>
             </div>
@@ -304,19 +323,19 @@
           <div class="detail-grid">
             <div class="detail-item">
               <label>Total Budget</label>
-              <div>{{ formatCurrency(selectedCampaign()!.totalBudget, selectedCampaign()!.currency) }}</div>
+              <div class="cell-mono">{{ formatCurrency(selectedCampaign()!.totalBudget, selectedCampaign()!.currency) }}</div>
             </div>
             <div class="detail-item">
               <label>Daily Budget</label>
-              <div>{{ formatCurrency(selectedCampaign()!.dailyBudget, selectedCampaign()!.currency) }}</div>
+              <div class="cell-mono">{{ formatCurrency(selectedCampaign()!.dailyBudget, selectedCampaign()!.currency) }}</div>
             </div>
             <div class="detail-item">
               <label>Spent Amount</label>
-              <div>{{ formatCurrency(selectedCampaign()!.spentAmount, selectedCampaign()!.currency) }}</div>
+              <div class="cell-mono">{{ formatCurrency(selectedCampaign()!.spentAmount, selectedCampaign()!.currency) }}</div>
             </div>
             <div class="detail-item">
               <label>Remaining</label>
-              <div>{{ formatCurrency(selectedCampaign()!.remainingAmount, selectedCampaign()!.currency) }}</div>
+              <div class="cell-mono">{{ formatCurrency(selectedCampaign()!.remainingAmount, selectedCampaign()!.currency) }}</div>
             </div>
           </div>
         </div>
@@ -326,19 +345,19 @@
           <div class="detail-grid">
             <div class="detail-item">
               <label>Impressions</label>
-              <div>{{ formatNumber(selectedCampaign()!.impressions) }}</div>
+              <div class="cell-mono">{{ formatNumber(selectedCampaign()!.impressions) }}</div>
             </div>
             <div class="detail-item">
               <label>Clicks</label>
-              <div>{{ formatNumber(selectedCampaign()!.clicks) }}</div>
+              <div class="cell-mono">{{ formatNumber(selectedCampaign()!.clicks) }}</div>
             </div>
             <div class="detail-item">
               <label>Conversions</label>
-              <div>{{ formatNumber(selectedCampaign()!.conversions) }}</div>
+              <div class="cell-mono">{{ formatNumber(selectedCampaign()!.conversions) }}</div>
             </div>
             <div class="detail-item">
               <label>Click-Through Rate</label>
-              <div>{{ formatPercentage(selectedCampaign()!.clickThroughRate) }}</div>
+              <div class="cell-mono">{{ formatPercentage(selectedCampaign()!.clickThroughRate) }}</div>
             </div>
           </div>
         </div>
@@ -410,5 +429,3 @@
     </div>
   </div>
 }
-
-

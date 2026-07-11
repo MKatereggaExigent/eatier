@@ -1,52 +1,56 @@
-<div class="promotions-container">
-  <header class="page-header">
-    <h1>Exclusive Deals</h1>
-    <p>Member-only promotions and discounts</p>
-  </header>
-
-  @if (loading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading promotions...</p>
+<div class="section">
+  <div class="section-inner">
+    <div class="page-header">
+      <h1 class="section-title">Exclusive Deals</h1>
+      <p class="tag">Member-only promotions and discounts</p>
     </div>
-  } @else if (promotions().length === 0) {
-    <div class="empty-state">
-      <h2>No Promotions Available</h2>
-      <p>Check back soon for exclusive member deals.</p>
-    </div>
-  } @else {
-    <div class="promotions-grid">
-      @for (promo of promotions(); track promo.id) {
-        <article class="promo-card">
-          <div class="promo-header">
-            <span class="promo-badge">{{ getTargetLabel(promo.targetType) }}</span>
-            <span class="promo-expiry" [class]="getExpiryClass(promo.validUntil)">
-              {{ getExpiryStatus(promo.validUntil) }}
-            </span>
-          </div>
 
-          <div class="promo-discount">
-            <span class="discount-value">{{ getDiscountDisplay(promo) }}</span>
-          </div>
-
-          <div class="promo-content">
-            <h3>{{ promo.title }}</h3>
-            <p class="promo-description">{{ promo.description }}</p>
-
-            <div class="promo-details">
-              @if (promo.minOrderAmount > 0) {
-                <span class="detail-item">Min. order: ${{ promo.minOrderAmount }}</span>
-              }
-              @if (promo.maxDiscount > 0) {
-                <span class="detail-item">Max discount: ${{ promo.maxDiscount }}</span>
-              }
-              <span class="detail-item">{{ getRemainingUses(promo) }}</span>
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading promotions...</p>
+      </div>
+    } @else if (promotions().length === 0) {
+      <div class="empty-state">
+        <lucide-icon [img]="Gift" [size]="48" class="empty-icon"></lucide-icon>
+        <h2>No Promotions Available</h2>
+        <p>Check back soon for exclusive member deals.</p>
+      </div>
+    } @else {
+      <div class="promotions-grid">
+        @for (promo of promotions(); track promo.id) {
+          <article class="promo-card">
+            <div class="promo-header">
+              <span class="promo-badge">
+                <lucide-icon [img]="getTargetIcon(promo.targetType)" [size]="14" class="badge-icon"></lucide-icon>
+                {{ getTargetLabel(promo.targetType) }}
+              </span>
+              <span class="promo-expiry" [class]="getExpiryClass(promo.validUntil)">
+                {{ getExpiryStatus(promo.validUntil) }}
+              </span>
             </div>
-          </div>
 
-          <div class="promo-footer">
-            <div class="promo-code-section">
-              <span class="code-label">Code</span>
+            <div class="promo-discount">
+              <span class="discount-value">{{ getDiscountDisplay(promo) }}</span>
+            </div>
+
+            <div class="promo-content">
+              <h3>{{ promo.title }}</h3>
+              <p class="promo-description">{{ promo.description }}</p>
+
+              <div class="promo-details">
+                @if (promo.minOrderAmount > 0) {
+                  <span class="detail-item">Min. order: ${{ promo.minOrderAmount }}</span>
+                }
+                @if (promo.maxDiscount > 0) {
+                  <span class="detail-item">Max discount: ${{ promo.maxDiscount }}</span>
+                }
+                <span class="detail-item">{{ getRemainingUses(promo) }}</span>
+              </div>
+            </div>
+
+            <div class="promo-footer">
+              <span class="code-label">Promo Code</span>
               <div class="code-box">
                 <span class="code">{{ promo.code }}</span>
                 <button
@@ -54,37 +58,40 @@
                   class="copy-btn"
                   (click)="copyCode(promo.code)"
                   [class.copied]="copiedCode() === promo.code">
-                  {{ copiedCode() === promo.code ? 'Copied' : 'Copy' }}
+                  @if (copiedCode() === promo.code) {
+                    <lucide-icon [img]="Check" [size]="16"></lucide-icon> Copied
+                  } @else {
+                    <lucide-icon [img]="Copy" [size]="16"></lucide-icon> Copy
+                  }
                 </button>
               </div>
             </div>
-          </div>
-        </article>
-      }
-    </div>
-
-    <!-- How It Works -->
-    <section class="how-it-works">
-      <h2>How to Use Promo Codes</h2>
-      <div class="steps">
-        <div class="step">
-          <span class="step-number">1</span>
-          <span class="step-text">Copy the promo code</span>
-        </div>
-        <div class="step">
-          <span class="step-number">2</span>
-          <span class="step-text">Add items to your cart</span>
-        </div>
-        <div class="step">
-          <span class="step-number">3</span>
-          <span class="step-text">Apply code at checkout</span>
-        </div>
-        <div class="step">
-          <span class="step-number">4</span>
-          <span class="step-text">Enjoy your discount</span>
-        </div>
+          </article>
+        }
       </div>
-    </section>
-  }
-</div>
 
+      <!-- How It Works -->
+      <section class="how-it-works">
+        <h2>How to Use Promo Codes</h2>
+        <div class="steps">
+          <div class="step">
+            <span class="step-number">1</span>
+            <span class="step-text">Copy the promo code</span>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <span class="step-text">Add items to your cart</span>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <span class="step-text">Apply code at checkout</span>
+          </div>
+          <div class="step">
+            <span class="step-number">4</span>
+            <span class="step-text">Enjoy your discount</span>
+          </div>
+        </div>
+      </section>
+    }
+  </div>
+</div>
