@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../config/database');
 const paystackService = require('../services/paystackService');
+const adTrackingService = require('../services/adTrackingService');
 const router = express.Router();
 
 // =====================================================
@@ -356,6 +357,8 @@ router.post('/my-ads', async (req, res) => {
     const costPerClick = tierCheck.rows[0].cost_per_click || 0;
     const costPerImpression = tierCheck.rows[0].cost_per_impression || 0;
 
+    const dailyBudgetValue = dailyBudget || totalBudget;
+
     const result = await pool.query(`
       INSERT INTO ad_campaigns (
         tenant_id, user_id, business_id,
@@ -370,7 +373,7 @@ router.post('/my-ads', async (req, res) => {
         priority_score, payment_required,
         status, is_active
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $20, $22, $23, $24, $25, $26, true, 'draft', false)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, true, 'draft', false)
       RETURNING *
     `, [
       tenantId, userId, businessId || null,
@@ -379,7 +382,7 @@ router.post('/my-ads', async (req, res) => {
       callToAction || 'Learn More', ctaType || 'learn_more', ctaUrl || null, ctaPhone || null,
       mediaUrls || [], videoUrls || [],
       targetRegions || [], targetLocations || [], targetCities || [],
-      currency || 'USD', totalBudget, dailyBudget || totalBudget,
+      currency || 'USD', totalBudget, dailyBudgetValue, totalBudget,
       costPerClick, costPerImpression,
       startDate || new Date(), endDate || null,
       priorityScore
@@ -983,15 +986,11 @@ router.post('/my-ads/:adId/resume', async (req, res) => {
 router.post('/track/impression/:adId', async (req, res) => {
   try {
     const { adId } = req.params;
-
-    await pool.query(`
-      UPDATE ad_campaigns
-      SET impressions = impressions + 1
-      WHERE id = $1 AND status = 'active'
-    `, [adId]);
-
-    res.json({ message: 'Impression tracked' });
-
+    const result = await adTrackingService.trackImpression(adId, {
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+    res.json(result);
   } catch (error) {
     console.error('Error tracking impression:', error);
     res.status(500).json({ error: 'Failed to track impression' });
@@ -1002,15 +1001,11 @@ router.post('/track/impression/:adId', async (req, res) => {
 router.post('/track/click/:adId', async (req, res) => {
   try {
     const { adId } = req.params;
-
-    await pool.query(`
-      UPDATE ad_campaigns
-      SET clicks = clicks + 1
-      WHERE id = $1 AND status = 'active'
-    `, [adId]);
-
-    res.json({ message: 'Click tracked' });
-
+    const result = await adTrackingService.trackClick(adId, {
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+    res.json(result);
   } catch (error) {
     console.error('Error tracking click:', error);
     res.status(500).json({ error: 'Failed to track click' });
@@ -1021,15 +1016,8 @@ router.post('/track/click/:adId', async (req, res) => {
 router.post('/track/conversion/:adId', async (req, res) => {
   try {
     const { adId } = req.params;
-
-    await pool.query(`
-      UPDATE ad_campaigns
-      SET conversions = conversions + 1
-      WHERE id = $1 AND status = 'active'
-    `, [adId]);
-
-    res.json({ message: 'Conversion tracked' });
-
+    const result = await adTrackingService.trackConversion(adId);
+    res.json(result);
   } catch (error) {
     console.error('Error tracking conversion:', error);
     res.status(500).json({ error: 'Failed to track conversion' });

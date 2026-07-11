@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('../config/database');
+const adTrackingService = require('../services/adTrackingService');
 const router = express.Router();
 
 // =====================================================
@@ -227,14 +228,36 @@ router.put('/campaigns/:campaignId', async (req, res) => {
     const { campaignId } = req.params;
     const updates = req.body;
 
-    // Build dynamic update query
+    const ALLOWED_CAMPAIGN_UPDATE_FIELDS = {
+      title: 'title',
+      description: 'description',
+      type: 'type',
+      status: 'status',
+      totalBudget: 'total_budget',
+      dailyBudget: 'daily_budget',
+      currency: 'currency',
+      targetLocations: 'target_locations',
+      targetAgeMin: 'target_age_min',
+      targetAgeMax: 'target_age_max',
+      targetGender: 'target_gender',
+      targetInterests: 'target_interests',
+      headline: 'headline',
+      bodyText: 'body_text',
+      callToAction: 'call_to_action',
+      mediaUrls: 'media_urls',
+      destinationUrl: 'destination_url',
+      startDate: 'start_date',
+      endDate: 'end_date',
+      isActive: 'is_active'
+    };
+
     const fields = [];
     const values = [];
     let paramCount = 1;
 
     Object.keys(updates).forEach(key => {
-      if (key !== 'id' && key !== 'userId') {
-        fields.push(`${key} = $${paramCount}`);
+      if (ALLOWED_CAMPAIGN_UPDATE_FIELDS[key]) {
+        fields.push(`${ALLOWED_CAMPAIGN_UPDATE_FIELDS[key]} = $${paramCount}`);
         values.push(updates[key]);
         paramCount++;
       }
@@ -479,16 +502,6 @@ router.get('/public', async (req, res) => {
 
     const result = await pool.query(query, params);
 
-    // Increment impressions for returned ads
-    if (result.rows.length > 0) {
-      const adIds = result.rows.map(ad => ad.id);
-      await pool.query(`
-        UPDATE ad_campaigns
-        SET impressions = impressions + 1
-        WHERE id = ANY($1)
-      `, [adIds]);
-    }
-
     res.json({
       ads: result.rows.map(ad => ({
         ...ad,
@@ -510,15 +523,11 @@ router.get('/public', async (req, res) => {
 router.post('/click/:adId', async (req, res) => {
   try {
     const { adId } = req.params;
-
-    await pool.query(`
-      UPDATE ad_campaigns
-      SET clicks = clicks + 1
-      WHERE id = $1
-    `, [adId]);
-
-    res.json({ success: true });
-
+    const result = await adTrackingService.trackClick(adId, {
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+    res.json(result);
   } catch (error) {
     console.error('Error tracking ad click:', error);
     res.status(500).json({ error: 'Failed to track click' });

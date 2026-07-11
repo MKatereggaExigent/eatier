@@ -10,7 +10,7 @@ set -e
 CAPROVER_NAME="aidoc-server"
 CAPROVER_APP="itiyum"
 BACKEND_HOST="172.17.0.1"
-BACKEND_PORT="3002"
+BACKEND_PORT="3001"
 
 echo ""
 echo "🚀 Itiyum CapRover Frontend Deployment"

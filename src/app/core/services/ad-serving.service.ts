@@ -97,17 +97,21 @@ export class AdServingService {
    */
   private fetchAds(placement: string, limit: number): void {
     // Map frontend placement names to backend placement names
+    // Database uses naming convention: {position}_{tier} (e.g., 'sidebar_basic', 'homepage_banner_premium')
+    // Backend uses LIKE query with % suffix, so we send the position prefix
     const placementMap: Record<string, string> = {
-      'sidebar_ad': 'sidebar_left',
-      'sidebar_left': 'sidebar_left',
-      'sidebar_right': 'sidebar_right',
-      'homepage_banner': 'homepage_hero_banner',
+      'sidebar_ad': 'sidebar',
+      'sidebar_left': 'sidebar',
+      'sidebar_right': 'sidebar',
+      'homepage_banner': 'homepage_banner',
       'header_banner': 'header_banner',
       'footer_banner': 'footer_banner',
       'inline_content': 'inline_content',
       'community_feed': 'community_feed',
-      'restaurant_list_banner': 'restaurant_list_banner',
-      'specialist_list_banner': 'specialist_list_banner'
+      'restaurant_list': 'restaurant_list',
+      'restaurant_list_banner': 'restaurant_list',
+      'specialist_list': 'specialist_list',
+      'specialist_list_banner': 'specialist_list'
     };
 
     const backendPlacement = placementMap[placement] || placement;

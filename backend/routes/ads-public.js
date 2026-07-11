@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
+const adTrackingService = require('../services/adTrackingService');
 
 /**
  * Get active ads by placement
@@ -29,7 +30,9 @@ router.get('/placements/:placement', async (req, res) => {
       'homepage_banner': { position: 'hero', page_location: 'homepage' },
       'community_feed': { position: 'feed', page_location: 'community' },
       'restaurant_list': { position: 'inline', page_location: 'restaurant_list' },
-      'specialist_list': { position: 'inline', page_location: 'specialists' }
+      'restaurant_list_banner': { position: 'inline', page_location: 'restaurant_list' },
+      'specialist_list': { position: 'inline', page_location: 'specialists' },
+      'specialist_list_banner': { position: 'inline', page_location: 'specialists' }
     };
 
     const mappedPlacement = placementMap[placement];
@@ -135,40 +138,17 @@ router.get('/placements/:placement', async (req, res) => {
 /**
  * Track ad impression
  * Called when an ad is displayed to a user
- * Also updates spent amount based on CPM (cost per thousand impressions)
+ * Uses AdTrackingService for consistent CPM-based cost calculation
  */
 router.post('/impressions/:adId', async (req, res) => {
   try {
     const { adId } = req.params;
-
-    // Get campaign details to calculate cost
-    const campaign = await pool.query(`
-      SELECT cpm, impressions
-      FROM ad_campaigns
-      WHERE id = $1 AND status = 'active'
-    `, [adId]);
-
-    if (campaign.rows.length === 0) {
-      return res.status(404).json({ error: 'Campaign not found or not active' });
-    }
-
-    const { cpm } = campaign.rows[0];
-
-    // Calculate cost for this impression (CPM = cost per 1000 impressions)
-    const costPerImpression = cpm ? parseFloat(cpm) / 1000 : 0;
-
-    // Update impressions, spent amount, and remaining budget
-    await pool.query(`
-      UPDATE ad_campaigns
-      SET
-        impressions = impressions + 1,
-        spent = spent + $2,
-        remaining_amount = remaining_amount - $2
-      WHERE id = $1 AND status = 'active'
-    `, [adId, costPerImpression]);
-
-    res.json({ success: true, costPerImpression });
-
+    const result = await adTrackingService.trackImpression(adId, {
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      placement: req.body.placement || null
+    });
+    res.json(result);
   } catch (error) {
     console.error('Error tracking impression:', error);
     res.status(500).json({ error: 'Failed to track impression' });
@@ -178,38 +158,16 @@ router.post('/impressions/:adId', async (req, res) => {
 /**
  * Track ad click
  * Called when a user clicks on an ad
- * Also updates spent amount based on CPC (cost per click)
+ * Uses AdTrackingService for consistent CPC-based cost calculation
  */
 router.post('/clicks/:adId', async (req, res) => {
   try {
     const { adId } = req.params;
-
-    // Get campaign details to calculate cost
-    const campaign = await pool.query(`
-      SELECT cpc
-      FROM ad_campaigns
-      WHERE id = $1 AND status = 'active'
-    `, [adId]);
-
-    if (campaign.rows.length === 0) {
-      return res.status(404).json({ error: 'Campaign not found or not active' });
-    }
-
-    const { cpc } = campaign.rows[0];
-    const costPerClick = cpc ? parseFloat(cpc) : 0;
-
-    // Update clicks and spent amount
-    await pool.query(`
-      UPDATE ad_campaigns
-      SET
-        clicks = clicks + 1,
-        spent = spent + $2,
-        remaining_amount = remaining_amount - $2
-      WHERE id = $1 AND status = 'active'
-    `, [adId, costPerClick]);
-
-    res.json({ success: true, costPerClick });
-
+    const result = await adTrackingService.trackClick(adId, {
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent')
+    });
+    res.json(result);
   } catch (error) {
     console.error('Error tracking click:', error);
     res.status(500).json({ error: 'Failed to track click' });
