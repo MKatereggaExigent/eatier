@@ -29,7 +29,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "📥 STEP 1: Pulling latest code"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 cd "$SCRIPT_DIR"
-git pull origin development-v2
+git pull origin development-v3
 
 # Step 2: Rebuild and restart Docker containers
 echo ""
