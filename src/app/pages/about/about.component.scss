@@ -92,6 +92,15 @@ $orange: #ff8c00;
     letter-spacing: 0.16em;
     color: rgba(255,255,255,0.6);
     margin-bottom: 1rem;
+
+    &.sponsored {
+      color: $orange;
+      background: rgba($orange, 0.12);
+      padding: 0.3em 0.8em;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+    }
   }
 
   .hero-title {
@@ -145,6 +154,13 @@ $orange: #ff8c00;
       text-decoration: none;
       transition: all 0.3s ease;
       &:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.35); transform: translateY(-1px); }
+    }
+
+    .ad-by {
+      font-family: $font-sans;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.45);
+      margin-left: 0.5rem;
     }
   }
 

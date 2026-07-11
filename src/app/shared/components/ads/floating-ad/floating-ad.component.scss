@@ -29,13 +29,13 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #CBD5E1;
+    color: #1E293B;
     transition: all 0.2s ease;
     padding: 0;
 
     &:hover {
       background: #f1f5f9;
-      color: #CBD5E1;
+      color: #1E293B;
       transform: scale(1.1);
     }
   }
@@ -82,7 +82,7 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #CBD5E1;
+        color: #1E293B;
         margin-bottom: 0.125rem;
         display: block;
       }
@@ -90,7 +90,7 @@
       .ad-title {
         font-size: 0.8125rem;
         font-weight: 600;
-        color: #CBD5E1;
+        color: #1E293B;
         margin: 0 0 0.125rem;
         line-height: 1.3;
         overflow: hidden;
@@ -100,7 +100,7 @@
 
       .ad-desc {
         font-size: 0.6875rem;
-        color: #CBD5E1;
+        color: #1E293B;
         margin: 0 0 0.5rem;
         line-height: 1.4;
         display: -webkit-box;

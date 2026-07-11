@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { PublicStatsService } from '../../core/services/public-stats.service';
+import { AdServingService, Ad } from '../../core/services/ad-serving.service';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, Zap, Store, UtensilsCrossed, User, ChefHat, CheckCircle, Shield, BookOpen, MessageCircle, GraduationCap, Handshake, Calendar, BarChart3, Megaphone, Globe, Heart, Target, Award, AlertTriangle, XCircle, MessageSquare, Mail, Phone, MapPin, Send, Star } from 'lucide-angular';
 
@@ -22,6 +23,8 @@ interface CarouselSlide {
   title: string;
   subtitle: string;
   overlay: string;
+  isAd?: boolean;
+  ad?: Ad;
 }
 
 @Component({
@@ -33,9 +36,11 @@ interface CarouselSlide {
 })
 export class AboutComponent implements OnInit, OnDestroy {
   private publicStatsService = inject(PublicStatsService);
+  private adServing = inject(AdServingService);
 
   currentSlide = signal<number>(0);
   private carouselInterval: any;
+  private trackedAds = new Set<string>();
 
   // Lucide Icons
   readonly CheckCircle = CheckCircle;
@@ -118,6 +123,7 @@ export class AboutComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.startCarousel();
     this.loadStatistics();
+    this.loadHomepageAds();
   }
 
   /**
@@ -137,6 +143,43 @@ export class AboutComponent implements OnInit, OnDestroy {
         console.error('Error loading statistics:', error);
         // Keep default values (0) on error
       }
+    });
+  }
+
+  /**
+   * Load homepage ads and merge them into carousel slides
+   */
+  loadHomepageAds(): void {
+    this.adServing.getAdsByPlacement('homepage_banner', 4).subscribe(ads => {
+      if (!ads.length) return;
+
+      const contentSlides: CarouselSlide[] = [...this.carouselSlides];
+      const adSlides: CarouselSlide[] = ads.map(ad => ({
+        image: ad.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&h=900&fit=crop',
+        label: ad.advertiser_name || 'Sponsored',
+        title: ad.headline || ad.title,
+        subtitle: ad.body_text || ad.description || '',
+        overlay: 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(15,23,42,0.4) 50%, rgba(0,0,0,0.6) 100%)',
+        isAd: true,
+        ad
+      }));
+
+      // Interleave: 2 content slides, 1 ad, repeat
+      const mixed: CarouselSlide[] = [];
+      let ci = 0, ai = 0;
+      let contentSinceAd = 0;
+      while (ci < contentSlides.length || ai < adSlides.length) {
+        if (ai < adSlides.length && (ci >= contentSlides.length || contentSinceAd >= 2)) {
+          mixed.push(adSlides[ai++]);
+          contentSinceAd = 0;
+        } else if (ci < contentSlides.length) {
+          mixed.push(contentSlides[ci++]);
+          contentSinceAd++;
+        } else {
+          break;
+        }
+      }
+      this.carouselSlides = mixed;
     });
   }
 
@@ -168,19 +211,36 @@ export class AboutComponent implements OnInit, OnDestroy {
   }
 
   nextSlide(): void {
-    this.currentSlide.update(current =>
-      current === this.carouselSlides.length - 1 ? 0 : current + 1
-    );
+    this.currentSlide.update(current => {
+      const next = current === this.carouselSlides.length - 1 ? 0 : current + 1;
+      this.trackAdIfActive(next);
+      return next;
+    });
   }
 
   prevSlide(): void {
-    this.currentSlide.update(current =>
-      current === 0 ? this.carouselSlides.length - 1 : current - 1
-    );
+    this.currentSlide.update(current => {
+      const prev = current === 0 ? this.carouselSlides.length - 1 : current - 1;
+      this.trackAdIfActive(prev);
+      return prev;
+    });
   }
 
   goToSlide(index: number): void {
     this.currentSlide.set(index);
+    this.trackAdIfActive(index);
+  }
+
+  private trackAdIfActive(index: number): void {
+    const slide = this.carouselSlides[index];
+    if (slide?.isAd && slide.ad && !this.trackedAds.has(slide.ad.id)) {
+      this.trackedAds.add(slide.ad.id);
+      this.adServing.trackImpression(slide.ad.id);
+    }
+  }
+
+  onAdClick(ad: Ad): void {
+    this.adServing.trackClick(ad.id);
   }
 
   userGroups: UserGroup[] = [
