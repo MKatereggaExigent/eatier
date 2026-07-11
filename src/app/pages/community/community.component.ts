@@ -5,6 +5,7 @@ import { LucideAngularModule, PenSquare, Heart, MessageCircle, Share2, Star, Bar
 
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { InlineAdComponent } from '../../shared/components/ads/inline-ad/inline-ad.component';
 import { RouterModule } from '@angular/router';
 
 interface CommunityPost {
@@ -43,7 +44,7 @@ interface CarouselSlide {
 @Component({
   selector: 'app-community',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule, InlineAdComponent],
   templateUrl: './community.component.html',
   styleUrls: ['./community.component.scss']
 })

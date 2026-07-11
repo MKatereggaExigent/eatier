@@ -119,6 +119,27 @@
   }
 }
 
+.inline-ad-placeholder {
+  background: #fafafa;
+  border: 1px dashed #e0e0e0;
+  border-radius: 8px;
+  padding: 2rem 1.5rem;
+  margin: 2rem 0;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .placeholder-label {
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #a0a0a0;
+  }
+}
+
 // Responsive design
 @media (max-width: 768px) {
   .inline-ad {

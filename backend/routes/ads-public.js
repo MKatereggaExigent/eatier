@@ -32,7 +32,11 @@ router.get('/placements/:placement', async (req, res) => {
       'restaurant_list': { position: 'inline', page_location: 'restaurant_list' },
       'restaurant_list_banner': { position: 'inline', page_location: 'restaurant_list' },
       'specialist_list': { position: 'inline', page_location: 'specialists' },
-      'specialist_list_banner': { position: 'inline', page_location: 'specialists' }
+      'specialist_list_banner': { position: 'inline', page_location: 'specialists' },
+      'blog_list': { position: 'inline', page_location: 'blog' },
+      'blog_list_banner': { position: 'inline', page_location: 'blog' },
+      'grow_page': { position: 'inline', page_location: 'grow_page' },
+      'grow_page_banner': { position: 'inline', page_location: 'grow_page' }
     };
 
     const mappedPlacement = placementMap[placement];

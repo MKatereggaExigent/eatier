@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { InlineAdComponent } from '../../../shared/components/ads/inline-ad/inline-ad.component';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -60,7 +61,7 @@ interface IndustryTrend {
 @Component({
   selector: 'app-blog-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule, InlineAdComponent],
   templateUrl: './blog-list.component.html',
   styleUrl: './blog-list.component.scss'
 })

@@ -4,6 +4,7 @@ import { LucideAngularModule, Target, Star, Handshake, Globe, Calendar, MessageC
 
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { InlineAdComponent } from '../../shared/components/ads/inline-ad/inline-ad.component';
 import { PublicStatsService } from '../../core/services/public-stats.service';
 import { CurrencyService } from '../../core/services/currency.service';
 
@@ -19,7 +20,7 @@ interface AdType {
 @Component({
   selector: 'app-grow',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule, InlineAdComponent],
   templateUrl: './grow.component.html',
   styleUrl: './grow.component.scss'
 })

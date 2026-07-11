@@ -6,6 +6,7 @@ import { AuthService } from './services/auth.service';
 import { CartService } from './services/cart.service';
 import { CommonModule } from '@angular/common';
 import { FavoritesService } from '../services/favorites.service';
+import { FloatingAdComponent } from '../shared/components/ads/floating-ad/floating-ad.component';
 import { FooterAdComponent } from '../shared/components/ads/footer-ad/footer-ad.component';
 import { FormsModule } from '@angular/forms';
 import { HeaderAdComponent } from '../shared/components/ads/header-ad/header-ad.component';
@@ -36,6 +37,7 @@ interface NavItem {
     CommonModule,
     FormsModule,
     HeaderAdComponent,
+    FloatingAdComponent,
     FooterAdComponent,
     LeftSidebarAdComponent,
     RightSidebarAdComponent,

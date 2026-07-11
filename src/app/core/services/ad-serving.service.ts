@@ -111,7 +111,11 @@ export class AdServingService {
       'restaurant_list': 'restaurant_list',
       'restaurant_list_banner': 'restaurant_list',
       'specialist_list': 'specialist_list',
-      'specialist_list_banner': 'specialist_list'
+      'specialist_list_banner': 'specialist_list',
+      'blog_list': 'blog_list',
+      'blog_list_banner': 'blog_list',
+      'grow_page': 'grow_page',
+      'grow_page_banner': 'grow_page'
     };
 
     const backendPlacement = placementMap[placement] || placement;

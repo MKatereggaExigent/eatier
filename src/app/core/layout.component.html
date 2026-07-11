@@ -296,6 +296,11 @@
     </div>
   }
 
+  <!-- Floating Ad - Overlay on full-width pages -->
+  @if (isFullWidthPage()) {
+    <app-floating-ad placement="inline_content" [position]="'bottom-right'" [dismissAfterMs]="30000"></app-floating-ad>
+  }
+
   <!-- Modern Footer -->
   <footer class="footer" [class.full-width]="isFullWidthPage()">
     <div class="footer-bg">

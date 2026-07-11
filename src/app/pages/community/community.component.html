@@ -39,6 +39,11 @@
     </div>
   </section>
 
+  <!-- Inline Ad - between hero and content -->
+  <div class="community-inline-ad">
+    <app-inline-ad placement="community_feed" [limit]="1"></app-inline-ad>
+  </div>
+
   <div class="community-layout">
     <!-- ========== LOADING ========== -->
     @if (isLoading()) {
@@ -170,7 +175,14 @@
             }
           </div>
         }
+      </section>
 
+      <!-- Inline Ad - between trending and popular -->
+      <div class="community-inline-ad">
+        <app-inline-ad placement="community_feed" [limit]="1"></app-inline-ad>
+      </div>
+
+      <section class="feed-section">
         <div class="section-head popular-head">
           <h2><lucide-icon [img]="TrendingUp" [size]="22"></lucide-icon> Popular Posts</h2>
           <p>Most engaged posts from the community</p>

@@ -1,7 +1,7 @@
 @if (ad(); as currentAd) {
   <div class="inline-ad" (click)="onAdClick(currentAd)">
     <span class="ad-label">Sponsored Content</span>
-    
+
     <div class="ad-wrapper">
       @if (currentAd.image_url) {
         <div class="ad-image-container">
@@ -15,7 +15,7 @@
         }
         <h3 class="ad-title">{{ currentAd.title }}</h3>
         <p class="ad-description">{{ currentAd.description }}</p>
-        
+
         <button class="ad-cta">
           {{ currentAd.cta_text }}
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -24,6 +24,10 @@
         </button>
       </div>
     </div>
+  </div>
+} @else {
+  <div class="inline-ad-placeholder">
+    <span class="placeholder-label">Advertisement</span>
   </div>
 }
 
