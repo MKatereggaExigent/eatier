@@ -8,6 +8,7 @@ import { MessagingWidgetComponent } from '../../../shared/components/messaging-w
 import { AvatarUploadComponent } from '../../../shared/components/avatar-upload/avatar-upload.component';
 import { AvatarContextMenuDirective } from '../../../shared/directives/avatar-context-menu.directive';
 import { MessagingService } from '../../../core/services/messaging.service';
+import { StoriesService, StoryUser } from '../../../core/services/stories.service';
 import {
   LucideAngularModule, Heart, MessageCircle, Share2, Search, Bell, Camera, Send,
   UserCheck, MoreHorizontal, Users, MessageSquare, UserPlus, AtSign, Star, Image,
@@ -77,6 +78,7 @@ export class BusinessSocialComponent implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
   private messagingService = inject(MessagingService);
+  private storiesService = inject(StoriesService);
 
   loading = signal(true);
   activeTab = signal<'feed' | 'discover' | 'following' | 'followers'>('feed');
@@ -85,6 +87,7 @@ export class BusinessSocialComponent implements OnInit {
   discoverUsers = signal<UserToFollow[]>([]);
   following = signal<UserToFollow[]>([]);
   followers = signal<UserToFollow[]>([]);
+  storyUsers = signal<StoryUser[]>([]);
 
   followingInProgress = signal<Set<string>>(new Set());
 
@@ -93,6 +96,13 @@ export class BusinessSocialComponent implements OnInit {
   totalActivityPages = signal(1);
 
   showAvatarUpload = signal(false);
+
+  // Story creation
+  showStoryCreate = signal(false);
+  storyFile = signal<File | null>(null);
+  storyPreview = signal<string | null>(null);
+  creatingStory = signal(false);
+  storyError = signal<string | null>(null);
 
   searchQuery = signal('');
   showNotifications = signal(false);
@@ -116,13 +126,12 @@ export class BusinessSocialComponent implements OnInit {
     return this.followers().filter(u => this.getUserFullName(u).toLowerCase().includes(q));
   });
 
-  stories = computed(() => this.discoverUsers().slice(0, 8));
-
   private currentUserAvatarSeed = signal(`user_${Date.now()}`);
 
   ngOnInit(): void {
     this.loadActivityFeed();
     this.loadDiscoverUsers();
+    this.loadStories();
   }
 
   setActiveTab(tab: 'feed' | 'discover' | 'following' | 'followers'): void {
@@ -185,6 +194,13 @@ export class BusinessSocialComponent implements OnInit {
     this.http.get<any>(`${environment.apiUrl}/social/followers`).subscribe({
       next: (data) => { this.followers.set(data.followers || []); this.loading.set(false); },
       error: () => this.loading.set(false)
+    });
+  }
+
+  loadStories(): void {
+    this.storiesService.getFeed().subscribe({
+      next: (data) => this.storyUsers.set(data.users || []),
+      error: () => {}
     });
   }
 
@@ -287,6 +303,77 @@ export class BusinessSocialComponent implements OnInit {
 
   closeAvatarUpload(): void {
     this.showAvatarUpload.set(false);
+  }
+
+  openStoryCreate(): void {
+    this.storyFile.set(null);
+    this.storyPreview.set(null);
+    this.storyError.set(null);
+    this.showStoryCreate.set(true);
+  }
+
+  closeStoryCreate(): void {
+    this.showStoryCreate.set(false);
+    this.storyFile.set(null);
+    this.storyPreview.set(null);
+    this.storyError.set(null);
+  }
+
+  onStoryFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+        this.storyError.set('Please select an image or video file');
+        return;
+      }
+      if (file.size > 20 * 1024 * 1024) {
+        this.storyError.set('File size must be less than 20MB');
+        return;
+      }
+      this.storyFile.set(file);
+      this.storyError.set(null);
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => this.storyPreview.set(e.target?.result as string);
+        reader.readAsDataURL(file);
+      } else {
+        this.storyPreview.set(null);
+      }
+    }
+  }
+
+  triggerStoryFileInput(): void {
+    document.getElementById('storyFileInput')?.click();
+  }
+
+  createStory(): void {
+    const file = this.storyFile();
+    if (!file) {
+      this.storyError.set('Please select a file first');
+      return;
+    }
+    this.creatingStory.set(true);
+    this.storyError.set(null);
+    this.storiesService.uploadStoryMedia(file).subscribe({
+      next: (res) => {
+        this.storiesService.createStory(res.mediaUrl, res.mediaType).subscribe({
+          next: () => {
+            this.creatingStory.set(false);
+            this.closeStoryCreate();
+            this.loadStories();
+          },
+          error: (err) => {
+            this.creatingStory.set(false);
+            this.storyError.set(err.error?.error || 'Failed to create story');
+          }
+        });
+      },
+      error: (err) => {
+        this.creatingStory.set(false);
+        this.storyError.set(err.error?.error || 'Failed to upload media');
+      }
+    });
   }
 
   enc(seed: string): string {

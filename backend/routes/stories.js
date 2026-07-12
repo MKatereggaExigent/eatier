@@ -1,7 +1,49 @@
 const express = require('express');
 const pool = require('../config/database');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs').promises;
 const { authenticateToken } = require('../middleware/auth');
+
+// Configure multer for story media uploads
+const storyStorage = multer.memoryStorage();
+const storyUpload = multer({
+  storage: storyStorage,
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image and video files are allowed'), false);
+    }
+  }
+});
+
+// POST /api/stories/upload - Upload story media file
+router.post('/upload', authenticateToken, storyUpload.single('media'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const tenantId = req.user.tenant_id;
+    const mediaType = req.file.mimetype.startsWith('video/') ? 'video' : 'image';
+    const ext = mediaType === 'video' ? '.mp4' : '.jpg';
+    const uploadsDir = path.join(__dirname, '../uploads/stories');
+    await fs.mkdir(uploadsDir, { recursive: true });
+
+    const filename = `story-${tenantId}-${Date.now()}${ext}`;
+    const filepath = path.join(uploadsDir, filename);
+    await fs.writeFile(filepath, req.file.buffer);
+
+    const mediaUrl = `/uploads/stories/${filename}`;
+    res.json({ mediaUrl, mediaType });
+  } catch (error) {
+    console.error('Story media upload error:', error);
+    res.status(500).json({ error: 'Failed to upload story media' });
+  }
+});
 
 // POST /api/stories - Create a story (expires in 24h)
 router.post('/', authenticateToken, async (req, res) => {

@@ -100,7 +100,7 @@
       <h2>Stories</h2>
     </div>
     <div class="stories-track">
-      <div class="story-item create-story" (click)="openAvatarUpload()" role="button" tabindex="0">
+      <div class="story-item create-story" (click)="openStoryCreate()" role="button" tabindex="0">
         <div class="story-ring create-ring">
           <div class="create-avatar">
             <lucide-icon [img]="Plus" [size]="22"></lucide-icon>
@@ -108,12 +108,12 @@
         </div>
         <span class="story-name">Your Story</span>
       </div>
-      @for (user of stories(); track user.id) {
+      @for (su of storyUsers(); track su.user.id) {
         <div class="story-item" role="button" tabindex="0">
           <div class="story-ring">
-            <img [src]="getUserAvatarUrl(user)" [alt]="getUserFullName(user)" class="story-avatar-img">
+            <img [src]="su.user.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + su.user.id + '&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50'" [alt]="su.user.firstName" class="story-avatar-img">
           </div>
-          <span class="story-name">{{ user.first_name || user.firstName || 'User' }}</span>
+          <span class="story-name">{{ su.user.firstName }}</span>
         </div>
       }
     </div>
@@ -392,4 +392,61 @@
 <!-- Avatar Upload Modal -->
 @if (showAvatarUpload()) {
   <app-avatar-upload (avatarUploaded)="onAvatarUploaded($event)" (closeModal)="closeAvatarUpload()"></app-avatar-upload>
+}
+
+<!-- Story Creation Modal -->
+@if (showStoryCreate()) {
+  <div class="modal-overlay" (click)="closeStoryCreate()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Create Story</h2>
+        <button type="button" class="close-btn" (click)="closeStoryCreate()" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        @if (storyPreview()) {
+          <div class="preview-container">
+            @if (storyFile()?.type.startsWith('video/')) {
+              <video [src]="storyPreview()" controls class="story-preview-media"></video>
+            } @else {
+              <img [src]="storyPreview()" alt="Story preview" class="story-preview-media" />
+            }
+          </div>
+        } @else {
+          <div class="preview-container placeholder">
+            <div class="placeholder-icon">
+              <lucide-icon [img]="Camera" [size]="32"></lucide-icon>
+            </div>
+            <p>Select an image or video</p>
+          </div>
+        }
+
+        <input type="file" id="storyFileInput" accept="image/*,video/*" (change)="onStoryFileSelected($event)" style="display: none;">
+
+        @if (storyError()) {
+          <div class="error-message">{{ storyError() }}</div>
+        }
+
+        <div class="actions">
+          <button type="button" class="btn btn-select" (click)="triggerStoryFileInput()" [disabled]="creatingStory()">
+            Select Media
+          </button>
+          @if (storyFile()) {
+            <button type="button" class="btn btn-upload" (click)="createStory()" [disabled]="creatingStory()">
+              @if (creatingStory()) {
+                Posting...
+              } @else {
+                Post Story
+              }
+            </button>
+          }
+        </div>
+
+        <div class="info">
+          <p>Max file size: 20MB</p>
+          <p>Supported: JPG, PNG, GIF, MP4</p>
+          <p>Stories expire after 24 hours</p>
+        </div>
+      </div>
+    </div>
+  </div>
 }

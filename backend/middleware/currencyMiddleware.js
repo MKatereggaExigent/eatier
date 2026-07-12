@@ -42,8 +42,8 @@ function detectCurrency(req, res, next) {
     console.error('Error in currency middleware:', error);
     // Fallback to default
     req.userCurrency = {
-      currency: 'UGX',
-      country: 'UG',
+      currency: 'ZAR',
+      country: 'ZA',
       ip: 'unknown'
     };
     next();

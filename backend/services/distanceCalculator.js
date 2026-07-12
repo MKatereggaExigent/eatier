@@ -4,8 +4,8 @@ const axios = require('axios');
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE';
 
 // Delivery fee configuration
-const BASE_DELIVERY_FEE = 2000; // 2000 UGX base fee
-const PRICE_PER_KM = 500; // 500 UGX per kilometer
+const BASE_DELIVERY_FEE = 2000; // 2000 ZAR base fee
+const PRICE_PER_KM = 500; // 500 ZAR per kilometer
 const MIN_DELIVERY_FEE = 2000; // Minimum delivery fee
 const MAX_DELIVERY_FEE = 15000; // Maximum delivery fee
 

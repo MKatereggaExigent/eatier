@@ -458,10 +458,10 @@ export class AdminBusinessesComponent implements OnInit {
   // Utility methods
   getPriceRangeLabel(range: string): string {
     const rangeMap: { [key: string]: string } = {
-      'budget': '$',
-      'moderate': '$$',
-      'expensive': '$$$',
-      'luxury': '$$$$'
+      'budget': 'R',
+      'moderate': 'RR',
+      'expensive': 'RRR',
+      'luxury': 'RRRR'
     };
     return rangeMap[range] || range;
   }

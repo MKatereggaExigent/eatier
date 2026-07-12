@@ -9,6 +9,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const sharp = require('sharp');
+const pool = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
 
 // Configure multer for file uploads
@@ -71,7 +72,7 @@ router.post('/avatar', authenticateToken, upload.single('avatar'), async (req, r
       RETURNING id, profile_image_url
     `;
     
-    const result = await req.db.query(query, [avatarUrl, userId, tenantId]);
+    const result = await pool.query(query, [avatarUrl, userId, tenantId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
@@ -100,7 +101,7 @@ router.delete('/avatar', authenticateToken, async (req, res) => {
 
     // Get current avatar to delete file
     const currentQuery = `SELECT profile_image_url FROM users WHERE id = $1 AND tenant_id = $2`;
-    const currentResult = await req.db.query(currentQuery, [userId, tenantId]);
+    const currentResult = await pool.query(currentQuery, [userId, tenantId]);
 
     if (currentResult.rows.length > 0 && currentResult.rows[0].profile_image_url) {
       const oldAvatarPath = path.join(__dirname, '..', currentResult.rows[0].profile_image_url);
@@ -119,7 +120,7 @@ router.delete('/avatar', authenticateToken, async (req, res) => {
       RETURNING id
     `;
     
-    const result = await req.db.query(query, [userId, tenantId]);
+    const result = await pool.query(query, [userId, tenantId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });

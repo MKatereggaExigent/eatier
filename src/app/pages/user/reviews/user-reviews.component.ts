@@ -609,11 +609,11 @@ export class UserReviewsComponent implements OnInit, OnDestroy {
 
   getPriceRangeDisplay(priceRange: string): string {
     const ranges = {
-      budget: '$',
-      moderate: '$$',
-      expensive: '$$$',
-      fine_dining: '$$$$'
+      budget: 'R',
+      moderate: 'RR',
+      expensive: 'RRR',
+      fine_dining: 'RRRR'
     };
-    return ranges[priceRange as keyof typeof ranges] || '$$';
+    return ranges[priceRange as keyof typeof ranges] || 'RR';
   }
 }

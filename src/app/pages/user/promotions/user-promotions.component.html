@@ -40,10 +40,10 @@
 
               <div class="promo-details">
                 @if (promo.minOrderAmount > 0) {
-                  <span class="detail-item">Min. order: ${{ promo.minOrderAmount }}</span>
+                  <span class="detail-item">Min. order: R{{ promo.minOrderAmount }}</span>
                 }
                 @if (promo.maxDiscount > 0) {
-                  <span class="detail-item">Max discount: ${{ promo.maxDiscount }}</span>
+                  <span class="detail-item">Max discount: R{{ promo.maxDiscount }}</span>
                 }
                 <span class="detail-item">{{ getRemainingUses(promo) }}</span>
               </div>

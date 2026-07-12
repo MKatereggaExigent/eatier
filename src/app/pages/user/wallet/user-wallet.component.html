@@ -201,7 +201,7 @@
               <div class="conversion-body">
                 <div class="conversion-input-group">
                   <label>Points to convert</label>
-                  <input type="number" [ngModel]="pointsToConvert()" (ngModelChange)="pointsToConvert.set(Revent)" min="100" [max]="wallet()!.loyaltyPoints" step="100">
+                  <input type="number" [ngModel]="pointsToConvert()" (ngModelChange)="pointsToConvert.set($event)" min="100" [max]="wallet()!.loyaltyPoints" step="100">
                 </div>
                 <div class="conversion-result">
                   <span class="result-label">You'll receive</span>

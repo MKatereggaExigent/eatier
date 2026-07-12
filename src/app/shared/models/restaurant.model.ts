@@ -38,10 +38,10 @@ export enum CuisineType {
 }
 
 export enum PriceRange {
-  BUDGET = '$',
-  MODERATE = '$$',
-  EXPENSIVE = '$$$',
-  FINE_DINING = '$$$$'
+  BUDGET = 'R',
+  MODERATE = 'RR',
+  EXPENSIVE = 'RRR',
+  FINE_DINING = 'RRRR'
 }
 
 export interface Location {

@@ -10,7 +10,7 @@ let lastRatesUpdate = null;
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 
 // Free exchange rate API (no key required)
-const EXCHANGE_RATE_API = 'https://api.exchangerate-api.com/v4/latest/UGX';
+const EXCHANGE_RATE_API = 'https://api.exchangerate-api.com/v4/latest/ZAR';
 
 /**
  * Country to currency mapping
@@ -42,16 +42,16 @@ function getCurrencyFromIP(ipAddress) {
 
     // Handle localhost
     if (ipAddress === '127.0.0.1' || ipAddress === '::1' || ipAddress === 'localhost') {
-      console.log('   Localhost detected - using default UGX');
-      return { currency: BASE_CURRENCY, country: 'UG' };
+      console.log('   Localhost detected - using default ZAR');
+      return { currency: BASE_CURRENCY, country: 'ZA' };
     }
 
     // Get geolocation from IP
     const geo = geoip.lookup(ipAddress);
     
     if (!geo) {
-      console.log('   IP lookup failed - using default UGX');
-      return { currency: BASE_CURRENCY, country: 'UG' };
+      console.log('   IP lookup failed - using default ZAR');
+      return { currency: BASE_CURRENCY, country: 'ZA' };
     }
 
     const country = geo.country;
@@ -82,7 +82,7 @@ async function updateExchangeRates() {
       lastRatesUpdate = Date.now();
       
       console.log('✅ Exchange rates updated successfully');
-      console.log('   Sample rates: 1 UGX =', {
+      console.log('   Sample rates: 1 ZAR =', {
         USD: exchangeRates.USD?.toFixed(6),
         ZAR: exchangeRates.ZAR?.toFixed(6),
         KES: exchangeRates.KES?.toFixed(6)
@@ -132,23 +132,23 @@ async function getExchangeRates() {
 }
 
 /**
- * Convert amount from UGX to target currency
+ * Convert amount from ZAR to target currency
  */
-async function convertCurrency(amountInUGX, targetCurrency) {
+async function convertCurrency(amountInZAR, targetCurrency) {
   if (targetCurrency === BASE_CURRENCY) {
-    return amountInUGX; // No conversion needed
+    return amountInZAR; // No conversion needed
   }
 
   const rates = await getExchangeRates();
   const rate = rates[targetCurrency];
 
   if (!rate) {
-    console.warn(`⚠️  No exchange rate for ${targetCurrency}, using UGX`);
-    return amountInUGX;
+    console.warn(`⚠️  No exchange rate for ${targetCurrency}, using ZAR`);
+    return amountInZAR;
   }
 
-  const converted = amountInUGX * rate;
-  console.log(`💱 Converted ${amountInUGX} UGX → ${converted.toFixed(2)} ${targetCurrency}`);
+  const converted = amountInZAR * rate;
+  console.log(`💱 Converted ${amountInZAR} ZAR → ${converted.toFixed(2)} ${targetCurrency}`);
   
   return Math.round(converted * 100) / 100; // Round to 2 decimal places
 }

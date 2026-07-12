@@ -514,7 +514,7 @@
       @if (selectedPlan()) {
         <div class="selected-plan-summary">
           <div class="plan-summary-name">{{ selectedPlan()?.name }} Plan</div>
-          <div class="plan-summary-price">${{ getPlanPrice(selectedPlan()!) }}/{{ billingCycle() === 'yearly' ? 'year' : 'month' }}</div>
+          <div class="plan-summary-price">R{{ getPlanPrice(selectedPlan()!) }}/{{ billingCycle() === 'yearly' ? 'year' : 'month' }}</div>
         </div>
       }
 
@@ -619,7 +619,7 @@
               <span class="loading-spinner"></span>
               Processing...
             } @else if (selectedPlan()) {
-              Pay ${{ getPlanPrice(selectedPlan()!) }}
+              Pay R{{ getPlanPrice(selectedPlan()!) }}
             } @else {
               Add Payment Method
             }

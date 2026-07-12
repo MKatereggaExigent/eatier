@@ -47,6 +47,12 @@ export class StoriesService {
     return this.http.post<Story>(`${environment.apiUrl}/stories`, { mediaUrl, mediaType, caption });
   }
 
+  uploadStoryMedia(file: File): Observable<{ mediaUrl: string; mediaType: string }> {
+    const formData = new FormData();
+    formData.append('media', file);
+    return this.http.post<{ mediaUrl: string; mediaType: string }>(`${environment.apiUrl}/stories/upload`, formData);
+  }
+
   markViewed(storyId: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${environment.apiUrl}/stories/${storyId}/view`, {});
   }

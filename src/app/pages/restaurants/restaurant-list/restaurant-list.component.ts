@@ -213,12 +213,12 @@ export class RestaurantListComponent implements OnInit {
    */
   private convertPriceRangeToSymbol(priceRange?: string): string {
     const priceMap: { [key: string]: string } = {
-      'budget': '$',      // $0-15 average
-      'moderate': '$$',   // $16-30 average
-      'expensive': '$$$', // $31-60 average
-      'luxury': '$$$$'    // $61+ average
+      'budget': 'R',      // R0-15 average
+      'moderate': 'RR',   // R16-30 average
+      'expensive': 'RRR', // R31-60 average
+      'luxury': 'RRRR'    // R61+ average
     };
-    return priceMap[priceRange || 'moderate'] || '$$';
+    return priceMap[priceRange || 'moderate'] || 'RR';
   }
 
   private isBusinessOpen(opensAt?: string, closesAt?: string): boolean {

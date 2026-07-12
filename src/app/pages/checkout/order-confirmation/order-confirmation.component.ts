@@ -66,7 +66,7 @@ export class OrderConfirmationComponent implements OnInit {
   }
 
   formatPrice(amount: number): string {
-    return `UGX ${amount.toLocaleString()}`;
+    return `R ${amount.toLocaleString()}`;
   }
 
   goToOrders(): void {

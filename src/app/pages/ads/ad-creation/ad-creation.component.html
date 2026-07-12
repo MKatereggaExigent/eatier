@@ -69,7 +69,7 @@
                     <div class="radio-card-body">
                       <div class="radio-card-top">
                         <span class="radio-card-title">{{ adType.label }}</span>
-                        <span class="radio-card-price">From ${{ adType.minBudget }}/day</span>
+                        <span class="radio-card-price">From R{{ adType.minBudget }}/day</span>
                       </div>
                       <p class="radio-card-desc">{{ adType.description }}</p>
                     </div>
@@ -146,7 +146,7 @@
                     <div class="placement-card" [class.selected]="selectedPlacement()?.id === placement.id" (click)="selectPlacement(placement)">
                       <div class="placement-top">
                         <span class="placement-name">{{ placement.displayName }}</span>
-                        <span class="placement-price">${{ placement.priceDaily }}/day</span>
+                        <span class="placement-price">R{{ placement.priceDaily }}/day</span>
                       </div>
                       <p class="placement-desc">{{ placement.description }}</p>
                       <div class="placement-meta">
@@ -163,7 +163,7 @@
                 <h4>Your Selection</h4>
                 <div class="sb-row"><span>Tier:</span><strong>{{ selectedTier()?.displayName }}</strong></div>
                 <div class="sb-row"><span>Placement:</span><strong>{{ selectedPlacement()?.displayName }}</strong></div>
-                <div class="sb-row sb-total"><span>Daily Cost:</span><strong>${{ (selectedTier()?.basePriceDaily || 0) + (selectedPlacement()?.priceDaily || 0) }}</strong></div>
+                <div class="sb-row sb-total"><span>Daily Cost:</span><strong>R{{ (selectedTier()?.basePriceDaily || 0) + (selectedPlacement()?.priceDaily || 0) }}</strong></div>
               </div>
             }
           </form>
@@ -398,7 +398,7 @@
             <div class="info-box">
               <div class="info-body">
                 <h3>Budget Recommendations</h3>
-                <p>Start with a modest budget and increase based on performance. Minimum spend is ${{ selectedAdType()?.minBudget || 5 }}/day for {{ selectedAdType()?.label || 'this' }} ads.</p>
+                <p>Start with a modest budget and increase based on performance. Minimum spend is R{{ selectedAdType()?.minBudget || 5 }}/day for {{ selectedAdType()?.label || 'this' }} ads.</p>
               </div>
             </div>
             <div class="form-group">
@@ -488,8 +488,8 @@
               <div class="summary-grid">
                 <div class="si"><span class="si-label">Campaign Name:</span><span class="si-val">{{ basicInfoForm.get('title')?.value || 'Untitled Campaign' }}</span></div>
                 <div class="si"><span class="si-label">Ad Type:</span><span class="si-val">{{ selectedAdType()?.label || 'Not selected' }}</span></div>
-                <div class="si"><span class="si-label">Total Budget:</span><span class="si-val">${{ budgetForm.get('totalBudget')?.value || 0 }}</span></div>
-                <div class="si"><span class="si-label">Daily Budget:</span><span class="si-val">${{ budgetForm.get('dailyBudget')?.value || 0 }}</span></div>
+                <div class="si"><span class="si-label">Total Budget:</span><span class="si-val">R{{ budgetForm.get('totalBudget')?.value || 0 }}</span></div>
+                <div class="si"><span class="si-label">Daily Budget:</span><span class="si-val">R{{ budgetForm.get('dailyBudget')?.value || 0 }}</span></div>
                 <div class="si"><span class="si-label">Target Countries:</span><span class="si-val">{{ (targetingForm.get('countries')?.value || []).join(', ') || 'Not selected' }}</span></div>
                 <div class="si"><span class="si-label">Start Date:</span><span class="si-val">{{ scheduleForm.get('startDate')?.value || 'Not set' }}</span></div>
               </div>
