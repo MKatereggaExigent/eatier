@@ -11,18 +11,22 @@
     </div>
 
     <!-- Stories Bar -->
-    @if (storyUsers().length > 0) {
-      <div class="stories-bar">
-        @for (su of storyUsers(); track su.user.id) {
-          <button class="story-ring" (click)="openStoryViewer(su)">
-            <div class="ring-avatar">
-              <img [src]="su.user.avatar || getActorAvatarUrl(su.user.firstName + ' ' + su.user.lastName)" [alt]="su.user.firstName">
-            </div>
-            <span class="ring-name">{{ su.user.firstName }}</span>
-          </button>
-        }
-      </div>
-    }
+    <div class="stories-bar">
+      <button class="story-ring create-story" (click)="openStoryCreate()">
+        <div class="ring-avatar create-avatar">
+          <lucide-icon [img]="Plus" [size]="22"></lucide-icon>
+        </div>
+        <span class="ring-name">Your Story</span>
+      </button>
+      @for (su of storyUsers(); track su.user.id) {
+        <button class="story-ring" (click)="openStoryViewer(su)">
+          <div class="ring-avatar">
+            <img [src]="su.user.avatar || getActorAvatarUrl(su.user.firstName + ' ' + su.user.lastName)" [alt]="su.user.firstName">
+          </div>
+          <span class="ring-name">{{ su.user.firstName }}</span>
+        </button>
+      }
+    </div>
 
     <!-- Post Creation -->
     <div class="post-create">
@@ -108,7 +112,7 @@
                   {{ post.like_count }} {{ post.like_count === 1 ? 'like' : 'likes' }}
                 </button>
                 <button class="stat-btn" (click)="toggleComments(post.id)">
-                  <lucide-icon [img]="MessageCircleIcon" [size]="14"></lucide-icon>
+                  <lucide-icon [img]="MessageCircle" [size]="14"></lucide-icon>
                   {{ post.comment_count }} {{ post.comment_count === 1 ? 'comment' : 'comments' }}
                 </button>
               </div>
@@ -118,7 +122,7 @@
                   <span>{{ post.is_liked ? 'Liked' : 'Like' }}</span>
                 </button>
                 <button class="pa-btn" (click)="toggleComments(post.id)">
-                  <lucide-icon [img]="MessageCircleIcon" [size]="18"></lucide-icon>
+                  <lucide-icon [img]="MessageCircle" [size]="18"></lucide-icon>
                   <span>Comment</span>
                 </button>
                 <button class="pa-btn">
@@ -140,7 +144,7 @@
                             {{ comment.like_count }} {{ comment.like_count === 1 ? 'like' : 'likes' }}
                           </button>
                           <button class="ca-btn" (click)="setReplyToComment(post.id, comment.id)">
-                            <lucide-icon [img]="MessageCircleIcon" [size]="12"></lucide-icon>
+                            <lucide-icon [img]="MessageCircle" [size]="12"></lucide-icon>
                             Reply
                           </button>
                           <button class="ca-btn">
@@ -384,6 +388,49 @@
         @for (s of viewingStoryUser()!.stories; track s.id; let i = $index) {
           <div class="sv-progress-bar" [class.active]="i <= currentStoryIndex()"></div>
         }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Story Creation Modal -->
+@if (showStoryCreate()) {
+  <div class="story-overlay" (click)="closeStoryCreate()">
+    <div class="story-viewer" (click)="$event.stopPropagation()" style="max-width: 480px;">
+      <div class="sv-header">
+        <strong>Create Story</strong>
+        <button class="sv-close" (click)="closeStoryCreate()">&times;</button>
+      </div>
+      <div style="padding: 1.5rem;">
+        @if (storyPreview()) {
+          <div style="margin-bottom: 1rem; border-radius: 12px; overflow: hidden; max-height: 300px;">
+            <img [src]="storyPreview()" alt="Story preview" style="width: 100%; max-height: 300px; object-fit: contain; display: block;">
+          </div>
+        } @else {
+          <div style="margin-bottom: 1rem; padding: 3rem; background: #F1F5F9; border-radius: 12px; text-align: center; color: #94A3B8;">
+            <lucide-icon [img]="Camera" [size]="32"></lucide-icon>
+            <p style="margin: 0.5rem 0 0;">Select an image or video</p>
+          </div>
+        }
+
+        <input type="file" id="storyFileInput" accept="image/*,video/*" (change)="onStoryFileSelected($event)" style="display: none;">
+
+        @if (storyError()) {
+          <div style="background: #FEF2F2; color: #DC2626; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.875rem;">{{ storyError() }}</div>
+        }
+
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" style="flex: 1; padding: 0.7rem 1rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: #F1F5F9; color: #334155;" (click)="triggerStoryFileInput()" [disabled]="creatingStory()">
+            Select Media
+          </button>
+          @if (storyFile()) {
+            <button type="button" style="flex: 1; padding: 0.7rem 1rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: #FF8C00; color: white;" (click)="createStory()" [disabled]="creatingStory()">
+              {{ creatingStory() ? 'Posting...' : 'Post Story' }}
+            </button>
+          }
+        </div>
+
+        <p style="font-size: 0.8rem; color: #94A3B8; margin-top: 1rem;">Stories expire after 24 hours. Max 20MB.</p>
       </div>
     </div>
   </div>

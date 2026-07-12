@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Star, Users, Heart, MessageCircle, Share2, Search, UserPlus, MessageSquare, BookOpen, GraduationCap, Handshake, Calendar, User, Camera, Send, ThumbsUp, RefreshCw, MessageCircle as MessageCircleIcon } from 'lucide-angular';
+import { LucideAngularModule, Star, Users, Heart, MessageCircle, Share2, Search, UserPlus, MessageSquare, BookOpen, GraduationCap, Handshake, Calendar, User, Camera, Send, ThumbsUp, RefreshCw, Plus } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
 import { SocialWidgetComponent } from '../../../shared/components/social-widget/social-widget.component';
 import { MessagingWidgetComponent } from '../../../shared/components/messaging-widget/messaging-widget.component';
@@ -71,7 +71,7 @@ export class UserSocialComponent implements OnInit {
   readonly Send = Send;
   readonly ThumbsUp = ThumbsUp;
   readonly RefreshCw = RefreshCw;
-  readonly MessageCircleIcon = MessageCircleIcon;
+  readonly Plus = Plus;
 
   loading = signal(true);
   discoverLoading = signal(false);
@@ -100,6 +100,13 @@ export class UserSocialComponent implements OnInit {
   newPostImages = signal<string[]>([]);
   isCreatingPost = signal(false);
   postError = signal('');
+
+  // Story creation
+  showStoryCreate = signal(false);
+  storyFile = signal<File | null>(null);
+  storyPreview = signal<string | null>(null);
+  creatingStory = signal(false);
+  storyError = signal<string | null>(null);
 
   // Story viewer
   viewingStoryUser = signal<StoryUser | null>(null);
@@ -436,6 +443,78 @@ export class UserSocialComponent implements OnInit {
     if (prevIndex >= 0) {
       this.currentStoryIndex.set(prevIndex);
     }
+  }
+
+  // ===== STORY CREATION =====
+  openStoryCreate(): void {
+    this.storyFile.set(null);
+    this.storyPreview.set(null);
+    this.storyError.set(null);
+    this.showStoryCreate.set(true);
+  }
+
+  closeStoryCreate(): void {
+    this.showStoryCreate.set(false);
+    this.storyFile.set(null);
+    this.storyPreview.set(null);
+    this.storyError.set(null);
+  }
+
+  onStoryFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+        this.storyError.set('Please select an image or video file');
+        return;
+      }
+      if (file.size > 20 * 1024 * 1024) {
+        this.storyError.set('File size must be less than 20MB');
+        return;
+      }
+      this.storyFile.set(file);
+      this.storyError.set(null);
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => this.storyPreview.set(e.target?.result as string);
+        reader.readAsDataURL(file);
+      } else {
+        this.storyPreview.set(null);
+      }
+    }
+  }
+
+  triggerStoryFileInput(): void {
+    document.getElementById('storyFileInput')?.click();
+  }
+
+  createStory(): void {
+    const file = this.storyFile();
+    if (!file) {
+      this.storyError.set('Please select a file first');
+      return;
+    }
+    this.creatingStory.set(true);
+    this.storyError.set(null);
+    this.storiesService.uploadStoryMedia(file).subscribe({
+      next: (res) => {
+        this.storiesService.createStory(res.mediaUrl, res.mediaType).subscribe({
+          next: () => {
+            this.creatingStory.set(false);
+            this.closeStoryCreate();
+            this.loadStories();
+          },
+          error: (err) => {
+            this.creatingStory.set(false);
+            this.storyError.set(err.error?.error || 'Failed to create story');
+          }
+        });
+      },
+      error: (err) => {
+        this.creatingStory.set(false);
+        this.storyError.set(err.error?.error || 'Failed to upload media');
+      }
+    });
   }
 
   // ===== ACTIVITY FEED LOADING (for activity tab) =====

@@ -20,15 +20,13 @@ $radius-xl: 20px;
 .section {
   padding: 48px 24px;
   background: $bg-white;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   animation: fadeIn 0.3s ease-out;
 }
 
 .main-content {
   min-height: 0;
   overflow-y: auto;
-  overscroll-behavior: contain;
 }
 
 .section-inner {
@@ -37,7 +35,7 @@ $radius-xl: 20px;
   display: grid;
   grid-template-columns: 1fr 340px;
   gap: 32px;
-  height: calc(100vh - 96px);
+  align-items: start;
 }
 
 .page-header {
@@ -134,6 +132,16 @@ $radius-xl: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  &.create-story .ring-avatar {
+    background: $bg-muted;
+    border: 2px dashed $border-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-muted;
+    padding: 0;
   }
 }
 
@@ -808,6 +816,10 @@ $radius-xl: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  position: sticky;
+  top: 48px;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
 }
 
 .resources-section {
@@ -1004,10 +1016,13 @@ $radius-xl: 20px;
 // RESPONSIVE
 // ===================================
 @media (max-width: 1024px) {
-  .section-inner { grid-template-columns: 1fr; height: auto; }
-  .section { height: auto; overflow: visible; }
-  .main-content { overflow-y: visible; max-height: none; }
-  .social-sidebar { display: none; }
+  .section-inner { grid-template-columns: 1fr; }
+  .social-sidebar {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+    margin-top: 32px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1020,4 +1035,5 @@ $radius-xl: 20px;
   .post-images { grid-template-columns: 1fr; }
 
   .tabs .tab { font-size: 13px; padding: 8px 12px; }
+  .tabs { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
 }

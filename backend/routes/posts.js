@@ -37,10 +37,12 @@ router.post('/', authenticateToken, async (req, res) => {
 
     res.status(201).json({
       ...post,
-      user: userResult.rows[0],
-      likeCount: 0,
-      commentCount: 0,
-      isLiked: false
+      first_name: userResult.rows[0]?.first_name,
+      last_name: userResult.rows[0]?.last_name,
+      avatar_url: userResult.rows[0]?.avatar_url,
+      like_count: 0,
+      comment_count: 0,
+      is_liked: false
     });
   } catch (error) {
     await client.query('ROLLBACK');
