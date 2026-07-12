@@ -405,7 +405,7 @@
       <div class="modal-body">
         @if (storyPreview()) {
           <div class="preview-container">
-            @if (storyFile()?.type.startsWith('video/')) {
+            @if (storyFile()?.type?.startsWith('video/')) {
               <video [src]="storyPreview()" controls class="story-preview-media"></video>
             } @else {
               <img [src]="storyPreview()" alt="Story preview" class="story-preview-media" />
